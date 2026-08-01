@@ -108,8 +108,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(record)
       setIsAuthenticated(true)
+      pb.send('/backend/v1/audit/auth', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'login', identity: email }),
+        headers: { 'Content-Type': 'application/json' },
+      }).catch(() => {})
       return { error: null }
     } catch (error: unknown) {
+      pb.send('/backend/v1/audit/auth', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'login_failed', identity: email }),
+        headers: { 'Content-Type': 'application/json' },
+      }).catch(() => {})
       const err = error as { status?: number }
       if (err?.status === 0) {
         return { error: 'Erro de conexão. Verifique sua internet e tente novamente.' }
@@ -142,6 +152,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const signOut = () => {
+    pb.send('/backend/v1/audit/auth', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'logout' }),
+      headers: { 'Content-Type': 'application/json' },
+    }).catch(() => {})
     pb.authStore.clear()
     setUser(null)
     setIsAuthenticated(false)

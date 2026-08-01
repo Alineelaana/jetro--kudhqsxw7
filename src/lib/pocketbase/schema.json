@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T22:28:45.588Z",
+  "generatedAt": "2026-08-01T22:40:40.056Z",
   "collections": [
     {
       "name": "users",
@@ -1410,6 +1410,113 @@
         "CREATE INDEX idx_vitrine_items_display_page ON vitrine_items (display_page)",
         "CREATE INDEX idx_vitrine_items_type ON vitrine_items (type)",
         "CREATE INDEX idx_vitrine_items_active ON vitrine_items (active)"
+      ]
+    },
+    {
+      "name": "audit_logs",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.role = 'SUP'",
+        "view": "@request.auth.role = 'SUP'",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "module",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "target_collection",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "target_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "target_summary",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_value",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_value",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ip_address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_agent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_audit_logs_created ON audit_logs (created)",
+        "CREATE INDEX idx_audit_logs_module ON audit_logs (module)",
+        "CREATE INDEX idx_audit_logs_action ON audit_logs (action)",
+        "CREATE INDEX idx_audit_logs_user_role ON audit_logs (user_role)",
+        "CREATE INDEX idx_audit_logs_user_name ON audit_logs (user_name)",
+        "CREATE INDEX idx_audit_logs_target_collection ON audit_logs (target_collection)"
       ]
     }
   ]

@@ -21,6 +21,7 @@ import { PartnerManagement } from '@/components/partner-management'
 import { RequestFilters } from '@/components/request-filters'
 import { PaginationControls } from '@/components/pagination-controls'
 import { CmsPanel } from '@/components/cms/cms-panel'
+import { AuditPanel } from '@/components/audit-panel'
 import { filterRecords, extractAttendants } from '@/lib/request-filters'
 import { type BudgetRecord } from '@/lib/types'
 import {
@@ -173,6 +174,7 @@ export function AdminDashboard() {
           <TabsTrigger value="chat">Chat Online</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
           {isAdmin && <TabsTrigger value="cms">Gestão do Site</TabsTrigger>}
+          {isAdmin && <TabsTrigger value="auditoria">Auditoria</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6">
@@ -379,6 +381,11 @@ export function AdminDashboard() {
         {isAdmin && (
           <TabsContent value="cms">
             <CmsPanel />
+          </TabsContent>
+        )}
+        {isAdmin && (
+          <TabsContent value="auditoria">
+            <AuditPanel />
           </TabsContent>
         )}
       </Tabs>
