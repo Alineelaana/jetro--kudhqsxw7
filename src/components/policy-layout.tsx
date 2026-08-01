@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { FloatingWhatsApp } from '@/components/floating-whatsapp'
+import { FloatingChat } from '@/components/floating-chat'
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
