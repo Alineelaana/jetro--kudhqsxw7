@@ -26,18 +26,19 @@ export function HeroSection() {
   return (
     <section
       id="inicio"
-      className="relative overflow-hidden bg-[#01361D] text-white pt-10 pb-20 border-b border-[#C89B3C]/30 min-h-[90vh] flex flex-col justify-center"
+      className="relative overflow-hidden bg-black text-white pt-10 pb-20 border-b border-[#C89B3C]/30 min-h-[90vh] flex flex-col justify-center"
     >
-      {/* Background Warehouse Image with Brand Gradient Overlays */}
+      {/* Background Warehouse Image — fully visible with subtle dark gradient for text legibility only */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src={warehouseBg}
           alt="Operação de Armazenagem Velora Log Espírito Santo"
-          className="w-full h-full object-cover object-center opacity-45 sm:opacity-55 transition-all duration-700"
+          className="w-full h-full object-cover object-center opacity-100 transition-all duration-700"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#01361D]/90 via-[#01361D]/75 to-[#01361D]/95 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_10%,_#01361D_90%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(0,91,46,0.4),transparent_70%)]" />
+        {/* Neutral dark gradient (bottom-heavy) for text legibility — no green tint */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
+        {/* Subtle vignette for focus — neutral, not green */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_rgba(0,0,0,0.5)_100%)]" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 pt-4">
@@ -51,18 +52,18 @@ export function HeroSection() {
             />
           </div>
 
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#005B2E]/80 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
             <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
             <span>Infraestrutura Própria & Operação em Tempo Real no ES</span>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-md">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             Sua Operação Logística Integrada com Precisão, Agilidade e{' '}
             <span className="gold-gradient-text">Padrão Premium</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed font-normal">
+          <p className="text-base sm:text-lg text-white/95 max-w-2xl mx-auto leading-relaxed font-normal drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
             Especialistas em armazenagem de alta capacidade com tecnologia WMS, movimentação de
             cargas, picking & packing, logística portuária e distribuição no Espírito Santo e todo o
             Brasil.
@@ -106,7 +107,7 @@ export function HeroSection() {
           {DIFFERENTIALS.map((item) => (
             <div
               key={item.label}
-              className="flex items-center gap-3 bg-[#01361D]/70 p-4 rounded-xl border border-[#C89B3C]/30 backdrop-blur hover:border-[#C89B3C] hover:bg-[#005B2E]/50 transition-all shadow-md group"
+              className="flex items-center gap-3 bg-black/60 p-4 rounded-xl border border-[#C89B3C]/30 backdrop-blur hover:border-[#C89B3C] hover:bg-black/70 transition-all shadow-md group"
             >
               <div className="w-10 h-10 rounded-lg bg-[#005B2E] border border-[#C89B3C]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <item.icon className="w-5 h-5 text-[#E4C46A]" />
