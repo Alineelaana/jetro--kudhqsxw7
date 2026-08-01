@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
+import warehouseBg from '@/assets/chatgpt-image-1-de-ago.de-2026-122134-e02ba.png'
 import {
   MessageCircle,
   FileText,
@@ -27,11 +28,16 @@ export function HeroSection() {
       id="inicio"
       className="relative overflow-hidden bg-[#01361D] text-white pt-10 pb-20 border-b border-[#C89B3C]/30 min-h-[90vh] flex flex-col justify-center"
     >
-      {/* Decorative gradient background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#005B2E]/60 via-[#01361D] to-[#01361D]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_rgba(0,91,46,0.3),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,_rgba(200,155,60,0.08),transparent_50%)]" />
+      {/* Background Warehouse Image with Brand Gradient Overlays */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <img
+          src={warehouseBg}
+          alt="Operação de Armazenagem Velora Log Espírito Santo"
+          className="w-full h-full object-cover object-center opacity-45 sm:opacity-55 transition-all duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#01361D]/90 via-[#01361D]/75 to-[#01361D]/95 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_10%,_#01361D_90%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(0,91,46,0.4),transparent_70%)]" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 pt-4">
