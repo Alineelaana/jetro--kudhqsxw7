@@ -95,8 +95,8 @@ export default function ClientArea() {
   ].filter((d) => d.file)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#01361D] text-white py-4 px-4 shadow-lg sticky top-0 z-40">
+    <div className="min-h-[calc(100vh-6rem)] bg-gray-50">
+      <header className="bg-[#01361D] text-white py-4 px-4 shadow-lg">
         <div className="container mx-auto flex items-center justify-between">
           <h1 className="text-lg sm:text-xl font-black">Área do Cliente — Velora Log</h1>
           <Button

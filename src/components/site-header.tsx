@@ -8,37 +8,52 @@ import { Menu, MessageCircle } from 'lucide-react'
 import logoGreenBg from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-a43e3.png'
 
 const NAV_LINKS = [
-  { label: 'Início', href: '#inicio' },
-  { label: 'Serviços', href: '#servicos' },
-  { label: 'Orçamento', href: '#orcamento' },
-  { label: 'Contato', href: '#contato' },
+  { label: 'Início', to: '/' },
+  { label: 'Serviços', to: '/#servicos' },
+  { label: 'Orçamento', to: '/#orcamento' },
+  { label: 'Contato', to: '/#contato' },
 ]
 
 export function SiteHeader() {
   const { whatsappNumber } = useSettings()
   const [open, setOpen] = useState(false)
 
+  const handleHomeClick = () => {
+    setOpen(false)
+    if (window.location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const handleMobileNavClick = (to: string) => {
+    setOpen(false)
+    if (to === '/' && window.location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[#01361D] border-b border-[#C89B3C]/30 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-24">
-          <a href="#inicio" className="flex items-center gap-2 group">
+          <Link to="/" onClick={handleHomeClick} className="flex items-center gap-2 group">
             <img
               src={logoGreenBg}
               alt="Velora Log"
               className="h-16 sm:h-20 w-auto object-contain transition-transform group-hover:scale-105 rounded-lg"
             />
-          </a>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
-              <a
-                key={link.href + link.label}
-                href={link.href}
+              <Link
+                key={link.to + link.label}
+                to={link.to}
+                onClick={link.to === '/' ? handleHomeClick : undefined}
                 className="text-sm font-bold text-white/80 hover:text-[#E4C46A] transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -84,22 +99,24 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-80 bg-white">
               <SheetTitle className="mb-6">
-                <img
-                  src={logoGreenBg}
-                  alt="Velora Log"
-                  className="h-16 w-auto object-contain rounded-lg"
-                />
+                <Link to="/" onClick={handleHomeClick}>
+                  <img
+                    src={logoGreenBg}
+                    alt="Velora Log"
+                    className="h-16 w-auto object-contain rounded-lg"
+                  />
+                </Link>
               </SheetTitle>
               <nav className="flex flex-col gap-4">
                 {NAV_LINKS.map((link) => (
-                  <a
-                    key={link.href + link.label}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
+                  <Link
+                    key={link.to + link.label}
+                    to={link.to}
+                    onClick={() => handleMobileNavClick(link.to)}
                     className="text-base font-bold text-foreground hover:text-[#005B2E] transition-colors py-1"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
                 <Button
                   asChild

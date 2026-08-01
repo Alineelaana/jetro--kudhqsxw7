@@ -32,16 +32,16 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/cadastro" element={<AdminRegister />} />
+                <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
+                <Route path="/cliente/login" element={<ClientLogin />} />
+                <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
+                <Route path="/cliente" element={<ClientArea />} />
+                <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+                <Route path="/politica-comercial" element={<PoliticaComercial />} />
+                <Route path="/termos-de-uso" element={<TermosDeUso />} />
+                <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
-              <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
-              <Route path="/cliente/login" element={<ClientLogin />} />
-              <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
-              <Route path="/cliente" element={<ClientArea />} />
-              <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
-              <Route path="/politica-comercial" element={<PoliticaComercial />} />
-              <Route path="/termos-de-uso" element={<TermosDeUso />} />
-              <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
-              <Route path="*" element={<NotFound />} />
             </Routes>
           </ClientAuthProvider>
         </SettingsProvider>
