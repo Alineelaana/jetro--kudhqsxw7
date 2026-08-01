@@ -77,7 +77,7 @@ export default function PoliticaCookies() {
       <div className="border-t border-[#C89B3C]/30 pt-6 mt-8">
         <p className="text-sm text-muted-foreground">
           Em caso de dúvidas sobre esta Política de Cookies, entre em contato pelo WhatsApp (31)
-          99129-7619 ou e-mail contato@veloralog.com.br.
+          99129-7619.
         </p>
       </div>
     </PolicyLayout>

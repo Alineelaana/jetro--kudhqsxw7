@@ -11,11 +11,9 @@ import {
   Bus,
   CheckCircle2,
   FileText,
-  MessageCircle,
   type LucideIcon,
 } from 'lucide-react'
 import type { ServiceItem } from '@/lib/constants'
-import { buildWhatsAppUrl } from '@/lib/utils'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Warehouse,
@@ -29,11 +27,10 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 interface ServiceCardProps {
   service: ServiceItem
-  whatsappNumber: string
   onSelect?: (title: string) => void
 }
 
-export function ServiceCard({ service, whatsappNumber, onSelect }: ServiceCardProps) {
+export function ServiceCard({ service, onSelect }: ServiceCardProps) {
   const Icon = ICON_MAP[service.icon] || Warehouse
 
   const handleQuoteClick = () => {
@@ -91,7 +88,7 @@ export function ServiceCard({ service, whatsappNumber, onSelect }: ServiceCardPr
         </CardContent>
       </div>
 
-      <div className="p-6 pt-2 space-y-2">
+      <div className="p-6 pt-2">
         <Button
           onClick={handleQuoteClick}
           className={`w-full font-extrabold shadow-md ${
@@ -102,24 +99,6 @@ export function ServiceCard({ service, whatsappNumber, onSelect }: ServiceCardPr
         >
           <FileText className="w-4 h-4 mr-2" />
           Solicitar Orçamento
-        </Button>
-
-        <Button
-          asChild
-          variant="outline"
-          className="w-full text-xs font-bold border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10"
-        >
-          <a
-            href={buildWhatsAppUrl(
-              whatsappNumber,
-              `Olá! Gostaria de cotar ${service.title} na Velora Log.`,
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
-            Cotar no WhatsApp
-          </a>
         </Button>
       </div>
     </Card>

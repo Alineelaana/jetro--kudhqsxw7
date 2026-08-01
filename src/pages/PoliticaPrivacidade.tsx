@@ -89,9 +89,8 @@ export default function PoliticaPrivacidade() {
       <h2 className="text-xl font-bold text-[#005B2E] pt-4">7. Como Exercer Seus Direitos</h2>
       <p>
         Para exercer qualquer um dos direitos listados acima, entre em contato com a Velora Log por
-        meio do WhatsApp <strong className="text-[#005B2E]">(31) 99129-7619</strong> ou pelo e-mail{' '}
-        <strong className="text-[#005B2E]">contato@veloralog.com.br</strong>. Sua solicitação será
-        analisada e respondida no prazo estabelecido pela LGPD.
+        meio do WhatsApp <strong className="text-[#005B2E]">(31) 99129-7619</strong>. Sua
+        solicitação será analisada e respondida no prazo estabelecido pela LGPD.
       </p>
 
       <h2 className="text-xl font-bold text-[#005B2E] pt-4">8. Alterações desta Política</h2>
@@ -104,7 +103,7 @@ export default function PoliticaPrivacidade() {
       <div className="border-t border-[#C89B3C]/30 pt-6 mt-8">
         <p className="text-sm text-muted-foreground">
           Em caso de dúvidas sobre esta Política de Privacidade, entre em contato pelo WhatsApp (31)
-          99129-7619 ou e-mail contato@veloralog.com.br.
+          99129-7619.
         </p>
       </div>
     </PolicyLayout>

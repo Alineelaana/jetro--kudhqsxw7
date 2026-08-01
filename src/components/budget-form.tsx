@@ -222,7 +222,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border/60">
+          <div className="space-y-4 pt-6 border-t border-border/60">
             <ConsentCheckbox
               checked={consentAccepted}
               onChange={(checked) => {
@@ -234,7 +234,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
             <Button
               type="submit"
               size="lg"
-              className="flex-1 bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-14 rounded-xl"
+              className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-14 rounded-xl"
               disabled={status === 'submitting'}
             >
               {status === 'submitting' ? (
@@ -248,24 +248,6 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
                   Enviar Solicitação de Orçamento
                 </>
               )}
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="flex-1 border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10 font-bold h-14 rounded-xl"
-            >
-              <a
-                href={buildWhatsAppUrl(
-                  whatsappNumber,
-                  'Olá! Quero solicitar um orçamento de logística direto pelo WhatsApp da Velora Log.',
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                Orçamento Direto no WhatsApp
-              </a>
             </Button>
           </div>
         </form>

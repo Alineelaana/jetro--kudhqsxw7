@@ -13,8 +13,8 @@ export default function PoliticaComercial() {
 
       <h2 className="text-xl font-bold text-[#005B2E] pt-4">1. Escopo dos Serviços</h2>
       <p>
-        A Velora Log oferece soluções logísticas completas no Espírito Santo e abrangência nacional,
-        compreendendo:
+        A Velora Log oferece soluções logísticas completas. Atendemos em todo o estado do Espírito
+        Santo, compreendendo:
       </p>
       <ul className="list-disc pl-6 space-y-1">
         <li>Armazenagem de produtos com gestão WMS, controle de lotes e validade;</li>
@@ -38,7 +38,7 @@ export default function PoliticaComercial() {
         <li>
           A equipe comercial da Velora Log analisa a solicitação e responde com uma cotação
           detalhada por meio do canal de contato fornecido (WhatsApp{' '}
-          <strong className="text-[#005B2E]">(31) 99129-7619</strong> ou e-mail);
+          <strong className="text-[#005B2E]">(31) 99129-7619</strong>);
         </li>
         <li>
           A cotação inclui escopo, prazos estimados, condições comerciais e validade da proposta;

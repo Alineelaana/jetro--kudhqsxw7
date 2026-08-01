@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import { MessageCircle, Phone, Mail, MapPin } from 'lucide-react'
+import { MessageCircle, Phone, MapPin } from 'lucide-react'
 import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
 import truckBg from '@/assets/chatgpt-image-1-de-ago.de-2026-123806-850fe.png'
 
@@ -13,18 +13,17 @@ export function FinalCTA() {
       id="contato"
       className="py-16 sm:py-24 text-white border-t border-[#C89B3C]/40 relative overflow-hidden bg-black"
     >
-      {/* High-impact branded background banner */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <img
           src={truckBg}
           alt="Velora Log Operações Logísticas"
-          className="w-full h-full object-cover object-center brightness-90 transition-all duration-700"
+          className="w-full h-full object-cover object-center brightness-90 transition-all duration-700 truck-animate"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-[#01361D]/75 to-black/90 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-6 bg-black/50 p-6 sm:p-10 rounded-2xl border border-[#C89B3C]/35 backdrop-blur-md shadow-2xl">
+        <div className="max-w-3xl mx-auto text-center space-y-6 p-6 sm:p-10">
           <div className="flex justify-center mb-2">
             <img
               src={logoDark}
@@ -33,11 +32,11 @@ export function FinalCTA() {
             />
           </div>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.95),0_0_3px_rgba(0,0,0,1)]">
             Pronto para elevar a eficiência da sua cadeia logística?
           </h2>
 
-          <p className="text-white/90 text-base sm:text-lg max-w-xl mx-auto font-medium drop-shadow">
+          <p className="text-white text-base sm:text-lg max-w-xl mx-auto font-medium [text-shadow:0_2px_6px_rgba(0,0,0,0.95),0_0_2px_rgba(0,0,0,1)]">
             Fale diretamente com os consultores operacionais da Velora Log e solicite um projeto
             personalizado para sua empresa.
           </p>
@@ -62,18 +61,14 @@ export function FinalCTA() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-8 border-t border-white/20 text-white/90 text-xs sm:text-sm font-medium">
-            <div className="flex items-center justify-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-8 border-t border-white/20 text-white text-xs sm:text-sm font-medium">
+            <div className="flex items-center justify-center gap-2 [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]">
               <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-[#E4C46A]" />
               <span>(31) 99129-7619</span>
             </div>
-            <div className="flex items-center justify-center gap-2">
-              <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-[#E4C46A]" />
-              <span>contato@veloralog.com.br</span>
-            </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]">
               <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-[#E4C46A]" />
-              <span>Espírito Santo, Brasil</span>
+              <span>Atendemos em todo o estado do Espírito Santo</span>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { MapPin, Phone, Clock } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { POLICY_LINKS } from '@/lib/policy-links'
 import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
@@ -60,16 +60,12 @@ export function SiteFooter() {
                 <span>Central: (31) 99129-7619</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#C89B3C]" />
-                <span>E-mail: contato@veloralog.com.br</span>
-              </li>
-              <li className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#C89B3C]" />
                 <span>Atendimento: Seg. a Sex. 08h às 18h</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#C89B3C]" />
-                <span>Espírito Santo & Atendimento Nacional</span>
+                <span>Atendemos em todo o estado do Espírito Santo</span>
               </li>
             </ul>
           </div>

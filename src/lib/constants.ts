@@ -28,9 +28,9 @@ export const SERVICES: ServiceItem[] = [
     title: 'Transporte de Cargas',
     shortTitle: 'Transporte de Cargas',
     description:
-      'Transporte rodoviário de cargas fracionadas e dedicadas com seguro total, monitoramento em tempo real e abrangência no ES e em todo o Brasil.',
+      'Transporte rodoviário de cargas fracionadas e dedicadas com monitoramento em tempo real. Atendemos em todo o estado do Espírito Santo.',
     icon: 'Truck',
-    tags: ['Carga Lotação', 'Carga Fracionada', 'Seguro Total', 'Rastreamento 24h'],
+    tags: ['Carga Lotação', 'Carga Fracionada', 'Sistema de Rastreamento'],
   },
   {
     id: 'distribuicao-urbana',
@@ -64,9 +64,13 @@ export const SERVICES: ServiceItem[] = [
     title: 'Cross Docking',
     shortTitle: 'Cross Docking',
     description:
-      'Processo ágil de triagem e redistribuição imediata de produtos sem custo de estocagem prolongada, reduzindo lead time.',
+      'Triagem e redistribuição imediata de produtos com agilidade na transferência de mercadorias entre modais, reduzindo lead time.',
     icon: 'ArrowLeftRight',
-    tags: ['Triagem Rápida', 'Zero Estoque Parado', 'Redução de Lead Time'],
+    tags: [
+      'Triagem Rápida',
+      'Agilidade na transferência de mercadorias entre modais',
+      'Redução de Lead Time',
+    ],
   },
   {
     id: 'gestao-frota',
@@ -75,7 +79,7 @@ export const SERVICES: ServiceItem[] = [
     description:
       'Telemetria avançada, gerenciamento de risco e condutores qualificados para garantir a segurança integral do seu patrimônio.',
     icon: 'Bus',
-    tags: ['Telemetria 24/7', 'Gerenciamento de Risco', 'Frota Rastreada'],
+    tags: ['Telemetria', 'Gerenciamento de Risco', 'Frota Rastreada'],
   },
 ]
 
@@ -92,7 +96,7 @@ export interface DefaultFormField {
 
 export const DEFAULT_FORM_FIELDS: DefaultFormField[] = [
   { name: 'nome_completo', label: 'Nome Completo', type: 'text', required: true, order: 1 },
-  { name: 'empresa', label: 'Empresa', type: 'text', required: false, order: 2 },
+  { name: 'empresa', label: 'Empresa', type: 'text', required: true, order: 2 },
   { name: 'email', label: 'E-mail Corporativo', type: 'email', required: true, order: 3 },
   { name: 'telefone', label: 'Telefone / WhatsApp', type: 'tel', required: true, order: 4 },
   {
@@ -107,7 +111,7 @@ export const DEFAULT_FORM_FIELDS: DefaultFormField[] = [
     name: 'tipo_operacao',
     label: 'Tipo de Operação',
     type: 'select',
-    required: false,
+    required: true,
     order: 6,
     options: [
       'Armazenagem de Produtos em Estoque',
@@ -120,34 +124,34 @@ export const DEFAULT_FORM_FIELDS: DefaultFormField[] = [
     ],
   },
   { name: 'cidade_origem', label: 'Cidade de Origem', type: 'text', required: true, order: 7 },
-  { name: 'cidade_destino', label: 'Cidade de Destino', type: 'text', required: false, order: 8 },
+  { name: 'cidade_destino', label: 'Cidade de Destino', type: 'text', required: true, order: 8 },
   {
     name: 'tipo_mercadoria',
     label: 'Tipo de Mercadoria / Produto',
     type: 'text',
-    required: false,
+    required: true,
     order: 9,
   },
   {
     name: 'volume_estimado',
     label: 'Volume Estimado (Paletes, peso, caixas)',
     type: 'text',
-    required: false,
+    required: true,
     order: 10,
   },
   {
     name: 'periodicidade',
     label: 'Periodicidade da Operação',
     type: 'select',
-    required: false,
+    required: true,
     order: 11,
     options: ['Operação Única / Pontual', 'Contrato Recorrente', 'Projeto Urgente'],
   },
   {
     name: 'mensagem',
-    label: 'Observações / Detalhes da Operação',
+    label: 'Conte-nos um pouco sobre sua empresa / Operação',
     type: 'textarea',
-    required: false,
+    required: true,
     order: 12,
   },
 ]

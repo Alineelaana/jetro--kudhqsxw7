@@ -66,13 +66,13 @@ export function HeroSection() {
           {/* Main Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.9)] [text-shadow:0_2px_6px_rgba(0,0,0,0.95),0_0_2px_rgba(0,0,0,1)]">
             Sua Operação Logística Integrada com Precisão, Agilidade e{' '}
-            <span className="gold-gradient-text">Padrão Premium</span>
+            <span className="gold-gradient-text">Segurança</span>
           </h1>
 
           <p className="text-base sm:text-lg text-white/95 max-w-2xl mx-auto leading-relaxed font-normal [text-shadow:0_2px_6px_rgba(0,0,0,0.9),0_0_1px_rgba(0,0,0,1)]">
             Especialistas em armazenagem de alta capacidade com tecnologia WMS, movimentação de
-            cargas, picking & packing, logística portuária e distribuição no Espírito Santo e todo o
-            Brasil.
+            cargas, picking & packing, logística portuária e distribuição. Atendemos em todo o
+            estado do Espírito Santo.
           </p>
 
           {/* Call to Actions */}
