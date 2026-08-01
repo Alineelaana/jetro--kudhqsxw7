@@ -12,3 +12,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Add any other utility functions here
+
+export function buildWhatsAppUrl(number: string, message?: string): string {
+  const cleanNumber = number.replace(/\D/g, '')
+  const url = `https://wa.me/${cleanNumber}`
+  return message ? `${url}?text=${encodeURIComponent(message)}` : url
+}
