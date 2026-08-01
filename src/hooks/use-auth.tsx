@@ -23,16 +23,38 @@ export const useAuth = () => {
 const ADMIN_EMAIL = 'veloralog@veloralog.com'
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const initialRecord = pb.authStore.isValid
+    ? (pb.authStore.record as Record<string, unknown>)
+    : null
   const [user, setUser] = useState<Record<string, unknown> | null>(
-    pb.authStore.isValid ? (pb.authStore.record as Record<string, unknown>) : null,
+    initialRecord && initialRecord.active !== false ? initialRecord : null,
   )
-  const [isAuthenticated, setIsAuthenticated] = useState(pb.authStore.isValid)
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    pb.authStore.isValid && initialRecord?.active !== false,
+  )
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (
+      pb.authStore.isValid &&
+      pb.authStore.record &&
+      (pb.authStore.record as Record<string, unknown>).active === false
+    ) {
+      pb.authStore.clear()
+      setUser(null)
+      setIsAuthenticated(false)
+    }
+
     const unsubscribe = pb.authStore.onChange((_token, record) => {
-      setUser(pb.authStore.isValid ? (record as Record<string, unknown>) : null)
-      setIsAuthenticated(pb.authStore.isValid)
+      const rec = record as Record<string, unknown> | null
+      if (rec && rec.active === false) {
+        pb.authStore.clear()
+        setUser(null)
+        setIsAuthenticated(false)
+        return
+      }
+      setUser(pb.authStore.isValid && rec?.active !== false ? rec : null)
+      setIsAuthenticated(pb.authStore.isValid && rec?.active !== false)
     })
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined
@@ -41,7 +63,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       timeoutId = setTimeout(() => setLoading(false), 5000)
       pb.collection('users')
         .authRefresh()
-        .catch(() => pb.authStore.clear())
+        .then((res) => {
+          const rec = res.record as Record<string, unknown> | null
+          if (rec && rec.active === false) {
+            pb.authStore.clear()
+            setUser(null)
+            setIsAuthenticated(false)
+          } else {
+            setUser(rec)
+            setIsAuthenticated(true)
+          }
+        })
+        .catch(() => {
+          pb.authStore.clear()
+          setUser(null)
+          setIsAuthenticated(false)
+        })
         .finally(() => {
           if (timeoutId) clearTimeout(timeoutId)
           setLoading(false)
@@ -59,7 +96,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (username: string, password: string) => {
     const email = username.trim() === 'veloralog' ? ADMIN_EMAIL : username.trim()
     try {
-      await pb.collection('users').authWithPassword(email, password)
+      const authData = await pb.collection('users').authWithPassword(email, password)
+      const record = authData.record as Record<string, unknown> | null
+
+      if (record && record.active === false) {
+        pb.authStore.clear()
+        setUser(null)
+        setIsAuthenticated(false)
+        return { error: 'Sua conta está inativa. Entre em contato com um administrador.' }
+      }
+
+      setUser(record)
+      setIsAuthenticated(true)
       return { error: null }
     } catch (error: unknown) {
       const err = error as { status?: number }
@@ -77,6 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
         passwordConfirm: password,
+        active: true,
       })
       return { error: null }
     } catch (error: unknown) {
@@ -94,6 +143,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = () => {
     pb.authStore.clear()
+    setUser(null)
+    setIsAuthenticated(false)
   }
 
   const userRole =

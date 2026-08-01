@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -10,9 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getUsers, createUser, deleteUser } from '@/services/users'
+import { getUsers, createUser, deleteUser, updateUserActiveStatus } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useAuth } from '@/hooks/use-auth'
 import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle, Upload } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
 
 const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
 const getAvatarUrl = (id: string, avatar: string) =>
@@ -47,9 +50,11 @@ interface UserRecord {
   cpf: string
   avatar: string
   created: string
+  active?: boolean
 }
 
 export function UserManagement() {
+  const { isAdmin, user: currentUser } = useAuth()
   const [users, setUsers] = useState<UserRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
@@ -60,6 +65,7 @@ export function UserManagement() {
   const [avatar, setAvatar] = useState<File | null>(null)
   const [cpfError, setCpfError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [error, setError] = useState('')
 
   const loadUsers = async () => {
@@ -107,6 +113,7 @@ export function UserManagement() {
         role,
         cpf: cpf.replace(/\D/g, ''),
         avatar,
+        active: true,
       })
       setName('')
       setEmail('')
@@ -115,6 +122,10 @@ export function UserManagement() {
       setCpf('')
       setAvatar(null)
       setCpfError('')
+      toast({
+        title: 'Usuário Criado',
+        description: 'Novo usuário cadastrado com sucesso como Ativo.',
+      })
     } catch (err: any) {
       if (err?.response?.data?.cpf) setError('CPF já cadastrado.')
       else if (err?.response?.data?.email) setError('E-mail já cadastrado.')
@@ -123,9 +134,43 @@ export function UserManagement() {
     setSubmitting(false)
   }
 
+  const handleToggleActive = async (u: UserRecord) => {
+    if (!isAdmin) {
+      toast({
+        title: 'Acesso negado',
+        description: 'Apenas usuários com a função SUP podem alterar o status de acesso.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const nextState = u.active === false ? true : false
+    setUpdatingId(u.id)
+    try {
+      await updateUserActiveStatus(u.id, nextState)
+      toast({
+        title: 'Status atualizado',
+        description: `Usuário ${u.name || u.email} agora está ${nextState ? 'Ativo' : 'Inativo'}.`,
+      })
+      await loadUsers()
+    } catch {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível alterar o status do usuário.',
+        variant: 'destructive',
+      })
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
   const handleDelete = async (id: string) => {
     try {
       await deleteUser(id)
+      toast({
+        title: 'Usuário Removido',
+        description: 'O usuário foi removido com sucesso.',
+      })
     } catch {
       setError('Erro ao excluir usuário.')
     }
@@ -250,48 +295,88 @@ export function UserManagement() {
             </div>
           ) : (
             <div className="space-y-2">
-              {users.map((u) => (
-                <div
-                  key={u.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    {u.avatar ? (
-                      <img
-                        src={getAvatarUrl(u.id, u.avatar)}
-                        alt={u.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : u.role === 'SUP' ? (
-                      <Shield className="w-5 h-5 text-[#C89B3C]" />
-                    ) : (
-                      <User className="w-5 h-5 text-[#005B2E]" />
-                    )}
-                    <div>
-                      <p className="font-semibold text-foreground">{u.name || '—'}</p>
-                      <p className="text-sm text-muted-foreground">{u.email}</p>
-                      {u.cpf && (
-                        <p className="text-xs text-muted-foreground">CPF: {formatCPF(u.cpf)}</p>
+              {users.map((u) => {
+                const isActive = u.active !== false
+                return (
+                  <div
+                    key={u.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5 transition-colors gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      {u.avatar ? (
+                        <img
+                          src={getAvatarUrl(u.id, u.avatar)}
+                          alt={u.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : u.role === 'SUP' ? (
+                        <Shield className="w-5 h-5 text-[#C89B3C]" />
+                      ) : (
+                        <User className="w-5 h-5 text-[#005B2E]" />
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-foreground">{u.name || '—'}</p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{u.email}</p>
+                        {u.cpf && (
+                          <p className="text-xs text-muted-foreground">CPF: {formatCPF(u.cpf)}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/50">
+                      {/* Active / Inactive Status Switch */}
+                      <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-full border border-border">
+                        <span
+                          className={`text-xs font-bold ${
+                            isActive
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-rose-600 dark:text-rose-400'
+                          }`}
+                        >
+                          {isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                        {isAdmin ? (
+                          <Switch
+                            checked={isActive}
+                            disabled={updatingId === u.id || u.id === (currentUser?.id as string)}
+                            onCheckedChange={() => handleToggleActive(u)}
+                            className="data-[state=checked]:bg-[#005B2E]"
+                          />
+                        ) : (
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              isActive ? 'bg-emerald-500' : 'bg-rose-500'
+                            }`}
+                          />
+                        )}
+                      </div>
+
+                      <span
+                        className={`text-xs font-bold px-2.5 py-1 rounded ${
+                          u.role === 'SUP'
+                            ? 'bg-[#C89B3C]/20 text-[#C89B3C]'
+                            : 'bg-[#005B2E]/10 text-[#005B2E]'
+                        }`}
+                      >
+                        {u.role}
+                      </span>
+
+                      {isAdmin && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                          onClick={() => handleDelete(u.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-bold px-2 py-1 rounded ${u.role === 'SUP' ? 'bg-[#C89B3C]/20 text-[#C89B3C]' : 'bg-[#005B2E]/10 text-[#005B2E]'}`}
-                    >
-                      {u.role}
-                    </span>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => handleDelete(u.id)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </CardContent>
