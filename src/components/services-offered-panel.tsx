@@ -31,6 +31,7 @@ interface ConfirmState {
 export function ServicesOfferedPanel() {
   const [services, setServices] = useState<ServiceOffered[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<ServiceOffered | null>(null)
@@ -38,11 +39,14 @@ export function ServicesOfferedPanel() {
   const [actionLoading, setActionLoading] = useState(false)
 
   const load = async () => {
+    setLoading(true)
+    setError('')
     try {
       const data = await getServicesOffered()
       setServices(Array.isArray(data) ? (data as unknown as ServiceOffered[]) : [])
     } catch {
-      /* ignore */
+      setError('Não foi possível carregar os serviços. Tente novamente.')
+      setServices([])
     }
     setLoading(false)
   }
@@ -56,7 +60,7 @@ export function ServicesOfferedPanel() {
     const term = search.toLowerCase().trim()
     const list = services || []
     if (!term) return list
-    return list.filter((s) => s?.name?.toLowerCase()?.includes(term))
+    return list.filter((s) => s && s?.name?.toLowerCase()?.includes(term))
   }, [services, search])
 
   const handleNew = () => {
@@ -136,6 +140,20 @@ export function ServicesOfferedPanel() {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
         </div>
+      ) : error ? (
+        <Card className="border-2 border-dashed border-destructive/30">
+          <CardContent className="py-16 text-center">
+            <Package className="w-12 h-12 text-destructive mx-auto mb-4" />
+            <p className="text-lg font-bold text-foreground mb-1">{error}</p>
+            <Button
+              onClick={load}
+              variant="outline"
+              className="mt-3 border-[#005B2E] text-[#005B2E]"
+            >
+              Tentar novamente
+            </Button>
+          </CardContent>
+        </Card>
       ) : filtered.length === 0 ? (
         <Card className="border-2 border-dashed border-border">
           <CardContent className="py-16 text-center">

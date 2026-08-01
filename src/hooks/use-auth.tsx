@@ -22,6 +22,19 @@ export const useAuth = () => {
 
 const ADMIN_EMAIL = 'veloralog@veloralog.com'
 
+function isTokenExpired(token: string | null | undefined): boolean {
+  if (!token) return true
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return true
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (payload.exp) return Date.now() >= payload.exp * 1000
+    return false
+  } catch {
+    return true
+  }
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const initialRecord = pb.authStore.isValid
     ? (pb.authStore.record as Record<string, unknown>)
@@ -59,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 
-    if (pb.authStore.isValid) {
+    if (pb.authStore.isValid && !isTokenExpired(pb.authStore.token)) {
       timeoutId = setTimeout(() => setLoading(false), 5000)
       pb.collection('users')
         .authRefresh()
@@ -88,6 +101,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         })
     } else {
       if (pb.authStore.record) pb.authStore.clear()
+      setUser(null)
+      setIsAuthenticated(false)
       setLoading(false)
     }
     return () => {

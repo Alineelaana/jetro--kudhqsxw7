@@ -29,9 +29,12 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
       getActiveServicesOffered().catch(() => []),
     ]).then(([fetched, activeServices]) => {
       let fieldsToUse: DefaultFormField[] = DEFAULT_FORM_FIELDS
-      if (fetched && fetched.length > 0) fieldsToUse = fetched
-      if (activeServices && activeServices.length > 0) {
-        const serviceNames = activeServices.map((s) => (s as { name: string }).name)
+      if (fetched && Array.isArray(fetched) && fetched.length > 0) fieldsToUse = fetched
+      if (activeServices && Array.isArray(activeServices) && activeServices.length > 0) {
+        const serviceNames = activeServices
+          .filter((s) => s && typeof s === 'object' && 'name' in s)
+          .map((s) => (s as { name: string }).name)
+          .filter(Boolean)
         fieldsToUse = fieldsToUse.map((f) =>
           f.name === 'servico_interesse' ? { ...f, options: serviceNames } : f,
         )

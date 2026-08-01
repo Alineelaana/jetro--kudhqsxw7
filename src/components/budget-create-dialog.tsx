@@ -135,14 +135,15 @@ export function BudgetCreateDialog({
 
   const handleGeneratePdf = async () => {
     if (!record) return
+    const rec = record as BudgetRecord
     setGenerating(true)
     setError('')
     try {
       const { number } = await getNextBudgetNumber()
       const quoteCreatedAt = new Date().toISOString()
-      const existingData = (record.data || {}) as Record<string, unknown>
+      const existingData = (rec.data || {}) as Record<string, unknown>
       const emissionDate = formatDateTime(quoteCreatedAt)
-      const requestDate = formatDateTime(record.created)
+      const requestDate = rec.created ? formatDateTime(rec.created) : ''
       const formattedValidUntil = validUntil
         ? new Date(validUntil + 'T00:00:00').toLocaleDateString('pt-BR')
         : ''
@@ -172,11 +173,11 @@ export function BudgetCreateDialog({
         budgetNumber: number,
         emissionDate,
         requestDate,
-        clientName: safeRecord.client_name,
-        clientEmail: safeRecord.client_email,
-        clientPhone: safeRecord.client_phone,
+        clientName: rec.client_name || '',
+        clientEmail: rec.client_email || '',
+        clientPhone: rec.client_phone || '',
         clientCompany: getString(existingData, 'empresa'),
-        service: safeRecord.service || '',
+        service: rec.service || '',
         origin: getString(existingData, 'cidade_origem'),
         destination: getString(existingData, 'cidade_destino'),
         merchandise: getString(existingData, 'tipo_mercadoria'),
@@ -226,7 +227,7 @@ export function BudgetCreateDialog({
   if (!record) return null
 
   const safeRecord = record as BudgetRecord
-  const data = (safeRecord.data || {}) as Record<string, unknown>
+  const data = (safeRecord?.data || {}) as Record<string, unknown>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -6,6 +6,7 @@ export interface QuoteData {
   responsible_email: string
   responsible_phone: string
   quote_created_at: string
+  data?: Record<string, unknown>
 }
 
 export async function saveQuoteData(id: string, data: QuoteData): Promise<void> {

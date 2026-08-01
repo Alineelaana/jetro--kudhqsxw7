@@ -23,6 +23,19 @@ function isClientRecord(record: unknown): boolean {
   return r.collectionName === 'clients'
 }
 
+function isTokenExpired(token: string | null | undefined): boolean {
+  if (!token) return true
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return true
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (payload.exp) return Date.now() >= payload.exp * 1000
+    return false
+  } catch {
+    return true
+  }
+}
+
 export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
   const initialRecord = pbClient.authStore.isValid ? pbClient.authStore.record : null
   const initialIsClient = pbClient.authStore.isValid && isClientRecord(initialRecord)
@@ -43,15 +56,22 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
     const currentRecord = pbClient.authStore.record
     const isValidClient = pbClient.authStore.isValid && isClientRecord(currentRecord)
 
-    if (isValidClient) {
+    if (isValidClient && !isTokenExpired(pbClient.authStore.token)) {
       pbClient
         .collection('clients')
         .authRefresh()
         .catch(() => {
           pbClient.authStore.clear()
+          setClient(null)
+          setIsClientAuthenticated(false)
         })
         .finally(() => setLoading(false))
     } else {
+      if (pbClient.authStore.isValid) {
+        pbClient.authStore.clear()
+        setClient(null)
+        setIsClientAuthenticated(false)
+      }
       setLoading(false)
     }
 
