@@ -21,12 +21,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full bg-[#01361D] border-b border-[#C89B3C]/30 shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
           <a href="#inicio" className="flex items-center gap-2 group">
             <img
               src={logoGreenBg}
               alt="Velora Log"
-              className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105 rounded-lg"
+              className="h-16 sm:h-20 w-auto object-contain transition-transform group-hover:scale-105 rounded-lg"
             />
           </a>
 
@@ -83,7 +83,7 @@ export function SiteHeader() {
                 <img
                   src={logoGreenBg}
                   alt="Velora Log"
-                  className="h-12 w-auto object-contain rounded-lg"
+                  className="h-16 w-auto object-contain rounded-lg"
                 />
               </SheetTitle>
               <nav className="flex flex-col gap-4">
