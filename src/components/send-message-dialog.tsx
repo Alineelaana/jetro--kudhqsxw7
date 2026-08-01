@@ -20,6 +20,7 @@ import {
 import { type BudgetRecord } from '@/lib/types'
 import { sendBudgetEmail, updateBudgetRequestStatus } from '@/services/budget-requests'
 import { buildWhatsAppUrl } from '@/lib/utils'
+import veloraSignatureImg from '@/assets/chatgpt-image-1-de-ago.de-2026-150848-e934f.png'
 import {
   Bold,
   Italic,
@@ -34,6 +35,7 @@ import {
   Send,
   Loader2,
   Sparkles,
+  Image as ImageIcon,
 } from 'lucide-react'
 
 interface SendMessageDialogProps {
@@ -83,6 +85,37 @@ export function SendMessageDialog({
   const [selectedColor, setSelectedColor] = useState('#1A1A1A')
   const editorRef = useRef<HTMLDivElement>(null)
 
+  const getSignatureUrl = () => {
+    if (typeof window === 'undefined') return veloraSignatureImg
+    if (
+      veloraSignatureImg.startsWith('http://') ||
+      veloraSignatureImg.startsWith('https://') ||
+      veloraSignatureImg.startsWith('data:')
+    ) {
+      return veloraSignatureImg
+    }
+    const origin = window.location.origin
+    const path = veloraSignatureImg.startsWith('/') ? veloraSignatureImg : `/${veloraSignatureImg}`
+    return `${origin}${path}`
+  }
+
+  const getSignatureHtml = () => {
+    const imgSrc = getSignatureUrl()
+    return `<div contenteditable="false" class="velora-signature-block" style="margin-top: 20px; margin-bottom: 8px; user-select: none;"><img src="${imgSrc}" alt="Cartão de Visita - Srta. Velora - Velora Log" style="max-width: 450px; width: 100%; height: auto; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); display: block;" /></div>`
+  }
+
+  const getDefaultTemplate = (rec: BudgetRecord, targetMode: 'email' | 'whatsapp') => {
+    const clientName = rec.client_name || 'Prezado(a) Cliente'
+    const serviceName = rec.service || 'Serviços Logísticos'
+    const budgetNum = rec.budget_number ? `<b>${rec.budget_number}</b>` : ''
+
+    if (targetMode === 'whatsapp') {
+      return `Olá, <b>${clientName}</b>! Tudo bem?<br/><br/>A equipe da <b>Velora Log Operações Logísticas</b> tem o prazer de apresentar sua proposta comercial para <b>${serviceName}</b>${budgetNum ? ` (Orçamento ${budgetNum})` : ''}.<br/><br/>Para visualizar todos os detalhes operacionais, custos e especificações técnicas, entre em contato ou acesse o arquivo anexo enviado por e-mail.<br/><br/>Estamos à disposição para esclarecer qualquer dúvida!<br/><br/>Atenciosamente,<br/><b>${authorName}</b> - Velora Log`
+    }
+
+    return `<p>Prezado(a) <b>${clientName}</b>,</p><p><br/></p><p>Agradecemos o interesse nos serviços da <b>Velora Log Operações Logísticas</b>.</p><p><br/></p><p>Anexamos a este e-mail a proposta técnica e comercial correspondente à solicitação de <b>${serviceName}</b>${budgetNum ? ` (Orçamento ${budgetNum})` : ''}.</p><p><br/></p><p>A Velora Log oferece soluções completas em transporte, armazenagem e gestão logística com foco em eficiência, inteligência e redução de custos operacionais.</p><p><br/></p><p>Ficamos à disposição para agendarmos uma apresentação detalhada ou para quaisquer dúvidas.</p><p><br/></p><p>Atenciosamente,</p><p><b>${authorName}</b><br/>Equipe Comercial - Velora Log<br/><span style="color: #005B2E; font-weight: bold;">Velora Log - Operações Logísticas de Excelência</span></p>${getSignatureHtml()}`
+  }
+
   useEffect(() => {
     if (open && record) {
       const budgetNum = record.budget_number ? ` nº ${record.budget_number}` : ''
@@ -95,18 +128,6 @@ export function SendMessageDialog({
     }
   }, [open, record, mode])
 
-  const getDefaultTemplate = (rec: BudgetRecord, targetMode: 'email' | 'whatsapp') => {
-    const clientName = rec.client_name || 'Prezado(a) Cliente'
-    const serviceName = rec.service || 'Serviços Logísticos'
-    const budgetNum = rec.budget_number ? `<b>${rec.budget_number}</b>` : ''
-
-    if (targetMode === 'whatsapp') {
-      return `Olá, <b>${clientName}</b>! Tudo bem?<br/><br/>A equipe da <b>Velora Log Operações Logísticas</b> tem o prazer de apresentar sua proposta comercial para <b>${serviceName}</b>${budgetNum ? ` (Orçamento ${budgetNum})` : ''}.<br/><br/>Para visualizar todos os detalhes operacionais, custos e especificações técnicas, entre em contato ou acesse o arquivo anexo enviado por e-mail.<br/><br/>Estamos à disposição para esclarecer qualquer dúvida!<br/><br/>Atenciosamente,<br/><b>${authorName}</b> - Velora Log`
-    }
-
-    return `<p>Prezado(a) <b>${clientName}</b>,</p><p><br/></p><p>Agradecemos o interesse nos serviços da <b>Velora Log Operações Logísticas</b>.</p><p><br/></p><p>Anexamos a este e-mail a proposta técnica e comercial correspondente à solicitação de <b>${serviceName}</b>${budgetNum ? ` (Orçamento ${budgetNum})` : ''}.</p><p><br/></p><p>A Velora Log oferece soluções completas em transporte, armazenagem e gestão logística com foco em eficiência, inteligência e redução de custos operacionais.</p><p><br/></p><p>Ficamos à disposição para agendarmos uma apresentação detalhada ou para quaisquer dúvidas.</p><p><br/></p><p>Atenciosamente,</p><p><b>${authorName}</b><br/>Equipe Comercial - Velora Log<br/><span style="color: #005B2E; font-weight: bold;">Velora Log - Operações Logísticas de Excelência</span></p>`
-  }
-
   const applyFormatting = (command: string, value: string | undefined = undefined) => {
     document.execCommand(command, false, value)
     if (editorRef.current) editorRef.current.focus()
@@ -116,13 +137,24 @@ export function SendMessageDialog({
     if (!editorRef.current || !record) return
     const clientName = record.client_name || 'Cliente'
     const serviceName = record.service || 'Serviços Logísticos'
+    const sig = mode === 'email' ? getSignatureHtml() : ''
 
     if (templateType === 'aprovacao') {
-      editorRef.current.innerHTML = `<p>Olá, <b>${clientName}</b>!</p><p><br/></p><p>Gostaríamos de saber se teve oportunidade de analisar a nossa proposta comercial de <b>${serviceName}</b>.</p><p><br/></p><p>Podemos agendar uma breve conversa para esclarecer possíveis dúvidas e ajustar os detalhes para início da operação?</p><p><br/></p><p>Atenciosamente,<br/><b>${authorName}</b> - Velora Log</p>`
+      editorRef.current.innerHTML = `<p>Olá, <b>${clientName}</b>!</p><p><br/></p><p>Gostaríamos de saber se teve oportunidade de analisar a nossa proposta comercial de <b>${serviceName}</b>.</p><p><br/></p><p>Podemos agendar uma breve conversa para esclarecer possíveis dúvidas e ajustar os detalhes para início da operação?</p><p><br/></p><p>Atenciosamente,</p><p><b>${authorName}</b><br/>Equipe Comercial - Velora Log</p>${sig}`
     } else if (templateType === 'duvidas') {
-      editorRef.current.innerHTML = `<p>Olá, <b>${clientName}</b>!</p><p><br/></p><p>Para darmos continuidade ao seu orçamento de <b>${serviceName}</b>, precisamos de algumas informações adicionais sobre o tipo de mercadoria e dimensões dos volumes.</p><p><br/></p><p>Qual o melhor horário para conversarmos por telefone?</p><p><br/></p><p>Atenciosamente,<br/><b>${authorName}</b> - Velora Log</p>`
+      editorRef.current.innerHTML = `<p>Olá, <b>${clientName}</b>!</p><p><br/></p><p>Para darmos continuidade ao seu orçamento de <b>${serviceName}</b>, precisamos de algumas informações adicionais sobre o tipo de mercadoria e dimensões dos volumes.</p><p><br/></p><p>Qual o melhor horário para conversarmos por telefone?</p><p><br/></p><p>Atenciosamente,</p><p><b>${authorName}</b><br/>Equipe Comercial - Velora Log</p>${sig}`
     } else {
       editorRef.current.innerHTML = getDefaultTemplate(record, mode)
+    }
+  }
+
+  const insertSignature = () => {
+    if (!editorRef.current) return
+    if (
+      !editorRef.current.innerHTML.includes('Cartão de Visita') &&
+      !editorRef.current.innerHTML.includes('velora-signature-block')
+    ) {
+      editorRef.current.innerHTML += `<br/>${getSignatureHtml()}`
     }
   }
 
@@ -136,6 +168,7 @@ export function SendMessageDialog({
       .replace(/<i>(.*?)<\/i>/gi, '_$1_')
       .replace(/<em>(.*?)<\/em>/gi, '_$1_')
       .replace(/<u\b[^>]*>(.*?)<\/u>/gi, '$1')
+      .replace(/<img[^>]*>/gi, '')
       .replace(/<[^>]+>/g, '')
 
     return text.replace(/\n{3,}/g, '\n\n').trim()
@@ -143,7 +176,7 @@ export function SendMessageDialog({
 
   const handleSend = async () => {
     if (!record) return
-    const htmlContent = editorRef.current?.innerHTML || ''
+    let htmlContent = editorRef.current?.innerHTML || ''
     setSending(true)
 
     try {
@@ -151,6 +184,13 @@ export function SendMessageDialog({
         const recipient = record.client_email
         if (!recipient) {
           throw new Error('E-mail do cliente não cadastrado nesta solicitação.')
+        }
+
+        if (
+          !htmlContent.includes('Cartão de Visita') &&
+          !htmlContent.includes('velora-signature-block')
+        ) {
+          htmlContent += getSignatureHtml()
         }
 
         await sendBudgetEmail({
@@ -273,6 +313,24 @@ export function SendMessageDialog({
               </Button>
             </div>
           </div>
+
+          {mode === 'email' && (
+            <div className="flex items-center justify-between gap-2 p-2 bg-[#005B2E]/5 border border-[#005B2E]/20 rounded-lg text-xs">
+              <div className="flex items-center gap-1.5 text-[#005B2E] font-medium">
+                <ImageIcon className="w-4 h-4 text-[#C89B3C]" />
+                <span>Assinatura visual de "Srta. Velora" incluída após o encerramento.</span>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 text-[11px] text-[#005B2E] hover:bg-[#005B2E]/10"
+                onClick={insertSignature}
+              >
+                + Inserir Assinatura
+              </Button>
+            </div>
+          )}
 
           <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-white">
             <div className="bg-muted/80 p-2 border-b border-border flex flex-wrap items-center gap-1.5 text-xs">
