@@ -1,7 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts'
+import { StatCard } from '@/components/dashboards/stat-card'
+import { ChartCard } from '@/components/dashboards/chart-card'
+import { downloadBarChart, downloadStatCard } from '@/lib/chart-export'
+import { useAuth } from '@/hooks/use-auth'
 import {
   getConversations,
   getAllChatMessages,
@@ -10,8 +14,8 @@ import {
 } from '@/services/chat'
 import { getUsers } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
-import { MessageSquare, Users, Clock, MessagesSquare, Loader2 } from 'lucide-react'
 import { formatDuration } from '@/lib/response-time'
+import { MessageSquare, Users, Clock, MessagesSquare, Loader2 } from 'lucide-react'
 
 interface UserMap {
   [id: string]: { name: string; avatar: string }
@@ -22,6 +26,8 @@ export function ChatProductivityDashboard() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [userMap, setUserMap] = useState<UserMap>({})
   const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+  const userName = (user?.name as string) || (user?.email as string) || 'Usuário'
 
   const loadData = useCallback(async () => {
     try {
@@ -50,60 +56,50 @@ export function ChatProductivityDashboard() {
   useRealtime('chat_messages', () => loadData())
 
   const stats = useMemo(() => {
-    const byAttendant: Record<string, { convs: number; msgs: number; responseTimes: number[] }> = {}
-    const convMap: Record<string, string> = {}
-
-    for (const conv of conversations) {
-      const aId = conv.attendant_id || 'unassigned'
-      convMap[conv.id] = aId
-      if (!byAttendant[aId]) byAttendant[aId] = { convs: 0, msgs: 0, responseTimes: [] }
-      byAttendant[aId].convs++
+    const byAtt: Record<string, { c: number; m: number; rt: number[] }> = {}
+    const cMap: Record<string, string> = {}
+    for (const cv of conversations) {
+      const a = cv.attendant_id || 'unassigned'
+      cMap[cv.id] = a
+      if (!byAtt[a]) byAtt[a] = { c: 0, m: 0, rt: [] }
+      byAtt[a].c++
     }
-
-    const msgsByConv: Record<string, ChatMessage[]> = {}
+    const mByC: Record<string, ChatMessage[]> = {}
     for (const msg of messages) {
       const cid = msg.conversation_id
-      if (!msgsByConv[cid]) msgsByConv[cid] = []
-      msgsByConv[cid].push(msg)
-      const aId = convMap[cid] || 'unassigned'
-      if (!byAttendant[aId]) byAttendant[aId] = { convs: 0, msgs: 0, responseTimes: [] }
-      byAttendant[aId].msgs++
+      if (!mByC[cid]) mByC[cid] = []
+      mByC[cid].push(msg)
+      const a = cMap[cid] || 'unassigned'
+      if (!byAtt[a]) byAtt[a] = { c: 0, m: 0, rt: [] }
+      byAtt[a].m++
     }
-
-    let totalResponseMs = 0
-    let responseCount = 0
-    for (const conv of conversations) {
-      const convMsgs = (msgsByConv[conv.id] || []).sort(
+    let tRt = 0,
+      rtC = 0
+    for (const cv of conversations) {
+      const cm = (mByC[cv.id] || []).sort(
         (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
       )
-      const firstClient = convMsgs.find((m) => m.sender === 'client')
-      const firstReply = convMsgs.find((m) => m.sender !== 'client')
-      if (firstClient && firstReply) {
-        const diff =
-          new Date(firstReply.created).getTime() - new Date(firstClient.created).getTime()
-        if (diff >= 0) {
-          totalResponseMs += diff
-          responseCount++
-          const aId = conv.attendant_id || 'unassigned'
-          if (byAttendant[aId]) byAttendant[aId].responseTimes.push(diff)
+      const fc = cm.find((m) => m.sender === 'client'),
+        fr = cm.find((m) => m.sender !== 'client')
+      if (fc && fr) {
+        const d = new Date(fr.created).getTime() - new Date(fc.created).getTime()
+        if (d >= 0) {
+          tRt += d
+          rtC++
+          byAtt[cv.attendant_id || 'unassigned']?.rt.push(d)
         }
       }
     }
-
-    const chartData = Object.entries(byAttendant).map(([id, d]) => ({
+    const chartData = Object.entries(byAtt).map(([id, v]) => ({
       name: userMap[id]?.name || 'Sem atendente',
       id,
-      convs: d.convs,
-      msgs: d.msgs,
-      avgResponse:
-        d.responseTimes.length > 0
-          ? d.responseTimes.reduce((a, b) => a + b, 0) / d.responseTimes.length
-          : 0,
+      convs: v.c,
+      msgs: v.m,
+      avgResponse: v.rt.length ? v.rt.reduce((a, b) => a + b, 0) / v.rt.length : 0,
     }))
-
     return {
       chartData,
-      avgResponseMs: responseCount > 0 ? totalResponseMs / responseCount : 0,
+      avgResponseMs: rtC ? tRt / rtC : 0,
       activeConvs: conversations.filter((c) => !c.closed).length,
       totalConvs: conversations.length,
       totalMsgs: messages.length,
@@ -122,108 +118,109 @@ export function ChatProductivityDashboard() {
     convs: { label: 'Conversas', color: '#005B2E' },
     msgs: { label: 'Mensagens', color: '#C89B3C' },
   }
+  const exp =
+    (label: string, value: string, color: string, title: string) => (fmt: 'png' | 'jpg') =>
+      downloadStatCard(label, value, color, title, userName, fmt)
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardContent className="py-4 px-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-[#005B2E]" />
-            </div>
-            <div>
-              <p className="text-xl font-black text-foreground">{stats.totalConvs}</p>
-              <p className="text-xs text-muted-foreground">Conversas</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-2 border-[#C89B3C]/30">
-          <CardContent className="py-4 px-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#C89B3C]/10 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-[#C89B3C]" />
-            </div>
-            <div>
-              <p className="text-xl font-black text-foreground">{stats.totalMsgs}</p>
-              <p className="text-xs text-muted-foreground">Mensagens</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardContent className="py-4 px-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-              <MessagesSquare className="w-5 h-5 text-[#005B2E]" />
-            </div>
-            <div>
-              <p className="text-xl font-black text-foreground">{stats.activeConvs}</p>
-              <p className="text-xs text-muted-foreground">Ativas</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-2 border-[#C89B3C]/30">
-          <CardContent className="py-4 px-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#C89B3C]/10 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-[#C89B3C]" />
-            </div>
-            <div>
-              <p className="text-xl font-black text-foreground">
-                {stats.avgResponseMs > 0 ? formatDuration(stats.avgResponseMs) : '—'}
-              </p>
-              <p className="text-xs text-muted-foreground">Tempo médio resposta</p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={Users}
+          value={stats.totalConvs}
+          label="Conversas"
+          hexColor="#005B2E"
+          onExport={exp('Conversas', String(stats.totalConvs), '#005B2E', 'Total de Conversas')}
+        />
+        <StatCard
+          icon={MessageSquare}
+          value={stats.totalMsgs}
+          label="Mensagens"
+          hexColor="#C89B3C"
+          onExport={exp('Mensagens', String(stats.totalMsgs), '#C89B3C', 'Total de Mensagens')}
+        />
+        <StatCard
+          icon={MessagesSquare}
+          value={stats.activeConvs}
+          label="Ativas"
+          hexColor="#005B2E"
+          onExport={exp('Ativas', String(stats.activeConvs), '#005B2E', 'Conversas Ativas')}
+        />
+        <StatCard
+          icon={Clock}
+          value={stats.avgResponseMs > 0 ? formatDuration(stats.avgResponseMs) : '—'}
+          label="Tempo médio resposta"
+          hexColor="#C89B3C"
+          onExport={exp(
+            'Tempo médio resposta',
+            stats.avgResponseMs > 0 ? formatDuration(stats.avgResponseMs) : '—',
+            '#C89B3C',
+            'Tempo Médio de Resposta do Chat',
+          )}
+        />
       </div>
-
       {stats.chartData.length > 0 && (
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardHeader>
-            <CardTitle className="text-base">Conversas por Atendente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.chartData}>
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fontSize: 12 }}
-                    allowDecimals={false}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="convs" fill="#005B2E" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <ChartCard
+          title="Conversas por Atendente"
+          hexColor="#005B2E"
+          onExport={(fmt) =>
+            downloadBarChart(
+              stats.chartData.map((d) => ({ name: d.name, value: d.convs })),
+              '#005B2E',
+              'Conversas por Atendente',
+              userName,
+              fmt,
+            )
+          }
+        >
+          <ChartContainer config={chartConfig} className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.chartData}>
+                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12 }}
+                  allowDecimals={false}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="convs" fill="#005B2E" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </ChartCard>
       )}
-
       {stats.chartData.length > 0 && (
-        <Card className="border-2 border-[#C89B3C]/30">
-          <CardHeader>
-            <CardTitle className="text-base">Mensagens por Atendente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.chartData}>
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fontSize: 12 }}
-                    allowDecimals={false}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="msgs" fill="#C89B3C" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <ChartCard
+          title="Mensagens por Atendente"
+          hexColor="#C89B3C"
+          onExport={(fmt) =>
+            downloadBarChart(
+              stats.chartData.map((d) => ({ name: d.name, value: d.msgs })),
+              '#C89B3C',
+              'Mensagens por Atendente',
+              userName,
+              fmt,
+            )
+          }
+        >
+          <ChartContainer config={chartConfig} className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.chartData}>
+                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12 }}
+                  allowDecimals={false}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="msgs" fill="#C89B3C" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </ChartCard>
       )}
-
       {stats.chartData.length === 0 && (
         <Card className="border-2 border-dashed border-border">
           <CardContent className="py-16 text-center">

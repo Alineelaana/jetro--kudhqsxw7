@@ -1,9 +1,18 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer } from 'recharts'
+import { StatCard } from '@/components/dashboards/stat-card'
+import { ChartCard } from '@/components/dashboards/chart-card'
+import { ChartExportButton } from '@/components/chart-export-button'
+import {
+  downloadBarChart,
+  downloadStatCard,
+  downloadTopAttendant,
+  downloadCommentsReport,
+} from '@/lib/chart-export'
+import { useAuth } from '@/hooks/use-auth'
 import { getChatRatings, type ChatRating } from '@/services/chat-ratings'
-import { getUsers } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Star, Trophy, MessageSquare, TrendingUp, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -12,24 +21,17 @@ const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
 const getAvatarUrl = (id: string, avatar: string) =>
   avatar ? `${PB_URL}/api/files/users/${id}/${avatar}` : ''
 
-interface UserRecord {
-  id: string
-  name: string
-  email: string
-  role: string
-  avatar: string
-  attendant_status: string
-}
-
 export function ChatDashboard() {
   const [ratings, setRatings] = useState<ChatRating[]>([])
   const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+  const userName = (user?.name as string) || (user?.email as string) || 'Usuário'
 
   const loadData = async () => {
     try {
       setRatings(await getChatRatings())
     } catch {
-      /* intentionally ignored */
+      /* ignored */
     }
     setLoading(false)
   }
@@ -79,6 +81,9 @@ export function ChatDashboard() {
   }
 
   const chartConfig = { avg: { label: 'Média', color: '#005B2E' } }
+  const exp =
+    (label: string, value: string, color: string, title: string) => (fmt: 'png' | 'jpg') =>
+      downloadStatCard(label, value, color, title, userName, fmt)
 
   if (stats.total === 0) {
     return (
@@ -99,28 +104,30 @@ export function ChatDashboard() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardContent className="py-4 px-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-[#005B2E]" />
-            </div>
-            <div>
-              <p className="text-2xl font-black text-foreground">{stats.overall}</p>
-              <p className="text-sm text-muted-foreground">Média Geral</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-2 border-[#C89B3C]/30">
-          <CardContent className="py-4 px-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#C89B3C]/10 flex items-center justify-center">
-              <Star className="w-6 h-6 text-[#C89B3C]" />
-            </div>
-            <div>
-              <p className="text-2xl font-black text-foreground">{stats.total}</p>
-              <p className="text-sm text-muted-foreground">Avaliações Recebidas</p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={TrendingUp}
+          value={stats.overall}
+          label="Média Geral"
+          hexColor="#005B2E"
+          onExport={exp(
+            'Média Geral',
+            String(stats.overall),
+            '#005B2E',
+            'Média Geral de Avaliações',
+          )}
+        />
+        <StatCard
+          icon={Star}
+          value={stats.total}
+          label="Avaliações Recebidas"
+          hexColor="#C89B3C"
+          onExport={exp(
+            'Avaliações Recebidas',
+            String(stats.total),
+            '#C89B3C',
+            'Total de Avaliações Recebidas',
+          )}
+        />
         {stats.top && (
           <Card className="border-2 border-[#C89B3C]/40 bg-gradient-to-br from-[#C89B3C]/5 to-[#005B2E]/5">
             <CardContent className="py-4 px-6 flex items-center gap-4">
@@ -135,46 +142,74 @@ export function ChatDashboard() {
                   <Trophy className="w-6 h-6 text-[#C89B3C]" />
                 </div>
               )}
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs font-bold text-[#C89B3C]">★ Usuário Destaque</p>
                 <p className="font-black text-foreground">{stats.top.name}</p>
                 <p className="text-sm text-muted-foreground">Média: {stats.top.avg}</p>
               </div>
+              <ChartExportButton
+                className="ml-auto"
+                onExport={(fmt) =>
+                  downloadTopAttendant(
+                    stats.top!.name,
+                    stats.top!.avg,
+                    getAvatarUrl(stats.top!.id, stats.top!.avatar),
+                    'Atendente Destaque',
+                    userName,
+                    fmt,
+                  )
+                }
+              />
             </CardContent>
           </Card>
         )}
       </div>
-
-      <Card className="border-2 border-[#005B2E]/20">
-        <CardHeader>
-          <CardTitle className="text-base">Média de Avaliação por Atendente</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.chartData}>
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-                <YAxis domain={[0, 5]} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="avg" radius={[8, 8, 0, 0]}>
-                  {stats.chartData.map((entry, i) => (
-                    <Cell key={i} fill={entry.id === stats.top?.id ? '#C89B3C' : '#005B2E'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-
+      <ChartCard
+        title="Média de Avaliação por Atendente"
+        hexColor="#005B2E"
+        onExport={(fmt) =>
+          downloadBarChart(
+            stats.chartData.map((d) => ({ name: d.name, value: d.avg })),
+            '#005B2E',
+            'Média de Avaliação por Atendente',
+            userName,
+            fmt,
+          )
+        }
+      >
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={stats.chartData}>
+              <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+              <YAxis domain={[0, 5]} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="avg" radius={[8, 8, 0, 0]}>
+                {stats.chartData.map((entry, i) => (
+                  <Cell key={i} fill={entry.id === stats.top?.id ? '#C89B3C' : '#005B2E'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </ChartCard>
       {stats.comments.length > 0 && (
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-[#005B2E]" /> Comentários e Observações
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <ChartCard
+          title="Comentários e Observações"
+          hexColor="#005B2E"
+          onExport={(fmt) =>
+            downloadCommentsReport(
+              stats.comments.map((r) => ({
+                author: r.expand?.attendant?.name || 'Atendente',
+                rating: r.rating,
+                comment: r.comment,
+              })),
+              'Comentários e Observações',
+              userName,
+              fmt,
+            )
+          }
+        >
+          <div className="space-y-3">
             {stats.comments.map((r) => (
               <div key={r.id} className="p-3 rounded-lg bg-muted/50 border border-border">
                 <div className="flex items-center justify-between mb-1">
@@ -199,8 +234,8 @@ export function ChatDashboard() {
                 </p>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </ChartCard>
       )}
     </div>
   )
