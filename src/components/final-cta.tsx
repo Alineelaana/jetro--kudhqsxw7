@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-6748f.png'
 import { MessageCircle, Phone, Mail, MapPin } from 'lucide-react'
 
 export function FinalCTA() {
@@ -15,7 +14,9 @@ export function FinalCTA() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <div className="flex justify-center mb-2">
-            <img src={logoDark} alt="VeloraLog" className="h-20 sm:h-24 w-auto object-contain" />
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+              Velora<span className="gold-gradient-text">Log</span>
+            </h2>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">

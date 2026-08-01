@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import logoLight from '@/assets/chatgpt-image-1-de-ago.de-2026-103549-66439.png'
 import { Menu, MessageCircle, PhoneCall } from 'lucide-react'
 
 const NAV_LINKS = [
@@ -22,12 +21,10 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur border-b border-[#C89B3C]/30 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <a href="#inicio" className="flex items-center gap-3 group">
-            <img
-              src={logoLight}
-              alt="VeloraLog Operações Logísticas"
-              className="h-12 w-auto object-contain transition-transform group-hover:scale-105"
-            />
+          <a href="#inicio" className="flex items-center gap-2 group">
+            <span className="text-2xl font-black tracking-tight text-[#005B2E] transition-transform group-hover:scale-105">
+              Velora<span className="text-[#C89B3C]">Log</span>
+            </span>
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -76,7 +73,9 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-80 bg-white">
               <SheetTitle className="mb-6">
-                <img src={logoLight} alt="VeloraLog" className="h-10 w-auto object-contain" />
+                <span className="text-2xl font-black tracking-tight text-[#005B2E]">
+                  Velora<span className="text-[#C89B3C]">Log</span>
+                </span>
               </SheetTitle>
               <nav className="flex flex-col gap-4">
                 {NAV_LINKS.map((link) => (

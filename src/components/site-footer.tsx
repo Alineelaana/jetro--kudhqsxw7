@@ -1,4 +1,3 @@
-import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-6748f.png'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
 export function SiteFooter() {
@@ -7,11 +6,9 @@ export function SiteFooter() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           <div className="space-y-4">
-            <img
-              src={logoDark}
-              alt="VeloraLog Operações Logísticas"
-              className="h-16 w-auto object-contain"
-            />
+            <h3 className="text-2xl font-black tracking-tight text-white">
+              Velora<span className="text-[#E4C46A]">Log</span>
+            </h3>
             <p className="text-sm leading-relaxed max-w-sm text-white/80">
               Operações Logísticas de Excelência no Espírito Santo. Soluções completas em
               armazenagem de estoque (WMS), transporte de cargas, logística portuária e distribuição

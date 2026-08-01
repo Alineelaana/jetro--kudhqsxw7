@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-6748f.png'
 import warehouseBg from '@/assets/captura-de-tela-2026-08-01-as-10.38.48-65c70.png'
 import {
   MessageCircle,
@@ -61,13 +60,11 @@ export function HeroSection() {
 
       <div className="container mx-auto px-4 relative z-10 pt-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          {/* Logo & Tag */}
+          {/* Brand Name */}
           <div className="flex justify-center mb-2 animate-fade-in-down">
-            <img
-              src={logoDark}
-              alt="VeloraLog Operações Logísticas"
-              className="h-28 sm:h-36 md:h-40 w-auto object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
-            />
+            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">
+              Velora<span className="gold-gradient-text">Log</span>
+            </h2>
           </div>
 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#005B2E]/80 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
