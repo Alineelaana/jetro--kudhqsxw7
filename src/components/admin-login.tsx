@@ -97,8 +97,14 @@ export function AdminLogin() {
               )}
             </Button>
             <Link
-              to="/admin/cadastro"
+              to="/admin/recuperar-senha"
               className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+            >
+              Esqueci minha senha
+            </Link>
+            <Link
+              to="/admin/cadastro"
+              className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-1"
             >
               Cadastre-se
             </Link>

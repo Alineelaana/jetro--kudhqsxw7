@@ -9,6 +9,7 @@ import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
 import AdminRegister from './pages/AdminRegister'
+import AdminPasswordRecovery from './pages/AdminPasswordRecovery'
 import ClientLogin from './pages/ClientLogin'
 import PasswordRecovery from './pages/PasswordRecovery'
 import ClientArea from './pages/ClientArea'
@@ -32,6 +33,7 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/cadastro" element={<AdminRegister />} />
               </Route>
+              <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
               <Route path="/cliente/login" element={<ClientLogin />} />
               <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
               <Route path="/cliente" element={<ClientArea />} />

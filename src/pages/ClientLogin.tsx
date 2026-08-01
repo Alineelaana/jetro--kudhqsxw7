@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate, Navigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -53,7 +53,8 @@ export default function ClientLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="pl-10 focus-visible:ring-[#005B2E]"
+                  className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -69,7 +70,8 @@ export default function ClientLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Digite sua senha"
-                  className="pl-10 focus-visible:ring-[#005B2E]"
+                  className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                  autoComplete="current-password"
                 />
               </div>
             </div>
@@ -82,7 +84,7 @@ export default function ClientLogin() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold h-12 rounded-xl"
+              className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
               disabled={submitting}
             >
               {submitting ? (
@@ -91,7 +93,10 @@ export default function ClientLogin() {
                   Entrando...
                 </>
               ) : (
-                'Entrar'
+                <>
+                  <Lock className="w-5 h-5 mr-2" />
+                  Entrar
+                </>
               )}
             </Button>
             <Link

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import { Menu, MessageCircle, LayoutDashboard } from 'lucide-react'
+import { Menu, MessageCircle } from 'lucide-react'
 import logoGreenBg from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-a43e3.png'
 
 const NAV_LINKS = [
@@ -45,9 +45,8 @@ export function SiteHeader() {
           <div className="hidden md:flex items-center gap-3">
             <Button
               asChild
-              variant="ghost"
               size="sm"
-              className="text-white/80 hover:text-[#E4C46A] hover:bg-white/10 font-bold rounded-lg"
+              className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-md rounded-lg"
             >
               <Link to="/cliente/login">Área do Cliente</Link>
             </Button>
@@ -56,10 +55,7 @@ export function SiteHeader() {
               size="sm"
               className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-md rounded-lg"
             >
-              <Link to="/admin">
-                <LayoutDashboard className="w-4 h-4 mr-1.5" />
-                Login ao Painel
-              </Link>
+              <Link to="/admin">Login ao Painel</Link>
             </Button>
             <Button
               asChild
@@ -107,8 +103,8 @@ export function SiteHeader() {
                 ))}
                 <Button
                   asChild
-                  variant="ghost"
-                  className="text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
+                  variant="outline"
+                  className="border-2 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E] hover:text-white font-bold"
                 >
                   <Link to="/cliente/login" onClick={() => setOpen(false)}>
                     Área do Cliente
@@ -120,7 +116,6 @@ export function SiteHeader() {
                   className="border-2 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E] hover:text-white font-bold"
                 >
                   <Link to="/admin" onClick={() => setOpen(false)}>
-                    <LayoutDashboard className="w-5 h-5 mr-2" />
                     Login ao Painel
                   </Link>
                 </Button>
