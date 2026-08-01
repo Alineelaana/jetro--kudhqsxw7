@@ -33,10 +33,9 @@ export function HeroSection() {
         <img
           src={warehouseBg}
           alt="Operação de Armazenagem Velora Log Espírito Santo"
-          className="w-full h-full object-cover object-center opacity-100 transition-all duration-700"
+          className="w-full h-full object-cover object-center opacity-100 brightness-110 transition-all duration-700"
         />
-        {/* Very light neutral gradient — only at top and bottom edges for text legibility, no green tint */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/25" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 pt-4">
