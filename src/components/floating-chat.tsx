@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { X, Send } from 'lucide-react'
 import { sendChatMessage, getChatMessages, type ChatMessage } from '@/services/chat'
 import { cn } from '@/lib/utils'
-
-const VELORA_AVATAR = 'https://img.usecurling.com/ppl/medium?gender=female&seed=velora'
+import veloraAvatar from '@/assets/chatgpt-image-1-de-ago.de-2026-150848-e934f.png'
 
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false)
@@ -81,9 +80,9 @@ export function FloatingChat() {
           aria-label="Abrir chat"
         >
           <img
-            src={VELORA_AVATAR}
+            src={veloraAvatar}
             alt="Srta. Velora"
-            className="w-10 h-10 rounded-full border-2 border-[#C89B3C]"
+            className="w-10 h-10 rounded-full border-2 border-[#C89B3C] object-cover"
           />
           <span className="text-sm font-bold hidden sm:inline">Fale com a Srta. Velora</span>
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse" />
@@ -93,9 +92,9 @@ export function FloatingChat() {
         <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-96 h-full sm:h-[32rem] bg-white rounded-none sm:rounded-2xl shadow-2xl flex flex-col border-2 border-[#005B2E]/20 overflow-hidden animate-fade-in-up">
           <div className="bg-[#005B2E] text-white px-4 py-3 flex items-center gap-3 flex-shrink-0">
             <img
-              src={VELORA_AVATAR}
+              src={veloraAvatar}
               alt="Srta. Velora"
-              className="w-10 h-10 rounded-full border-2 border-[#C89B3C]"
+              className="w-10 h-10 rounded-full border-2 border-[#C89B3C] object-cover"
             />
             <div className="flex-1">
               <p className="font-bold text-sm">Srta. Velora</p>

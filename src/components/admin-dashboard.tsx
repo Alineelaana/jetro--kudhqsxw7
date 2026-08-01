@@ -12,6 +12,7 @@ import { StatusUpdateDialog } from '@/components/status-update-dialog'
 import { StatusHistoryDialog } from '@/components/status-history-dialog'
 import { StatusDashboard } from '@/components/status-dashboard'
 import { BudgetCreateDialog } from '@/components/budget-create-dialog'
+import { SendMessageDialog } from '@/components/send-message-dialog'
 import { UserManagement } from '@/components/user-management'
 import { AdminChatPanel } from '@/components/admin-chat-panel'
 import { type BudgetRecord } from '@/lib/types'
@@ -45,6 +46,10 @@ export function AdminDashboard() {
   } | null>(null)
   const [historyRecord, setHistoryRecord] = useState<BudgetRecord | null>(null)
   const [budgetRecord, setBudgetRecord] = useState<BudgetRecord | null>(null)
+  const [sendMessageState, setSendMessageState] = useState<{
+    record: BudgetRecord
+    mode: 'email' | 'whatsapp'
+  } | null>(null)
 
   const labelMap = useMemo(() => {
     const map: Record<string, string> = {}
@@ -94,7 +99,7 @@ export function AdminDashboard() {
             Painel de Solicitações
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Gerencie todas as cotações recebidas pelo site
+            Gerencie cotações, envie orçamentos e responda clientes em tempo real
           </p>
         </div>
         <Button
@@ -239,6 +244,12 @@ export function AdminDashboard() {
                         onStatusSelect={(rec, status) => setStatusUpdate({ record: rec, status })}
                         onHistoryClick={(rec) => setHistoryRecord(rec)}
                         onBudgetClick={(rec) => setBudgetRecord(rec)}
+                        onSendEmailClick={(rec) =>
+                          setSendMessageState({ record: rec, mode: 'email' })
+                        }
+                        onSendWhatsAppClick={(rec) =>
+                          setSendMessageState({ record: rec, mode: 'whatsapp' })
+                        }
                       />
                     ))}
                   </tbody>
@@ -246,6 +257,10 @@ export function AdminDashboard() {
               </div>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="chat">
+          <AdminChatPanel />
         </TabsContent>
 
         {isAdmin && (
@@ -274,6 +289,15 @@ export function AdminDashboard() {
         open={!!budgetRecord}
         onOpenChange={(open) => !open && setBudgetRecord(null)}
         record={budgetRecord}
+        authorName={authorName}
+        onSuccess={loadData}
+      />
+
+      <SendMessageDialog
+        open={!!sendMessageState}
+        onOpenChange={(open) => !open && setSendMessageState(null)}
+        record={sendMessageState?.record || null}
+        mode={sendMessageState?.mode || 'email'}
         authorName={authorName}
         onSuccess={loadData}
       />

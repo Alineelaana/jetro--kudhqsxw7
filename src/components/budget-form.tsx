@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BudgetFormField } from '@/components/budget-form-field'
 import { ConsentCheckbox } from '@/components/consent-checkbox'
-import { BudgetFormExtras } from '@/components/budget-form-extras'
 import { getFormFields } from '@/services/budget-form-fields'
 import { createBudgetRequest } from '@/services/budget-requests'
 import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
@@ -75,22 +74,6 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
     if (values.volume_estimado) parts.push(`📊 *Volume:* ${values.volume_estimado}`)
     if (values.periodicidade) parts.push(`🗓️ *Periodicidade:* ${values.periodicidade}`)
     if (values.mensagem) parts.push(`📝 *Observações:* ${values.mensagem}`)
-    if (values.servicos_inclusos) parts.push(`✅ *Serviços Inclusos:* ${values.servicos_inclusos}`)
-    if (values.valor_mercadoria)
-      parts.push(`💰 *Valor da Mercadoria:* R$ ${values.valor_mercadoria}`)
-    if (values.necessita_seguro === 'Sim') parts.push(`🛡️ *Necessita Seguro:* Sim`)
-    if (values.necessita_picking === 'Sim') parts.push(`📦 *Necessita Picking:* Sim`)
-    if (values.necessita_cross_docking === 'Sim') parts.push(`🔄 *Necessita Cross Docking:* Sim`)
-    if (values.necessita_fracionamento === 'Sim') parts.push(`📏 *Necessita Fracionamento:* Sim`)
-    if (values.necessita_distribuicao === 'Sim') parts.push(`🚚 *Necessita Distribuição:* Sim`)
-    if (values.tipo_carga) parts.push(`🏷️ *Tipo de Carga:* ${values.tipo_carga}`)
-    if (values.prazo_desejado) parts.push(`⏱️ *Prazo Desejado:* ${values.prazo_desejado}`)
-    if (values.quantidade_volumes) parts.push(`📦 *Qtd. Volumes:* ${values.quantidade_volumes}`)
-    if (values.peso) parts.push(`⚖️ *Peso:* ${values.peso} kg`)
-    if (values.cubagem) parts.push(`📐 *Cubagem:* ${values.cubagem} m³`)
-    if (values.valor_seguro) parts.push(`🛡️ *Valor do Seguro:* R$ ${values.valor_seguro}`)
-    if (values.forma_pagamento) parts.push(`💳 *Forma de Pagamento:* ${values.forma_pagamento}`)
-    if (values.prazo) parts.push(`📅 *Prazo Comercial:* ${values.prazo}`)
     return parts.join('\n')
   }
 
@@ -238,8 +221,6 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
               </div>
             ))}
           </div>
-
-          <BudgetFormExtras values={values} onChange={handleChange} />
 
           <div className="space-y-4 pt-6 border-t border-border/60">
             <ConsentCheckbox

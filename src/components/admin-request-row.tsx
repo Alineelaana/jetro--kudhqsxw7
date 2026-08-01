@@ -1,6 +1,14 @@
 import { AdminRequestDetails } from '@/components/admin-request-details'
 import { getResponseTime } from '@/lib/response-time'
-import { ChevronDown, ChevronUp, History, Receipt, Settings2 } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  History,
+  Receipt,
+  Settings2,
+  Mail,
+  MessageCircle,
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -28,6 +36,8 @@ interface AdminRequestRowProps {
   onStatusSelect: (record: BudgetRecord, status: string) => void
   onHistoryClick: (record: BudgetRecord) => void
   onBudgetClick: (record: BudgetRecord) => void
+  onSendEmailClick: (record: BudgetRecord) => void
+  onSendWhatsAppClick: (record: BudgetRecord) => void
 }
 
 export function AdminRequestRow({
@@ -38,6 +48,8 @@ export function AdminRequestRow({
   onStatusSelect,
   onHistoryClick,
   onBudgetClick,
+  onSendEmailClick,
+  onSendWhatsAppClick,
 }: AdminRequestRowProps) {
   const status = record.status || 'PENDENTE'
   const responseTime = getResponseTime(record.created, record.quote_created_at)
@@ -85,13 +97,13 @@ export function AdminRequestRow({
           {formatDate(record.created)}
         </td>
         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <Button
               size="icon"
               variant="ghost"
               className="h-8 w-8"
               onClick={() => onHistoryClick(record)}
-              title="Histórico"
+              title="Ver Histórico de Alterações"
             >
               <History className="w-4 h-4 text-[#005B2E]" />
             </Button>
@@ -100,20 +112,46 @@ export function AdminRequestRow({
               variant="outline"
               className="h-8 border-[#C89B3C] text-[#C89B3C] hover:bg-[#C89B3C]/10 text-xs font-bold whitespace-nowrap"
               onClick={() => onBudgetClick(record)}
-              title="Criar Orçamento"
+              title="Gerar Proposta e PDF"
             >
-              <Receipt className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">Orçamento</span>
+              <Receipt className="w-3.5 h-3.5 mr-1" />
+              <span className="hidden xl:inline">Gerar Orçamento</span>
+              <span className="xl:hidden">Orçamento</span>
             </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 text-xs font-bold whitespace-nowrap"
+              onClick={() => onSendEmailClick(record)}
+              title="Enviar orçamento por e-mail"
+            >
+              <Mail className="w-3.5 h-3.5 mr-1 text-[#005B2E]" />
+              <span className="hidden 2xl:inline">Enviar por e-mail</span>
+              <span className="2xl:hidden">E-mail</span>
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 border-[#25D366] text-[#1da851] hover:bg-[#25D366]/10 text-xs font-bold whitespace-nowrap"
+              onClick={() => onSendWhatsAppClick(record)}
+              title="Enviar orçamento pelo WhatsApp"
+            >
+              <MessageCircle className="w-3.5 h-3.5 mr-1 text-[#25D366]" />
+              <span className="hidden 2xl:inline">Enviar pelo WhatsApp</span>
+              <span className="2xl:hidden">WhatsApp</span>
+            </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-8 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 text-xs font-bold whitespace-nowrap"
+                  className="h-8 border-border text-foreground hover:bg-muted text-xs font-semibold whitespace-nowrap"
                 >
-                  <Settings2 className="w-3 h-3 mr-1" />
-                  Alterar Status
+                  <Settings2 className="w-3.5 h-3.5 mr-1" />
+                  Status
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -124,6 +162,7 @@ export function AdminRequestRow({
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
             <Button
               size="icon"
               variant="ghost"
