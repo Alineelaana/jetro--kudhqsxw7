@@ -20,8 +20,8 @@ interface BudgetFormFieldProps {
 
 export function BudgetFormField({ field, value, onChange, error }: BudgetFormFieldProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor={field.name} className="text-sm font-medium text-foreground">
+    <div className="space-y-1.5">
+      <Label htmlFor={field.name} className="text-xs sm:text-sm font-semibold text-foreground">
         {field.label}
         {field.required && <span className="text-destructive ml-1">*</span>}
       </Label>
@@ -31,15 +31,24 @@ export function BudgetFormField({ field, value, onChange, error }: BudgetFormFie
           id={field.name}
           value={value}
           onChange={(e) => onChange(field.name, e.target.value)}
-          className={cn(error && 'border-destructive')}
+          placeholder="Descreva detalhes como dimensões, peso, janela de entrega ou requisitos especiais..."
+          className={cn(
+            'focus-visible:ring-[#005B2E] border-border',
+            error && 'border-destructive focus-visible:ring-destructive',
+          )}
           rows={3}
         />
       ) : field.type === 'select' ? (
         <Select value={value} onValueChange={(v) => onChange(field.name, v)}>
-          <SelectTrigger className={cn(error && 'border-destructive')}>
-            <SelectValue placeholder="Selecione..." />
+          <SelectTrigger
+            className={cn(
+              'focus:ring-[#005B2E] border-border bg-white',
+              error && 'border-destructive focus:ring-destructive',
+            )}
+          >
+            <SelectValue placeholder="Selecione uma opção..." />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white z-50">
             {field.options?.map((opt) => (
               <SelectItem key={opt} value={opt}>
                 {opt}
@@ -53,11 +62,21 @@ export function BudgetFormField({ field, value, onChange, error }: BudgetFormFie
           type={field.type}
           value={value}
           onChange={(e) => onChange(field.name, e.target.value)}
-          className={cn(error && 'border-destructive')}
+          placeholder={
+            field.type === 'email'
+              ? 'nome@empresa.com.br'
+              : field.type === 'tel'
+                ? '(27) 99999-9999'
+                : ''
+          }
+          className={cn(
+            'focus-visible:ring-[#005B2E] border-border',
+            error && 'border-destructive focus-visible:ring-destructive',
+          )}
         />
       )}
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className="text-xs text-destructive font-medium">{error}</p>}
     </div>
   )
 }

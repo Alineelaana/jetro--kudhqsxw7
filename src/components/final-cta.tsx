@@ -1,47 +1,65 @@
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
+import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-6748f.png'
 import { MessageCircle, Phone, Mail, MapPin } from 'lucide-react'
 
 export function FinalCTA() {
   const { whatsappNumber } = useSettings()
 
   return (
-    <section id="contato" className="py-20 bg-primary text-white">
-      <div className="container mx-auto px-4">
+    <section
+      id="contato"
+      className="py-20 bg-forest text-white border-t border-[#C89B3C]/30 relative overflow-hidden"
+    >
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl md:text-4xl font-bold">Pronto para otimizar sua logística?</h2>
-          <p className="text-white/80 text-lg">
-            Fale com nossa equipe e descubra como podemos ajudar sua empresa a reduzir custos e
-            ganhar eficiência.
+          <div className="flex justify-center mb-2">
+            <img src={logoDark} alt="VeloraLog" className="h-20 sm:h-24 w-auto object-contain" />
+          </div>
+
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            Pronto para elevar a eficiência da sua cadeia logística?
+          </h2>
+
+          <p className="text-white/80 text-base sm:text-lg max-w-xl mx-auto">
+            Fale diretamente com os consultores operacionais da VeloraLog e solicite um projeto
+            personalizado para sua empresa.
           </p>
-          <Button
-            asChild
-            size="lg"
-            className="bg-[#25D366] hover:bg-[#1da851] text-white text-base"
-          >
-            <a
-              href={buildWhatsAppUrl(
-                whatsappNumber,
-                'Olá! Gostaria de falar sobre serviços logísticos.',
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
+
+          <div className="pt-2">
+            <Button
+              asChild
+              size="lg"
+              className="bg-[#25D366] hover:bg-[#1da851] text-white font-extrabold text-lg px-8 shadow-xl"
             >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Falar pelo WhatsApp
-            </a>
-          </Button>
-          <div className="flex flex-wrap justify-center gap-8 pt-8 text-white/70 text-sm">
-            <span className="flex items-center gap-2">
-              <Phone className="w-4 h-4" /> (31) 99129-7619
-            </span>
-            <span className="flex items-center gap-2">
-              <Mail className="w-4 h-4" /> contato@logisticapremiumes.com.br
-            </span>
-            <span className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" /> Espírito Santo, Brasil
-            </span>
+              <a
+                href={buildWhatsAppUrl(
+                  whatsappNumber,
+                  'Olá! Gostaria de conversar com a equipe comercial da VeloraLog.',
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="w-6 h-6 mr-2" />
+                Falar com a VeloraLog no WhatsApp
+              </a>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 border-t border-white/10 text-white/80 text-sm">
+            <div className="flex items-center justify-center gap-2">
+              <Phone className="w-5 h-5 text-[#C89B3C]" />
+              <span>(31) 99129-7619</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <Mail className="w-5 h-5 text-[#C89B3C]" />
+              <span>contato@veloralog.com.br</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <MapPin className="w-5 h-5 text-[#C89B3C]" />
+              <span>Espírito Santo, Brasil</span>
+            </div>
           </div>
         </div>
       </div>

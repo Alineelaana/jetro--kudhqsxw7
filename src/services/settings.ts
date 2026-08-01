@@ -11,6 +11,9 @@ export async function getSetting(key: string): Promise<string | null> {
 }
 
 export async function getWhatsappNumber(): Promise<string> {
-  const value = await getSetting('whatsapp_number')
-  return value || DEFAULT_WHATSAPP_NUMBER
+  const companyWa = await getSetting('company_whatsapp')
+  if (companyWa) return companyWa
+  const waNum = await getSetting('whatsapp_number')
+  if (waNum) return waNum
+  return DEFAULT_WHATSAPP_NUMBER
 }

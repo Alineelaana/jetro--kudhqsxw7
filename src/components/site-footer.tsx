@@ -1,57 +1,74 @@
-import { Truck } from 'lucide-react'
+import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-6748f.png'
 
 export function SiteFooter() {
   return (
-    <footer className="bg-foreground text-white/70 py-12">
+    <footer className="bg-[#002B16] text-white/70 py-12 border-t border-white/10">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <Truck className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white">Logística Premium ES</span>
-            </div>
-            <p className="text-sm">
-              Operações logísticas de excelência no Espírito Santo e em todo o Brasil.
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          <div className="space-y-4">
+            <img
+              src={logoDark}
+              alt="VeloraLog Operações Logísticas"
+              className="h-14 w-auto object-contain"
+            />
+            <p className="text-sm leading-relaxed max-w-sm">
+              Operações Logísticas de Excelência no Espírito Santo. Soluções completas em
+              armazenagem WMS, transporte rodoviário, logística portuária e distribuição urbana.
             </p>
           </div>
-          <div className="space-y-2">
-            <h4 className="text-white font-semibold mb-2">Serviços</h4>
-            <ul className="text-sm space-y-1">
+
+          <div className="space-y-3">
+            <h4 className="text-white font-bold text-base border-b border-[#C89B3C]/30 pb-2 inline-block">
+              Soluções Logísticas
+            </h4>
+            <ul className="text-sm space-y-2">
               <li>
-                <a href="#servicos" className="hover:text-white transition-colors">
-                  Transporte Rodoviário
+                <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
+                  Armazenagem de Estoque (WMS)
                 </a>
               </li>
               <li>
-                <a href="#servicos" className="hover:text-white transition-colors">
-                  Armazenagem
+                <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
+                  Transporte de Cargas
                 </a>
               </li>
               <li>
-                <a href="#servicos" className="hover:text-white transition-colors">
-                  Distribuição
+                <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
+                  Distribuição Urbana e Delivery
                 </a>
               </li>
               <li>
-                <a href="#servicos" className="hover:text-white transition-colors">
+                <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
+                  Logística Portuária no ES
+                </a>
+              </li>
+              <li>
+                <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
                   Cross Docking
                 </a>
               </li>
             </ul>
           </div>
-          <div className="space-y-2">
-            <h4 className="text-white font-semibold mb-2">Contato</h4>
-            <ul className="text-sm space-y-1">
-              <li>(31) 99129-7619</li>
-              <li>contato@logisticapremiumes.com.br</li>
+
+          <div className="space-y-3">
+            <h4 className="text-white font-bold text-base border-b border-[#C89B3C]/30 pb-2 inline-block">
+              Contato & Localização
+            </h4>
+            <ul className="text-sm space-y-2">
+              <li>Central de Atendimento: (31) 99129-7619</li>
+              <li>E-mail Comercial: contato@veloralog.com.br</li>
+              <li>Atendimento: Segunda a Sexta, 08h às 18h</li>
               <li>Espírito Santo, Brasil</li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/10 mt-8 pt-8 text-sm text-center">
-          © {new Date().getFullYear()} Logística Premium ES. Todos os direitos reservados.
+
+        <div className="border-t border-white/10 mt-10 pt-6 text-xs text-center text-white/50 flex flex-col sm:flex-row justify-between items-center gap-2">
+          <span>
+            © {new Date().getFullYear()} VeloraLog Operações Logísticas. Todos os direitos
+            reservados.
+          </span>
+          <span>VeloraLog - Excelência em Soluções Logísticas no ES</span>
         </div>
       </div>
     </footer>

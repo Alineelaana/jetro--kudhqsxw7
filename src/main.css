@@ -5,78 +5,71 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 142 10% 15%;
+    --foreground: 152 70% 8%;
+
     --card: 0 0% 100%;
-    --card-foreground: 142 10% 15%;
+    --card-foreground: 152 70% 8%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 142 10% 15%;
-    --primary: 142 68% 22%;
+    --popover-foreground: 152 70% 8%;
+
+    --primary: 150 100% 18%; /* #005B2E - Verde Bandeira Premium */
     --primary-foreground: 0 0% 100%;
-    --secondary: 142 30% 96%;
-    --secondary-foreground: 142 68% 22%;
-    --muted: 142 10% 96%;
-    --muted-foreground: 142 5% 45%;
-    --accent: 142 30% 92%;
-    --accent-foreground: 142 68% 22%;
+
+    --secondary: 150 83% 26%; /* #0B7A43 - Verde Esmeralda */
+    --secondary-foreground: 0 0% 100%;
+
+    --gold: 41 54% 51%; /* #C89B3C - Gold Metallic */
+    --gold-light: 45 68% 65%; /* #E4C46A - Champagne Gold */
+    --gold-dark: 40 54% 34%; /* #8F6A1E - Antique Gold */
+
+    --forest: 152 96% 11%; /* #01361D - Deep Forest Green */
+
+    --muted: 150 20% 96%;
+    --muted-foreground: 150 15% 40%;
+
+    --accent: 41 54% 51%;
+    --accent-foreground: 0 0% 100%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 142 10% 90%;
-    --input: 142 10% 90%;
-    --ring: 142 68% 22%;
-    --radius: 0.5rem;
-    --gold: 43 86% 49%;
 
-    --chart-1: 142 68% 22%;
-    --chart-2: 43 86% 49%;
-    --chart-3: 142 40% 50%;
-    --chart-4: 142 30% 70%;
-    --chart-5: 43 60% 40%;
-  }
+    --border: 150 20% 88%;
+    --input: 150 20% 88%;
+    --ring: 41 54% 51%;
 
-  .dark {
-    --background: 142 20% 8%;
-    --foreground: 0 0% 98%;
-    --card: 142 20% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 142 20% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142 68% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 142 20% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 142 20% 15%;
-    --muted-foreground: 142 10% 65%;
-    --accent: 142 20% 20%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 142 20% 20%;
-    --input: 142 20% 20%;
-    --ring: 142 68% 35%;
-    --gold: 43 86% 49%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings:
-      'rlig' 1,
-      'calt' 1;
+    --radius: 0.75rem;
   }
 }
 
 @layer utilities {
-  .text-gold {
-    color: hsl(var(--gold));
+  .bg-forest {
+    background-color: #01361d;
   }
-  .bg-gold {
-    background-color: hsl(var(--gold));
+  .bg-primary-green {
+    background-color: #005b2e;
   }
-  .border-gold {
-    border-color: hsl(var(--gold));
+  .bg-gold-metallic {
+    background-color: #c89b3c;
+  }
+  .text-primary-green {
+    color: #005b2e;
+  }
+  .text-gold-metallic {
+    color: #c89b3c;
+  }
+  .border-gold-metallic {
+    border-color: #c89b3c;
+  }
+  .gold-gradient-text {
+    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 50%, #8f6a1e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .gold-gradient-bg {
+    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 50%, #8f6a1e 100%);
+  }
+  .green-gold-border {
+    border: 1px solid rgba(200, 155, 60, 0.3);
   }
 }
