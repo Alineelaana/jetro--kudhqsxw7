@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T18:42:38.763Z",
+  "generatedAt": "2026-08-01T18:53:20.366Z",
   "collections": [
     {
       "name": "users",
@@ -462,6 +462,53 @@
         "CREATE INDEX idx_chat_ratings_attendant ON chat_ratings (attendant)",
         "CREATE INDEX idx_chat_ratings_conversation ON chat_ratings (conversation)"
       ]
+    },
+    {
+      "name": "ai_training",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.role = 'SUP'",
+        "update": "@request.auth.role = 'SUP'",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instruction", "qa", "template"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_ai_training_type ON ai_training (type)"]
     }
   ]
 }

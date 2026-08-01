@@ -11,8 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Send, MessageSquare, Users, SpellCheck, Lock } from 'lucide-react'
+import {
+  Send,
+  MessageSquare,
+  Users,
+  SpellCheck,
+  Lock,
+  Bot,
+  ToggleLeft,
+  ToggleRight,
+} from 'lucide-react'
 import { EmojiPicker } from '@/components/emoji-picker'
+import { getAiFulltimeActive, setAiFulltimeActive } from '@/services/ai-settings'
 import {
   getConversations,
   getConversationMessages,
@@ -33,7 +43,7 @@ const STATUS_OPTS = [
 ]
 
 export function AdminChatPanel() {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const [conversations, setConversations] = useState<ChatConversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -41,6 +51,8 @@ export function AdminChatPanel() {
   const [sending, setSending] = useState(false)
   const [spellchecking, setSpellchecking] = useState(false)
   const [status, setStatus] = useState<string>((user?.attendant_status as string) || 'Offline')
+  const [aiFulltimeActive, setAiFulltimeActiveState] = useState(false)
+  const [aiToggling, setAiToggling] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const loadConversations = useCallback(async () => {
@@ -62,6 +74,12 @@ export function AdminChatPanel() {
   useEffect(() => {
     loadConversations()
   }, [loadConversations])
+
+  useEffect(() => {
+    getAiFulltimeActive()
+      .then(setAiFulltimeActiveState)
+      .catch(() => {})
+  }, [])
   useEffect(() => {
     if (selectedId) loadMessages(selectedId)
   }, [selectedId, loadMessages])
@@ -69,6 +87,11 @@ export function AdminChatPanel() {
   useRealtime('chat_conversations', () => loadConversations())
   useRealtime('chat_messages', () => {
     if (selectedId) loadMessages(selectedId)
+  })
+  useRealtime('settings', () => {
+    getAiFulltimeActive()
+      .then(setAiFulltimeActiveState)
+      .catch(() => {})
   })
 
   useEffect(() => {
@@ -120,12 +143,65 @@ export function AdminChatPanel() {
     }
   }
 
+  const handleToggleAi = async () => {
+    if (aiToggling) return
+    setAiToggling(true)
+    const newValue = !aiFulltimeActive
+    try {
+      await setAiFulltimeActive(newValue)
+      setAiFulltimeActiveState(newValue)
+    } catch {
+      /* intentionally ignored */
+    }
+    setAiToggling(false)
+  }
+
   const handleEmojiInsert = (emoji: string) => setInput((prev) => prev + emoji)
   const selectedConv = conversations.find((c) => c.id === selectedId)
   const isClosed = selectedConv?.closed === true
 
   return (
     <div className="flex flex-col gap-4">
+      {isAdmin && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#C89B3C]/30 bg-gradient-to-r from-[#C89B3C]/5 to-[#005B2E]/5">
+          <div className="flex items-center gap-3">
+            <Bot className="w-5 h-5 text-[#C89B3C] flex-shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-foreground">
+                Ativar Srta. Velora em tempo integral
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A IA responderá automaticamente todas as mensagens do chat
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleToggleAi}
+            disabled={aiToggling}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex-shrink-0',
+              aiFulltimeActive
+                ? 'bg-[#005B2E] text-white hover:bg-[#01361D]'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80',
+            )}
+          >
+            {aiFulltimeActive ? (
+              <ToggleRight className="w-5 h-5" />
+            ) : (
+              <ToggleLeft className="w-5 h-5" />
+            )}
+            {aiFulltimeActive ? 'Ativada' : 'Desativada'}
+          </button>
+        </div>
+      )}
+      {aiFulltimeActive && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#005B2E]/10 border border-[#005B2E]/20">
+          <Bot className="w-4 h-4 text-[#005B2E] flex-shrink-0" />
+          <span className="text-sm font-bold text-[#005B2E]">
+            Srta. Velora está atendendo em tempo integral no chat online.
+          </span>
+        </div>
+      )}
       <div className="flex items-center gap-3">
         <span className="text-sm font-bold text-foreground">Seu status:</span>
         <Select value={status} onValueChange={handleStatusChange}>

@@ -15,6 +15,7 @@ import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { SendMessageDialog } from '@/components/send-message-dialog'
 import { UserManagement } from '@/components/user-management'
 import { AdminChatPanel } from '@/components/admin-chat-panel'
+import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { type BudgetRecord } from '@/lib/types'
 import {
@@ -265,8 +266,9 @@ export function AdminDashboard() {
           <DashboardsPanel />
         </TabsContent>
 
-        <TabsContent value="chat">
+        <TabsContent value="chat" className="space-y-6">
           <AdminChatPanel />
+          {isAdmin && <AiTrainingPanel />}
         </TabsContent>
 
         {isAdmin && (

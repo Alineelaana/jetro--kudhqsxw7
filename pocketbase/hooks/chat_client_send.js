@@ -1,15 +1,23 @@
 routerAdd('POST', '/backend/v1/chat/send', (e) => {
   try {
-    const body = e.requestInfo().body || {}
-    const convId = body.conversation_id || ''
-    const clientName = body.client_name || 'Visitante'
-    const clientEmail = body.client_email || ''
-    const clientPhone = body.client_phone || ''
-    const message = (body.message || '').trim()
+    var body = e.requestInfo().body || {}
+    var convId = body.conversation_id || ''
+    var clientName = body.client_name || 'Visitante'
+    var clientEmail = body.client_email || ''
+    var clientPhone = body.client_phone || ''
+    var message = (body.message || '').trim()
 
     if (!message) return e.badRequestError('Mensagem é obrigatória')
 
-    let conversation = null
+    var aiFulltimeActive = false
+    try {
+      var aiSetting = $app.findFirstRecordByData('settings', 'key', 'ai_fulltime_active')
+      if (aiSetting && aiSetting.getString('value') === 'true') {
+        aiFulltimeActive = true
+      }
+    } catch (_) {}
+
+    var conversation = null
 
     if (convId) {
       try {
@@ -19,10 +27,10 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       }
     }
 
-    const now = new Date().toISOString()
+    var now = new Date().toISOString()
 
     if (!conversation) {
-      const convCol = $app.findCollectionByNameOrId('chat_conversations')
+      var convCol = $app.findCollectionByNameOrId('chat_conversations')
       conversation = new Record(convCol)
       conversation.set('client_name', clientName)
       conversation.set('client_email', clientEmail)
@@ -38,54 +46,110 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       $app.save(conversation)
     }
 
-    const msgCol = $app.findCollectionByNameOrId('chat_messages')
-    const clientMsg = new Record(msgCol)
+    var msgCol = $app.findCollectionByNameOrId('chat_messages')
+    var clientMsg = new Record(msgCol)
     clientMsg.set('conversation_id', conversation.id)
     clientMsg.set('sender', 'client')
     clientMsg.set('content', message)
     clientMsg.set('author_name', clientName)
     $app.save(clientMsg)
 
-    let hasOnlineAttendant = false
-    try {
-      const onlineAttendants = $app.findRecordsByFilter(
-        'users',
-        "attendant_status = 'Online'",
-        '',
-        1,
-        0,
-      )
-      hasOnlineAttendant = onlineAttendants.length > 0
-    } catch (_) {}
+    var shouldAiRespond = false
 
-    if (!hasOnlineAttendant) {
+    if (aiFulltimeActive) {
+      shouldAiRespond = true
+    } else {
+      var hasOnlineAttendant = false
       try {
-        const reply = $ai.chat({
-          model: 'fast',
-          messages: [
-            {
-              role: 'system',
-              content:
-                'Você é a Srta. Velora, atendente virtual da VeloraLog, empresa de operações logísticas no Espírito Santo. No momento não há atendentes humanos disponíveis. Seja educada, simpática e acolhedora. Informe que não há atendentes disponíveis no momento, mas que o cliente pode deixar seu contato (nome, telefone ou e-mail) que retornaremos assim que possível. Responda sempre em português brasileiro de forma breve. Se o cliente já deixou contato, agradeça e diga que retornaremos em breve.',
-            },
-            { role: 'user', content: message },
-          ],
-        })
+        var onlineAttendants = $app.findRecordsByFilter(
+          'users',
+          "attendant_status = 'Online'",
+          '',
+          1,
+          0,
+        )
+        hasOnlineAttendant = onlineAttendants.length > 0
+      } catch (_) {}
+      if (!hasOnlineAttendant) shouldAiRespond = true
+    }
 
-        const aiContent = reply.choices[0].message.content
-        const aiMsg = new Record(msgCol)
+    if (shouldAiRespond) {
+      var trainingContent = ''
+      try {
+        var trainings = $app.findRecordsByFilter('ai_training', "id != ''", '-created', 50, 0)
+        if (trainings.length > 0) {
+          trainingContent = '\n\n--- CONTEÚDO DE TREINAMENTO DA EMPRESA ---\n'
+          for (var i = 0; i < trainings.length; i++) {
+            var t = trainings[i]
+            var tType = t.getString('type')
+            var tLabel =
+              tType === 'qa'
+                ? 'Pergunta e Resposta'
+                : tType === 'template'
+                  ? 'Template de Resposta'
+                  : 'Instrução'
+            trainingContent +=
+              '\n[' + tLabel + '] ' + t.getString('title') + ':\n' + t.getString('content') + '\n'
+          }
+          trainingContent += '--- FIM DO CONTEÚDO DE TREINAMENTO ---\n'
+        }
+      } catch (_) {}
+
+      var historyMessages = []
+      try {
+        var recentMsgs = $app.findRecordsByFilter(
+          'chat_messages',
+          "conversation_id = '" + conversation.id + "'",
+          '-created',
+          11,
+          0,
+        )
+        recentMsgs.reverse()
+        for (var j = 0; j < recentMsgs.length; j++) {
+          var hm = recentMsgs[j]
+          if (hm.id === clientMsg.id) continue
+          var role = hm.getString('sender') === 'client' ? 'user' : 'assistant'
+          historyMessages.push({ role: role, content: hm.getString('content') })
+        }
+      } catch (_) {}
+
+      var systemPrompt =
+        'Você é a Srta. Velora, atendente virtual da VeloraLog, empresa de operações logísticas no Espírito Santo. Seja educada, simpática e profissional. Responda sempre em português brasileiro de forma breve e clara.'
+      systemPrompt +=
+        '\n\nVocê atua dentro do escopo dos serviços da VeloraLog: armazenagem de produtos em estoque, transporte de cargas, distribuição urbana e last mile, centro de distribuição, logística portuária, cross docking e gestão de frota e rastreamento.'
+      systemPrompt +=
+        '\nSe o cliente perguntar sobre assuntos totalmente fora do escopo da empresa, redirecione educadamente para um atendente humano, informando que um atendente entrará em contato.'
+      systemPrompt +=
+        '\nMantenha uma persona consistente e profissional, alinhada com a identidade da VeloraLog.'
+
+      if (trainingContent) {
+        systemPrompt +=
+          '\n\nUse o conteúdo de treinamento abaixo como base para suas respostas, adaptando-se ao modelo de trabalho e formato de serviço da empresa:'
+        systemPrompt += trainingContent
+      }
+
+      var aiMessages = [{ role: 'system', content: systemPrompt }]
+      for (var k = 0; k < historyMessages.length; k++) {
+        aiMessages.push(historyMessages[k])
+      }
+      aiMessages.push({ role: 'user', content: message })
+
+      try {
+        var reply = $ai.chat({ model: 'fast', messages: aiMessages })
+        var aiContent = reply.choices[0].message.content
+        var aiMsg = new Record(msgCol)
         aiMsg.set('conversation_id', conversation.id)
         aiMsg.set('sender', 'ai')
         aiMsg.set('content', aiContent)
         aiMsg.set('author_name', 'Srta. Velora (IA)')
         $app.save(aiMsg)
       } catch (err) {
-        const fallbackMsg = new Record(msgCol)
+        var fallbackMsg = new Record(msgCol)
         fallbackMsg.set('conversation_id', conversation.id)
         fallbackMsg.set('sender', 'ai')
         fallbackMsg.set(
           'content',
-          'Olá! No momento não temos atendentes disponíveis. Mas pode deixar seu nome e telefone ou e-mail que retornaremos assim que possível. Obrigado!',
+          'Olá! Recebi sua mensagem. No momento estamos processando sua solicitação. Um de nossos atendentes entrará em contato em breve. Obrigado!',
         )
         fallbackMsg.set('author_name', 'Srta. Velora (IA)')
         $app.save(fallbackMsg)
