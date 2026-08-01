@@ -7,6 +7,7 @@ import { AuthProvider } from '@/hooks/use-auth'
 import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
+import AdminRegister from './pages/AdminRegister'
 import PoliticaPrivacidade from './pages/PoliticaPrivacidade'
 import PoliticaComercial from './pages/PoliticaComercial'
 import TermosDeUso from './pages/TermosDeUso'
@@ -24,6 +25,7 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/cadastro" element={<AdminRegister />} />
             </Route>
             <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
             <Route path="/politica-comercial" element={<PoliticaComercial />} />

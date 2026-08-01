@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -95,6 +96,12 @@ export function AdminLogin() {
                 </>
               )}
             </Button>
+            <Link
+              to="/admin/cadastro"
+              className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+            >
+              Cadastre-se
+            </Link>
           </form>
         </CardContent>
       </Card>

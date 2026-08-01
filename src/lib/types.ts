@@ -1,0 +1,42 @@
+export type BudgetStatus =
+  | 'PENDENTE'
+  | 'EM ANDAMENTO'
+  | 'CONCLUÍDO'
+  | 'CANCELADO'
+  | 'EM CONTATO COM O CLIENTE'
+
+export const STATUS_OPTIONS: BudgetStatus[] = [
+  'PENDENTE',
+  'EM ANDAMENTO',
+  'EM CONTATO COM O CLIENTE',
+  'CONCLUÍDO',
+  'CANCELADO',
+]
+
+export const STATUS_COLORS: Record<string, string> = {
+  PENDENTE: 'bg-amber-100 text-amber-800 border-amber-300',
+  'EM ANDAMENTO': 'bg-blue-100 text-blue-800 border-blue-300',
+  'EM CONTATO COM O CLIENTE': 'bg-cyan-100 text-cyan-800 border-cyan-300',
+  CONCLUÍDO: 'bg-green-100 text-green-800 border-green-300',
+  CANCELADO: 'bg-red-100 text-red-800 border-red-300',
+}
+
+export interface StatusHistoryEntry {
+  status: string
+  note: string
+  author: string
+  date: string
+}
+
+export interface BudgetRecord {
+  id: string
+  data: Record<string, unknown>
+  client_name: string
+  client_email: string
+  client_phone: string
+  service: string
+  status: string
+  status_history: StatusHistoryEntry[]
+  created: string
+  updated: string
+}

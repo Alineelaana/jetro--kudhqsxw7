@@ -5,7 +5,9 @@ interface AuthContextType {
   user: Record<string, unknown> | null
   isAuthenticated: boolean
   isAdmin: boolean
+  userRole: string
   login: (username: string, password: string) => Promise<{ error: string | null }>
+  signUp: (name: string, email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => void
   loading: boolean
 }
@@ -68,14 +70,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const signUp = async (name: string, email: string, password: string) => {
+    try {
+      await pb.collection('users').create({
+        name,
+        email,
+        password,
+        passwordConfirm: password,
+      })
+      return { error: null }
+    } catch (error: unknown) {
+      const err = error as {
+        status?: number
+        response?: { data?: { email?: { message?: string }; password?: { message?: string } } }
+      }
+      if (err?.status === 0) return { error: 'Erro de conexão. Verifique sua internet.' }
+      if (err?.response?.data?.email) return { error: 'Este e-mail já está cadastrado.' }
+      if (err?.response?.data?.password)
+        return { error: 'A senha deve ter no mínimo 8 caracteres.' }
+      return { error: 'Não foi possível cadastrar. Verifique os dados e tente novamente.' }
+    }
+  }
+
   const signOut = () => {
     pb.authStore.clear()
   }
 
-  const isAdmin = isAuthenticated && (user?.email as string) === ADMIN_EMAIL
+  const userRole =
+    (user?.role as string) || ((user?.email as string) === ADMIN_EMAIL ? 'SUP' : 'PADRAO')
+  const isAdmin = isAuthenticated && userRole === 'SUP'
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, signOut, loading }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, isAdmin, userRole, login, signUp, signOut, loading }}
+    >
       {children}
     </AuthContext.Provider>
   )

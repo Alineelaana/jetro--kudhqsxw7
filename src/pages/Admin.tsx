@@ -4,7 +4,7 @@ import { AdminDashboard } from '@/components/admin-dashboard'
 import { Loader2 } from 'lucide-react'
 
 export default function Admin() {
-  const { isAdmin, loading } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
 
   if (loading) {
     return (
@@ -14,7 +14,7 @@ export default function Admin() {
     )
   }
 
-  if (!isAdmin) {
+  if (!isAuthenticated) {
     return <AdminLogin />
   }
 

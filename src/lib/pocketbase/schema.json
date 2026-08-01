@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-01T16:08:39.746Z",
+  "generatedAt": "2026-08-01T16:24:50.106Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || id = @request.auth.id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || id = @request.auth.id)",
         "create": "",
-        "update": "id = @request.auth.id",
-        "delete": "id = @request.auth.id"
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || id = @request.auth.id)",
+        "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
         {
@@ -37,11 +37,19 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["SUP", "PADRAO"]
         }
       ],
       "indexes": [
         "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
-        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''",
+        "CREATE INDEX `idx_users_role` ON `users` (role)"
       ]
     },
     {
@@ -159,11 +167,11 @@
       "name": "budget_requests",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.email = \"veloralog@veloralog.com\"",
-        "view": "@request.auth.email = \"veloralog@veloralog.com\"",
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
         "create": "",
-        "update": null,
-        "delete": null
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
         {
@@ -209,12 +217,25 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status_history",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_budget_requests_client_email ON budget_requests (client_email)",
         "CREATE INDEX idx_budget_requests_service ON budget_requests (service)",
-        "CREATE INDEX idx_budget_requests_created ON budget_requests (created)"
+        "CREATE INDEX idx_budget_requests_created ON budget_requests (created)",
+        "CREATE INDEX `idx_budget_requests_status` ON `budget_requests` (status)"
       ]
     }
   ]
