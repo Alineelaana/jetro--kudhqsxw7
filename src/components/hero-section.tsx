@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 
 const DIFFERENTIALS = [
-  { icon: ShieldCheck, label: 'Segurança & Seguro Total (RCTR-C/RCF-DC)' },
+  { icon: ShieldCheck, label: 'Sistema de força de vendas para que você use em sua operação' },
   { icon: Warehouse, label: 'Armazenagem WMS em Espaço Próprio' },
   { icon: Clock, label: 'SLA de Expedição 99.8%' },
   { icon: Boxes, label: '+15.000 Pos. Paletes no ES' },
@@ -53,7 +53,7 @@ export function HeroSection() {
 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/50 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
             <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
-            <span>Infraestrutura Própria & Operação em Tempo Real no ES</span>
+            <span>Infraestrutura Própria, Operação Segura e Otimizada</span>
           </div>
 
           {responseTimeFormatted && (

@@ -19,7 +19,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur border-b border-[#C89B3C]/30 shadow-sm">
+    <header className="sticky top-0 z-40 w-full bg-[#01361D] border-b border-[#C89B3C]/30 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <a href="#inicio" className="flex items-center gap-2 group">
@@ -35,7 +35,7 @@ export function SiteHeader() {
               <a
                 key={link.href + link.label}
                 href={link.href}
-                className="text-sm font-bold text-foreground/80 hover:text-[#005B2E] transition-colors"
+                className="text-sm font-bold text-white/80 hover:text-[#E4C46A] transition-colors"
               >
                 {link.label}
               </a>
