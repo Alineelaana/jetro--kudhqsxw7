@@ -15,6 +15,7 @@ import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { SendMessageDialog } from '@/components/send-message-dialog'
 import { UserManagement } from '@/components/user-management'
 import { AdminChatPanel } from '@/components/admin-chat-panel'
+import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { type BudgetRecord } from '@/lib/types'
 import {
   LogOut,
@@ -115,6 +116,7 @@ export function AdminDashboard() {
       <Tabs defaultValue="solicitacoes">
         <TabsList className="mb-6">
           <TabsTrigger value="solicitacoes">Solicitações</TabsTrigger>
+          <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
           <TabsTrigger value="chat">Chat Online</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
         </TabsList>
@@ -257,6 +259,10 @@ export function AdminDashboard() {
               </div>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="dashboards">
+          <DashboardsPanel />
         </TabsContent>
 
         <TabsContent value="chat">

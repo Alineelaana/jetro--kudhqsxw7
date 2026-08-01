@@ -51,6 +51,10 @@ export async function getConversationMessages(conversationId: string): Promise<C
   })
 }
 
+export async function getAllChatMessages(): Promise<ChatMessage[]> {
+  return pb.collection('chat_messages').getFullList({ sort: 'created' })
+}
+
 export async function replyToConversation(conversationId: string, content: string): Promise<void> {
   await pb.send('/backend/v1/chat/reply', {
     method: 'POST',
