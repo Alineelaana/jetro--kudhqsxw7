@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { STATUS_OPTIONS, STATUS_COLORS, type BudgetRecord } from '@/lib/types'
 
 function formatDate(iso: string): string {
@@ -119,107 +120,137 @@ export function AdminRequestRow({
         >
           {formatDate(record.created)}
         </td>
-        <td className={cellPad} onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-1 flex-nowrap">
-            <span
-              className={cn(
-                'font-bold px-1.5 py-0.5 rounded border whitespace-nowrap shrink-0',
-                compact ? 'text-[9px]' : 'text-[10px]',
-                STATUS_COLORS[status] || STATUS_COLORS['PENDENTE'],
-              )}
-              title={status}
-            >
-              {status}
-            </span>
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn(
-                iconBtn,
-                'text-[#C89B3C] hover:bg-[#C89B3C]/10 hover:text-[#C89B3C] shrink-0',
-              )}
-              onClick={() => onBudgetClick(record)}
-              title="Abrir orçamento"
-              aria-label="Abrir orçamento"
-            >
-              <Receipt className={iconMd} />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn(
-                iconBtn,
-                'text-[#005B2E] hover:bg-[#005B2E]/10 hover:text-[#005B2E] shrink-0',
-              )}
-              onClick={() => onSendEmailClick(record)}
-              title="Enviar e-mail"
-              aria-label="Enviar e-mail"
-            >
-              <Mail className={iconMd} />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn(
-                iconBtn,
-                'text-[#1da851] hover:bg-[#25D366]/10 hover:text-[#1da851] shrink-0',
-              )}
-              onClick={() => onSendWhatsAppClick(record)}
-              title="Abrir WhatsApp"
-              aria-label="Abrir WhatsApp"
-            >
-              <MessageCircle className={iconMd} />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn(iconBtn, 'text-[#005B2E] hover:bg-[#005B2E]/10 shrink-0')}
-              onClick={() => onHistoryClick(record)}
-              title="Ver histórico de alterações"
-              aria-label="Ver histórico de alterações"
-            >
-              <History className={iconMd} />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+        <td className={cellPad}>
+          <span
+            className={cn(
+              'font-bold px-1.5 py-0.5 rounded border whitespace-nowrap',
+              compact ? 'text-[9px]' : 'text-[10px]',
+              STATUS_COLORS[status] || STATUS_COLORS['PENDENTE'],
+            )}
+            title={status}
+          >
+            {status}
+          </span>
+        </td>
+        <td className={cn(cellPad, 'text-center')} onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-center gap-1 flex-nowrap">
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button
                   size="icon"
                   variant="ghost"
-                  className={cn(iconBtn, 'text-foreground hover:bg-muted shrink-0')}
-                  title="Alterar status"
-                  aria-label="Alterar status"
+                  className={cn(
+                    iconBtn,
+                    'text-[#C89B3C] hover:bg-[#C89B3C]/10 hover:text-[#C89B3C] shrink-0',
+                  )}
+                  onClick={() => onBudgetClick(record)}
+                  aria-label="Orçamento"
                 >
-                  <Settings2 className={iconMd} />
+                  <Receipt className={iconMd} />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {STATUS_OPTIONS.map((s) => (
-                  <DropdownMenuItem key={s} onClick={() => onStatusSelect(record, s)}>
-                    {s}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn(iconBtn, 'shrink-0')}
-              onClick={onToggle}
-              title={isExpanded ? 'Recolher detalhes' : 'Expandir detalhes'}
-              aria-label={isExpanded ? 'Recolher detalhes' : 'Expandir detalhes'}
-            >
-              {isExpanded ? (
-                <ChevronUp className={cn(iconMd, 'text-[#005B2E]')} />
-              ) : (
-                <ChevronDown className={cn(iconMd, 'text-[#005B2E]')} />
-              )}
-            </Button>
+              </TooltipTrigger>
+              <TooltipContent>Orçamento</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={cn(
+                    iconBtn,
+                    'text-[#005B2E] hover:bg-[#005B2E]/10 hover:text-[#005B2E] shrink-0',
+                  )}
+                  onClick={() => onSendEmailClick(record)}
+                  aria-label="E-mail"
+                >
+                  <Mail className={iconMd} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>E-mail</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={cn(
+                    iconBtn,
+                    'text-[#1da851] hover:bg-[#25D366]/10 hover:text-[#1da851] shrink-0',
+                  )}
+                  onClick={() => onSendWhatsAppClick(record)}
+                  aria-label="WhatsApp"
+                >
+                  <MessageCircle className={iconMd} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>WhatsApp</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={cn(iconBtn, 'text-[#005B2E] hover:bg-[#005B2E]/10 shrink-0')}
+                  onClick={() => onHistoryClick(record)}
+                  aria-label="Histórico de alterações"
+                >
+                  <History className={iconMd} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Histórico de alterações</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={cn(iconBtn, 'text-foreground hover:bg-muted shrink-0')}
+                        aria-label="Alterar status"
+                      >
+                        <Settings2 className={iconMd} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {STATUS_OPTIONS.map((s) => (
+                        <DropdownMenuItem key={s} onClick={() => onStatusSelect(record, s)}>
+                          {s}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Alterar status</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={cn(iconBtn, 'shrink-0')}
+                  onClick={onToggle}
+                  aria-label={isExpanded ? 'Recolher detalhes' : 'Expandir detalhes'}
+                >
+                  {isExpanded ? (
+                    <ChevronUp className={cn(iconMd, 'text-[#005B2E]')} />
+                  ) : (
+                    <ChevronDown className={cn(iconMd, 'text-[#005B2E]')} />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isExpanded ? 'Recolher detalhes' : 'Expandir detalhes'}
+              </TooltipContent>
+            </Tooltip>
           </div>
         </td>
       </tr>
       {isExpanded && (
         <tr className="bg-muted/30">
-          <td colSpan={7} className="px-4 py-4">
+          <td colSpan={8} className="px-4 py-4">
             <AdminRequestDetails data={record.data} labelMap={labelMap} record={record} />
           </td>
         </tr>

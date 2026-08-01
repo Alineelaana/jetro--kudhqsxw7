@@ -316,7 +316,8 @@ export function AdminDashboard() {
                         Tempo
                       </th>
                       <th className="text-left px-3 py-3 font-bold w-[12%]">Data/Hora</th>
-                      <th className="text-left px-3 py-3 font-bold w-[29%]">Ações</th>
+                      <th className="text-left px-3 py-3 font-bold w-[10%]">Status</th>
+                      <th className="text-center px-3 py-3 font-bold w-[19%]">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
