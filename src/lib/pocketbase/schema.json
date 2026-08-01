@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T12:58:49.080Z",
+  "generatedAt": "2026-08-01T13:24:12.454Z",
   "collections": [
     {
       "name": "users",
@@ -42,6 +42,179 @@
       "indexes": [
         "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
         "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+      ]
+    },
+    {
+      "name": "settings",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_settings_key ON settings (key)"]
+    },
+    {
+      "name": "budget_form_fields",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["text", "email", "tel", "textarea", "select"]
+        },
+        {
+          "name": "options",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_budget_form_fields_order ON budget_form_fields (order)"]
+    },
+    {
+      "name": "budget_requests",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "data",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_phone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "service",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_budget_requests_client_email ON budget_requests (client_email)",
+        "CREATE INDEX idx_budget_requests_service ON budget_requests (service)",
+        "CREATE INDEX idx_budget_requests_created ON budget_requests (created)"
       ]
     }
   ]

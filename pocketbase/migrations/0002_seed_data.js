@@ -12,26 +12,6 @@ migrate(
 
     const fieldsCol = app.findCollectionByNameOrId('budget_form_fields')
 
-    var serviceOptions = [
-      'Transporte Rodoviario de Cargas',
-      'Distribuicao e Last Mile',
-      'Armazenagem de Produtos em Estoque',
-      'Cross Docking',
-      'Logistica Portuaria',
-      'Gestao de Frota',
-      'Logistica Integrada',
-    ]
-    var operationOptions = [
-      'Transporte',
-      'Distribuicao',
-      'Armazenagem',
-      'Cross Docking',
-      'Logistica Portuaria',
-      'Gestao de Frota',
-      'Operacao Completa',
-    ]
-    var periodicityOptions = ['Operacao Unica', 'Recorrente', 'Urgente']
-
     var fields = [
       {
         name: 'nome_completo',
@@ -57,7 +37,15 @@ migrate(
         type: 'select',
         required: true,
         order: 5,
-        values: serviceOptions,
+        values: [
+          'Transporte Rodoviario de Cargas',
+          'Distribuicao e Last Mile',
+          'Armazenagem de Produtos em Estoque',
+          'Cross Docking',
+          'Logistica Portuaria',
+          'Gestao de Frota',
+          'Logistica Integrada',
+        ],
       },
       {
         name: 'tipo_operacao',
@@ -65,7 +53,15 @@ migrate(
         type: 'select',
         required: false,
         order: 6,
-        values: operationOptions,
+        values: [
+          'Transporte',
+          'Distribuicao',
+          'Armazenagem',
+          'Cross Docking',
+          'Logistica Portuaria',
+          'Gestao de Frota',
+          'Operacao Completa',
+        ],
       },
       {
         name: 'cidade_origem',
@@ -105,7 +101,7 @@ migrate(
         type: 'select',
         required: false,
         order: 11,
-        values: periodicityOptions,
+        values: ['Operacao Unica', 'Recorrente', 'Urgente'],
       },
       {
         name: 'mensagem',
