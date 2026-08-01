@@ -6,9 +6,6 @@ const PRESENTATION_MESSAGE =
 const DIFFERENTIALS_TEXT =
   'A VeloraLog oferece muito mais do que serviços logísticos: entregamos inteligência operacional. Atuamos com planejamento, tecnologia, segurança e eficiência para desenvolver soluções personalizadas que reduzem custos, aumentam a produtividade e garantem operações confiáveis do início ao fim.'
 
-const COMMITMENT_TEXT =
-  'Transformamos operações logísticas em vantagem competitiva, combinando inteligência, tecnologia e excelência operacional para entregar resultados que impulsionam o crescimento dos nossos clientes.'
-
 export interface BudgetPdfData {
   budgetNumber: string
   emissionDate: string
@@ -61,45 +58,39 @@ export function generateBudgetPdf(data: BudgetPdfData): void {
 <style>
 @page{size:A4;margin:0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;width:210mm;background:#fff}
-.stripe-top{background:linear-gradient(135deg,#005B2E 0%,#01361D 100%);height:14mm;width:100%}
-.stripe-bottom{background:linear-gradient(135deg,#01361D 0%,#005B2E 100%);height:10mm;width:100%;display:flex;align-items:center;justify-content:center}
-.content{padding:12mm 18mm}
-.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6mm}
-.header img{height:90px}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;width:210mm;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.stripe-top{background:linear-gradient(135deg,#005B2E 0%,#01361D 100%);height:14mm;width:100%;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.stripe-bottom{background:linear-gradient(135deg,#01361D 0%,#005B2E 100%);height:10mm;width:100%;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.content{padding:10mm 18mm}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm}
+.header img{height:120px;width:auto}
 .header-right{text-align:right}
-.header-right h1{font-size:28px;color:#005B2E;letter-spacing:2px}
-.header-right .number{font-size:16px;color:#C89B3C;font-weight:bold;margin-top:4px}
-.header-right .date-line{font-size:11px;color:#666;margin-top:8px;line-height:1.7}
-.gold-divider{height:2px;background:linear-gradient(90deg,#C89B3C,transparent);margin:5mm 0}
-.presentation{background:#f0f7f3;border-left:4px solid #005B2E;border-radius:6px;padding:10px 14px;margin-bottom:5mm}
-.presentation p{font-size:11.5px;line-height:1.6;color:#333;font-style:italic}
-.section{margin-bottom:5mm}
+.header-right h1{font-size:26px;color:#005B2E;letter-spacing:2px}
+.header-right .number{font-size:15px;color:#C89B3C;font-weight:bold;margin-top:4px}
+.header-right .date-line{font-size:11px;color:#666;margin-top:6px;line-height:1.6}
+.gold-divider{height:2px;background:linear-gradient(90deg,#C89B3C,transparent);margin:4mm 0}
+.presentation{background:#f0f7f3;border-left:4px solid #005B2E;border-radius:6px;padding:8px 14px;margin-bottom:4mm}
+.presentation p{font-size:11px;line-height:1.5;color:#333;font-style:italic}
+.section{margin-bottom:4mm}
 .section-title{font-size:12px;font-weight:bold;color:#005B2E;text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;border-bottom:2px solid #C89B3C;margin-bottom:6px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px}
-.info-item{font-size:12px;line-height:1.5}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+.info-item{font-size:11.5px;line-height:1.45}
 .info-item strong{color:#005B2E}
 .services-checklist{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px}
-.service-item{font-size:12px;color:#005B2E;font-weight:600;padding:3px 0}
-.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
-.budget-item{font-size:13px;padding:10px;background:#f7f7f5;border-radius:6px;border-left:3px solid #005B2E}
+.service-item{font-size:11.5px;color:#005B2E;font-weight:600;padding:2px 0}
+.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.budget-item{font-size:12.5px;padding:8px;background:#f7f7f5;border-radius:6px;border-left:3px solid #005B2E}
 .budget-item strong{color:#005B2E;display:block;font-size:10px;text-transform:uppercase;margin-bottom:3px;letter-spacing:.5px}
-.responsible-box{margin-top:8px;padding:10px;background:#f0f7f3;border-radius:6px;border:1px solid rgba(0,91,46,0.12)}
+.responsible-box{margin-top:6px;padding:8px;background:#f0f7f3;border-radius:6px;border:1px solid rgba(0,91,46,0.12)}
 .responsible-box .title{font-size:10px;text-transform:uppercase;color:#005B2E;font-weight:bold;margin-bottom:4px;letter-spacing:.5px}
-.responsible-box .info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;font-size:12px}
+.responsible-box .info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;font-size:11.5px}
 .responsible-box .info strong{color:#005B2E}
-.observations{font-size:12px;padding:10px;background:#f7f7f5;border-radius:6px;border-left:3px solid #C89B3C;min-height:40px;white-space:pre-wrap;margin-top:6px;line-height:1.5}
-.brand-section{background:linear-gradient(135deg,#f0f7f3 0%,#faf5e8 100%);border-radius:8px;padding:12px 14px;margin-top:5mm;border:1px solid rgba(200,155,60,0.25)}
-.brand-section .title{font-size:11px;text-transform:uppercase;color:#005B2E;font-weight:bold;margin-bottom:5px;letter-spacing:.5px}
-.brand-section p{font-size:11.5px;line-height:1.6;color:#333}
-.commitment-section{background:#01361D;border-radius:8px;padding:12px 14px;margin-top:4mm}
-.commitment-section .title{font-size:11px;text-transform:uppercase;color:#E4C46A;font-weight:bold;margin-bottom:5px;letter-spacing:.5px}
-.commitment-section p{font-size:11.5px;line-height:1.6;color:#fff}
-.brand-section{margin-top:3mm}
-.commitment-section{margin-top:3mm}
-
+.observations{font-size:11.5px;padding:8px;background:#f7f7f5;border-radius:6px;border-left:3px solid #C89B3C;min-height:30px;white-space:pre-wrap;margin-top:5px;line-height:1.45}
+.brand-section{background:linear-gradient(135deg,#f0f7f3 0%,#faf5e8 100%);border-radius:8px;padding:10px 14px;margin-top:3mm;border:1px solid rgba(200,155,60,0.25)}
+.brand-section .title{font-size:11px;text-transform:uppercase;color:#005B2E;font-weight:bold;margin-bottom:4px;letter-spacing:.5px}
+.brand-section p{font-size:11px;line-height:1.5;color:#333}
 .footer-text{font-size:10px;color:#C89B3C;font-weight:bold}
-@media print{body{width:210mm}}
+@media print{body{width:210mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}.stripe-top,.stripe-bottom{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style></head><body>
 <div class="stripe-top"></div>
 <div class="content">
@@ -150,15 +141,11 @@ ${servicesSection}
 <div><strong>E-mail:</strong> ${data.responsibleEmail || '—'}</div>
 <div><strong>Telefone:</strong> ${data.responsiblePhone || '—'}</div>
 </div></div>
-<div style="margin-top:8px;"><div class="section-title" style="font-size:11px;">Observações</div>
+<div style="margin-top:6px;"><div class="section-title" style="font-size:11px;">Observações</div>
 <div class="observations">${data.observations || '—'}</div></div></div>
 <div class="brand-section">
 <div class="title">Nossos Diferenciais</div>
 <p>${DIFFERENTIALS_TEXT}</p>
-</div>
-<div class="commitment-section">
-<div class="title">Nosso Compromisso</div>
-<p>${COMMITMENT_TEXT}</p>
 </div>
 </div>
 <div class="stripe-bottom"><span class="footer-text">Velora Log — Operações Logísticas de Excelência</span></div>
