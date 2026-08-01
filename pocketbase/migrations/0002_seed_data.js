@@ -57,7 +57,7 @@ migrate(
         type: 'select',
         required: true,
         order: 5,
-        options: serviceOptions,
+        values: serviceOptions,
       },
       {
         name: 'tipo_operacao',
@@ -65,7 +65,7 @@ migrate(
         type: 'select',
         required: false,
         order: 6,
-        options: operationOptions,
+        values: operationOptions,
       },
       {
         name: 'cidade_origem',
@@ -105,7 +105,7 @@ migrate(
         type: 'select',
         required: false,
         order: 11,
-        options: periodicityOptions,
+        values: periodicityOptions,
       },
       {
         name: 'mensagem',
@@ -126,8 +126,8 @@ migrate(
         record.set('name', f.name)
         record.set('label', f.label)
         record.set('type', f.type)
-        if (f.options) {
-          record.set('options', f.options)
+        if (f.values) {
+          record.set('options', f.values)
         }
         record.set('required', f.required)
         record.set('order', f.order)
