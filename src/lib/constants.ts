@@ -155,3 +155,50 @@ export const DEFAULT_FORM_FIELDS: DefaultFormField[] = [
     order: 12,
   },
 ]
+
+export const SERVICE_CHECKLIST_OPTIONS = [
+  'Recebimento',
+  'Conferência',
+  'Armazenagem',
+  'Separação',
+  'Embalagem',
+  'Expedição',
+  'Transporte',
+  'Monitoramento',
+  'Entrega',
+]
+
+export const CARGO_TYPE_OPTIONS = [
+  'Carga Geral',
+  'Carga Fracionada',
+  'Carga Lotação',
+  'Carga Perecível',
+  'Carga Perigosa (NR-20)',
+  'Carga Refrigerada',
+  'Contêiner',
+  'Granel',
+  'Outros',
+]
+
+export const PAYMENT_OPTIONS = [
+  'À Vista',
+  'Boleto Bancário',
+  'PIX',
+  'Transferência Bancária',
+  'Cartão de Crédito',
+  '30 Dias',
+  '30/60 Dias',
+  '30/60/90 Dias',
+  'A Combinar',
+]
+
+export const DEADLINE_OPTIONS = [
+  'Imediato',
+  '24 horas',
+  '48 horas',
+  '72 horas',
+  '1 semana',
+  '2 semanas',
+  '30 dias',
+  'A Combinar',
+]

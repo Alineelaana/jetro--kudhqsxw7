@@ -5,6 +5,21 @@ import { getResponseTime } from '@/lib/response-time'
 const SPECIAL_LABELS: Record<string, string> = {
   privacy_consent_accepted: 'Consentimento de Privacidade',
   privacy_consent_accepted_at: 'Consentimento aceito em',
+  servicos_inclusos: 'Serviços Inclusos',
+  necessita_seguro: 'Necessita Seguro',
+  necessita_picking: 'Necessita Picking',
+  necessita_cross_docking: 'Necessita Cross Docking',
+  necessita_fracionamento: 'Necessita Fracionamento',
+  necessita_distribuicao: 'Necessita Distribuição',
+  valor_mercadoria: 'Valor da Mercadoria',
+  tipo_carga: 'Tipo de Carga',
+  prazo_desejado: 'Prazo Desejado',
+  quantidade_volumes: 'Quantidade de Volumes',
+  peso: 'Peso (kg)',
+  cubagem: 'Cubagem (m³)',
+  valor_seguro: 'Valor do Seguro',
+  forma_pagamento: 'Forma de Pagamento',
+  prazo: 'Prazo Comercial',
 }
 
 function formatValue(key: string, value: unknown): string {

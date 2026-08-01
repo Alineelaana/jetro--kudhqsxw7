@@ -102,6 +102,23 @@ export function BudgetCreateDialog({
         responsibleEmail,
         responsiblePhone,
         observations,
+        servicosInclusos: getString(data, 'servicos_inclusos')
+          ? getString(data, 'servicos_inclusos').split(',').filter(Boolean)
+          : [],
+        valorMercadoria: getString(data, 'valor_mercadoria'),
+        necessitaSeguro: getString(data, 'necessita_seguro'),
+        necessitaPicking: getString(data, 'necessita_picking'),
+        necessitaCrossDocking: getString(data, 'necessita_cross_docking'),
+        necessitaFracionamento: getString(data, 'necessita_fracionamento'),
+        necessitaDistribuicao: getString(data, 'necessita_distribuicao'),
+        prazoDesejado: getString(data, 'prazo_desejado'),
+        quantidadeVolumes: getString(data, 'quantidade_volumes'),
+        peso: getString(data, 'peso'),
+        cubagem: getString(data, 'cubagem'),
+        tipoCarga: getString(data, 'tipo_carga'),
+        valorSeguro: getString(data, 'valor_seguro'),
+        formaPagamento: getString(data, 'forma_pagamento'),
+        prazoComercial: getString(data, 'prazo'),
       })
 
       await saveQuoteData(record.id, {
