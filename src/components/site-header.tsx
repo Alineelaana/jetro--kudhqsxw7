@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import { Menu, MessageCircle, PhoneCall } from 'lucide-react'
+import { Menu, MessageCircle, LayoutDashboard } from 'lucide-react'
 import logoLight from '@/assets/chatgpt-image-1-de-ago.de-2026-103549-f6f46.png'
 
 const NAV_LINKS = [
@@ -42,12 +43,16 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <a
-              href="tel:5531991297619"
-              className="text-xs font-bold text-[#005B2E] flex items-center gap-1.5 hover:underline"
+            <Button
+              asChild
+              size="sm"
+              className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-md rounded-lg"
             >
-              <PhoneCall className="w-3.5 h-3.5 text-[#C89B3C]" /> (31) 99129-7619
-            </a>
+              <Link to="/admin">
+                <LayoutDashboard className="w-4 h-4 mr-1.5" />
+                Login ao Painel
+              </Link>
+            </Button>
             <Button
               asChild
               size="sm"
@@ -88,6 +93,16 @@ export function SiteHeader() {
                     {link.label}
                   </a>
                 ))}
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-2 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E] hover:text-white font-bold"
+                >
+                  <Link to="/admin" onClick={() => setOpen(false)}>
+                    <LayoutDashboard className="w-5 h-5 mr-2" />
+                    Login ao Painel
+                  </Link>
+                </Button>
                 <Button
                   asChild
                   className="bg-[#25D366] hover:bg-[#1da851] text-white font-bold mt-4 shadow-md"
