@@ -62,28 +62,28 @@ export function AdminRequestRow({
         }`}
         onClick={onToggle}
       >
-        <td className="px-4 py-3 font-semibold text-foreground whitespace-nowrap">
+        <td className="px-3 py-3 font-semibold text-foreground truncate">
           {record.client_name || '—'}
         </td>
-        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap hidden md:table-cell">
+        <td className="px-3 py-3 text-muted-foreground truncate hidden md:table-cell">
           {record.client_email || '—'}
         </td>
-        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap hidden lg:table-cell">
+        <td className="px-3 py-3 text-muted-foreground truncate hidden lg:table-cell">
           {record.client_phone || '—'}
         </td>
-        <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell max-w-[220px] truncate">
+        <td className="px-3 py-3 text-muted-foreground truncate hidden sm:table-cell">
           {record.service || '—'}
         </td>
-        <td className="px-4 py-3 whitespace-nowrap hidden sm:table-cell">
+        <td className="px-3 py-3 hidden sm:table-cell">
           <span
-            className={`text-xs font-bold px-2 py-1 rounded border ${
+            className={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${
               STATUS_COLORS[status] || STATUS_COLORS['PENDENTE']
             }`}
           >
             {status}
           </span>
         </td>
-        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs sm:text-sm hidden md:table-cell">
+        <td className="px-3 py-3 text-muted-foreground text-xs sm:text-sm hidden md:table-cell">
           <span className={responseTime.hasQuote ? 'text-foreground' : 'text-amber-600'}>
             {responseTime.text}
           </span>
@@ -93,10 +93,10 @@ export function AdminRequestRow({
             </span>
           )}
         </td>
-        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs sm:text-sm">
+        <td className="px-3 py-3 text-muted-foreground text-xs sm:text-sm truncate">
           {formatDate(record.created)}
         </td>
-        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+        <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-1.5 flex-wrap">
             <Button
               size="icon"

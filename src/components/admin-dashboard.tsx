@@ -34,6 +34,7 @@ import { getAverageResponseTime } from '@/lib/response-time'
 import { generateSolicitationsPdf } from '@/lib/report-pdf'
 import { generateSolicitationsXls } from '@/lib/report-xls'
 import { downloadChartsImage } from '@/lib/charts-export'
+import { PaginationControls } from '@/components/pagination-controls'
 
 export function AdminDashboard() {
   const { signOut, isAdmin, user } = useAuth()
@@ -52,6 +53,8 @@ export function AdminDashboard() {
     record: BudgetRecord
     mode: 'email' | 'whatsapp'
   } | null>(null)
+  const [pageSize, setPageSize] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const labelMap = useMemo(() => {
     const map: Record<string, string> = {}
@@ -92,6 +95,20 @@ export function AdminDashboard() {
   const authorName = (user?.name as string) || (user?.email as string) || 'Usuário'
   const avgResponseTime = useMemo(() => getAverageResponseTime(records), [records])
   const toggleRow = (id: string) => setExpandedId((prev) => (prev === id ? null : id))
+
+  const totalPages = pageSize === 0 ? 1 : Math.max(1, Math.ceil(records.length / pageSize))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedRecords =
+    pageSize === 0 ? records : records.slice((safePage - 1) * pageSize, safePage * pageSize)
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages)
+  }, [currentPage, totalPages])
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1)
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -212,32 +229,32 @@ export function AdminDashboard() {
             </Card>
           ) : (
             <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-              <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
-                <table className="w-full text-sm">
+              <div className="max-h-[70vh] overflow-y-auto">
+                <table className="w-full text-sm table-fixed">
                   <thead className="sticky top-0 z-10">
                     <tr className="bg-[#01361D] text-white">
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap">Cliente</th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden md:table-cell">
+                      <th className="text-left px-3 py-3 font-bold w-[14%]">Cliente</th>
+                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[14%]">
                         E-mail
                       </th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden lg:table-cell">
+                      <th className="text-left px-3 py-3 font-bold hidden lg:table-cell w-[11%]">
                         Telefone
                       </th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden sm:table-cell">
+                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[14%]">
                         Serviço
                       </th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden sm:table-cell">
+                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[11%]">
                         Status
                       </th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden md:table-cell">
+                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[9%]">
                         Tempo
                       </th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap">Data/Hora</th>
-                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap">Ações</th>
+                      <th className="text-left px-3 py-3 font-bold w-[12%]">Data/Hora</th>
+                      <th className="text-left px-3 py-3 font-bold w-[15%]">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {records.map((record) => (
+                    {paginatedRecords.map((record) => (
                       <AdminRequestRow
                         key={record.id}
                         record={record}
@@ -259,6 +276,13 @@ export function AdminDashboard() {
                 </table>
               </div>
             </Card>
+            <PaginationControls
+              totalRecords={records.length}
+              pageSize={pageSize}
+              currentPage={safePage}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={handlePageSizeChange}
+            />
           )}
         </TabsContent>
 
