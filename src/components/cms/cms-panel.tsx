@@ -20,6 +20,7 @@ import {
   Code,
   History,
   Rocket,
+  Megaphone,
 } from 'lucide-react'
 import { CmsOverview } from '@/components/cms/cms-overview'
 import { CmsHeaderSettings } from '@/components/cms/cms-header-settings'
@@ -35,12 +36,14 @@ import { CmsNavigationMenu } from '@/components/cms/cms-navigation-menu'
 import { CmsFooterSettings } from '@/components/cms/cms-footer-settings'
 import { CmsSeoSettings, CmsScripts } from '@/components/cms/cms-seo-scripts'
 import { CmsChangeHistory, CmsPublication } from '@/components/cms/cms-workflow'
+import { CmsVitrine } from '@/components/cms/cms-vitrine'
 
 const CMS_TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
   { id: 'header', label: 'Cabeçalho', icon: PanelTop },
   { id: 'homepage', label: 'Página Inicial', icon: Home },
   { id: 'banners', label: 'Banners', icon: Image },
+  { id: 'vitrine', label: 'Vitrine', icon: Megaphone },
   { id: 'sections', label: 'Seções do Site', icon: Layers },
   { id: 'texts', label: 'Conteúdos e Textos', icon: FileText },
   { id: 'services', label: 'Serviços', icon: Package },
@@ -127,6 +130,7 @@ export function CmsPanel() {
           {activeTab === 'header' && <CmsHeaderSettings />}
           {activeTab === 'homepage' && <CmsHomepage />}
           {activeTab === 'banners' && <CmsBanners />}
+          {activeTab === 'vitrine' && <CmsVitrine />}
           {activeTab === 'sections' && <CmsSections />}
           {activeTab === 'texts' && <CmsContentTexts />}
           {activeTab === 'services' && <CmsServicesSettings />}

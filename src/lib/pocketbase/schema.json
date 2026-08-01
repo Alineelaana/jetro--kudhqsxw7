@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T22:14:20.777Z",
+  "generatedAt": "2026-08-01T22:28:45.588Z",
   "collections": [
     {
       "name": "users",
@@ -1199,6 +1199,218 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_cms_publication_status ON cms_publication (status)"]
+    },
+    {
+      "name": "vitrine_items",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.role = 'SUP'",
+        "update": "@request.auth.role = 'SUP'",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "banner_principal",
+            "banner_interno",
+            "campanha_promocional",
+            "destaque_servico",
+            "chamada_orcamento",
+            "imagem_texto",
+            "bloco_promocional",
+            "aviso"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "subtitle",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "image_desktop",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "image_mobile",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "image_alt",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "button_text",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "button_link",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "text_color",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bg_color",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "overlay_color",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "opacity",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "text_position",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["left", "center", "right"]
+        },
+        {
+          "name": "display_page",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "home_banner",
+            "home_middle",
+            "home_footer",
+            "services_page",
+            "institutional_page",
+            "specific_page",
+            "all_pages"
+          ]
+        },
+        {
+          "name": "specific_page_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "display_order",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "start_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "end_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "linked_services",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "click_destination",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "service_page",
+            "budget_form",
+            "internal_page",
+            "external_link",
+            "whatsapp",
+            "client_area"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["rascunho", "agendada", "publicada", "inativa", "encerrada"]
+        },
+        {
+          "name": "has_publish_history",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_vitrine_items_status ON vitrine_items (status)",
+        "CREATE INDEX idx_vitrine_items_display_page ON vitrine_items (display_page)",
+        "CREATE INDEX idx_vitrine_items_type ON vitrine_items (type)",
+        "CREATE INDEX idx_vitrine_items_active ON vitrine_items (active)"
+      ]
     }
   ]
 }
