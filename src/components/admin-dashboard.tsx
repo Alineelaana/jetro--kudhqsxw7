@@ -13,6 +13,7 @@ import { StatusHistoryDialog } from '@/components/status-history-dialog'
 import { StatusDashboard } from '@/components/status-dashboard'
 import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { UserManagement } from '@/components/user-management'
+import { AdminChatPanel } from '@/components/admin-chat-panel'
 import { type BudgetRecord } from '@/lib/types'
 import {
   LogOut,
@@ -109,6 +110,7 @@ export function AdminDashboard() {
       <Tabs defaultValue="solicitacoes">
         <TabsList className="mb-6">
           <TabsTrigger value="solicitacoes">Solicitações</TabsTrigger>
+          <TabsTrigger value="chat">Chat Online</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
         </TabsList>
 

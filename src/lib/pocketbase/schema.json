@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T17:46:47.521Z",
+  "generatedAt": "2026-08-01T18:05:06.047Z",
   "collections": [
     {
       "name": "users",
@@ -260,6 +260,123 @@
         "CREATE INDEX idx_budget_requests_service ON budget_requests (service)",
         "CREATE INDEX idx_budget_requests_created ON budget_requests (created)",
         "CREATE INDEX `idx_budget_requests_status` ON `budget_requests` (status)"
+      ]
+    },
+    {
+      "name": "chat_conversations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "client_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_phone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "last_message_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_chat_conversations_status ON chat_conversations (status)",
+        "CREATE INDEX idx_chat_conversations_created ON chat_conversations (created)"
+      ]
+    },
+    {
+      "name": "chat_messages",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "conversation_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "chat_conversations"
+        },
+        {
+          "name": "sender",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["client", "attendant", "ai"]
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "author_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_chat_messages_conversation ON chat_messages (conversation_id, created)"
       ]
     }
   ]

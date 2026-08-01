@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { FloatingWhatsApp } from '@/components/floating-whatsapp'
+import { FloatingChat } from '@/components/floating-chat'
 
 export default function Layout() {
   return (
@@ -11,7 +11,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <SiteFooter />
-      <FloatingWhatsApp />
+      <FloatingChat />
     </div>
   )
 }
