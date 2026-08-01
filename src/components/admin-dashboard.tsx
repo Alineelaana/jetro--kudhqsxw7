@@ -303,23 +303,20 @@ export function AdminDashboard() {
                   <thead>
                     <tr className="bg-[#01361D] text-white">
                       <th className="text-left px-3 py-3 font-bold w-[14%]">Cliente</th>
-                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[14%]">
+                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[13%]">
                         E-mail
                       </th>
-                      <th className="text-left px-3 py-3 font-bold hidden lg:table-cell w-[11%]">
+                      <th className="text-left px-3 py-3 font-bold hidden lg:table-cell w-[10%]">
                         Telefone
                       </th>
-                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[14%]">
+                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[13%]">
                         Serviço
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[11%]">
-                        Status
                       </th>
                       <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[9%]">
                         Tempo
                       </th>
                       <th className="text-left px-3 py-3 font-bold w-[12%]">Data/Hora</th>
-                      <th className="text-left px-3 py-3 font-bold w-[15%]">Ações</th>
+                      <th className="text-left px-3 py-3 font-bold w-[29%]">Ações</th>
                     </tr>
                   </thead>
                   <tbody>

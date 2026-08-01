@@ -56,10 +56,8 @@ export function AdminRequestRow({
 }: AdminRequestRowProps) {
   const status = record.status || 'PENDENTE'
   const responseTime = getResponseTime(record.created, record.quote_created_at)
-  const cellPad = compact ? 'px-3 py-1.5' : 'px-3 py-3'
-  const iconSm = compact ? 'w-3 h-3' : 'w-3.5 h-3.5'
+  const cellPad = compact ? 'px-3 py-1.5' : 'px-3 py-2.5'
   const iconMd = compact ? 'w-3 h-3' : 'w-4 h-4'
-  const btnH = compact ? 'h-6 px-2 text-[10px]' : 'h-8 text-xs'
   const iconBtn = compact ? 'h-6 w-6' : 'h-8 w-8'
 
   return (
@@ -95,18 +93,6 @@ export function AdminRequestRow({
         >
           {record.service || '—'}
         </td>
-        <td className={cn(cellPad, 'hidden sm:table-cell')}>
-          <span
-            className={cn(
-              'font-bold px-2 py-0.5 rounded border whitespace-nowrap',
-              compact ? 'text-[10px]' : 'text-xs',
-              STATUS_COLORS[status] || STATUS_COLORS['PENDENTE'],
-            )}
-            title={status}
-          >
-            {status}
-          </span>
-        </td>
         <td
           className={cn(
             cellPad,
@@ -134,66 +120,76 @@ export function AdminRequestRow({
           {formatDate(record.created)}
         </td>
         <td className={cellPad} onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-1 flex-nowrap">
+            <span
+              className={cn(
+                'font-bold px-1.5 py-0.5 rounded border whitespace-nowrap shrink-0',
+                compact ? 'text-[9px]' : 'text-[10px]',
+                STATUS_COLORS[status] || STATUS_COLORS['PENDENTE'],
+              )}
+              title={status}
+            >
+              {status}
+            </span>
             <Button
               size="icon"
               variant="ghost"
-              className={iconBtn}
-              onClick={() => onHistoryClick(record)}
-              title="Ver Histórico de Alterações"
-            >
-              <History className={cn(iconMd, 'text-[#005B2E]')} />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
               className={cn(
-                'border-[#C89B3C] text-[#C89B3C] hover:bg-[#C89B3C]/10 font-bold whitespace-nowrap',
-                btnH,
+                iconBtn,
+                'text-[#C89B3C] hover:bg-[#C89B3C]/10 hover:text-[#C89B3C] shrink-0',
               )}
               onClick={() => onBudgetClick(record)}
-              title="Gerar Proposta e PDF"
+              title="Abrir orçamento"
+              aria-label="Abrir orçamento"
             >
-              <Receipt className={cn(iconSm, 'mr-1')} />
-              <span className="hidden xl:inline">Orçamento</span>
+              <Receipt className={iconMd} />
             </Button>
             <Button
-              size="sm"
-              variant="outline"
+              size="icon"
+              variant="ghost"
               className={cn(
-                'border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold whitespace-nowrap',
-                btnH,
+                iconBtn,
+                'text-[#005B2E] hover:bg-[#005B2E]/10 hover:text-[#005B2E] shrink-0',
               )}
               onClick={() => onSendEmailClick(record)}
-              title="Enviar orçamento por e-mail"
+              title="Enviar e-mail"
+              aria-label="Enviar e-mail"
             >
-              <Mail className={cn(iconSm, 'mr-1 text-[#005B2E]')} />
-              <span className="hidden 2xl:inline">E-mail</span>
+              <Mail className={iconMd} />
             </Button>
             <Button
-              size="sm"
-              variant="outline"
+              size="icon"
+              variant="ghost"
               className={cn(
-                'border-[#25D366] text-[#1da851] hover:bg-[#25D366]/10 font-bold whitespace-nowrap',
-                btnH,
+                iconBtn,
+                'text-[#1da851] hover:bg-[#25D366]/10 hover:text-[#1da851] shrink-0',
               )}
               onClick={() => onSendWhatsAppClick(record)}
-              title="Enviar orçamento pelo WhatsApp"
+              title="Abrir WhatsApp"
+              aria-label="Abrir WhatsApp"
             >
-              <MessageCircle className={cn(iconSm, 'mr-1 text-[#25D366]')} />
-              <span className="hidden 2xl:inline">WhatsApp</span>
+              <MessageCircle className={iconMd} />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className={cn(iconBtn, 'text-[#005B2E] hover:bg-[#005B2E]/10 shrink-0')}
+              onClick={() => onHistoryClick(record)}
+              title="Ver histórico de alterações"
+              aria-label="Ver histórico de alterações"
+            >
+              <History className={iconMd} />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  size="sm"
-                  variant="outline"
-                  className={cn(
-                    'border-border text-foreground hover:bg-muted font-semibold whitespace-nowrap',
-                    btnH,
-                  )}
+                  size="icon"
+                  variant="ghost"
+                  className={cn(iconBtn, 'text-foreground hover:bg-muted shrink-0')}
+                  title="Alterar status"
+                  aria-label="Alterar status"
                 >
-                  <Settings2 className={cn(iconSm, 'mr-1')} /> Status
+                  <Settings2 className={iconMd} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -207,9 +203,10 @@ export function AdminRequestRow({
             <Button
               size="icon"
               variant="ghost"
-              className={iconBtn}
+              className={cn(iconBtn, 'shrink-0')}
               onClick={onToggle}
-              title="Detalhes"
+              title={isExpanded ? 'Recolher detalhes' : 'Expandir detalhes'}
+              aria-label={isExpanded ? 'Recolher detalhes' : 'Expandir detalhes'}
             >
               {isExpanded ? (
                 <ChevronUp className={cn(iconMd, 'text-[#005B2E]')} />
@@ -222,7 +219,7 @@ export function AdminRequestRow({
       </tr>
       {isExpanded && (
         <tr className="bg-muted/30">
-          <td colSpan={8} className="px-4 py-4">
+          <td colSpan={7} className="px-4 py-4">
             <AdminRequestDetails data={record.data} labelMap={labelMap} record={record} />
           </td>
         </tr>

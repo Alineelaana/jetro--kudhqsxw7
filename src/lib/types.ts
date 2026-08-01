@@ -14,11 +14,11 @@ export const STATUS_OPTIONS: BudgetStatus[] = [
 ]
 
 export const STATUS_COLORS: Record<string, string> = {
-  PENDENTE: 'bg-amber-100 text-amber-800 border-amber-300',
-  'EM ANDAMENTO': 'bg-blue-100 text-blue-800 border-blue-300',
-  'EM CONTATO COM O CLIENTE': 'bg-cyan-100 text-cyan-800 border-cyan-300',
+  PENDENTE: 'bg-red-100 text-red-800 border-red-300',
+  'EM ANDAMENTO': 'bg-orange-100 text-orange-800 border-orange-300',
+  'EM CONTATO COM O CLIENTE': 'bg-blue-100 text-blue-800 border-blue-300',
   CONCLUÍDO: 'bg-green-100 text-green-800 border-green-300',
-  CANCELADO: 'bg-red-100 text-red-800 border-red-300',
+  CANCELADO: 'bg-[#DEB887]/30 text-[#8B4513] border-[#8B4513]/40',
 }
 
 export interface StatusHistoryEntry {
