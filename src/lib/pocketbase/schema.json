@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T22:48:18.853Z",
+  "generatedAt": "2026-08-01T22:57:26.380Z",
   "collections": [
     {
       "name": "users",
@@ -1517,6 +1517,105 @@
         "CREATE INDEX idx_audit_logs_user_role ON audit_logs (user_role)",
         "CREATE INDEX idx_audit_logs_user_name ON audit_logs (user_name)",
         "CREATE INDEX idx_audit_logs_target_collection ON audit_logs (target_collection)"
+      ]
+    },
+    {
+      "name": "backups",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.role = 'SUP'",
+        "view": "@request.auth.role = 'SUP'",
+        "create": "@request.auth.role = 'SUP'",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "version_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "backup_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["full", "database", "files", "config"]
+        },
+        {
+          "name": "backup_data",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "file",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "file_size",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_by_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_by_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_by_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "auto_generated",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_backups_status ON backups (status)",
+        "CREATE INDEX idx_backups_type ON backups (backup_type)",
+        "CREATE INDEX idx_backups_created ON backups (created)"
       ]
     }
   ]

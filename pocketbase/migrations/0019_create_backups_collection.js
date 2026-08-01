@@ -49,7 +49,7 @@ migrate(
       { key: 'auto_backup_daily', value: 'false' },
       { key: 'auto_backup_weekly', value: 'false' },
       { key: 'auto_backup_type', value: 'full' },
-      { key: 'auto_backup_last_run', value: '' },
+      { key: 'auto_backup_last_run', value: 'never' },
     ]
     for (var i = 0; i < autoSettings.length; i++) {
       try {
