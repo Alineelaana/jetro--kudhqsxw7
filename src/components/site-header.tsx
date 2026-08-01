@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import { Menu, MessageCircle, LayoutDashboard } from 'lucide-react'
-import logoLight from '@/assets/chatgpt-image-1-de-ago.de-2026-103549-f6f46.png'
+import logoGreenBg from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-a43e3.png'
 
 const NAV_LINKS = [
   { label: 'Início', href: '#inicio' },
@@ -24,9 +24,9 @@ export function SiteHeader() {
         <div className="flex items-center justify-between h-20">
           <a href="#inicio" className="flex items-center gap-2 group">
             <img
-              src={logoLight}
+              src={logoGreenBg}
               alt="Velora Log"
-              className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+              className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105 rounded-lg"
             />
           </a>
 
@@ -80,7 +80,11 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-80 bg-white">
               <SheetTitle className="mb-6">
-                <img src={logoLight} alt="Velora Log" className="h-12 w-auto object-contain" />
+                <img
+                  src={logoGreenBg}
+                  alt="Velora Log"
+                  className="h-12 w-auto object-contain rounded-lg"
+                />
               </SheetTitle>
               <nav className="flex flex-col gap-4">
                 {NAV_LINKS.map((link) => (
