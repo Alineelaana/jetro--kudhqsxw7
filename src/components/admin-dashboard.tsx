@@ -14,8 +14,22 @@ import { StatusDashboard } from '@/components/status-dashboard'
 import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { UserManagement } from '@/components/user-management'
 import { type BudgetRecord } from '@/lib/types'
-import { LogOut, Inbox, FileText, Loader2, RefreshCw, AlertCircle, Clock } from 'lucide-react'
+import {
+  LogOut,
+  Inbox,
+  FileText,
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  Clock,
+  FileDown,
+  FileSpreadsheet,
+  Download,
+} from 'lucide-react'
 import { getAverageResponseTime } from '@/lib/response-time'
+import { generateSolicitationsPdf } from '@/lib/report-pdf'
+import { generateSolicitationsXls } from '@/lib/report-xls'
+import { downloadChartsImage } from '@/lib/charts-export'
 
 export function AdminDashboard() {
   const { signOut, isAdmin, user } = useAuth()
@@ -128,6 +142,32 @@ export function AdminDashboard() {
               </Card>
             )}
           </div>
+
+          {!loading && !error && records.length > 0 && (
+            <div className="flex flex-wrap gap-3 mb-2">
+              <Button
+                onClick={() => generateSolicitationsPdf(records, authorName)}
+                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Exportar PDF
+              </Button>
+              <Button
+                onClick={() => generateSolicitationsXls(records, authorName)}
+                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+              >
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Exportar XLS
+              </Button>
+              <Button
+                onClick={() => downloadChartsImage(records, authorName)}
+                className="bg-[#C89B3C] hover:bg-[#b8881f] text-white font-bold"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Baixar Gráficos
+              </Button>
+            </div>
+          )}
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
