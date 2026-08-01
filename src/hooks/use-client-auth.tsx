@@ -17,27 +17,44 @@ export const useClientAuth = () => {
   return context
 }
 
+function isClientRecord(record: unknown): boolean {
+  if (!record || typeof record !== 'object') return false
+  const r = record as { collectionName?: string }
+  return r.collectionName === 'clients'
+}
+
 export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
+  const initialRecord = pbClient.authStore.isValid ? pbClient.authStore.record : null
+  const initialIsClient = pbClient.authStore.isValid && isClientRecord(initialRecord)
+
   const [client, setClient] = useState<Record<string, unknown> | null>(
-    pbClient.authStore.isValid ? pbClient.authStore.record : null,
+    initialIsClient ? (initialRecord as Record<string, unknown>) : null,
   )
-  const [isClientAuthenticated, setIsClientAuthenticated] = useState(pbClient.authStore.isValid)
+  const [isClientAuthenticated, setIsClientAuthenticated] = useState(initialIsClient)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const unsubscribe = pbClient.authStore.onChange((_token, record) => {
-      setClient(pbClient.authStore.isValid ? record : null)
-      setIsClientAuthenticated(pbClient.authStore.isValid)
+      const isValid = pbClient.authStore.isValid && isClientRecord(record)
+      setClient(isValid ? (record as Record<string, unknown>) : null)
+      setIsClientAuthenticated(isValid)
     })
-    if (pbClient.authStore.isValid) {
+
+    const currentRecord = pbClient.authStore.record
+    const isValidClient = pbClient.authStore.isValid && isClientRecord(currentRecord)
+
+    if (isValidClient) {
       pbClient
         .collection('clients')
         .authRefresh()
-        .catch(() => pbClient.authStore.clear())
+        .catch(() => {
+          pbClient.authStore.clear()
+        })
         .finally(() => setLoading(false))
     } else {
       setLoading(false)
     }
+
     return () => {
       unsubscribe()
     }

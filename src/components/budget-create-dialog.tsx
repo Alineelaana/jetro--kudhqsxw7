@@ -172,11 +172,11 @@ export function BudgetCreateDialog({
         budgetNumber: number,
         emissionDate,
         requestDate,
-        clientName: record.client_name,
-        clientEmail: record.client_email,
-        clientPhone: record.client_phone,
+        clientName: safeRecord.client_name,
+        clientEmail: safeRecord.client_email,
+        clientPhone: safeRecord.client_phone,
         clientCompany: getString(existingData, 'empresa'),
-        service: record.service,
+        service: safeRecord.service || '',
         origin: getString(existingData, 'cidade_origem'),
         destination: getString(existingData, 'cidade_destino'),
         merchandise: getString(existingData, 'tipo_mercadoria'),
@@ -225,7 +225,8 @@ export function BudgetCreateDialog({
 
   if (!record) return null
 
-  const data = (record.data || {}) as Record<string, unknown>
+  const safeRecord = record as BudgetRecord
+  const data = (safeRecord.data || {}) as Record<string, unknown>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -247,19 +248,19 @@ export function BudgetCreateDialog({
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <p>
-                <strong>Nome:</strong> {record.client_name || '—'}
+                <strong>Nome:</strong> {safeRecord.client_name || '—'}
               </p>
               <p>
                 <strong>Empresa:</strong> {getString(data, 'empresa') || '—'}
               </p>
               <p>
-                <strong>E-mail:</strong> {record.client_email || '—'}
+                <strong>E-mail:</strong> {safeRecord.client_email || '—'}
               </p>
               <p>
-                <strong>Telefone:</strong> {record.client_phone || '—'}
+                <strong>Telefone:</strong> {safeRecord.client_phone || '—'}
               </p>
               <p>
-                <strong>Serviço:</strong> {record.service || '—'}
+                <strong>Serviço:</strong> {safeRecord.service || '—'}
               </p>
               <p>
                 <strong>Origem ➔ Destino:</strong> {getString(data, 'cidade_origem') || 'ES'} ➔{' '}

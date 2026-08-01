@@ -74,10 +74,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsAuthenticated(true)
           }
         })
-        .catch(() => {
-          pb.authStore.clear()
-          setUser(null)
-          setIsAuthenticated(false)
+        .catch((err: unknown) => {
+          const status = (err as { status?: number })?.status
+          if (status === 403 || status === 401) {
+            pb.authStore.clear()
+            setUser(null)
+            setIsAuthenticated(false)
+          }
         })
         .finally(() => {
           if (timeoutId) clearTimeout(timeoutId)

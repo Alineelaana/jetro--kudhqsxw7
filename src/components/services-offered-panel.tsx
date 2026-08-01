@@ -40,7 +40,7 @@ export function ServicesOfferedPanel() {
   const load = async () => {
     try {
       const data = await getServicesOffered()
-      setServices(data as unknown as ServiceOffered[])
+      setServices(Array.isArray(data) ? (data as unknown as ServiceOffered[]) : [])
     } catch {
       /* ignore */
     }
@@ -54,8 +54,9 @@ export function ServicesOfferedPanel() {
 
   const filtered = useMemo(() => {
     const term = search.toLowerCase().trim()
-    if (!term) return services
-    return services.filter((s) => s.name.toLowerCase().includes(term))
+    const list = services || []
+    if (!term) return list
+    return list.filter((s) => s?.name?.toLowerCase()?.includes(term))
   }, [services, search])
 
   const handleNew = () => {
