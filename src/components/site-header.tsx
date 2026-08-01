@@ -8,7 +8,6 @@ import { Menu, MessageCircle, PhoneCall } from 'lucide-react'
 const NAV_LINKS = [
   { label: 'Início', href: '#inicio' },
   { label: 'Serviços', href: '#servicos' },
-  { label: 'Armazenagem WMS', href: '#infraestrutura' },
   { label: 'Orçamento', href: '#orcamento' },
   { label: 'Contato', href: '#contato' },
 ]

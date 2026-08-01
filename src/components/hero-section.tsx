@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import warehouseBg from '@/assets/captura-de-tela-2026-08-01-as-10.38.48-65c70.png'
 import {
   MessageCircle,
   FileText,
@@ -22,40 +20,17 @@ const DIFFERENTIALS = [
 
 export function HeroSection() {
   const { whatsappNumber } = useSettings()
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window
-      const x = (e.clientX / innerWidth - 0.5) * 12
-      const y = (e.clientY / innerHeight - 0.5) * 12
-      setMousePos({ x, y })
-    }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
 
   return (
     <section
       id="inicio"
       className="relative overflow-hidden bg-[#01361D] text-white pt-10 pb-20 border-b border-[#C89B3C]/30 min-h-[90vh] flex flex-col justify-center"
     >
-      {/* Interactive Background Image with Ken Burns & Parallax */}
-      <div
-        className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
-        style={{
-          transform: `translate3d(${mousePos.x}px, ${mousePos.y}y, 0px) scale(1.05)`,
-          transition: 'transform 0.2s ease-out',
-        }}
-      >
-        <img
-          src={warehouseBg}
-          alt="Estrutura de Armazenagem VeloraLog no Espírito Santo"
-          className="w-full h-full object-cover object-center filter brightness-90 ken-burns scale-110"
-        />
-        {/* Dark Institutional Overlay */}
-        <div className="absolute inset-0 dark-hero-overlay" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#005B2E]/40 via-transparent to-[#01361D]/90" />
+      {/* Decorative gradient background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#005B2E]/60 via-[#01361D] to-[#01361D]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_rgba(0,91,46,0.3),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,_rgba(200,155,60,0.08),transparent_50%)]" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 pt-4">
@@ -78,7 +53,7 @@ export function HeroSection() {
             <span className="gold-gradient-text">Padrão Premium</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed font-normal drop-shadow">
+          <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed font-normal">
             Especialistas em armazenagem de alta capacidade com tecnologia WMS, movimentação de
             cargas, picking & packing, logística portuária e distribuição no Espírito Santo e todo o
             Brasil.
@@ -117,7 +92,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Floating Telemetry & Real Warehouse Metrics */}
+        {/* Differentials */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mt-14 pt-8 border-t border-[#C89B3C]/30 max-w-5xl mx-auto">
           {DIFFERENTIALS.map((item) => (
             <div

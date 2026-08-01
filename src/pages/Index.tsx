@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { HeroSection } from '@/components/hero-section'
-import { WarehouseShowcase } from '@/components/warehouse-showcase'
 import { ServicesSection } from '@/components/services-section'
 import { BudgetForm } from '@/components/budget-form'
 import { FinalCTA } from '@/components/final-cta'
@@ -21,9 +20,6 @@ export default function Index() {
   return (
     <main className="min-h-screen bg-background">
       <HeroSection />
-      <div id="infraestrutura">
-        <WarehouseShowcase />
-      </div>
       <ServicesSection onSelectService={handleSelectService} />
       <section id="orcamento" className="py-20 bg-white relative">
         <div className="container mx-auto px-4 max-w-4xl">
