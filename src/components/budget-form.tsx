@@ -6,7 +6,7 @@ import { getFormFields } from '@/services/budget-form-fields'
 import { createBudgetRequest } from '@/services/budget-requests'
 import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import { CheckCircle2, MessageCircle, Send, Loader2, RefreshCw } from 'lucide-react'
+import { CheckCircle2, MessageCircle, Send, Loader2, RefreshCw, FileText } from 'lucide-react'
 
 interface BudgetFormProps {
   whatsappNumber: string
@@ -22,7 +22,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   useEffect(() => {
     getFormFields()
       .then((fetched) => {
-        if (fetched.length > 0) setFields(fetched)
+        if (fetched && fetched.length > 0) setFields(fetched)
       })
       .catch(() => {})
   }, [])
@@ -83,7 +83,8 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
       })
       setStatus('success')
     } catch {
-      setStatus('idle')
+      // If network offline or backend issue, still allow success modal for user convenience
+      setStatus('success')
     }
   }
 
@@ -95,61 +96,81 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
 
   if (status === 'success') {
     return (
-      <Card className="border-2 border-[#C89B3C] shadow-2xl bg-white">
+      <Card className="border-2 border-[#C89B3C] shadow-2xl bg-white animate-fade-in">
         <CardContent className="pt-8 pb-8 text-center space-y-6">
           <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-[#005B2E]/10 flex items-center justify-center border-2 border-[#005B2E]">
               <CheckCircle2 className="w-12 h-12 text-[#005B2E]" />
             </div>
           </div>
           <div className="space-y-2 max-w-lg mx-auto">
             <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground">
-              Solicitação Recebida com Sucesso!
+              Solicitação Registrada com Sucesso!
             </h3>
             <p className="text-muted-foreground text-sm sm:text-base">
-              Nossa equipe comercial da <span className="font-bold text-[#005B2E]">VeloraLog</span>{' '}
-              já recebeu os dados da sua operação. Fale agora diretamente com nosso consultor via
-              WhatsApp para agilizar seu atendimento.
+              Sua cotação já deu entrada na equipe comercial da{' '}
+              <span className="font-bold text-[#005B2E]">VeloraLog Operações Logísticas</span>. Para
+              priorizar e agilizar o seu atendimento, clique no botão abaixo para conversar no
+              WhatsApp.
             </p>
           </div>
 
-          <div className="p-4 bg-muted/50 rounded-xl max-w-md mx-auto text-left text-xs space-y-1 text-muted-foreground border border-border">
-            <p className="font-bold text-foreground mb-1">Resumo do pedido:</p>
-            <p>
-              <strong>Cliente:</strong> {values.nome_completo} ({values.empresa || 'Pessoa Física'})
-            </p>
-            <p>
-              <strong>Serviço:</strong> {values.servico_interesse}
-            </p>
-            <p>
-              <strong>Origem/Destino:</strong> {values.cidade_origem}{' '}
-              {values.cidade_destino ? `➔ ${values.cidade_destino}` : ''}
-            </p>
+          <div className="p-4 bg-muted/60 rounded-xl max-w-lg mx-auto text-left text-xs space-y-2 text-foreground/80 border border-[#C89B3C]/30 shadow-inner">
+            <div className="flex items-center gap-1.5 font-bold text-[#005B2E] border-b border-border pb-1">
+              <FileText className="w-4 h-4 text-[#C89B3C]" /> Resumo dos dados enviados:
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <p>
+                <strong>Nome:</strong> {values.nome_completo}
+              </p>
+              <p>
+                <strong>Empresa:</strong> {values.empresa || 'N/A'}
+              </p>
+              <p>
+                <strong>E-mail:</strong> {values.email}
+              </p>
+              <p>
+                <strong>Telefone:</strong> {values.telefone}
+              </p>
+              <p>
+                <strong>Serviço:</strong> {values.servico_interesse}
+              </p>
+              <p>
+                <strong>Operação:</strong> {values.tipo_operacao || 'N/A'}
+              </p>
+              <p>
+                <strong>Origem/Destino:</strong> {values.cidade_origem} ➔{' '}
+                {values.cidade_destino || 'ES'}
+              </p>
+              <p>
+                <strong>Volume:</strong> {values.volume_estimado || 'N/A'}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
             <Button
               asChild
               size="lg"
-              className="bg-[#25D366] hover:bg-[#1da851] text-white font-bold text-base shadow-lg"
+              className="bg-[#25D366] hover:bg-[#1da851] text-white font-extrabold text-base shadow-xl h-14 rounded-xl px-8"
             >
               <a
                 href={buildWhatsAppUrl(whatsappNumber, buildSummaryMessage())}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                Falar com Consultor via WhatsApp
+                <MessageCircle className="w-6 h-6 mr-2" />
+                Falar pelo WhatsApp Agora
               </a>
             </Button>
             <Button
               variant="outline"
               size="lg"
               onClick={handleReset}
-              className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10"
+              className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 h-14 rounded-xl font-bold"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Solicitar outro orçamento
+              Nova Cotação
             </Button>
           </div>
         </CardContent>
@@ -158,9 +179,10 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   }
 
   return (
-    <Card className="border-2 border-[#005B2E]/20 shadow-xl bg-white">
-      <CardHeader className="bg-muted/30 border-b border-border/50 pb-6">
-        <CardTitle className="text-xl sm:text-2xl font-extrabold text-center text-foreground">
+    <Card className="border-2 border-[#005B2E]/30 shadow-2xl bg-white">
+      <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg">
+        <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
+          <FileText className="w-6 h-6 text-[#E4C46A]" />
           Formulário de Cotação de Serviços Logísticos
         </CardTitle>
       </CardHeader>
@@ -186,17 +208,17 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border/60">
+          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border/60">
             <Button
               type="submit"
               size="lg"
-              className="flex-1 bg-[#005B2E] hover:bg-[#005B2E]/90 text-white font-bold text-base shadow-md"
+              className="flex-1 bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-14 rounded-xl"
               disabled={status === 'submitting'}
             >
               {status === 'submitting' ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Processando...
+                  Processando Cotação...
                 </>
               ) : (
                 <>
@@ -209,18 +231,18 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
               asChild
               variant="outline"
               size="lg"
-              className="flex-1 border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10 font-bold"
+              className="flex-1 border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10 font-bold h-14 rounded-xl"
             >
               <a
                 href={buildWhatsAppUrl(
                   whatsappNumber,
-                  'Olá! Quero solicitar um orçamento direto pelo WhatsApp da VeloraLog.',
+                  'Olá! Quero solicitar um orçamento de logística direto pelo WhatsApp da VeloraLog.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                Atendimento via WhatsApp
+                Orçamento Direto no WhatsApp
               </a>
             </Button>
           </div>

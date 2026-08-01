@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 152 100% 98%;
     --foreground: 152 70% 8%;
 
     --card: 0 0% 100%;
@@ -13,46 +13,74 @@
     --popover: 0 0% 100%;
     --popover-foreground: 152 70% 8%;
 
-    --primary: 150 100% 18%; /* #005B2E - Verde Bandeira Premium */
+    --primary: 150 100% 18%; /* #005B2E Flag Green */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 150 83% 26%; /* #0B7A43 - Verde Esmeralda */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 41 54% 51%; /* #C89B3C Gold Metallic */
+    --secondary-foreground: 150 100% 11%; /* #01361D Dark Institutional */
 
-    --gold: 41 54% 51%; /* #C89B3C - Gold Metallic */
-    --gold-light: 45 68% 65%; /* #E4C46A - Champagne Gold */
-    --gold-dark: 40 54% 34%; /* #8F6A1E - Antique Gold */
+    --muted: 150 20% 95%;
+    --muted-foreground: 150 15% 35%;
 
-    --forest: 152 96% 11%; /* #01361D - Deep Forest Green */
-
-    --muted: 150 20% 96%;
-    --muted-foreground: 150 15% 40%;
-
-    --accent: 41 54% 51%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 41 60% 92%;
+    --accent-foreground: 150 100% 18%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 150 20% 88%;
-    --input: 150 20% 88%;
-    --ring: 41 54% 51%;
+    --border: 150 25% 88%;
+    --input: 150 25% 88%;
+    --ring: 150 100% 18%;
 
     --radius: 0.75rem;
+
+    --gold: 41 54% 51%;
+    --gold-light: 42 70% 65%;
+    --dark-institutional: 150 96% 11%; /* #01361D */
+  }
+
+  .dark {
+    --background: 150 96% 11%;
+    --foreground: 0 0% 98%;
+
+    --card: 150 80% 13%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 150 80% 13%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 41 54% 51%;
+    --primary-foreground: 150 96% 11%;
+
+    --secondary: 150 100% 18%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 150 40% 16%;
+    --muted-foreground: 150 15% 70%;
+
+    --accent: 150 60% 20%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 150 40% 20%;
+    --input: 150 40% 20%;
+    --ring: 41 54% 51%;
   }
 }
 
 @layer utilities {
-  .bg-forest {
-    background-color: #01361d;
-  }
-  .bg-primary-green {
+  .bg-flag-green {
     background-color: #005b2e;
   }
   .bg-gold-metallic {
     background-color: #c89b3c;
   }
-  .text-primary-green {
+  .bg-dark-institutional {
+    background-color: #01361d;
+  }
+  .text-flag-green {
     color: #005b2e;
   }
   .text-gold-metallic {
@@ -61,15 +89,39 @@
   .border-gold-metallic {
     border-color: #c89b3c;
   }
+
   .gold-gradient-text {
-    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 50%, #8f6a1e 100%);
+    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 50%, #9a6f22 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
   .gold-gradient-bg {
-    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 50%, #8f6a1e 100%);
+    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 100%);
   }
-  .green-gold-border {
-    border: 1px solid rgba(200, 155, 60, 0.3);
+
+  .dark-hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(1, 54, 29, 0.88) 0%,
+      rgba(0, 91, 46, 0.82) 60%,
+      rgba(1, 54, 29, 0.95) 100%
+    );
+  }
+
+  .ken-burns {
+    animation: kenburns 25s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.08) translate(-1%, -1%);
+  }
+  100% {
+    transform: scale(1.12) translate(1%, 1%);
   }
 }

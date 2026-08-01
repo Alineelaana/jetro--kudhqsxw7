@@ -1,74 +1,90 @@
 import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-6748f.png'
+import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#002B16] text-white/70 py-12 border-t border-white/10">
+    <footer id="contato" className="bg-[#01361D] text-white/80 py-12 border-t border-[#C89B3C]/30">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           <div className="space-y-4">
             <img
               src={logoDark}
               alt="VeloraLog Operações Logísticas"
-              className="h-14 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
-            <p className="text-sm leading-relaxed max-w-sm">
+            <p className="text-sm leading-relaxed max-w-sm text-white/80">
               Operações Logísticas de Excelência no Espírito Santo. Soluções completas em
-              armazenagem WMS, transporte rodoviário, logística portuária e distribuição urbana.
+              armazenagem de estoque (WMS), transporte de cargas, logística portuária e distribuição
+              urbana.
             </p>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-base border-b border-[#C89B3C]/30 pb-2 inline-block">
+            <h4 className="text-white font-black text-base border-b border-[#C89B3C]/40 pb-2 inline-block">
               Soluções Logísticas
             </h4>
             <ul className="text-sm space-y-2">
               <li>
                 <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
-                  Armazenagem de Estoque (WMS)
+                  • Armazenagem de Produtos (WMS)
                 </a>
               </li>
               <li>
                 <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
-                  Transporte de Cargas
+                  • Transporte Rodoviário de Cargas
                 </a>
               </li>
               <li>
                 <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
-                  Distribuição Urbana e Delivery
+                  • Distribuição Urbana e Last Mile
                 </a>
               </li>
               <li>
                 <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
-                  Logística Portuária no ES
+                  • Logística Portuária no ES
                 </a>
               </li>
               <li>
                 <a href="#servicos" className="hover:text-[#E4C46A] transition-colors">
-                  Cross Docking
+                  • Cross Docking & Triagem
                 </a>
               </li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-base border-b border-[#C89B3C]/30 pb-2 inline-block">
-              Contato & Localização
+            <h4 className="text-white font-black text-base border-b border-[#C89B3C]/40 pb-2 inline-block">
+              Central de Atendimento
             </h4>
-            <ul className="text-sm space-y-2">
-              <li>Central de Atendimento: (31) 99129-7619</li>
-              <li>E-mail Comercial: contato@veloralog.com.br</li>
-              <li>Atendimento: Segunda a Sexta, 08h às 18h</li>
-              <li>Espírito Santo, Brasil</li>
+            <ul className="text-sm space-y-2.5">
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-[#C89B3C]" />
+                <span>Central: (31) 99129-7619</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-[#C89B3C]" />
+                <span>E-mail: contato@veloralog.com.br</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#C89B3C]" />
+                <span>Atendimento: Seg. a Sex. 08h às 18h</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#C89B3C]" />
+                <span>Espírito Santo & Atendimento Nacional</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-6 text-xs text-center text-white/50 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div className="border-t border-white/10 mt-10 pt-6 text-xs text-center text-white/60 flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>
             © {new Date().getFullYear()} VeloraLog Operações Logísticas. Todos os direitos
             reservados.
           </span>
-          <span>VeloraLog - Excelência em Soluções Logísticas no ES</span>
+          <span className="text-[#E4C46A]">
+            VeloraLog - Excelência em Soluções Logísticas no ES
+          </span>
         </div>
       </div>
     </footer>

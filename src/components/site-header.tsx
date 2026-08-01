@@ -4,12 +4,12 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import logoLight from '@/assets/chatgpt-image-1-de-ago.de-2026-103549-66439.png'
-import { Menu, MessageCircle } from 'lucide-react'
+import { Menu, MessageCircle, PhoneCall } from 'lucide-react'
 
 const NAV_LINKS = [
   { label: 'Início', href: '#inicio' },
   { label: 'Serviços', href: '#servicos' },
-  { label: 'Armazenagem WMS', href: '#servicos' },
+  { label: 'Armazenagem WMS', href: '#infraestrutura' },
   { label: 'Orçamento', href: '#orcamento' },
   { label: 'Contato', href: '#contato' },
 ]
@@ -19,14 +19,14 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur border-b border-[#C89B3C]/20 shadow-sm">
+    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur border-b border-[#C89B3C]/30 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <a href="#inicio" className="flex items-center gap-3">
+          <a href="#inicio" className="flex items-center gap-3 group">
             <img
               src={logoLight}
               alt="VeloraLog Operações Logísticas"
-              className="h-12 w-auto object-contain"
+              className="h-12 w-auto object-contain transition-transform group-hover:scale-105"
             />
           </a>
 
@@ -35,7 +35,7 @@ export function SiteHeader() {
               <a
                 key={link.href + link.label}
                 href={link.href}
-                className="text-sm font-semibold text-foreground/80 hover:text-[#005B2E] transition-colors"
+                className="text-sm font-bold text-foreground/80 hover:text-[#005B2E] transition-colors"
               >
                 {link.label}
               </a>
@@ -43,20 +43,26 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
+            <a
+              href="tel:5531991297619"
+              className="text-xs font-bold text-[#005B2E] flex items-center gap-1.5 hover:underline"
+            >
+              <PhoneCall className="w-3.5 h-3.5 text-[#C89B3C]" /> (31) 99129-7619
+            </a>
             <Button
               asChild
               size="sm"
-              className="bg-[#25D366] hover:bg-[#1da851] text-white font-semibold shadow-md"
+              className="bg-[#25D366] hover:bg-[#1da851] text-white font-bold shadow-md rounded-lg"
             >
               <a
                 href={buildWhatsAppUrl(
                   whatsappNumber,
-                  'Olá! Gostaria de informações sobre os serviços da VeloraLog.',
+                  'Olá! Gostaria de informações sobre os serviços de armazenagem e transporte da VeloraLog.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <MessageCircle className="w-4 h-4 mr-2" />
+                <MessageCircle className="w-4 h-4 mr-1.5" />
                 WhatsApp
               </a>
             </Button>
@@ -78,14 +84,14 @@ export function SiteHeader() {
                     key={link.href + link.label}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="text-base font-semibold text-foreground hover:text-[#005B2E] transition-colors py-1"
+                    className="text-base font-bold text-foreground hover:text-[#005B2E] transition-colors py-1"
                   >
                     {link.label}
                   </a>
                 ))}
                 <Button
                   asChild
-                  className="bg-[#25D366] hover:bg-[#1da851] text-white font-semibold mt-4 shadow-md"
+                  className="bg-[#25D366] hover:bg-[#1da851] text-white font-bold mt-4 shadow-md"
                 >
                   <a
                     href={buildWhatsAppUrl(
