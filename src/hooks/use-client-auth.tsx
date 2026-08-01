@@ -47,11 +47,15 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = pbClient.authStore.onChange((_token, record) => {
-      const isValid = pbClient.authStore.isValid && isClientRecord(record)
-      setClient(isValid ? (record as Record<string, unknown>) : null)
-      setIsClientAuthenticated(isValid)
-    })
+    let unsubscribe: (() => void) | undefined
+
+    if (typeof pbClient.authStore.onChange === 'function') {
+      unsubscribe = pbClient.authStore.onChange((_token, record) => {
+        const isValid = pbClient.authStore.isValid && isClientRecord(record)
+        setClient(isValid ? (record as Record<string, unknown>) : null)
+        setIsClientAuthenticated(isValid)
+      })
+    }
 
     const currentRecord = pbClient.authStore.record
     const isValidClient = pbClient.authStore.isValid && isClientRecord(currentRecord)
@@ -60,10 +64,13 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
       pbClient
         .collection('clients')
         .authRefresh()
-        .catch(() => {
-          pbClient.authStore.clear()
-          setClient(null)
-          setIsClientAuthenticated(false)
+        .catch((err: unknown) => {
+          const status = (err as { status?: number })?.status
+          if (status === 403 || status === 401) {
+            pbClient.authStore.clear()
+            setClient(null)
+            setIsClientAuthenticated(false)
+          }
         })
         .finally(() => setLoading(false))
     } else {
@@ -76,7 +83,7 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return () => {
-      unsubscribe()
+      if (typeof unsubscribe === 'function') unsubscribe()
     }
   }, [])
 

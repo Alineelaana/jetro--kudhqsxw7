@@ -58,17 +58,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(false)
     }
 
-    const unsubscribe = pb.authStore.onChange((_token, record) => {
-      const rec = record as Record<string, unknown> | null
-      if (rec && rec.active === false) {
-        pb.authStore.clear()
-        setUser(null)
-        setIsAuthenticated(false)
-        return
-      }
-      setUser(pb.authStore.isValid && rec?.active !== false ? rec : null)
-      setIsAuthenticated(pb.authStore.isValid && rec?.active !== false)
-    })
+    const unsubscribe =
+      typeof pb.authStore.onChange === 'function'
+        ? pb.authStore.onChange((_token, record) => {
+            const rec = record as Record<string, unknown> | null
+            if (rec && rec.active === false) {
+              pb.authStore.clear()
+              setUser(null)
+              setIsAuthenticated(false)
+              return
+            }
+            setUser(pb.authStore.isValid && rec?.active !== false ? rec : null)
+            setIsAuthenticated(pb.authStore.isValid && rec?.active !== false)
+          })
+        : undefined
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 
@@ -106,7 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false)
     }
     return () => {
-      unsubscribe()
+      if (typeof unsubscribe === 'function') unsubscribe()
       if (timeoutId) clearTimeout(timeoutId)
     }
   }, [])
