@@ -12,7 +12,7 @@ migrate(
 
     const fieldsCol = app.findCollectionByNameOrId('budget_form_fields')
 
-    var serviceOptions = JSON.stringify([
+    var serviceOptions = [
       'Transporte Rodoviario de Cargas',
       'Distribuicao e Last Mile',
       'Armazenagem de Produtos em Estoque',
@@ -20,8 +20,8 @@ migrate(
       'Logistica Portuaria',
       'Gestao de Frota',
       'Logistica Integrada',
-    ])
-    var operationOptions = JSON.stringify([
+    ]
+    var operationOptions = [
       'Transporte',
       'Distribuicao',
       'Armazenagem',
@@ -29,8 +29,8 @@ migrate(
       'Logistica Portuaria',
       'Gestao de Frota',
       'Operacao Completa',
-    ])
-    var periodicityOptions = JSON.stringify(['Operacao Unica', 'Recorrente', 'Urgente'])
+    ]
+    var periodicityOptions = ['Operacao Unica', 'Recorrente', 'Urgente']
 
     var fields = [
       {
