@@ -5,8 +5,9 @@ import {
   getPublicationState,
   getPendingChangesCount,
   publishAllSections,
-  getCmsContent,
+  discardAllDrafts,
 } from '@/services/cms'
+import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import {
@@ -34,11 +35,7 @@ export function CmsOverview() {
 
   const load = async () => {
     try {
-      const [pub, pending, content] = await Promise.all([
-        getPublicationState(),
-        getPendingChangesCount(),
-        getCmsContent(),
-      ])
+      const [pub, pending] = await Promise.all([getPublicationState(), getPendingChangesCount()])
       setPubState(pub as Record<string, unknown> | null)
       setPendingCount(pending)
     } catch {
@@ -50,6 +47,24 @@ export function CmsOverview() {
   useEffect(() => {
     load()
   }, [])
+  useRealtime('cms_content', () => load())
+  useRealtime('cms_publication', () => load())
+
+  const handleDiscard = async () => {
+    if (!confirm('Descartar todas as alterações não publicadas? Esta ação não pode ser desfeita.'))
+      return
+    try {
+      await discardAllDrafts()
+      toast.success('Alterações descartadas com sucesso!')
+      await load()
+    } catch {
+      toast.error('Erro ao descartar alterações.')
+    }
+  }
+
+  const handleRestore = () => {
+    toast.info('Use a aba "Publicação" para selecionar e restaurar uma versão anterior.')
+  }
 
   const handlePublish = async () => {
     setPublishing(true)
@@ -150,10 +165,15 @@ export function CmsOverview() {
           )}
           Publicar Alterações
         </Button>
-        <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 font-bold">
+        <Button
+          onClick={handleDiscard}
+          variant="outline"
+          className="border-red-300 text-red-600 hover:bg-red-50 font-bold"
+        >
           <Undo2 className="w-4 h-4 mr-2" /> Descartar Alterações
         </Button>
         <Button
+          onClick={handleRestore}
           variant="outline"
           className="border-[#C89B3C] text-[#C89B3C] hover:bg-[#C89B3C]/10 font-bold"
         >

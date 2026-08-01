@@ -1,0 +1,435 @@
+migrate(
+  (app) => {
+    var adminUser = null
+    try {
+      adminUser = app.findFirstRecordByData('users', 'email', 'veloralog@veloralog.com')
+    } catch (_) {}
+
+    var sections = {
+      header: {
+        logoText: 'Velora Log',
+        logoSize: 'h-16 sm:h-20',
+        logoPosition: 'left',
+        fixed: true,
+        navItems: [
+          { id: '1', label: 'Início', link: '/', newTab: false, active: true },
+          { id: '2', label: 'Serviços', link: '/#servicos', newTab: false, active: true },
+          { id: '3', label: 'Orçamento', link: '/#orcamento', newTab: false, active: true },
+          { id: '4', label: 'Contato', link: '/#contato', newTab: false, active: true },
+        ],
+        clientAreaButton: {
+          text: 'Área do Cliente',
+          link: '/cliente/login',
+          visible: true,
+          color: '#005B2E',
+          textColor: '#FFFFFF',
+        },
+        adminButton: {
+          text: 'Login ao Painel',
+          link: '/admin',
+          visible: true,
+          color: '#005B2E',
+          textColor: '#FFFFFF',
+        },
+        whatsappButton: { text: 'WhatsApp', visible: true, color: '#25D366', textColor: '#FFFFFF' },
+      },
+      homepage: {
+        sections: [
+          {
+            id: 'hero',
+            name: 'Hero Principal',
+            active: true,
+            order: 1,
+            alignment: 'center',
+            title: 'Sua Operação Logística Integrada com Precisão, Agilidade e Segurança',
+            subtitle: 'Infraestrutura Própria, Operação Segura e Otimizada',
+            text: 'Especialistas em armazenagem de alta capacidade com tecnologia WMS, movimentação de cargas, picking & packing, logística portuária e distribuição. Atendemos em todo o estado do Espírito Santo.',
+            complementaryText: '',
+            backgroundColor: '#000000',
+            textColor: '#FFFFFF',
+            primaryButtonText: 'Falar com Especialista no WhatsApp',
+            primaryButtonLink: '#whatsapp',
+            secondaryButtonText: 'Solicitar Cotação Rápida',
+            secondaryButtonLink: '#orcamento',
+          },
+        ],
+      },
+      banners: {
+        items: [
+          {
+            id: 'b1',
+            name: 'Banner Principal',
+            title: 'Velora Log — Excelência Logística',
+            subtitle: 'Operações Logísticas de Excelência no Espírito Santo',
+            text: '',
+            buttonText: 'Solicitar Orçamento',
+            buttonLink: '#orcamento',
+            active: true,
+            order: 1,
+            textPosition: 'center',
+            textColor: '#FFFFFF',
+            overlay: true,
+            overlayColor: '#000000',
+            opacity: 40,
+            startDate: '',
+            endDate: '',
+          },
+        ],
+      },
+      sections: {
+        items: [
+          {
+            id: 's1',
+            template: 'Chamada para ação',
+            name: 'CTA Final',
+            title: 'Pronto para elevar a eficiência da sua cadeia logística?',
+            active: true,
+            order: 1,
+            desktopVisible: true,
+            mobileVisible: true,
+          },
+        ],
+      },
+      services: {
+        sectionTitle: 'Excelência Operacional para o seu Negócio',
+        sectionSubtitle: 'Nossas Soluções Logísticas',
+        introText:
+          'Com tecnologia WMS de ponta, instalações próprias modernas e equipe altamente qualificada. Atendemos em todo o estado do Espírito Santo.',
+        visibleServices: [
+          'armazenagem-estoque',
+          'transporte-cargas',
+          'distribuicao-urbana',
+          'armazenagem-cd',
+          'logistica-portuaria',
+          'cross-docking',
+          'gestao-frota',
+        ],
+        serviceOrder: [
+          'armazenagem-estoque',
+          'transporte-cargas',
+          'distribuicao-urbana',
+          'armazenagem-cd',
+          'logistica-portuaria',
+          'cross-docking',
+          'gestao-frota',
+        ],
+      },
+      institutional: {
+        aboutTitle: 'Sobre a Velora Log',
+        aboutText:
+          'A Velora Log é uma empresa especializada em operações logísticas no Espírito Santo.',
+        mission:
+          'Providenciar soluções logísticas de excelência que impulsionam o crescimento dos nossos clientes.',
+        vision:
+          'Ser referência em operações logísticas no Espírito Santo, reconhecida pela qualidade e inovação.',
+        values: 'Segurança, Eficiência, Inovação, Compromisso, Transparência',
+        history: '',
+        team: '',
+        active: true,
+      },
+      buttons: {
+        items: [
+          {
+            id: 'btn1',
+            name: 'WhatsApp Hero',
+            text: 'Falar com Especialista no WhatsApp',
+            link: '#whatsapp',
+            linkType: 'WhatsApp',
+            newTab: true,
+            color: '#25D366',
+            textColor: '#FFFFFF',
+            style: 'solid',
+            icon: 'MessageCircle',
+            iconPosition: 'left',
+            active: true,
+          },
+          {
+            id: 'btn2',
+            name: 'Cotação Hero',
+            text: 'Solicitar Cotação Rápida',
+            link: '#orcamento',
+            linkType: 'Âncora dentro da página',
+            newTab: false,
+            color: '#01361D',
+            textColor: '#E4C46A',
+            style: 'outline',
+            icon: 'FileText',
+            iconPosition: 'left',
+            active: true,
+          },
+        ],
+      },
+      identity: {
+        primaryColor: '#005B2E',
+        darkGreenColor: '#01361D',
+        goldColor: '#C89B3C',
+        whiteColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF',
+        textColor: '#1a1a1a',
+        buttonColor: '#005B2E',
+        primaryTypography: 'Inter, sans-serif',
+        secondaryTypography: 'Inter, sans-serif',
+        titleSize: '3xl',
+        bodySize: 'base',
+        borderRadius: 'rounded-xl',
+        shadow: 'shadow-lg',
+        cardStyle: 'border-2',
+        buttonStyle: 'font-bold rounded-lg',
+      },
+      navigation: {
+        items: [
+          {
+            id: 'n1',
+            name: 'Início',
+            link: '/',
+            icon: 'Home',
+            visibility: 'always',
+            newTab: false,
+            active: true,
+          },
+          {
+            id: 'n2',
+            name: 'Serviços',
+            link: '/#servicos',
+            icon: 'Package',
+            visibility: 'always',
+            newTab: false,
+            active: true,
+          },
+          {
+            id: 'n3',
+            name: 'Orçamento',
+            link: '/#orcamento',
+            icon: 'FileText',
+            visibility: 'always',
+            newTab: false,
+            active: true,
+          },
+          {
+            id: 'n4',
+            name: 'Contato',
+            link: '/#contato',
+            icon: 'Phone',
+            visibility: 'always',
+            newTab: false,
+            active: true,
+          },
+        ],
+      },
+      footer: {
+        institutionalText:
+          'Operações Logísticas de Excelência no Espírito Santo. Soluções completas em armazenagem de estoque (WMS), transporte de cargas, logística portuária e distribuição urbana.',
+        phone: '(31) 99129-7619',
+        whatsapp: '5531991297619',
+        email: '',
+        website: '',
+        address: 'Atendemos em todo o estado do Espírito Santo',
+        copyrightText: 'Velora Log Operações Logísticas. Todos os direitos reservados.',
+        socialLinks: {},
+        backgroundColor: '#01361D',
+        textColor: '#FFFFFF',
+        columns: [
+          {
+            id: 'c1',
+            title: 'Soluções Logísticas',
+            links: [
+              { label: 'Armazenagem de Produtos (WMS)', link: '#servicos' },
+              { label: 'Transporte Rodoviário de Cargas', link: '#servicos' },
+            ],
+          },
+          { id: 'c2', title: 'Central de Atendimento', links: [] },
+        ],
+      },
+      seo: {
+        title: 'Velora Log - Operações Logísticas de Excelência no Espírito Santo',
+        description:
+          'Soluções completas em armazenagem, transporte de cargas, logística portuária e distribuição. Atendemos em todo o estado do Espírito Santo.',
+        keywords: 'logística, armazenagem, transporte, cargas, Espírito Santo, WMS, distribuição',
+        canonicalUrl: '',
+        ogTitle: 'Velora Log - Operações Logísticas',
+        ogDescription: 'Excelência em soluções logísticas no ES',
+        indexNoIndex: 'index',
+        friendlyUrl: '',
+        defaultTitle: 'Velora Log - Operações Logísticas de Excelência no Espírito Santo',
+        defaultDescription:
+          'Soluções completas em armazenagem, transporte de cargas, logística portuária e distribuição.',
+        defaultKeywords:
+          'logística, armazenagem, transporte, cargas, Espírito Santo, WMS, distribuição',
+        favicon: '',
+        searchLogo: '',
+        pages: [
+          {
+            url: '/',
+            name: 'Página Inicial',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/#servicos',
+            name: 'Serviços',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/#orcamento',
+            name: 'Orçamento',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/#contato',
+            name: 'Contato',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/cliente/login',
+            name: 'Área do Cliente',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: false,
+            follow: true,
+          },
+          {
+            url: '/admin',
+            name: 'Painel Administrativo',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: false,
+            follow: false,
+          },
+          {
+            url: '/politica-de-privacidade',
+            name: 'Política de Privacidade',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/termos-de-uso',
+            name: 'Termos de Uso',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/politica-comercial',
+            name: 'Política Comercial',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+          {
+            url: '/politica-de-cookies',
+            name: 'Política de Cookies',
+            title: '',
+            description: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+            index: true,
+            follow: true,
+          },
+        ],
+      },
+      scripts: {
+        headScripts: '',
+        bodyScripts: '',
+        analyticsId: '',
+        whatsappWidgetId: '',
+        customEmbeds: '',
+        googleAnalytics: '',
+        googleTagManager: '',
+        metaPixel: '',
+        googleSearchConsole: '',
+        robotsTxt: 'User-agent: *\nAllow: /',
+        sitemapXml: '',
+      },
+    }
+
+    var cmsCol = app.findCollectionByNameOrId('cms_content')
+    for (var key in sections) {
+      try {
+        app.findFirstRecordByData('cms_content', 'section_key', key)
+      } catch (_) {
+        var record = new Record(cmsCol)
+        record.set('section_key', key)
+        record.set('draft_data', sections[key])
+        record.set('published_data', sections[key])
+        record.set('status', 'published')
+        if (adminUser) record.set('updated_by', adminUser.id)
+        app.save(record)
+      }
+    }
+
+    var pubCol = app.findCollectionByNameOrId('cms_publication')
+    var existingPub = app.findRecordsByFilter('cms_publication', "id != ''", '', 1, 0)
+    if (existingPub.length === 0) {
+      var pub = new Record(pubCol)
+      pub.set('status', 'published')
+      pub.set('last_published_at', new Date().toISOString())
+      if (adminUser) pub.set('last_published_by', adminUser.id)
+      pub.set('pending_changes', 0)
+      app.save(pub)
+    }
+  },
+  (app) => {},
+)

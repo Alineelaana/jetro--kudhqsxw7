@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { SettingsProvider } from '@/hooks/use-settings'
 import { AuthProvider } from '@/hooks/use-auth'
 import { ClientAuthProvider } from '@/hooks/use-client-auth'
+import { CmsContentProvider } from '@/hooks/use-cms-content'
 import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
@@ -26,25 +27,27 @@ const App = () => (
       <AuthProvider>
         <SettingsProvider>
           <ClientAuthProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/cadastro" element={<AdminRegister />} />
-                <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
-                <Route path="/cliente/login" element={<ClientLogin />} />
-                <Route path="/cliente/cadastro" element={<ClientRegister />} />
-                <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
-                <Route path="/cliente" element={<ClientArea />} />
-                <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
-                <Route path="/politica-comercial" element={<PoliticaComercial />} />
-                <Route path="/termos-de-uso" element={<TermosDeUso />} />
-                <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
+            <CmsContentProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin/cadastro" element={<AdminRegister />} />
+                  <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
+                  <Route path="/cliente/login" element={<ClientLogin />} />
+                  <Route path="/cliente/cadastro" element={<ClientRegister />} />
+                  <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
+                  <Route path="/cliente" element={<ClientArea />} />
+                  <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+                  <Route path="/politica-comercial" element={<PoliticaComercial />} />
+                  <Route path="/termos-de-uso" element={<TermosDeUso />} />
+                  <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </CmsContentProvider>
           </ClientAuthProvider>
         </SettingsProvider>
       </AuthProvider>

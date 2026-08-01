@@ -48,24 +48,24 @@ export async function discardDraft(sectionKey: string): Promise<void> {
 }
 
 export async function publishAllSections(userId: string): Promise<void> {
+  await pb.send('/backend/v1/cms/publish', {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function discardAllDrafts(): Promise<void> {
   const allContent = await getCmsContent()
   for (const content of allContent) {
     if (content.status === 'pending') {
-      await pb.collection('cms_content').update(content.id, {
-        published_data: content.draft_data,
-        status: 'published',
-      })
-      await pb.collection('cms_versions').create({
-        section_key: content.section_key,
-        version_data: content.draft_data,
-        version_number: Math.floor(Date.now() / 1000),
-        published_by: userId,
-        published_at: new Date().toISOString(),
-        label: `Publicação ${new Date().toLocaleString('pt-BR')}`,
-      })
+      await discardDraft(content.section_key)
     }
   }
-  await updatePublicationState('published', userId, 0)
+}
+
+export async function generateSitemap(): Promise<string> {
+  return pb.send('/backend/v1/cms/sitemap', { method: 'GET' })
 }
 
 export async function getPublicationState() {
