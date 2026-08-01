@@ -1,3 +1,7 @@
+import { Clock, Receipt, Mail, Phone } from 'lucide-react'
+import { type BudgetRecord } from '@/lib/types'
+import { getResponseTime } from '@/lib/response-time'
+
 const SPECIAL_LABELS: Record<string, string> = {
   privacy_consent_accepted: 'Consentimento de Privacidade',
   privacy_consent_accepted_at: 'Consentimento aceito em',
@@ -23,29 +27,65 @@ function formatValue(key: string, value: unknown): string {
 interface AdminRequestDetailsProps {
   data: Record<string, unknown>
   labelMap: Record<string, string>
+  record: BudgetRecord
 }
 
-export function AdminRequestDetails({ data, labelMap }: AdminRequestDetailsProps) {
+export function AdminRequestDetails({ data, labelMap, record }: AdminRequestDetailsProps) {
+  const responseTime = getResponseTime(record.created, record.quote_created_at)
   const entries = Object.entries(data || {})
-  if (entries.length === 0) {
-    return <p className="text-sm text-muted-foreground">Sem dados adicionais.</p>
-  }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl">
-      {entries.map(([key, value]) => {
-        const label = labelMap[key] || SPECIAL_LABELS[key] || key
-        return (
-          <div key={key} className="flex flex-col gap-0.5">
-            <span className="text-xs font-bold text-[#005B2E] uppercase tracking-wide">
-              {label}
+    <div className="space-y-4 max-w-4xl">
+      <div className="p-3 rounded-lg bg-[#005B2E]/5 border border-[#005B2E]/20">
+        <div className="flex items-center gap-2 mb-2">
+          <Clock className="w-4 h-4 text-[#005B2E]" />
+          <span className="text-sm font-bold text-[#005B2E]">
+            Tempo de resposta: {responseTime.text}
+          </span>
+          {!responseTime.hasQuote && (
+            <span className="text-xs text-amber-600 font-medium">
+              (Aguardando geração de orçamento)
             </span>
-            <span className="text-sm text-foreground/90 break-words">
-              {formatValue(key, value)}
+          )}
+        </div>
+        {record.budget_number && (
+          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Receipt className="w-3 h-3" /> {record.budget_number}
             </span>
+            {record.responsible_email && (
+              <span className="flex items-center gap-1">
+                <Mail className="w-3 h-3" /> {record.responsible_email}
+              </span>
+            )}
+            {record.responsible_phone && (
+              <span className="flex items-center gap-1">
+                <Phone className="w-3 h-3" /> {record.responsible_phone}
+              </span>
+            )}
           </div>
-        )
-      })}
+        )}
+      </div>
+
+      {entries.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Sem dados adicionais.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {entries.map(([key, value]) => {
+            const label = labelMap[key] || SPECIAL_LABELS[key] || key
+            return (
+              <div key={key} className="flex flex-col gap-0.5">
+                <span className="text-xs font-bold text-[#005B2E] uppercase tracking-wide">
+                  {label}
+                </span>
+                <span className="text-sm text-foreground/90 break-words">
+                  {formatValue(key, value)}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

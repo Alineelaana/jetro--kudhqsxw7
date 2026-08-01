@@ -1,4 +1,5 @@
 import { AdminRequestDetails } from '@/components/admin-request-details'
+import { getResponseTime } from '@/lib/response-time'
 import { ChevronDown, ChevronUp, History, Receipt, Settings2 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -39,6 +40,7 @@ export function AdminRequestRow({
   onBudgetClick,
 }: AdminRequestRowProps) {
   const status = record.status || 'PENDENTE'
+  const responseTime = getResponseTime(record.created, record.quote_created_at)
 
   return (
     <>
@@ -68,6 +70,16 @@ export function AdminRequestRow({
           >
             {status}
           </span>
+        </td>
+        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs sm:text-sm hidden md:table-cell">
+          <span className={responseTime.hasQuote ? 'text-foreground' : 'text-amber-600'}>
+            {responseTime.text}
+          </span>
+          {!responseTime.hasQuote && (
+            <span className="text-amber-500 ml-1" title="Aguardando orçamento">
+              ●
+            </span>
+          )}
         </td>
         <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs sm:text-sm">
           {formatDate(record.created)}
@@ -130,8 +142,8 @@ export function AdminRequestRow({
       </tr>
       {isExpanded && (
         <tr className="bg-muted/30">
-          <td colSpan={7} className="px-4 py-4">
-            <AdminRequestDetails data={record.data} labelMap={labelMap} />
+          <td colSpan={8} className="px-4 py-4">
+            <AdminRequestDetails data={record.data} labelMap={labelMap} record={record} />
           </td>
         </tr>
       )}

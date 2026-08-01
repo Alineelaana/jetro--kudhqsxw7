@@ -1,6 +1,25 @@
 import pb from '@/lib/pocketbase/client'
 import type { StatusHistoryEntry } from '@/lib/types'
 
+export interface QuoteData {
+  budget_number: string
+  responsible_email: string
+  responsible_phone: string
+  quote_created_at: string
+}
+
+export async function saveQuoteData(id: string, data: QuoteData): Promise<void> {
+  await pb.collection('budget_requests').update(id, data)
+}
+
+export async function getAverageResponseTime(): Promise<{
+  averageMs: number
+  count: number
+  formatted: string
+}> {
+  return pb.send('/backend/v1/response-time/average', { method: 'GET' })
+}
+
 export interface BudgetRequestData {
   data: Record<string, string>
   client_name: string

@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { AlertCircle, Loader2, Download } from 'lucide-react'
-import { getNextBudgetNumber } from '@/services/budget-requests'
+import { getNextBudgetNumber, saveQuoteData } from '@/services/budget-requests'
 import { generateBudgetPdf } from '@/lib/pdf-generator'
 import { type BudgetRecord } from '@/lib/types'
 
@@ -21,6 +21,7 @@ interface BudgetCreateDialogProps {
   onOpenChange: (open: boolean) => void
   record: BudgetRecord | null
   authorName: string
+  onSuccess?: () => void
 }
 
 function getString(obj: Record<string, unknown>, key: string): string {
@@ -28,15 +29,28 @@ function getString(obj: Record<string, unknown>, key: string): string {
   return typeof val === 'string' ? val : ''
 }
 
+function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function BudgetCreateDialog({
   open,
   onOpenChange,
   record,
   authorName,
+  onSuccess,
 }: BudgetCreateDialogProps) {
   const [value, setValue] = useState('')
   const [validUntil, setValidUntil] = useState('')
   const [responsible, setResponsible] = useState('')
+  const [responsibleEmail, setResponsibleEmail] = useState('')
+  const [responsiblePhone, setResponsiblePhone] = useState('')
   const [observations, setObservations] = useState('')
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
@@ -46,6 +60,8 @@ export function BudgetCreateDialog({
       setValue('')
       setValidUntil('')
       setResponsible(authorName)
+      setResponsibleEmail('')
+      setResponsiblePhone('')
       setObservations('')
       setError('')
     }
@@ -57,8 +73,10 @@ export function BudgetCreateDialog({
     setError('')
     try {
       const { number } = await getNextBudgetNumber()
+      const quoteCreatedAt = new Date().toISOString()
       const data = record.data as Record<string, unknown>
-      const emissionDate = new Date().toLocaleDateString('pt-BR')
+      const emissionDate = formatDateTime(quoteCreatedAt)
+      const requestDate = formatDateTime(record.created)
       const formattedValidUntil = validUntil
         ? new Date(validUntil + 'T00:00:00').toLocaleDateString('pt-BR')
         : ''
@@ -66,6 +84,7 @@ export function BudgetCreateDialog({
       generateBudgetPdf({
         budgetNumber: number,
         emissionDate,
+        requestDate,
         clientName: record.client_name,
         clientEmail: record.client_email,
         clientPhone: record.client_phone,
@@ -80,8 +99,20 @@ export function BudgetCreateDialog({
         value,
         validUntil: formattedValidUntil,
         responsible,
+        responsibleEmail,
+        responsiblePhone,
         observations,
       })
+
+      await saveQuoteData(record.id, {
+        budget_number: number,
+        responsible_email: responsibleEmail,
+        responsible_phone: responsiblePhone,
+        quote_created_at: quoteCreatedAt,
+      })
+
+      onSuccess?.()
+      onOpenChange(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao gerar orçamento. Tente novamente.')
     } finally {
@@ -161,17 +192,45 @@ export function BudgetCreateDialog({
               />
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="responsible" className="text-sm font-semibold">
-              Nome do Responsável
-            </Label>
-            <Input
-              id="responsible"
-              value={responsible}
-              onChange={(e) => setResponsible(e.target.value)}
-              placeholder="Ex: João Silva"
-              className="focus-visible:ring-[#005B2E]"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-1.5 sm:col-span-1">
+              <Label htmlFor="responsible" className="text-sm font-semibold">
+                Nome do Responsável
+              </Label>
+              <Input
+                id="responsible"
+                value={responsible}
+                onChange={(e) => setResponsible(e.target.value)}
+                placeholder="Ex: João Silva"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="responsibleEmail" className="text-sm font-semibold">
+                E-mail do responsável
+              </Label>
+              <Input
+                id="responsibleEmail"
+                type="email"
+                value={responsibleEmail}
+                onChange={(e) => setResponsibleEmail(e.target.value)}
+                placeholder="responsavel@veloralog.com.br"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="responsiblePhone" className="text-sm font-semibold">
+                Telefone do responsável
+              </Label>
+              <Input
+                id="responsiblePhone"
+                type="tel"
+                value={responsiblePhone}
+                onChange={(e) => setResponsiblePhone(e.target.value)}
+                placeholder="(27) 99999-9999"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="observations" className="text-sm font-semibold">

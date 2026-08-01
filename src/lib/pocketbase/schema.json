@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T16:28:09.571Z",
+  "generatedAt": "2026-08-01T16:49:56.866Z",
   "collections": [
     {
       "name": "users",
@@ -227,6 +227,30 @@
         {
           "name": "status_history",
           "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_phone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quote_created_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "budget_number",
+          "type": "text",
           "required": false,
           "system": false
         }

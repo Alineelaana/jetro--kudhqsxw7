@@ -39,4 +39,8 @@ export interface BudgetRecord {
   status_history: StatusHistoryEntry[]
   created: string
   updated: string
+  responsible_email?: string
+  responsible_phone?: string
+  quote_created_at?: string
+  budget_number?: string
 }

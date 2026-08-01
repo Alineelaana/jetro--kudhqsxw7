@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
+import { useResponseTime } from '@/hooks/use-response-time'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
 import warehouseBg from '@/assets/chatgpt-image-1-de-ago.de-2026-122134-e02ba.png'
@@ -22,6 +23,7 @@ const DIFFERENTIALS = [
 
 export function HeroSection() {
   const { whatsappNumber } = useSettings()
+  const { formatted: responseTimeFormatted } = useResponseTime()
 
   return (
     <section
@@ -53,6 +55,13 @@ export function HeroSection() {
             <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
             <span>Infraestrutura Própria & Operação em Tempo Real no ES</span>
           </div>
+
+          {responseTimeFormatted && (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#005B2E]/80 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
+              <Clock className="w-4 h-4" />
+              Resposta em média de {responseTimeFormatted}
+            </div>
+          )}
 
           {/* Main Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.9)] [text-shadow:0_2px_6px_rgba(0,0,0,0.95),0_0_2px_rgba(0,0,0,1)]">

@@ -14,7 +14,8 @@ import { StatusDashboard } from '@/components/status-dashboard'
 import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { UserManagement } from '@/components/user-management'
 import { type BudgetRecord } from '@/lib/types'
-import { LogOut, Inbox, FileText, Loader2, RefreshCw, AlertCircle } from 'lucide-react'
+import { LogOut, Inbox, FileText, Loader2, RefreshCw, AlertCircle, Clock } from 'lucide-react'
+import { getAverageResponseTime } from '@/lib/response-time'
 
 export function AdminDashboard() {
   const { signOut, isAdmin, user } = useAuth()
@@ -67,6 +68,7 @@ export function AdminDashboard() {
   })
 
   const authorName = (user?.name as string) || (user?.email as string) || 'Usuário'
+  const avgResponseTime = useMemo(() => getAverageResponseTime(records), [records])
   const toggleRow = (id: string) => setExpandedId((prev) => (prev === id ? null : id))
 
   return (
@@ -98,19 +100,34 @@ export function AdminDashboard() {
 
         <TabsContent value="solicitacoes" className="space-y-6">
           {!loading && !error && records.length > 0 && <StatusDashboard records={records} />}
-          <Card className="border-2 border-[#C89B3C]/30 bg-white">
-            <CardContent className="py-4 px-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-[#005B2E]" />
-              </div>
-              <div>
-                <p className="text-2xl font-black text-foreground">{records.length}</p>
-                <p className="text-sm text-muted-foreground">
-                  {records.length === 1 ? 'Solicitação recebida' : 'Solicitações recebidas'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Card className="border-2 border-[#C89B3C]/30 bg-white flex-1">
+              <CardContent className="py-4 px-6 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-[#005B2E]" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">{records.length}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {records.length === 1 ? 'Solicitação recebida' : 'Solicitações recebidas'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            {avgResponseTime && (
+              <Card className="border-2 border-[#005B2E]/30 bg-white flex-1">
+                <CardContent className="py-4 px-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-[#005B2E]" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-foreground">{avgResponseTime}</p>
+                    <p className="text-sm text-muted-foreground">Tempo médio de resposta</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -161,6 +178,9 @@ export function AdminDashboard() {
                       </th>
                       <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden sm:table-cell">
                         Status
+                      </th>
+                      <th className="text-left px-4 py-3 font-bold whitespace-nowrap hidden md:table-cell">
+                        Tempo
                       </th>
                       <th className="text-left px-4 py-3 font-bold whitespace-nowrap">Data/Hora</th>
                       <th className="text-left px-4 py-3 font-bold whitespace-nowrap">Ações</th>
@@ -213,6 +233,7 @@ export function AdminDashboard() {
         onOpenChange={(open) => !open && setBudgetRecord(null)}
         record={budgetRecord}
         authorName={authorName}
+        onSuccess={loadData}
       />
     </div>
   )
