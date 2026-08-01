@@ -1,4 +1,6 @@
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { POLICY_LINKS } from '@/lib/policy-links'
 import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
 
 export function SiteFooter() {
@@ -73,14 +75,23 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-6 text-xs text-center text-white/60 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <span>
-            © {new Date().getFullYear()} Velora Log Operações Logísticas. Todos os direitos
-            reservados.
-          </span>
-          <span className="text-[#E4C46A]">
-            Velora Log - Excelência em Soluções Logísticas no ES
-          </span>
+        <div className="border-t border-white/10 mt-10 pt-6 text-xs text-center text-white/60 flex flex-col gap-4">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            {POLICY_LINKS.map((link) => (
+              <Link key={link.to} to={link.to} className="hover:text-[#E4C46A] transition-colors">
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>
+              © {new Date().getFullYear()} Velora Log Operações Logísticas. Todos os direitos
+              reservados.
+            </span>
+            <span className="text-[#E4C46A]">
+              Velora Log - Excelência em Soluções Logísticas no ES
+            </span>
+          </div>
         </div>
       </div>
     </footer>

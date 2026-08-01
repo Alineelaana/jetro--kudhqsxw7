@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BudgetFormField } from '@/components/budget-form-field'
+import { ConsentCheckbox } from '@/components/consent-checkbox'
 import { getFormFields } from '@/services/budget-form-fields'
 import { createBudgetRequest } from '@/services/budget-requests'
 import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
@@ -18,6 +19,8 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   const [values, setValues] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
+  const [consentAccepted, setConsentAccepted] = useState(false)
+  const [consentError, setConsentError] = useState('')
 
   useEffect(() => {
     getFormFields()
@@ -48,8 +51,13 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
         newErrors[field.name] = 'E-mail corporativo inválido'
       }
     }
+    if (!consentAccepted) {
+      setConsentError('Você deve aceitar a Política de Privacidade para continuar.')
+    } else {
+      setConsentError('')
+    }
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return Object.keys(newErrors).length === 0 && consentAccepted
   }
 
   const buildSummaryMessage = () => {
@@ -75,7 +83,11 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
     setStatus('submitting')
     try {
       await createBudgetRequest({
-        data: values,
+        data: {
+          ...values,
+          privacy_consent_accepted: true,
+          privacy_consent_accepted_at: new Date().toISOString(),
+        },
         client_name: values.nome_completo || '',
         client_email: values.email || '',
         client_phone: values.telefone || '',
@@ -92,6 +104,8 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
     setValues({})
     setErrors({})
     setStatus('idle')
+    setConsentAccepted(false)
+    setConsentError('')
   }
 
   if (status === 'success') {
@@ -209,6 +223,14 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border/60">
+            <ConsentCheckbox
+              checked={consentAccepted}
+              onChange={(checked) => {
+                setConsentAccepted(checked)
+                if (checked) setConsentError('')
+              }}
+              error={consentError}
+            />
             <Button
               type="submit"
               size="lg"
