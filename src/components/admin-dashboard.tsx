@@ -28,7 +28,12 @@ export function AdminDashboard() {
       const data = await getBudgetRequests()
       setRecords(data as unknown as BudgetRecord[])
       setError('')
-    } catch {
+    } catch (err) {
+      const status = (err as { status?: number })?.status
+      if (status === 401) {
+        signOut()
+        return
+      }
       setError('Erro ao carregar solicitações. Tente novamente.')
     } finally {
       setLoading(false)

@@ -32,17 +32,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(pb.authStore.isValid ? (record as Record<string, unknown>) : null)
       setIsAuthenticated(pb.authStore.isValid)
     })
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
     if (pb.authStore.isValid) {
+      timeoutId = setTimeout(() => setLoading(false), 5000)
       pb.collection('users')
         .authRefresh()
         .catch(() => pb.authStore.clear())
-        .finally(() => setLoading(false))
+        .finally(() => {
+          if (timeoutId) clearTimeout(timeoutId)
+          setLoading(false)
+        })
     } else {
       if (pb.authStore.record) pb.authStore.clear()
       setLoading(false)
     }
     return () => {
       unsubscribe()
+      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [])
 
