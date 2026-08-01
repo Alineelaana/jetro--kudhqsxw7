@@ -1,10 +1,28 @@
 export interface FinancialEntry {
   id: string
   date: string
-  description: string
+  responsible_user: string
+  type: string
   amount: string
-  type: 'credit' | 'debit'
-  note: string
+  description: string
+  note?: string
+}
+
+export interface RestrictionEntry {
+  id: string
+  action: 'activate' | 'remove'
+  reason: string
+  responsible_user: string
+  date: string
+}
+
+export interface DocumentMetadata {
+  id: string
+  name: string
+  category: string
+  uploaded_at: string
+  responsible_user: string
+  file_field: string
 }
 
 export interface PartnerFormState {
@@ -14,6 +32,11 @@ export interface PartnerFormState {
   phone: string
   cep: string
   address: string
+  address_number: string
+  address_complement: string
+  address_district: string
+  address_city: string
+  address_state: string
   reference_point: string
   full_name: string
   cpf: string
@@ -22,6 +45,11 @@ export interface PartnerFormState {
   profession: string
   monthly_income: string
   rg_cnh: string
+  document_type: string
+  document_number: string
+  document_issuer: string
+  document_issue_date: string
+  document_validity: string
   company_name: string
   trade_name: string
   cnpj: string
@@ -39,6 +67,11 @@ export const EMPTY_PARTNER_FORM: PartnerFormState = {
   phone: '',
   cep: '',
   address: '',
+  address_number: '',
+  address_complement: '',
+  address_district: '',
+  address_city: '',
+  address_state: '',
   reference_point: '',
   full_name: '',
   cpf: '',
@@ -47,6 +80,11 @@ export const EMPTY_PARTNER_FORM: PartnerFormState = {
   profession: '',
   monthly_income: '',
   rg_cnh: '',
+  document_type: '',
+  document_number: '',
+  document_issuer: '',
+  document_issue_date: '',
+  document_validity: '',
   company_name: '',
   trade_name: '',
   cnpj: '',

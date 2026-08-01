@@ -94,6 +94,12 @@ export default function ClientLogin() {
                 'Entrar'
               )}
             </Button>
+            <Link
+              to="/cliente/recuperar-senha"
+              className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+            >
+              Esqueci minha senha
+            </Link>
           </form>
         </CardContent>
       </Card>

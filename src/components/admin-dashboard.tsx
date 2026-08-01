@@ -17,6 +17,7 @@ import { UserManagement } from '@/components/user-management'
 import { AdminChatPanel } from '@/components/admin-chat-panel'
 import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
+import { PartnerManagement } from '@/components/partner-management'
 import { RequestFilters } from '@/components/request-filters'
 import { PaginationControls } from '@/components/pagination-controls'
 import { filterRecords, extractAttendants } from '@/lib/request-filters'
@@ -167,6 +168,7 @@ export function AdminDashboard() {
         <TabsList className="mb-6">
           <TabsTrigger value="solicitacoes">Solicitações</TabsTrigger>
           <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
+          <TabsTrigger value="parceiros">Parceiros</TabsTrigger>
           <TabsTrigger value="chat">Chat Online</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
         </TabsList>
@@ -356,6 +358,10 @@ export function AdminDashboard() {
 
         <TabsContent value="dashboards">
           <DashboardsPanel />
+        </TabsContent>
+
+        <TabsContent value="parceiros">
+          <PartnerManagement />
         </TabsContent>
 
         <TabsContent value="chat" className="space-y-6">

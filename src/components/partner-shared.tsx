@@ -1,4 +1,9 @@
-import type { PartnerFormState, FinancialEntry } from '@/lib/partner-types'
+import type {
+  PartnerFormState,
+  FinancialEntry,
+  RestrictionEntry,
+  DocumentMetadata,
+} from '@/lib/partner-types'
 import { getFileUrl } from '@/lib/partner-utils'
 import { Label } from '@/components/ui/label'
 import { Upload, FileText } from 'lucide-react'
@@ -20,6 +25,11 @@ export interface PartnerRecord {
   email: string
   phone: string
   address: string
+  address_number: string
+  address_complement: string
+  address_district: string
+  address_city: string
+  address_state: string
   reference_point: string
   cep: string
   full_name: string
@@ -29,6 +39,11 @@ export interface PartnerRecord {
   profession: string
   monthly_income: string
   rg_cnh: string
+  document_type: string
+  document_number: string
+  document_issuer: string
+  document_issue_date: string
+  document_validity: string
   company_name: string
   trade_name: string
   cnpj: string
@@ -39,6 +54,10 @@ export interface PartnerRecord {
   address_proof: string
   rg_cnh_doc: string
   financial_history: FinancialEntry[]
+  financial_restriction: boolean
+  restriction_reason: string
+  restriction_history: RestrictionEntry[]
+  documents_metadata: DocumentMetadata[]
   created: string
   updated: string
 }

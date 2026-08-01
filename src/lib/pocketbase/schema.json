@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T20:09:49.797Z",
+  "generatedAt": "2026-08-01T20:43:45.629Z",
   "collections": [
     {
       "name": "users",
@@ -45,13 +45,6 @@
           "system": false
         },
         {
-          "name": "role",
-          "type": "select",
-          "required": false,
-          "system": false,
-          "selectValues": ["SUP", "PADRAO", "SDR", "Vendedor"]
-        },
-        {
           "name": "attendant_status",
           "type": "select",
           "required": false,
@@ -63,6 +56,13 @@
           "type": "bool",
           "required": false,
           "system": false
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["SUP", "PADRAO", "SDR", "Vendedor", "FINANCEIRO", "COMERCIAL"]
         }
       ],
       "indexes": [
@@ -737,6 +737,91 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "address_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "address_complement",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "address_district",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "address_city",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "address_state",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "document_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "document_issuer",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "document_issue_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "document_validity",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "restriction_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "document_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["RG", "CNH"]
+        },
+        {
+          "name": "financial_restriction",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "restriction_history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "documents_metadata",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

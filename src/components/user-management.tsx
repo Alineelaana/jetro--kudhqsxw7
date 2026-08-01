@@ -234,6 +234,8 @@ export function UserManagement() {
                 <SelectContent>
                   <SelectItem value="PADRAO">PADRÃO (Funcionário)</SelectItem>
                   <SelectItem value="SUP">SUP (Gestão)</SelectItem>
+                  <SelectItem value="FINANCEIRO">Financeiro</SelectItem>
+                  <SelectItem value="COMERCIAL">Comercial</SelectItem>
                   <SelectItem value="SDR">SDR</SelectItem>
                   <SelectItem value="Vendedor">Vendedor</SelectItem>
                 </SelectContent>

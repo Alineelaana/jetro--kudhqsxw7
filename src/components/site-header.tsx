@@ -45,6 +45,14 @@ export function SiteHeader() {
           <div className="hidden md:flex items-center gap-3">
             <Button
               asChild
+              variant="ghost"
+              size="sm"
+              className="text-white/80 hover:text-[#E4C46A] hover:bg-white/10 font-bold rounded-lg"
+            >
+              <Link to="/cliente/login">Área do Cliente</Link>
+            </Button>
+            <Button
+              asChild
               size="sm"
               className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-md rounded-lg"
             >
@@ -97,6 +105,15 @@ export function SiteHeader() {
                     {link.label}
                   </a>
                 ))}
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
+                >
+                  <Link to="/cliente/login" onClick={() => setOpen(false)}>
+                    Área do Cliente
+                  </Link>
+                </Button>
                 <Button
                   asChild
                   variant="outline"

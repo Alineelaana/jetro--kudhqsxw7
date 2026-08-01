@@ -12,41 +12,53 @@ import {
 } from '@/components/ui/select'
 import { updateFinancialHistory } from '@/services/partners'
 import { type FinancialEntry } from '@/lib/partner-types'
+import { FINANCIAL_RECORD_TYPES } from '@/lib/partner-constants'
 import type { PartnerRecord } from '@/components/partner-shared'
-import { Plus, Trash2, Loader2, TrendingUp, TrendingDown } from 'lucide-react'
+import { Plus, Loader2, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
   partner: PartnerRecord | null
+  responsibleUser: string
   onSuccess: () => void
 }
 
-export function PartnerFinancialDialog({ open, onOpenChange, partner, onSuccess }: Props) {
+export function PartnerFinancialDialog({
+  open,
+  onOpenChange,
+  partner,
+  responsibleUser,
+  onSuccess,
+}: Props) {
   const [entries, setEntries] = useState<FinancialEntry[]>([])
   const [saving, setSaving] = useState(false)
   const [newEntry, setNewEntry] = useState<Omit<FinancialEntry, 'id'>>({
     date: new Date().toISOString().split('T')[0],
-    description: '',
+    responsible_user: responsibleUser,
+    type: FINANCIAL_RECORD_TYPES[0],
     amount: '',
-    type: 'credit',
-    note: '',
+    description: '',
   })
 
   useEffect(() => {
     setEntries((partner?.financial_history as unknown as FinancialEntry[]) || [])
-  }, [partner])
+    setNewEntry((p) => ({ ...p, responsible_user: responsibleUser }))
+  }, [partner, responsibleUser])
 
   const handleAdd = () => {
-    if (!newEntry.description.trim() || !newEntry.amount.trim()) return
-    setEntries((prev) => [{ ...newEntry, id: crypto.randomUUID() }, ...prev])
+    if (!newEntry.description.trim()) return
+    setEntries((prev) => [
+      { ...newEntry, id: crypto.randomUUID(), responsible_user: responsibleUser },
+      ...prev,
+    ])
     setNewEntry({
       date: new Date().toISOString().split('T')[0],
-      description: '',
+      responsible_user: responsibleUser,
+      type: FINANCIAL_RECORD_TYPES[0],
       amount: '',
-      type: 'credit',
-      note: '',
+      description: '',
     })
   }
 
@@ -66,6 +78,8 @@ export function PartnerFinancialDialog({ open, onOpenChange, partner, onSuccess 
     }
     setSaving(false)
   }
+
+  const isNegative = (type: string) => type === 'Pagamento em atraso' || type === 'Restrição'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -89,31 +103,25 @@ export function PartnerFinancialDialog({ open, onOpenChange, partner, onSuccess 
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Tipo</Label>
+                <Label className="text-xs">Tipo do registro</Label>
                 <Select
                   value={newEntry.type}
-                  onValueChange={(v) => setNewEntry({ ...newEntry, type: v as 'credit' | 'debit' })}
+                  onValueChange={(v) => setNewEntry({ ...newEntry, type: v })}
                 >
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="credit">Crédito (Pagamento)</SelectItem>
-                    <SelectItem value="debit">Débito (Dívida)</SelectItem>
+                    {FINANCIAL_RECORD_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Descrição</Label>
-                <Input
-                  value={newEntry.description}
-                  onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
-                  placeholder="Descrição"
-                  className="h-9"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Valor</Label>
+                <Label className="text-xs">Valor (quando aplicável)</Label>
                 <Input
                   value={newEntry.amount}
                   onChange={(e) => setNewEntry({ ...newEntry, amount: e.target.value })}
@@ -121,12 +129,16 @@ export function PartnerFinancialDialog({ open, onOpenChange, partner, onSuccess 
                   className="h-9"
                 />
               </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Usuário responsável</Label>
+                <Input value={responsibleUser} disabled className="h-9 bg-muted/50" />
+              </div>
               <div className="space-y-1 sm:col-span-2">
-                <Label className="text-xs">Observação</Label>
+                <Label className="text-xs">Descrição</Label>
                 <Input
-                  value={newEntry.note}
-                  onChange={(e) => setNewEntry({ ...newEntry, note: e.target.value })}
-                  placeholder="Nota opcional"
+                  value={newEntry.description}
+                  onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
+                  placeholder="Descrição"
                   className="h-9"
                 />
               </div>
@@ -149,40 +161,37 @@ export function PartnerFinancialDialog({ open, onOpenChange, partner, onSuccess 
               entries.map((e) => (
                 <div
                   key={e.id}
-                  className={`flex items-start gap-3 p-3 rounded-lg border ${e.type === 'credit' ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'}`}
+                  className={`flex items-start gap-3 p-3 rounded-lg border ${isNegative(e.type) ? 'border-red-200 bg-red-50' : 'border-emerald-200 bg-emerald-50'}`}
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      {e.type === 'credit' ? (
-                        <TrendingUp className="w-4 h-4 text-emerald-600" />
-                      ) : (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {isNegative(e.type) ? (
                         <TrendingDown className="w-4 h-4 text-red-600" />
+                      ) : (
+                        <TrendingUp className="w-4 h-4 text-emerald-600" />
                       )}
-                      <span className="font-bold text-sm">{e.description}</span>
-                      <span
-                        className={`text-sm font-bold ${e.type === 'credit' ? 'text-emerald-600' : 'text-red-600'}`}
-                      >
-                        {e.amount}
-                      </span>
+                      <span className="font-bold text-sm">{e.type}</span>
+                      {e.amount && (
+                        <span
+                          className={`text-sm font-bold ${isNegative(e.type) ? 'text-red-600' : 'text-emerald-600'}`}
+                        >
+                          {e.amount}
+                        </span>
+                      )}
                     </div>
+                    <p className="text-sm text-foreground/90 mt-1">{e.description}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {e.date}
-                      {e.note ? ` — ${e.note}` : ''}
+                      {e.date} — {e.responsible_user || 'Sistema'}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 text-destructive"
-                    onClick={() => setEntries((prev) => prev.filter((x) => x.id !== e.id))}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
               ))
             )}
           </div>
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" /> Os registros financeiros são permanentes e não podem
+            ser excluídos.
+          </p>
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
@@ -193,8 +202,7 @@ export function PartnerFinancialDialog({ open, onOpenChange, partner, onSuccess 
               disabled={saving}
               className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
             >
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Salvar
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Salvar
             </Button>
           </div>
         </div>

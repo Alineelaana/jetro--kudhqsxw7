@@ -15,17 +15,19 @@ import {
 import { PartnerPfFields } from '@/components/partner-pf-fields'
 import { PartnerPjFields } from '@/components/partner-pj-fields'
 import { PartnerFinancialDialog } from '@/components/partner-financial-dialog'
+import { PartnerRestrictionControls } from '@/components/partner-restriction-controls'
+import { PartnerTypeManager } from '@/components/partner-type-manager'
 import { type PartnerFieldProps, type PartnerRecord } from '@/components/partner-shared'
 import {
   createPartner,
   updatePartner,
   createClientForPartner,
   updateClientPassword,
-  updatePartnerField,
 } from '@/services/partners'
 import { getPartnerTypes } from '@/services/partner-types'
 import { EMPTY_PARTNER_FORM, type PartnerFormState } from '@/lib/partner-types'
 import { Loader2, Save, Ban, Unlock, Wallet, AlertCircle, Lock } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 
 interface Props {
@@ -36,6 +38,7 @@ interface Props {
 }
 
 export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Props) {
+  const { user } = useAuth()
   const [form, setForm] = useState<PartnerFormState>(EMPTY_PARTNER_FORM)
   const [files, setFiles] = useState<Record<string, File | null>>({})
   const [partnerTypes, setPartnerTypes] = useState<string[]>(['Cliente', 'Fornecedor', 'Usuário'])
@@ -44,6 +47,7 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
   const [financialOpen, setFinancialOpen] = useState(false)
   const isEditing = !!partner
   const isCliente = form.partner_type === 'Cliente'
+  const userName = (user?.name as string) || (user?.email as string) || 'Sistema'
 
   useEffect(() => {
     getPartnerTypes()
@@ -60,6 +64,11 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
         phone: partner.phone || '',
         cep: partner.cep || '',
         address: partner.address || '',
+        address_number: partner.address_number || '',
+        address_complement: partner.address_complement || '',
+        address_district: partner.address_district || '',
+        address_city: partner.address_city || '',
+        address_state: partner.address_state || '',
         reference_point: partner.reference_point || '',
         full_name: partner.full_name || '',
         cpf: partner.cpf || '',
@@ -68,6 +77,11 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
         profession: partner.profession || '',
         monthly_income: partner.monthly_income || '',
         rg_cnh: partner.rg_cnh || '',
+        document_type: partner.document_type || '',
+        document_number: partner.document_number || '',
+        document_issuer: partner.document_issuer || '',
+        document_issue_date: partner.document_issue_date || '',
+        document_validity: partner.document_validity || '',
         company_name: partner.company_name || '',
         trade_name: partner.trade_name || '',
         cnpj: partner.cnpj || '',
@@ -105,6 +119,7 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
   const handleToggleBlocked = async () => {
     if (!partner) return
     try {
+      const { updatePartnerField } = await import('@/services/partners')
       await updatePartnerField(partner.id, { blocked: !partner.blocked })
       toast({ title: partner.blocked ? 'Desbloqueado' : 'Bloqueado' })
       onSuccess()
@@ -161,12 +176,17 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 flex-wrap">
               <Lock className="w-5 h-5 text-[#005B2E]" />
               {isEditing ? 'Editar Parceiro' : 'Novo Parceiro'}
               {isEditing && partner?.blocked && (
                 <span className="text-xs bg-red-100 text-red-700 border border-red-300 px-2 py-0.5 rounded-full font-bold">
                   BLOQUEADO
+                </span>
+              )}
+              {isEditing && partner?.financial_restriction && (
+                <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-bold">
+                  RESTRITO
                 </span>
               )}
             </DialogTitle>
@@ -188,53 +208,29 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
                   </SelectContent>
                 </Select>
               </div>
-              {isCliente && (
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold">Pessoa Física / Jurídica</Label>
-                  <Select value={form.person_type} onValueChange={(v) => update('person_type', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PF">Pessoa Física</SelectItem>
-                      <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-
-            {!isCliente && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold">Nome</Label>
-                  <Input
-                    value={form.full_name}
-                    onChange={(e) => update('full_name', e.target.value)}
-                    className="focus-visible:ring-[#005B2E]"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold">E-mail</Label>
-                  <Input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => update('email', e.target.value)}
-                    className="focus-visible:ring-[#005B2E]"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold">Telefone</Label>
-                  <Input
-                    value={form.phone}
-                    onChange={(e) => update('phone', e.target.value)}
-                    className="focus-visible:ring-[#005B2E]"
-                  />
-                </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-semibold">Tipo de Pessoa *</Label>
+                <Select value={form.person_type} onValueChange={(v) => update('person_type', v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PF">Pessoa Física</SelectItem>
+                    <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-            {isCliente && form.person_type === 'PF' && <PartnerPfFields {...fieldProps} />}
-            {isCliente && form.person_type === 'PJ' && <PartnerPjFields {...fieldProps} />}
+            </div>
+            <PartnerTypeManager
+              onTypesChange={() =>
+                getPartnerTypes()
+                  .then(setPartnerTypes)
+                  .catch(() => {})
+              }
+            />
+
+            {form.person_type === 'PF' && <PartnerPfFields {...fieldProps} />}
+            {form.person_type === 'PJ' && <PartnerPjFields {...fieldProps} />}
 
             {isCliente && (
               <div className="space-y-1.5">
@@ -250,7 +246,6 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
                 />
               </div>
             )}
-
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">Observações</Label>
               <Textarea
@@ -260,7 +255,6 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
                 className="focus-visible:ring-[#005B2E]"
               />
             </div>
-
             <div className="flex items-center gap-3 bg-muted/40 px-4 py-3 rounded-lg border border-border">
               <span className="text-sm font-bold">Ativo</span>
               <Switch
@@ -274,6 +268,10 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
                 {form.active ? 'Ativo' : 'Inativo'}
               </span>
             </div>
+
+            {isEditing && partner && (
+              <PartnerRestrictionControls partner={partner} onSuccess={onSuccess} />
+            )}
 
             {error && (
               <p className="text-sm text-destructive flex items-center gap-1">
@@ -323,7 +321,7 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                   <Save className="w-4 h-4 mr-2" />
-                )}
+                )}{' '}
                 Salvar
               </Button>
             </div>
@@ -334,6 +332,7 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
         open={financialOpen}
         onOpenChange={setFinancialOpen}
         partner={partner}
+        responsibleUser={userName}
         onSuccess={onSuccess}
       />
     </>
