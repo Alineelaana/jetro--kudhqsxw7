@@ -228,61 +228,63 @@ export function AdminDashboard() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-              <div className="max-h-[70vh] overflow-y-auto">
-                <table className="w-full text-sm table-fixed">
-                  <thead className="sticky top-0 z-10">
-                    <tr className="bg-[#01361D] text-white">
-                      <th className="text-left px-3 py-3 font-bold w-[14%]">Cliente</th>
-                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[14%]">
-                        E-mail
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden lg:table-cell w-[11%]">
-                        Telefone
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[14%]">
-                        Serviço
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[11%]">
-                        Status
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[9%]">
-                        Tempo
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold w-[12%]">Data/Hora</th>
-                      <th className="text-left px-3 py-3 font-bold w-[15%]">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedRecords.map((record) => (
-                      <AdminRequestRow
-                        key={record.id}
-                        record={record}
-                        labelMap={labelMap}
-                        isExpanded={expandedId === record.id}
-                        onToggle={() => toggleRow(record.id)}
-                        onStatusSelect={(rec, status) => setStatusUpdate({ record: rec, status })}
-                        onHistoryClick={(rec) => setHistoryRecord(rec)}
-                        onBudgetClick={(rec) => setBudgetRecord(rec)}
-                        onSendEmailClick={(rec) =>
-                          setSendMessageState({ record: rec, mode: 'email' })
-                        }
-                        onSendWhatsAppClick={(rec) =>
-                          setSendMessageState({ record: rec, mode: 'whatsapp' })
-                        }
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-            <PaginationControls
-              totalRecords={records.length}
-              pageSize={pageSize}
-              currentPage={safePage}
-              onPageChange={setCurrentPage}
-              onPageSizeChange={handlePageSizeChange}
-            />
+            <>
+              <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
+                <div className="max-h-[70vh] overflow-y-auto">
+                  <table className="w-full text-sm table-fixed">
+                    <thead className="sticky top-0 z-10">
+                      <tr className="bg-[#01361D] text-white">
+                        <th className="text-left px-3 py-3 font-bold w-[14%]">Cliente</th>
+                        <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[14%]">
+                          E-mail
+                        </th>
+                        <th className="text-left px-3 py-3 font-bold hidden lg:table-cell w-[11%]">
+                          Telefone
+                        </th>
+                        <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[14%]">
+                          Serviço
+                        </th>
+                        <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[11%]">
+                          Status
+                        </th>
+                        <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[9%]">
+                          Tempo
+                        </th>
+                        <th className="text-left px-3 py-3 font-bold w-[12%]">Data/Hora</th>
+                        <th className="text-left px-3 py-3 font-bold w-[15%]">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedRecords.map((record) => (
+                        <AdminRequestRow
+                          key={record.id}
+                          record={record}
+                          labelMap={labelMap}
+                          isExpanded={expandedId === record.id}
+                          onToggle={() => toggleRow(record.id)}
+                          onStatusSelect={(rec, status) => setStatusUpdate({ record: rec, status })}
+                          onHistoryClick={(rec) => setHistoryRecord(rec)}
+                          onBudgetClick={(rec) => setBudgetRecord(rec)}
+                          onSendEmailClick={(rec) =>
+                            setSendMessageState({ record: rec, mode: 'email' })
+                          }
+                          onSendWhatsAppClick={(rec) =>
+                            setSendMessageState({ record: rec, mode: 'whatsapp' })
+                          }
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+              <PaginationControls
+                totalRecords={records.length}
+                pageSize={pageSize}
+                currentPage={safePage}
+                onPageChange={setCurrentPage}
+                onPageSizeChange={handlePageSizeChange}
+              />
+            </>
           )}
         </TabsContent>
 
