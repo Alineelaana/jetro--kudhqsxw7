@@ -47,15 +47,15 @@ export function ServiceCard({ service, whatsappNumber, onSelect }: ServiceCardPr
 
   return (
     <Card
-      className={`group relative flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl overflow-hidden ${
+      className={`group relative flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl overflow-visible ${
         service.highlight
           ? 'border-2 border-[#C89B3C] bg-gradient-to-b from-white via-white to-[#005B2E]/10 shadow-lg'
-          : 'border border-[#005B2E]/20 bg-white hover:border-[#005B2E]'
+          : 'border-2 border-[#005B2E]/20 bg-white hover:border-[#005B2E]'
       }`}
     >
       {service.highlight && (
-        <div className="absolute -top-3.5 right-6 z-20">
-          <Badge className="bg-[#C89B3C] hover:bg-[#C89B3C] text-[#01361D] font-black px-3.5 py-1 shadow-md text-xs uppercase tracking-wider">
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
+          <Badge className="bg-[#C89B3C] hover:bg-[#C89B3C] text-[#01361D] font-black px-3.5 py-1 shadow-md text-xs uppercase tracking-wider whitespace-nowrap">
             Destaque Operacional / WMS
           </Badge>
         </div>
