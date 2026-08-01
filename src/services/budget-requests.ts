@@ -11,3 +11,9 @@ export interface BudgetRequestData {
 export async function createBudgetRequest(payload: BudgetRequestData): Promise<void> {
   await pb.collection('budget_requests').create(payload)
 }
+
+export async function getBudgetRequests() {
+  return pb.collection('budget_requests').getFullList({
+    sort: '-created',
+  })
+}

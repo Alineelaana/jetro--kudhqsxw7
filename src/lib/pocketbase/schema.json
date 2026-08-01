@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T15:39:31.673Z",
+  "generatedAt": "2026-08-01T15:51:54.864Z",
   "collections": [
     {
       "name": "users",
@@ -159,8 +159,8 @@
       "name": "budget_requests",
       "type": "base",
       "apiRules": {
-        "list": null,
-        "view": null,
+        "list": "@request.auth.email = \"veloralog@veloralog.com\"",
+        "view": "@request.auth.email = \"veloralog@veloralog.com\"",
         "create": "",
         "update": null,
         "delete": null
