@@ -53,7 +53,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   }
 
   const buildSummaryMessage = () => {
-    const parts = ['*Nova Solicitação de Orçamento - VeloraLog*']
+    const parts = ['*Nova Solicitação de Orçamento - Velora Log*']
     if (values.nome_completo) parts.push(`👤 *Nome:* ${values.nome_completo}`)
     if (values.empresa) parts.push(`🏢 *Empresa:* ${values.empresa}`)
     if (values.email) parts.push(`📧 *E-mail:* ${values.email}`)
@@ -109,8 +109,8 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
             </h3>
             <p className="text-muted-foreground text-sm sm:text-base">
               Sua cotação já deu entrada na equipe comercial da{' '}
-              <span className="font-bold text-[#005B2E]">VeloraLog Operações Logísticas</span>. Para
-              priorizar e agilizar o seu atendimento, clique no botão abaixo para conversar no
+              <span className="font-bold text-[#005B2E]">Velora Log Operações Logísticas</span>.
+              Para priorizar e agilizar o seu atendimento, clique no botão abaixo para conversar no
               WhatsApp.
             </p>
           </div>
@@ -236,7 +236,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
               <a
                 href={buildWhatsAppUrl(
                   whatsappNumber,
-                  'Olá! Quero solicitar um orçamento de logística direto pelo WhatsApp da VeloraLog.',
+                  'Olá! Quero solicitar um orçamento de logística direto pelo WhatsApp da Velora Log.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

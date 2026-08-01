@@ -112,7 +112,7 @@ export function ServiceCard({ service, whatsappNumber, onSelect }: ServiceCardPr
           <a
             href={buildWhatsAppUrl(
               whatsappNumber,
-              `Olá! Gostaria de cotar ${service.title} na VeloraLog.`,
+              `Olá! Gostaria de cotar ${service.title} na Velora Log.`,
             )}
             target="_blank"
             rel="noopener noreferrer"

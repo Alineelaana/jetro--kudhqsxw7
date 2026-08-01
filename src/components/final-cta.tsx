@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import { MessageCircle, Phone, Mail, MapPin } from 'lucide-react'
+import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
 
 export function FinalCTA() {
   const { whatsappNumber } = useSettings()
@@ -14,9 +15,11 @@ export function FinalCTA() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <div className="flex justify-center mb-2">
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-              Velora<span className="gold-gradient-text">Log</span>
-            </h2>
+            <img
+              src={logoDark}
+              alt="Velora Log"
+              className="h-24 w-auto object-contain drop-shadow-md"
+            />
           </div>
 
           <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
@@ -24,7 +27,7 @@ export function FinalCTA() {
           </h2>
 
           <p className="text-white/80 text-base sm:text-lg max-w-xl mx-auto">
-            Fale diretamente com os consultores operacionais da VeloraLog e solicite um projeto
+            Fale diretamente com os consultores operacionais da Velora Log e solicite um projeto
             personalizado para sua empresa.
           </p>
 
@@ -37,13 +40,13 @@ export function FinalCTA() {
               <a
                 href={buildWhatsAppUrl(
                   whatsappNumber,
-                  'Olá! Gostaria de conversar com a equipe comercial da VeloraLog.',
+                  'Olá! Gostaria de conversar com a equipe comercial da Velora Log.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <MessageCircle className="w-6 h-6 mr-2" />
-                Falar com a VeloraLog no WhatsApp
+                Falar com a Velora Log no WhatsApp
               </a>
             </Button>
           </div>

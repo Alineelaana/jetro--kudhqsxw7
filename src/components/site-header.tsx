@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import { Menu, MessageCircle, PhoneCall } from 'lucide-react'
+import logoLight from '@/assets/chatgpt-image-1-de-ago.de-2026-103549-f6f46.png'
 
 const NAV_LINKS = [
   { label: 'Início', href: '#inicio' },
@@ -21,9 +22,11 @@ export function SiteHeader() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <a href="#inicio" className="flex items-center gap-2 group">
-            <span className="text-2xl font-black tracking-tight text-[#005B2E] transition-transform group-hover:scale-105">
-              Velora<span className="text-[#C89B3C]">Log</span>
-            </span>
+            <img
+              src={logoLight}
+              alt="Velora Log"
+              className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+            />
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -53,7 +56,7 @@ export function SiteHeader() {
               <a
                 href={buildWhatsAppUrl(
                   whatsappNumber,
-                  'Olá! Gostaria de informações sobre os serviços de armazenagem e transporte da VeloraLog.',
+                  'Olá! Gostaria de informações sobre os serviços de armazenagem e transporte da Velora Log.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -72,9 +75,7 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-80 bg-white">
               <SheetTitle className="mb-6">
-                <span className="text-2xl font-black tracking-tight text-[#005B2E]">
-                  Velora<span className="text-[#C89B3C]">Log</span>
-                </span>
+                <img src={logoLight} alt="Velora Log" className="h-12 w-auto object-contain" />
               </SheetTitle>
               <nav className="flex flex-col gap-4">
                 {NAV_LINKS.map((link) => (
@@ -94,7 +95,7 @@ export function SiteHeader() {
                   <a
                     href={buildWhatsAppUrl(
                       whatsappNumber,
-                      'Olá! Gostaria de informações sobre os serviços da VeloraLog.',
+                      'Olá! Gostaria de informações sobre os serviços da Velora Log.',
                     )}
                     target="_blank"
                     rel="noopener noreferrer"

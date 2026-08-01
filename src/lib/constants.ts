@@ -1,5 +1,5 @@
 export const DEFAULT_WHATSAPP_NUMBER = '5531991297619'
-export const BRAND_NAME = 'VeloraLog'
+export const BRAND_NAME = 'Velora Log'
 export const BRAND_SLOGAN = 'Operações Logísticas de Excelência'
 
 export interface ServiceItem {

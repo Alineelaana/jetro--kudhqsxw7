@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
+import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
 import {
   MessageCircle,
   FileText,
@@ -35,11 +36,13 @@ export function HeroSection() {
 
       <div className="container mx-auto px-4 relative z-10 pt-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          {/* Brand Name */}
+          {/* Main Logo Header */}
           <div className="flex justify-center mb-2 animate-fade-in-down">
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">
-              Velora<span className="gold-gradient-text">Log</span>
-            </h2>
+            <img
+              src={logoDark}
+              alt="Velora Log Operações Logísticas"
+              className="h-28 sm:h-36 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
+            />
           </div>
 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#005B2E]/80 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
@@ -69,7 +72,7 @@ export function HeroSection() {
               <a
                 href={buildWhatsAppUrl(
                   whatsappNumber,
-                  'Olá! Gostaria de falar com um especialista da VeloraLog sobre as operações de armazenagem e transporte.',
+                  'Olá! Gostaria de falar com um especialista da Velora Log sobre as operações de armazenagem e transporte.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -107,7 +110,7 @@ export function HeroSection() {
                   {item.label}
                 </span>
                 <span className="text-[10px] text-[#E4C46A] flex items-center gap-1 font-semibold mt-0.5">
-                  <CheckCircle className="w-3 h-3 text-[#25D366]" /> VeloraLog ES
+                  <CheckCircle className="w-3 h-3 text-[#25D366]" /> Velora Log ES
                 </span>
               </div>
             </div>

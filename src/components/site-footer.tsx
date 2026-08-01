@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
 
 export function SiteFooter() {
   return (
@@ -6,9 +7,7 @@ export function SiteFooter() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           <div className="space-y-4">
-            <h3 className="text-2xl font-black tracking-tight text-white">
-              Velora<span className="text-[#E4C46A]">Log</span>
-            </h3>
+            <img src={logoDark} alt="Velora Log" className="h-16 w-auto object-contain" />
             <p className="text-sm leading-relaxed max-w-sm text-white/80">
               Operações Logísticas de Excelência no Espírito Santo. Soluções completas em
               armazenagem de estoque (WMS), transporte de cargas, logística portuária e distribuição
@@ -76,11 +75,11 @@ export function SiteFooter() {
 
         <div className="border-t border-white/10 mt-10 pt-6 text-xs text-center text-white/60 flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>
-            © {new Date().getFullYear()} VeloraLog Operações Logísticas. Todos os direitos
+            © {new Date().getFullYear()} Velora Log Operações Logísticas. Todos os direitos
             reservados.
           </span>
           <span className="text-[#E4C46A]">
-            VeloraLog - Excelência em Soluções Logísticas no ES
+            Velora Log - Excelência em Soluções Logísticas no ES
           </span>
         </div>
       </div>

@@ -9,7 +9,7 @@ export function FloatingWhatsApp() {
     <a
       href={buildWhatsAppUrl(
         whatsappNumber,
-        'Olá! Gostaria de falar com a equipe da VeloraLog sobre orçamento logístico.',
+        'Olá! Gostaria de falar com a equipe da Velora Log sobre orçamento logístico.',
       )}
       target="_blank"
       rel="noopener noreferrer"
