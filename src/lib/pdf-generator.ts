@@ -66,7 +66,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;width:210mm;backgroun
 .stripe-bottom{background:linear-gradient(135deg,#01361D 0%,#005B2E 100%);height:10mm;width:100%;display:flex;align-items:center;justify-content:center}
 .content{padding:12mm 18mm}
 .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6mm}
-.header img{height:60px}
+.header img{height:90px}
 .header-right{text-align:right}
 .header-right h1{font-size:28px;color:#005B2E;letter-spacing:2px}
 .header-right .number{font-size:16px;color:#C89B3C;font-weight:bold;margin-top:4px}
@@ -95,8 +95,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;width:210mm;backgroun
 .commitment-section{background:#01361D;border-radius:8px;padding:12px 14px;margin-top:4mm}
 .commitment-section .title{font-size:11px;text-transform:uppercase;color:#E4C46A;font-weight:bold;margin-bottom:5px;letter-spacing:.5px}
 .commitment-section p{font-size:11.5px;line-height:1.6;color:#fff}
-.legal{margin-top:7mm;padding-top:5mm;border-top:1px solid #ddd}
-.legal p{font-size:9px;color:#888;line-height:1.5;margin-bottom:3px}
+.brand-section{margin-top:3mm}
+.commitment-section{margin-top:3mm}
+
 .footer-text{font-size:10px;color:#C89B3C;font-weight:bold}
 @media print{body{width:210mm}}
 </style></head><body>
@@ -105,7 +106,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;width:210mm;backgroun
 <div class="header"><img src="${fullLogoUrl}" alt="Velora Log" />
 <div class="header-right"><h1>ORÇAMENTO</h1>
 <div class="number">Nº ${data.budgetNumber}</div>
-<div class="date-line">Gerado em: ${data.emissionDate}<br/>Solicitação recebida em: ${data.requestDate}</div></div></div>
+<div class="date-line">Solicitação recebida em: ${data.requestDate}<br/>Gerado em: ${data.emissionDate}</div></div></div>
 <div class="gold-divider"></div>
 <div class="presentation"><p>${PRESENTATION_MESSAGE}</p></div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
@@ -158,13 +159,6 @@ ${servicesSection}
 <div class="commitment-section">
 <div class="title">Nosso Compromisso</div>
 <p>${COMMITMENT_TEXT}</p>
-</div>
-<div class="legal">
-<p>1. Este orçamento tem validade de 15 (quinze) dias a partir da data de emissão, ou até a data de validade indicada, prevalecendo a que ocorrer primeiro.</p>
-<p>2. Após o vencimento, os valores poderão ser reajustados sem aviso prévio, em decorrência de variações de mercado, custos de combustível, pedágios e demais fatores logísticos.</p>
-<p>3. As condições de pagamento e prazos de entrega estão sujeitas a confirmação no ato da contratação.</p>
-<p>4. A Velora Log não se responsabiliza por atrasos decorrentes de fatores externos, como condições climáticas, bloqueios rodoviários, fiscalização ou eventos de força maior.</p>
-<p>5. A aceitação deste orçamento implica na concordância com os termos e condições aqui descritos.</p>
 </div>
 </div>
 <div class="stripe-bottom"><span class="footer-text">Velora Log — Operações Logísticas de Excelência</span></div>
