@@ -43,7 +43,7 @@ export default function ClientLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="client-email" className="text-sm font-semibold">
-                E-mail
+                Usuário
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -105,6 +105,14 @@ export default function ClientLogin() {
             >
               Esqueci minha senha
             </Link>
+            <div className="border-t border-border pt-4 mt-4">
+              <p className="text-center text-sm text-muted-foreground">
+                Ainda não tem cadastro?{' '}
+                <Link to="/cliente/cadastro" className="text-[#005B2E] hover:underline font-bold">
+                  Clique aqui para fazer um pré-cadastro
+                </Link>
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>

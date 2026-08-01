@@ -1,4 +1,5 @@
 import pb from '@/lib/pocketbase/client'
+import pbClient from '@/lib/pocketbase/client-client'
 import type { FinancialEntry, RestrictionEntry } from '@/lib/partner-types'
 
 export async function getPartners() {
@@ -23,6 +24,10 @@ export async function updatePartnerField(id: string, data: Record<string, unknow
 
 export async function deletePartner(id: string) {
   return pb.collection('partners').delete(id)
+}
+
+export async function preRegisterPartner(formData: FormData) {
+  return pbClient.collection('partners').create(formData)
 }
 
 export async function createClientForPartner(

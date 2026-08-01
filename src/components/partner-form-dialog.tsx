@@ -152,8 +152,14 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
       })
       if (isEditing) {
         await updatePartner(partner.id, formData)
-        if (isCliente && password && partner.client_id)
-          await updateClientPassword(partner.client_id, password)
+        if (isCliente && password) {
+          if (partner.client_id) {
+            await updateClientPassword(partner.client_id, password)
+          } else if (form.email) {
+            const name = form.person_type === 'PF' ? form.full_name : form.company_name
+            await createClientForPartner(form.email, password, name || 'Cliente', partner.id)
+          }
+        }
         toast({ title: 'Parceiro atualizado' })
       } else {
         const created = await createPartner(formData)

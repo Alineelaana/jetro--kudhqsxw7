@@ -18,6 +18,10 @@ export function PartnerManagement() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [personFilter, setPersonFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [restrictionFilter, setRestrictionFilter] = useState('all')
+  const [cityFilter, setCityFilter] = useState('')
+  const [stateFilter, setStateFilter] = useState('')
   const [editingPartner, setEditingPartner] = useState<PartnerRecord | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -43,14 +47,47 @@ export function PartnerManagement() {
         !term ||
         (p.full_name || '').toLowerCase().includes(term) ||
         (p.company_name || '').toLowerCase().includes(term) ||
+        (p.trade_name || '').toLowerCase().includes(term) ||
         (p.cpf || '').toLowerCase().includes(term) ||
         (p.cnpj || '').toLowerCase().includes(term) ||
-        (p.email || '').toLowerCase().includes(term)
+        (p.email || '').toLowerCase().includes(term) ||
+        (p.phone || '').toLowerCase().includes(term)
       const matchesType = typeFilter === 'all' || p.partner_type === typeFilter
       const matchesPerson = personFilter === 'all' || p.person_type === personFilter
-      return matchesSearch && matchesType && matchesPerson
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && p.active !== false) ||
+        (statusFilter === 'inactive' && p.active === false)
+      const matchesRestriction =
+        restrictionFilter === 'all' ||
+        (restrictionFilter === 'restricted' && p.financial_restriction === true) ||
+        (restrictionFilter === 'not-restricted' && p.financial_restriction !== true)
+      const matchesCity =
+        !cityFilter.trim() ||
+        (p.address_city || '').toLowerCase().includes(cityFilter.toLowerCase().trim())
+      const matchesState =
+        !stateFilter.trim() ||
+        (p.address_state || '').toLowerCase().includes(stateFilter.toLowerCase().trim())
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesPerson &&
+        matchesStatus &&
+        matchesRestriction &&
+        matchesCity &&
+        matchesState
+      )
     })
-  }, [partners, search, typeFilter, personFilter])
+  }, [
+    partners,
+    search,
+    typeFilter,
+    personFilter,
+    statusFilter,
+    restrictionFilter,
+    cityFilter,
+    stateFilter,
+  ])
 
   const handleNew = () => {
     setEditingPartner(null)
@@ -88,7 +125,7 @@ export function PartnerManagement() {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por nome, CPF, CNPJ, e-mail..."
+                placeholder="Buscar por nome, CPF, CNPJ, e-mail, telefone..."
                 className="pl-10 focus-visible:ring-[#005B2E]"
               />
             </div>
@@ -113,6 +150,62 @@ export function PartnerManagement() {
               <option value="PF">Pessoa Física</option>
               <option value="PJ">Pessoa Jurídica</option>
             </select>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-border rounded-md px-3 py-2 text-sm bg-white"
+            >
+              <option value="all">Todos os status</option>
+              <option value="active">Ativo</option>
+              <option value="inactive">Inativo</option>
+            </select>
+            <select
+              value={restrictionFilter}
+              onChange={(e) => setRestrictionFilter(e.target.value)}
+              className="border border-border rounded-md px-3 py-2 text-sm bg-white"
+            >
+              <option value="all">Todas as restrições</option>
+              <option value="restricted">Com restrição</option>
+              <option value="not-restricted">Sem restrição</option>
+            </select>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Input
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
+              placeholder="Cidade"
+              className="focus-visible:ring-[#005B2E] text-sm"
+            />
+            <Input
+              value={stateFilter}
+              onChange={(e) => setStateFilter(e.target.value)}
+              placeholder="Estado"
+              className="focus-visible:ring-[#005B2E] text-sm sm:max-w-[120px]"
+            />
+            {(search ||
+              typeFilter !== 'all' ||
+              personFilter !== 'all' ||
+              statusFilter !== 'all' ||
+              restrictionFilter !== 'all' ||
+              cityFilter ||
+              stateFilter) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearch('')
+                  setTypeFilter('all')
+                  setPersonFilter('all')
+                  setStatusFilter('all')
+                  setRestrictionFilter('all')
+                  setCityFilter('')
+                  setStateFilter('')
+                }}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Limpar filtros
+              </Button>
+            )}
           </div>
           <p className="text-sm text-muted-foreground">
             {filtered.length} parceiro(s) encontrado(s)

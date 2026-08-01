@@ -11,6 +11,7 @@ import Admin from './pages/Admin'
 import AdminRegister from './pages/AdminRegister'
 import AdminPasswordRecovery from './pages/AdminPasswordRecovery'
 import ClientLogin from './pages/ClientLogin'
+import ClientRegister from './pages/ClientRegister'
 import PasswordRecovery from './pages/PasswordRecovery'
 import ClientArea from './pages/ClientArea'
 import PoliticaPrivacidade from './pages/PoliticaPrivacidade'
@@ -34,6 +35,7 @@ const App = () => (
                 <Route path="/admin/cadastro" element={<AdminRegister />} />
                 <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                 <Route path="/cliente/login" element={<ClientLogin />} />
+                <Route path="/cliente/cadastro" element={<ClientRegister />} />
                 <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
                 <Route path="/cliente" element={<ClientArea />} />
                 <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
