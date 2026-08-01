@@ -58,3 +58,19 @@ export async function updateBudgetRequestStatus(
 export async function getNextBudgetNumber(): Promise<{ number: string; sequence: number }> {
   return pb.send('/backend/v1/budget-number/next', { method: 'GET' })
 }
+
+export interface SendBudgetEmailPayload {
+  request_id: string
+  recipient_email: string
+  subject: string
+  content?: string
+  author_name: string
+}
+
+export async function sendBudgetEmail(payload: SendBudgetEmailPayload): Promise<void> {
+  await pb.send('/backend/v1/send-budget-email', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
