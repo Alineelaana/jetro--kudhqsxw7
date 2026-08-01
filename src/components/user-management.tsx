@@ -14,7 +14,8 @@ import {
 import { getUsers, createUser, deleteUser, updateUserActiveStatus } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
-import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle, Upload } from 'lucide-react'
+import { UserEditDialog } from '@/components/user-edit-dialog'
+import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle, Upload, Pencil } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
@@ -67,6 +68,8 @@ export function UserManagement() {
   const [submitting, setSubmitting] = useState(false)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [editUser, setEditUser] = useState<UserRecord | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
 
   const loadUsers = async () => {
     try {
@@ -174,6 +177,11 @@ export function UserManagement() {
     } catch {
       setError('Erro ao excluir usuário.')
     }
+  }
+
+  const handleEdit = (u: UserRecord) => {
+    setEditUser(u)
+    setEditOpen(true)
   }
 
   return (
@@ -369,6 +377,17 @@ export function UserManagement() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          className="h-8 w-8 text-[#005B2E] hover:bg-[#005B2E]/10"
+                          onClick={() => handleEdit(u)}
+                          title="Editar usuário"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {isAdmin && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           className="h-8 w-8 text-destructive hover:bg-destructive/10"
                           onClick={() => handleDelete(u.id)}
                         >
@@ -383,6 +402,13 @@ export function UserManagement() {
           )}
         </CardContent>
       </Card>
+
+      <UserEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        user={editUser}
+        onSuccess={loadUsers}
+      />
     </div>
   )
 }
