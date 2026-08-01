@@ -68,6 +68,7 @@ export const AUDIT_MODULE_OPTIONS = [
   { value: 'auth', label: 'Autenticação' },
   { value: 'users', label: 'Usuários' },
   { value: 'partners', label: 'Parceiros' },
+  { value: 'services_offered', label: 'Serviços Prestados' },
   { value: 'budgets', label: 'Orçamentos' },
   { value: 'site_management', label: 'Gestão do Site' },
   { value: 'vitrine', label: 'Vitrine' },

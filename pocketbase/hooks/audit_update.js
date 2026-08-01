@@ -36,6 +36,7 @@ onRecordUpdateRequest(
       'vitrine_items',
       'ai_training',
       'chat_conversations',
+      'services_offered',
     ]
     if (AUDITED.indexOf(collection) === -1) return
 
@@ -55,6 +56,7 @@ onRecordUpdateRequest(
         vitrine_items: 'vitrine',
         ai_training: 'settings',
         chat_conversations: 'settings',
+        services_offered: 'services_offered',
       }
       var mod = MOD_MAP[collection] || 'settings'
 
@@ -125,6 +127,7 @@ onRecordUpdateRequest(
         'client_id',
         'observations',
         'financial_history',
+        'max_discount',
       ]
 
       function snap(rec) {
@@ -221,4 +224,5 @@ onRecordUpdateRequest(
   'vitrine_items',
   'ai_training',
   'chat_conversations',
+  'services_offered',
 )

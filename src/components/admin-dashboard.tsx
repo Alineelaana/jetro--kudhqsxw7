@@ -18,6 +18,7 @@ import { AdminChatPanel } from '@/components/admin-chat-panel'
 import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { PartnerManagement } from '@/components/partner-management'
+import { ServicesOfferedPanel } from '@/components/services-offered-panel'
 import { RequestFilters } from '@/components/request-filters'
 import { PaginationControls } from '@/components/pagination-controls'
 import { CmsPanel } from '@/components/cms/cms-panel'
@@ -171,6 +172,7 @@ export function AdminDashboard() {
           <TabsTrigger value="solicitacoes">Solicitações</TabsTrigger>
           <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
           <TabsTrigger value="parceiros">Parceiros</TabsTrigger>
+          <TabsTrigger value="servicos">Serviços Prestados</TabsTrigger>
           <TabsTrigger value="chat">Chat Online</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
           {isAdmin && <TabsTrigger value="cms">Gestão do Site</TabsTrigger>}
@@ -366,6 +368,10 @@ export function AdminDashboard() {
 
         <TabsContent value="parceiros">
           <PartnerManagement />
+        </TabsContent>
+
+        <TabsContent value="servicos">
+          <ServicesOfferedPanel />
         </TabsContent>
 
         <TabsContent value="chat" className="space-y-6">

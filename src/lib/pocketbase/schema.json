@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T22:57:26.380Z",
+  "generatedAt": "2026-08-01T23:04:08.750Z",
   "collections": [
     {
       "name": "users",
@@ -1616,6 +1616,73 @@
         "CREATE INDEX idx_backups_status ON backups (status)",
         "CREATE INDEX idx_backups_type ON backups (backup_type)",
         "CREATE INDEX idx_backups_created ON backups (created)"
+      ]
+    },
+    {
+      "name": "services_offered",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "max_discount",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_services_offered_name ON services_offered (name)",
+        "CREATE INDEX idx_services_offered_active ON services_offered (active)"
       ]
     }
   ]

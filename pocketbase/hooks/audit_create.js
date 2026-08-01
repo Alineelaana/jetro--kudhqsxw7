@@ -31,6 +31,7 @@ onRecordCreateRequest(
       'vitrine_items',
       'ai_training',
       'chat_conversations',
+      'services_offered',
     ]
     if (AUDITED.indexOf(collection) === -1) return
 
@@ -50,6 +51,7 @@ onRecordCreateRequest(
         vitrine_items: 'vitrine',
         ai_training: 'settings',
         chat_conversations: 'settings',
+        services_offered: 'services_offered',
       }
       var mod = MOD_MAP[collection] || 'settings'
 
@@ -145,6 +147,7 @@ onRecordCreateRequest(
         'client_id',
         'observations',
         'financial_history',
+        'max_discount',
       ]
       var newData = { id: e.record.id }
       for (var i = 0; i < FIELDS.length; i++) {
@@ -187,4 +190,5 @@ onRecordCreateRequest(
   'vitrine_items',
   'ai_training',
   'chat_conversations',
+  'services_offered',
 )
