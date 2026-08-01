@@ -5,6 +5,7 @@ import { BudgetFormField } from '@/components/budget-form-field'
 import { ConsentCheckbox } from '@/components/consent-checkbox'
 import { getFormFields } from '@/services/budget-form-fields'
 import { createBudgetRequest } from '@/services/budget-requests'
+import { getActiveServicesOffered } from '@/services/services-offered'
 import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import { CheckCircle2, MessageCircle, Send, Loader2, RefreshCw, FileText } from 'lucide-react'
@@ -23,11 +24,20 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   const [consentError, setConsentError] = useState('')
 
   useEffect(() => {
-    getFormFields()
-      .then((fetched) => {
-        if (fetched && fetched.length > 0) setFields(fetched)
-      })
-      .catch(() => {})
+    Promise.all([
+      getFormFields().catch(() => null),
+      getActiveServicesOffered().catch(() => []),
+    ]).then(([fetched, activeServices]) => {
+      let fieldsToUse: DefaultFormField[] = DEFAULT_FORM_FIELDS
+      if (fetched && fetched.length > 0) fieldsToUse = fetched
+      if (activeServices && activeServices.length > 0) {
+        const serviceNames = activeServices.map((s) => (s as { name: string }).name)
+        fieldsToUse = fieldsToUse.map((f) =>
+          f.name === 'servico_interesse' ? { ...f, options: serviceNames } : f,
+        )
+      }
+      setFields(fieldsToUse)
+    })
   }, [])
 
   useEffect(() => {
