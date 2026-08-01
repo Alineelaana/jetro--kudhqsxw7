@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Send } from 'lucide-react'
-import { sendChatMessage, getChatMessages, type ChatMessage } from '@/services/chat'
+import { X, Send, Star } from 'lucide-react'
+import {
+  sendChatMessage,
+  getChatMessages,
+  getConversationStatus,
+  type ChatMessage,
+} from '@/services/chat'
+import { submitRating } from '@/services/chat-ratings'
 import { cn } from '@/lib/utils'
 import veloraAvatar from '@/assets/chatgpt-image-1-de-ago.de-2026-150848-e934f.png'
 
@@ -15,6 +21,12 @@ export function FloatingChat() {
   const [contact, setContact] = useState('')
   const [step, setStep] = useState<'info' | 'chat'>(conversationId ? 'chat' : 'info')
   const [sending, setSending] = useState(false)
+  const [showRating, setShowRating] = useState(false)
+  const [hasRated, setHasRated] = useState(false)
+  const [ratingValue, setRatingValue] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
+  const [ratingComment, setRatingComment] = useState('')
+  const [submittingRating, setSubmittingRating] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -30,6 +42,10 @@ export function FloatingChat() {
           setMessages(msgs)
           setStep('chat')
         }
+        if (!hasRated) {
+          const st = await getConversationStatus(conversationId)
+          if (st.closed) setShowRating(true)
+        }
       } catch (_) {
         localStorage.removeItem('velora_chat_conv_id')
         setConversationId(null)
@@ -39,7 +55,7 @@ export function FloatingChat() {
     poll()
     const interval = setInterval(poll, 3000)
     return () => clearInterval(interval)
-  }, [isOpen, conversationId])
+  }, [isOpen, conversationId, hasRated])
 
   const handleSend = async () => {
     if (!input.trim() || sending) return
@@ -57,8 +73,7 @@ export function FloatingChat() {
         localStorage.setItem('velora_chat_conv_id', result.conversation_id)
       }
       setInput('')
-      const msgs = await getChatMessages(result.conversation_id)
-      setMessages(msgs)
+      setMessages(await getChatMessages(result.conversation_id))
       setStep('chat')
     } catch {
       /* intentionally ignored */
@@ -69,6 +84,20 @@ export function FloatingChat() {
   const handleStart = () => {
     if (!name.trim()) return
     setStep('chat')
+  }
+
+  const handleSubmitRating = async () => {
+    if (ratingValue < 1 || submittingRating || !conversationId) return
+    setSubmittingRating(true)
+    try {
+      await submitRating(conversationId, ratingValue, ratingComment)
+      setHasRated(true)
+      setShowRating(false)
+      setMessages(await getChatMessages(conversationId))
+    } catch {
+      /* intentionally ignored */
+    }
+    setSubmittingRating(false)
   }
 
   return (
@@ -146,24 +175,62 @@ export function FloatingChat() {
                       'max-w-[80%] rounded-2xl p-3 text-sm',
                       msg.sender === 'client'
                         ? 'ml-auto bg-[#005B2E] text-white rounded-tr-sm'
-                        : msg.sender === 'ai'
-                          ? 'bg-[#C89B3C]/15 text-foreground rounded-tl-sm border border-[#C89B3C]/30'
-                          : 'bg-blue-50 text-foreground rounded-tl-sm border border-blue-200',
+                        : 'bg-[#C89B3C]/15 text-foreground rounded-tl-sm border border-[#C89B3C]/30',
                     )}
                   >
                     {msg.sender !== 'client' && (
                       <p className="text-xs font-bold mb-1 opacity-70">
-                        {msg.sender === 'ai' ? 'Srta. Velora (IA)' : msg.author_name || 'Atendente'}
+                        {msg.sender === 'ai' ? 'Srta. Velora (IA)' : 'Srta. Velora'}
                       </p>
                     )}
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 ))}
+                {showRating && !hasRated && (
+                  <div className="bg-white border-2 border-[#C89B3C]/40 rounded-2xl p-4 space-y-3">
+                    <p className="text-sm font-bold text-foreground text-center">
+                      Avalie o atendimento
+                    </p>
+                    <div className="flex justify-center gap-2">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setRatingValue(n)}
+                          onMouseEnter={() => setHoverRating(n)}
+                          onMouseLeave={() => setHoverRating(0)}
+                        >
+                          <Star
+                            className={cn(
+                              'w-8 h-8 transition-colors',
+                              n <= (hoverRating || ratingValue)
+                                ? 'fill-[#C89B3C] text-[#C89B3C]'
+                                : 'text-muted-foreground',
+                            )}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      placeholder="Observação ou sugestão (opcional)"
+                      value={ratingComment}
+                      onChange={(e) => setRatingComment(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border text-sm focus-visible:ring-[#005B2E] resize-none"
+                      rows={2}
+                    />
+                    <button
+                      onClick={handleSubmitRating}
+                      disabled={ratingValue < 1 || submittingRating}
+                      className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-bold py-2 rounded-lg text-sm disabled:opacity-50"
+                    >
+                      {submittingRating ? 'Enviando...' : 'Enviar Avaliação'}
+                    </button>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </>
             )}
           </div>
-          {step === 'chat' && (
+          {step === 'chat' && !showRating && !hasRated && (
             <div className="p-3 border-t border-border flex items-center gap-2 bg-white flex-shrink-0">
               <input
                 type="text"

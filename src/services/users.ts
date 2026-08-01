@@ -5,6 +5,8 @@ export interface CreateUserData {
   email: string
   password: string
   role: string
+  cpf?: string
+  avatar?: File | null
 }
 
 export async function getUsers() {
@@ -12,13 +14,22 @@ export async function getUsers() {
 }
 
 export async function createUser(data: CreateUserData): Promise<void> {
-  await pb.collection('users').create({
+  const recordData: Record<string, unknown> = {
     name: data.name,
     email: data.email,
     password: data.password,
     passwordConfirm: data.password,
     role: data.role,
-  })
+    cpf: data.cpf || '',
+  }
+  if (data.avatar) {
+    recordData.avatar = data.avatar
+  }
+  await pb.collection('users').create(recordData)
+}
+
+export async function updateAttendantStatus(userId: string, status: string): Promise<void> {
+  await pb.collection('users').update(userId, { attendant_status: status })
 }
 
 export async function deleteUser(id: string): Promise<void> {

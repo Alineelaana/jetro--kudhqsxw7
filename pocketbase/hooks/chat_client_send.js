@@ -46,24 +46,19 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     clientMsg.set('author_name', clientName)
     $app.save(clientMsg)
 
-    let hasRecentAttendant = false
+    let hasOnlineAttendant = false
     try {
-      const recentMsgs = $app.findRecordsByFilter(
-        'chat_messages',
-        "conversation_id = '" + conversation.id + "' && sender = 'attendant'",
-        '-created',
+      const onlineAttendants = $app.findRecordsByFilter(
+        'users',
+        "attendant_status = 'Online'",
+        '',
         1,
         0,
       )
-      if (recentMsgs.length > 0) {
-        const lastTime = new Date(recentMsgs[0].getString('created')).getTime()
-        if (Date.now() - lastTime < 5 * 60 * 1000) {
-          hasRecentAttendant = true
-        }
-      }
+      hasOnlineAttendant = onlineAttendants.length > 0
     } catch (_) {}
 
-    if (!hasRecentAttendant) {
+    if (!hasOnlineAttendant) {
       try {
         const reply = $ai.chat({
           model: 'fast',

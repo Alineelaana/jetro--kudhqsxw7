@@ -16,6 +16,8 @@ export interface ChatConversation {
   client_phone: string
   status: string
   last_message_at: string
+  closed: boolean
+  attendant_id: string
   created: string
   updated: string
 }
@@ -49,19 +51,33 @@ export async function getConversationMessages(conversationId: string): Promise<C
   })
 }
 
-export async function replyToConversation(
+export async function replyToConversation(conversationId: string, content: string): Promise<void> {
+  await pb.send('/backend/v1/chat/reply', {
+    method: 'POST',
+    body: JSON.stringify({ conversation_id: conversationId, content }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function closeConversation(conversationId: string): Promise<void> {
+  await pb.send('/backend/v1/chat/close', {
+    method: 'POST',
+    body: JSON.stringify({ conversation_id: conversationId }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function spellCheck(text: string): Promise<string> {
+  const result = await pb.send('/backend/v1/chat/spellcheck', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+  return result.corrected || text
+}
+
+export async function getConversationStatus(
   conversationId: string,
-  content: string,
-  authorName: string,
-): Promise<void> {
-  await pb.collection('chat_messages').create({
-    conversation_id: conversationId,
-    sender: 'attendant',
-    content,
-    author_name: authorName,
-  })
-  await pb.collection('chat_conversations').update(conversationId, {
-    last_message_at: new Date().toISOString(),
-    status: 'active',
-  })
+): Promise<{ closed: boolean; status: string }> {
+  return pb.send(`/backend/v1/chat/status/${conversationId}`, { method: 'GET' })
 }

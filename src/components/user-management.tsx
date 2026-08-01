@@ -12,13 +12,40 @@ import {
 } from '@/components/ui/select'
 import { getUsers, createUser, deleteUser } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle } from 'lucide-react'
+import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle, Upload } from 'lucide-react'
+
+const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
+const getAvatarUrl = (id: string, avatar: string) =>
+  avatar ? `${PB_URL}/api/files/users/${id}/${avatar}` : ''
+
+function validateCPF(cpf: string): boolean {
+  const clean = cpf.replace(/\D/g, '')
+  if (clean.length !== 11) return false
+  if (/^(\d)\1{10}$/.test(clean)) return false
+  let sum = 0
+  for (let i = 0; i < 9; i++) sum += parseInt(clean[i]) * (10 - i)
+  let d = 11 - (sum % 11)
+  if (d >= 10) d = 0
+  if (d !== parseInt(clean[9])) return false
+  sum = 0
+  for (let i = 0; i < 10; i++) sum += parseInt(clean[i]) * (11 - i)
+  d = 11 - (sum % 11)
+  if (d >= 10) d = 0
+  return d === parseInt(clean[10])
+}
+
+function formatCPF(cpf: string): string {
+  const c = cpf.replace(/\D/g, '').slice(0, 11)
+  return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+}
 
 interface UserRecord {
   id: string
   name: string
   email: string
   role: string
+  cpf: string
+  avatar: string
   created: string
 }
 
@@ -29,27 +56,32 @@ export function UserManagement() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('PADRAO')
+  const [cpf, setCpf] = useState('')
+  const [avatar, setAvatar] = useState<File | null>(null)
+  const [cpfError, setCpfError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
   const loadUsers = async () => {
     try {
-      const data = await getUsers()
-      setUsers(data as unknown as UserRecord[])
+      setUsers((await getUsers()) as unknown as UserRecord[])
     } catch {
       setError('Erro ao carregar usuários.')
-    } finally {
-      setLoading(false)
     }
+    setLoading(false)
   }
 
   useEffect(() => {
     loadUsers()
   }, [])
+  useRealtime('users', () => loadUsers())
 
-  useRealtime('users', () => {
-    loadUsers()
-  })
+  const handleCpfChange = (v: string) => {
+    const formatted = formatCPF(v)
+    setCpf(formatted)
+    if (formatted && !validateCPF(formatted)) setCpfError('CPF inválido')
+    else setCpfError('')
+  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,19 +93,34 @@ export function UserManagement() {
       setError('A senha deve ter no mínimo 8 caracteres.')
       return
     }
+    if (cpf && !validateCPF(cpf)) {
+      setError('CPF inválido.')
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
-      await createUser({ name: name.trim(), email: email.trim(), password, role })
+      await createUser({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role,
+        cpf: cpf.replace(/\D/g, ''),
+        avatar,
+      })
       setName('')
       setEmail('')
       setPassword('')
       setRole('PADRAO')
-    } catch {
-      setError('Erro ao criar usuário. Tente novamente.')
-    } finally {
-      setSubmitting(false)
+      setCpf('')
+      setAvatar(null)
+      setCpfError('')
+    } catch (err: any) {
+      if (err?.response?.data?.cpf) setError('CPF já cadastrado.')
+      else if (err?.response?.data?.email) setError('E-mail já cadastrado.')
+      else setError('Erro ao criar usuário. Tente novamente.')
     }
+    setSubmitting(false)
   }
 
   const handleDelete = async (id: string) => {
@@ -89,8 +136,7 @@ export function UserManagement() {
       <Card className="border-2 border-[#C89B3C]/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <UserPlus className="w-5 h-5 text-[#005B2E]" />
-            Criar Novo Usuário
+            <UserPlus className="w-5 h-5 text-[#005B2E]" /> Criar Novo Usuário
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -125,6 +171,16 @@ export function UserManagement() {
               />
             </div>
             <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">CPF</Label>
+              <Input
+                value={cpf}
+                onChange={(e) => handleCpfChange(e.target.value)}
+                placeholder="000.000.000-00"
+                className="focus-visible:ring-[#005B2E]"
+              />
+              {cpfError && <p className="text-xs text-destructive">{cpfError}</p>}
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-sm font-semibold">Função</Label>
               <Select value={role} onValueChange={setRole}>
                 <SelectTrigger>
@@ -133,8 +189,30 @@ export function UserManagement() {
                 <SelectContent>
                   <SelectItem value="PADRAO">PADRÃO (Funcionário)</SelectItem>
                   <SelectItem value="SUP">SUP (Gestão)</SelectItem>
+                  <SelectItem value="SDR">SDR</SelectItem>
+                  <SelectItem value="Vendedor">Vendedor</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Foto de Perfil</Label>
+              <div className="flex items-center gap-3">
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors text-sm">
+                  <Upload className="w-4 h-4" />
+                  {avatar ? avatar.name : 'Escolher arquivo'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => setAvatar(e.target.files?.[0] || null)}
+                  />
+                </label>
+                {avatar && (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setAvatar(null)}>
+                    Remover
+                  </Button>
+                )}
+              </div>
             </div>
             {error && (
               <p className="text-sm text-destructive col-span-full flex items-center gap-1">
@@ -150,8 +228,7 @@ export function UserManagement() {
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Criando...
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Criando...
                   </>
                 ) : (
                   'Criar Usuário'
@@ -179,7 +256,13 @@ export function UserManagement() {
                   className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    {u.role === 'SUP' ? (
+                    {u.avatar ? (
+                      <img
+                        src={getAvatarUrl(u.id, u.avatar)}
+                        alt={u.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : u.role === 'SUP' ? (
                       <Shield className="w-5 h-5 text-[#C89B3C]" />
                     ) : (
                       <User className="w-5 h-5 text-[#005B2E]" />
@@ -187,17 +270,16 @@ export function UserManagement() {
                     <div>
                       <p className="font-semibold text-foreground">{u.name || '—'}</p>
                       <p className="text-sm text-muted-foreground">{u.email}</p>
+                      {u.cpf && (
+                        <p className="text-xs text-muted-foreground">CPF: {formatCPF(u.cpf)}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`text-xs font-bold px-2 py-1 rounded ${
-                        u.role === 'SUP'
-                          ? 'bg-[#C89B3C]/20 text-[#C89B3C]'
-                          : 'bg-[#005B2E]/10 text-[#005B2E]'
-                      }`}
+                      className={`text-xs font-bold px-2 py-1 rounded ${u.role === 'SUP' ? 'bg-[#C89B3C]/20 text-[#C89B3C]' : 'bg-[#005B2E]/10 text-[#005B2E]'}`}
                     >
-                      {u.role === 'SUP' ? 'SUP' : 'PADRÃO'}
+                      {u.role}
                     </span>
                     <Button
                       size="icon"
