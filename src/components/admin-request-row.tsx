@@ -1,5 +1,5 @@
 import { AdminRequestDetails } from '@/components/admin-request-details'
-import { ChevronDown, ChevronUp, History, Settings2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, History, Receipt, Settings2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -26,6 +26,7 @@ interface AdminRequestRowProps {
   onToggle: () => void
   onStatusSelect: (record: BudgetRecord, status: string) => void
   onHistoryClick: (record: BudgetRecord) => void
+  onBudgetClick: (record: BudgetRecord) => void
 }
 
 export function AdminRequestRow({
@@ -35,6 +36,7 @@ export function AdminRequestRow({
   onToggle,
   onStatusSelect,
   onHistoryClick,
+  onBudgetClick,
 }: AdminRequestRowProps) {
   const status = record.status || 'PENDENTE'
 
@@ -80,6 +82,16 @@ export function AdminRequestRow({
               title="Histórico"
             >
               <History className="w-4 h-4 text-[#005B2E]" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 border-[#C89B3C] text-[#C89B3C] hover:bg-[#C89B3C]/10 text-xs font-bold whitespace-nowrap"
+              onClick={() => onBudgetClick(record)}
+              title="Criar Orçamento"
+            >
+              <Receipt className="w-3 h-3 mr-1" />
+              <span className="hidden sm:inline">Orçamento</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

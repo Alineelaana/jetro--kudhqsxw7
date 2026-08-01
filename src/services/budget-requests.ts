@@ -35,3 +35,7 @@ export async function updateBudgetRequestStatus(
   history.push({ status, note, author, date: new Date().toISOString() })
   await pb.collection('budget_requests').update(id, { status, status_history: history })
 }
+
+export async function getNextBudgetNumber(): Promise<{ number: string; sequence: number }> {
+  return pb.send('/backend/v1/budget-number/next', { method: 'GET' })
+}

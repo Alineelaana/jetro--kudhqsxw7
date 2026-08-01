@@ -10,6 +10,8 @@ import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
 import { AdminRequestRow } from '@/components/admin-request-row'
 import { StatusUpdateDialog } from '@/components/status-update-dialog'
 import { StatusHistoryDialog } from '@/components/status-history-dialog'
+import { StatusDashboard } from '@/components/status-dashboard'
+import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { UserManagement } from '@/components/user-management'
 import { type BudgetRecord } from '@/lib/types'
 import { LogOut, Inbox, FileText, Loader2, RefreshCw, AlertCircle } from 'lucide-react'
@@ -26,6 +28,7 @@ export function AdminDashboard() {
     status: string
   } | null>(null)
   const [historyRecord, setHistoryRecord] = useState<BudgetRecord | null>(null)
+  const [budgetRecord, setBudgetRecord] = useState<BudgetRecord | null>(null)
 
   const labelMap = useMemo(() => {
     const map: Record<string, string> = {}
@@ -94,6 +97,7 @@ export function AdminDashboard() {
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6">
+          {!loading && !error && records.length > 0 && <StatusDashboard records={records} />}
           <Card className="border-2 border-[#C89B3C]/30 bg-white">
             <CardContent className="py-4 px-6 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
@@ -172,6 +176,7 @@ export function AdminDashboard() {
                         onToggle={() => toggleRow(record.id)}
                         onStatusSelect={(rec, status) => setStatusUpdate({ record: rec, status })}
                         onHistoryClick={(rec) => setHistoryRecord(rec)}
+                        onBudgetClick={(rec) => setBudgetRecord(rec)}
                       />
                     ))}
                   </tbody>
@@ -201,6 +206,13 @@ export function AdminDashboard() {
         open={!!historyRecord}
         onOpenChange={(open) => !open && setHistoryRecord(null)}
         history={historyRecord?.status_history || []}
+      />
+
+      <BudgetCreateDialog
+        open={!!budgetRecord}
+        onOpenChange={(open) => !open && setBudgetRecord(null)}
+        record={budgetRecord}
+        authorName={authorName}
       />
     </div>
   )
