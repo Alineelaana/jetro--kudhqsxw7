@@ -126,8 +126,8 @@ export async function getMedia(): Promise<CmsMedia[]> {
   return pb.collection('cms_media').getFullList({ sort: '-created' })
 }
 
-export async function uploadMedia(formData: FormData): Promise<void> {
-  await pb.collection('cms_media').create(formData)
+export async function uploadMedia(formData: FormData): Promise<CmsMedia> {
+  return pb.collection('cms_media').create(formData)
 }
 
 export async function updateMedia(id: string, data: Record<string, unknown>): Promise<void> {

@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
+import { SeoHead } from '@/components/seo-head'
 
 function ScrollManager() {
   const { pathname, hash } = useLocation()
@@ -26,6 +27,7 @@ export default function Layout() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <ScrollManager />
+      <SeoHead />
       <SiteHeader />
       <main className="flex-1">
         <Outlet />
