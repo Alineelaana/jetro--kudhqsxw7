@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 
     if (pb.authStore.isValid && !isTokenExpired(pb.authStore.token)) {
-      timeoutId = setTimeout(() => setLoading(false), 5000)
+      timeoutId = setTimeout(() => setLoading(false), 3000)
       pb.collection('users')
         .authRefresh()
         .then((res) => {
@@ -90,13 +90,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsAuthenticated(true)
           }
         })
-        .catch((err: unknown) => {
-          const status = (err as { status?: number })?.status
-          if (status === 403 || status === 401) {
-            pb.authStore.clear()
-            setUser(null)
-            setIsAuthenticated(false)
-          }
+        .catch(() => {
+          pb.authStore.clear()
+          setUser(null)
+          setIsAuthenticated(false)
         })
         .finally(() => {
           if (timeoutId) clearTimeout(timeoutId)

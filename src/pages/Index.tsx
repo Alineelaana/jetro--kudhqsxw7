@@ -3,10 +3,13 @@ import { HeroSection } from '@/components/hero-section'
 import { ServicesSection } from '@/components/services-section'
 import { BudgetForm } from '@/components/budget-form'
 import { FinalCTA } from '@/components/final-cta'
+import { ServicesOfferedPanel } from '@/components/services-offered-panel'
 import { useSettings } from '@/hooks/use-settings'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function Index() {
   const { whatsappNumber } = useSettings()
+  const { isAdmin } = useAuth()
   const [selectedService, setSelectedService] = useState<string>('')
 
   const handleSelectService = (serviceTitle: string) => {
@@ -40,6 +43,13 @@ export default function Index() {
         </div>
       </section>
       <FinalCTA />
+      {isAdmin && (
+        <section id="servicos-prestados" className="py-16 bg-muted/30 border-t border-[#005B2E]/10">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <ServicesOfferedPanel />
+          </div>
+        </section>
+      )}
     </main>
   )
 }

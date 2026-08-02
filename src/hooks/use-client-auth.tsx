@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import pbClient from '@/lib/pocketbase/client-client'
 
 interface ClientAuthContextType {
-  client: any
+  client: Record<string, unknown> | null
   isAuthenticated: boolean
-  signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>
-  signIn: (email: string, password: string) => Promise<{ error: any }>
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: unknown }>
+  signIn: (email: string, password: string) => Promise<{ error: unknown }>
   signOut: () => void
   loading: boolean
 }
@@ -18,32 +18,64 @@ export const useClientAuth = () => {
   return context
 }
 
+function isTokenExpired(token: string | null | undefined): boolean {
+  if (!token) return true
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return true
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (payload.exp) return Date.now() >= payload.exp * 1000
+    return false
+  } catch {
+    return true
+  }
+}
+
 export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
-  const [client, setClient] = useState<any>(null)
+  const [client, setClient] = useState<Record<string, unknown> | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined
 
-    if (typeof pbClient.authStore.onChange === 'function') {
-      unsubscribe = pbClient.authStore.onChange((_token, record) => {
-        const isClient = record?.collectionName === 'clients'
-        setClient(isClient ? record : null)
-        setIsAuthenticated(isClient && pbClient.authStore.isValid)
-      })
+    try {
+      if (typeof pbClient.authStore.onChange === 'function') {
+        unsubscribe = pbClient.authStore.onChange((_token, record) => {
+          const rec = record as Record<string, unknown> | null
+          const isClient = rec?.collectionName === 'clients'
+          setClient(isClient ? rec : null)
+          setIsAuthenticated(isClient && pbClient.authStore.isValid)
+        })
+      }
+    } catch {
+      /* onChange not supported — skip safely */
     }
 
-    const record = pbClient.authStore.record
+    const record = pbClient.authStore.record as Record<string, unknown> | null
     const isClientRecord = record?.collectionName === 'clients'
+    const tokenValid = pbClient.authStore.isValid && !isTokenExpired(pbClient.authStore.token)
 
-    if (pbClient.authStore.isValid && isClientRecord) {
+    if (tokenValid && isClientRecord) {
       pbClient
         .collection('clients')
         .authRefresh()
-        .catch(() => pbClient.authStore.clear())
+        .then((res) => {
+          const rec = res.record as Record<string, unknown> | null
+          const isClient = rec?.collectionName === 'clients'
+          setClient(isClient ? rec : null)
+          setIsAuthenticated(isClient)
+        })
+        .catch(() => {
+          pbClient.authStore.clear()
+          setClient(null)
+          setIsAuthenticated(false)
+        })
         .finally(() => setLoading(false))
     } else {
+      if (!tokenValid && pbClient.authStore.record) {
+        pbClient.authStore.clear()
+      }
       setClient(null)
       setIsAuthenticated(false)
       setLoading(false)
@@ -83,6 +115,8 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = () => {
     pbClient.authStore.clear()
+    setClient(null)
+    setIsAuthenticated(false)
   }
 
   return (
