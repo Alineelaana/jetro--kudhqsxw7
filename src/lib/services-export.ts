@@ -23,9 +23,19 @@ function formatBRLNum(n: number): string {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-export function exportServicesExcel(services: ServiceOffered[]): void {
+function formatDateTime(): string {
+  return new Date().toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export function exportServicesExcel(services: ServiceOffered[], userName: string): void {
   const safeServices = Array.isArray(services) ? services.filter(Boolean) : []
-  const genDateTime = new Date().toLocaleString('pt-BR')
+  const genDateTime = formatDateTime()
   const rows = safeServices
     .map((s) => {
       const total = parseBR(s?.value || '') + parseBR(s?.tax_value || '')
@@ -49,6 +59,7 @@ export function exportServicesExcel(services: ServiceOffered[]): void {
 <table border="1">
 <tr><td colspan="11"><strong>Relatório de Serviços — Velora Log</strong></td></tr>
 <tr><td colspan="11">Gerado em: ${escapeHtml(genDateTime)}</td></tr>
+<tr><td colspan="11">Gerado por: ${escapeHtml(userName)}</td></tr>
 <tr><td colspan="11"></td></tr>
 <tr style="background:#005B2E;color:#fff;font-weight:bold">
 <th>Código</th><th>Nome</th><th>Descrição</th><th>Valor</th><th>Imposto</th><th>Total</th><th>Desc. Máx.</th><th>Profissional</th><th>Área</th><th>Observações</th><th>Status</th>
@@ -67,9 +78,9 @@ ${rows}
   URL.revokeObjectURL(url)
 }
 
-export function exportServicesPdf(services: ServiceOffered[]): void {
+export function exportServicesPdf(services: ServiceOffered[], userName: string): void {
   const safeServices = Array.isArray(services) ? services.filter(Boolean) : []
-  const genDateTime = new Date().toLocaleString('pt-BR')
+  const genDateTime = formatDateTime()
   const rows = safeServices
     .map((s, i) => {
       const total = parseBR(s?.value || '') + parseBR(s?.tax_value || '')
@@ -119,7 +130,7 @@ tr{page-break-inside:avoid}
 </div>
 <div class="footer">
 <span>Gerado em: ${escapeHtml(genDateTime)}</span>
-<span>Velora Log</span>
+<span>Gerado por: ${escapeHtml(userName)}</span>
 </div>
 <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>
 </body></html>`

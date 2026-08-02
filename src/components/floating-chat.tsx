@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Send, Star } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
+import { X, Send, Star, EyeOff } from 'lucide-react'
 import {
   sendChatMessage,
   getChatMessages,
@@ -7,10 +8,13 @@ import {
   type ChatMessage,
 } from '@/services/chat'
 import { submitRating } from '@/services/chat-ratings'
+import { getChatVisibility } from '@/services/chat-visibility'
 import { cn } from '@/lib/utils'
 import veloraAvatar from '@/assets/chatgpt-image-1-de-ago.de-2026-150848-e934f.png'
 
 export function FloatingChat() {
+  const { pathname } = useLocation()
+  const [chatEnabled, setChatEnabled] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(() =>
     localStorage.getItem('velora_chat_conv_id'),
@@ -28,6 +32,16 @@ export function FloatingChat() {
   const [ratingComment, setRatingComment] = useState('')
   const [submittingRating, setSubmittingRating] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (pathname.startsWith('/admin') || pathname.startsWith('/cliente')) {
+      setChatEnabled(false)
+      return
+    }
+    getChatVisibility()
+      .then(setChatEnabled)
+      .catch(() => setChatEnabled(true))
+  }, [pathname])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -100,6 +114,8 @@ export function FloatingChat() {
     setSubmittingRating(false)
   }
 
+  if (!chatEnabled) return null
+
   return (
     <>
       {!isOpen && (
@@ -118,20 +134,32 @@ export function FloatingChat() {
         </button>
       )}
       {isOpen && (
-        <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-96 h-full sm:h-[32rem] bg-white rounded-none sm:rounded-2xl shadow-2xl flex flex-col border-2 border-[#005B2E]/20 overflow-hidden animate-fade-in-up">
+        <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-96 h-[100dvh] sm:h-[32rem] bg-white rounded-none sm:rounded-2xl shadow-2xl flex flex-col border-2 border-[#005B2E]/20 overflow-hidden animate-fade-in-up">
           <div className="bg-[#005B2E] text-white px-4 py-3 flex items-center gap-3 flex-shrink-0">
             <img
               src={veloraAvatar}
               alt="Srta. Velora"
               className="w-10 h-10 rounded-full border-2 border-[#C89B3C] object-cover"
             />
-            <div className="flex-1">
-              <p className="font-bold text-sm">Srta. Velora</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-sm truncate">Srta. Velora</p>
               <p className="text-xs text-white/80 flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full" /> Atendente Online
+                <span className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0" /> Atendente
+                Online
               </p>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-white/80 hover:text-white p-1"
+              aria-label="Fechar chat"
+            >
+              <EyeOff className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-white/80 hover:text-white p-1"
+              aria-label="Minimizar"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -183,7 +211,7 @@ export function FloatingChat() {
                         {msg.sender === 'ai' ? 'Srta. Velora (IA)' : 'Srta. Velora'}
                       </p>
                     )}
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                   </div>
                 ))}
                 {showRating && !hasRated && (
@@ -239,7 +267,7 @@ export function FloatingChat() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 disabled={sending}
-                className="flex-1 px-3 py-2 rounded-full border border-border text-sm focus-visible:ring-[#005B2E]"
+                className="flex-1 min-w-0 px-3 py-2 rounded-full border border-border text-sm focus-visible:ring-[#005B2E]"
               />
               <button
                 onClick={handleSend}

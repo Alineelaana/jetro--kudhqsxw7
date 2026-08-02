@@ -23,6 +23,7 @@ import { RequestFilters } from '@/components/request-filters'
 import { PaginationControls } from '@/components/pagination-controls'
 import { CmsPanel } from '@/components/cms/cms-panel'
 import { AuditPanel } from '@/components/audit-panel'
+import { InternalBudgetDialog } from '@/components/internal-budget-dialog'
 import { filterRecords, extractAttendants } from '@/lib/request-filters'
 import { type BudgetRecord } from '@/lib/types'
 import {
@@ -37,6 +38,7 @@ import {
   FileSpreadsheet,
   Download,
   SearchX,
+  Plus,
 } from 'lucide-react'
 import { getAverageResponseTime } from '@/lib/response-time'
 import { generateSolicitationsPdf } from '@/lib/report-pdf'
@@ -59,6 +61,7 @@ export function AdminDashboard() {
     record: BudgetRecord
     mode: 'email' | 'whatsapp'
   } | null>(null)
+  const [internalBudgetOpen, setInternalBudgetOpen] = useState(false)
   const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
@@ -158,17 +161,25 @@ export function AdminDashboard() {
             Gerencie cotações, envie orçamentos e responda clientes em tempo real
           </p>
         </div>
-        <Button
-          onClick={signOut}
-          variant="outline"
-          className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
-        >
-          <LogOut className="w-4 h-4 mr-2" /> Sair
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={() => setInternalBudgetOpen(true)}
+            className="bg-[#C89B3C] hover:bg-[#b8881f] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Novo Orçamento
+          </Button>
+          <Button
+            onClick={signOut}
+            variant="outline"
+            className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
+          >
+            <LogOut className="w-4 h-4 mr-2" /> Sair
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="solicitacoes">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 overflow-x-auto flex-nowrap">
           <TabsTrigger value="solicitacoes">Solicitações</TabsTrigger>
           <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
           <TabsTrigger value="parceiros">Parceiros</TabsTrigger>
@@ -414,6 +425,11 @@ export function AdminDashboard() {
         onOpenChange={(open) => !open && setBudgetRecord(null)}
         record={budgetRecord}
         authorName={authorName}
+        onSuccess={loadData}
+      />
+      <InternalBudgetDialog
+        open={internalBudgetOpen}
+        onOpenChange={setInternalBudgetOpen}
         onSuccess={loadData}
       />
       <SendMessageDialog

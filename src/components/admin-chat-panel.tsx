@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { EmojiPicker } from '@/components/emoji-picker'
 import { getAiFulltimeActive, setAiFulltimeActive } from '@/services/ai-settings'
+import { getChatVisibility, setChatVisibility } from '@/services/chat-visibility'
 import {
   getConversations,
   getConversationMessages,
@@ -53,6 +54,8 @@ export function AdminChatPanel() {
   const [status, setStatus] = useState<string>((user?.attendant_status as string) || 'Offline')
   const [aiFulltimeActive, setAiFulltimeActiveState] = useState(false)
   const [aiToggling, setAiToggling] = useState(false)
+  const [chatVisible, setChatVisibleState] = useState(true)
+  const [chatVisibilityToggling, setChatVisibilityToggling] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const loadConversations = useCallback(async () => {
@@ -78,6 +81,9 @@ export function AdminChatPanel() {
   useEffect(() => {
     getAiFulltimeActive()
       .then(setAiFulltimeActiveState)
+      .catch(() => {})
+    getChatVisibility()
+      .then(setChatVisibleState)
       .catch(() => {})
   }, [])
   useEffect(() => {
@@ -143,6 +149,19 @@ export function AdminChatPanel() {
     }
   }
 
+  const handleToggleChatVisibility = async () => {
+    if (chatVisibilityToggling) return
+    setChatVisibilityToggling(true)
+    const newValue = !chatVisible
+    try {
+      await setChatVisibility(newValue)
+      setChatVisibleState(newValue)
+    } catch {
+      /* intentionally ignored */
+    }
+    setChatVisibilityToggling(false)
+  }
+
   const handleToggleAi = async () => {
     if (aiToggling) return
     setAiToggling(true)
@@ -162,6 +181,30 @@ export function AdminChatPanel() {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#005B2E]/30 bg-gradient-to-r from-[#005B2E]/5 to-[#C89B3C]/5">
+        <div className="flex items-center gap-3">
+          <MessageSquare className="w-5 h-5 text-[#005B2E] flex-shrink-0" />
+          <div>
+            <p className="text-sm font-bold text-foreground">Exibir chat no site público</p>
+            <p className="text-xs text-muted-foreground">
+              Controla se o chat da Srta. Velora aparece para os visitantes
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleToggleChatVisibility}
+          disabled={chatVisibilityToggling}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex-shrink-0',
+            chatVisible
+              ? 'bg-[#005B2E] text-white hover:bg-[#01361D]'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80',
+          )}
+        >
+          {chatVisible ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+          {chatVisible ? 'Visível' : 'Oculto'}
+        </button>
+      </div>
       {isAdmin && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#C89B3C]/30 bg-gradient-to-r from-[#C89B3C]/5 to-[#005B2E]/5">
           <div className="flex items-center gap-3">

@@ -42,6 +42,7 @@ export interface BudgetPdfData {
   valorSeguro: string
   formaPagamento: string
   prazoComercial: string
+  userName?: string
 }
 
 export function generateBudgetPdf(data: BudgetPdfData): void {
@@ -148,7 +149,7 @@ ${servicesSection}
 <p>${DIFFERENTIALS_TEXT}</p>
 </div>
 </div>
-<div class="stripe-bottom"><span class="footer-text">Velora Log — Operações Logísticas de Excelência</span></div>
+<div class="stripe-bottom"><span class="footer-text">Velora Log — Operações Logísticas de Excelência${data.userName ? ' | Gerado por: ' + data.userName : ''}</span></div>
 <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>
 </body></html>`
 

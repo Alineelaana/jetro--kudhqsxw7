@@ -19,7 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { AlertCircle, Loader2, Download, Package, CheckSquare, DollarSign } from 'lucide-react'
+import {
+  AlertCircle,
+  Loader2,
+  Download,
+  Package,
+  CheckSquare,
+  DollarSign,
+  Lock,
+} from 'lucide-react'
 import { getNextBudgetNumber, saveQuoteData } from '@/services/budget-requests'
 import { generateBudgetPdf } from '@/lib/pdf-generator'
 import { type BudgetRecord } from '@/lib/types'
@@ -99,7 +107,7 @@ export function BudgetCreateDialog({
     if (open && record) {
       const data = (record.data || {}) as Record<string, unknown>
       setValue(getString(data, 'valor_orcamento') || '')
-      setValidUntil('')
+      setValidUntil(getString(data, 'validade_orcamento') || '')
       setResponsible(authorName)
       setResponsibleEmail(record.responsible_email || '')
       setResponsiblePhone(record.responsible_phone || '')
@@ -139,8 +147,16 @@ export function BudgetCreateDialog({
     setGenerating(true)
     setError('')
     try {
-      const { number } = await getNextBudgetNumber()
-      const quoteCreatedAt = new Date().toISOString()
+      let number: string
+      let quoteCreatedAt: string
+      if (isLocked) {
+        number = rec.budget_number || ''
+        quoteCreatedAt = rec.quote_created_at || new Date().toISOString()
+      } else {
+        const next = await getNextBudgetNumber()
+        number = next.number
+        quoteCreatedAt = new Date().toISOString()
+      }
       const existingData = (rec.data || {}) as Record<string, unknown>
       const emissionDate = formatDateTime(quoteCreatedAt)
       const requestDate = rec.created ? formatDateTime(rec.created) : ''
@@ -167,6 +183,7 @@ export function BudgetCreateDialog({
         servicos_inclusos: selectedServices.join(','),
         valor_orcamento: value,
         observacoes: observations,
+        validade_orcamento: validUntil,
       }
 
       generateBudgetPdf({
@@ -205,17 +222,19 @@ export function BudgetCreateDialog({
         valorSeguro,
         formaPagamento,
         prazoComercial,
+        userName: authorName,
       })
 
-      await saveQuoteData(record.id, {
-        budget_number: number,
-        responsible_email: responsibleEmail,
-        responsible_phone: responsiblePhone,
-        quote_created_at: quoteCreatedAt,
-        data: updatedData,
-      })
-
-      onSuccess?.()
+      if (!isLocked) {
+        await saveQuoteData(record.id, {
+          budget_number: number,
+          responsible_email: responsibleEmail,
+          responsible_phone: responsiblePhone,
+          quote_created_at: quoteCreatedAt,
+          data: updatedData,
+        })
+        onSuccess?.()
+      }
       onOpenChange(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao gerar orçamento. Tente novamente.')
@@ -226,6 +245,7 @@ export function BudgetCreateDialog({
 
   if (!record) return null
 
+  const isLocked = !!record.quote_created_at
   const safeRecord = record as BudgetRecord
   const data = (safeRecord?.data || {}) as Record<string, unknown>
 
@@ -242,7 +262,21 @@ export function BudgetCreateDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5">
+        <fieldset className="space-y-5 border-0 p-0 m-0" disabled={isLocked}>
+          {isLocked && (
+            <div className="rounded-xl border border-[#C89B3C]/40 bg-[#C89B3C]/10 p-4 text-sm flex items-center gap-2">
+              <Lock className="w-5 h-5 text-[#C89B3C] flex-shrink-0" />
+              <div>
+                <p className="font-bold text-[#8F6A1E]">
+                  Orçamento já gerado e bloqueado para edição
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Nº {record.budget_number} — Gerado em{' '}
+                  {new Date(record.quote_created_at || '').toLocaleString('pt-BR')}
+                </p>
+              </div>
+            </div>
+          )}
           <div className="rounded-xl border border-[#005B2E]/20 bg-[#005B2E]/5 p-4 text-xs sm:text-sm">
             <p className="font-bold text-[#005B2E] mb-2 uppercase tracking-wide">
               Resumo da Solicitação do Cliente
@@ -563,7 +597,7 @@ export function BudgetCreateDialog({
               <span>{error}</span>
             </div>
           )}
-        </div>
+        </fieldset>
 
         <DialogFooter className="gap-2 sm:gap-0 pt-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -582,7 +616,7 @@ export function BudgetCreateDialog({
             ) : (
               <>
                 <Download className="w-4 h-4 mr-2" />
-                Gerar PDF e Salvar Orçamento
+                {isLocked ? 'Reimprimir PDF' : 'Gerar PDF e Salvar Orçamento'}
               </>
             )}
           </Button>

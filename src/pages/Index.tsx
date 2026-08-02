@@ -24,7 +24,7 @@ export default function Index() {
     <main className="min-h-screen bg-background">
       <HeroSection />
       <ServicesSection onSelectService={handleSelectService} />
-      <section id="orcamento" className="py-20 bg-white relative">
+      <section id="orcamento" className="py-12 sm:py-20 bg-white relative">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-10 space-y-3">
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#C89B3C]/10 border border-[#C89B3C]/40 text-[#8F6A1E] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
@@ -44,7 +44,10 @@ export default function Index() {
       </section>
       <FinalCTA />
       {isAdmin && (
-        <section id="servicos-prestados" className="py-16 bg-muted/30 border-t border-[#005B2E]/10">
+        <section
+          id="servicos-prestados"
+          className="py-10 sm:py-16 bg-muted/30 border-t border-[#005B2E]/10"
+        >
           <div className="container mx-auto px-4 max-w-7xl">
             <ServicesOfferedPanel />
           </div>

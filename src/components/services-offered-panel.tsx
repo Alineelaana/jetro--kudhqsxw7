@@ -29,6 +29,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { ServiceFormDialog } from '@/components/service-form-dialog'
 import { ServicesValueReport } from '@/components/services-value-report'
 import { exportServicesExcel, exportServicesPdf } from '@/lib/services-export'
+import { useAuth } from '@/hooks/use-auth'
 import { type ServiceOffered } from '@/lib/service-types'
 import {
   Plus,
@@ -55,6 +56,8 @@ function parseBR(v: string): number {
 }
 
 export function ServicesOfferedPanel() {
+  const { user } = useAuth()
+  const userName = (user?.name as string) || (user?.email as string) || 'Usuário'
   const [services, setServices] = useState<ServiceOffered[]>([])
   const [areas, setAreas] = useState<ServiceArea[]>([])
   const [loading, setLoading] = useState(true)
@@ -164,7 +167,7 @@ export function ServicesOfferedPanel() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportServicesExcel(filtered)}
+                onClick={() => exportServicesExcel(filtered, userName)}
                 className="border-[#005B2E] text-[#005B2E]"
               >
                 <FileSpreadsheet className="w-4 h-4 mr-1.5" /> Excel
@@ -172,7 +175,7 @@ export function ServicesOfferedPanel() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportServicesPdf(filtered)}
+                onClick={() => exportServicesPdf(filtered, userName)}
                 className="border-[#005B2E] text-[#005B2E]"
               >
                 <FileText className="w-4 h-4 mr-1.5" /> PDF

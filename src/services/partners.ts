@@ -77,3 +77,15 @@ export async function toggleFinancialRestriction(
     restriction_history: [...existingHistory, newEntry],
   })
 }
+
+export async function searchPartners(query: string): Promise<Record<string, unknown>[]> {
+  if (!query.trim()) return []
+  const q = query.trim().replace(/"/g, '\\"')
+  const filter = `cpf = "${q}" || cnpj = "${q}" || company_name ~ "${q}" || full_name ~ "${q}" || email ~ "${q}"`
+  try {
+    const result = await pb.collection('partners').getList(1, 20, { filter })
+    return result.items as unknown as Record<string, unknown>[]
+  } catch {
+    return []
+  }
+}
