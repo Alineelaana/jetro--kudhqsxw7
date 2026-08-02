@@ -64,6 +64,7 @@ export function ServicesOfferedPanel() {
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [areaFilter, setAreaFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('created-desc')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<ServiceOffered | null>(null)
   const [confirm, setConfirm] = useState<ConfirmState | null>(null)
@@ -100,16 +101,23 @@ export function ServicesOfferedPanel() {
   const filtered = useMemo(() => {
     const term = search.toLowerCase().trim()
     const list = (services || []).filter(Boolean)
-    return list.filter((s) => {
+    const result = list.filter((s) => {
       const matchText =
         !term ||
         s?.name?.toLowerCase()?.includes(term) ||
-        s?.service_code?.toLowerCase()?.includes(term) ||
-        s?.professional_name?.toLowerCase()?.includes(term)
+        s?.service_code?.toLowerCase()?.includes(term)
       const matchArea = areaFilter === 'all' || s?.service_area === areaFilter
       return matchText && matchArea
     })
-  }, [services, search, areaFilter])
+    const [field, dir] = sortBy.split('-')
+    const mult = dir === 'asc' ? 1 : -1
+    return result.sort((a, b) => {
+      if (field === 'name') return (a?.name || '').localeCompare(b?.name || '') * mult
+      if (field === 'value') return (parseBR(a?.value || '') - parseBR(b?.value || '')) * mult
+      if (field === 'created') return ((a?.created || '') > (b?.created || '') ? 1 : -1) * mult
+      return 0
+    })
+  }, [services, search, areaFilter, sortBy])
 
   const handleNew = () => {
     setEditing(null)
@@ -212,7 +220,7 @@ export function ServicesOfferedPanel() {
                   <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar por nome, código ou profissional..."
+                    placeholder="Pesquisar por nome ou código"
                     className="pl-10 focus-visible:ring-[#005B2E]"
                   />
                 </div>
@@ -227,6 +235,19 @@ export function ServicesOfferedPanel() {
                         {a.name}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full sm:w-52 focus-visible:ring-[#005B2E]">
+                    <SelectValue placeholder="Ordenar por" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="created-desc">Mais recentes</SelectItem>
+                    <SelectItem value="created-asc">Mais antigos</SelectItem>
+                    <SelectItem value="name-asc">Nome (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Nome (Z-A)</SelectItem>
+                    <SelectItem value="value-asc">Menor valor</SelectItem>
+                    <SelectItem value="value-desc">Maior valor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

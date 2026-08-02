@@ -1,445 +1,113 @@
-import { useState, useEffect, useMemo } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { getBudgetRequests } from '@/services/budget-requests'
-import { getFormFields } from '@/services/budget-form-fields'
-import { useRealtime } from '@/hooks/use-realtime'
+import { useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
-import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
-import { AdminRequestRow } from '@/components/admin-request-row'
-import { StatusUpdateDialog } from '@/components/status-update-dialog'
-import { StatusHistoryDialog } from '@/components/status-history-dialog'
-import { StatusDashboard } from '@/components/status-dashboard'
-import { BudgetCreateDialog } from '@/components/budget-create-dialog'
-import { SendMessageDialog } from '@/components/send-message-dialog'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { BudgetRequestsPanel } from '@/components/budget-requests-panel'
+import { ServicesOfferedPanel } from '@/components/services-offered-panel'
+import { ContractsOperationsPanel } from '@/components/contracts-operations-panel'
+import { PartnerManagement } from '@/components/partner-management'
 import { UserManagement } from '@/components/user-management'
 import { AdminChatPanel } from '@/components/admin-chat-panel'
 import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
-import { PartnerManagement } from '@/components/partner-management'
-import { ServicesOfferedPanel } from '@/components/services-offered-panel'
-import { RequestFilters } from '@/components/request-filters'
-import { PaginationControls } from '@/components/pagination-controls'
 import { CmsPanel } from '@/components/cms/cms-panel'
 import { AuditPanel } from '@/components/audit-panel'
-import { InternalBudgetDialog } from '@/components/internal-budget-dialog'
-import { filterRecords, extractAttendants } from '@/lib/request-filters'
-import { type BudgetRecord } from '@/lib/types'
 import {
   LogOut,
-  Inbox,
   FileText,
-  Loader2,
-  RefreshCw,
-  AlertCircle,
-  Clock,
-  FileDown,
-  FileSpreadsheet,
-  Download,
-  SearchX,
-  Plus,
+  Package,
+  Users,
+  MessageSquare,
+  Bot,
+  BarChart3,
+  LayoutDashboard,
+  ClipboardList,
+  ScrollText,
 } from 'lucide-react'
-import { getAverageResponseTime } from '@/lib/response-time'
-import { generateSolicitationsPdf } from '@/lib/report-pdf'
-import { generateSolicitationsXls } from '@/lib/report-xls'
-import { downloadChartsImage } from '@/lib/charts-export'
 
 export function AdminDashboard() {
-  const { signOut, isAdmin, user } = useAuth()
-  const [records, setRecords] = useState<BudgetRecord[]>([])
-  const [fields, setFields] = useState<DefaultFormField[]>(DEFAULT_FORM_FIELDS)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [statusUpdate, setStatusUpdate] = useState<{ record: BudgetRecord; status: string } | null>(
-    null,
-  )
-  const [historyRecord, setHistoryRecord] = useState<BudgetRecord | null>(null)
-  const [budgetRecord, setBudgetRecord] = useState<BudgetRecord | null>(null)
-  const [sendMessageState, setSendMessageState] = useState<{
-    record: BudgetRecord
-    mode: 'email' | 'whatsapp'
-  } | null>(null)
-  const [internalBudgetOpen, setInternalBudgetOpen] = useState(false)
-  const [pageSize, setPageSize] = useState(10)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [clientFilter, setClientFilter] = useState('')
-  const [attendantFilter, setAttendantFilter] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const { user, signOut, userRole } = useAuth()
+  const [activeTab, setActiveTab] = useState('budgets')
 
-  const labelMap = useMemo(() => {
-    const map: Record<string, string> = {}
-    for (const f of fields) map[f.name] = f.label
-    return map
-  }, [fields])
-
-  const loadData = async () => {
-    try {
-      const data = await getBudgetRequests()
-      setRecords(data as unknown as BudgetRecord[])
-      setError('')
-    } catch (err) {
-      if ((err as { status?: number })?.status === 401) {
-        signOut()
-        return
-      }
-      setError('Erro ao carregar solicitações. Tente novamente.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    getFormFields()
-      .then((f) => {
-        if (f && f.length > 0) setFields(f)
-      })
-      .catch(() => {})
-    loadData()
-  }, [])
-
-  useRealtime('budget_requests', () => {
-    loadData()
-  })
-
-  const authorName = (user?.name as string) || (user?.email as string) || 'Usuário'
-  const avgResponseTime = useMemo(() => getAverageResponseTime(records), [records])
-  const toggleRow = (id: string) => setExpandedId((prev) => (prev === id ? null : id))
-
-  const hasActiveFilters =
-    searchTerm.trim() !== '' ||
-    clientFilter.trim() !== '' ||
-    attendantFilter !== '' ||
-    startDate !== '' ||
-    endDate !== ''
-
-  const attendants = useMemo(() => extractAttendants(records), [records])
-
-  const filteredRecords = useMemo(
-    () => filterRecords(records, { searchTerm, clientFilter, attendantFilter, startDate, endDate }),
-    [records, searchTerm, clientFilter, attendantFilter, startDate, endDate],
-  )
-
-  const totalPages = pageSize === 0 ? 1 : Math.max(1, Math.ceil(filteredRecords.length / pageSize))
-  const safePage = Math.min(currentPage, totalPages)
-  const paginatedRecords =
-    pageSize === 0
-      ? filteredRecords
-      : filteredRecords.slice((safePage - 1) * pageSize, safePage * pageSize)
-  const isCompact = pageSize >= 50
-
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages)
-  }, [currentPage, totalPages])
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [searchTerm, clientFilter, attendantFilter, startDate, endDate])
-
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size)
-    setCurrentPage(1)
-  }
-  const clearFilters = () => {
-    setSearchTerm('')
-    setClientFilter('')
-    setAttendantFilter('')
-    setStartDate('')
-    setEndDate('')
-  }
+  const tabItems = [
+    { value: 'budgets', label: 'Orçamentos', icon: FileText },
+    { value: 'services', label: 'Serviços', icon: Package },
+    { value: 'contracts', label: 'Contratos/Operações', icon: ClipboardList },
+    { value: 'partners', label: 'Parceiros', icon: Users },
+    { value: 'chat', label: 'Chat', icon: MessageSquare },
+    { value: 'users', label: 'Usuários', icon: Users },
+    { value: 'ai', label: 'IA', icon: Bot },
+    { value: 'dashboards', label: 'Dashboards', icon: BarChart3 },
+    { value: 'cms', label: 'CMS', icon: LayoutDashboard },
+    { value: 'audit', label: 'Auditoria', icon: ScrollText },
+  ]
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-foreground">
-            Painel de Solicitações
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Gerencie cotações, envie orçamentos e responda clientes em tempo real
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            onClick={() => setInternalBudgetOpen(true)}
-            className="bg-[#C89B3C] hover:bg-[#b8881f] text-white font-bold"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Novo Orçamento
-          </Button>
-          <Button
-            onClick={signOut}
-            variant="outline"
-            className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
-          >
-            <LogOut className="w-4 h-4 mr-2" /> Sair
-          </Button>
-        </div>
-      </div>
-
-      <Tabs defaultValue="solicitacoes">
-        <TabsList className="mb-6 overflow-x-auto flex-nowrap">
-          <TabsTrigger value="solicitacoes">Solicitações</TabsTrigger>
-          <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
-          <TabsTrigger value="parceiros">Parceiros</TabsTrigger>
-          <TabsTrigger value="servicos">Serviços Prestados</TabsTrigger>
-          <TabsTrigger value="chat">Chat Online</TabsTrigger>
-          {isAdmin && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
-          {isAdmin && <TabsTrigger value="cms">Gestão do Site</TabsTrigger>}
-          {isAdmin && <TabsTrigger value="auditoria">Auditoria</TabsTrigger>}
-        </TabsList>
-
-        <TabsContent value="solicitacoes" className="space-y-6">
-          {!loading && !error && records.length > 0 && <StatusDashboard records={records} />}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Card className="border-2 border-[#C89B3C]/30 bg-white flex-1">
-              <CardContent className="py-4 px-6 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-[#005B2E]" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">{filteredRecords.length}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {hasActiveFilters
-                      ? `de ${records.length} solicitações`
-                      : records.length === 1
-                        ? 'Solicitação recebida'
-                        : 'Solicitações recebidas'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            {avgResponseTime && (
-              <Card className="border-2 border-[#005B2E]/30 bg-white flex-1">
-                <CardContent className="py-4 px-6 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-[#005B2E]" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-black text-foreground">{avgResponseTime}</p>
-                    <p className="text-sm text-muted-foreground">Tempo médio de resposta</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-[#01361D] text-white px-4 py-3 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <h1 className="text-lg font-bold">Painel Administrativo</h1>
+          <div className="flex items-center gap-3">
+            <span className="text-sm hidden sm:block">
+              {user?.name || user?.email || 'Admin'} · {userRole}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={signOut}
+              className="bg-transparent border-white/30 text-white hover:bg-white/10"
+            >
+              <LogOut className="w-4 h-4 mr-1" /> Sair
+            </Button>
           </div>
+        </div>
+      </header>
 
-          {!loading && !error && records.length > 0 && (
-            <RequestFilters
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              clientFilter={clientFilter}
-              onClientChange={setClientFilter}
-              attendantFilter={attendantFilter}
-              onAttendantChange={setAttendantFilter}
-              attendants={attendants}
-              startDate={startDate}
-              onStartDateChange={setStartDate}
-              endDate={endDate}
-              onEndDateChange={setEndDate}
-              onClear={clearFilters}
-              hasActiveFilters={hasActiveFilters}
-            />
-          )}
+      <div className="max-w-7xl mx-auto p-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="flex flex-wrap h-auto gap-1 mb-4 bg-white border">
+            {tabItems.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5">
+                  <Icon className="w-4 h-4" /> {tab.label}
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
 
-          {!loading && !error && filteredRecords.length > 0 && (
-            <div className="flex flex-wrap gap-3 mb-2">
-              <Button
-                onClick={() => generateSolicitationsPdf(filteredRecords, authorName)}
-                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-              >
-                <FileDown className="w-4 h-4 mr-2" /> Exportar PDF
-              </Button>
-              <Button
-                onClick={() => generateSolicitationsXls(filteredRecords, authorName)}
-                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-              >
-                <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar XLS
-              </Button>
-              <Button
-                onClick={() => downloadChartsImage(filteredRecords, authorName)}
-                className="bg-[#C89B3C] hover:bg-[#b8881f] text-white font-bold"
-              >
-                <Download className="w-4 h-4 mr-2" /> Baixar Gráficos
-              </Button>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
-            </div>
-          ) : error ? (
-            <Card className="border-destructive/30">
-              <CardContent className="py-8 text-center space-y-4">
-                <AlertCircle className="w-10 h-10 text-destructive mx-auto" />
-                <p className="text-destructive font-medium">{error}</p>
-                <Button
-                  onClick={loadData}
-                  variant="outline"
-                  className="border-[#005B2E] text-[#005B2E]"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" /> Tentar novamente
-                </Button>
-              </CardContent>
-            </Card>
-          ) : records.length === 0 ? (
-            <Card className="border-2 border-dashed border-border">
-              <CardContent className="py-16 text-center">
-                <Inbox className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-bold text-foreground mb-1">
-                  Nenhuma solicitação recebida até o momento.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  As novas cotações enviadas pelo site aparecerão aqui automaticamente.
-                </p>
-              </CardContent>
-            </Card>
-          ) : filteredRecords.length === 0 ? (
-            <Card className="border-2 border-dashed border-border">
-              <CardContent className="py-16 text-center space-y-4">
-                <SearchX className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-bold text-foreground mb-1">
-                  Nenhuma solicitação encontrada para os filtros aplicados.
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Tente ajustar ou limpar os filtros para ver mais resultados.
-                </p>
-                <Button
-                  onClick={clearFilters}
-                  variant="outline"
-                  className="border-[#005B2E] text-[#005B2E]"
-                >
-                  Limpar filtros
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-                <table className="w-full text-sm table-fixed">
-                  <thead>
-                    <tr className="bg-[#01361D] text-white">
-                      <th className="text-left px-3 py-3 font-bold w-[14%]">Cliente</th>
-                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[13%]">
-                        E-mail
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden lg:table-cell w-[10%]">
-                        Telefone
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden sm:table-cell w-[13%]">
-                        Serviço
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold hidden md:table-cell w-[9%]">
-                        Tempo
-                      </th>
-                      <th className="text-left px-3 py-3 font-bold w-[12%]">Data/Hora</th>
-                      <th className="text-left px-3 py-3 font-bold w-[10%]">Status</th>
-                      <th className="text-center px-3 py-3 font-bold w-[19%]">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedRecords.map((record) => (
-                      <AdminRequestRow
-                        key={record.id}
-                        record={record}
-                        labelMap={labelMap}
-                        isExpanded={expandedId === record.id}
-                        onToggle={() => toggleRow(record.id)}
-                        onStatusSelect={(rec, status) => setStatusUpdate({ record: rec, status })}
-                        onHistoryClick={(rec) => setHistoryRecord(rec)}
-                        onBudgetClick={(rec) => setBudgetRecord(rec)}
-                        onSendEmailClick={(rec) =>
-                          setSendMessageState({ record: rec, mode: 'email' })
-                        }
-                        onSendWhatsAppClick={(rec) =>
-                          setSendMessageState({ record: rec, mode: 'whatsapp' })
-                        }
-                        compact={isCompact}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </Card>
-              <PaginationControls
-                totalRecords={filteredRecords.length}
-                pageSize={pageSize}
-                currentPage={safePage}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={handlePageSizeChange}
-              />
-            </>
-          )}
-        </TabsContent>
-
-        <TabsContent value="dashboards">
-          <DashboardsPanel />
-        </TabsContent>
-
-        <TabsContent value="parceiros">
-          <PartnerManagement />
-        </TabsContent>
-
-        <TabsContent value="servicos">
-          <ServicesOfferedPanel />
-        </TabsContent>
-
-        <TabsContent value="chat" className="space-y-6">
-          <AdminChatPanel />
-          {isAdmin && <AiTrainingPanel />}
-        </TabsContent>
-
-        {isAdmin && (
-          <TabsContent value="usuarios">
+          <TabsContent value="budgets">
+            <BudgetRequestsPanel />
+          </TabsContent>
+          <TabsContent value="services">
+            <ServicesOfferedPanel />
+          </TabsContent>
+          <TabsContent value="contracts">
+            <ContractsOperationsPanel />
+          </TabsContent>
+          <TabsContent value="partners">
+            <PartnerManagement />
+          </TabsContent>
+          <TabsContent value="chat">
+            <AdminChatPanel />
+          </TabsContent>
+          <TabsContent value="users">
             <UserManagement />
           </TabsContent>
-        )}
-        {isAdmin && (
+          <TabsContent value="ai">
+            <AiTrainingPanel />
+          </TabsContent>
+          <TabsContent value="dashboards">
+            <DashboardsPanel />
+          </TabsContent>
           <TabsContent value="cms">
             <CmsPanel />
           </TabsContent>
-        )}
-        {isAdmin && (
-          <TabsContent value="auditoria">
+          <TabsContent value="audit">
             <AuditPanel />
           </TabsContent>
-        )}
-      </Tabs>
-
-      <StatusUpdateDialog
-        open={!!statusUpdate}
-        onOpenChange={(open) => !open && setStatusUpdate(null)}
-        recordId={statusUpdate?.record.id || ''}
-        selectedStatus={statusUpdate?.status || ''}
-        authorName={authorName}
-        onSuccess={loadData}
-      />
-      <StatusHistoryDialog
-        open={!!historyRecord}
-        onOpenChange={(open) => !open && setHistoryRecord(null)}
-        history={historyRecord?.status_history || []}
-      />
-      <BudgetCreateDialog
-        open={!!budgetRecord}
-        onOpenChange={(open) => !open && setBudgetRecord(null)}
-        record={budgetRecord}
-        authorName={authorName}
-        onSuccess={loadData}
-      />
-      <InternalBudgetDialog
-        open={internalBudgetOpen}
-        onOpenChange={setInternalBudgetOpen}
-        onSuccess={loadData}
-      />
-      <SendMessageDialog
-        open={!!sendMessageState}
-        onOpenChange={(open) => !open && setSendMessageState(null)}
-        record={sendMessageState?.record || null}
-        mode={sendMessageState?.mode || 'email'}
-        authorName={authorName}
-        onSuccess={loadData}
-      />
+        </Tabs>
+      </div>
     </div>
   )
 }
