@@ -22,15 +22,16 @@ interface AreaTotal {
 
 export function ServicesValueReport({ services }: { services: ServiceOffered[] }) {
   const { areaTotals, avgDiscount } = useMemo(() => {
+    const safeServices = Array.isArray(services) ? services : []
     const map = new Map<string, AreaTotal>()
     let discountSum = 0
     let discountCount = 0
 
-    for (const s of services) {
+    for (const s of safeServices) {
       if (!s) continue
       const area = s.service_area || 'Sem área'
       const existing = map.get(area) || { area, valueTotal: 0, taxTotal: 0, count: 0 }
-      existing.valueTotal += parseBR(s.value)
+      existing.valueTotal += parseBR(s.value || '')
       existing.taxTotal += parseBR(s.tax_value || '')
       existing.count += 1
       map.set(area, existing)
@@ -47,7 +48,7 @@ export function ServicesValueReport({ services }: { services: ServiceOffered[] }
     }
   }, [services])
 
-  if (!services || services.length === 0) return null
+  if (!services || !Array.isArray(services) || services.length === 0) return null
 
   return (
     <div className="space-y-4">

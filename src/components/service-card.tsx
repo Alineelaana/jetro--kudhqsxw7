@@ -31,6 +31,7 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, onSelect }: ServiceCardProps) {
+  if (!service) return null
   const Icon = ICON_MAP[service.icon] || Warehouse
 
   const handleQuoteClick = () => {

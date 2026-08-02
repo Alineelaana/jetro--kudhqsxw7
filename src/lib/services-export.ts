@@ -24,22 +24,23 @@ function formatBRLNum(n: number): string {
 }
 
 export function exportServicesExcel(services: ServiceOffered[]): void {
+  const safeServices = Array.isArray(services) ? services.filter(Boolean) : []
   const genDateTime = new Date().toLocaleString('pt-BR')
-  const rows = services
+  const rows = safeServices
     .map((s) => {
-      const total = parseBR(s.value) + parseBR(s.tax_value || '')
+      const total = parseBR(s?.value || '') + parseBR(s?.tax_value || '')
       return `<tr>
-<td>${escapeHtml(s.service_code || '—')}</td>
-<td>${escapeHtml(s.name)}</td>
-<td>${escapeHtml(s.description || '—')}</td>
-<td>${formatBRL(s.value)}</td>
-<td>${formatBRL(s.tax_value || '')}</td>
+<td>${escapeHtml(s?.service_code || '—')}</td>
+<td>${escapeHtml(s?.name || '—')}</td>
+<td>${escapeHtml(s?.description || '—')}</td>
+<td>${formatBRL(s?.value || '')}</td>
+<td>${formatBRL(s?.tax_value || '')}</td>
 <td>${formatBRLNum(total)}</td>
-<td>${s.max_discount || 0}%</td>
-<td>${escapeHtml(s.professional_name || '—')}</td>
-<td>${escapeHtml(s.service_area || '—')}</td>
-<td>${escapeHtml(s.observations || '—')}</td>
-<td>${s.active !== false ? 'Ativo' : 'Inativo'}</td>
+<td>${s?.max_discount || 0}%</td>
+<td>${escapeHtml(s?.professional_name || '—')}</td>
+<td>${escapeHtml(s?.service_area || '—')}</td>
+<td>${escapeHtml(s?.observations || '—')}</td>
+<td>${s?.active !== false ? 'Ativo' : 'Inativo'}</td>
 </tr>`
     })
     .join('')
@@ -67,20 +68,21 @@ ${rows}
 }
 
 export function exportServicesPdf(services: ServiceOffered[]): void {
+  const safeServices = Array.isArray(services) ? services.filter(Boolean) : []
   const genDateTime = new Date().toLocaleString('pt-BR')
-  const rows = services
+  const rows = safeServices
     .map((s, i) => {
-      const total = parseBR(s.value) + parseBR(s.tax_value || '')
+      const total = parseBR(s?.value || '') + parseBR(s?.tax_value || '')
       return `<tr class="${i % 2 === 0 ? 'even' : 'odd'}">
-<td>${escapeHtml(s.service_code || '—')}</td>
-<td>${escapeHtml(s.name)}</td>
-<td>${formatBRL(s.value)}</td>
-<td>${formatBRL(s.tax_value || '')}</td>
+<td>${escapeHtml(s?.service_code || '—')}</td>
+<td>${escapeHtml(s?.name || '—')}</td>
+<td>${formatBRL(s?.value || '')}</td>
+<td>${formatBRL(s?.tax_value || '')}</td>
 <td>${formatBRLNum(total)}</td>
-<td>${s.max_discount || 0}%</td>
-<td>${escapeHtml(s.service_area || '—')}</td>
-<td>${escapeHtml(s.professional_name || '—')}</td>
-<td>${s.active !== false ? 'Ativo' : 'Inativo'}</td>
+<td>${s?.max_discount || 0}%</td>
+<td>${escapeHtml(s?.service_area || '—')}</td>
+<td>${escapeHtml(s?.professional_name || '—')}</td>
+<td>${s?.active !== false ? 'Ativo' : 'Inativo'}</td>
 </tr>`
     })
     .join('')
@@ -108,7 +110,7 @@ tr{page-break-inside:avoid}
 <div class="content">
 <div class="header">
 <h1>Relatório de Serviços</h1>
-<div class="meta">Total: ${services.length} serviço(s)</div>
+<div class="meta">Total: ${safeServices.length} serviço(s)</div>
 </div>
 <div class="gold-divider"></div>
 <table><thead><tr>

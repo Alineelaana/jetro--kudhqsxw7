@@ -139,18 +139,20 @@ export function ServicesOfferedPanel() {
   }
 
   const isEmpty = !loading && !error && (services || []).length === 0
-  const confirmTitle =
-    confirm?.type === 'delete'
+  const confirmTitle = !confirm
+    ? ''
+    : confirm.type === 'delete'
       ? 'Excluir Serviço'
-      : confirm?.type === 'activate'
+      : confirm.type === 'activate'
         ? 'Ativar Serviço'
         : 'Inativar Serviço'
-  const confirmDesc =
-    confirm?.type === 'delete'
-      ? `Excluir "${confirm.service.name}"? Esta ação não pode ser desfeita.`
-      : confirm?.type === 'activate'
-        ? `Ativar "${confirm.service.name}"?`
-        : `Inativar "${confirm.service.name}"? Serviços inativos não aparecerão em novos orçamentos.`
+  const confirmDesc = !confirm
+    ? ''
+    : confirm.type === 'delete'
+      ? `Excluir "${confirm.service?.name || '—'}"? Esta ação não pode ser desfeita.`
+      : confirm.type === 'activate'
+        ? `Ativar "${confirm.service?.name || '—'}"?`
+        : `Inativar "${confirm.service?.name || '—'}"? Serviços inativos não aparecerão em novos orçamentos.`
 
   return (
     <div className="space-y-4">
@@ -283,34 +285,34 @@ export function ServicesOfferedPanel() {
                     </thead>
                     <tbody>
                       {filtered.map((s) => {
-                        const total = parseBR(s.value) + parseBR(s.tax_value || '')
+                        const total = parseBR(s?.value || '') + parseBR(s?.tax_value || '')
                         return (
                           <tr
-                            key={s.id}
+                            key={s?.id || Math.random()}
                             className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
                           >
                             <td className="px-4 py-3 hidden md:table-cell">
                               <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                                {s.service_code || '—'}
+                                {s?.service_code || '—'}
                               </span>
                             </td>
                             <td className="px-4 py-3 font-medium">
-                              {s.name}
-                              {s.description && (
+                              {s?.name || '—'}
+                              {s?.description && (
                                 <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                                   {s.description}
                                 </p>
                               )}
                             </td>
                             <td className="px-4 py-3 hidden lg:table-cell">
-                              {s.service_area || '—'}
+                              {s?.service_area || '—'}
                             </td>
                             <td className="px-4 py-3 hidden lg:table-cell">
-                              {s.professional_name || '—'}
+                              {s?.professional_name || '—'}
                             </td>
                             <td className="px-4 py-3 hidden sm:table-cell">
-                              {s.value ? `R$ ${s.value}` : '—'}
-                              {s.tax_value && (
+                              {s?.value ? `R$ ${s.value}` : '—'}
+                              {s?.tax_value && (
                                 <span className="text-xs text-muted-foreground block">
                                   Imposto: R$ {s.tax_value}
                                 </span>
@@ -318,7 +320,7 @@ export function ServicesOfferedPanel() {
                               <span className="text-xs text-[#005B2E] font-semibold block">
                                 Total: R$ {total.toFixed(2).replace('.', ',')}
                               </span>
-                              {s.max_discount > 0 && (
+                              {s?.max_discount != null && s.max_discount > 0 && (
                                 <span className="text-xs text-muted-foreground block">
                                   Desc. máx: {s.max_discount}%
                                 </span>
@@ -327,12 +329,12 @@ export function ServicesOfferedPanel() {
                             <td className="px-4 py-3">
                               <span
                                 className={`text-xs font-bold px-2 py-1 rounded ${
-                                  s.active !== false
+                                  s?.active !== false
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-gray-100 text-gray-600'
                                 }`}
                               >
-                                {s.active !== false ? 'Ativo' : 'Inativo'}
+                                {s?.active !== false ? 'Ativo' : 'Inativo'}
                               </span>
                             </td>
                             <td className="px-4 py-3">
@@ -343,16 +345,18 @@ export function ServicesOfferedPanel() {
                                   onClick={() => handleEdit(s)}
                                   className="text-[#005B2E] hover:bg-[#005B2E]/10"
                                   title="Editar"
+                                  disabled={!s}
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </Button>
-                                {s.active !== false ? (
+                                {s?.active !== false ? (
                                   <Button
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => setConfirm({ type: 'inactivate', service: s })}
                                     className="text-orange-600 hover:bg-orange-50"
                                     title="Inativar"
+                                    disabled={!s}
                                   >
                                     <Power className="w-3.5 h-3.5" />
                                   </Button>
@@ -363,6 +367,7 @@ export function ServicesOfferedPanel() {
                                     onClick={() => setConfirm({ type: 'activate', service: s })}
                                     className="text-emerald-600 hover:bg-emerald-50"
                                     title="Ativar"
+                                    disabled={!s}
                                   >
                                     <Power className="w-3.5 h-3.5" />
                                   </Button>
@@ -373,6 +378,7 @@ export function ServicesOfferedPanel() {
                                   onClick={() => setConfirm({ type: 'delete', service: s })}
                                   className="text-red-600 hover:bg-red-50"
                                   title="Excluir"
+                                  disabled={!s}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </Button>
