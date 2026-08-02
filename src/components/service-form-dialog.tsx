@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -10,8 +10,16 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { AlertCircle, Loader2, Save } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { AlertCircle, Loader2, Save, Plus, Hash } from 'lucide-react'
 import { createServiceOffered, updateServiceOffered } from '@/services/services-offered'
+import { getServiceAreas, createServiceArea, type ServiceArea } from '@/services/service-areas'
 import { type ServiceOffered } from '@/lib/service-types'
 import { toast } from '@/hooks/use-toast'
 
@@ -22,25 +30,68 @@ interface Props {
   onSuccess: () => void
 }
 
+const parseBR = (v: string): number => {
+  if (!v) return 0
+  const s = v.replace(/\s/g, '').replace('R$', '').replace(/\./g, '').replace(',', '.')
+  return parseFloat(s) || 0
+}
+
 export function ServiceFormDialog({ open, onOpenChange, service, onSuccess }: Props) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [value, setValue] = useState('')
+  const [taxValue, setTaxValue] = useState('')
   const [maxDiscount, setMaxDiscount] = useState('')
+  const [professionalName, setProfessionalName] = useState('')
+  const [selectedArea, setSelectedArea] = useState('')
   const [observations, setObservations] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [areas, setAreas] = useState<ServiceArea[]>([])
+  const [showNewArea, setShowNewArea] = useState(false)
+  const [newAreaName, setNewAreaName] = useState('')
+  const [creatingArea, setCreatingArea] = useState(false)
+
+  const totalValue = useMemo(() => {
+    const v = parseBR(value)
+    const t = parseBR(taxValue)
+    return (v + t).toFixed(2).replace('.', ',')
+  }, [value, taxValue])
 
   useEffect(() => {
     if (open) {
       setName(service?.name || '')
       setDescription(service?.description || '')
       setValue(service?.value || '')
+      setTaxValue(service?.tax_value || '')
       setMaxDiscount(service?.max_discount != null ? String(service.max_discount) : '')
+      setProfessionalName(service?.professional_name || '')
+      setSelectedArea(service?.service_area || '')
       setObservations(service?.observations || '')
       setErrors({})
+      setShowNewArea(false)
+      setNewAreaName('')
+      getServiceAreas()
+        .then(setAreas)
+        .catch(() => {})
     }
   }, [open, service])
+
+  const handleCreateArea = async () => {
+    if (!newAreaName.trim()) return
+    setCreatingArea(true)
+    try {
+      const newArea = await createServiceArea(newAreaName.trim())
+      setAreas((prev) => [...prev, newArea])
+      setSelectedArea(newArea.name)
+      setShowNewArea(false)
+      setNewAreaName('')
+      toast({ title: 'Área cadastrada' })
+    } catch {
+      toast({ title: 'Erro ao cadastrar área', variant: 'destructive' })
+    }
+    setCreatingArea(false)
+  }
 
   const validate = () => {
     const e: Record<string, string> = {}
@@ -64,7 +115,10 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSuccess }: Pr
         name: name.trim(),
         description: description.trim(),
         value: value.trim(),
+        tax_value: taxValue.trim(),
         max_discount: maxDiscount ? Number(maxDiscount) : 0,
+        professional_name: professionalName.trim(),
+        service_area: selectedArea,
         observations: observations.trim(),
         active: service ? service.active : true,
       }
@@ -127,7 +181,24 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSuccess }: Pr
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Percentual máximo de desconto (%)</Label>
+              <Label className="text-sm font-semibold">Valor do imposto (R$)</Label>
+              <Input
+                value={taxValue}
+                onChange={(e) => setTaxValue(e.target.value)}
+                placeholder="Ex: 285,00"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Valor total (automático)</Label>
+              <div className="h-10 px-3 flex items-center rounded-md border border-input bg-muted/50 text-sm font-bold text-[#005B2E]">
+                R$ {totalValue}
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Desconto máximo (%)</Label>
               <Input
                 type="number"
                 min="0"
@@ -146,6 +217,68 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSuccess }: Pr
               )}
             </div>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Nome do profissional</Label>
+              <Input
+                value={professionalName}
+                onChange={(e) => setProfessionalName(e.target.value)}
+                placeholder="Ex: João Silva"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Área vinculada</Label>
+              <Select
+                value={selectedArea}
+                onValueChange={(v) => {
+                  if (v === '__new__') {
+                    setShowNewArea(true)
+                    setSelectedArea('')
+                  } else {
+                    setShowNewArea(false)
+                    setSelectedArea(v)
+                  }
+                }}
+              >
+                <SelectTrigger className="focus-visible:ring-[#005B2E]">
+                  <SelectValue placeholder="Selecione a área" />
+                </SelectTrigger>
+                <SelectContent>
+                  {areas.map((a) => (
+                    <SelectItem key={a.id} value={a.name}>
+                      {a.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="__new__">➕ Cadastrar nova área...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {showNewArea && (
+            <div className="flex gap-2">
+              <Input
+                value={newAreaName}
+                onChange={(e) => setNewAreaName(e.target.value)}
+                placeholder="Nome da nova área"
+                className="focus-visible:ring-[#005B2E]"
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateArea())}
+              />
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleCreateArea}
+                disabled={creatingArea || !newAreaName.trim()}
+                className="bg-[#005B2E] hover:bg-[#01361D] text-white"
+              >
+                {creatingArea ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold">Observações</Label>
             <Textarea
@@ -155,6 +288,17 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSuccess }: Pr
               className="focus-visible:ring-[#005B2E]"
             />
           </div>
+          {service?.service_code ? (
+            <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md border border-border">
+              <Hash className="w-4 h-4 text-[#C89B3C]" />
+              <span className="text-sm text-muted-foreground">Código do serviço:</span>
+              <span className="text-sm font-bold text-[#005B2E]">{service.service_code}</span>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground italic">
+              O código do serviço será gerado automaticamente após salvar.
+            </p>
+          )}
           <DialogFooter className="gap-2 sm:gap-0 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar

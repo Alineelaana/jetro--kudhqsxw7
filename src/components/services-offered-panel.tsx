@@ -58,9 +58,15 @@ export function ServicesOfferedPanel() {
 
   const filtered = useMemo(() => {
     const term = search.toLowerCase().trim()
-    const list = services || []
+    const list = (services || []).filter(Boolean)
     if (!term) return list
-    return list.filter((s) => s && s?.name?.toLowerCase()?.includes(term))
+    return list.filter(
+      (s) =>
+        s?.name?.toLowerCase()?.includes(term) ||
+        s?.service_code?.toLowerCase()?.includes(term) ||
+        s?.professional_name?.toLowerCase()?.includes(term) ||
+        s?.service_area?.toLowerCase()?.includes(term),
+    )
   }, [services, search])
 
   const handleNew = () => {
@@ -107,6 +113,48 @@ export function ServicesOfferedPanel() {
         ? `Tem certeza que deseja ativar "${confirm.service.name}"?`
         : `Tem certeza que deseja inativar "${confirm.service.name}"? Serviços inativos não aparecerão em novos orçamentos.`
 
+  if (!loading && !error && (services || []).length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col items-center justify-center py-20">
+          <Package className="w-16 h-16 text-[#005B2E]/30 mb-6" />
+          <p className="text-lg font-bold text-foreground mb-6">Nenhum serviço cadastrado</p>
+          <Button
+            onClick={handleNew}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold text-base h-14 px-8 rounded-xl shadow-lg"
+          >
+            <Plus className="w-5 h-5 mr-2" /> Cadastrar serviço
+          </Button>
+        </div>
+        <ServiceFormDialog
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          service={editing}
+          onSuccess={load}
+        />
+        <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
+              <AlertDialogDescription>{confirmDesc}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirm}
+                disabled={actionLoading}
+                className="bg-[#005B2E] hover:bg-[#01361D]"
+              >
+                {actionLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Confirmar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -126,7 +174,7 @@ export function ServicesOfferedPanel() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nome do serviço..."
+              placeholder="Buscar por nome, código, profissional ou área..."
               className="pl-10 focus-visible:ring-[#005B2E]"
             />
           </div>
@@ -158,103 +206,122 @@ export function ServicesOfferedPanel() {
         <Card className="border-2 border-dashed border-border">
           <CardContent className="py-16 text-center">
             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-bold text-foreground mb-1">Nenhum serviço cadastrado.</p>
+            <p className="text-lg font-bold text-foreground mb-1">Nenhum serviço encontrado.</p>
             <p className="text-sm text-muted-foreground">
-              Clique em "Novo Cadastro" para registrar o primeiro serviço.
+              Tente ajustar a busca ou cadastre um novo serviço.
             </p>
           </CardContent>
         </Card>
       ) : (
         <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-4 py-3 font-bold">Nome do serviço</th>
-                <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">Valor</th>
-                <th className="text-left px-4 py-3 font-bold">Status</th>
-                <th className="text-center px-4 py-3 font-bold">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((s) => (
-                <tr
-                  key={s.id}
-                  className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
-                >
-                  <td className="px-4 py-3 font-medium">
-                    {s.name}
-                    {s.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                        {s.description}
-                      </p>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    {s.value ? `R$ ${s.value}` : '—'}
-                    {s.max_discount > 0 && (
-                      <span className="text-xs text-muted-foreground block">
-                        Desc. máx: {s.max_discount}%
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`text-xs font-bold px-2 py-1 rounded ${
-                        s.active !== false
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {s.active !== false ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(s)}
-                        className="text-[#005B2E] hover:bg-[#005B2E]/10"
-                        title="Editar"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                      {s.active !== false ? (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirm({ type: 'inactivate', service: s })}
-                          className="text-orange-600 hover:bg-orange-50"
-                          title="Inativar"
-                        >
-                          <Power className="w-3.5 h-3.5" />
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirm({ type: 'activate', service: s })}
-                          className="text-emerald-600 hover:bg-emerald-50"
-                          title="Ativar"
-                        >
-                          <Power className="w-3.5 h-3.5" />
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setConfirm({ type: 'delete', service: s })}
-                        className="text-red-600 hover:bg-red-50"
-                        title="Excluir"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#01361D] text-white">
+                  <th className="text-left px-4 py-3 font-bold hidden md:table-cell">Código</th>
+                  <th className="text-left px-4 py-3 font-bold">Nome do serviço</th>
+                  <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">Área</th>
+                  <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">
+                    Profissional
+                  </th>
+                  <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">Valor</th>
+                  <th className="text-left px-4 py-3 font-bold">Status</th>
+                  <th className="text-center px-4 py-3 font-bold">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((s) => (
+                  <tr
+                    key={s.id}
+                    className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
+                  >
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                        {s.service_code || '—'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      {s.name}
+                      {s.description && (
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                          {s.description}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell">{s.service_area || '—'}</td>
+                    <td className="px-4 py-3 hidden lg:table-cell">{s.professional_name || '—'}</td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      {s.value ? `R$ ${s.value}` : '—'}
+                      {s.tax_value && (
+                        <span className="text-xs text-muted-foreground block">
+                          Imposto: R$ {s.tax_value}
+                        </span>
+                      )}
+                      {s.max_discount > 0 && (
+                        <span className="text-xs text-muted-foreground block">
+                          Desc. máx: {s.max_discount}%
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`text-xs font-bold px-2 py-1 rounded ${
+                          s.active !== false
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {s.active !== false ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEdit(s)}
+                          className="text-[#005B2E] hover:bg-[#005B2E]/10"
+                          title="Editar"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        {s.active !== false ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setConfirm({ type: 'inactivate', service: s })}
+                            className="text-orange-600 hover:bg-orange-50"
+                            title="Inativar"
+                          >
+                            <Power className="w-3.5 h-3.5" />
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setConfirm({ type: 'activate', service: s })}
+                            className="text-emerald-600 hover:bg-emerald-50"
+                            title="Ativar"
+                          >
+                            <Power className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setConfirm({ type: 'delete', service: s })}
+                          className="text-red-600 hover:bg-red-50"
+                          title="Excluir"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       )}
 

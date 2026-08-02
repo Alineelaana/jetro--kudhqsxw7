@@ -148,6 +148,10 @@ onRecordCreateRequest(
         'observations',
         'financial_history',
         'max_discount',
+        'tax_value',
+        'professional_name',
+        'service_area',
+        'service_code',
       ]
       var newData = { id: e.record.id }
       for (var i = 0; i < FIELDS.length; i++) {

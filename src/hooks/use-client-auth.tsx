@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import pbClient from '@/lib/pocketbase/client-client'
 
 interface ClientAuthContextType {
-  client: Record<string, unknown> | null
-  isClientAuthenticated: boolean
-  clientLogin: (email: string, password: string) => Promise<{ error: string | null }>
-  clientLogout: () => void
+  client: any
+  isAuthenticated: boolean
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>
+  signIn: (email: string, password: string) => Promise<{ error: any }>
+  signOut: () => void
   loading: boolean
 }
 
@@ -17,33 +18,9 @@ export const useClientAuth = () => {
   return context
 }
 
-function isClientRecord(record: unknown): boolean {
-  if (!record || typeof record !== 'object') return false
-  const r = record as { collectionName?: string }
-  return r.collectionName === 'clients'
-}
-
-function isTokenExpired(token: string | null | undefined): boolean {
-  if (!token) return true
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3) return true
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
-    if (payload.exp) return Date.now() >= payload.exp * 1000
-    return false
-  } catch {
-    return true
-  }
-}
-
 export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
-  const initialRecord = pbClient.authStore.isValid ? pbClient.authStore.record : null
-  const initialIsClient = pbClient.authStore.isValid && isClientRecord(initialRecord)
-
-  const [client, setClient] = useState<Record<string, unknown> | null>(
-    initialIsClient ? (initialRecord as Record<string, unknown>) : null,
-  )
-  const [isClientAuthenticated, setIsClientAuthenticated] = useState(initialIsClient)
+  const [client, setClient] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -51,60 +28,66 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (typeof pbClient.authStore.onChange === 'function') {
       unsubscribe = pbClient.authStore.onChange((_token, record) => {
-        const isValid = pbClient.authStore.isValid && isClientRecord(record)
-        setClient(isValid ? (record as Record<string, unknown>) : null)
-        setIsClientAuthenticated(isValid)
+        const isClient = record?.collectionName === 'clients'
+        setClient(isClient ? record : null)
+        setIsAuthenticated(isClient && pbClient.authStore.isValid)
       })
     }
 
-    const currentRecord = pbClient.authStore.record
-    const isValidClient = pbClient.authStore.isValid && isClientRecord(currentRecord)
+    const record = pbClient.authStore.record
+    const isClientRecord = record?.collectionName === 'clients'
 
-    if (isValidClient && !isTokenExpired(pbClient.authStore.token)) {
+    if (pbClient.authStore.isValid && isClientRecord) {
       pbClient
         .collection('clients')
         .authRefresh()
-        .catch((err: unknown) => {
-          const status = (err as { status?: number })?.status
-          if (status === 403 || status === 401) {
-            pbClient.authStore.clear()
-            setClient(null)
-            setIsClientAuthenticated(false)
-          }
-        })
+        .catch(() => pbClient.authStore.clear())
         .finally(() => setLoading(false))
     } else {
-      if (pbClient.authStore.isValid) {
-        pbClient.authStore.clear()
-        setClient(null)
-        setIsClientAuthenticated(false)
-      }
+      setClient(null)
+      setIsAuthenticated(false)
       setLoading(false)
     }
 
     return () => {
-      if (typeof unsubscribe === 'function') unsubscribe()
+      if (unsubscribe) {
+        try {
+          unsubscribe()
+        } catch {
+          /* intentionally ignored */
+        }
+      }
     }
   }, [])
 
-  const clientLogin = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, name?: string) => {
     try {
+      const data: Record<string, unknown> = { email, password, passwordConfirm: password }
+      if (name) data.name = name
+      await pbClient.collection('clients').create(data)
       await pbClient.collection('clients').authWithPassword(email, password)
       return { error: null }
-    } catch {
-      return { error: 'Credenciais inválidas. Verifique seu e-mail e senha.' }
+    } catch (error) {
+      return { error }
     }
   }
 
-  const clientLogout = () => {
+  const signIn = async (email: string, password: string) => {
+    try {
+      await pbClient.collection('clients').authWithPassword(email, password)
+      return { error: null }
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  const signOut = () => {
     pbClient.authStore.clear()
-    setClient(null)
-    setIsClientAuthenticated(false)
   }
 
   return (
     <ClientAuthContext.Provider
-      value={{ client, isClientAuthenticated, clientLogin, clientLogout, loading }}
+      value={{ client, isAuthenticated, signUp, signIn, signOut, loading }}
     >
       {children}
     </ClientAuthContext.Provider>
