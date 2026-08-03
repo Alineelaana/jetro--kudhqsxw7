@@ -1,17 +1,18 @@
 import { useState } from 'react'
+import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { NotificationBell } from '@/components/notification-bell'
-import { useAuth } from '@/hooks/use-auth'
-import { cn } from '@/lib/utils'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { BudgetRequestsPanel } from '@/components/budget-requests-panel'
 import { ServicesOfferedPanel } from '@/components/services-offered-panel'
+import { ProductsPanel } from '@/components/products-panel'
 import { ContractsOperationsPanel } from '@/components/contracts-operations-panel'
 import { PartnerManagement } from '@/components/partner-management'
 import { UserManagement } from '@/components/user-management'
@@ -20,123 +21,156 @@ import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { CmsPanel } from '@/components/cms/cms-panel'
 import { AuditPanel } from '@/components/audit-panel'
 import { BackupPanel } from '@/components/backup-panel'
-import { LogOut, Menu, Shield } from 'lucide-react'
+import {
+  LayoutDashboard,
+  FileText,
+  Wrench,
+  Package,
+  FileSignature,
+  Users,
+  MessageSquare,
+  Bot,
+  Layout,
+  History,
+  Database,
+  LogOut,
+  UserCog,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-interface MenuOption {
-  value: string
+type TabId =
+  | 'dashboard'
+  | 'budgets'
+  | 'services'
+  | 'products'
+  | 'contracts'
+  | 'partners'
+  | 'chat'
+  | 'cms'
+  | 'ai'
+  | 'users'
+  | 'audit'
+  | 'backups'
+
+interface MenuItem {
+  id: TabId
   label: string
-  adminOnly?: boolean
+  icon: typeof LayoutDashboard
+  sup: boolean
 }
 
-const MENU_OPTIONS: MenuOption[] = [
-  { value: 'dashboard', label: 'Visão Geral' },
-  { value: 'budgets', label: 'Orçamentos' },
-  { value: 'services', label: 'Serviços' },
-  { value: 'contracts', label: 'Contratos' },
-  { value: 'partners', label: 'Parceiros' },
-  { value: 'chat', label: 'Atendimento' },
-  { value: 'users', label: 'Usuários', adminOnly: true },
-  { value: 'ai', label: 'IA', adminOnly: true },
-  { value: 'cms', label: 'CMS', adminOnly: true },
-  { value: 'audit', label: 'Auditoria', adminOnly: true },
-  { value: 'backups', label: 'Backups', adminOnly: true },
+const MENU_ITEMS: MenuItem[] = [
+  { id: 'dashboard', label: 'Painel', icon: LayoutDashboard, sup: false },
+  { id: 'budgets', label: 'Orçamentos', icon: FileText, sup: false },
+  { id: 'services', label: 'Serviços', icon: Wrench, sup: false },
+  { id: 'products', label: 'Produtos', icon: Package, sup: false },
+  { id: 'contracts', label: 'Contratos', icon: FileSignature, sup: false },
+  { id: 'partners', label: 'Parceiros', icon: Users, sup: false },
+  { id: 'chat', label: 'Chat', icon: MessageSquare, sup: false },
+  { id: 'cms', label: 'CMS', icon: Layout, sup: false },
+  { id: 'ai', label: 'Treinar IA', icon: Bot, sup: true },
+  { id: 'users', label: 'Usuários', icon: UserCog, sup: true },
+  { id: 'audit', label: 'Auditoria', icon: History, sup: true },
+  { id: 'backups', label: 'Backups', icon: Database, sup: true },
 ]
 
 export function AdminDashboard() {
-  const { user, isAdmin, signOut } = useAuth()
-  const [section, setSection] = useState('dashboard')
+  const { user, signOut } = useAuth()
+  const [activeTab, setActiveTab] = useState<TabId>('dashboard')
 
-  const userName = (user?.name as string) || (user?.email as string) || 'Admin'
+  const isSup = user?.role === 'SUP'
+  const visibleItems = MENU_ITEMS.filter((item) => !item.sup || isSup)
 
-  const visibleOptions = MENU_OPTIONS.filter((opt) => !opt.adminOnly || isAdmin)
-
-  const currentLabel = MENU_OPTIONS.find((opt) => opt.value === section)?.label ?? 'Visão Geral'
-
-  const renderPanel = () => {
-    switch (section) {
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardsPanel />
       case 'budgets':
         return <BudgetRequestsPanel />
       case 'services':
         return <ServicesOfferedPanel />
+      case 'products':
+        return <ProductsPanel />
       case 'contracts':
         return <ContractsOperationsPanel />
       case 'partners':
         return <PartnerManagement />
       case 'chat':
         return <AdminChatPanel />
-      case 'users':
-        return isAdmin ? <UserManagement /> : null
-      case 'ai':
-        return isAdmin ? <AiTrainingPanel /> : null
       case 'cms':
-        return isAdmin ? <CmsPanel /> : null
+        return <CmsPanel />
+      case 'ai':
+        return <AiTrainingPanel />
+      case 'users':
+        return <UserManagement />
       case 'audit':
-        return isAdmin ? <AuditPanel /> : null
+        return <AuditPanel />
       case 'backups':
-        return isAdmin ? <BackupPanel /> : null
+        return <BackupPanel />
       default:
         return <DashboardsPanel />
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#005B2E] text-white sticky top-0 z-30 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-white text-[#005B2E] border-[#C89B3C] hover:bg-gray-100 font-semibold"
-                  >
-                    <Menu className="w-4 h-4 mr-2" />
-                    Menu
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="w-56"
-                  onCloseAutoFocus={(e) => e.preventDefault()}
-                >
-                  {visibleOptions.map((opt) => (
-                    <DropdownMenuItem
-                      key={opt.value}
-                      onClick={() => setSection(opt.value)}
-                      className={cn(
-                        'cursor-pointer',
-                        section === opt.value && 'bg-[#005B2E]/10 font-semibold text-[#005B2E]',
-                      )}
-                    >
-                      {opt.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-              <Shield className="w-6 h-6 text-[#C89B3C]" />
-              <span className="font-black text-lg">VeloraLog — Admin</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <NotificationBell />
-              <span className="text-sm hidden sm:inline">{userName}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={signOut}
-                className="text-white hover:bg-white/10"
-              >
-                <LogOut className="w-4 h-4 mr-1" /> Sair
-              </Button>
-            </div>
-          </div>
+    <div className="flex min-h-[calc(100vh-4rem)]">
+      <aside className="hidden md:flex w-60 bg-[#01361D] text-white flex-col shrink-0">
+        <div className="p-4 border-b border-white/10">
+          <p className="text-sm font-bold truncate">{user?.name || 'Admin'}</p>
+          <p className="text-xs text-white/60">{user?.role || ''}</p>
         </div>
-      </header>
+        <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+          {visibleItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  activeTab === item.id
+                    ? 'bg-[#005B2E] text-white'
+                    : 'text-white/70 hover:bg-white/5 hover:text-white',
+                )}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {item.label}
+              </button>
+            )
+          })}
+        </nav>
+        <div className="p-2 border-t border-white/10">
+          <Button
+            variant="ghost"
+            onClick={signOut}
+            className="w-full justify-start text-white/70 hover:bg-white/5 hover:text-white"
+          >
+            <LogOut className="w-4 h-4 mr-3" /> Sair
+          </Button>
+        </div>
+      </aside>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">{renderPanel()}</div>
+      <main className="flex-1 overflow-x-auto bg-background">
+        <div className="flex items-center justify-between p-3 border-b gap-3">
+          <div className="md:hidden flex-1">
+            <Select value={activeTab} onValueChange={(v) => setActiveTab(v as TabId)}>
+              <SelectTrigger className="w-full focus-visible:ring-[#005B2E]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {visibleItems.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="hidden md:block" />
+          <NotificationBell />
+        </div>
+        <div className="p-4 md:p-6">{renderContent()}</div>
+      </main>
     </div>
   )
 }

@@ -3,6 +3,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -16,12 +23,25 @@ import {
   getProducts,
   deleteProduct,
   toggleProductActive,
+  updateProduct,
   getProductPhotoUrl,
 } from '@/services/products'
 import { useRealtime } from '@/hooks/use-realtime'
 import { ProductFormDialog } from '@/components/product-form-dialog'
+import { exportProductsExcel, exportProductsPdf } from '@/lib/product-export'
 import { type Product } from '@/lib/product-types'
-import { Plus, Search, Pencil, Trash2, Power, Loader2, Package, ImageIcon } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  Power,
+  Loader2,
+  Package,
+  ImageIcon,
+  FileSpreadsheet,
+  FileText,
+} from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 interface ConfirmState {
@@ -29,11 +49,46 @@ interface ConfirmState {
   product: Product
 }
 
+function StockCell({
+  product,
+  onUpdate,
+}: {
+  product: Product
+  onUpdate: (id: string, stock: number) => void
+}) {
+  const [value, setValue] = useState(String(product.stock ?? 0))
+
+  useEffect(() => {
+    setValue(String(product.stock ?? 0))
+  }, [product.stock])
+
+  const handleBlur = () => {
+    const num = parseInt(value, 10) || 0
+    if (num !== (product.stock ?? 0)) {
+      onUpdate(product.id, num)
+    }
+  }
+
+  return (
+    <Input
+      type="number"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={handleBlur}
+      placeholder="0"
+      min="0"
+      className="w-20 h-8 text-center focus-visible:ring-[#005B2E]"
+    />
+  )
+}
+
 export function ProductsPanel() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Product | null>(null)
   const [confirm, setConfirm] = useState<ConfirmState | null>(null)
@@ -57,18 +112,28 @@ export function ProductsPanel() {
   }, [])
   useRealtime('products', () => load())
 
+  const categories = useMemo(() => {
+    const cats = (products || []).map((p) => p?.category).filter(Boolean)
+    return [...new Set(cats)].sort()
+  }, [products])
+
   const filtered = useMemo(() => {
     const term = search.toLowerCase().trim()
     return (products || []).filter(Boolean).filter((p) => {
-      return (
+      const matchesSearch =
         !term ||
         p?.name?.toLowerCase()?.includes(term) ||
         p?.code?.toLowerCase()?.includes(term) ||
         p?.ean?.toLowerCase()?.includes(term) ||
         p?.ncm?.toLowerCase()?.includes(term)
-      )
+      const matchesCategory = categoryFilter === 'all' || p?.category === categoryFilter
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && p?.active !== false) ||
+        (statusFilter === 'inactive' && p?.active === false)
+      return matchesSearch && matchesCategory && matchesStatus
     })
-  }, [products, search])
+  }, [products, search, categoryFilter, statusFilter])
 
   const handleNew = () => {
     setEditing(null)
@@ -77,6 +142,16 @@ export function ProductsPanel() {
   const handleEdit = (p: Product) => {
     setEditing(p)
     setFormOpen(true)
+  }
+
+  const handleStockUpdate = async (id: string, stock: number) => {
+    try {
+      await updateProduct(id, { stock } as Record<string, unknown>)
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stock } : p)))
+      toast({ title: 'Estoque atualizado' })
+    } catch {
+      toast({ title: 'Erro ao atualizar estoque', variant: 'destructive' })
+    }
   }
 
   const handleConfirm = async () => {
@@ -151,9 +226,52 @@ export function ProductsPanel() {
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Pesquisar por nome, código, EAN ou NCM"
+                  placeholder="Pesquisar por nome, código ou EAN"
                   className="pl-10 focus-visible:ring-[#005B2E]"
                 />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full sm:w-48 focus-visible:ring-[#005B2E]">
+                    <SelectValue placeholder="Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as categorias</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-40 focus-visible:ring-[#005B2E]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os status</SelectItem>
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="inactive">Inativo</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2 sm:ml-auto">
+                  <Button
+                    variant="outline"
+                    onClick={() => exportProductsExcel(filtered)}
+                    disabled={filtered.length === 0}
+                    className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/5"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => exportProductsPdf(filtered)}
+                    disabled={filtered.length === 0}
+                    className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/5"
+                  >
+                    <FileText className="w-4 h-4 mr-2" /> PDF
+                  </Button>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground">
                 {filtered.length} produto(s) encontrado(s)
@@ -200,6 +318,7 @@ export function ProductsPanel() {
                       <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">EAN</th>
                       <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">NCM</th>
                       <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">Preço</th>
+                      <th className="text-left px-4 py-3 font-bold">Estoque</th>
                       <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">Fotos</th>
                       <th className="text-left px-4 py-3 font-bold">Status</th>
                       <th className="text-center px-4 py-3 font-bold">Ações</th>
@@ -228,6 +347,9 @@ export function ProductsPanel() {
                         <td className="px-4 py-3 hidden lg:table-cell">{p?.ncm || '—'}</td>
                         <td className="px-4 py-3 hidden sm:table-cell">
                           {p?.price ? `R$ ${p.price}` : '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StockCell product={p} onUpdate={handleStockUpdate} />
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <div className="flex items-center gap-1">

@@ -10,6 +10,7 @@ export interface Product {
   brand: string
   category: string
   active: boolean
+  stock: number
   photos: string[]
   created: string
   updated: string

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T23:38:57.676Z",
+  "generatedAt": "2026-08-03T23:47:43.212Z",
   "collections": [
     {
       "name": "users",
@@ -1987,6 +1987,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "stock",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

@@ -39,6 +39,7 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
   const [brand, setBrand] = useState('')
   const [category, setCategory] = useState('')
   const [active, setActive] = useState(true)
+  const [stock, setStock] = useState('0')
   const [newPhotos, setNewPhotos] = useState<File[]>([])
   const [removedPhotos, setRemovedPhotos] = useState<string[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -56,6 +57,7 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
       setBrand(product?.brand || '')
       setCategory(product?.category || '')
       setActive(product?.active !== false)
+      setStock(String(product?.stock ?? 0))
       setNewPhotos([])
       setRemovedPhotos([])
       setErrors({})
@@ -103,6 +105,7 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
       formData.append('brand', brand.trim())
       formData.append('category', category.trim())
       formData.append('active', String(active))
+      formData.append('stock', String(parseInt(stock, 10) || 0))
 
       if (!product) {
         const { number } = await getNextProductCode()
@@ -245,9 +248,22 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
               />
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Switch checked={active} onCheckedChange={setActive} />
-            <Label className="text-sm font-semibold">Produto ativo</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Estoque (quantidade)</Label>
+              <Input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                placeholder="0"
+                min="0"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div className="flex items-center gap-3 pt-6">
+              <Switch checked={active} onCheckedChange={setActive} />
+              <Label className="text-sm font-semibold">Produto ativo</Label>
+            </div>
           </div>
           {product?.code ? (
             <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md border border-border">
