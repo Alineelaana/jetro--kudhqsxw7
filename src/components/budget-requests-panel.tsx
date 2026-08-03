@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
@@ -8,17 +8,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getBudgetRequests } from '@/services/budget-requests'
+import {
+  getBudgetRequests,
+  updateBudgetRequestStatus,
+  getNextBudgetNumber,
+  saveQuoteData,
+} from '@/services/budget-requests'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useAuth } from '@/hooks/use-auth'
+import { BudgetCreateDialog } from '@/components/budget-create-dialog'
+import { BudgetRequestActions } from '@/components/budget-request-actions'
 import type { BudgetRecord } from '@/lib/types'
 import { STATUS_OPTIONS, STATUS_COLORS } from '@/lib/types'
 import { Search, Loader2, FileText } from 'lucide-react'
+import { toast } from 'sonner'
 
 export function BudgetRequestsPanel() {
+  const { user } = useAuth()
   const [records, setRecords] = useState<BudgetRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [selectedRecord, setSelectedRecord] = useState<BudgetRecord | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [savingId, setSavingId] = useState<string | null>(null)
 
   const load = async () => {
     try {
@@ -51,11 +64,70 @@ export function BudgetRequestsPanel() {
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {}
     records.forEach((r) => {
-      const s = r.status || 'PENDENTE'
+      const s = r?.status || 'PENDENTE'
       counts[s] = (counts[s] || 0) + 1
     })
     return counts
   }, [records])
+
+  const authorName = user?.name || user?.email || 'Operador'
+
+  const handleRespond = useCallback(
+    (record: BudgetRecord) => {
+      setSelectedRecord(record)
+      setDialogOpen(true)
+      if (!record?.quote_created_at) {
+        updateBudgetRequestStatus(
+          record.id,
+          'EM ANDAMENTO',
+          'Iniciando resposta ao orçamento',
+          authorName,
+        ).catch(() => {})
+      }
+    },
+    [authorName],
+  )
+
+  const handleReprint = useCallback((record: BudgetRecord) => {
+    setSelectedRecord(record)
+    setDialogOpen(true)
+  }, [])
+
+  const handleSave = useCallback(
+    async (record: BudgetRecord) => {
+      if (!record?.id) return
+      setSavingId(record.id)
+      try {
+        if (!record.quote_created_at) {
+          const next = await getNextBudgetNumber()
+          await saveQuoteData(record.id, {
+            budget_number: next.number,
+            responsible_email: record.responsible_email || user?.email || '',
+            responsible_phone: record.responsible_phone || '',
+            quote_created_at: new Date().toISOString(),
+          })
+          await updateBudgetRequestStatus(record.id, 'EM ANDAMENTO', 'Orçamento salvo', authorName)
+          toast.success('Orçamento salvo com sucesso!', { description: `Número: ${next.number}` })
+        } else {
+          const existingData = (record.data || {}) as Record<string, unknown>
+          await saveQuoteData(record.id, {
+            budget_number: record.budget_number || '',
+            responsible_email: record.responsible_email || user?.email || '',
+            responsible_phone: record.responsible_phone || '',
+            quote_created_at: record.quote_created_at,
+            data: existingData,
+          })
+          toast.success('Orçamento atualizado com sucesso!')
+        }
+        await load()
+      } catch {
+        toast.error('Erro ao salvar orçamento. Tente novamente.')
+      } finally {
+        setSavingId(null)
+      }
+    },
+    [user, authorName],
+  )
 
   return (
     <div className="space-y-4">
@@ -126,6 +198,7 @@ export function BudgetRequestsPanel() {
                   <th className="text-left px-4 py-3 font-bold hidden md:table-cell">Contato</th>
                   <th className="text-left px-4 py-3 font-bold">Status</th>
                   <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">Data</th>
+                  <th className="text-left px-4 py-3 font-bold min-w-[280px]">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -151,6 +224,15 @@ export function BudgetRequestsPanel() {
                     <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">
                       {r.created ? new Date(r.created).toLocaleDateString('pt-BR') : '—'}
                     </td>
+                    <td className="px-4 py-3">
+                      <BudgetRequestActions
+                        record={r}
+                        onRespond={handleRespond}
+                        onReprint={handleReprint}
+                        onSave={handleSave}
+                        savingId={savingId}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -158,6 +240,14 @@ export function BudgetRequestsPanel() {
           </div>
         </Card>
       )}
+
+      <BudgetCreateDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        record={selectedRecord}
+        authorName={authorName}
+        onSuccess={load}
+      />
     </div>
   )
 }
