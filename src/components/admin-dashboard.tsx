@@ -83,8 +83,40 @@ export function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#005B2E] text-white sticky top-0 z-30 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white text-[#005B2E] border-[#C89B3C] hover:bg-gray-100 font-semibold"
+                  >
+                    <Menu className="w-4 h-4 mr-2" />
+                    Menu
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-56"
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                >
+                  {visibleOptions.map((opt) => (
+                    <DropdownMenuItem
+                      key={opt.value}
+                      onClick={() => setSection(opt.value)}
+                      className={cn(
+                        'cursor-pointer',
+                        section === opt.value && 'bg-[#005B2E]/10 font-semibold text-[#005B2E]',
+                      )}
+                    >
+                      {opt.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
               <Shield className="w-6 h-6 text-[#C89B3C]" />
               <span className="font-black text-lg">VeloraLog — Admin</span>
             </div>
@@ -100,38 +132,6 @@ export function AdminDashboard() {
                 <LogOut className="w-4 h-4 mr-1" /> Sair
               </Button>
             </div>
-          </div>
-          <div className="mt-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white text-[#005B2E] border-[#C89B3C] hover:bg-gray-100 font-semibold"
-                >
-                  <Menu className="w-4 h-4 mr-2" />
-                  {currentLabel}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-56"
-                onCloseAutoFocus={(e) => e.preventDefault()}
-              >
-                {visibleOptions.map((opt) => (
-                  <DropdownMenuItem
-                    key={opt.value}
-                    onClick={() => setSection(opt.value)}
-                    className={cn(
-                      'cursor-pointer',
-                      section === opt.value && 'bg-[#005B2E]/10 font-semibold text-[#005B2E]',
-                    )}
-                  >
-                    {opt.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </header>
