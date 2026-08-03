@@ -28,6 +28,24 @@ export interface StatusHistoryEntry {
   date: string
 }
 
+export interface SendingHistoryEntry {
+  channel: 'email' | 'whatsapp'
+  recipient: string
+  sender: string
+  sent_at: string
+}
+
+export interface BudgetServiceItem {
+  id: string
+  name: string
+  service_code: string
+  professional_name: string
+  service_area: string
+  quantity: number
+  unit_price: string
+  tax_value: string
+}
+
 export interface BudgetRecord {
   id: string
   data: Record<string, unknown>
@@ -37,6 +55,8 @@ export interface BudgetRecord {
   service: string
   status: string
   status_history: StatusHistoryEntry[]
+  sending_history?: SendingHistoryEntry[]
+  services?: BudgetServiceItem[]
   created: string
   updated: string
   responsible_email?: string

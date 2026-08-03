@@ -33,6 +33,8 @@ import { generateBudgetPdf } from '@/lib/pdf-generator'
 import { type BudgetRecord } from '@/lib/types'
 import { CARGO_TYPE_OPTIONS, PAYMENT_OPTIONS, DEADLINE_OPTIONS } from '@/lib/constants'
 import { getServiceAreas } from '@/services/service-areas'
+import { BudgetServicePicker } from '@/components/budget-service-picker'
+import type { BudgetServiceItem } from '@/lib/types'
 
 const INTERNAL_SERVICES_CHECKLIST = [
   'Recebimento',
@@ -107,6 +109,7 @@ export function BudgetCreateDialog({
   const [necessitaDistribuicao, setNecessitaDistribuicao] = useState(false)
 
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [budgetServices, setBudgetServices] = useState<BudgetServiceItem[]>([])
 
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
@@ -145,6 +148,8 @@ export function BudgetCreateDialog({
 
       const rawServices = getString(data, 'servicos_inclusos')
       setSelectedServices(rawServices ? rawServices.split(',').filter(Boolean) : [])
+      const rawBudgetServices = (record.services || []) as BudgetServiceItem[]
+      setBudgetServices(Array.isArray(rawBudgetServices) ? rawBudgetServices : [])
       setError('')
     }
   }, [open, record, authorName])
@@ -257,6 +262,7 @@ export function BudgetCreateDialog({
           responsible_phone: responsiblePhone,
           quote_created_at: quoteCreatedAt,
           data: updatedData,
+          services: budgetServices,
         })
         onSuccess?.()
       }
@@ -352,6 +358,14 @@ export function BudgetCreateDialog({
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="p-4 rounded-xl border border-[#005B2E]/20 bg-white space-y-3 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Package className="w-5 h-5 text-[#005B2E]" />
+              <h4 className="text-sm font-bold text-[#005B2E]">Produtos e Serviços Vinculados</h4>
+            </div>
+            <BudgetServicePicker services={budgetServices} onChange={setBudgetServices} />
           </div>
 
           <div className="p-4 rounded-xl border border-[#C89B3C]/40 bg-[#C89B3C]/5 space-y-4 shadow-sm">

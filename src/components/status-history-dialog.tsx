@@ -5,12 +5,14 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { STATUS_COLORS, type StatusHistoryEntry } from '@/lib/types'
+import { STATUS_COLORS, type StatusHistoryEntry, type SendingHistoryEntry } from '@/lib/types'
+import { Mail, MessageCircle } from 'lucide-react'
 
 interface StatusHistoryDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   history: StatusHistoryEntry[]
+  sendingHistory?: SendingHistoryEntry[]
 }
 
 function formatDate(iso: string): string {
@@ -23,7 +25,12 @@ function formatDate(iso: string): string {
   })
 }
 
-export function StatusHistoryDialog({ open, onOpenChange, history }: StatusHistoryDialogProps) {
+export function StatusHistoryDialog({
+  open,
+  onOpenChange,
+  history,
+  sendingHistory = [],
+}: StatusHistoryDialogProps) {
   const sorted = [...history].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )
@@ -37,7 +44,7 @@ export function StatusHistoryDialog({ open, onOpenChange, history }: StatusHisto
             Todas as atualizações registradas para esta solicitação.
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-[60vh] overflow-y-auto space-y-3">
+        <div className="max-h-[50vh] overflow-y-auto space-y-3">
           {sorted.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">Nenhum histórico disponível.</p>
           ) : (
@@ -59,6 +66,31 @@ export function StatusHistoryDialog({ open, onOpenChange, history }: StatusHisto
             ))
           )}
         </div>
+
+        {sendingHistory.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <h4 className="text-sm font-bold text-[#005B2E] mb-3">Histórico de Envios</h4>
+            <div className="space-y-2">
+              {sendingHistory.map((entry, i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                  {entry.channel === 'email' ? (
+                    <Mail className="w-4 h-4 text-[#005B2E] shrink-0" />
+                  ) : (
+                    <MessageCircle className="w-4 h-4 text-green-600 shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">
+                      {entry.channel === 'email' ? 'E-mail' : 'WhatsApp'} → {entry.recipient || '—'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Enviado por: {entry.sender || '—'} • {formatDate(entry.sent_at)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

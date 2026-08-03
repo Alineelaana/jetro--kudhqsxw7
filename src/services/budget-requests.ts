@@ -1,5 +1,5 @@
 import pb from '@/lib/pocketbase/client'
-import type { StatusHistoryEntry } from '@/lib/types'
+import type { StatusHistoryEntry, BudgetServiceItem } from '@/lib/types'
 
 export interface QuoteData {
   budget_number: string
@@ -7,6 +7,7 @@ export interface QuoteData {
   responsible_phone: string
   quote_created_at: string
   data?: Record<string, unknown>
+  services?: BudgetServiceItem[]
 }
 
 export async function saveQuoteData(id: string, data: QuoteData): Promise<void> {
@@ -47,6 +48,7 @@ export interface ManualBudgetPayload {
   responsible_email?: string
   responsible_phone?: string
   author_name: string
+  services?: BudgetServiceItem[]
 }
 
 export async function createManualBudget(payload: ManualBudgetPayload): Promise<void> {
@@ -68,6 +70,7 @@ export async function createManualBudget(payload: ManualBudgetPayload): Promise<
     responsible_email: payload.responsible_email || '',
     responsible_phone: payload.responsible_phone || '',
     status_history: statusHistory,
+    services: payload.services || [],
   })
 }
 
@@ -106,6 +109,19 @@ export async function sendBudgetEmail(payload: SendBudgetEmailPayload): Promise<
   await pb.send('/backend/v1/send-budget-email', {
     method: 'POST',
     body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function logBudgetSend(
+  requestId: string,
+  channel: 'email' | 'whatsapp',
+  recipient: string,
+  sender: string,
+): Promise<void> {
+  await pb.send('/backend/v1/budget-send-log', {
+    method: 'POST',
+    body: JSON.stringify({ request_id: requestId, channel, recipient, sender }),
     headers: { 'Content-Type': 'application/json' },
   })
 }

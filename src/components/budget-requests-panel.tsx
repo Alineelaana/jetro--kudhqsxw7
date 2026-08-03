@@ -29,8 +29,10 @@ import type { BudgetRecord } from '@/lib/types'
 import { STATUS_OPTIONS } from '@/lib/types'
 import { DEFAULT_FORM_FIELDS } from '@/lib/constants'
 import { buildWhatsAppUrl, normalizePhone } from '@/lib/utils'
-import { Search, Loader2, FileText, Plus } from 'lucide-react'
+import { Search, Loader2, FileText, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { NotificationBell } from '@/components/notification-bell'
+import { logBudgetSend } from '@/services/budget-requests'
 
 export function BudgetRequestsPanel() {
   const { user } = useAuth()
@@ -100,9 +102,18 @@ export function BudgetRequestsPanel() {
         !term ||
         r?.client_name?.toLowerCase()?.includes(term) ||
         r?.client_email?.toLowerCase()?.includes(term) ||
-        r?.service?.toLowerCase()?.includes(term)
+        r?.service?.toLowerCase()?.includes(term) ||
+        r?.budget_number?.toLowerCase()?.includes(term)
+      const matchDate = (() => {
+        if (!term) return true
+        if (!r?.created) return true
+        const d = new Date(r.created)
+        const dateBR = d.toLocaleDateString('pt-BR')
+        const iso = r.created.split('T')[0]
+        return dateBR.includes(term) || iso.includes(term)
+      })()
       const matchStatus = statusFilter === 'all' || r?.status === statusFilter
-      return matchText && matchStatus
+      return matchText && matchDate && matchStatus
     })
   }, [records, search, statusFilter])
 
@@ -160,15 +171,19 @@ export function BudgetRequestsPanel() {
     setMessageOpen(true)
   }, [])
 
-  const handleSendWhatsAppClick = useCallback((record: BudgetRecord) => {
-    const phone = normalizePhone(record.client_phone || '')
-    if (!phone) {
-      toast.error('Cliente não possui telefone cadastrado.')
-      return
-    }
-    const msg = `Olá ${record.client_name}! Conforme sua solicitação de orçamento para ${record.service || 'serviços logísticos'}, estamos retornando o contato.`
-    window.open(buildWhatsAppUrl(phone, msg), '_blank')
-  }, [])
+  const handleSendWhatsAppClick = useCallback(
+    (record: BudgetRecord) => {
+      const phone = normalizePhone(record.client_phone || '')
+      if (!phone) {
+        toast.error('Cliente não possui telefone cadastrado.')
+        return
+      }
+      const msg = `Olá ${record.client_name}! Conforme sua solicitação de orçamento para ${record.service || 'serviços logísticos'}, estamos retornando o contato.`
+      window.open(buildWhatsAppUrl(phone, msg), '_blank')
+      logBudgetSend(record.id, 'whatsapp', phone, authorName).catch(() => {})
+    },
+    [authorName],
+  )
 
   const handleHistoryClick = useCallback((record: BudgetRecord) => {
     setHistoryRecord(record)
@@ -221,13 +236,16 @@ export function BudgetRequestsPanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-xl font-black text-foreground">Solicitações de Orçamento</h2>
-        <Button
-          onClick={() => setManualOpen(true)}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Criar Orçamento
-        </Button>
+        <div className="flex items-center gap-2">
+          <NotificationBell />
+          <Button
+            onClick={() => setManualOpen(true)}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Orçamento
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -249,9 +267,17 @@ export function BudgetRequestsPanel() {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por nome, e-mail ou serviço..."
-                className="pl-10 focus-visible:ring-[#005B2E]"
+                placeholder="Buscar por nome, nº orçamento ou data..."
+                className="pl-10 pr-8 focus-visible:ring-[#005B2E]"
               />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48 focus-visible:ring-[#005B2E]">
@@ -347,6 +373,7 @@ export function BudgetRequestsPanel() {
         open={historyOpen}
         onOpenChange={setHistoryOpen}
         history={historyRecord?.status_history || []}
+        sendingHistory={historyRecord?.sending_history || []}
       />
 
       <StatusUpdateDialog

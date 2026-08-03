@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T15:12:37.119Z",
+  "generatedAt": "2026-08-03T15:40:07.830Z",
   "collections": [
     {
       "name": "users",
@@ -273,13 +273,27 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "sending_history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "services",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_budget_requests_client_email ON budget_requests (client_email)",
         "CREATE INDEX idx_budget_requests_service ON budget_requests (service)",
         "CREATE INDEX idx_budget_requests_created ON budget_requests (created)",
-        "CREATE INDEX `idx_budget_requests_status` ON `budget_requests` (status)"
+        "CREATE INDEX `idx_budget_requests_status` ON `budget_requests` (status)",
+        "CREATE INDEX `idx_budget_requests_budget_number` ON `budget_requests` (budget_number)",
+        "CREATE INDEX `idx_budget_requests_client_name` ON `budget_requests` (client_name)"
       ]
     },
     {
@@ -1804,6 +1818,76 @@
       "indexes": [
         "CREATE INDEX idx_contracts_operations_status ON contracts_operations (status)",
         "CREATE INDEX idx_contracts_operations_created ON contracts_operations (created)"
+      ]
+    },
+    {
+      "name": "notifications",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && recipient = @request.auth.id",
+        "view": "@request.auth.id != '' && recipient = @request.auth.id",
+        "create": "@request.auth.role = 'SUP'",
+        "update": "@request.auth.id != '' && recipient = @request.auth.id",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["budget_created", "budget_saved"]
+        },
+        {
+          "name": "recipient",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "read",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_notifications_recipient ON notifications (recipient)",
+        "CREATE INDEX idx_notifications_read ON notifications (read)",
+        "CREATE INDEX idx_notifications_created ON notifications (created)"
       ]
     }
   ]

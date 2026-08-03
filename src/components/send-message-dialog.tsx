@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import pb from '@/lib/pocketbase/client'
 import { toast } from '@/hooks/use-toast'
 import { Loader2, Mail, Send } from 'lucide-react'
+import { logBudgetSend } from '@/services/budget-requests'
 import signatureImg from '@/assets/chatgpt-image-1-de-ago.de-2026-155412-d05ee.png'
 
 interface SendMessageDialogProps {
@@ -62,6 +63,8 @@ export function SendMessageDialog({
           author_name: authorName,
         }),
       })
+
+      await logBudgetSend(requestId, 'email', clientEmail, authorName)
 
       toast({
         title: 'E-mail Enviado!',

@@ -20,8 +20,9 @@ import {
 } from '@/components/ui/select'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { createManualBudget } from '@/services/budget-requests'
-import { STATUS_OPTIONS } from '@/lib/types'
+import { STATUS_OPTIONS, type BudgetServiceItem } from '@/lib/types'
 import { SERVICE_OPTIONS } from '@/lib/constants'
+import { BudgetServicePicker } from '@/components/budget-service-picker'
 import { toast } from 'sonner'
 
 const OPERATION_TYPES = [
@@ -53,6 +54,7 @@ export function ManualBudgetDialog({
 }: ManualBudgetDialogProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [budgetServices, setBudgetServices] = useState<BudgetServiceItem[]>([])
   const [form, setForm] = useState<Record<string, string>>({
     client_name: '',
     client_email: '',
@@ -91,6 +93,7 @@ export function ManualBudgetDialog({
         responsible_phone: '',
       })
       setError('')
+      setBudgetServices([])
     }
   }, [open, authorEmail])
 
@@ -121,6 +124,7 @@ export function ManualBudgetDialog({
         responsible_email: form.responsible_email,
         responsible_phone: form.responsible_phone,
         author_name: authorName,
+        services: budgetServices,
         data: {
           empresa: form.empresa,
           tipo_operacao: form.tipo_operacao,
@@ -310,9 +314,13 @@ export function ManualBudgetDialog({
               />
             </div>
           </div>
+          <div className="p-3 rounded-lg border border-[#005B2E]/20 bg-[#005B2E]/5 space-y-2">
+            <Label className="text-xs font-bold text-[#005B2E]">Produtos e Serviços</Label>
+            <BudgetServicePicker services={budgetServices} onChange={setBudgetServices} />
+          </div>
           <div className="space-y-1">
             <Label className="text-xs font-semibold">Observações</Label>
-            <Textarea
+            <Textarea>
               value={form.mensagem}
               onChange={(e) => set('mensagem', e.target.value)}
               placeholder="Observações sobre a operação..."
