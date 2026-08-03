@@ -16,6 +16,7 @@ import ClientLogin from './pages/ClientLogin'
 import ClientRegister from './pages/ClientRegister'
 import PasswordRecovery from './pages/PasswordRecovery'
 import ClientArea from './pages/ClientArea'
+import ClientPasswordReset from './pages/ClientPasswordReset'
 import PoliticaPrivacidade from './pages/PoliticaPrivacidade'
 import PoliticaComercial from './pages/PoliticaComercial'
 import TermosDeUso from './pages/TermosDeUso'
@@ -41,6 +42,8 @@ const App = () => (
                     <Route path="/cliente/login" element={<ClientLogin />} />
                     <Route path="/cliente/cadastro" element={<ClientRegister />} />
                     <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
+                    <Route path="/cliente/redefinir-senha" element={<ClientPasswordReset />} />
+                    <Route path="/_/" element={<ClientPasswordReset />} />
                     <Route path="/cliente" element={<ClientArea />} />
                     <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
                     <Route path="/politica-comercial" element={<PoliticaComercial />} />

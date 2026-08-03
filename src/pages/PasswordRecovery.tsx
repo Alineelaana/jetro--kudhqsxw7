@@ -7,27 +7,35 @@ import { Label } from '@/components/ui/label'
 import pbClient from '@/lib/pocketbase/client-client'
 import { Mail, AlertCircle, CheckCircle, Loader2, ArrowLeft } from 'lucide-react'
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export default function PasswordRecovery() {
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setEmailError('')
+
     if (!email.trim()) {
-      setError('Digite seu e-mail.')
+      setEmailError('O e-mail é obrigatório.')
       return
     }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailError('Digite um e-mail válido.')
+      return
+    }
+
     setSubmitting(true)
-    setError('')
     try {
       await pbClient.collection('clients').requestPasswordReset(email.trim())
-      setSuccess(true)
     } catch {
-      setError('Não foi possível enviar o e-mail. Verifique o endereço e tente novamente.')
+      // Silently ignore — show neutral message regardless
     }
     setSubmitting(false)
+    setSuccess(true)
   }
 
   return (
@@ -43,8 +51,7 @@ export default function PasswordRecovery() {
             <div className="space-y-4 text-center">
               <CheckCircle className="w-12 h-12 text-emerald-600 mx-auto" />
               <p className="text-sm text-foreground">
-                Enviamos um link de recuperação para <strong>{email}</strong>. Verifique sua caixa
-                de entrada.
+                Se o e-mail existir, você receberá um link de redefinição de senha.
               </p>
               <Button asChild variant="outline" className="border-[#005B2E] text-[#005B2E]">
                 <Link to="/cliente/login">
@@ -67,18 +74,17 @@ export default function PasswordRecovery() {
                     id="recovery-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (emailError) setEmailError('')
+                    }}
                     placeholder="seu@email.com"
-                    className="pl-10 focus-visible:ring-[#005B2E]"
+                    className={`pl-10 focus-visible:ring-[#005B2E] ${emailError ? 'border-destructive' : 'border-border'}`}
+                    autoComplete="email"
                   />
                 </div>
+                {emailError && <p className="text-sm text-destructive font-medium">{emailError}</p>}
               </div>
-              {error && (
-                <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-lg p-3 border border-destructive/30">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-medium">{error}</span>
-                </div>
-              )}
               <Button
                 type="submit"
                 size="lg"
@@ -90,7 +96,7 @@ export default function PasswordRecovery() {
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Enviando...
                   </>
                 ) : (
-                  'Enviar link de recuperação'
+                  'Enviar link de redefinição'
                 )}
               </Button>
               <Link
