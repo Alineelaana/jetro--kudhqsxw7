@@ -1,3 +1,5 @@
+import pb from '@/lib/pocketbase/client'
+
 const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
 
 export function getFileUrl(recordId: string, filename: string, collection = 'partners') {
@@ -52,16 +54,15 @@ export interface CnpjLookupResult {
   cep?: string
   email?: string
   telefone?: string
+  situacao?: string
 }
 
 export async function lookupCnpj(cnpj: string): Promise<CnpjLookupResult | null> {
   const clean = cnpj.replace(/\D/g, '')
   if (clean.length !== 14) return null
   try {
-    const res = await fetch(`https://receitaws.com.br/v1/cnpj/${clean}`)
-    if (!res.ok) return null
-    const data = await res.json()
-    if (data.status === 'ERROR' || data.error) return null
+    const data = await pb.send(`/backend/v1/cnpj/${clean}`, { method: 'GET' })
+    if (data.error) return null
     return data as CnpjLookupResult
   } catch {
     return null

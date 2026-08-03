@@ -32,6 +32,7 @@ const CNPJ_FIELDS: Array<{
   { key: 'cep', getValue: (d) => formatCep(d.cep || '') },
   { key: 'email', getValue: (d) => d.email || '' },
   { key: 'phone', getValue: (d) => formatPhone(d.telefone || '') },
+  { key: 'observations', getValue: (d) => (d.situacao ? `Situação cadastral: ${d.situacao}` : '') },
 ]
 
 export function PartnerPjFields({
