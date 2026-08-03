@@ -37,6 +37,40 @@ export async function createBudgetRequest(payload: BudgetRequestData): Promise<v
   })
 }
 
+export interface ManualBudgetPayload {
+  client_name: string
+  client_email: string
+  client_phone: string
+  service: string
+  status: string
+  data: Record<string, string>
+  responsible_email?: string
+  responsible_phone?: string
+  author_name: string
+}
+
+export async function createManualBudget(payload: ManualBudgetPayload): Promise<void> {
+  const statusHistory: StatusHistoryEntry[] = [
+    {
+      status: payload.status,
+      note: 'Orçamento criado manualmente',
+      author: payload.author_name,
+      date: new Date().toISOString(),
+    },
+  ]
+  await pb.collection('budget_requests').create({
+    client_name: payload.client_name,
+    client_email: payload.client_email,
+    client_phone: payload.client_phone,
+    service: payload.service,
+    status: payload.status,
+    data: payload.data,
+    responsible_email: payload.responsible_email || '',
+    responsible_phone: payload.responsible_phone || '',
+    status_history: statusHistory,
+  })
+}
+
 export async function getBudgetRequests() {
   return pb.collection('budget_requests').getFullList({
     sort: '-created',

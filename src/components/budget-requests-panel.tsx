@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -22,11 +23,13 @@ import { BudgetCreateDialog } from '@/components/budget-create-dialog'
 import { StatusHistoryDialog } from '@/components/status-history-dialog'
 import { StatusUpdateDialog } from '@/components/status-update-dialog'
 import { SendMessageDialog } from '@/components/send-message-dialog'
+import { PaginationControls } from '@/components/pagination-controls'
+import { ManualBudgetDialog } from '@/components/manual-budget-dialog'
 import type { BudgetRecord } from '@/lib/types'
 import { STATUS_OPTIONS } from '@/lib/types'
 import { DEFAULT_FORM_FIELDS } from '@/lib/constants'
 import { buildWhatsAppUrl, normalizePhone } from '@/lib/utils'
-import { Search, Loader2, FileText } from 'lucide-react'
+import { Search, Loader2, FileText, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function BudgetRequestsPanel() {
@@ -37,6 +40,8 @@ export function BudgetRequestsPanel() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [labelMap, setLabelMap] = useState<Record<string, string>>({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   const [selectedRecord, setSelectedRecord] = useState<BudgetRecord | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -51,6 +56,8 @@ export function BudgetRequestsPanel() {
 
   const [messageRecord, setMessageRecord] = useState<BudgetRecord | null>(null)
   const [messageOpen, setMessageOpen] = useState(false)
+
+  const [manualOpen, setManualOpen] = useState(false)
 
   const authorName = (user?.name as string) || (user?.email as string) || 'Operador'
 
@@ -98,6 +105,16 @@ export function BudgetRequestsPanel() {
       return matchText && matchStatus
     })
   }, [records, search, statusFilter])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, statusFilter])
+
+  const paginated = useMemo(() => {
+    if (pageSize === 0) return filtered
+    const start = (currentPage - 1) * pageSize
+    return filtered.slice(start, start + pageSize)
+  }, [filtered, currentPage, pageSize])
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -202,7 +219,16 @@ export function BudgetRequestsPanel() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-black text-foreground">Solicitações de Orçamento</h2>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <h2 className="text-xl font-black text-foreground">Solicitações de Orçamento</h2>
+        <Button
+          onClick={() => setManualOpen(true)}
+          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Criar Orçamento
+        </Button>
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {STATUS_OPTIONS.map((status) => (
@@ -275,7 +301,7 @@ export function BudgetRequestsPanel() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((r) => (
+                {paginated.map((r) => (
                   <AdminRequestRow
                     key={r.id}
                     record={r}
@@ -296,6 +322,16 @@ export function BudgetRequestsPanel() {
               </tbody>
             </table>
           </div>
+          <PaginationControls
+            totalRecords={filtered.length}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size)
+              setCurrentPage(1)
+            }}
+          />
         </Card>
       )}
 
@@ -329,6 +365,14 @@ export function BudgetRequestsPanel() {
         clientName={messageRecord?.client_name || ''}
         clientEmail={messageRecord?.client_email || ''}
         authorName={authorName}
+        onSuccess={load}
+      />
+
+      <ManualBudgetDialog
+        open={manualOpen}
+        onOpenChange={setManualOpen}
+        authorName={authorName}
+        authorEmail={(user?.email as string) || ''}
         onSuccess={load}
       />
     </div>
