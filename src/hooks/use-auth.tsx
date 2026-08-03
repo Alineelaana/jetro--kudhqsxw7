@@ -1,13 +1,22 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { ClientResponseError } from 'pocketbase'
 import pb from '@/lib/pocketbase/client'
+import { extractFieldErrors, getErrorMessage, type FieldErrors } from '@/lib/pocketbase/errors'
 
 interface AuthContextType {
   user: Record<string, unknown> | null
   isAuthenticated: boolean
   isAdmin: boolean
   userRole: string
-  login: (username: string, password: string) => Promise<{ error: string | null }>
-  signUp: (name: string, email: string, password: string) => Promise<{ error: string | null }>
+  login: (
+    username: string,
+    password: string,
+  ) => Promise<{ error: string | null; fieldErrors: FieldErrors }>
+  signUp: (
+    name: string,
+    email: string,
+    password: string,
+  ) => Promise<{ error: string | null; fieldErrors: FieldErrors }>
   signOut: () => void
   loading: boolean
 }
@@ -121,7 +130,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         pb.authStore.clear()
         setUser(null)
         setIsAuthenticated(false)
-        return { error: 'Sua conta está inativa. Entre em contato com um administrador.' }
+        return {
+          error: 'Sua conta está inativa. Entre em contato com um administrador.',
+          fieldErrors: {},
+        }
       }
 
       setUser(record)
@@ -131,18 +143,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ action: 'login', identity: email }),
         headers: { 'Content-Type': 'application/json' },
       }).catch(() => {})
-      return { error: null }
+      return { error: null, fieldErrors: {} }
     } catch (error: unknown) {
       pb.send('/backend/v1/audit/auth', {
         method: 'POST',
         body: JSON.stringify({ action: 'login_failed', identity: email }),
         headers: { 'Content-Type': 'application/json' },
       }).catch(() => {})
-      const err = error as { status?: number }
-      if (err?.status === 0) {
-        return { error: 'Erro de conexão. Verifique sua internet e tente novamente.' }
+
+      if (error instanceof ClientResponseError) {
+        if (error.isAbort) {
+          return { error: 'A requisição foi cancelada. Tente novamente.', fieldErrors: {} }
+        }
+        if (error.status === 0) {
+          return {
+            error:
+              'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.',
+            fieldErrors: {},
+          }
+        }
+        const fErrors = extractFieldErrors(error)
+        const fieldMsg = Object.values(fErrors).join(' ')
+        if (error.status === 400 || error.status === 401) {
+          return {
+            error: fieldMsg || 'Credenciais inválidas. Verifique usuário e senha.',
+            fieldErrors: fErrors,
+          }
+        }
+        if (error.status === 403) {
+          return {
+            error: 'Acesso negado. Você não tem permissão para acessar esta área.',
+            fieldErrors: fErrors,
+          }
+        }
+        if (error.status === 429) {
+          return {
+            error: 'Muitas tentativas de login. Aguarde alguns minutos e tente novamente.',
+            fieldErrors: fErrors,
+          }
+        }
+        if (error.status >= 500) {
+          return {
+            error: 'Erro no servidor. Tente novamente em alguns instantes.',
+            fieldErrors: fErrors,
+          }
+        }
+        return { error: fieldMsg || getErrorMessage(error), fieldErrors: fErrors }
       }
-      return { error: 'Credenciais inválidas. Verifique usuário e senha.' }
+
+      if (error instanceof Error) {
+        return { error: error.message, fieldErrors: {} }
+      }
+      return { error: 'Erro inesperado. Tente novamente.', fieldErrors: {} }
     }
   }
 
@@ -155,17 +207,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         passwordConfirm: password,
         active: true,
       })
-      return { error: null }
+      return { error: null, fieldErrors: {} }
     } catch (error: unknown) {
-      const err = error as {
-        status?: number
-        response?: { data?: { email?: { message?: string }; password?: { message?: string } } }
+      if (error instanceof ClientResponseError) {
+        if (error.isAbort) {
+          return { error: 'A requisição foi cancelada. Tente novamente.', fieldErrors: {} }
+        }
+        if (error.status === 0) {
+          return {
+            error: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
+            fieldErrors: {},
+          }
+        }
+        const fErrors = extractFieldErrors(error)
+        const fieldMsg = Object.values(fErrors).join(' ')
+        if (fieldMsg) {
+          return { error: fieldMsg, fieldErrors: fErrors }
+        }
+        return { error: getErrorMessage(error), fieldErrors: fErrors }
       }
-      if (err?.status === 0) return { error: 'Erro de conexão. Verifique sua internet.' }
-      if (err?.response?.data?.email) return { error: 'Este e-mail já está cadastrado.' }
-      if (err?.response?.data?.password)
-        return { error: 'A senha deve ter no mínimo 8 caracteres.' }
-      return { error: 'Não foi possível cadastrar. Verifique os dados e tente novamente.' }
+      if (error instanceof Error) {
+        return { error: error.message, fieldErrors: {} }
+      }
+      return {
+        error: 'Não foi possível cadastrar. Verifique os dados e tente novamente.',
+        fieldErrors: {},
+      }
     }
   }
 

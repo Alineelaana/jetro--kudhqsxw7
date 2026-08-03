@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
+import { type FieldErrors } from '@/lib/pocketbase/errors'
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'
 
 export function AdminLogin() {
@@ -12,20 +13,43 @@ export function AdminLogin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [submitting, setSubmitting] = useState(false)
+
+  const clearErrors = () => {
+    if (error) setError('')
+    if (Object.keys(fieldErrors).length > 0) setFieldErrors({})
+  }
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value)
+    clearErrors()
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value)
+    clearErrors()
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!username.trim() || !password.trim()) {
       setError('Preencha todos os campos.')
+      setFieldErrors({})
       return
     }
     setSubmitting(true)
     setError('')
-    const { error } = await login(username.trim(), password)
+    setFieldErrors({})
+    const { error: loginError, fieldErrors: fErrors } = await login(username.trim(), password)
     setSubmitting(false)
-    if (error) setError(error)
+    if (loginError) {
+      setError(loginError)
+      setFieldErrors(fErrors || {})
+    }
   }
+
+  const hasFieldError = !!fieldErrors.email || !!fieldErrors.username || !!fieldErrors.password
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
@@ -48,12 +72,17 @@ export function AdminLogin() {
                   id="username"
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={handleUsernameChange}
                   placeholder="Digite seu usuário"
                   className="pl-10 focus-visible:ring-[#005B2E] border-border"
                   autoComplete="username"
                 />
               </div>
+              {(fieldErrors.email || fieldErrors.username) && (
+                <p className="text-sm text-destructive font-medium">
+                  {fieldErrors.email || fieldErrors.username}
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-sm font-semibold text-foreground">
@@ -65,14 +94,17 @@ export function AdminLogin() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   placeholder="Digite sua senha"
                   className="pl-10 focus-visible:ring-[#005B2E] border-border"
                   autoComplete="current-password"
                 />
               </div>
+              {fieldErrors.password && (
+                <p className="text-sm text-destructive font-medium">{fieldErrors.password}</p>
+              )}
             </div>
-            {error && (
+            {error && !hasFieldError && (
               <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-lg p-3 border border-destructive/30">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span className="font-medium">{error}</span>
