@@ -23,7 +23,8 @@ const DIFFERENTIALS = [
 
 export function HeroSection() {
   const { whatsappNumber } = useSettings()
-  const { formatted: responseTimeFormatted } = useResponseTime()
+  const responseTime = useResponseTime()
+  const responseTimeFormatted = responseTime?.formatted ?? ''
 
   return (
     <section
@@ -84,7 +85,7 @@ export function HeroSection() {
             >
               <a
                 href={buildWhatsAppUrl(
-                  whatsappNumber,
+                  whatsappNumber || '',
                   'Olá! Gostaria de falar com um especialista da Velora Log sobre as operações de armazenagem e transporte.',
                 )}
                 target="_blank"

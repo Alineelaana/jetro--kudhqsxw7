@@ -19,16 +19,19 @@ function resolveLink(item: VitrineItem): string {
 }
 
 function VitrineBanner({ item }: { item: VitrineItem }) {
+  if (!item) return null
   const posClass =
     item.text_position === 'left'
       ? 'items-start text-left'
       : item.text_position === 'right'
         ? 'items-end text-right'
         : 'items-center text-center'
+  const bgColor = item.bg_color || '#005B2E'
+  const textColor = item.text_color || '#FFFFFF'
   return (
     <div
       className="relative aspect-[21/9] sm:aspect-video flex flex-col justify-center p-6 md:p-12 rounded-xl overflow-hidden"
-      style={{ backgroundColor: item.bg_color || '#005B2E' }}
+      style={{ backgroundColor: bgColor }}
     >
       {item.image_desktop && (
         <img
@@ -43,10 +46,7 @@ function VitrineBanner({ item }: { item: VitrineItem }) {
           style={{ backgroundColor: item.overlay_color, opacity: (item.opacity || 0) / 100 }}
         />
       )}
-      <div
-        className={`relative flex flex-col gap-2 ${posClass}`}
-        style={{ color: item.text_color || '#FFFFFF' }}
-      >
+      <div className={`relative flex flex-col gap-2 ${posClass}`} style={{ color: textColor }}>
         {item.title && <h2 className="text-2xl md:text-4xl font-black">{item.title}</h2>}
         {item.subtitle && (
           <p className="text-base md:text-lg font-semibold opacity-90">{item.subtitle}</p>
@@ -59,8 +59,8 @@ function VitrineBanner({ item }: { item: VitrineItem }) {
             href={resolveLink(item)}
             className="mt-3 inline-block px-6 py-3 rounded-lg font-bold text-sm transition-transform hover:scale-105"
             style={{
-              backgroundColor: item.text_color || '#FFFFFF',
-              color: item.bg_color || '#005B2E',
+              backgroundColor: textColor,
+              color: bgColor,
             }}
           >
             {item.button_text}
@@ -82,7 +82,7 @@ export function VitrineDisplay({ position }: { position: string }) {
       .finally(() => setLoading(false))
   }, [position])
 
-  if (loading || items.length === 0) return null
+  if (loading || !Array.isArray(items) || items.length === 0) return null
 
   return (
     <div className="container mx-auto px-4 py-6">

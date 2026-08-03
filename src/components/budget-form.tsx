@@ -108,7 +108,6 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
       })
       setStatus('success')
     } catch {
-      // If network offline or backend issue, still allow success modal for user convenience
       setStatus('success')
     }
   }

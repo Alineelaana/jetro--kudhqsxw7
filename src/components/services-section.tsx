@@ -23,9 +23,12 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {(Array.isArray(SERVICES) ? SERVICES : []).filter(Boolean).map((service) => (
-            <ServiceCard key={service.id} service={service} onSelect={onSelectService} />
-          ))}
+          {(Array.isArray(SERVICES) ? SERVICES : [])
+            .filter(Boolean)
+            .filter((s) => s && typeof s === 'object' && s.id)
+            .map((service) => (
+              <ServiceCard key={service.id} service={service} onSelect={onSelectService} />
+            ))}
         </div>
       </div>
     </section>

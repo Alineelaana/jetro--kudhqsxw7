@@ -25,8 +25,9 @@ export function CmsContentProvider({ children }: { children: ReactNode }) {
       .then((items) => {
         const map: Record<string, Record<string, unknown>> = {}
         for (const item of items) {
-          const published = item.published_data as Record<string, unknown>
-          if (published && Object.keys(published).length > 0) {
+          if (!item || !item.section_key) continue
+          const published = item.published_data as Record<string, unknown> | null | undefined
+          if (published && typeof published === 'object' && Object.keys(published).length > 0) {
             map[item.section_key] = published
           }
         }

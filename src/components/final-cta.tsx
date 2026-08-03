@@ -49,7 +49,7 @@ export function FinalCTA() {
             >
               <a
                 href={buildWhatsAppUrl(
-                  whatsappNumber,
+                  whatsappNumber || '',
                   'Olá! Gostaria de conversar com a equipe comercial da Velora Log.',
                 )}
                 target="_blank"

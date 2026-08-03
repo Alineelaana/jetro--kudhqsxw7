@@ -52,13 +52,13 @@ export function FloatingChat() {
     const poll = async () => {
       try {
         const msgs = await getChatMessages(conversationId)
-        if (msgs.length > 0) {
+        if (Array.isArray(msgs) && msgs.length > 0) {
           setMessages(msgs)
           setStep('chat')
         }
         if (!hasRated) {
           const st = await getConversationStatus(conversationId)
-          if (st.closed) setShowRating(true)
+          if (st && st.closed) setShowRating(true)
         }
       } catch (_) {
         localStorage.removeItem('velora_chat_conv_id')
@@ -82,12 +82,15 @@ export function FloatingChat() {
         client_phone: contact,
         message: input.trim(),
       })
-      if (!conversationId) {
+      if (!conversationId && result?.conversation_id) {
         setConversationId(result.conversation_id)
         localStorage.setItem('velora_chat_conv_id', result.conversation_id)
       }
       setInput('')
-      setMessages(await getChatMessages(result.conversation_id))
+      if (result?.conversation_id) {
+        const msgs = await getChatMessages(result.conversation_id)
+        if (Array.isArray(msgs)) setMessages(msgs)
+      }
       setStep('chat')
     } catch {
       /* intentionally ignored */
@@ -107,7 +110,8 @@ export function FloatingChat() {
       await submitRating(conversationId, ratingValue, ratingComment)
       setHasRated(true)
       setShowRating(false)
-      setMessages(await getChatMessages(conversationId))
+      const msgs = await getChatMessages(conversationId)
+      if (Array.isArray(msgs)) setMessages(msgs)
     } catch {
       /* intentionally ignored */
     }

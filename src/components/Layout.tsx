@@ -3,31 +3,16 @@ import { useEffect } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
-import { SeoHead } from '@/components/seo-head'
-
-function ScrollManager() {
-  const { pathname, hash } = useLocation()
-
-  useEffect(() => {
-    if (hash) {
-      const id = hash.replace('#', '')
-      const el = document.getElementById(id)
-      if (el) {
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
-      }
-    } else {
-      window.scrollTo(0, 0)
-    }
-  }, [pathname, hash])
-
-  return null
-}
 
 export default function Layout() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <ScrollManager />
-      <SeoHead />
+    <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex-1">
         <Outlet />

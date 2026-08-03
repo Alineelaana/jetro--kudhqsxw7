@@ -15,12 +15,18 @@ const SettingsContext = createContext<SettingsContextType>({
 export const useSettings = () => useContext(SettingsContext)
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_WHATSAPP_NUMBER)
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(DEFAULT_WHATSAPP_NUMBER)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getWhatsappNumber()
-      .then((num) => setWhatsappNumber(num || DEFAULT_WHATSAPP_NUMBER))
+      .then((num) => {
+        if (typeof num === 'string' && num.trim()) {
+          setWhatsappNumber(num)
+        } else {
+          setWhatsappNumber(DEFAULT_WHATSAPP_NUMBER)
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])

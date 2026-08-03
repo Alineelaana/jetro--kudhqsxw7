@@ -70,7 +70,7 @@ export function SiteHeader() {
               size="sm"
               className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-md rounded-lg"
             >
-              <Link to="/admin">Login ao Painel</Link>
+              <Link to="/admin">Área da empresa</Link>
             </Button>
             <Button
               asChild
@@ -133,7 +133,7 @@ export function SiteHeader() {
                   className="border-2 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E] hover:text-white font-bold"
                 >
                   <Link to="/admin" onClick={() => setOpen(false)}>
-                    Login ao Painel
+                    Área da empresa
                   </Link>
                 </Button>
                 <Button
