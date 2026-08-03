@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T15:40:07.830Z",
+  "generatedAt": "2026-08-03T15:56:03.103Z",
   "collections": [
     {
       "name": "users",
@@ -285,6 +285,12 @@
           "type": "json",
           "required": false,
           "system": false
+        },
+        {
+          "name": "request_number",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -293,7 +299,8 @@
         "CREATE INDEX idx_budget_requests_created ON budget_requests (created)",
         "CREATE INDEX `idx_budget_requests_status` ON `budget_requests` (status)",
         "CREATE INDEX `idx_budget_requests_budget_number` ON `budget_requests` (budget_number)",
-        "CREATE INDEX `idx_budget_requests_client_name` ON `budget_requests` (client_name)"
+        "CREATE INDEX `idx_budget_requests_client_name` ON `budget_requests` (client_name)",
+        "CREATE INDEX `idx_budget_requests_request_number` ON `budget_requests` (request_number)"
       ]
     },
     {

@@ -86,10 +86,9 @@ export function AdminRequestRow({
           {record.client_name || '—'}
         </td>
         <td
-          className={cn(cellPad, 'text-muted-foreground truncate hidden md:table-cell')}
-          title={record.client_email || ''}
+          className={cn(cellPad, 'font-bold text-[#005B2E] hidden md:table-cell whitespace-nowrap')}
         >
-          {record.client_email || '—'}
+          {record.request_number ? `#${record.request_number}` : '—'}
         </td>
         <td
           className={cn(cellPad, 'text-muted-foreground truncate hidden lg:table-cell')}

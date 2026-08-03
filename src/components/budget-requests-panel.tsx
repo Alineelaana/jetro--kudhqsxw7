@@ -103,7 +103,9 @@ export function BudgetRequestsPanel() {
         r?.client_name?.toLowerCase()?.includes(term) ||
         r?.client_email?.toLowerCase()?.includes(term) ||
         r?.service?.toLowerCase()?.includes(term) ||
-        r?.budget_number?.toLowerCase()?.includes(term)
+        r?.budget_number?.toLowerCase()?.includes(term) ||
+        String(r?.request_number || '').includes(term) ||
+        `#${r?.request_number || ''}`.toLowerCase().includes(term)
       const matchDate = (() => {
         if (!term) return true
         if (!r?.created) return true
@@ -317,7 +319,7 @@ export function BudgetRequestsPanel() {
               <thead>
                 <tr className="bg-[#01361D] text-white">
                   <th className="text-left px-3 py-3 font-bold">Cliente</th>
-                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">E-mail</th>
+                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Nº</th>
                   <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Telefone</th>
                   <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Serviço</th>
                   <th className="text-left px-3 py-3 font-bold">Tempo</th>
