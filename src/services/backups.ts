@@ -94,3 +94,25 @@ export async function downloadBackupFile(id: string, fileName: string) {
   document.body.removeChild(a)
   URL.revokeObjectURL(a.href)
 }
+
+export interface ComparisonCollection {
+  name: string
+  added: Array<{ id: string; data: Record<string, unknown> }>
+  removed: Array<{ id: string; data: Record<string, unknown> }>
+  changed: Array<{ id: string; before: Record<string, unknown>; after: Record<string, unknown> }>
+  summary: { added: number; removed: number; changed: number; total_a: number; total_b: number }
+}
+
+export interface ComparisonResult {
+  backup_a: { id: string; name: string; created: string }
+  backup_b: { id: string; name: string; created: string }
+  collections: ComparisonCollection[]
+}
+
+export async function compareBackups(backupA: string, backupB: string): Promise<ComparisonResult> {
+  return pb.send('/backend/v1/backup/compare', {
+    method: 'POST',
+    body: JSON.stringify({ backup_a: backupA, backup_b: backupB }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}

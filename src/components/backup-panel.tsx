@@ -23,7 +23,21 @@ import {
 } from '@/services/backups'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
 import { BackupCreateDialog } from '@/components/backup-create-dialog'
-import { Loader2, Plus, Download, Trash2, AlertCircle, HardDrive } from 'lucide-react'
+import { BackupRestoreDialog } from '@/components/backup-restore-dialog'
+import { BackupSettingsSection } from '@/components/backup-settings-section'
+import { BackupCompareDialog } from '@/components/backup-compare-dialog'
+import { BackupCodeExportDialog } from '@/components/backup-code-export-dialog'
+import {
+  Loader2,
+  Plus,
+  Download,
+  Trash2,
+  AlertCircle,
+  HardDrive,
+  RotateCcw,
+  GitCompare,
+  Code2,
+} from 'lucide-react'
 
 const TYPE_LABELS: Record<string, string> = {
   full: 'Completo',
@@ -31,7 +45,6 @@ const TYPE_LABELS: Record<string, string> = {
   files: 'Arquivos',
   config: 'Configuração',
 }
-
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-green-100 text-green-800 border-green-300',
   restored: 'bg-blue-100 text-blue-800 border-blue-300',
@@ -47,6 +60,9 @@ export function BackupPanel() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const [restoreId, setRestoreId] = useState<string | null>(null)
+  const [compareOpen, setCompareOpen] = useState(false)
+  const [codeExportOpen, setCodeExportOpen] = useState(false)
 
   const loadBackups = async () => {
     setLoading(true)
@@ -94,6 +110,8 @@ export function BackupPanel() {
     }
   }
 
+  const restoreBackupRecord = backups.find((b) => b.id === restoreId)
+
   if (!isAdmin) {
     return (
       <Card className="border-destructive/30">
@@ -109,16 +127,32 @@ export function BackupPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-xl font-black text-foreground flex items-center gap-2">
           <HardDrive className="w-5 h-5 text-[#005B2E]" /> Backups do Sistema
         </h2>
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Criar Backup
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setCompareOpen(true)}
+            className="border-[#005B2E] text-[#005B2E]"
+          >
+            <GitCompare className="w-4 h-4 mr-2" /> Comparar
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setCodeExportOpen(true)}
+            className="border-yellow-500 text-yellow-600"
+          >
+            <Code2 className="w-4 h-4 mr-2" /> Exportar Código
+          </Button>
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Criar Backup
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -180,7 +214,7 @@ export function BackupPanel() {
                           variant="outline"
                           onClick={() => handleDownload(backup)}
                           disabled={downloadingId === backup.id || !backup.file}
-                          className="border-[#005B2E] text-[#005B2E]"
+                          className="border-[#005B2E] text-[#005B2E] h-8 w-8 p-0"
                         >
                           {downloadingId === backup.id ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -191,8 +225,16 @@ export function BackupPanel() {
                         <Button
                           size="sm"
                           variant="outline"
+                          onClick={() => setRestoreId(backup.id)}
+                          className="border-blue-500 text-blue-500 hover:bg-blue-50 h-8 w-8 p-0"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => setDeleteId(backup.id)}
-                          className="border-red-500 text-red-500 hover:bg-red-50"
+                          className="border-red-500 text-red-500 hover:bg-red-50 h-8 w-8 p-0"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
@@ -206,12 +248,30 @@ export function BackupPanel() {
         </Card>
       )}
 
+      <BackupSettingsSection />
+
       <BackupCreateDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
         onCreated={loadBackups}
         onError={setError}
       />
+      <BackupRestoreDialog
+        backupId={restoreId}
+        backupName={restoreBackupRecord?.version_name ?? ''}
+        onOpenChange={(o) => {
+          if (!o) setRestoreId(null)
+        }}
+        onRestored={loadBackups}
+        onError={setError}
+      />
+      <BackupCompareDialog
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        backups={backups}
+        onError={setError}
+      />
+      <BackupCodeExportDialog open={codeExportOpen} onOpenChange={setCodeExportOpen} />
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
