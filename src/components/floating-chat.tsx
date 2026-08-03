@@ -49,18 +49,22 @@ export function FloatingChat() {
 
   useEffect(() => {
     if (!isOpen || !conversationId) return
+    let active = true
     const poll = async () => {
       try {
         const msgs = await getChatMessages(conversationId)
+        if (!active) return
         if (Array.isArray(msgs) && msgs.length > 0) {
           setMessages(msgs)
           setStep('chat')
         }
         if (!hasRated) {
           const st = await getConversationStatus(conversationId)
+          if (!active) return
           if (st && st.closed) setShowRating(true)
         }
-      } catch (_) {
+      } catch {
+        if (!active) return
         localStorage.removeItem('velora_chat_conv_id')
         setConversationId(null)
         setStep('info')
@@ -68,7 +72,10 @@ export function FloatingChat() {
     }
     poll()
     const interval = setInterval(poll, 3000)
-    return () => clearInterval(interval)
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
   }, [isOpen, conversationId, hasRated])
 
   const handleSend = async () => {
@@ -79,7 +86,7 @@ export function FloatingChat() {
         conversation_id: conversationId || undefined,
         client_name: name || 'Visitante',
         client_email: '',
-        client_phone: contact,
+        client_phone: contact || '',
         message: input.trim(),
       })
       if (!conversationId && result?.conversation_id) {
@@ -107,7 +114,7 @@ export function FloatingChat() {
     if (ratingValue < 1 || submittingRating || !conversationId) return
     setSubmittingRating(true)
     try {
-      await submitRating(conversationId, ratingValue, ratingComment)
+      await submitRating(conversationId, ratingValue, ratingComment || '')
       setHasRated(true)
       setShowRating(false)
       const msgs = await getChatMessages(conversationId)
@@ -200,24 +207,27 @@ export function FloatingChat() {
               </div>
             ) : (
               <>
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      'max-w-[80%] rounded-2xl p-3 text-sm',
-                      msg.sender === 'client'
-                        ? 'ml-auto bg-[#005B2E] text-white rounded-tr-sm'
-                        : 'bg-[#C89B3C]/15 text-foreground rounded-tl-sm border border-[#C89B3C]/30',
-                    )}
-                  >
-                    {msg.sender !== 'client' && (
-                      <p className="text-xs font-bold mb-1 opacity-70">
-                        {msg.sender === 'ai' ? 'Srta. Velora (IA)' : 'Srta. Velora'}
-                      </p>
-                    )}
-                    <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                  </div>
-                ))}
+                {(Array.isArray(messages) ? messages : [])
+                  .filter(Boolean)
+                  .filter((m) => m && typeof m === 'object' && m.id)
+                  .map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        'max-w-[80%] rounded-2xl p-3 text-sm',
+                        msg.sender === 'client'
+                          ? 'ml-auto bg-[#005B2E] text-white rounded-tr-sm'
+                          : 'bg-[#C89B3C]/15 text-foreground rounded-tl-sm border border-[#C89B3C]/30',
+                      )}
+                    >
+                      {msg.sender !== 'client' && (
+                        <p className="text-xs font-bold mb-1 opacity-70">
+                          {msg.sender === 'ai' ? 'Srta. Velora (IA)' : 'Srta. Velora'}
+                        </p>
+                      )}
+                      <p className="whitespace-pre-wrap break-words">{msg.content || ''}</p>
+                    </div>
+                  ))}
                 {showRating && !hasRated && (
                   <div className="bg-white border-2 border-[#C89B3C]/40 rounded-2xl p-4 space-y-3">
                     <p className="text-sm font-bold text-foreground text-center">

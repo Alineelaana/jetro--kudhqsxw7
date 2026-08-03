@@ -24,23 +24,34 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   const [consentError, setConsentError] = useState('')
 
   useEffect(() => {
+    let cancelled = false
     Promise.all([
-      getFormFields().catch(() => null),
-      getActiveServicesOffered().catch(() => []),
-    ]).then(([fetched, activeServices]) => {
-      let fieldsToUse: DefaultFormField[] = DEFAULT_FORM_FIELDS
-      if (fetched && Array.isArray(fetched) && fetched.length > 0) fieldsToUse = fetched
-      if (activeServices && Array.isArray(activeServices) && activeServices.length > 0) {
-        const serviceNames = activeServices
-          .filter((s) => s && typeof s === 'object' && 'name' in s)
-          .map((s) => (s as { name: string }).name)
-          .filter(Boolean)
-        fieldsToUse = fieldsToUse.map((f) =>
-          f.name === 'servico_interesse' ? { ...f, options: serviceNames } : f,
-        )
-      }
-      setFields(fieldsToUse)
-    })
+      Promise.resolve(getFormFields?.()).catch(() => null),
+      Promise.resolve(getActiveServicesOffered?.()).catch(() => []),
+    ])
+      .then(([fetched, activeServices]) => {
+        if (cancelled) return
+        let fieldsToUse: DefaultFormField[] = Array.isArray(DEFAULT_FORM_FIELDS)
+          ? DEFAULT_FORM_FIELDS
+          : []
+        if (fetched && Array.isArray(fetched) && fetched.length > 0) {
+          fieldsToUse = fetched.filter(Boolean).filter((f) => f && typeof f === 'object' && f.name)
+        }
+        if (activeServices && Array.isArray(activeServices) && activeServices.length > 0) {
+          const serviceNames = activeServices
+            .filter((s) => s && typeof s === 'object' && 'name' in s)
+            .map((s) => (s as { name: string }).name)
+            .filter(Boolean)
+          fieldsToUse = fieldsToUse.map((f) =>
+            f.name === 'servico_interesse' ? { ...f, options: serviceNames } : f,
+          )
+        }
+        if (fieldsToUse.length > 0) setFields(fieldsToUse)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -56,8 +67,10 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
-    for (const field of fields) {
-      const val = values[field.name]?.trim() || ''
+    const safeFields = Array.isArray(fields) ? fields : []
+    for (const field of safeFields) {
+      if (!field || !field.name) continue
+      const val = (values[field.name] || '').trim()
       if (field.required && !val) {
         newErrors[field.name] = 'Campo obrigatório'
       } else if (field.type === 'email' && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
@@ -97,7 +110,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
     try {
       await createBudgetRequest({
         data: {
-          ...values,
+          ...(values || {}),
           privacy_consent_accepted: true,
           privacy_consent_accepted_at: new Date().toISOString(),
         },
@@ -215,23 +228,26 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {fields.map((field) => (
-              <div
-                key={field.name}
-                className={
-                  field.type === 'textarea' || field.name === 'servico_interesse'
-                    ? 'sm:col-span-2'
-                    : ''
-                }
-              >
-                <BudgetFormField
-                  field={field}
-                  value={values[field.name] || ''}
-                  onChange={handleChange}
-                  error={errors[field.name]}
-                />
-              </div>
-            ))}
+            {(Array.isArray(fields) ? fields : [])
+              .filter(Boolean)
+              .filter((f) => f && typeof f === 'object' && f.name)
+              .map((field) => (
+                <div
+                  key={field.name}
+                  className={
+                    field.type === 'textarea' || field.name === 'servico_interesse'
+                      ? 'sm:col-span-2'
+                      : ''
+                  }
+                >
+                  <BudgetFormField
+                    field={field}
+                    value={values[field.name] || ''}
+                    onChange={handleChange}
+                    error={errors[field.name]}
+                  />
+                </div>
+              ))}
           </div>
 
           <div className="space-y-4 pt-6 border-t border-border/60">

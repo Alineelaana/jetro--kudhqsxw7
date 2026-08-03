@@ -6,6 +6,7 @@ export function SeoHead() {
 
   useEffect(() => {
     if (loading) return
+    if (typeof getCmsData !== 'function') return
     try {
       const seo = getCmsData('seo') as Record<string, unknown> | undefined
       if (!seo || typeof seo !== 'object') return

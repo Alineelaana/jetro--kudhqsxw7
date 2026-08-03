@@ -7,6 +7,7 @@ import truckBg from '@/assets/chatgpt-image-1-de-ago.de-2026-123806-850fe.png'
 
 export function FinalCTA() {
   const { whatsappNumber } = useSettings()
+  const safeWhatsapp = whatsappNumber || ''
 
   return (
     <section
@@ -49,7 +50,7 @@ export function FinalCTA() {
             >
               <a
                 href={buildWhatsAppUrl(
-                  whatsappNumber || '',
+                  safeWhatsapp,
                   'Olá! Gostaria de conversar com a equipe comercial da Velora Log.',
                 )}
                 target="_blank"

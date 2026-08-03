@@ -6,6 +6,8 @@ interface ServicesSectionProps {
 }
 
 export function ServicesSection({ onSelectService }: ServicesSectionProps) {
+  const safeServices = Array.isArray(SERVICES) ? SERVICES : []
+
   return (
     <section id="servicos" className="py-20 bg-muted/30 relative">
       <div className="container mx-auto px-4">
@@ -23,7 +25,7 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {(Array.isArray(SERVICES) ? SERVICES : [])
+          {safeServices
             .filter(Boolean)
             .filter((s) => s && typeof s === 'object' && s.id)
             .map((service) => (

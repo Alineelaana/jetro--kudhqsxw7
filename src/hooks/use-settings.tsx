@@ -15,20 +15,33 @@ const SettingsContext = createContext<SettingsContextType>({
 export const useSettings = () => useContext(SettingsContext)
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [whatsappNumber, setWhatsappNumber] = useState<string>(DEFAULT_WHATSAPP_NUMBER)
+  const fallbackNumber =
+    typeof DEFAULT_WHATSAPP_NUMBER === 'string' && DEFAULT_WHATSAPP_NUMBER
+      ? DEFAULT_WHATSAPP_NUMBER
+      : '5531991297619'
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(fallbackNumber)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getWhatsappNumber()
+    let cancelled = false
+    Promise.resolve(getWhatsappNumber?.())
       .then((num) => {
+        if (cancelled) return
         if (typeof num === 'string' && num.trim()) {
           setWhatsappNumber(num)
         } else {
-          setWhatsappNumber(DEFAULT_WHATSAPP_NUMBER)
+          setWhatsappNumber(fallbackNumber)
         }
       })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+      .catch(() => {
+        if (!cancelled) setWhatsappNumber(fallbackNumber)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (

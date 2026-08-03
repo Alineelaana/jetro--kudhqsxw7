@@ -23,6 +23,7 @@ const DIFFERENTIALS = [
 
 export function HeroSection() {
   const { whatsappNumber } = useSettings()
+  const safeWhatsapp = whatsappNumber || ''
   const responseTime = useResponseTime()
   const responseTimeFormatted = responseTime?.formatted ?? ''
 
@@ -85,7 +86,7 @@ export function HeroSection() {
             >
               <a
                 href={buildWhatsAppUrl(
-                  whatsappNumber || '',
+                  safeWhatsapp,
                   'Olá! Gostaria de falar com um especialista da Velora Log sobre as operações de armazenagem e transporte.',
                 )}
                 target="_blank"
@@ -111,24 +112,27 @@ export function HeroSection() {
 
         {/* Differentials */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mt-14 pt-8 border-t border-[#C89B3C]/30 max-w-5xl mx-auto">
-          {DIFFERENTIALS.map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center gap-3 bg-black/40 p-4 rounded-xl border border-[#C89B3C]/30 backdrop-blur hover:border-[#C89B3C] hover:bg-black/60 transition-all shadow-md group"
-            >
-              <div className="w-10 h-10 rounded-lg bg-[#005B2E] border border-[#C89B3C]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <item.icon className="w-5 h-5 text-[#E4C46A]" />
+          {(Array.isArray(DIFFERENTIALS) ? DIFFERENTIALS : [])
+            .filter(Boolean)
+            .filter((d) => d && typeof d === 'object' && d.icon && d.label)
+            .map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 bg-black/40 p-4 rounded-xl border border-[#C89B3C]/30 backdrop-blur hover:border-[#C89B3C] hover:bg-black/60 transition-all shadow-md group"
+              >
+                <div className="w-10 h-10 rounded-lg bg-[#005B2E] border border-[#C89B3C]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <item.icon className="w-5 h-5 text-[#E4C46A]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs sm:text-sm font-bold text-white leading-snug">
+                    {item.label}
+                  </span>
+                  <span className="text-[10px] text-[#E4C46A] flex items-center gap-1 font-semibold mt-0.5">
+                    <CheckCircle className="w-3 h-3 text-[#25D366]" /> Velora Log ES
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs sm:text-sm font-bold text-white leading-snug">
-                  {item.label}
-                </span>
-                <span className="text-[10px] text-[#E4C46A] flex items-center gap-1 font-semibold mt-0.5">
-                  <CheckCircle className="w-3 h-3 text-[#25D366]" /> Velora Log ES
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </section>

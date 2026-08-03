@@ -7,10 +7,11 @@ import { useSettings } from '@/hooks/use-settings'
 
 export default function Index() {
   const { whatsappNumber } = useSettings()
+  const safeWhatsapp = whatsappNumber || ''
   const [selectedService, setSelectedService] = useState<string>('')
 
   const handleSelectService = (serviceTitle: string) => {
-    setSelectedService(serviceTitle)
+    setSelectedService(serviceTitle || '')
     const budgetSection = document.getElementById('orcamento')
     if (budgetSection) {
       budgetSection.scrollIntoView({ behavior: 'smooth' })
@@ -36,7 +37,7 @@ export default function Index() {
               ideal.
             </p>
           </div>
-          <BudgetForm whatsappNumber={whatsappNumber} selectedService={selectedService} />
+          <BudgetForm whatsappNumber={safeWhatsapp} selectedService={selectedService} />
         </div>
       </section>
       <FinalCTA />

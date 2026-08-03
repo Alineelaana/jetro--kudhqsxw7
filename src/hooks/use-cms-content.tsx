@@ -21,20 +21,29 @@ export function CmsContentProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getCmsContent()
+    let cancelled = false
+    Promise.resolve(getCmsContent?.())
       .then((items) => {
+        if (cancelled) return
         const map: Record<string, Record<string, unknown>> = {}
-        for (const item of items) {
-          if (!item || !item.section_key) continue
-          const published = item.published_data as Record<string, unknown> | null | undefined
-          if (published && typeof published === 'object' && Object.keys(published).length > 0) {
-            map[item.section_key] = published
+        if (Array.isArray(items)) {
+          for (const item of items) {
+            if (!item || !item.section_key) continue
+            const published = item.published_data as Record<string, unknown> | null | undefined
+            if (published && typeof published === 'object' && Object.keys(published).length > 0) {
+              map[item.section_key] = published
+            }
           }
         }
-        setContent(map)
+        if (!cancelled) setContent(map)
       })
       .catch(() => {})
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const getCmsData = (key: string) => content[key] || CMS_DEFAULT_CONTENT[key] || {}

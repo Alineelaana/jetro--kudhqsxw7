@@ -16,6 +16,7 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const { whatsappNumber } = useSettings()
+  const safeWhatsapp = whatsappNumber || ''
   const [open, setOpen] = useState(false)
 
   const handleHomeClick = () => {
@@ -45,16 +46,19 @@ export function SiteHeader() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.to + link.label}
-                to={link.to}
-                onClick={link.to === '/' ? handleHomeClick : undefined}
-                className="text-sm font-bold text-white/80 hover:text-[#E4C46A] transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {(Array.isArray(NAV_LINKS) ? NAV_LINKS : [])
+              .filter(Boolean)
+              .filter((l) => l && typeof l === 'object' && l.label)
+              .map((link) => (
+                <Link
+                  key={link.to + link.label}
+                  to={link.to}
+                  onClick={link.to === '/' ? handleHomeClick : undefined}
+                  className="text-sm font-bold text-white/80 hover:text-[#E4C46A] transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
@@ -79,7 +83,7 @@ export function SiteHeader() {
             >
               <a
                 href={buildWhatsAppUrl(
-                  whatsappNumber,
+                  safeWhatsapp,
                   'Olá! Gostaria de informações sobre os serviços de armazenagem e transporte da Velora Log.',
                 )}
                 target="_blank"
@@ -108,16 +112,19 @@ export function SiteHeader() {
                 </Link>
               </SheetTitle>
               <nav className="flex flex-col gap-4">
-                {NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.to + link.label}
-                    to={link.to}
-                    onClick={() => handleMobileNavClick(link.to)}
-                    className="text-base font-bold text-foreground hover:text-[#005B2E] transition-colors py-1"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {(Array.isArray(NAV_LINKS) ? NAV_LINKS : [])
+                  .filter(Boolean)
+                  .filter((l) => l && typeof l === 'object' && l.label)
+                  .map((link) => (
+                    <Link
+                      key={link.to + link.label}
+                      to={link.to}
+                      onClick={() => handleMobileNavClick(link.to)}
+                      className="text-base font-bold text-foreground hover:text-[#005B2E] transition-colors py-1"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
                 <Button
                   asChild
                   variant="outline"
@@ -142,7 +149,7 @@ export function SiteHeader() {
                 >
                   <a
                     href={buildWhatsAppUrl(
-                      whatsappNumber,
+                      safeWhatsapp,
                       'Olá! Gostaria de informações sobre os serviços da Velora Log.',
                     )}
                     target="_blank"

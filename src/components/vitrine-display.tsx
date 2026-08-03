@@ -4,11 +4,12 @@ import type { VitrineItem } from '@/lib/vitrine-types'
 import { DEFAULT_WHATSAPP_NUMBER } from '@/lib/constants'
 
 function resolveLink(item: VitrineItem): string {
+  if (!item) return '#'
   switch (item.click_destination) {
     case 'budget_form':
       return '#orcamento'
     case 'whatsapp':
-      return `https://wa.me/${DEFAULT_WHATSAPP_NUMBER}`
+      return `https://wa.me/${DEFAULT_WHATSAPP_NUMBER || ''}`
     case 'client_area':
       return '/cliente/login'
     case 'service_page':
@@ -19,7 +20,7 @@ function resolveLink(item: VitrineItem): string {
 }
 
 function VitrineBanner({ item }: { item: VitrineItem }) {
-  if (!item) return null
+  if (!item || typeof item !== 'object') return null
   const posClass =
     item.text_position === 'left'
       ? 'items-start text-left'
@@ -87,9 +88,12 @@ export function VitrineDisplay({ position }: { position: string }) {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="space-y-6">
-        {items.map((item) => (
-          <VitrineBanner key={item.id} item={item} />
-        ))}
+        {items
+          .filter(Boolean)
+          .filter((i) => i && typeof i === 'object' && i.id)
+          .map((item) => (
+            <VitrineBanner key={item.id} item={item} />
+          ))}
       </div>
     </div>
   )
