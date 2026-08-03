@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { NotificationBell } from '@/components/notification-bell'
+import { useAuth } from '@/hooks/use-auth'
+import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { BudgetRequestsPanel } from '@/components/budget-requests-panel'
 import { ServicesOfferedPanel } from '@/components/services-offered-panel'
 import { ContractsOperationsPanel } from '@/components/contracts-operations-panel'
@@ -9,53 +11,33 @@ import { PartnerManagement } from '@/components/partner-management'
 import { UserManagement } from '@/components/user-management'
 import { AdminChatPanel } from '@/components/admin-chat-panel'
 import { AiTrainingPanel } from '@/components/ai-training-panel'
-import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { CmsPanel } from '@/components/cms/cms-panel'
 import { AuditPanel } from '@/components/audit-panel'
-import {
-  LogOut,
-  FileText,
-  Package,
-  Users,
-  MessageSquare,
-  Bot,
-  BarChart3,
-  LayoutDashboard,
-  ClipboardList,
-  ScrollText,
-} from 'lucide-react'
+import { BackupPanel } from '@/components/backup-panel'
+import { LogOut, Shield } from 'lucide-react'
 
 export function AdminDashboard() {
-  const { user, signOut, userRole } = useAuth()
-  const [activeTab, setActiveTab] = useState('budgets')
+  const { user, isAdmin, signOut } = useAuth()
+  const [tab, setTab] = useState('dashboard')
 
-  const tabItems = [
-    { value: 'budgets', label: 'Orçamentos', icon: FileText },
-    { value: 'services', label: 'Serviços', icon: Package },
-    { value: 'contracts', label: 'Contratos/Operações', icon: ClipboardList },
-    { value: 'partners', label: 'Parceiros', icon: Users },
-    { value: 'chat', label: 'Chat', icon: MessageSquare },
-    { value: 'users', label: 'Usuários', icon: Users },
-    { value: 'ai', label: 'IA', icon: Bot },
-    { value: 'dashboards', label: 'Dashboards', icon: BarChart3 },
-    { value: 'cms', label: 'CMS', icon: LayoutDashboard },
-    { value: 'audit', label: 'Auditoria', icon: ScrollText },
-  ]
+  const userName = (user?.name as string) || (user?.email as string) || 'Admin'
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#01361D] text-white px-4 py-3 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold">Painel Administrativo</h1>
+      <header className="bg-[#005B2E] text-white sticky top-0 z-30 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="w-6 h-6 text-[#C89B3C]" />
+            <span className="font-black text-lg">VeloraLog — Admin</span>
+          </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm hidden sm:block">
-              {user?.name || user?.email || 'Admin'} · {userRole}
-            </span>
+            <NotificationBell />
+            <span className="text-sm hidden sm:inline">{userName}</span>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={signOut}
-              className="bg-transparent border-white/30 text-white hover:bg-white/10"
+              className="text-white hover:bg-white/10"
             >
               <LogOut className="w-4 h-4 mr-1" /> Sair
             </Button>
@@ -63,19 +45,26 @@ export function AdminDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex flex-wrap h-auto gap-1 mb-4 bg-white border">
-            {tabItems.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5">
-                  <Icon className="w-4 h-4" /> {tab.label}
-                </TabsTrigger>
-              )
-            })}
-          </TabsList>
-
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <Tabs value={tab} onValueChange={setTab}>
+          <div className="overflow-x-auto pb-2">
+            <TabsList className="inline-flex">
+              <TabsTrigger value="dashboard">Visão Geral</TabsTrigger>
+              <TabsTrigger value="budgets">Orçamentos</TabsTrigger>
+              <TabsTrigger value="services">Serviços</TabsTrigger>
+              <TabsTrigger value="contracts">Contratos</TabsTrigger>
+              <TabsTrigger value="partners">Parceiros</TabsTrigger>
+              <TabsTrigger value="chat">Atendimento</TabsTrigger>
+              {isAdmin && <TabsTrigger value="users">Usuários</TabsTrigger>}
+              {isAdmin && <TabsTrigger value="ai">IA</TabsTrigger>}
+              {isAdmin && <TabsTrigger value="cms">CMS</TabsTrigger>}
+              {isAdmin && <TabsTrigger value="audit">Auditoria</TabsTrigger>}
+              {isAdmin && <TabsTrigger value="backups">Backups</TabsTrigger>}
+            </TabsList>
+          </div>
+          <TabsContent value="dashboard">
+            <DashboardsPanel />
+          </TabsContent>
           <TabsContent value="budgets">
             <BudgetRequestsPanel />
           </TabsContent>
@@ -91,21 +80,31 @@ export function AdminDashboard() {
           <TabsContent value="chat">
             <AdminChatPanel />
           </TabsContent>
-          <TabsContent value="users">
-            <UserManagement />
-          </TabsContent>
-          <TabsContent value="ai">
-            <AiTrainingPanel />
-          </TabsContent>
-          <TabsContent value="dashboards">
-            <DashboardsPanel />
-          </TabsContent>
-          <TabsContent value="cms">
-            <CmsPanel />
-          </TabsContent>
-          <TabsContent value="audit">
-            <AuditPanel />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="users">
+              <UserManagement />
+            </TabsContent>
+          )}
+          {isAdmin && (
+            <TabsContent value="ai">
+              <AiTrainingPanel />
+            </TabsContent>
+          )}
+          {isAdmin && (
+            <TabsContent value="cms">
+              <CmsPanel />
+            </TabsContent>
+          )}
+          {isAdmin && (
+            <TabsContent value="audit">
+              <AuditPanel />
+            </TabsContent>
+          )}
+          {isAdmin && (
+            <TabsContent value="backups">
+              <BackupPanel />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
