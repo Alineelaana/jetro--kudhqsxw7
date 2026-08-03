@@ -328,7 +328,7 @@ export function ProductsPanel() {
                     {filtered.map((p) => (
                       <tr
                         key={p?.id || Math.random()}
-                        className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
+                        className={`border-b border-border hover:bg-[#005B2E]/5 transition-colors ${(p?.stock ?? 0) <= (p?.min_stock ?? 0) ? 'bg-amber-50/60' : ''}`}
                       >
                         <td className="px-4 py-3 hidden md:table-cell">
                           <span className="text-xs font-mono font-bold text-[#C89B3C]">
@@ -350,6 +350,11 @@ export function ProductsPanel() {
                         </td>
                         <td className="px-4 py-3">
                           <StockCell product={p} onUpdate={handleStockUpdate} />
+                          {(p?.stock ?? 0) <= (p?.min_stock ?? 0) && (
+                            <span className="inline-block mt-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                              Estoque baixo
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <div className="flex items-center gap-1">

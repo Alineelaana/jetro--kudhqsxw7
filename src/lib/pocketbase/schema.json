@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T23:47:43.212Z",
+  "generatedAt": "2026-08-03T23:55:14.887Z",
   "collections": [
     {
       "name": "users",
@@ -1990,6 +1990,18 @@
         },
         {
           "name": "stock",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "variations",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "min_stock",
           "type": "number",
           "required": false,
           "system": false

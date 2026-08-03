@@ -9,26 +9,24 @@ routerAdd(
         counter = $app.findFirstRecordByData('settings', 'key', 'product_sequence')
       } catch (_) {}
 
-      var nextNum = 1
+      var nextNum = 100
       if (counter) {
-        nextNum = parseInt(counter.getString('value') || '0', 10) + 1
+        var currentVal = parseInt(counter.getString('value') || '0', 10)
+        if (currentVal < 100) {
+          nextNum = 100
+        } else {
+          nextNum = currentVal + 1
+        }
         counter.set('value', String(nextNum))
         $app.save(counter)
       } else {
         var record = new Record(settingsCol)
         record.set('key', 'product_sequence')
-        record.set('value', '1')
+        record.set('value', '100')
         $app.save(record)
       }
 
-      var year = new Date().getFullYear()
-      var seqStr = String(nextNum)
-      while (seqStr.length < 4) {
-        seqStr = '0' + seqStr
-      }
-      var productCode = 'PROD-' + year + '-' + seqStr
-
-      return e.json(200, { number: productCode, sequence: nextNum })
+      return e.json(200, { number: String(nextNum), sequence: nextNum })
     } catch (err) {
       $app.logger().error('product code generation failed', 'error', String(err))
       return e.json(500, { error: 'Falha ao gerar codigo de produto' })

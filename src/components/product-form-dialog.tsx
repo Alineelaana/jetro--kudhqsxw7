@@ -19,7 +19,8 @@ import {
   getProductPhotoUrl,
 } from '@/services/products'
 import { extractFieldErrors } from '@/lib/pocketbase/errors'
-import { type Product } from '@/lib/product-types'
+import { type Product, type FormVariation, type ProductVariation } from '@/lib/product-types'
+import { ProductVariationsSection } from '@/components/product-variations-section'
 import { toast } from '@/hooks/use-toast'
 
 interface Props {
@@ -40,6 +41,8 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
   const [category, setCategory] = useState('')
   const [active, setActive] = useState(true)
   const [stock, setStock] = useState('0')
+  const [minStock, setMinStock] = useState('0')
+  const [variations, setVariations] = useState<FormVariation[]>([])
   const [newPhotos, setNewPhotos] = useState<File[]>([])
   const [removedPhotos, setRemovedPhotos] = useState<string[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -58,6 +61,17 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
       setCategory(product?.category || '')
       setActive(product?.active !== false)
       setStock(String(product?.stock ?? 0))
+      setMinStock(String(product?.min_stock ?? 0))
+      setVariations(
+        Array.isArray(product?.variations)
+          ? product.variations.map((v: ProductVariation, i: number) => ({
+              id: `var-${Date.now()}-${i}`,
+              size: String(v?.size || ''),
+              color: String(v?.color || ''),
+              price: String(v?.price || ''),
+            }))
+          : [],
+      )
       setNewPhotos([])
       setRemovedPhotos([])
       setErrors({})
@@ -106,6 +120,15 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
       formData.append('category', category.trim())
       formData.append('active', String(active))
       formData.append('stock', String(parseInt(stock, 10) || 0))
+      formData.append('min_stock', String(parseInt(minStock, 10) || 0))
+      formData.append(
+        'variations',
+        JSON.stringify(
+          variations
+            .filter((v) => v.size.trim() || v.color.trim() || v.price.trim())
+            .map(({ size, color, price }) => ({ size, color, price })),
+        ),
+      )
 
       if (!product) {
         const { number } = await getNextProductCode()
@@ -248,7 +271,7 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">Estoque (quantidade)</Label>
               <Input
@@ -260,11 +283,23 @@ export function ProductFormDialog({ open, onOpenChange, product, onSuccess }: Pr
                 className="focus-visible:ring-[#005B2E]"
               />
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Estoque mínimo</Label>
+              <Input
+                type="number"
+                value={minStock}
+                onChange={(e) => setMinStock(e.target.value)}
+                placeholder="0"
+                min="0"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
             <div className="flex items-center gap-3 pt-6">
               <Switch checked={active} onCheckedChange={setActive} />
               <Label className="text-sm font-semibold">Produto ativo</Label>
             </div>
           </div>
+          <ProductVariationsSection variations={variations} onChange={setVariations} />
           {product?.code ? (
             <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md border border-border">
               <Hash className="w-4 h-4 text-[#C89B3C]" />
