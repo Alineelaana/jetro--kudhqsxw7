@@ -1,6 +1,11 @@
 import { useState } from 'react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
 import { NotificationBell } from '@/components/notification-bell'
 import { useAuth } from '@/hooks/use-auth'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
@@ -14,99 +19,123 @@ import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { CmsPanel } from '@/components/cms/cms-panel'
 import { AuditPanel } from '@/components/audit-panel'
 import { BackupPanel } from '@/components/backup-panel'
-import { LogOut, Shield } from 'lucide-react'
+import { LogOut, Menu, Shield } from 'lucide-react'
+
+interface MenuOption {
+  value: string
+  label: string
+  adminOnly?: boolean
+}
+
+const MENU_OPTIONS: MenuOption[] = [
+  { value: 'dashboard', label: 'Visão Geral' },
+  { value: 'budgets', label: 'Orçamentos' },
+  { value: 'services', label: 'Serviços' },
+  { value: 'contracts', label: 'Contratos' },
+  { value: 'partners', label: 'Parceiros' },
+  { value: 'chat', label: 'Atendimento' },
+  { value: 'users', label: 'Usuários', adminOnly: true },
+  { value: 'ai', label: 'IA', adminOnly: true },
+  { value: 'cms', label: 'CMS', adminOnly: true },
+  { value: 'audit', label: 'Auditoria', adminOnly: true },
+  { value: 'backups', label: 'Backups', adminOnly: true },
+]
 
 export function AdminDashboard() {
   const { user, isAdmin, signOut } = useAuth()
-  const [tab, setTab] = useState('dashboard')
+  const [section, setSection] = useState('dashboard')
 
   const userName = (user?.name as string) || (user?.email as string) || 'Admin'
+
+  const visibleOptions = MENU_OPTIONS.filter((opt) => !opt.adminOnly || isAdmin)
+
+  const currentLabel = MENU_OPTIONS.find((opt) => opt.value === section)?.label ?? 'Visão Geral'
+
+  const renderPanel = () => {
+    switch (section) {
+      case 'budgets':
+        return <BudgetRequestsPanel />
+      case 'services':
+        return <ServicesOfferedPanel />
+      case 'contracts':
+        return <ContractsOperationsPanel />
+      case 'partners':
+        return <PartnerManagement />
+      case 'chat':
+        return <AdminChatPanel />
+      case 'users':
+        return isAdmin ? <UserManagement /> : null
+      case 'ai':
+        return isAdmin ? <AiTrainingPanel /> : null
+      case 'cms':
+        return isAdmin ? <CmsPanel /> : null
+      case 'audit':
+        return isAdmin ? <AuditPanel /> : null
+      case 'backups':
+        return isAdmin ? <BackupPanel /> : null
+      default:
+        return <DashboardsPanel />
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#005B2E] text-white sticky top-0 z-30 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-[#C89B3C]" />
-            <span className="font-black text-lg">VeloraLog — Admin</span>
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-6 h-6 text-[#C89B3C]" />
+              <span className="font-black text-lg">VeloraLog — Admin</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <NotificationBell />
+              <span className="text-sm hidden sm:inline">{userName}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="text-white hover:bg-white/10"
+              >
+                <LogOut className="w-4 h-4 mr-1" /> Sair
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <NotificationBell />
-            <span className="text-sm hidden sm:inline">{userName}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={signOut}
-              className="text-white hover:bg-white/10"
-            >
-              <LogOut className="w-4 h-4 mr-1" /> Sair
-            </Button>
+          <div className="mt-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white text-[#005B2E] border-[#C89B3C] hover:bg-gray-100 font-semibold"
+                >
+                  <Menu className="w-4 h-4 mr-2" />
+                  {currentLabel}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-56"
+                onCloseAutoFocus={(e) => e.preventDefault()}
+              >
+                {visibleOptions.map((opt) => (
+                  <DropdownMenuItem
+                    key={opt.value}
+                    onClick={() => setSection(opt.value)}
+                    className={cn(
+                      'cursor-pointer',
+                      section === opt.value && 'bg-[#005B2E]/10 font-semibold text-[#005B2E]',
+                    )}
+                  >
+                    {opt.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <Tabs value={tab} onValueChange={setTab}>
-          <div className="overflow-x-auto pb-2">
-            <TabsList className="inline-flex">
-              <TabsTrigger value="dashboard">Visão Geral</TabsTrigger>
-              <TabsTrigger value="budgets">Orçamentos</TabsTrigger>
-              <TabsTrigger value="services">Serviços</TabsTrigger>
-              <TabsTrigger value="contracts">Contratos</TabsTrigger>
-              <TabsTrigger value="partners">Parceiros</TabsTrigger>
-              <TabsTrigger value="chat">Atendimento</TabsTrigger>
-              {isAdmin && <TabsTrigger value="users">Usuários</TabsTrigger>}
-              {isAdmin && <TabsTrigger value="ai">IA</TabsTrigger>}
-              {isAdmin && <TabsTrigger value="cms">CMS</TabsTrigger>}
-              {isAdmin && <TabsTrigger value="audit">Auditoria</TabsTrigger>}
-              {isAdmin && <TabsTrigger value="backups">Backups</TabsTrigger>}
-            </TabsList>
-          </div>
-          <TabsContent value="dashboard">
-            <DashboardsPanel />
-          </TabsContent>
-          <TabsContent value="budgets">
-            <BudgetRequestsPanel />
-          </TabsContent>
-          <TabsContent value="services">
-            <ServicesOfferedPanel />
-          </TabsContent>
-          <TabsContent value="contracts">
-            <ContractsOperationsPanel />
-          </TabsContent>
-          <TabsContent value="partners">
-            <PartnerManagement />
-          </TabsContent>
-          <TabsContent value="chat">
-            <AdminChatPanel />
-          </TabsContent>
-          {isAdmin && (
-            <TabsContent value="users">
-              <UserManagement />
-            </TabsContent>
-          )}
-          {isAdmin && (
-            <TabsContent value="ai">
-              <AiTrainingPanel />
-            </TabsContent>
-          )}
-          {isAdmin && (
-            <TabsContent value="cms">
-              <CmsPanel />
-            </TabsContent>
-          )}
-          {isAdmin && (
-            <TabsContent value="audit">
-              <AuditPanel />
-            </TabsContent>
-          )}
-          {isAdmin && (
-            <TabsContent value="backups">
-              <BackupPanel />
-            </TabsContent>
-          )}
-        </Tabs>
-      </div>
+      <div className="max-w-7xl mx-auto px-4 py-6">{renderPanel()}</div>
     </div>
   )
 }
