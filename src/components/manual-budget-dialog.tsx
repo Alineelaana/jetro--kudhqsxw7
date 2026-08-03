@@ -320,7 +320,7 @@ export function ManualBudgetDialog({
           </div>
           <div className="space-y-1">
             <Label className="text-xs font-semibold">Observações</Label>
-            <Textarea>
+            <Textarea
               value={form.mensagem}
               onChange={(e) => set('mensagem', e.target.value)}
               placeholder="Observações sobre a operação..."
