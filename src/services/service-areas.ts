@@ -16,3 +16,11 @@ export async function getServiceAreas(): Promise<ServiceArea[]> {
     return []
   }
 }
+
+export async function createServiceArea(name: string): Promise<ServiceArea> {
+  const record = await pb.collection('service_areas').create({ name })
+  return {
+    id: record.id,
+    name: (record as Record<string, unknown>).name as string,
+  }
+}
