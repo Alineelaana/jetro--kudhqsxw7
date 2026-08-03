@@ -23,8 +23,8 @@ import PoliticaCookies from './pages/PoliticaCookies'
 import Layout from './components/Layout'
 
 const App = () => (
-  <ErrorBoundary>
-    <BrowserRouter>
+  <BrowserRouter>
+    <ErrorBoundary>
       <TooltipProvider>
         <AuthProvider>
           <SettingsProvider>
@@ -54,8 +54,8 @@ const App = () => (
           </SettingsProvider>
         </AuthProvider>
       </TooltipProvider>
-    </BrowserRouter>
-  </ErrorBoundary>
+    </ErrorBoundary>
+  </BrowserRouter>
 )
 
 export default App

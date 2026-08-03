@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { NotificationBell } from '@/components/notification-bell'
 import { useAuth } from '@/hooks/use-auth'
+import { cn } from '@/lib/utils'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
 import { BudgetRequestsPanel } from '@/components/budget-requests-panel'
 import { ServicesOfferedPanel } from '@/components/services-offered-panel'
