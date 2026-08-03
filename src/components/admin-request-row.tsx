@@ -19,6 +19,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { STATUS_OPTIONS, STATUS_COLORS, type BudgetRecord } from '@/lib/types'
+import { BudgetRequestActions } from '@/components/budget-request-actions'
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString('pt-BR', {
@@ -40,6 +41,10 @@ interface AdminRequestRowProps {
   onBudgetClick: (record: BudgetRecord) => void
   onSendEmailClick: (record: BudgetRecord) => void
   onSendWhatsAppClick: (record: BudgetRecord) => void
+  onRespond?: (record: BudgetRecord) => void
+  onReprint?: (record: BudgetRecord) => void
+  onSave?: (record: BudgetRecord) => void
+  savingId?: string | null
   compact?: boolean
 }
 
@@ -53,6 +58,10 @@ export function AdminRequestRow({
   onBudgetClick,
   onSendEmailClick,
   onSendWhatsAppClick,
+  onRespond,
+  onReprint,
+  onSave,
+  savingId,
   compact = false,
 }: AdminRequestRowProps) {
   const status = record.status || 'PENDENTE'
@@ -252,6 +261,17 @@ export function AdminRequestRow({
         <tr className="bg-muted/30">
           <td colSpan={8} className="px-4 py-4">
             <AdminRequestDetails data={record.data} labelMap={labelMap} record={record} />
+            {onRespond && onReprint && onSave && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <BudgetRequestActions
+                  record={record}
+                  onRespond={onRespond}
+                  onReprint={onReprint}
+                  onSave={onSave}
+                  savingId={savingId ?? null}
+                />
+              </div>
+            )}
           </td>
         </tr>
       )}

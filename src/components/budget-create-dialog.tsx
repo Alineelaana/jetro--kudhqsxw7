@@ -32,6 +32,7 @@ import { getNextBudgetNumber, saveQuoteData } from '@/services/budget-requests'
 import { generateBudgetPdf } from '@/lib/pdf-generator'
 import { type BudgetRecord } from '@/lib/types'
 import { CARGO_TYPE_OPTIONS, PAYMENT_OPTIONS, DEADLINE_OPTIONS } from '@/lib/constants'
+import { getServiceAreas } from '@/services/service-areas'
 
 const INTERNAL_SERVICES_CHECKLIST = [
   'Recebimento',
@@ -92,6 +93,13 @@ export function BudgetCreateDialog({
   const [formaPagamento, setFormaPagamento] = useState('')
   const [prazoComercial, setPrazoComercial] = useState('')
 
+  const [maxDiscount, setMaxDiscount] = useState('')
+  const [professionalName, setProfessionalName] = useState('')
+  const [taxValue, setTaxValue] = useState('')
+  const [serviceArea, setServiceArea] = useState('')
+  const [serviceCode, setServiceCode] = useState('')
+  const [serviceAreas, setServiceAreas] = useState<{ id: string; name: string }[]>([])
+
   const [necessitaSeguro, setNecessitaSeguro] = useState(false)
   const [necessitaPicking, setNecessitaPicking] = useState(false)
   const [necessitaCrossDocking, setNecessitaCrossDocking] = useState(false)
@@ -123,6 +131,12 @@ export function BudgetCreateDialog({
       setFormaPagamento(getString(data, 'forma_pagamento') || '')
       setPrazoComercial(getString(data, 'prazo') || '')
 
+      setMaxDiscount(getString(data, 'max_discount') || '')
+      setProfessionalName(getString(data, 'professional_name') || '')
+      setTaxValue(getString(data, 'tax_value') || '')
+      setServiceArea(getString(data, 'service_area') || '')
+      setServiceCode(getString(data, 'service_code') || '')
+
       setNecessitaSeguro(getString(data, 'necessita_seguro') === 'Sim')
       setNecessitaPicking(getString(data, 'necessita_picking') === 'Sim')
       setNecessitaCrossDocking(getString(data, 'necessita_cross_docking') === 'Sim')
@@ -134,6 +148,12 @@ export function BudgetCreateDialog({
       setError('')
     }
   }, [open, record, authorName])
+
+  useEffect(() => {
+    getServiceAreas()
+      .then(setServiceAreas)
+      .catch(() => {})
+  }, [])
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
@@ -175,6 +195,11 @@ export function BudgetCreateDialog({
         valor_seguro: valorSeguro,
         forma_pagamento: formaPagamento,
         prazo: prazoComercial,
+        max_discount: maxDiscount,
+        professional_name: professionalName,
+        tax_value: taxValue,
+        service_area: serviceArea,
+        service_code: serviceCode,
         necessita_seguro: necessitaSeguro ? 'Sim' : 'Não',
         necessita_picking: necessitaPicking ? 'Sim' : 'Não',
         necessita_cross_docking: necessitaCrossDocking ? 'Sim' : 'Não',
@@ -542,6 +567,61 @@ export function BudgetCreateDialog({
                   value={prazoComercial}
                   onChange={(e) => setPrazoComercial(e.target.value)}
                   placeholder="Ex: 5 a 7 dias úteis após a coleta"
+                  className="h-9 focus-visible:ring-[#005B2E]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/60">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Desconto Máximo (%)</Label>
+                <Input
+                  type="number"
+                  value={maxDiscount}
+                  onChange={(e) => setMaxDiscount(e.target.value)}
+                  placeholder="Ex: 10"
+                  className="h-9 focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Nome do Profissional</Label>
+                <Input
+                  value={professionalName}
+                  onChange={(e) => setProfessionalName(e.target.value)}
+                  placeholder="Ex: João Silva"
+                  className="h-9 focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Valor do Imposto (R$)</Label>
+                <Input
+                  value={taxValue}
+                  onChange={(e) => setTaxValue(e.target.value)}
+                  placeholder="Ex: 450,00"
+                  className="h-9 focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Área de Atendimento</Label>
+                <Select value={serviceArea} onValueChange={setServiceArea}>
+                  <SelectTrigger className="h-9 bg-white">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    {serviceAreas.map((a) => (
+                      <SelectItem key={a.id} value={a.name}>
+                        {a.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Código do Serviço</Label>
+                <Input
+                  value={serviceCode}
+                  onChange={(e) => setServiceCode(e.target.value)}
+                  placeholder="Ex: ARM-001"
                   className="h-9 focus-visible:ring-[#005B2E]"
                 />
               </div>

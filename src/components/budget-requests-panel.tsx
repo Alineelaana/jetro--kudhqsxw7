@@ -14,12 +14,18 @@ import {
   getNextBudgetNumber,
   saveQuoteData,
 } from '@/services/budget-requests'
+import { getFormFields } from '@/services/budget-form-fields'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
+import { AdminRequestRow } from '@/components/admin-request-row'
 import { BudgetCreateDialog } from '@/components/budget-create-dialog'
-import { BudgetRequestActions } from '@/components/budget-request-actions'
+import { StatusHistoryDialog } from '@/components/status-history-dialog'
+import { StatusUpdateDialog } from '@/components/status-update-dialog'
+import { SendMessageDialog } from '@/components/send-message-dialog'
 import type { BudgetRecord } from '@/lib/types'
-import { STATUS_OPTIONS, STATUS_COLORS } from '@/lib/types'
+import { STATUS_OPTIONS } from '@/lib/types'
+import { DEFAULT_FORM_FIELDS } from '@/lib/constants'
+import { buildWhatsAppUrl, normalizePhone } from '@/lib/utils'
 import { Search, Loader2, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -29,11 +35,26 @@ export function BudgetRequestsPanel() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [labelMap, setLabelMap] = useState<Record<string, string>>({})
+
   const [selectedRecord, setSelectedRecord] = useState<BudgetRecord | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [savingId, setSavingId] = useState<string | null>(null)
 
-  const load = async () => {
+  const [historyRecord, setHistoryRecord] = useState<BudgetRecord | null>(null)
+  const [historyOpen, setHistoryOpen] = useState(false)
+
+  const [statusRecord, setStatusRecord] = useState<BudgetRecord | null>(null)
+  const [statusUpdateOpen, setStatusUpdateOpen] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState('')
+
+  const [messageRecord, setMessageRecord] = useState<BudgetRecord | null>(null)
+  const [messageOpen, setMessageOpen] = useState(false)
+
+  const authorName = (user?.name as string) || (user?.email as string) || 'Operador'
+
+  const load = useCallback(async () => {
     try {
       const data = await getBudgetRequests()
       setRecords(Array.isArray(data) ? (data as unknown as BudgetRecord[]) : [])
@@ -41,11 +62,28 @@ export function BudgetRequestsPanel() {
       setRecords([])
     }
     setLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
     load()
-  }, [])
+    getFormFields()
+      .then((fields) => {
+        const map: Record<string, string> = {}
+        const allFields = fields && fields.length > 0 ? fields : DEFAULT_FORM_FIELDS
+        for (const f of allFields) {
+          if (f?.name && f?.label) map[f.name] = f.label
+        }
+        setLabelMap(map)
+      })
+      .catch(() => {
+        const map: Record<string, string> = {}
+        for (const f of DEFAULT_FORM_FIELDS) {
+          map[f.name] = f.label
+        }
+        setLabelMap(map)
+      })
+  }, [load])
+
   useRealtime('budget_requests', () => load())
 
   const filtered = useMemo(() => {
@@ -70,9 +108,16 @@ export function BudgetRequestsPanel() {
     return counts
   }, [records])
 
-  const authorName = user?.name || user?.email || 'Operador'
+  const toggleRow = useCallback((id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
 
-  const handleRespond = useCallback(
+  const handleBudgetClick = useCallback(
     (record: BudgetRecord) => {
       setSelectedRecord(record)
       setDialogOpen(true)
@@ -93,6 +138,32 @@ export function BudgetRequestsPanel() {
     setDialogOpen(true)
   }, [])
 
+  const handleSendEmailClick = useCallback((record: BudgetRecord) => {
+    setMessageRecord(record)
+    setMessageOpen(true)
+  }, [])
+
+  const handleSendWhatsAppClick = useCallback((record: BudgetRecord) => {
+    const phone = normalizePhone(record.client_phone || '')
+    if (!phone) {
+      toast.error('Cliente não possui telefone cadastrado.')
+      return
+    }
+    const msg = `Olá ${record.client_name}! Conforme sua solicitação de orçamento para ${record.service || 'serviços logísticos'}, estamos retornando o contato.`
+    window.open(buildWhatsAppUrl(phone, msg), '_blank')
+  }, [])
+
+  const handleHistoryClick = useCallback((record: BudgetRecord) => {
+    setHistoryRecord(record)
+    setHistoryOpen(true)
+  }, [])
+
+  const handleStatusSelect = useCallback((record: BudgetRecord, status: string) => {
+    setStatusRecord(record)
+    setSelectedStatus(status)
+    setStatusUpdateOpen(true)
+  }, [])
+
   const handleSave = useCallback(
     async (record: BudgetRecord) => {
       if (!record?.id) return
@@ -102,7 +173,7 @@ export function BudgetRequestsPanel() {
           const next = await getNextBudgetNumber()
           await saveQuoteData(record.id, {
             budget_number: next.number,
-            responsible_email: record.responsible_email || user?.email || '',
+            responsible_email: record.responsible_email || (user?.email as string) || '',
             responsible_phone: record.responsible_phone || '',
             quote_created_at: new Date().toISOString(),
           })
@@ -112,7 +183,7 @@ export function BudgetRequestsPanel() {
           const existingData = (record.data || {}) as Record<string, unknown>
           await saveQuoteData(record.id, {
             budget_number: record.budget_number || '',
-            responsible_email: record.responsible_email || user?.email || '',
+            responsible_email: record.responsible_email || (user?.email as string) || '',
             responsible_phone: record.responsible_phone || '',
             quote_created_at: record.quote_created_at,
             data: existingData,
@@ -126,7 +197,7 @@ export function BudgetRequestsPanel() {
         setSavingId(null)
       }
     },
-    [user, authorName],
+    [user, authorName, load],
   )
 
   return (
@@ -193,47 +264,34 @@ export function BudgetRequestsPanel() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-4 py-3 font-bold">Cliente</th>
-                  <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">Serviço</th>
-                  <th className="text-left px-4 py-3 font-bold hidden md:table-cell">Contato</th>
-                  <th className="text-left px-4 py-3 font-bold">Status</th>
-                  <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">Data</th>
-                  <th className="text-left px-4 py-3 font-bold min-w-[280px]">Ações</th>
+                  <th className="text-left px-3 py-3 font-bold">Cliente</th>
+                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">E-mail</th>
+                  <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Telefone</th>
+                  <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Serviço</th>
+                  <th className="text-left px-3 py-3 font-bold">Tempo</th>
+                  <th className="text-left px-3 py-3 font-bold">Data</th>
+                  <th className="text-left px-3 py-3 font-bold">Status</th>
+                  <th className="text-left px-3 py-3 font-bold whitespace-nowrap">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((r) => (
-                  <tr
+                  <AdminRequestRow
                     key={r.id}
-                    className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
-                  >
-                    <td className="px-4 py-3 font-medium">{r.client_name || '—'}</td>
-                    <td className="px-4 py-3 hidden sm:table-cell">{r.service || '—'}</td>
-                    <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
-                      {r.client_email || '—'}
-                      <br />
-                      {r.client_phone || ''}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded border ${STATUS_COLORS[r.status] || STATUS_COLORS['PENDENTE']}`}
-                      >
-                        {r.status || 'PENDENTE'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">
-                      {r.created ? new Date(r.created).toLocaleDateString('pt-BR') : '—'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <BudgetRequestActions
-                        record={r}
-                        onRespond={handleRespond}
-                        onReprint={handleReprint}
-                        onSave={handleSave}
-                        savingId={savingId}
-                      />
-                    </td>
-                  </tr>
+                    record={r}
+                    labelMap={labelMap}
+                    isExpanded={expandedRows.has(r.id)}
+                    onToggle={() => toggleRow(r.id)}
+                    onStatusSelect={handleStatusSelect}
+                    onHistoryClick={handleHistoryClick}
+                    onBudgetClick={handleBudgetClick}
+                    onSendEmailClick={handleSendEmailClick}
+                    onSendWhatsAppClick={handleSendWhatsAppClick}
+                    onRespond={handleBudgetClick}
+                    onReprint={handleReprint}
+                    onSave={handleSave}
+                    savingId={savingId}
+                  />
                 ))}
               </tbody>
             </table>
@@ -245,6 +303,31 @@ export function BudgetRequestsPanel() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         record={selectedRecord}
+        authorName={authorName}
+        onSuccess={load}
+      />
+
+      <StatusHistoryDialog
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        history={historyRecord?.status_history || []}
+      />
+
+      <StatusUpdateDialog
+        open={statusUpdateOpen}
+        onOpenChange={setStatusUpdateOpen}
+        recordId={statusRecord?.id || ''}
+        selectedStatus={selectedStatus}
+        authorName={authorName}
+        onSuccess={load}
+      />
+
+      <SendMessageDialog
+        open={messageOpen}
+        onOpenChange={setMessageOpen}
+        requestId={messageRecord?.id || ''}
+        clientName={messageRecord?.client_name || ''}
+        clientEmail={messageRecord?.client_email || ''}
         authorName={authorName}
         onSuccess={load}
       />
