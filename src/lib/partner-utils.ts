@@ -39,13 +39,30 @@ export async function lookupCep(cep: string) {
   }
 }
 
-export async function lookupCnpj(cnpj: string) {
+export interface CnpjLookupResult {
+  nome?: string
+  fantasia?: string
+  cnpj?: string
+  logradouro?: string
+  numero?: string
+  complemento?: string
+  bairro?: string
+  municipio?: string
+  uf?: string
+  cep?: string
+  email?: string
+  telefone?: string
+}
+
+export async function lookupCnpj(cnpj: string): Promise<CnpjLookupResult | null> {
   const clean = cnpj.replace(/\D/g, '')
   if (clean.length !== 14) return null
   try {
-    const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${clean}`)
+    const res = await fetch(`https://receitaws.com.br/v1/cnpj/${clean}`)
     if (!res.ok) return null
-    return await res.json()
+    const data = await res.json()
+    if (data.status === 'ERROR' || data.error) return null
+    return data as CnpjLookupResult
   } catch {
     return null
   }

@@ -1,11 +1,38 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { FileUploadField, type PartnerFieldProps } from '@/components/partner-shared'
 import { PartnerAddressFields } from '@/components/partner-address-fields'
-import { formatCnpj, formatPhone, lookupCnpj } from '@/lib/partner-utils'
-import { Loader2, Building2 } from 'lucide-react'
+import { formatCnpj, formatPhone, formatCep, lookupCnpj } from '@/lib/partner-utils'
+import { Loader2, Building2, AlertCircle } from 'lucide-react'
+
+const CNPJ_FIELDS: Array<{
+  key: string
+  getValue: (d: NonNullable<Awaited<ReturnType<typeof lookupCnpj>>>) => string
+}> = [
+  { key: 'company_name', getValue: (d) => d.nome || '' },
+  { key: 'trade_name', getValue: (d) => d.fantasia || '' },
+  { key: 'cnpj', getValue: (d) => formatCnpj(d.cnpj || '') },
+  { key: 'address', getValue: (d) => [d.logradouro, d.numero].filter(Boolean).join(', ').trim() },
+  { key: 'address_complement', getValue: (d) => d.complemento || '' },
+  { key: 'address_district', getValue: (d) => d.bairro || '' },
+  { key: 'address_city', getValue: (d) => d.municipio || '' },
+  { key: 'address_state', getValue: (d) => d.uf || '' },
+  { key: 'cep', getValue: (d) => formatCep(d.cep || '') },
+  { key: 'email', getValue: (d) => d.email || '' },
+  { key: 'phone', getValue: (d) => formatPhone(d.telefone || '') },
+]
 
 export function PartnerPjFields({
   form,
@@ -15,25 +42,67 @@ export function PartnerPjFields({
   partnerId,
 }: PartnerFieldProps) {
   const [importing, setImporting] = useState(false)
+  const [cnpjError, setCnpjError] = useState('')
+  const [confirmOverwrite, setConfirmOverwrite] = useState(false)
+  const [pendingData, setPendingData] = useState<Record<string, string> | null>(null)
+  const editedFields = useRef<Set<string>>(new Set())
 
-  const handleImportCnpj = async () => {
+  const manualUpdate = (field: keyof PartnerFieldProps['form'], value: string) => {
+    editedFields.current.add(field as string)
+    update(field, value)
+  }
+
+  const applyData = (data: Record<string, string>, overwriteEdited: boolean) => {
+    Object.entries(data).forEach(([field, value]) => {
+      if (!overwriteEdited && editedFields.current.has(field)) return
+      update(field as keyof PartnerFieldProps['form'], value)
+    })
+  }
+
+  const handleCnpjLookup = async () => {
+    const cleanCnpj = form.cnpj.replace(/\D/g, '')
+    if (cleanCnpj.length !== 14) {
+      setCnpjError('CNPJ deve conter 14 dígitos.')
+      return
+    }
+    setCnpjError('')
     setImporting(true)
     const data = await lookupCnpj(form.cnpj)
     setImporting(false)
-    if (!data) return
-    const addr = [data.descricao_tipo_de_logradouro, data.logradouro, data.numero]
-      .filter(Boolean)
-      .join(' ')
-    update(
-      'address',
-      `${addr}, ${data.bairro || ''}, ${data.municipio || ''} - ${data.uf || ''}`.trim(),
+    if (!data) {
+      setCnpjError('Não foi possível obter os dados. Verifique o CNPJ e tente novamente.')
+      return
+    }
+    const fieldMap: Record<string, string> = {}
+    CNPJ_FIELDS.forEach(({ key, getValue }) => {
+      fieldMap[key] = getValue(data)
+    })
+    const hasEditedWithValues = Object.keys(fieldMap).some(
+      (field) => editedFields.current.has(field) && (form as Record<string, unknown>)[field],
     )
-    if (data.cep) update('cep', data.cep)
-    if (data.bairro) update('address_district', data.bairro)
-    if (data.municipio) update('address_city', data.municipio)
-    if (data.uf) update('address_state', data.uf)
-    if (data.razao_social) update('company_name', data.razao_social)
-    if (data.nome_fantasia) update('trade_name', data.nome_fantasia)
+    if (hasEditedWithValues) {
+      setPendingData(fieldMap)
+      setConfirmOverwrite(true)
+    } else {
+      applyData(fieldMap, false)
+    }
+  }
+
+  const handleCnpjKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleCnpjLookup()
+    }
+  }
+
+  const handleConfirmOverwrite = () => {
+    if (pendingData) applyData(pendingData, true)
+    setPendingData(null)
+  }
+
+  const handleCancelOverwrite = () => {
+    if (pendingData) applyData(pendingData, false)
+    setPendingData(null)
   }
 
   return (
@@ -43,7 +112,7 @@ export function PartnerPjFields({
           <Label className="text-sm font-semibold">Razão Social</Label>
           <Input
             value={form.company_name}
-            onChange={(e) => update('company_name', e.target.value)}
+            onChange={(e) => manualUpdate('company_name', e.target.value)}
             className="focus-visible:ring-[#005B2E]"
           />
         </div>
@@ -51,24 +120,39 @@ export function PartnerPjFields({
           <Label className="text-sm font-semibold">Nome Fantasia</Label>
           <Input
             value={form.trade_name}
-            onChange={(e) => update('trade_name', e.target.value)}
+            onChange={(e) => manualUpdate('trade_name', e.target.value)}
             className="focus-visible:ring-[#005B2E]"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 sm:col-span-2">
           <Label className="text-sm font-semibold">CNPJ</Label>
-          <Input
-            value={form.cnpj}
-            onChange={(e) => update('cnpj', formatCnpj(e.target.value))}
-            placeholder="00.000.000/0000-00"
-            className="focus-visible:ring-[#005B2E]"
-          />
+          <div className="flex items-center gap-2">
+            <Input
+              value={form.cnpj}
+              onChange={(e) => {
+                manualUpdate('cnpj', formatCnpj(e.target.value))
+                setCnpjError('')
+              }}
+              onKeyDown={handleCnpjKeyDown}
+              placeholder="00.000.000/0000-00"
+              className="focus-visible:ring-[#005B2E]"
+            />
+            {importing && <Loader2 className="w-5 h-5 text-[#005B2E] animate-spin flex-shrink-0" />}
+          </div>
+          {cnpjError && (
+            <p className="text-sm text-destructive flex items-center gap-1">
+              <AlertCircle className="w-4 h-4" /> {cnpjError}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Digite o CNPJ e pressione Enter para buscar os dados na Receita Federal.
+          </p>
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-semibold">Inscrição Estadual</Label>
           <Input
             value={form.state_registration}
-            onChange={(e) => update('state_registration', e.target.value)}
+            onChange={(e) => manualUpdate('state_registration', e.target.value)}
             className="focus-visible:ring-[#005B2E]"
           />
         </div>
@@ -77,7 +161,7 @@ export function PartnerPjFields({
           <Input
             type="email"
             value={form.email}
-            onChange={(e) => update('email', e.target.value)}
+            onChange={(e) => manualUpdate('email', e.target.value)}
             className="focus-visible:ring-[#005B2E]"
           />
         </div>
@@ -85,7 +169,7 @@ export function PartnerPjFields({
           <Label className="text-sm font-semibold">Telefone</Label>
           <Input
             value={form.phone}
-            onChange={(e) => update('phone', formatPhone(e.target.value))}
+            onChange={(e) => manualUpdate('phone', formatPhone(e.target.value))}
             className="focus-visible:ring-[#005B2E]"
           />
         </div>
@@ -93,7 +177,7 @@ export function PartnerPjFields({
       <Button
         type="button"
         variant="outline"
-        onClick={handleImportCnpj}
+        onClick={handleCnpjLookup}
         disabled={importing || !form.cnpj}
         className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
       >
@@ -105,7 +189,7 @@ export function PartnerPjFields({
         Importar da Receita Federal
       </Button>
       <p className="text-sm font-bold text-[#005B2E]">Endereço</p>
-      <PartnerAddressFields form={form} update={update} onFileChange={onFileChange} />
+      <PartnerAddressFields form={form} update={manualUpdate} onFileChange={onFileChange} />
       <FileUploadField
         label="Comprovante de Endereço"
         field="address_proof"
@@ -113,6 +197,25 @@ export function PartnerPjFields({
         partnerId={partnerId}
         onFileChange={onFileChange}
       />
+      <AlertDialog open={confirmOverwrite} onOpenChange={setConfirmOverwrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sobrescrever campos editados?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Alguns campos já foram preenchidos manualmente. Deseja substituí-los pelos dados da
+              Receita Federal?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelOverwrite}>
+              Manter campos atuais
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmOverwrite}>
+              Sim, sobrescrever
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
