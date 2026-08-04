@@ -22,6 +22,7 @@ import PoliticaComercial from './pages/PoliticaComercial'
 import TermosDeUso from './pages/TermosDeUso'
 import PoliticaCookies from './pages/PoliticaCookies'
 import Products from './pages/Products'
+import Cadastros from './pages/Cadastros'
 import Layout from './components/Layout'
 
 const App = () => (
@@ -39,6 +40,7 @@ const App = () => (
                     <Route path="/" element={<Index />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/admin/produtos" element={<Products />} />
+                    <Route path="/admin/cadastros" element={<Cadastros />} />
                     <Route path="/admin/cadastro" element={<AdminRegister />} />
                     <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                     <Route path="/cliente/login" element={<ClientLogin />} />
