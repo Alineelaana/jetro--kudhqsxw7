@@ -1,12 +1,16 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { HeroSection } from '@/components/hero-section'
 import { ServicesSection } from '@/components/services-section'
 import { BudgetForm } from '@/components/budget-form'
 import { FinalCTA } from '@/components/final-cta'
 import { useSettings } from '@/hooks/use-settings'
+import { useAuth } from '@/hooks/use-auth'
+import { Shield } from 'lucide-react'
 
 export default function Index() {
   const { whatsappNumber } = useSettings()
+  const { isAuthenticated } = useAuth()
   const safeWhatsapp = whatsappNumber || ''
   const [selectedService, setSelectedService] = useState<string>('')
 
@@ -41,6 +45,15 @@ export default function Index() {
         </div>
       </section>
       <FinalCTA />
+      {isAuthenticated && (
+        <Link
+          to="/admin"
+          className="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#005B2E] text-white text-sm font-bold shadow-lg hover:bg-[#01361D] transition-colors"
+        >
+          <Shield className="w-4 h-4" />
+          Área Administrativa
+        </Link>
+      )}
     </main>
   )
 }

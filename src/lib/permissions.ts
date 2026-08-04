@@ -101,3 +101,50 @@ export function canExportInfo(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
+
+export function canViewConfiguracoes(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+}
+
+export function canManageConfiguracoes(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canViewAuditLogs(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+export function canManageIntegrations(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManageBackups(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManageApis(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManagePermissions(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManageSystemParams(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManageUsers(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManageCms(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP'].includes(role)
+}
+
+export function canManageAiTraining(role: string | undefined): boolean {
+  return role === 'SUP'
+}
