@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T23:07:05.305Z",
+  "generatedAt": "2026-08-04T23:18:43.700Z",
   "collections": [
     {
       "name": "users",
@@ -18727,6 +18727,240 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_sst_ind_cat ON sst_indicators (categoria)"]
+    },
+    {
+      "name": "nfse_records",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "cte_records",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "mdfe_records",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "fiscal_apuracao",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_configs",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_classifications",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_rules",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_transition",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_credits",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_simulations",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_comparatives",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "reform_validations",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "fiscal_corrections",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "fiscal_manifestations",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "fiscal_inutilizations",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "fiscal_certificates",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "fiscal_configurations",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "sped_records",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [],
+      "indexes": []
     }
   ]
 }

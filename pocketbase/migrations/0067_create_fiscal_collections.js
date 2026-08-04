@@ -3,23 +3,17 @@ migrate(
     var R = "@request.auth.id != ''"
     var RS = "@request.auth.role = 'SUP'"
     var A = [
-      { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-      { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+      new AutodateField({ name: 'created', onCreate: true, onUpdate: false }),
+      new AutodateField({ name: 'updated', onCreate: true, onUpdate: true }),
     ]
-    var T = function (n) {
-      return { name: n, type: 'text' }
+    function T(n) {
+      return new TextField({ name: n })
     }
-    var J = function (n) {
-      return { name: n, type: 'json' }
+    function J(n) {
+      return new JSONField({ name: n })
     }
-    var N = function (n) {
-      return { name: n, type: 'number' }
-    }
-    var B = function (n) {
-      return { name: n, type: 'bool' }
-    }
-    var S = function (n, v) {
-      return { name: n, type: 'select', values: v, maxSelect: 1 }
+    function S(n, v) {
+      return new SelectField({ name: n, values: v, maxSelect: 1 })
     }
 
     function mk(name, fields, indexes) {
