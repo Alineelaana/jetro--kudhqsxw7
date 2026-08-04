@@ -42,10 +42,11 @@ import { ConfigCrudScreen } from '@/components/configuracoes/config-crud-screen'
 import { LogsScreen } from '@/components/configuracoes/logs-screen'
 import { ApisScreen } from '@/components/configuracoes/apis-screen'
 import { ImportExportScreen } from '@/components/configuracoes/import-export-screen'
+import { PermissionMatrixScreen } from '@/components/configuracoes/permission-matrix-screen'
 import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
+import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import {
-  PERMISSOES_CONFIG,
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
   DOC_TEMPLATE_CONFIG,
@@ -121,10 +122,7 @@ const App = () => (
                         <Route index element={<Navigate to="dados-empresa" replace />} />
                         <Route path="dados-empresa" element={<EmpresaScreen />} />
                         <Route path="parametros" element={<ParametrosScreen />} />
-                        <Route
-                          path="permissoes"
-                          element={<ConfigCrudScreen config={PERMISSOES_CONFIG} />}
-                        />
+                        <Route path="permissoes" element={<PermissionMatrixScreen />} />
                         <Route path="logs" element={<LogsScreen />} />
                         <Route
                           path="integracoes"
@@ -151,6 +149,7 @@ const App = () => (
                         <Route path="seguranca" element={<SegurancaScreen />} />
                         <Route path="backup" element={<BackupScreen />} />
                       </Route>
+                      <Route path="/admin/notificacoes" element={<Notifications />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                       <Route path="/cliente/login" element={<ClientLogin />} />

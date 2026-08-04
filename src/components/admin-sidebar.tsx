@@ -11,7 +11,18 @@ import { useAuth } from '@/hooks/use-auth'
 import { useMenuHistory } from '@/hooks/use-menu-history'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useMenuBadges } from '@/hooks/use-menu-badges'
-import { canViewSales, canViewStock } from '@/lib/permissions'
+import {
+  canViewSales,
+  canViewStock,
+  canConsultCosts,
+  canViewAuditLogs,
+  canManageUsers,
+  canManageCms,
+  canManageBackups,
+  canManageAiTraining,
+  canViewConfiguracoes,
+  canViewPurchasing,
+} from '@/lib/permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -39,6 +50,7 @@ import {
   X,
   Star,
   Table,
+  Bell,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -113,6 +125,7 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { id: 'budgets', label: 'Orçamentos', icon: FileText },
       { id: 'services', label: 'Serviços', icon: Wrench },
       { id: 'chat', label: 'Chat', icon: MessageSquare },
+      { to: '/admin/notificacoes', label: 'Notificações', icon: Bell },
       { id: 'partners', label: 'Parceiros', icon: Users },
     ],
   },
@@ -123,9 +136,9 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { to: '/admin/produtos', label: 'Produtos', icon: Package },
       { label: 'Vendas', icon: ShoppingCart, submenu: SALES_SUBMENU, permission: canViewSales },
       { label: 'Estoque', icon: Boxes, submenu: STOCK_SUBMENU, permission: canViewStock },
-      { id: 'contracts', label: 'Contratos', icon: FileSignature },
-      { id: 'purchasing', label: 'Compras', icon: Briefcase },
-      { id: 'pricing', label: 'Precificação', icon: DollarSign },
+      { id: 'contracts', label: 'Contratos', icon: FileSignature, permission: canViewSales },
+      { id: 'purchasing', label: 'Compras', icon: Briefcase, permission: canViewPurchasing },
+      { id: 'pricing', label: 'Precificação', icon: DollarSign, permission: canConsultCosts },
       {
         to: '/admin/tabelas-precos',
         label: 'Tabela de Preços',
@@ -137,12 +150,17 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Administração',
     items: [
-      { id: 'users', label: 'Usuários', icon: Settings },
-      { id: 'cms', label: 'CMS', icon: Archive },
-      { id: 'audit', label: 'Auditoria', icon: Shield },
-      { id: 'backups', label: 'Backups', icon: Database },
-      { id: 'ai', label: 'Treinamento IA', icon: Bot },
-      { label: 'Configurações', icon: Cog, submenu: CONFIG_SUBMENU },
+      { id: 'users', label: 'Usuários', icon: Settings, permission: canManageUsers },
+      { id: 'cms', label: 'CMS', icon: Archive, permission: canManageCms },
+      { id: 'audit', label: 'Auditoria', icon: Shield, permission: canViewAuditLogs },
+      { id: 'backups', label: 'Backups', icon: Database, permission: canManageBackups },
+      { id: 'ai', label: 'Treinamento IA', icon: Bot, permission: canManageAiTraining },
+      {
+        label: 'Configurações',
+        icon: Cog,
+        submenu: CONFIG_SUBMENU,
+        permission: canViewConfiguracoes,
+      },
     ],
   },
 ]

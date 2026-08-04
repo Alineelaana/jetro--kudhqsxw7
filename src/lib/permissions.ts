@@ -148,3 +148,18 @@ export function canManageCms(role: string | undefined): boolean {
 export function canManageAiTraining(role: string | undefined): boolean {
   return role === 'SUP'
 }
+
+export function canViewPurchasing(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+}
+
+export function canViewBudgets(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+export function canViewChat(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}

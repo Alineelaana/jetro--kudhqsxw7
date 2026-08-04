@@ -89,8 +89,19 @@ export async function logImportExport(data: Record<string, unknown>) {
   return pb.collection('import_export_history').create(data)
 }
 
-export async function getImportExportHistory() {
-  return pb.collection('import_export_history').getFullList({ sort: '-created' })
+export async function getImportExportHistory(filters?: {
+  operation?: string
+  format?: string
+  module?: string
+}) {
+  const parts: string[] = []
+  if (filters?.operation) parts.push(`operation = "${filters.operation}"`)
+  if (filters?.format) parts.push(`format = "${filters.format}"`)
+  if (filters?.module) parts.push(`module = "${filters.module}"`)
+  return pb.collection('import_export_history').getFullList({
+    sort: '-created',
+    filter: parts.length ? parts.join(' && ') : undefined,
+  })
 }
 
 export async function getActiveSessions() {
@@ -107,7 +118,11 @@ export async function getLoginAttempts() {
   })
 }
 
-export function exportToCsv(records: Record<string, unknown>[], filename: string) {
+export function exportToCsv(
+  records: Record<string, unknown>[],
+  filename: string,
+  options?: { module?: string; format?: string; filters?: Record<string, unknown> },
+) {
   if (!records.length) return
   const headers = Object.keys(records[0])
   const lines = [headers.join(',')]
@@ -123,4 +138,18 @@ export function exportToCsv(records: Record<string, unknown>[], filename: string
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+  if (options?.module) {
+    const userName = ((pb.authStore.record as Record<string, unknown>)?.name as string) || 'Sistema'
+    pb.collection('import_export_history')
+      .create({
+        operation: 'export',
+        entity: options.module,
+        format: options.format || 'csv',
+        user_name: userName,
+        module: options.module,
+        filters_applied: options.filters || {},
+        record_count: records.length,
+      })
+      .catch(() => {})
+  }
 }

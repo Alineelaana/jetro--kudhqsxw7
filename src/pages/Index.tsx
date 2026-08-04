@@ -7,6 +7,7 @@ import { FinalCTA } from '@/components/final-cta'
 import { useSettings } from '@/hooks/use-settings'
 import { useAuth } from '@/hooks/use-auth'
 import { Shield } from 'lucide-react'
+import { PortalDashboard } from '@/components/portal-dashboard'
 
 export default function Index() {
   const { whatsappNumber } = useSettings()
@@ -20,6 +21,10 @@ export default function Index() {
     if (budgetSection) {
       budgetSection.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  if (isAuthenticated) {
+    return <PortalDashboard />
   }
 
   return (
