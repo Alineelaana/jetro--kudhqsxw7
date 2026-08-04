@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T13:37:13.025Z",
+  "generatedAt": "2026-08-04T13:52:44.699Z",
   "collections": [
     {
       "name": "users",
@@ -2011,7 +2011,22 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["budget_created", "budget_saved", "stock_low", "price_below_cost"]
+          "selectValues": [
+            "budget_created",
+            "budget_saved",
+            "stock_low",
+            "price_below_cost",
+            "approval_pending",
+            "account_due",
+            "document_expiring",
+            "order_delayed",
+            "delivery_delayed",
+            "negative_margin",
+            "integration_error",
+            "certificate_expiring",
+            "processing_failure",
+            "other"
+          ]
         }
       ],
       "indexes": [
@@ -4258,6 +4273,48 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "regime_tributario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "site",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_legal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contador",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "moeda_padrao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fuso_horario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "formato_data",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -6997,6 +7054,1135 @@
       "indexes": [
         "CREATE INDEX idx_audit_alerts_alert_type ON audit_alerts (alert_type)",
         "CREATE INDEX idx_audit_alerts_resolved ON audit_alerts (resolved)"
+      ]
+    },
+    {
+      "name": "system_parameters",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "module",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "value_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["text", "number", "boolean", "select", "json"]
+        },
+        {
+          "name": "options",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "changed_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "change_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_sysparams_module ON system_parameters (module)",
+        "CREATE INDEX idx_sysparams_key ON system_parameters (key)"
+      ]
+    },
+    {
+      "name": "integrations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "environment",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["producao", "homologacao", "sandbox"]
+        },
+        {
+          "name": "credentials",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ativa", "inativa", "em_configuracao", "com_erro", "bloqueada"]
+        },
+        {
+          "name": "last_sync_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "last_sync_result",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_integrations_type ON integrations (type)",
+        "CREATE INDEX idx_integrations_status ON integrations (status)"
+      ]
+    },
+    {
+      "name": "integration_logs",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.role = 'SUP'",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "integration_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "integration_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "started_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "finished_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "result",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "errors",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["sucesso", "erro", "em_andamento"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_intlog_integration ON integration_logs (integration_id)"]
+    },
+    {
+      "name": "api_credentials",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "app_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "api_secret",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expires_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rate_limit",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ativa", "inativa", "expirada", "revogada", "bloqueada"]
+        },
+        {
+          "name": "last_used_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "request_count",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_apicred_status ON api_credentials (status)"]
+    },
+    {
+      "name": "api_request_logs",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.role = 'SUP'",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "app_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "endpoint",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_or_key",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ip_address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "result",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "response_code",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_apireqlog_app ON api_request_logs (app_name)",
+        "CREATE INDEX idx_apireqlog_created ON api_request_logs (created)"
+      ]
+    },
+    {
+      "name": "email_templates",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "pedido_venda",
+            "pedido_compra",
+            "proposta",
+            "boleto",
+            "pix",
+            "cobranca",
+            "nota_fiscal",
+            "contrato",
+            "entrega",
+            "aprovacao",
+            "rh",
+            "suporte",
+            "outros"
+          ]
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sender",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "signature",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "default_attachments",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_emailtpl_category ON email_templates (category)"]
+    },
+    {
+      "name": "document_templates",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "propostas",
+            "pedidos",
+            "contratos",
+            "recibos",
+            "orcamentos",
+            "relatorios",
+            "declaracoes",
+            "termos",
+            "avisos",
+            "rh",
+            "romaneios",
+            "etiquetas",
+            "outros"
+          ]
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "header",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "footer",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "logo",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "signatures",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "page_numbering",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "orientation",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["retrato", "paisagem"]
+        },
+        {
+          "name": "paper_size",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["a4", "a3", "carta", "oficio"]
+        },
+        {
+          "name": "is_default",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "version_number",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_doctpl_category ON document_templates (category)"]
+    },
+    {
+      "name": "document_template_versions",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.role = 'SUP'",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "template_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "template_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "version_data",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "version_number",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_doctplver_template ON document_template_versions (template_id)"]
+    },
+    {
+      "name": "notification_configs",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "event",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "approval_pending",
+            "account_due",
+            "stock_low",
+            "document_expiring",
+            "order_delayed",
+            "delivery_delayed",
+            "negative_margin",
+            "integration_error",
+            "certificate_expiring",
+            "processing_failure",
+            "other"
+          ]
+        },
+        {
+          "name": "module",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recipient_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["user", "profile"]
+        },
+        {
+          "name": "recipient_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recipient_profile",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "channel",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["internal", "email", "whatsapp", "dashboard"]
+        },
+        {
+          "name": "deadline",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "frequency",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["immediate", "hourly", "daily", "weekly"]
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_notifcfg_event ON notification_configs (event)"]
+    },
+    {
+      "name": "numerations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "document_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "clientes",
+            "fornecedores",
+            "produtos",
+            "pedidos_venda",
+            "pedidos_compra",
+            "ordens_producao",
+            "titulos_financeiros",
+            "contratos",
+            "propostas",
+            "romaneios",
+            "entregas",
+            "chamados",
+            "outros"
+          ]
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prefix",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "next_number",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "digit_count",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "annual_reset",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_numerations_unique ON numerations (document_type, company, branch, prefix)"
+      ]
+    },
+    {
+      "name": "security_config",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "changed_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "change_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_seccfg_key ON security_config (key)"]
+    },
+    {
+      "name": "import_export_history",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.role = 'SUP'",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "operation",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["import", "export"]
+        },
+        {
+          "name": "entity",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "format",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["excel", "csv", "pdf", "xml"]
+        },
+        {
+          "name": "file_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_records",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valid_records",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "error_records",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "duplicate_records",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "updated_records",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_records",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["pending", "processing", "completed", "error"]
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_iexphist_op ON import_export_history (operation)",
+        "CREATE INDEX idx_iexphist_created ON import_export_history (created)"
       ]
     }
   ]

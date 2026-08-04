@@ -56,8 +56,7 @@ migrate(
     app.save(empCol)
 
     var notifCol = app.findCollectionByNameOrId('notifications')
-    var oldType = notifCol.fields.getByName('type')
-    if (oldType) notifCol.fields.remove(oldType)
+    if (notifCol.fields.getByName('type')) notifCol.fields.removeByName('type')
     notifCol.fields.add(
       new SelectField({
         name: 'type',
