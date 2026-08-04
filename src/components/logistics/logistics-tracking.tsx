@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { getTracking } from '@/services/logistics'
 import { useRealtime } from '@/hooks/use-realtime'
 import { TRACKING_STATUS } from '@/lib/logistics-types'
+import { LogisticsMap } from '@/components/logistics/logistics-map'
 import { Search, Loader2, MapPin, Activity } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -39,6 +40,15 @@ export function LogisticsTracking() {
     return !t || veiculo.includes(t) || motorista.includes(t) || cliente.includes(t)
   })
 
+  const mapMarkers = filtered
+    .map((r) => {
+      const lat = parseFloat(String(r.latitude || ''))
+      const lng = parseFloat(String(r.longitude || ''))
+      if (isNaN(lat) || isNaN(lng)) return null
+      return { lat, lng, label: String(r.veiculo || '') }
+    })
+    .filter((m): m is { lat: number; lng: number; label: string } => m !== null)
+
   if (loading)
     return (
       <div className="flex justify-center py-12">
@@ -57,6 +67,7 @@ export function LogisticsTracking() {
           className="pl-10 focus-visible:ring-[#005B2E]"
         />
       </div>
+      {mapMarkers.length > 0 && <LogisticsMap markers={mapMarkers} height="350px" />}
       {filtered.length === 0 ? (
         <Card className="border-2 border-dashed">
           <div className="py-16 text-center">

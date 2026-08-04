@@ -267,6 +267,25 @@ export interface LogisticsOccurrence {
   updated: string
 }
 
+export interface MapMarker {
+  lat: number
+  lng: number
+  label?: string
+}
+
+export interface GpsPosition {
+  latitude: number
+  longitude: number
+  timestamp: string
+}
+
+export interface RouteCalcResult {
+  distance: number
+  duration: number
+  distanceText: string
+  durationText: string
+}
+
 export const REVERSE_LOGISTICS_STATUS = [
   'Solicitada',
   'Aprovada',

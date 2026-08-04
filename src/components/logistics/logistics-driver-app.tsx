@@ -23,6 +23,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import { OCCURRENCE_TYPES, type LogisticsDelivery } from '@/lib/logistics-types'
+import { LogisticsMap } from '@/components/logistics/logistics-map'
 import {
   Loader2,
   Truck,
@@ -169,6 +170,10 @@ export function LogisticsDriverApp() {
                   : '—'}
               </p>
             </div>
+            <LogisticsMap
+              query={`${selected.endereco || ''} ${selected.cidade || ''}`.trim()}
+              height="200px"
+            />
             {!isDone && (
               <div className="grid grid-cols-2 gap-2 pt-2">
                 {canAdvance && (

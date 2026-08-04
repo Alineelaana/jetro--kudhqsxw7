@@ -31,6 +31,11 @@ export function LogisticsRoutePlanning() {
   const [driverId, setDriverId] = useState('')
   const [routeName, setRouteName] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [cidadeOrigem, setCidadeOrigem] = useState('')
+  const [routeCalc, setRouteCalc] = useState<{ distanceText: string; durationText: string } | null>(
+    null,
+  )
+  const [calcLoading, setCalcLoading] = useState(false)
 
   const load = async () => {
     try {
@@ -78,6 +83,24 @@ export function LogisticsRoutePlanning() {
     })
   }
 
+  const handleCalcRoute = async () => {
+    if (!cidadeOrigem || selectedOrders.length === 0) return
+    setCalcLoading(true)
+    try {
+      const dest = selectedOrders[0]?.delivery_address || selectedOrders[0]?.client_name || ''
+      const wps = selectedOrders
+        .slice(1)
+        .map((o) => o.delivery_address || o.client_name)
+        .filter(Boolean)
+      const result = await calculateRoute(cidadeOrigem, dest, wps)
+      setRouteCalc(result)
+    } catch {
+      setRouteCalc(null)
+      toast.error('Erro ao calcular rota')
+    }
+    setCalcLoading(false)
+  }
+
   const handleCreate = async () => {
     if (!routeName || !vehicleId || !driverId || selected.size === 0) {
       toast.error('Preencha todos os campos e selecione pedidos')
@@ -91,6 +114,9 @@ export function LogisticsRoutePlanning() {
         nome_rota: routeName,
         situacao: 'Em Planejamento',
         responsavel: '',
+        cidade_origem: cidadeOrigem,
+        distancia_estimada: routeCalc?.distanceText || '',
+        tempo_estimado: routeCalc?.durationText || '',
         capacidade_maxima_peso: selectedVehicle?.capacidade_peso || 0,
         capacidade_maxima_volume: selectedVehicle?.capacidade_volume || 0,
         clientes_vinculados: selectedOrders.map((o) => o.client_name),
@@ -205,6 +231,45 @@ export function LogisticsRoutePlanning() {
               Total: <strong className="text-[#005B2E]">R$ {totalValue.toFixed(2)}</strong>
             </span>
           </div>
+          <div className="flex gap-2">
+            <Input
+              value={cidadeOrigem}
+              onChange={(e) => setCidadeOrigem(e.target.value)}
+              placeholder="Cidade de origem (ex: Vitória, ES)"
+              className="focus-visible:ring-[#005B2E]"
+            />
+            <Button
+              variant="outline"
+              onClick={handleCalcRoute}
+              disabled={calcLoading || !cidadeOrigem}
+              className="border-[#005B2E] text-[#005B2E] whitespace-nowrap"
+            >
+              {calcLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Calcular Rota'}
+            </Button>
+          </div>
+          {routeCalc && (
+            <div className="flex gap-4 text-sm">
+              <span>
+                Distância: <strong className="text-[#005B2E]">{routeCalc.distanceText}</strong>
+              </span>
+              <span>
+                Tempo: <strong className="text-[#005B2E]">{routeCalc.durationText}</strong>
+              </span>
+            </div>
+          )}
+          {cidadeOrigem && selectedOrders.length > 0 && (
+            <LogisticsMap
+              origin={cidadeOrigem}
+              destination={
+                selectedOrders[0]?.delivery_address || selectedOrders[0]?.client_name || ''
+              }
+              waypoints={selectedOrders
+                .slice(1)
+                .map((o) => o.delivery_address || o.client_name)
+                .filter(Boolean)}
+              height="250px"
+            />
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
               <Label className="text-xs font-semibold">Nome da Rota *</Label>
