@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { useMenuHistory } from '@/hooks/use-menu-history'
+import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { canViewSales, canViewStock } from '@/lib/permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -33,6 +34,7 @@ import {
   Boxes,
   Search,
   X,
+  Star,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -55,6 +57,7 @@ interface FlatItem {
   to?: string
   id?: string
   parentLabel?: string
+  icon?: IconType
 }
 
 const SALES_SUBMENU: SubItem[] = [
@@ -121,6 +124,36 @@ function getItemKey(item: FlatItem): string {
   return item.to || item.id || item.label
 }
 
+function StarToggle({ isPinned, onToggle }: { isPinned: boolean; onToggle: () => void }) {
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        onToggle()
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          e.stopPropagation()
+          onToggle()
+        }
+      }}
+      className="shrink-0 p-0.5 rounded transition-colors cursor-pointer"
+      aria-label={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
+    >
+      <Star
+        className={cn(
+          'w-3.5 h-3.5',
+          isPinned ? 'fill-amber-400 text-amber-400' : 'text-gray-300 hover:text-amber-400',
+        )}
+      />
+    </span>
+  )
+}
+
 export function AdminSidebar({
   activeTab,
   onTabChange,
@@ -138,6 +171,7 @@ export function AdminSidebar({
   const [openMenus, setOpenMenus] = useState<Set<string>>(new Set(['Vendas', 'Estoque']))
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)
+  const { favorites, toggleFavorite, isFavorite } = useMenuFavorites(user?.id as string)
 
   const allFlatItems = useMemo<FlatItem[]>(() => {
     const items: FlatItem[] = []
@@ -146,16 +180,21 @@ export function AdminSidebar({
         if (item.permission && !item.permission(user?.role as string)) continue
         if (item.submenu) {
           for (const sub of item.submenu)
-            items.push({ label: sub.label, to: sub.to, parentLabel: item.label })
+            items.push({ label: sub.label, to: sub.to, parentLabel: item.label, icon: item.icon })
         } else if (item.to) {
-          items.push({ label: item.label, to: item.to })
+          items.push({ label: item.label, to: item.to, icon: item.icon })
         } else if (item.id) {
-          items.push({ label: item.label, id: item.id })
+          items.push({ label: item.label, id: item.id, icon: item.icon })
         }
       }
     }
     return items
   }, [user?.role])
+
+  const favoriteItems = useMemo<FlatItem[]>(
+    () => allFlatItems.filter((item) => favorites.has(getItemKey(item))),
+    [allFlatItems, favorites],
+  )
 
   const filteredItems = useMemo<FlatItem[] | null>(() => {
     const q = search.trim().toLowerCase()
@@ -164,6 +203,9 @@ export function AdminSidebar({
     matches.sort((a, b) => {
       const aKey = getItemKey(a)
       const bKey = getItemKey(b)
+      const aFav = favorites.has(aKey) ? 1 : 0
+      const bFav = favorites.has(bKey) ? 1 : 0
+      if (bFav !== aFav) return bFav - aFav
       const aCount = history[aKey]?.count || 0
       const bCount = history[bKey]?.count || 0
       if (bCount !== aCount) return bCount - aCount
@@ -172,7 +214,7 @@ export function AdminSidebar({
       return bLast - aLast
     })
     return matches
-  }, [search, allFlatItems, history])
+  }, [search, allFlatItems, history, favorites])
 
   useEffect(() => {
     setActiveIndex(0)
@@ -233,7 +275,9 @@ export function AdminSidebar({
       <div className="flex flex-col gap-0.5">
         {filteredItems.map((item, idx) => {
           const isActive = idx === activeIndex
-          const visits = history[getItemKey(item)]?.count || 0
+          const key = getItemKey(item)
+          const visits = history[key]?.count || 0
+          const pinned = favorites.has(key)
           if (item.to)
             return (
               <Link
@@ -258,7 +302,10 @@ export function AdminSidebar({
                   )}
                   {item.label}
                 </span>
-                {visits > 0 && <span className="text-xs text-amber-500">★</span>}
+                <div className="flex items-center gap-1">
+                  <StarToggle isPinned={pinned} onToggle={() => toggleFavorite(key)} />
+                  {visits > 0 && <span className="text-xs text-amber-500">★</span>}
+                </div>
               </Link>
             )
           return (
@@ -276,12 +323,101 @@ export function AdminSidebar({
                 )}
                 {item.label}
               </span>
-              {visits > 0 && <span className="text-xs text-amber-400">★</span>}
+              <div className="flex items-center gap-1">
+                <StarToggle isPinned={pinned} onToggle={() => toggleFavorite(key)} />
+                {visits > 0 && <span className="text-xs text-amber-400">★</span>}
+              </div>
             </button>
           )
         })}
       </div>
     )
+  }
+
+  const renderFavoriteItem = (fItem: FlatItem) => {
+    const key = getItemKey(fItem)
+    const Icon = fItem.icon!
+    if (fItem.to)
+      return (
+        <Link
+          key={key}
+          to={fItem.to}
+          onClick={() => {
+            recordVisit(fItem.to!)
+            onNavigate?.()
+          }}
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors group"
+        >
+          <Icon className="w-4 h-4" />
+          <span className="flex-1">
+            {fItem.parentLabel && (
+              <span className="text-xs text-gray-400 block">{fItem.parentLabel}</span>
+            )}
+            {fItem.label}
+          </span>
+          <StarToggle isPinned={true} onToggle={() => toggleFavorite(key)} />
+        </Link>
+      )
+    if (fItem.id)
+      return (
+        <button
+          key={key}
+          onClick={() => handleTabChange(fItem.id!)}
+          className={cn(
+            'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors group',
+            activeTab === fItem.id ? 'bg-[#005B2E] text-white' : 'text-gray-600 hover:bg-gray-100',
+          )}
+        >
+          <Icon className="w-4 h-4" />
+          <span className="flex-1">{fItem.label}</span>
+          <StarToggle isPinned={true} onToggle={() => toggleFavorite(key)} />
+        </button>
+      )
+    return null
+  }
+
+  const renderCollapsedFavorite = (fItem: FlatItem) => {
+    const key = getItemKey(fItem)
+    const Icon = fItem.icon!
+    const tooltipLabel = fItem.parentLabel ? `${fItem.parentLabel} — ${fItem.label}` : fItem.label
+    if (fItem.to)
+      return (
+        <Tooltip key={key}>
+          <TooltipTrigger asChild>
+            <Link
+              to={fItem.to}
+              onClick={() => {
+                recordVisit(fItem.to!)
+                onNavigate?.()
+              }}
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+            >
+              <Icon className="w-4 h-4" />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">{tooltipLabel}</TooltipContent>
+        </Tooltip>
+      )
+    if (fItem.id)
+      return (
+        <Tooltip key={key}>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => handleTabChange(fItem.id!)}
+              className={cn(
+                'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
+                activeTab === fItem.id
+                  ? 'bg-[#005B2E] text-white'
+                  : 'text-gray-600 hover:bg-gray-100',
+              )}
+            >
+              <Icon className="w-4 h-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right">{tooltipLabel}</TooltipContent>
+        </Tooltip>
+      )
+    return null
   }
 
   if (collapsed) {
@@ -323,6 +459,13 @@ export function AdminSidebar({
           </PopoverContent>
         </Popover>
 
+        {favoriteItems.length > 0 && (
+          <>
+            <div className="h-px w-6 bg-gray-200 my-1" />
+            {favoriteItems.map(renderCollapsedFavorite)}
+          </>
+        )}
+
         <div className="h-px w-6 bg-gray-200 my-1" />
 
         {SECTIONS.map((section) => (
@@ -362,9 +505,13 @@ export function AdminSidebar({
                             recordVisit(sub.to)
                             onNavigate?.()
                           }}
-                          className="block px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+                          className="flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
                         >
                           {sub.label}
+                          <StarToggle
+                            isPinned={isFavorite(sub.to)}
+                            onToggle={() => toggleFavorite(sub.to)}
+                          />
                         </Link>
                       ))}
                     </div>
@@ -452,6 +599,16 @@ export function AdminSidebar({
         )
       ) : (
         <>
+          {favoriteItems.length > 0 && (
+            <div>
+              <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                Favoritos
+              </div>
+              {favoriteItems.map(renderFavoriteItem)}
+            </div>
+          )}
+
           {SECTIONS.map((section) => (
             <div key={section.title}>
               <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
@@ -488,9 +645,13 @@ export function AdminSidebar({
                                 recordVisit(sub.to)
                                 onNavigate?.()
                               }}
-                              className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+                              className="flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors group"
                             >
-                              {sub.label}
+                              <span>{sub.label}</span>
+                              <StarToggle
+                                isPinned={isFavorite(sub.to)}
+                                onToggle={() => toggleFavorite(sub.to)}
+                              />
                             </Link>
                           ))}
                         </div>
@@ -508,10 +669,14 @@ export function AdminSidebar({
                         recordVisit(item.to!)
                         onNavigate?.()
                       }}
-                      className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+                      className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors group"
                     >
                       <Icon className="w-4 h-4" />
-                      {item.label}
+                      <span className="flex-1">{item.label}</span>
+                      <StarToggle
+                        isPinned={isFavorite(item.to!)}
+                        onToggle={() => toggleFavorite(item.to!)}
+                      />
                     </Link>
                   )
                 }
@@ -521,14 +686,18 @@ export function AdminSidebar({
                     key={item.label}
                     onClick={() => handleTabChange(item.id!)}
                     className={cn(
-                      'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                      'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors group',
                       activeTab === item.id
                         ? 'bg-[#005B2E] text-white'
                         : 'text-gray-600 hover:bg-gray-100',
                     )}
                   >
                     <Icon className="w-4 h-4" />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    <StarToggle
+                      isPinned={isFavorite(item.id!)}
+                      onToggle={() => toggleFavorite(item.id!)}
+                    />
                   </button>
                 )
               })}

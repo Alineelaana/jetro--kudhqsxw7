@@ -14,11 +14,13 @@ import { getProducts } from '@/services/products'
 import {
   getSimulations,
   createSimulation,
+  updateSimulation,
   deleteSimulation,
   getPricingConfig,
 } from '@/services/pricing'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
+import { extractFieldErrors, type FieldErrors } from '@/lib/pocketbase/errors'
 import {
   parseNum,
   formatCurrency,
@@ -28,7 +30,7 @@ import {
   type PricingSimulation,
 } from '@/lib/pricing-types'
 import type { Product } from '@/lib/product-types'
-import { Plus, Trash2, Loader2, FlaskConical, TrendingUp } from 'lucide-react'
+import { Plus, Trash2, Loader2, FlaskConical, TrendingUp, Pencil, Save, X } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 const SCENARIO_TYPES = [
@@ -40,6 +42,21 @@ const SCENARIO_TYPES = [
   { value: 'promocional', label: 'Venda Promocional' },
   { value: 'personalizado', label: 'Personalizado' },
 ]
+
+function formatDate(iso: string): string {
+  if (!iso) return '—'
+  try {
+    return new Date(iso).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return '—'
+  }
+}
 
 export function PricingSimulations() {
   const { user } = useAuth()
@@ -53,6 +70,8 @@ export function PricingSimulations() {
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [pricingCfg, setPricingCfg] = useState<PricingConfig | null>(null)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const load = async () => {
     try {
@@ -94,14 +113,24 @@ export function PricingSimulations() {
     return { profit, margin, profitPercent, rentability }
   }, [simPrice, cost])
 
-  const handleCreate = async () => {
+  const resetForm = () => {
+    setEditId(null)
+    setSimPrice('')
+    setScenarioName('')
+    setScenarioType('a_vista')
+    setNotes('')
+    setFieldErrors({})
+  }
+
+  const handleSave = async () => {
     if (!selectedProductId || !simPrice) {
       toast({ title: 'Selecione um produto e informe o preço', variant: 'destructive' })
       return
     }
     setSaving(true)
+    setFieldErrors({})
     try {
-      await createSimulation({
+      const data = {
         product_id: selectedProductId,
         product_code: selectedProduct?.code || '',
         product_name: selectedProduct?.name || '',
@@ -119,16 +148,33 @@ export function PricingSimulations() {
         rentability: simResult.rentability.toFixed(2),
         notes,
         created_by: (user?.name as string) || '',
-      })
-      toast({ title: 'Simulação criada' })
-      setSimPrice('')
-      setScenarioName('')
-      setNotes('')
+      }
+      if (editId) {
+        await updateSimulation(editId, data)
+        toast({ title: 'Simulação atualizada' })
+      } else {
+        await createSimulation(data)
+        toast({ title: 'Simulação criada' })
+      }
+      resetForm()
       load()
-    } catch {
-      toast({ title: 'Erro ao criar simulação', variant: 'destructive' })
+    } catch (err) {
+      const errors = extractFieldErrors(err)
+      setFieldErrors(errors)
+      const errorMsg = Object.values(errors).join(' ') || 'Erro ao salvar simulação'
+      toast({ title: errorMsg, variant: 'destructive' })
     }
     setSaving(false)
+  }
+
+  const handleEdit = (s: PricingSimulation) => {
+    setEditId(s.id)
+    setSelectedProductId(s.product_id)
+    setScenarioName(s.scenario_name)
+    setScenarioType(s.scenario_type)
+    setSimPrice(s.simulated_price)
+    setNotes(s.notes || '')
+    setFieldErrors({})
   }
 
   const handleDelete = async (id: string) => {
@@ -142,6 +188,7 @@ export function PricingSimulations() {
   }
 
   const productSims = simulations.filter((s) => s?.product_id === selectedProductId)
+  const userName = (user?.name as string) || ''
 
   if (loading)
     return (
@@ -166,6 +213,9 @@ export function PricingSimulations() {
               ))}
             </SelectContent>
           </Select>
+          {fieldErrors.product_id && (
+            <p className="text-xs text-red-500 mt-1">{fieldErrors.product_id}</p>
+          )}
         </CardContent>
       </Card>
 
@@ -174,7 +224,8 @@ export function PricingSimulations() {
           <Card className="border-2 border-[#005B2E]/20">
             <CardHeader>
               <CardTitle className="text-base text-[#005B2E] flex items-center gap-2">
-                <FlaskConical className="w-4 h-4" /> Nova Simulação
+                <FlaskConical className="w-4 h-4" />{' '}
+                {editId ? 'Editar Simulação' : 'Nova Simulação'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -193,6 +244,9 @@ export function PricingSimulations() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {fieldErrors.scenario_type && (
+                    <p className="text-xs text-red-500">{fieldErrors.scenario_type}</p>
+                  )}
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Nome do Cenário</Label>
@@ -202,6 +256,9 @@ export function PricingSimulations() {
                     placeholder="Ex: Promoção Black Friday"
                     className="focus-visible:ring-[#005B2E]"
                   />
+                  {fieldErrors.scenario_name && (
+                    <p className="text-xs text-red-500">{fieldErrors.scenario_name}</p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -213,6 +270,9 @@ export function PricingSimulations() {
                     placeholder="0,00"
                     className="focus-visible:ring-[#005B2E]"
                   />
+                  {fieldErrors.simulated_price && (
+                    <p className="text-xs text-red-500">{fieldErrors.simulated_price}</p>
+                  )}
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Custo Base</Label>
@@ -251,19 +311,30 @@ export function PricingSimulations() {
                   placeholder="Notas sobre a simulação..."
                   className="focus-visible:ring-[#005B2E]"
                 />
+                {fieldErrors.notes && <p className="text-xs text-red-500">{fieldErrors.notes}</p>}
               </div>
-              <Button
-                onClick={handleCreate}
-                disabled={saving}
-                className="bg-[#005B2E] hover:bg-[#01361D] text-white"
-              >
-                {saving ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Plus className="w-4 h-4 mr-2" />
-                )}{' '}
-                Criar Simulação
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="bg-[#005B2E] hover:bg-[#01361D] text-white"
+                >
+                  {saving ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : editId ? (
+                    <Save className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Plus className="w-4 h-4 mr-2" />
+                  )}
+                  {editId ? 'Atualizar Simulação' : 'Criar Simulação'}
+                </Button>
+                {editId && (
+                  <Button variant="outline" onClick={resetForm}>
+                    <X className="w-4 h-4 mr-2" />
+                    Cancelar
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
 
@@ -278,44 +349,64 @@ export function PricingSimulations() {
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {productSims.map((s) => (
-                    <div
-                      key={s.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm">{s.scenario_name}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-[#005B2E]/10 text-[#005B2E]">
-                            {SCENARIO_TYPES.find((t) => t.value === s.scenario_type)?.label ||
-                              s.scenario_type}
-                          </span>
+                  {productSims.map((s) => {
+                    const isOwner = !!userName && s.created_by === userName
+                    return (
+                      <div
+                        key={s.id}
+                        className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-sm">{s.scenario_name}</span>
+                            <span className="text-xs px-1.5 py-0.5 rounded bg-[#005B2E]/10 text-[#005B2E]">
+                              {SCENARIO_TYPES.find((t) => t.value === s.scenario_type)?.label ||
+                                s.scenario_type}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            Por {s.created_by || '—'} em {formatDate(s.created)}
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1 text-xs">
+                            <span>
+                              Preço: <strong>R$ {formatCurrency(s.simulated_price)}</strong>
+                            </span>
+                            <span>
+                              Lucro: <strong>R$ {formatCurrency(s.profit_value)}</strong>
+                            </span>
+                            <span>
+                              Margem: <strong>{formatCurrency(s.simulated_margin)}%</strong>
+                            </span>
+                            <span>
+                              Rentab.: <strong>{formatCurrency(s.rentability)}%</strong>
+                            </span>
+                          </div>
                         </div>
-                        <div className="grid grid-cols-4 gap-2 mt-1 text-xs">
-                          <span>
-                            Preço: <strong>R$ {formatCurrency(s.simulated_price)}</strong>
-                          </span>
-                          <span>
-                            Lucro: <strong>R$ {formatCurrency(s.profit_value)}</strong>
-                          </span>
-                          <span>
-                            Margem: <strong>{formatCurrency(s.simulated_margin)}%</strong>
-                          </span>
-                          <span>
-                            Rentab.: <strong>{formatCurrency(s.rentability)}%</strong>
-                          </span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {isOwner && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEdit(s)}
+                              className="text-[#005B2E] hover:bg-[#005B2E]/10"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
+                          {isOwner && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(s.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(s.id)}
-                        className="text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </CardContent>
