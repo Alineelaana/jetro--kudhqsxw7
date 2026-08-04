@@ -6,19 +6,19 @@ migrate(
         { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
         { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
       ])
-      app.save(
-        new Collection({
-          name: name,
-          type: 'base',
-          listRule: "@request.auth.id != ''",
-          viewRule: "@request.auth.id != ''",
-          createRule: "@request.auth.id != ''",
-          updateRule: "@request.auth.id != ''",
-          deleteRule: "@request.auth.role = 'SUP'",
-          fields: allFields,
-          indexes: indexes || [],
-        }),
-      )
+      var col = new Collection({
+        name: name,
+        type: 'base',
+        listRule: "@request.auth.id != ''",
+        viewRule: "@request.auth.id != ''",
+        createRule: "@request.auth.id != ''",
+        updateRule: "@request.auth.id != ''",
+        deleteRule: "@request.auth.role = 'SUP'",
+        fields: allFields,
+        indexes: indexes || [],
+      })
+      app.save(col)
+      return col
     }
     function logCol(name, fields, indexes) {
       var allFields = fields.concat([
@@ -83,7 +83,7 @@ migrate(
     )
     app.save(notifCol)
 
-    stdCol(
+    var paramCol = stdCol(
       'system_parameters',
       [
         { name: 'module', type: 'text', required: true },
@@ -341,7 +341,7 @@ migrate(
       ['CREATE INDEX idx_notifcfg_event ON notification_configs (event)'],
     )
 
-    stdCol(
+    var numCol = stdCol(
       'numerations',
       [
         {
@@ -377,7 +377,7 @@ migrate(
       ],
     )
 
-    stdCol(
+    var secCol = stdCol(
       'security_config',
       [
         { name: 'key', type: 'text', required: true },
@@ -424,7 +424,6 @@ migrate(
       ],
     )
 
-    var secCol = app.findCollectionByNameOrId('security_config')
     var secDefaults = [
       { key: 'password_min_length', value: '8' },
       { key: 'password_require_uppercase', value: 'true' },
@@ -454,7 +453,6 @@ migrate(
       }
     }
 
-    var numCol = app.findCollectionByNameOrId('numerations')
     var numDefaults = [
       { document_type: 'clientes', prefix: 'CLI', next_number: 1, digit_count: 6 },
       { document_type: 'fornecedores', prefix: 'FOR', next_number: 1, digit_count: 6 },
@@ -479,7 +477,6 @@ migrate(
       }
     }
 
-    var paramCol = app.findCollectionByNameOrId('system_parameters')
     var paramDefaults = [
       {
         module: 'Vendas',
