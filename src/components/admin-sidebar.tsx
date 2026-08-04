@@ -23,6 +23,7 @@ import {
   canViewConfiguracoes,
   canViewPurchasing,
 } from '@/lib/permissions'
+import { canViewLogistics } from '@/lib/logistics-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -51,6 +52,7 @@ import {
   Star,
   Table,
   Bell,
+  Truck,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -156,6 +158,26 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         icon: Table,
         permission: canViewPriceTables,
       },
+      {
+        label: 'Logística',
+        icon: Truck,
+        submenu: [
+          { to: '/admin/logistica', label: 'Dashboard Logístico' },
+          { to: '/admin/logistica/rotas', label: 'Rotas' },
+          { to: '/admin/logistica/entregas', label: 'Entregas' },
+          { to: '/admin/logistica/veiculos', label: 'Veículos' },
+          { to: '/admin/logistica/motoristas', label: 'Motoristas' },
+          { to: '/admin/logistica/romaneios', label: 'Romaneios' },
+          { to: '/admin/logistica/fretes', label: 'Fretes' },
+          { to: '/admin/logistica/tabelas-frete', label: 'Tabelas de Frete' },
+          { to: '/admin/logistica/rastreamento', label: 'Rastreamento' },
+          { to: '/admin/logistica/ocorrencias', label: 'Ocorrências' },
+          { to: '/admin/logistica/comprovantes', label: 'Comprovantes' },
+          { to: '/admin/logistica/custos', label: 'Custos Logísticos' },
+          { to: '/admin/logistica/relatorios', label: 'Relatórios' },
+        ],
+        permission: canViewLogistics,
+      },
     ],
   },
   {
@@ -243,7 +265,7 @@ export function AdminSidebar({
   const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [openMenus, setOpenMenus] = useState<Set<string>>(
-    new Set(['Vendas', 'Estoque', 'Configurações']),
+    new Set(['Vendas', 'Estoque', 'Configurações', 'Logística']),
   )
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)

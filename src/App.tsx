@@ -36,6 +36,7 @@ import SalesHistoryPage from './pages/sales/SalesHistoryPage'
 import StockPage from './pages/StockPage'
 import WmsScreen from './pages/WmsScreen'
 import Layout from './components/Layout'
+import Logistics from './pages/Logistics'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
 import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
@@ -73,6 +74,55 @@ const App = () => (
                       <Route path="/admin/produtos" element={<Products />} />
                       <Route path="/admin/cadastros" element={<Cadastros />} />
                       <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
+                      <Route path="/admin/logistica" element={<Logistics screen="dashboard" />} />
+                      <Route
+                        path="/admin/logistica/rotas"
+                        element={<Logistics screen="routes" />}
+                      />
+                      <Route
+                        path="/admin/logistica/entregas"
+                        element={<Logistics screen="deliveries" />}
+                      />
+                      <Route
+                        path="/admin/logistica/veiculos"
+                        element={<Logistics screen="vehicles" />}
+                      />
+                      <Route
+                        path="/admin/logistica/motoristas"
+                        element={<Logistics screen="drivers" />}
+                      />
+                      <Route
+                        path="/admin/logistica/romaneios"
+                        element={<Logistics screen="romaneios" />}
+                      />
+                      <Route
+                        path="/admin/logistica/fretes"
+                        element={<Logistics screen="freights" />}
+                      />
+                      <Route
+                        path="/admin/logistica/tabelas-frete"
+                        element={<Logistics screen="freight_tables" />}
+                      />
+                      <Route
+                        path="/admin/logistica/rastreamento"
+                        element={<Logistics screen="tracking" />}
+                      />
+                      <Route
+                        path="/admin/logistica/ocorrencias"
+                        element={<Logistics screen="occurrences" />}
+                      />
+                      <Route
+                        path="/admin/logistica/comprovantes"
+                        element={<Logistics screen="proof" />}
+                      />
+                      <Route
+                        path="/admin/logistica/custos"
+                        element={<Logistics screen="costs" />}
+                      />
+                      <Route
+                        path="/admin/logistica/relatorios"
+                        element={<Logistics screen="reports" />}
+                      />
                       <Route path="/admin/vendas" element={<SalesDashboardPage />} />
                       <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
                       <Route path="/admin/vendas/faturamento" element={<InvoicingPage />} />
