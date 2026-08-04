@@ -12,6 +12,7 @@ import { useMenuHistory } from '@/hooks/use-menu-history'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useMenuBadges } from '@/hooks/use-menu-badges'
 import { canViewSales, canViewStock } from '@/lib/permissions'
+import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -36,6 +37,7 @@ import {
   Search,
   X,
   Star,
+  Table,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -107,6 +109,12 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { id: 'contracts', label: 'Contratos', icon: FileSignature },
       { id: 'purchasing', label: 'Compras', icon: Briefcase },
       { id: 'pricing', label: 'Precificação', icon: DollarSign },
+      {
+        to: '/admin/tabelas-precos',
+        label: 'Tabela de Preços',
+        icon: Table,
+        permission: canViewPriceTables,
+      },
     ],
   },
   {

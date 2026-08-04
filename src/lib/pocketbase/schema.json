@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T13:16:24.463Z",
+  "generatedAt": "2026-08-04T13:32:28.036Z",
   "collections": [
     {
       "name": "users",
@@ -3792,6 +3792,42 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "current_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "difference_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "difference_percent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cbs",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ibs",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "selective_tax",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

@@ -121,6 +121,12 @@ export interface PricingSimulation {
   profit_value: string
   profit_percent: string
   rentability: string
+  current_price: string
+  difference_value: string
+  difference_percent: string
+  cbs: string
+  ibs: string
+  selective_tax: string
   notes: string
   created_by: string
   created: string

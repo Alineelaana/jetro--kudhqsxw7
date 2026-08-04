@@ -26,6 +26,7 @@ import {
   formatCurrency,
   calcFinalCost,
   calcTotalTaxes,
+  calcPrices,
   type PricingConfig,
   type PricingSimulation,
 } from '@/lib/pricing-types'
@@ -133,6 +134,40 @@ export function PricingSimulations() {
     return { profit, margin, profitPercent, rentability }
   }, [simPrice, cost])
 
+  const currentValues = useMemo(() => {
+    if (!pricingCfg) return null
+    const computed = calcPrices(pricingCfg)
+    return {
+      price: parseNum(pricingCfg.suggested_price),
+      cost: computed.total_cost,
+      margin: computed.profit_percent,
+      profit: computed.profit_value,
+      taxes: computed.total_taxes,
+      cbs: parseNum(pricingCfg.cbs),
+      ibs: parseNum(pricingCfg.ibs),
+      selective: parseNum(pricingCfg.selective_tax),
+      profitability: computed.profit_percent,
+    }
+  }, [pricingCfg])
+
+  const comparisonRows = useMemo(() => {
+    if (!currentValues) return [] as [string, number, number][]
+    const sp = parseNum(simPrice)
+    const simProfit = sp - cost
+    const simMargin = sp > 0 ? (simProfit / sp) * 100 : 0
+    return [
+      ['Preço', currentValues.price, sp],
+      ['Custo', currentValues.cost, cost],
+      ['Margem (%)', currentValues.margin, simMargin],
+      ['Lucro', currentValues.profit, simProfit],
+      ['Impostos', currentValues.taxes, currentValues.taxes],
+      ['CBS', currentValues.cbs, currentValues.cbs],
+      ['IBS', currentValues.ibs, currentValues.ibs],
+      ['Seletivo', currentValues.selective, currentValues.selective],
+      ['Rentab.', currentValues.profitability, simMargin],
+    ]
+  }, [currentValues, simPrice, cost])
+
   const resetForm = () => {
     setEditId(null)
     setSimPrice('')
@@ -150,6 +185,10 @@ export function PricingSimulations() {
     setSaving(true)
     setFieldErrors({})
     try {
+      const sp = parseNum(simPrice)
+      const currPrice = currentValues?.price || 0
+      const diffValue = sp - currPrice
+      const diffPercent = currPrice > 0 ? (diffValue / currPrice) * 100 : 0
       const data = {
         product_id: selectedProductId,
         product_code: selectedProduct?.code || '',
@@ -168,6 +207,12 @@ export function PricingSimulations() {
         rentability: simResult.rentability.toFixed(2),
         notes,
         created_by: (user?.name as string) || '',
+        current_price: currPrice.toFixed(2),
+        difference_value: diffValue.toFixed(2),
+        difference_percent: diffPercent.toFixed(2),
+        cbs: pricingCfg?.cbs || '',
+        ibs: pricingCfg?.ibs || '',
+        selective_tax: pricingCfg?.selective_tax || '',
       }
       if (editId) {
         await updateSimulation(editId, data)
@@ -319,6 +364,64 @@ export function PricingSimulations() {
                     <span className="text-xs text-muted-foreground block">Rentabilidade</span>
                     <span className="font-bold text-sm">
                       {formatCurrency(simResult.rentability)}%
+                    </span>
+                  </div>
+                </div>
+              )}
+              {simPrice && currentValues && comparisonRows.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-[#01361D] text-white">
+                        <th className="text-left px-3 py-2">Indicador</th>
+                        <th className="text-right px-3 py-2">Atual</th>
+                        <th className="text-right px-3 py-2">Novo</th>
+                        <th className="text-right px-3 py-2">Dif. %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonRows.map(([label, curr, newVal], i) => {
+                        const diff = curr > 0 ? ((newVal - curr) / curr) * 100 : 0
+                        return (
+                          <tr key={i} className="border-b border-border">
+                            <td className="px-3 py-2 font-medium">{label}</td>
+                            <td className="text-right px-3 py-2">
+                              {label.includes('%')
+                                ? `${formatCurrency(curr)}%`
+                                : `R$ ${formatCurrency(curr)}`}
+                            </td>
+                            <td className="text-right px-3 py-2 font-bold text-[#005B2E]">
+                              {label.includes('%')
+                                ? `${formatCurrency(newVal)}%`
+                                : `R$ ${formatCurrency(newVal)}`}
+                            </td>
+                            <td
+                              className={`text-right px-3 py-2 ${diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-red-600' : ''}`}
+                            >
+                              {diff > 0 ? '+' : ''}
+                              {formatCurrency(diff)}%
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {pricingCfg && (
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="p-2 rounded bg-muted/50">
+                    <span className="text-xs text-muted-foreground block">CBS</span>
+                    <span className="font-bold text-sm">R$ {formatCurrency(pricingCfg.cbs)}</span>
+                  </div>
+                  <div className="p-2 rounded bg-muted/50">
+                    <span className="text-xs text-muted-foreground block">IBS</span>
+                    <span className="font-bold text-sm">R$ {formatCurrency(pricingCfg.ibs)}</span>
+                  </div>
+                  <div className="p-2 rounded bg-muted/50">
+                    <span className="text-xs text-muted-foreground block">Imposto Seletivo</span>
+                    <span className="font-bold text-sm">
+                      R$ {formatCurrency(pricingCfg.selective_tax)}
                     </span>
                   </div>
                 </div>

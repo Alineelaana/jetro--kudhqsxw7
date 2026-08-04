@@ -23,6 +23,7 @@ import TermosDeUso from './pages/TermosDeUso'
 import PoliticaCookies from './pages/PoliticaCookies'
 import Products from './pages/Products'
 import Cadastros from './pages/Cadastros'
+import PriceTablesPage from './pages/PriceTablesPage'
 import SalesDashboardPage from './pages/sales/SalesDashboardPage'
 import SalesOrdersPage from './pages/sales/SalesOrdersPage'
 import InvoicingPage from './pages/sales/InvoicingPage'
@@ -50,6 +51,7 @@ const App = () => (
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/admin/produtos" element={<Products />} />
                     <Route path="/admin/cadastros" element={<Cadastros />} />
+                    <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
                     <Route path="/admin/vendas" element={<SalesDashboardPage />} />
                     <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
                     <Route path="/admin/vendas/faturamento" element={<InvoicingPage />} />

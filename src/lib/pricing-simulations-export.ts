@@ -40,6 +40,12 @@ export function exportPricingSimulationsCsv(simulations: PricingSimulation[]): v
     'Cenário',
     'Tipo',
     'Preço',
+    'Preço Atual',
+    'Dif. Valor',
+    'Dif. %',
+    'CBS',
+    'IBS',
+    'Imposto Seletivo',
     'Custo',
     'Margem (%)',
     'Lucro',
@@ -51,6 +57,12 @@ export function exportPricingSimulationsCsv(simulations: PricingSimulation[]): v
     s.scenario_name || '—',
     SCENARIO_LABELS[s.scenario_type] || s.scenario_type,
     s.simulated_price || '0',
+    s.current_price || '0',
+    s.difference_value || '0',
+    s.difference_percent || '0',
+    s.cbs || '0',
+    s.ibs || '0',
+    s.selective_tax || '0',
     s.simulated_cost || '0',
     s.simulated_margin || '0',
     s.profit_value || '0',
@@ -71,6 +83,11 @@ export function exportPricingSimulationsPdf(
     'Cenário',
     'Tipo',
     'Preço',
+    'Preço Atual',
+    'Dif. %',
+    'CBS',
+    'IBS',
+    'Seletivo',
     'Custo',
     'Margem (%)',
     'Lucro',
@@ -86,6 +103,11 @@ export function exportPricingSimulationsPdf(
 <td>${escapeHtml(s.scenario_name || '—')}</td>
 <td>${escapeHtml(SCENARIO_LABELS[s.scenario_type] || s.scenario_type)}</td>
 <td>R$ ${escapeHtml(s.simulated_price || '0')}</td>
+<td>R$ ${escapeHtml(s.current_price || '0')}</td>
+<td>${escapeHtml(s.difference_percent || '0')}%</td>
+<td>R$ ${escapeHtml(s.cbs || '0')}</td>
+<td>R$ ${escapeHtml(s.ibs || '0')}</td>
+<td>R$ ${escapeHtml(s.selective_tax || '0')}</td>
 <td>R$ ${escapeHtml(s.simulated_cost || '0')}</td>
 <td>${escapeHtml(s.simulated_margin || '0')}%</td>
 <td>R$ ${escapeHtml(s.profit_value || '0')}</td>

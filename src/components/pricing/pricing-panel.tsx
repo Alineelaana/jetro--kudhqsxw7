@@ -6,7 +6,6 @@ import { PricingTables } from '@/components/pricing/pricing-tables'
 import { PricingApprovals } from '@/components/pricing/pricing-approvals'
 import { PricingDashboard } from '@/components/pricing/pricing-dashboard'
 import { PricingIntelligence } from '@/components/pricing/pricing-intelligence'
-import { PricingSimulator } from '@/components/pricing/pricing-simulator'
 import { PricingVersions } from '@/components/pricing/pricing-versions'
 import { PricingTimeline } from '@/components/pricing/pricing-timeline'
 import { PricingVault } from '@/components/pricing/pricing-vault'
@@ -22,7 +21,6 @@ type SubTab =
   | 'approvals'
   | 'dashboard'
   | 'intelligence'
-  | 'simulator'
   | 'versions'
   | 'timeline'
   | 'vault'
@@ -32,7 +30,6 @@ type SubTab =
 
 const SUB_TABS: { id: SubTab; label: string }[] = [
   { id: 'products', label: 'Central de Preços' },
-  { id: 'simulator', label: 'Simulador' },
   { id: 'simulations', label: 'Simulações' },
   { id: 'tables', label: 'Tabelas de Preços' },
   { id: 'approvals', label: 'Aprovações' },
@@ -63,8 +60,6 @@ export function PricingPanel() {
         return <PricingDashboard />
       case 'intelligence':
         return <PricingIntelligence />
-      case 'simulator':
-        return <PricingSimulator />
       case 'versions':
         return <PricingVersions />
       case 'timeline':
