@@ -87,6 +87,7 @@ export function AdminDashboard() {
                 setActiveTab(t)
                 setMobileOpen(false)
               }}
+              onNavigate={() => setMobileOpen(false)}
             />
           </div>
         </div>
