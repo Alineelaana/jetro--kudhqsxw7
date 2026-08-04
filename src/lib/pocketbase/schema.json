@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T00:58:26.704Z",
+  "generatedAt": "2026-08-04T01:04:23.352Z",
   "collections": [
     {
       "name": "users",
@@ -1881,13 +1881,6 @@
           "system": false
         },
         {
-          "name": "type",
-          "type": "select",
-          "required": true,
-          "system": false,
-          "selectValues": ["budget_created", "budget_saved"]
-        },
-        {
           "name": "recipient",
           "type": "relation",
           "required": true,
@@ -1919,6 +1912,13 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["budget_created", "budget_saved", "stock_low", "price_below_cost"]
         }
       ],
       "indexes": [
@@ -5148,6 +5148,105 @@
         "CREATE UNIQUE INDEX idx_representantes_code ON representantes (code) WHERE code != ''",
         "CREATE INDEX idx_representantes_name ON representantes (name)",
         "CREATE INDEX idx_representantes_active ON representantes (active)"
+      ]
+    },
+    {
+      "name": "stock_alerts",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "alert_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["below_min_stock"]
+        },
+        {
+          "name": "severity",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["info", "warning", "critical"]
+        },
+        {
+          "name": "current_stock",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "min_stock",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_stock_alerts_product_id ON stock_alerts (product_id)",
+        "CREATE INDEX idx_stock_alerts_resolved ON stock_alerts (resolved)"
       ]
     }
   ]
