@@ -303,141 +303,119 @@ migrate(
       'stock_expeditions',
       [
         T('numero_expedicao'),
-        T('pedido'),
-        T('cliente'),
-        T('transportadora'),
-        T('motorista'),
-        T('veiculo'),
         T('data'),
-        N('quantidade_volumes'),
+        T('documento_origem'),
+        T('documento_tipo'),
+        T('cliente_destino'),
+        T('transportadora'),
+        T('tipo_frete'),
+        T('volumes'),
         T('peso_bruto'),
         T('peso_liquido'),
-        T('status'),
+        T('valor_mercadoria'),
+        T('data_saida'),
+        T('data_entrega_prevista'),
+        T('data_entrega_real'),
+        T('codigo_rastreamento'),
         T('responsavel'),
+        T('observacoes'),
+        T('status'),
+        J('itens'),
         T('empresa'),
         T('filial'),
         T('deposito'),
-        T('romaneio'),
-        T('observacoes'),
-        J('historico'),
-        FL('proof_of_delivery'),
+        FL('attachments'),
       ],
       [
         'CREATE INDEX idx_stock_expeditions_status ON stock_expeditions (status)',
         'CREATE INDEX idx_stock_expeditions_created ON stock_expeditions (created DESC)',
+        'CREATE INDEX idx_stock_expeditions_cliente ON stock_expeditions (cliente_destino)',
       ],
     )
 
-    // Seed data
-    var locCol = app.findCollectionByNameOrId('stock_locations')
-    try {
-      app.findFirstRecordByData('stock_locations', 'codigo', 'LOC-001')
-    } catch (_) {
-      var loc = new Record(locCol)
-      loc.set('codigo', 'LOC-001')
-      loc.set('descricao', 'Armazém Principal - Setor A - Rua 1 - Coluna 1 - Nível 1 - Posição 1')
-      loc.set('empresa', 'Velora Log')
-      loc.set('filial', 'Matriz')
-      loc.set('deposito', 'Depósito Central')
-      loc.set('setor', 'A')
-      loc.set('rua', '1')
-      loc.set('coluna', '1')
-      loc.set('nivel', '1')
-      loc.set('posicao', '1')
-      loc.set('tipo', 'Armazenagem')
-      loc.set('capacidade', 100)
-      loc.set('permite_mistura_produtos', false)
-      loc.set('permite_mistura_lotes', false)
-      loc.set('situacao', 'Ativo')
-      loc.set('produtos_armazenados', [])
-      app.save(loc)
-    }
+    createCol(
+      'stock_expiries',
+      [
+        T('produto_id'),
+        T('produto_nome'),
+        T('produto_codigo'),
+        T('numero_lote'),
+        T('data_fabricacao'),
+        T('data_validade'),
+        N('quantidade'),
+        N('dias_para_vencer'),
+        T('localizacao'),
+        T('fornecedor'),
+        T('nota_fiscal_entrada'),
+        T('empresa'),
+        T('filial'),
+        T('deposito'),
+        T('situacao'),
+        T('acao_tomada'),
+        T('responsavel'),
+        T('observacoes'),
+        J('historico'),
+      ],
+      [
+        'CREATE INDEX idx_stock_expiries_produto_id ON stock_expiries (produto_id)',
+        'CREATE INDEX idx_stock_expiries_lote ON stock_expiries (numero_lote)',
+        'CREATE INDEX idx_stock_expiries_validade ON stock_expiries (data_validade)',
+        'CREATE INDEX idx_stock_expiries_situacao ON stock_expiries (situacao)',
+        'CREATE INDEX idx_stock_expiries_created ON stock_expiries (created DESC)',
+      ],
+    )
 
-    var batchCol = app.findCollectionByNameOrId('stock_batches')
-    try {
-      app.findFirstRecordByData('stock_batches', 'numero_lote', 'LOTE-2026-001')
-    } catch (_) {
-      var batch = new Record(batchCol)
-      batch.set('produto_id', '')
-      batch.set('produto_nome', 'Caixa de Papelão Ondulado 40x30x30')
-      batch.set('produto_codigo', 'PROD-' + new Date().getFullYear() + '-0001')
-      batch.set('numero_lote', 'LOTE-2026-001')
-      batch.set('data_fabricacao', '2026-07-01')
-      batch.set('data_validade', '2027-07-01')
-      batch.set('fornecedor', 'PackLog')
-      batch.set('nota_fiscal_entrada', 'NF-0001')
-      batch.set('quantidade_recebida', 500)
-      batch.set('quantidade_disponivel', 500)
-      batch.set('quantidade_reservada', 0)
-      batch.set('localizacao', 'LOC-001')
-      batch.set('situacao', 'Disponível')
-      batch.set('empresa', 'Velora Log')
-      batch.set('filial', 'Matriz')
-      batch.set('deposito', 'Depósito Central')
-      batch.set('historico', [])
-      app.save(batch)
-    }
-
-    if (movCol) {
-      try {
-        app.findFirstRecordByData('stock_movements', 'documento_origem', 'NF-ENTRADA-001')
-      } catch (_) {
-        var mov = new Record(movCol)
-        mov.set('produto_nome', 'Caixa de Papelão Ondulado 40x30x30')
-        mov.set('produto_codigo', 'PROD-' + new Date().getFullYear() + '-0001')
-        mov.set('tipo_movimentacao', 'Entrada por Compra')
-        mov.set('documento_origem', 'NF-ENTRADA-001')
-        mov.set('documento_tipo', 'Nota Fiscal de Entrada')
-        mov.set('lote', 'LOTE-2026-001')
-        mov.set('quantidade', 500)
-        mov.set('unidade', 'un')
-        mov.set('localizacao_destino', 'LOC-001')
-        mov.set('saldo_anterior', 0)
-        mov.set('saldo_atual', 500)
-        mov.set('empresa', 'Velora Log')
-        mov.set('filial', 'Matriz')
-        mov.set('deposito', 'Depósito Central')
-        mov.set('localizacao', 'LOC-001')
-        mov.set('motivo', 'Entrada por compra - NF-0001')
-        mov.set('responsavel', 'Sistema')
-        mov.set('custo_unitario', '8,50')
-        mov.set('custo_total', '4250,00')
-        app.save(mov)
-      }
-    }
+    createCol(
+      'stock_dashboards',
+      [
+        T('titulo'),
+        T('descricao'),
+        T('empresa'),
+        T('filial'),
+        T('deposito'),
+        J('dados'),
+        T('periodo'),
+        T('responsavel'),
+      ],
+      ['CREATE INDEX idx_stock_dashboards_created ON stock_dashboards (created DESC)'],
+    )
   },
   (app) => {
-    var cols = [
-      'stock_expeditions',
-      'stock_checkings',
-      'stock_pickings',
-      'stock_locations',
-      'stock_batches',
-      'stock_adjustments',
-      'stock_transfers',
-      'stock_inventories',
+    var collections = [
       'stock_movements',
+      'stock_inventories',
+      'stock_transfers',
+      'stock_adjustments',
+      'stock_batches',
+      'stock_locations',
+      'stock_pickings',
+      'stock_checkings',
+      'stock_expeditions',
+      'stock_expiries',
+      'stock_dashboards',
     ]
-    for (var i = 0; i < cols.length; i++) {
+    for (var i = 0; i < collections.length; i++) {
       try {
-        app.delete(app.findCollectionByNameOrId(cols[i]))
+        var col = app.findCollectionByNameOrId(collections[i])
+        app.delete(col)
       } catch (_) {}
     }
-    try {
-      var prodCol = app.findCollectionByNameOrId('products')
-      var remFields = [
-        'estoque_reservado',
-        'estoque_separacao',
-        'estoque_conferencia',
-        'estoque_transito',
-        'estoque_bloqueado',
-        'estoque_avariado',
-      ]
-      for (var r = 0; r < remFields.length; r++) {
-        var f = prodCol.fields.getByName(remFields[r])
-        if (f) prodCol.fields.remove(f.id)
+
+    var prodCol = app.findCollectionByNameOrId('products')
+    var balFields = [
+      'estoque_reservado',
+      'estoque_separacao',
+      'estoque_conferencia',
+      'estoque_transito',
+      'estoque_bloqueado',
+      'estoque_avariado',
+    ]
+    for (var bi = 0; bi < balFields.length; bi++) {
+      var field = prodCol.fields.getByName(balFields[bi])
+      if (field) {
+        prodCol.fields.remove(field)
       }
-      app.save(prodCol)
-    } catch (_) {}
+    }
+    app.save(prodCol)
   },
 )
