@@ -56,5 +56,18 @@ onRecordCreate((e) => {
   if (!e.record.get('is_suspicious')) e.record.set('is_suspicious', false)
   if (!e.record.get('archived')) e.record.set('archived', false)
 
+  if (!e.record.getString('empresa') || !e.record.getString('filial')) {
+    var userId = e.record.getString('user_id')
+    if (userId) {
+      try {
+        var userRec = $app.findRecordById('users', userId)
+        if (!e.record.getString('empresa'))
+          e.record.set('empresa', userRec.getString('empresa_id') || '')
+        if (!e.record.getString('filial'))
+          e.record.set('filial', userRec.getString('filial_id') || '')
+      } catch (_) {}
+    }
+  }
+
   e.next()
 }, 'audit_logs')

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T04:07:46.170Z",
+  "generatedAt": "2026-08-04T04:19:44.523Z",
   "collections": [
     {
       "name": "users",
@@ -1633,6 +1633,18 @@
           "type": "bool",
           "required": false,
           "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "filial",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1646,7 +1658,9 @@
         "CREATE INDEX `idx_audit_logs_origem` ON `audit_logs` (origem)",
         "CREATE INDEX `idx_audit_logs_session_id` ON `audit_logs` (session_id)",
         "CREATE INDEX `idx_audit_logs_ip_address` ON `audit_logs` (ip_address)",
-        "CREATE INDEX `idx_audit_logs_archived` ON `audit_logs` (archived)"
+        "CREATE INDEX `idx_audit_logs_archived` ON `audit_logs` (archived)",
+        "CREATE INDEX `idx_audit_logs_empresa` ON `audit_logs` (empresa)",
+        "CREATE INDEX `idx_audit_logs_filial` ON `audit_logs` (filial)"
       ]
     },
     {
@@ -6750,7 +6764,7 @@
         "list": "@request.auth.role = 'SUP'",
         "view": "@request.auth.role = 'SUP'",
         "create": null,
-        "update": null,
+        "update": "@request.auth.role = 'SUP'",
         "delete": null
       },
       "fields": [
