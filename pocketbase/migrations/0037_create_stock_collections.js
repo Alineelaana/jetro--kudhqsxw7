@@ -61,6 +61,9 @@ migrate(
       return { name: n, type: 'bool' }
     }
     function SL(n, vals) {
+      if (!vals || !vals.length) {
+        return T(n)
+      }
       return { name: n, type: 'select', values: vals, maxSelect: 1 }
     }
     function FL(n) {
