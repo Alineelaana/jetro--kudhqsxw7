@@ -30,6 +30,12 @@ migrate(
         app.findCollectionByNameOrId(name)
         return null
       } catch (_) {}
+      var safeFields = fields.map(function (f) {
+        if (f.type === 'select' && (!f.values || !f.values.length)) {
+          return { name: f.name, type: 'text' }
+        }
+        return f
+      })
       var col = new Collection({
         name: name,
         type: 'base',
@@ -38,7 +44,7 @@ migrate(
         createRule: R,
         updateRule: R,
         deleteRule: SA,
-        fields: fields.concat([
+        fields: safeFields.concat([
           { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
           { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
         ]),
