@@ -109,6 +109,7 @@ const STOCK_SUBMENU: SubItem[] = [
   { to: '/admin/estoque/wms-volumes', label: 'Gestão de Volumes' },
   { to: '/admin/estoque/wms-coletores', label: 'Gestão de Coletores' },
   { to: '/admin/estoque/wms-operadores', label: 'Gestão de Operadores' },
+  { to: '/admin/estoque/wms-managerial', label: 'Dashboard Gerencial WMS' },
 ]
 
 const CONFIG_SUBMENU: SubItem[] = [

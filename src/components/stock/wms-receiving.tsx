@@ -19,6 +19,7 @@ import { type WmsReceipt } from '@/lib/wms-types'
 import { Plus, Loader2, Search } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
+  'Aguardando Chegada': 'bg-cyan-100 text-cyan-700',
   Pendente: 'bg-amber-100 text-amber-700',
   'Em Recebimento': 'bg-blue-100 text-blue-700',
   Recebido: 'bg-emerald-100 text-emerald-700',
@@ -151,6 +152,16 @@ export function WmsReceiving() {
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex justify-center gap-1">
+                      {r.status === 'Aguardando Chegada' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleStatus(r.id, 'Em Recebimento')}
+                          className="text-cyan-600 h-7 text-xs"
+                        >
+                          Confirmar Chegada
+                        </Button>
+                      )}
                       {r.status === 'Pendente' && (
                         <Button
                           size="sm"

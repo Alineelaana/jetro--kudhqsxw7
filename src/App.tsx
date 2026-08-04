@@ -156,6 +156,10 @@ const App = () => (
                         path="/admin/estoque/wms-operadores"
                         element={<WmsScreen screen="wms-operators" />}
                       />
+                      <Route
+                        path="/admin/estoque/wms-managerial"
+                        element={<WmsScreen screen="wms-managerial" />}
+                      />
                       <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
                         <Route index element={<Navigate to="dados-empresa" replace />} />
                         <Route path="dados-empresa" element={<EmpresaScreen />} />

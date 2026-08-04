@@ -35,6 +35,8 @@ export const updateWmsReplenishment = (
 
 export const getWmsReceiptChecks = (): Promise<Record<string, unknown>[]> =>
   pb.collection('wms_receipt_checks').getFullList({ sort: '-created' })
+export const createWmsReceiptCheck = (data: Record<string, unknown>) =>
+  pb.collection('wms_receipt_checks').create(data)
 export const updateWmsReceiptCheck = (id: string, data: Record<string, unknown>) =>
   pb.collection('wms_receipt_checks').update(id, data)
 
@@ -47,6 +49,8 @@ export const updateWmsSeparation = (id: string, data: Record<string, unknown>) =
 
 export const getWmsExpeditionChecks = (): Promise<Record<string, unknown>[]> =>
   pb.collection('wms_expedition_checks').getFullList({ sort: '-created' })
+export const createWmsExpeditionCheck = (data: Record<string, unknown>) =>
+  pb.collection('wms_expedition_checks').create(data)
 export const updateWmsExpeditionCheck = (id: string, data: Record<string, unknown>) =>
   pb.collection('wms_expedition_checks').update(id, data)
 
