@@ -21,6 +21,7 @@ import { AiTrainingPanel } from '@/components/ai-training-panel'
 import { CmsPanel } from '@/components/cms/cms-panel'
 import { AuditPanel } from '@/components/audit-panel'
 import { BackupPanel } from '@/components/backup-panel'
+import { PurchasingPanel } from '@/components/purchasing/purchasing-panel'
 import {
   LayoutDashboard,
   FileText,
@@ -35,6 +36,7 @@ import {
   Database,
   LogOut,
   UserCog,
+  ShoppingCart,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -51,6 +53,7 @@ type TabId =
   | 'users'
   | 'audit'
   | 'backups'
+  | 'purchasing'
 
 interface MenuItem {
   id: TabId
@@ -68,6 +71,7 @@ const MENU_ITEMS: MenuItem[] = [
   { id: 'partners', label: 'Parceiros', icon: Users, sup: false },
   { id: 'chat', label: 'Chat', icon: MessageSquare, sup: false },
   { id: 'cms', label: 'CMS', icon: Layout, sup: false },
+  { id: 'purchasing', label: 'Gestão Compras', icon: ShoppingCart, sup: false },
   { id: 'ai', label: 'Treinar IA', icon: Bot, sup: true },
   { id: 'users', label: 'Usuários', icon: UserCog, sup: true },
   { id: 'audit', label: 'Auditoria', icon: History, sup: true },
@@ -99,6 +103,8 @@ export function AdminDashboard() {
         return <AdminChatPanel />
       case 'cms':
         return <CmsPanel />
+      case 'purchasing':
+        return <PurchasingPanel />
       case 'ai':
         return <AiTrainingPanel />
       case 'users':
