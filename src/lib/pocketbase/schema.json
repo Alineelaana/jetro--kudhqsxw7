@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T00:34:24.158Z",
+  "generatedAt": "2026-08-04T00:45:53.749Z",
   "collections": [
     {
       "name": "users",
@@ -2826,6 +2826,983 @@
         "CREATE INDEX idx_purchase_returns_status ON purchase_returns (status)",
         "CREATE INDEX idx_purchase_returns_created ON purchase_returns (created)",
         "CREATE INDEX idx_purchase_returns_supplier_id ON purchase_returns (supplier_id)"
+      ]
+    },
+    {
+      "name": "pricing_config",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "brand",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "last_purchase_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "average_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "accounting_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "replacement_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "freight_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "insurance_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "other_expenses_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "financial_discount",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bonifications",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "final_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "icms",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "icms_st",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ipi",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pis",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cofins",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fcp",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "difal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "iss",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "icms_credit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pis_credit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cofins_credit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "commission_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "commission_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "card_fee_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "card_fee_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pix_fee_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "pix_fee_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marketplace_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "marketplace_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "packaging_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "packaging_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "storage_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "storage_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "logistics_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "logistics_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marketing_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "marketing_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "admin_expenses_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "admin_expenses_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "financial_cost_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "financial_cost_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "other_opex_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["percent", "fixed"]
+        },
+        {
+          "name": "other_opex_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "desired_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "minimum_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "markup",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_expenses",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_taxes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expected_profit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "minimum_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ideal_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "suggested_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profit_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profit_percent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price_varejo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price_atacado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price_distribuidor",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price_promocional",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price_especial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pricing_config_product_id ON pricing_config (product_id)",
+        "CREATE INDEX idx_pricing_config_product_code ON pricing_config (product_code)",
+        "CREATE INDEX idx_pricing_config_category ON pricing_config (category)",
+        "CREATE INDEX idx_pricing_config_brand ON pricing_config (brand)"
+      ]
+    },
+    {
+      "name": "price_tables",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "table_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "table_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["varejo", "atacado", "distribuidor", "promocional", "especial"]
+        },
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "discount_percent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "final_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_price_tables_product_id ON price_tables (product_id)",
+        "CREATE INDEX idx_price_tables_table_type ON price_tables (table_type)"
+      ]
+    },
+    {
+      "name": "pricing_simulations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "scenario_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "scenario_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "a_vista",
+            "pix",
+            "cartao",
+            "atacado",
+            "varejo",
+            "promocional",
+            "personalizado"
+          ]
+        },
+        {
+          "name": "simulated_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "simulated_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "simulated_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "simulated_profit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profit_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profit_percent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rentability",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pricing_simulations_product_id ON pricing_simulations (product_id)",
+        "CREATE INDEX idx_pricing_simulations_scenario_type ON pricing_simulations (scenario_type)"
+      ]
+    },
+    {
+      "name": "pricing_history",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "change_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "field_changed",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pricing_history_product_id ON pricing_history (product_id)",
+        "CREATE INDEX idx_pricing_history_created ON pricing_history (created)"
+      ]
+    },
+    {
+      "name": "pricing_approvals",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "requested_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "current_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "margin_percent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "minimum_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["pending", "approved", "rejected"]
+        },
+        {
+          "name": "requester_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approver_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rejection_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pricing_approvals_product_id ON pricing_approvals (product_id)",
+        "CREATE INDEX idx_pricing_approvals_status ON pricing_approvals (status)"
+      ]
+    },
+    {
+      "name": "pricing_alerts",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "alert_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "below_cost",
+            "negative_margin",
+            "selling_at_loss",
+            "tax_not_configured",
+            "cost_outdated",
+            "supplier_price_changed",
+            "tax_burden_changed"
+          ]
+        },
+        {
+          "name": "severity",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["info", "warning", "critical"]
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pricing_alerts_product_id ON pricing_alerts (product_id)",
+        "CREATE INDEX idx_pricing_alerts_alert_type ON pricing_alerts (alert_type)",
+        "CREATE INDEX idx_pricing_alerts_resolved ON pricing_alerts (resolved)"
       ]
     }
   ]
