@@ -26,3 +26,8 @@ export function canViewSales(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
+
+export function canViewStock(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}

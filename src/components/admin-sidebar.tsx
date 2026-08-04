@@ -2,7 +2,7 @@ import { useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
-import { canViewSales } from '@/lib/permissions'
+import { canViewSales, canViewStock } from '@/lib/permissions'
 import {
   LayoutDashboard,
   FileText,
@@ -20,6 +20,7 @@ import {
   Archive,
   Bot,
   FileSignature,
+  Boxes,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -48,6 +49,20 @@ const SALES_SUBMENU: SubItem[] = [
   { to: '/admin/vendas/historico', label: 'Histórico de Vendas' },
 ]
 
+const STOCK_SUBMENU: SubItem[] = [
+  { to: '/admin/estoque', label: 'Dashboard de Estoque' },
+  { to: '/admin/estoque/movimentacoes', label: 'Movimentações' },
+  { to: '/admin/estoque/inventario', label: 'Inventário' },
+  { to: '/admin/estoque/transferencias', label: 'Transferências' },
+  { to: '/admin/estoque/ajustes', label: 'Ajustes de Estoque' },
+  { to: '/admin/estoque/lotes', label: 'Controle de Lotes' },
+  { to: '/admin/estoque/validade', label: 'Controle de Validade' },
+  { to: '/admin/estoque/localizacoes', label: 'Localizações' },
+  { to: '/admin/estoque/separacao', label: 'Separação' },
+  { to: '/admin/estoque/conferencia', label: 'Conferência' },
+  { to: '/admin/estoque/expedicao', label: 'Expedição' },
+]
+
 const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operacional',
@@ -65,6 +80,7 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { to: '/admin/cadastros', label: 'Cadastros', icon: Database },
       { to: '/admin/produtos', label: 'Produtos', icon: Package },
       { label: 'Vendas', icon: ShoppingCart, submenu: SALES_SUBMENU, permission: canViewSales },
+      { label: 'Estoque', icon: Boxes, submenu: STOCK_SUBMENU, permission: canViewStock },
       { id: 'contracts', label: 'Contratos', icon: FileSignature },
       { id: 'purchasing', label: 'Compras', icon: Briefcase },
       { id: 'pricing', label: 'Precificação', icon: DollarSign },
@@ -90,7 +106,7 @@ export function AdminSidebar({
   onTabChange: (tab: string) => void
 }) {
   const { user } = useAuth()
-  const [openMenus, setOpenMenus] = useState<Set<string>>(new Set(['Vendas']))
+  const [openMenus, setOpenMenus] = useState<Set<string>>(new Set(['Vendas', 'Estoque']))
 
   const toggleMenu = (label: string) =>
     setOpenMenus((prev) => {

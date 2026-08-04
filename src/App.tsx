@@ -31,6 +31,7 @@ import NfcePage from './pages/sales/NfcePage'
 import ContractsPage from './pages/sales/ContractsPage'
 import SalesReturnsPage from './pages/sales/SalesReturnsPage'
 import SalesHistoryPage from './pages/sales/SalesHistoryPage'
+import StockPage from './pages/StockPage'
 import Layout from './components/Layout'
 
 const App = () => (
@@ -57,6 +58,41 @@ const App = () => (
                     <Route path="/admin/vendas/contratos" element={<ContractsPage />} />
                     <Route path="/admin/vendas/devolucoes" element={<SalesReturnsPage />} />
                     <Route path="/admin/vendas/historico" element={<SalesHistoryPage />} />
+                    <Route path="/admin/estoque" element={<StockPage screen="dashboard" />} />
+                    <Route
+                      path="/admin/estoque/movimentacoes"
+                      element={<StockPage screen="movements" />}
+                    />
+                    <Route
+                      path="/admin/estoque/inventario"
+                      element={<StockPage screen="inventory" />}
+                    />
+                    <Route
+                      path="/admin/estoque/transferencias"
+                      element={<StockPage screen="transfers" />}
+                    />
+                    <Route
+                      path="/admin/estoque/ajustes"
+                      element={<StockPage screen="adjustments" />}
+                    />
+                    <Route path="/admin/estoque/lotes" element={<StockPage screen="batches" />} />
+                    <Route path="/admin/estoque/validade" element={<StockPage screen="expiry" />} />
+                    <Route
+                      path="/admin/estoque/localizacoes"
+                      element={<StockPage screen="locations" />}
+                    />
+                    <Route
+                      path="/admin/estoque/separacao"
+                      element={<StockPage screen="picking" />}
+                    />
+                    <Route
+                      path="/admin/estoque/conferencia"
+                      element={<StockPage screen="checking" />}
+                    />
+                    <Route
+                      path="/admin/estoque/expedicao"
+                      element={<StockPage screen="expedition" />}
+                    />
                     <Route path="/admin/cadastro" element={<AdminRegister />} />
                     <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                     <Route path="/cliente/login" element={<ClientLogin />} />
