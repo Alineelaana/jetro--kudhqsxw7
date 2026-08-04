@@ -10,6 +10,10 @@ import { StockLocations } from '@/components/stock/stock-locations'
 import { StockPicking } from '@/components/stock/stock-picking'
 import { StockChecking } from '@/components/stock/stock-checking'
 import { StockExpedition } from '@/components/stock/stock-expedition'
+import { WmsReceiving } from '@/components/stock/wms-receiving'
+import { WmsPutaway } from '@/components/stock/wms-putaway'
+import { WmsWaves } from '@/components/stock/wms-waves'
+import { WmsReplenishment } from '@/components/stock/wms-replenishment'
 
 const TITLES: Record<string, string> = {
   dashboard: 'Dashboard de Estoque',
@@ -23,6 +27,10 @@ const TITLES: Record<string, string> = {
   picking: 'Separação',
   checking: 'Conferência',
   expedition: 'Expedição',
+  receiving: 'Recebimento WMS',
+  putaway: 'Endereçamento',
+  waves: 'Ondas de Separação',
+  replenishment: 'Reabastecimento',
 }
 
 export default function StockPage({ screen }: { screen: string }) {
@@ -52,6 +60,14 @@ export default function StockPage({ screen }: { screen: string }) {
         return <StockChecking />
       case 'expedition':
         return <StockExpedition />
+      case 'receiving':
+        return <WmsReceiving />
+      case 'putaway':
+        return <WmsPutaway />
+      case 'waves':
+        return <WmsWaves />
+      case 'replenishment':
+        return <WmsReplenishment />
       default:
         return <StockDashboard />
     }

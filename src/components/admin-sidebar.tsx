@@ -99,6 +99,10 @@ const STOCK_SUBMENU: SubItem[] = [
   { to: '/admin/estoque/separacao', label: 'Separação' },
   { to: '/admin/estoque/conferencia', label: 'Conferência' },
   { to: '/admin/estoque/expedicao', label: 'Expedição' },
+  { to: '/admin/estoque/recebimento', label: 'Recebimento WMS' },
+  { to: '/admin/estoque/enderecamento', label: 'Endereçamento' },
+  { to: '/admin/estoque/ondas', label: 'Ondas de Separação' },
+  { to: '/admin/estoque/reabastecimento', label: 'Reabastecimento' },
 ]
 
 const CONFIG_SUBMENU: SubItem[] = [

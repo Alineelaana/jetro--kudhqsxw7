@@ -118,6 +118,19 @@ const App = () => (
                         path="/admin/estoque/expedicao"
                         element={<StockPage screen="expedition" />}
                       />
+                      <Route
+                        path="/admin/estoque/recebimento"
+                        element={<StockPage screen="receiving" />}
+                      />
+                      <Route
+                        path="/admin/estoque/enderecamento"
+                        element={<StockPage screen="putaway" />}
+                      />
+                      <Route path="/admin/estoque/ondas" element={<StockPage screen="waves" />} />
+                      <Route
+                        path="/admin/estoque/reabastecimento"
+                        element={<StockPage screen="replenishment" />}
+                      />
                       <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
                         <Route index element={<Navigate to="dados-empresa" replace />} />
                         <Route path="dados-empresa" element={<EmpresaScreen />} />
