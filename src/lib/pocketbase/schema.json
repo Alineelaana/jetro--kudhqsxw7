@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T01:09:54.559Z",
+  "generatedAt": "2026-08-04T01:23:34.257Z",
   "collections": [
     {
       "name": "users",
@@ -5247,6 +5247,780 @@
       "indexes": [
         "CREATE INDEX idx_stock_alerts_product_id ON stock_alerts (product_id)",
         "CREATE INDEX idx_stock_alerts_resolved ON stock_alerts (resolved)"
+      ]
+    },
+    {
+      "name": "sales_orders",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "salesperson_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "salesperson_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "price_table_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_condition",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_method",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivery_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "carrier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "freight_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivery_address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cost_center",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "internal_notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fiscal_notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gross_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "discount_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "addition_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "freight_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "insurance_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "other_expenses",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tax_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_data",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "stock_reserved",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_sales_orders_status ON sales_orders (status)",
+        "CREATE INDEX idx_sales_orders_created ON sales_orders (created DESC)",
+        "CREATE INDEX idx_sales_orders_client ON sales_orders (client_name)"
+      ]
+    },
+    {
+      "name": "sales_invoices",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "invoice_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "carrier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "volumes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gross_weight",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "net_weight",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "freight_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "other_expenses",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_sales_invoices_status ON sales_invoices (status)",
+        "CREATE INDEX idx_sales_invoices_created ON sales_invoices (created DESC)"
+      ]
+    },
+    {
+      "name": "nfe_records",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "nfe_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nature_of_operation",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cfop",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tax_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "carrier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "volumes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "billing_data",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "additional_info",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "xml_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "danfe_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "authorization_protocol",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rejection_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_nfe_records_status ON nfe_records (status)",
+        "CREATE INDEX idx_nfe_records_created ON nfe_records (created DESC)"
+      ]
+    },
+    {
+      "name": "nfce_records",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "nfce_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "consumer_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "consumer_doc",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "discount_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_method",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "change_amount",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "xml_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "receipt_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "authorization_protocol",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_nfce_records_status ON nfce_records (status)",
+        "CREATE INDEX idx_nfce_records_created ON nfce_records (created DESC)"
+      ]
+    },
+    {
+      "name": "sales_returns",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "return_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_condition",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "destination",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_analyst",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "financial_treatment",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_sales_returns_status ON sales_returns (status)",
+        "CREATE INDEX idx_sales_returns_created ON sales_returns (created DESC)"
       ]
     }
   ]
