@@ -41,6 +41,7 @@ import Logistics from './pages/Logistics'
 import Financial from './pages/Financial'
 import RH from './pages/RH'
 import Conformidade from './pages/Conformidade'
+import Fiscal from './pages/Fiscal'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
 import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
@@ -336,6 +337,77 @@ const App = () => (
                       <Route path="/admin/rh/aprovacoes" element={<RH screen="approvals" />} />
                       <Route path="/admin/rh/relatorios" element={<RH screen="reports" />} />
                       <Route path="/admin/conformidade" element={<Conformidade />} />
+                      <Route path="/admin/fiscal" element={<Fiscal screen="dashboard" />} />
+                      <Route path="/admin/fiscal/entrada" element={<Fiscal screen="entrada" />} />
+                      <Route path="/admin/fiscal/nfe" element={<Fiscal screen="nfe" />} />
+                      <Route path="/admin/fiscal/nfse" element={<Fiscal screen="nfse" />} />
+                      <Route path="/admin/fiscal/nfce" element={<Fiscal screen="nfce" />} />
+                      <Route path="/admin/fiscal/cte" element={<Fiscal screen="cte" />} />
+                      <Route path="/admin/fiscal/mdfe" element={<Fiscal screen="mdfe" />} />
+                      <Route path="/admin/fiscal/apuracao" element={<Fiscal screen="apuracao" />} />
+                      <Route
+                        path="/admin/fiscal/reforma-dashboard"
+                        element={<Fiscal screen="reforma_dashboard" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-cbs-ibs"
+                        element={<Fiscal screen="reforma_cbs_ibs" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-seletivo"
+                        element={<Fiscal screen="reforma_seletivo" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-classificacao"
+                        element={<Fiscal screen="reforma_classificacao" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-regras"
+                        element={<Fiscal screen="reforma_regras" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-transicao"
+                        element={<Fiscal screen="reforma_transicao" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-creditos"
+                        element={<Fiscal screen="reforma_creditos" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-simulador"
+                        element={<Fiscal screen="reforma_simulador" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/reforma-validacao"
+                        element={<Fiscal screen="reforma_validacao" />}
+                      />
+                      <Route path="/admin/fiscal/sped" element={<Fiscal screen="sped" />} />
+                      <Route path="/admin/fiscal/livros" element={<Fiscal screen="livros" />} />
+                      <Route path="/admin/fiscal/correcao" element={<Fiscal screen="correcao" />} />
+                      <Route
+                        path="/admin/fiscal/manifestacao"
+                        element={<Fiscal screen="manifestacao" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/documentos"
+                        element={<Fiscal screen="documentos" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/inutilizacao"
+                        element={<Fiscal screen="inutilizacao" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/certificados"
+                        element={<Fiscal screen="certificados" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/configuracoes"
+                        element={<Fiscal screen="configuracoes" />}
+                      />
+                      <Route
+                        path="/admin/fiscal/relatorios"
+                        element={<Fiscal screen="relatorios" />}
+                      />
                       <Route path="/admin/notificacoes" element={<Notifications />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />

@@ -149,6 +149,11 @@ export function canManageAiTraining(role: string | undefined): boolean {
   return role === 'SUP'
 }
 
+export function canViewFiscal(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
 export function canViewPurchasing(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)

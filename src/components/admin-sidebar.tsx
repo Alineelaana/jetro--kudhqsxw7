@@ -26,6 +26,7 @@ import {
 import { canViewLogistics } from '@/lib/logistics-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
+import { canViewFiscal } from '@/lib/permissions'
 import { canViewRH } from '@/lib/rh-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -202,6 +203,39 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         permission: canViewFinancial,
       },
       {
+        label: 'Fiscal',
+        icon: FileText,
+        permission: canViewFiscal,
+        submenu: [
+          { to: '/admin/fiscal', label: 'Dashboard Fiscal' },
+          { to: '/admin/fiscal/entrada', label: 'Entrada de Notas' },
+          { to: '/admin/fiscal/nfe', label: 'Emissão de NF-e' },
+          { to: '/admin/fiscal/nfse', label: 'Emissão de NFS-e' },
+          { to: '/admin/fiscal/nfce', label: 'NFC-e' },
+          { to: '/admin/fiscal/cte', label: 'CT-e' },
+          { to: '/admin/fiscal/mdfe', label: 'MDF-e' },
+          { to: '/admin/fiscal/apuracao', label: 'Apuração de Impostos' },
+          { to: '/admin/fiscal/reforma-dashboard', label: 'Reforma: Dashboard' },
+          { to: '/admin/fiscal/reforma-cbs-ibs', label: 'Reforma: CBS/IBS' },
+          { to: '/admin/fiscal/reforma-seletivo', label: 'Reforma: Imposto Seletivo' },
+          { to: '/admin/fiscal/reforma-classificacao', label: 'Reforma: Classificação' },
+          { to: '/admin/fiscal/reforma-regras', label: 'Reforma: Regras' },
+          { to: '/admin/fiscal/reforma-transicao', label: 'Reforma: Transição' },
+          { to: '/admin/fiscal/reforma-creditos', label: 'Reforma: Créditos/Débitos' },
+          { to: '/admin/fiscal/reforma-simulador', label: 'Reforma: Simulador' },
+          { to: '/admin/fiscal/reforma-validacao', label: 'Reforma: Validação' },
+          { to: '/admin/fiscal/sped', label: 'SPED' },
+          { to: '/admin/fiscal/livros', label: 'Livros Fiscais' },
+          { to: '/admin/fiscal/correcao', label: 'Carta de Correção' },
+          { to: '/admin/fiscal/manifestacao', label: 'Manifestação' },
+          { to: '/admin/fiscal/documentos', label: 'Documentos Fiscais' },
+          { to: '/admin/fiscal/inutilizacao', label: 'Inutilização' },
+          { to: '/admin/fiscal/certificados', label: 'Certificados Digitais' },
+          { to: '/admin/fiscal/configuracoes', label: 'Configurações Fiscais' },
+          { to: '/admin/fiscal/relatorios', label: 'Relatórios Fiscais' },
+        ],
+      },
+      {
         label: 'Logística',
         icon: Truck,
         submenu: [
@@ -318,7 +352,7 @@ export function AdminSidebar({
   const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [openMenus, setOpenMenus] = useState<Set<string>>(
-    new Set(['Vendas', 'Estoque', 'Configurações', 'Logística', 'Financeiro']),
+    new Set(['Vendas', 'Estoque', 'Configurações', 'Logística', 'Financeiro', 'Fiscal']),
   )
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)
