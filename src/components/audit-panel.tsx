@@ -14,13 +14,8 @@ import { PaginationControls } from '@/components/pagination-controls'
 import { AuditDetailDialog } from '@/components/audit-detail-dialog'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
-import {
-  getAuditLogs,
-  type AuditLog,
-  AUDIT_MODULE_OPTIONS,
-  AUDIT_ACTION_OPTIONS,
-  AUDIT_ROLE_OPTIONS,
-} from '@/services/audit-logs'
+import { getAuditLogs, type AuditLog } from '@/services/audit-logs'
+import { AUDIT_MODULE_OPTIONS, AUDIT_ACTION_OPTIONS, AUDIT_ROLE_OPTIONS } from '@/lib/audit-helpers'
 import { exportAuditExcel, exportAuditPdf } from '@/lib/audit-export'
 import {
   Loader2,
