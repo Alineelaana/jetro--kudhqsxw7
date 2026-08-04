@@ -1,0 +1,68 @@
+import type { RhScreenConfig } from '@/lib/rh-types'
+
+export const RH_EXTENDED_CONFIGS: Record<string, RhScreenConfig> = {
+  avaliacoes: {
+    collection: 'rh_performance_evaluations',
+    title: 'Avaliações de Desempenho',
+    nameLabel: 'Colaborador',
+    statusField: 'situacao',
+    statusOptions: ['Pendente', 'Em Andamento', 'Concluída', 'Cancelada'],
+    fields: [
+      { name: 'employee_name', label: 'Colaborador', type: 'text', required: true },
+      { name: 'cargo', label: 'Cargo', type: 'text' },
+      { name: 'departamento', label: 'Departamento', type: 'text' },
+      { name: 'avaliador', label: 'Avaliador', type: 'text' },
+      { name: 'periodo', label: 'Período', type: 'text', required: true },
+      { name: 'tipo_avaliacao', label: 'Tipo', type: 'text' },
+      { name: 'nota_final', label: 'Nota Final', type: 'text' },
+      { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+    ],
+  },
+  plano_carreira: {
+    collection: 'rh_career_plans',
+    title: 'Plano de Carreira',
+    nameLabel: 'Colaborador',
+    statusField: 'situacao',
+    statusOptions: ['Ativo', 'Concluído', 'Pausado', 'Cancelado'],
+    fields: [
+      { name: 'employee_name', label: 'Colaborador', type: 'text', required: true },
+      { name: 'cargo_atual', label: 'Cargo Atual', type: 'text' },
+      { name: 'cargo_desejado', label: 'Cargo Desejado', type: 'text' },
+      { name: 'prazo', label: 'Prazo', type: 'text' },
+      { name: 'sucessor_de', label: 'Sucessor de', type: 'text' },
+      { name: 'acoes_necessarias', label: 'Ações Necessárias', type: 'textarea', span: 2 },
+      { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+    ],
+  },
+  pesquisa_clima: {
+    collection: 'rh_climate_surveys',
+    title: 'Pesquisa de Clima Organizacional',
+    nameLabel: 'Título',
+    statusField: 'situacao',
+    statusOptions: ['Planejada', 'Aberta', 'Encerrada', 'Cancelada'],
+    fields: [
+      { name: 'titulo', label: 'Título', type: 'text', required: true },
+      { name: 'periodo_inicio', label: 'Início', type: 'date' },
+      { name: 'periodo_fim', label: 'Fim', type: 'date' },
+      { name: 'participantes', label: 'Participantes', type: 'number' },
+      { name: 'taxa_participacao', label: 'Taxa Participação (%)', type: 'text' },
+      { name: 'nota_geral', label: 'Nota Geral', type: 'text' },
+      { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+    ],
+  },
+  comunicacao: {
+    collection: 'rh_internal_communications',
+    title: 'Comunicação Interna',
+    nameLabel: 'Título',
+    statusField: 'situacao',
+    statusOptions: ['Rascunho', 'Publicada', 'Agendada', 'Arquivada'],
+    fields: [
+      { name: 'titulo', label: 'Título', type: 'text', required: true },
+      { name: 'tipo', label: 'Tipo', type: 'text' },
+      { name: 'data_publicacao', label: 'Data Publicação', type: 'date' },
+      { name: 'destinatarios', label: 'Destinatários', type: 'text' },
+      { name: 'autor', label: 'Autor', type: 'text' },
+      { name: 'conteudo', label: 'Conteúdo', type: 'textarea', span: 2 },
+    ],
+  },
+}

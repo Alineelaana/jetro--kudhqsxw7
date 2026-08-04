@@ -1,0 +1,72 @@
+import type { RhFieldDef, RhScreenConfig } from '@/lib/rh-types'
+
+export interface DpScreenConfig extends RhScreenConfig {
+  filterField?: string
+  filterValue?: string
+}
+
+const SIT_GERAL = ['Ativo', 'Inativo', 'Pendente', 'Concluído', 'Cancelado'] as const
+const SIT_DOC = ['Válido', 'Vencido', 'Próximo do Vencimento', 'Arquivado'] as const
+
+export const DP_SCREEN_CONFIGS: Record<string, DpScreenConfig> = {
+  admissions: { collection: 'dp_admissions', title: 'Admissões', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Pendente', 'Em Andamento', 'Concluída', 'Cancelada'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'cpf', label: 'CPF', type: 'text' }, { name: 'cargo', label: 'Cargo', type: 'text' }, { name: 'data_admissao', label: 'Data Admissão', type: 'date' }, { name: 'tipo_contrato', label: 'Tipo Contrato', type: 'text' }, { name: 'salario', label: 'Salário', type: 'text' }, { name: 'departamento', label: 'Departamento', type: 'text' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  contracts: { collection: 'dp_work_contracts', title: 'Contratos de Trabalho', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Ativo', 'Suspensos', 'Rescindido', 'Vencido'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'tipo_contrato', label: 'Tipo', type: 'text' }, { name: 'data_inicio', label: 'Data Início', type: 'date' }, { name: 'data_fim', label: 'Data Fim', type: 'date' }, { name: 'salario', label: 'Salário', type: 'text' }, { name: 'jornada', label: 'Jornada', type: 'text' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  jornadas: { collection: 'rh_scales', title: 'Jornadas de Trabalho', nameLabel: 'Escala', statusField: 'situacao', statusOptions: ['Ativo', 'Inativo'], fields: [
+    { name: 'name', label: 'Nome', type: 'text', required: true }, { name: 'tipo_escala', label: 'Tipo', type: 'text' }, { name: 'turno', label: 'Turno', type: 'text' }, { name: 'horario_entrada', label: 'Entrada', type: 'text' }, { name: 'horario_saida', label: 'Saída', type: 'text' }, { name: 'jornada_diaria', label: 'Jornada Diária', type: 'text' }, { name: 'dias_trabalho', label: 'Dias Trabalho', type: 'text' },
+  ]},
+  escalas: { collection: 'rh_scales', title: 'Escalas', nameLabel: 'Escala', statusField: 'situacao', statusOptions: ['Ativo', 'Inativo'], fields: [
+    { name: 'name', label: 'Nome', type: 'text', required: true }, { name: 'tipo_escala', label: 'Tipo', type: 'text' }, { name: 'turno', label: 'Turno', type: 'text' }, { name: 'horario_entrada', label: 'Entrada', type: 'text' }, { name: 'horario_saida', label: 'Saída', type: 'text' }, { name: 'folgas', label: 'Folgas', type: 'text' },
+  ]},
+  banco_horas: { collection: 'rh_time_records', title: 'Banco de Horas', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Pendente', 'Aprovado', 'Fechado'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'data', label: 'Data', type: 'date' }, { name: 'banco_horas', label: 'Banco de Horas', type: 'text' }, { name: 'horas_trabalhadas', label: 'Horas Trabalhadas', type: 'text' },
+  ]},
+  horas_extras: { collection: 'rh_time_records', title: 'Horas Extras', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Pendente', 'Aprovado', 'Fechado'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'data', label: 'Data', type: 'date' }, { name: 'horas_extras', label: 'Horas Extras', type: 'text' }, { name: 'adicional_noturno', label: 'Adicional Noturno', type: 'text' },
+  ]},
+  leaves: { collection: 'dp_leaves', title: 'Afastamentos', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Em Andamento', 'Concluído', 'Cancelado'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'tipo_afastamento', label: 'Tipo', type: 'text' }, { name: 'data_inicio', label: 'Início', type: 'date' }, { name: 'data_fim', label: 'Fim', type: 'date' }, { name: 'motivo', label: 'Motivo', type: 'text' }, { name: 'cid', label: 'CID', type: 'text' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  licenses: { collection: 'dp_licenses', title: 'Licenças', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Ativa', 'Concluída', 'Cancelada'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'tipo_licenca', label: 'Tipo', type: 'text' }, { name: 'data_inicio', label: 'Início', type: 'date' }, { name: 'data_fim', label: 'Fim', type: 'date' }, { name: 'motivo', label: 'Motivo', type: 'text' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  events: { collection: 'rh_payroll_events', title: 'Eventos da Folha', nameLabel: 'Evento', statusField: 'situacao', statusOptions: [...SIT_GERAL], fields: [
+    { name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nome', type: 'text', required: true }, { name: 'tipo', label: 'Tipo', type: 'text' }, { name: 'forma_calculo', label: 'Forma Cálculo', type: 'text' }, { name: 'percentual', label: 'Percentual', type: 'text' },
+  ]},
+  13th_salary: { collection: 'dp_13th_salary', title: '13º Salário', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Planejada', 'Primeira Parcela Paga', 'Concluída', 'Cancelada'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'competencia', label: 'Competência', type: 'text' }, { name: 'valor_primeira', label: 'Valor 1ª Parcela', type: 'text' }, { name: 'valor_segunda', label: 'Valor 2ª Parcela', type: 'text' }, { name: 'data_primeira', label: 'Data 1ª', type: 'date' }, { name: 'data_segunda', label: 'Data 2ª', type: 'date' },
+  ]},
+  dismissals: { collection: 'rh_dismissals', title: 'Rescisões', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Pendente', 'Concluída', 'Cancelada'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'data_desligamento', label: 'Data Desligamento', type: 'date' }, { name: 'tipo_desligamento', label: 'Tipo', type: 'text' }, { name: 'motivo', label: 'Motivo', type: 'text' }, { name: 'aviso_previo', label: 'Aviso Prévio', type: 'text' }, { name: 'valor_rescisao', label: 'Valor Rescisão', type: 'text' },
+  ]},
+  benefits: { collection: 'rh_benefits', title: 'Benefícios', nameLabel: 'Benefício', statusField: 'situacao', statusOptions: ['Ativo', 'Inativo'], fields: [
+    { name: 'name', label: 'Nome', type: 'text', required: true }, { name: 'tipo_beneficio', label: 'Tipo', type: 'text' }, { name: 'fornecedor', label: 'Fornecedor', type: 'text' }, { name: 'valor', label: 'Valor', type: 'text' }, { name: 'participacao_empresa', label: 'Participação Empresa', type: 'text' },
+  ]},
+  charges: { collection: 'dp_labor_charges', title: 'Encargos Trabalhistas', nameLabel: 'Tipo', statusField: 'situacao', statusOptions: ['Em Aberto', 'Pago', 'Vencido', 'Cancelado'], fields: [
+    { name: 'tipo_encargo', label: 'Tipo', type: 'text', required: true }, { name: 'competencia', label: 'Competência', type: 'text' }, { name: 'valor', label: 'Valor', type: 'text' }, { name: 'data_vencimento', label: 'Vencimento', type: 'date' }, { name: 'data_pagamento', label: 'Pagamento', type: 'date' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  esocial: { collection: 'dp_esocial_events', title: 'eSocial', nameLabel: 'Evento', statusField: 'situacao', statusOptions: ['Pendente', 'Enviado', 'Processado', 'Rejeitado'], fields: [
+    { name: 'tipo_evento', label: 'Tipo Evento', type: 'text', required: true }, { name: 'codigo', label: 'Código', type: 'text' }, { name: 'competencia', label: 'Competência', type: 'text' }, { name: 'employee_name', label: 'Colaborador', type: 'text' }, { name: 'data_envio', label: 'Data Envio', type: 'date' }, { name: 'protocolo', label: 'Protocolo', type: 'text' },
+  ]},
+  fgts: { collection: 'dp_labor_charges', title: 'FGTS', nameLabel: 'Tipo', filterField: 'tipo_encargo', filterValue: 'FGTS', statusField: 'situacao', statusOptions: ['Em Aberto', 'Pago', 'Vencido'], fields: [
+    { name: 'competencia', label: 'Competência', type: 'text', required: true }, { name: 'valor', label: 'Valor', type: 'text' }, { name: 'data_vencimento', label: 'Vencimento', type: 'date' }, { name: 'data_pagamento', label: 'Pagamento', type: 'date' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  inss: { collection: 'dp_labor_charges', title: 'INSS', nameLabel: 'Tipo', filterField: 'tipo_encargo', filterValue: 'INSS', statusField: 'situacao', statusOptions: ['Em Aberto', 'Pago', 'Vencido'], fields: [
+    { name: 'competencia', label: 'Competência', type: 'text', required: true }, { name: 'valor', label: 'Valor', type: 'text' }, { name: 'data_vencimento', label: 'Vencimento', type: 'date' }, { name: 'data_pagamento', label: 'Pagamento', type: 'date' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  irrf: { collection: 'dp_labor_charges', title: 'IRRF', nameLabel: 'Tipo', filterField: 'tipo_encargo', filterValue: 'IRRF', statusField: 'situacao', statusOptions: ['Em Aberto', 'Pago', 'Vencido'], fields: [
+    { name: 'competencia', label: 'Competência', type: 'text', required: true }, { name: 'valor', label: 'Valor', type: 'text' }, { name: 'data_vencimento', label: 'Vencimento', type: 'date' }, { name: 'data_pagamento', label: 'Pagamento', type: 'date' }, { name: 'observacoes', label: 'Observações', type: 'textarea', span: 2 },
+  ]},
+  exams: { collection: 'dp_occupational_exams', title: 'Exames Ocupacionais', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: [...SIT_DOC], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'tipo_exame', label: 'Tipo Exame', type: 'text' }, { name: 'data_realizacao', label: 'Data Realização', type: 'date' }, { name: 'data_validade', label: 'Validade', type: 'date' }, { name: 'resultado', label: 'Resultado', type: 'text' }, { name: 'medico', label: 'Médico', type: 'text' },
+  ]},
+  uniforms_epis: { collection: 'dp_uniforms_epis', title: 'Uniformes e EPIs', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: ['Entregue', 'Devolvido', 'Vencido'], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'item', label: 'Item', type: 'text' }, { name: 'tipo', label: 'Tipo', type: 'text' }, { name: 'data_entrega', label: 'Data Entrega', type: 'date' }, { name: 'quantidade', label: 'Quantidade', type: 'number' }, { name: 'ca', label: 'CA', type: 'text' },
+  ]},
+  mandatory_docs: { collection: 'dp_mandatory_docs', title: 'Documentos Obrigatórios', nameLabel: 'Colaborador', statusField: 'situacao', statusOptions: [...SIT_DOC], fields: [
+    { name: 'employee_name', label: 'Colaborador', type: 'text', required: true }, { name: 'documento', label: 'Documento', type: 'text' }, { name: 'categoria', label: 'Categoria', type: 'text' }, { name: 'data_entrega', label: 'Data Entrega', type: 'date' }, { name: 'data_validade', label: 'Validade', type: 'date' },
+  ]},
+}
