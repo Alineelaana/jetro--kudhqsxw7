@@ -36,6 +36,9 @@ import {
 import type { Product } from '@/lib/product-types'
 import { Search, Save, Loader2, AlertTriangle, TrendingUp, Calculator } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { JustificationDialog } from '@/components/pricing/justification-dialog'
+import { createVaultEntry } from '@/services/pricing-governance'
+import { checkSmartBlocks } from '@/lib/pricing-permissions'
 
 export function PricingProducts() {
   const { user } = useAuth()
@@ -52,6 +55,12 @@ export function PricingProducts() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [supplierFilter, setSupplierFilter] = useState('all')
   const [tableFilter, setTableFilter] = useState('all')
+  const [justificationOpen, setJustificationOpen] = useState(false)
+  const [justificationReason, setJustificationReason] = useState('')
+  const [justificationText, setJustificationText] = useState('')
+  const [relatedDocument, setRelatedDocument] = useState('')
+  const [relatedCampaign, setRelatedCampaign] = useState('')
+  const [observations, setObservations] = useState('')
 
   const loadData = async () => {
     try {
@@ -137,6 +146,14 @@ export function PricingProducts() {
       toast({ title: 'Selecione um produto', variant: 'destructive' })
       return
     }
+    if (!justificationOpen) {
+      setJustificationOpen(true)
+      return
+    }
+    if (!justificationReason.trim() || !justificationText.trim()) {
+      toast({ title: 'Motivo e justificativa são obrigatórios', variant: 'destructive' })
+      return
+    }
     setSaving(true)
     try {
       const data: Record<string, unknown> = {
@@ -179,6 +196,43 @@ export function PricingProducts() {
           new_value: data.suggested_price as string,
         })
       }
+      try {
+        const vaultCount = await import('@/lib/pocketbase/client').then((pb) =>
+          pb
+            .collection('price_vault')
+            .getList(1, 1, { filter: `product_id = "${selectedProductId}"` }),
+        )
+        const versionNumber = (vaultCount.totalItems || 0) + 1
+        await createVaultEntry({
+          product_id: selectedProductId,
+          product_code: config.product_code || '',
+          product_name: config.product_name || '',
+          version_number: versionNumber,
+          field_changed: 'suggested_price',
+          previous_value: prevPrice,
+          new_value: data.suggested_price as string,
+          previous_margin: existingConfig?.profit_percent || '',
+          new_margin: computed.profit_percent.toFixed(2),
+          previous_cost: existingConfig?.total_cost || '',
+          new_cost: computed.total_cost.toFixed(2),
+          user_name: (user?.name as string) || 'Sistema',
+          user_role: (user?.role as string) || '',
+          reason: justificationReason,
+          justification: justificationText,
+          related_document: relatedDocument,
+          related_campaign: relatedCampaign,
+          observations,
+          approval_status: 'pending',
+        })
+      } catch {
+        /* noop */
+      }
+      setJustificationOpen(false)
+      setJustificationReason('')
+      setJustificationText('')
+      setRelatedDocument('')
+      setRelatedCampaign('')
+      setObservations('')
       toast({ title: 'Precificação salva com sucesso' })
       loadData()
     } catch {
@@ -462,6 +516,14 @@ export function PricingProducts() {
                     className="h-8 text-sm focus-visible:ring-[#005B2E]"
                   />
                 </div>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs w-32">Margem Máxima (%)</Label>
+                  <Input
+                    value={config.maximum_margin || ''}
+                    onChange={(e) => setField('maximum_margin', e.target.value)}
+                    className="h-8 text-sm focus-visible:ring-[#005B2E]"
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
                 <div className="p-3 rounded-lg bg-muted/50">
@@ -498,6 +560,12 @@ export function PricingProducts() {
                     R$ {formatCurrency(computed.suggested_price)}
                   </span>
                 </div>
+                <div className="p-3 rounded-lg bg-purple-50 border border-purple-200">
+                  <span className="text-xs text-purple-700 block">Preço Máximo</span>
+                  <span className="font-black text-purple-700">
+                    R$ {formatCurrency(computed.maximum_price)}
+                  </span>
+                </div>
                 <div className="p-3 rounded-lg bg-muted/50">
                   <span className="text-xs text-muted-foreground block">Lucro Esperado</span>
                   <span className="font-black">R$ {formatCurrency(computed.expected_profit)}</span>
@@ -517,6 +585,17 @@ export function PricingProducts() {
                   configurado. Alteração requer aprovação.
                 </div>
               )}
+              {parseNum(config.suggested_price) > 0 &&
+                parseNum(config.suggested_price) < computed.total_cost && (
+                  <div className="mt-3 flex items-center gap-2 p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                    <AlertTriangle className="w-4 h-4" /> Bloqueado: Preço abaixo do custo total.
+                  </div>
+                )}
+              {computed.profit_percent < 0 && (
+                <div className="mt-3 flex items-center gap-2 p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                  <AlertTriangle className="w-4 h-4" /> Bloqueado: Margem negativa.
+                </div>
+              )}
               <Button
                 onClick={handleSave}
                 disabled={saving}
@@ -533,6 +612,23 @@ export function PricingProducts() {
           </Card>
         </>
       )}
+      <JustificationDialog
+        open={justificationOpen}
+        onClose={() => setJustificationOpen(false)}
+        onConfirm={handleSave}
+        reason={justificationReason}
+        setReason={setJustificationReason}
+        justification={justificationText}
+        setJustification={setJustificationText}
+        relatedDocument={relatedDocument}
+        setRelatedDocument={setRelatedDocument}
+        relatedCampaign={relatedCampaign}
+        setRelatedCampaign={setRelatedCampaign}
+        observations={observations}
+        setObservations={setObservations}
+        saving={saving}
+        blockReasons={selectedProduct ? checkSmartBlocks(config, selectedProduct) : []}
+      />
       {!selectedProductId && !loading && (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">

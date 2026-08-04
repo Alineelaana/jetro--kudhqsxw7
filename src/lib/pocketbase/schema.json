@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T03:38:56.905Z",
+  "generatedAt": "2026-08-04T03:56:27.675Z",
   "collections": [
     {
       "name": "users",
@@ -3313,6 +3313,60 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "cbs",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ibs",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "selective_tax",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cashback",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "maximum_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "market_avg_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "market_lowest_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "market_highest_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "market_position",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -6164,6 +6218,341 @@
         }
       ],
       "indexes": []
+    },
+    {
+      "name": "price_vault",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "version_number",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "field_changed",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "justification",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "related_document",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "related_campaign",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "electronic_signature",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_restored",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "restored_from_version",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_price_vault_product ON price_vault (product_id)",
+        "CREATE INDEX idx_price_vault_created ON price_vault (created)",
+        "CREATE INDEX idx_price_vault_user ON price_vault (user_name)"
+      ]
+    },
+    {
+      "name": "pricing_risk_monitor",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "product_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "change_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risk_index",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risk_factors",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previous_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "new_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "change_percentage",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "requires_approval",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pricing_risk_product ON pricing_risk_monitor (product_id)",
+        "CREATE INDEX idx_pricing_risk_user ON pricing_risk_monitor (user_name)",
+        "CREATE INDEX idx_pricing_risk_index ON pricing_risk_monitor (risk_index)",
+        "CREATE INDEX idx_pricing_risk_created ON pricing_risk_monitor (created)"
+      ]
     }
   ]
 }

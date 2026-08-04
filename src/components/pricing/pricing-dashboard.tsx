@@ -77,6 +77,17 @@ export function PricingDashboard() {
     const productsWithoutConfig = products.filter(
       (p) => !configs.some((c) => c.product_id === p.id),
     ).length
+    let withoutTax = 0,
+      negativeProfitability = 0,
+      aboveMaxMargin = 0
+    for (const c of configs) {
+      if (!c) continue
+      const computed = calcPrices(c)
+      if (!c.icms && !c.cbs && !c.ibs) withoutTax++
+      if (computed.profit_value < 0) negativeProfitability++
+      if (parseNum(c.maximum_margin) > 0 && computed.profit_percent > parseNum(c.maximum_margin))
+        aboveMaxMargin++
+    }
     return {
       negativeMargin,
       belowMinimum,
@@ -85,6 +96,9 @@ export function PricingDashboard() {
       avgProfit: count > 0 ? totalProfit / count : 0,
       avgMargin: count > 0 ? totalMargin / count : 0,
       pendingApprovals: approvals.length,
+      withoutTax,
+      negativeProfitability,
+      aboveMaxMargin,
     }
   }, [configs, products, approvals])
 
@@ -111,6 +125,24 @@ export function PricingDashboard() {
     },
     { icon: PackageX, label: 'Produtos sem Preço', value: stats.noPrice, color: '#6b7280' },
     { icon: Clock, label: 'Aguardando Aprovação', value: stats.pendingApprovals, color: '#3b82f6' },
+    {
+      icon: AlertTriangle,
+      label: 'Sem Classificação Fiscal',
+      value: stats.withoutTax,
+      color: '#8b5cf6',
+    },
+    {
+      icon: TrendingDown,
+      label: 'Rentabilidade Negativa',
+      value: stats.negativeProfitability,
+      color: '#ef4444',
+    },
+    {
+      icon: TrendingUp,
+      label: 'Acima da Margem Máxima',
+      value: stats.aboveMaxMargin,
+      color: '#f97316',
+    },
   ]
 
   if (loading)

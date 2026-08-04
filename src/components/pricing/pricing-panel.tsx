@@ -6,17 +6,44 @@ import { PricingTables } from '@/components/pricing/pricing-tables'
 import { PricingApprovals } from '@/components/pricing/pricing-approvals'
 import { PricingDashboard } from '@/components/pricing/pricing-dashboard'
 import { PricingIntelligence } from '@/components/pricing/pricing-intelligence'
+import { PricingSimulator } from '@/components/pricing/pricing-simulator'
+import { PricingVersions } from '@/components/pricing/pricing-versions'
+import { PricingTimeline } from '@/components/pricing/pricing-timeline'
+import { PricingVault } from '@/components/pricing/pricing-vault'
+import { PricingRiskMonitor } from '@/components/pricing/pricing-risk-monitor'
+import { PricingCostComparator } from '@/components/pricing/pricing-cost-comparator'
+import { PricingAISuggestions } from '@/components/pricing/pricing-ai-suggestions'
 import { Calculator } from 'lucide-react'
 
-type SubTab = 'products' | 'simulations' | 'tables' | 'approvals' | 'dashboard' | 'intelligence'
+type SubTab =
+  | 'products'
+  | 'simulations'
+  | 'tables'
+  | 'approvals'
+  | 'dashboard'
+  | 'intelligence'
+  | 'simulator'
+  | 'versions'
+  | 'timeline'
+  | 'vault'
+  | 'risk'
+  | 'comparator'
+  | 'ai'
 
 const SUB_TABS: { id: SubTab; label: string }[] = [
-  { id: 'products', label: 'Precificação de Produtos' },
+  { id: 'products', label: 'Central de Preços' },
+  { id: 'simulator', label: 'Simulador' },
   { id: 'simulations', label: 'Simulações' },
   { id: 'tables', label: 'Tabelas de Preços' },
   { id: 'approvals', label: 'Aprovações' },
+  { id: 'versions', label: 'Versões' },
+  { id: 'timeline', label: 'Linha do Tempo' },
+  { id: 'vault', label: 'Cofre de Preços' },
+  { id: 'risk', label: 'Monitor de Riscos' },
+  { id: 'comparator', label: 'Comparador de Custos' },
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'intelligence', label: 'Inteligência Comercial' },
+  { id: 'ai', label: 'Sugestões IA' },
 ]
 
 export function PricingPanel() {
@@ -36,6 +63,20 @@ export function PricingPanel() {
         return <PricingDashboard />
       case 'intelligence':
         return <PricingIntelligence />
+      case 'simulator':
+        return <PricingSimulator />
+      case 'versions':
+        return <PricingVersions />
+      case 'timeline':
+        return <PricingTimeline />
+      case 'vault':
+        return <PricingVault />
+      case 'risk':
+        return <PricingRiskMonitor />
+      case 'comparator':
+        return <PricingCostComparator />
+      case 'ai':
+        return <PricingAISuggestions />
       default:
         return <PricingProducts />
     }

@@ -51,8 +51,12 @@ export function useMenuBadges(userId?: string) {
         if (key) badgeMap[key] = (badgeMap[key] || 0) + 1
       }
 
+      const pendingRisks = await pb
+        .collection('pricing_risk_monitor')
+        .count('resolved = false && risk_index >= 50')
       badgeMap['purchasing'] = (badgeMap['purchasing'] || 0) + (pendingPurchases as number)
-      badgeMap['pricing'] = (badgeMap['pricing'] || 0) + (pendingApprovals as number)
+      badgeMap['pricing'] =
+        (badgeMap['pricing'] || 0) + (pendingApprovals as number) + (pendingRisks as number)
       badgeMap['Vendas'] = (badgeMap['Vendas'] || 0) + (pendingSales as number)
 
       setBadges(badgeMap)
@@ -69,6 +73,7 @@ export function useMenuBadges(userId?: string) {
   useRealtime('purchase_requests', () => load())
   useRealtime('quotations', () => load())
   useRealtime('pricing_approvals', () => load())
+  useRealtime('pricing_risk_monitor', () => load())
   useRealtime('sales_orders', () => load())
 
   return badges

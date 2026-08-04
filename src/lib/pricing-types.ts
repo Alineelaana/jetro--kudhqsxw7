@@ -70,6 +70,15 @@ export interface PricingConfig {
   price_distribuidor: string
   price_promocional: string
   price_especial: string
+  cbs: string
+  ibs: string
+  selective_tax: string
+  cashback: string
+  maximum_margin: string
+  market_avg_price: string
+  market_lowest_price: string
+  market_highest_price: string
+  market_position: string
   company: string
   branch: string
   created: string
@@ -200,6 +209,7 @@ export const COST_FIELDS = [
   { key: 'other_expenses_cost', label: 'Outras Despesas' },
   { key: 'financial_discount', label: 'Desconto Financeiro' },
   { key: 'bonifications', label: 'Bonificações' },
+  { key: 'cashback', label: 'Cashback' },
 ] as const
 
 export const TAX_FIELDS = [
@@ -214,6 +224,9 @@ export const TAX_FIELDS = [
   { key: 'icms_credit', label: 'Crédito de ICMS' },
   { key: 'pis_credit', label: 'Crédito de PIS' },
   { key: 'cofins_credit', label: 'Crédito de COFINS' },
+  { key: 'cbs', label: 'CBS (Reforma Tributária)' },
+  { key: 'ibs', label: 'IBS (Reforma Tributária)' },
+  { key: 'selective_tax', label: 'Imposto Seletivo' },
 ] as const
 
 export const TABLE_TYPES = [
@@ -261,7 +274,10 @@ export function calcTotalTaxes(cfg: Partial<PricingConfig>): number {
     parseNum(cfg.iss) -
     parseNum(cfg.icms_credit) -
     parseNum(cfg.pis_credit) -
-    parseNum(cfg.cofins_credit)
+    parseNum(cfg.cofins_credit) +
+    parseNum(cfg.cbs) +
+    parseNum(cfg.ibs) +
+    parseNum(cfg.selective_tax)
   )
 }
 
@@ -297,6 +313,8 @@ export function calcPrices(cfg: Partial<PricingConfig>) {
   const totalWithExpenses = totalCost + expenses
   const minimumPrice = totalWithExpenses / (1 - minimumMargin / 100)
   const idealPrice = totalWithExpenses / (1 - desiredMargin / 100)
+  const maximumMargin = parseNum(cfg.maximum_margin) || 50
+  const maximumPrice = totalWithExpenses / (1 - maximumMargin / 100)
   const suggestedPrice = idealPrice
   const profitValue = suggestedPrice - totalWithExpenses
   const profitPercent = totalWithExpenses > 0 ? (profitValue / totalWithExpenses) * 100 : 0
@@ -314,6 +332,7 @@ export function calcPrices(cfg: Partial<PricingConfig>) {
     profit_percent: profitPercent,
     markup,
     expected_profit: expectedProfit,
+    maximum_price: maximumPrice,
   }
 }
 
@@ -371,7 +390,73 @@ export function getInitialPricingConfig(productId?: string): Partial<PricingConf
     other_opex_value: '',
     desired_margin: '30',
     minimum_margin: '10',
+    maximum_margin: '50',
+    cbs: '',
+    ibs: '',
+    selective_tax: '',
+    cashback: '',
+    market_avg_price: '',
+    market_lowest_price: '',
+    market_highest_price: '',
+    market_position: '',
     company: '',
     branch: '',
   }
+}
+
+export interface PriceVault {
+  id: string
+  product_id: string
+  product_code: string
+  product_name: string
+  version_number: number
+  field_changed: string
+  previous_value: string
+  new_value: string
+  previous_margin: string
+  new_margin: string
+  previous_cost: string
+  new_cost: string
+  user_name: string
+  user_role: string
+  company: string
+  branch: string
+  reason: string
+  justification: string
+  related_document: string
+  related_campaign: string
+  observations: string
+  approval_id: string
+  approval_status: string
+  approved_at: string
+  approved_by: string
+  electronic_signature: string
+  is_restored: boolean
+  restored_from_version: number
+  created: string
+  updated: string
+}
+
+export interface PricingRiskMonitor {
+  id: string
+  product_id: string
+  product_code: string
+  product_name: string
+  user_name: string
+  user_role: string
+  change_type: string
+  risk_index: number
+  risk_factors: Record<string, unknown>
+  previous_value: string
+  new_value: string
+  change_percentage: string
+  company: string
+  branch: string
+  requires_approval: boolean
+  approval_status: string
+  resolved: boolean
+  resolved_by: string
+  resolved_at: string
+  created: string
+  updated: string
 }
