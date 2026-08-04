@@ -31,6 +31,7 @@ import {
   logSalesAudit,
 } from '@/services/sales'
 import { useAuth } from '@/hooks/use-auth'
+import { useSystemParams } from '@/hooks/use-system-params'
 import { FREIGHT_TYPES, type SalesOrder, type SalesOrderItem } from '@/lib/sales-types'
 import { Loader2, Save, Check, Plus, X, Send } from 'lucide-react'
 import { toast } from 'sonner'
@@ -59,6 +60,8 @@ const emptyItem: SalesOrderItem = {
 
 export function SalesOrderDialog({ open, onOpenChange, order, onSaved }: Props) {
   const { user } = useAuth()
+  const { getParamNumber } = useSystemParams()
+  const maxDiscountPercent = getParamNumber('Vendas', 'max_discount', 0)
   const [saving, setSaving] = useState(false)
   const [clients, setClients] = useState<Array<Record<string, unknown>>>([])
   const [products, setProducts] = useState<Array<Record<string, unknown>>>([])
@@ -163,13 +166,61 @@ export function SalesOrderDialog({ open, onOpenChange, order, onSaved }: Props) 
         if (['quantity', 'unit_price', 'discount', 'addition'].includes(field)) {
           const qty = parseFloat(updated.quantity) || 0
           const price = parseFloat(updated.unit_price) || 0
-          const disc = parseFloat(updated.discount) || 0
+          let disc = parseFloat(updated.discount) || 0
+          if (maxDiscountPercent > 0 && price > 0 && qty > 0) {
+            const maxDisc = (qty * price * maxDiscountPercent) / 100
+            if (disc > maxDisc) disc = maxDisc
+          }
+          updated.discount = String(disc)
           const add = parseFloat(updated.addition) || 0
           updated.total = String((qty * price - disc + add).toFixed(2))
           updated.situation =
             parseFloat(updated.available_stock) >= qty ? 'OK' : 'Estoque insuficiente'
         }
         return updated
+      }),
+    )
+  }
+
+  const handlePriceTableChange = (tableId: string) => {
+    setForm((prev) => ({ ...prev, price_table_id: tableId }))
+    if (!tableId) return
+    const table = priceTables.find((t) => t.id === tableId)
+    if (!table) return
+    const rawItems = table.items
+    let tableItems: Array<Record<string, unknown>> = []
+    if (Array.isArray(rawItems)) tableItems = rawItems
+    else if (typeof rawItems === 'string') {
+      try {
+        tableItems = JSON.parse(rawItems)
+      } catch {
+        /* ignore */
+      }
+    }
+    const tableDiscount = parseFloat(String(table.discount_percent || '0').replace(',', '.')) || 0
+    setItems((prev) =>
+      prev.map((it) => {
+        if (!it.product) return it
+        const match = tableItems.find(
+          (ti) => String(ti.name || '') === it.product || String(ti.code || '') === it.code,
+        )
+        const newPrice = match
+          ? String(match.new_price || match.current_price || match.price || it.unit_price)
+          : it.unit_price
+        const lineDiscount = match?.max_discount
+          ? parseFloat(String(match.max_discount).replace(',', '.')) || 0
+          : tableDiscount
+        const qty = parseFloat(it.quantity) || 0
+        const priceNum = parseFloat(String(newPrice).replace(',', '.')) || 0
+        const total = (qty * priceNum - lineDiscount).toFixed(2)
+        return {
+          ...it,
+          table_price: newPrice,
+          unit_price: newPrice,
+          discount: String(lineDiscount),
+          total,
+          situation: parseFloat(it.available_stock) >= qty ? 'OK' : 'Estoque insuficiente',
+        }
       }),
     )
   }
@@ -278,10 +329,7 @@ export function SalesOrderDialog({ open, onOpenChange, order, onSaved }: Props) 
             </div>
             <div>
               <Label className="text-xs">Tabela de Preços</Label>
-              <Select
-                value={form.price_table_id || ''}
-                onValueChange={(v) => setForm({ ...form, price_table_id: v })}
-              >
+              <Select value={form.price_table_id || ''} onValueChange={handlePriceTableChange}>
                 <SelectTrigger className="focus-visible:ring-[#005B2E]">
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
@@ -522,7 +570,12 @@ export function SalesOrderDialog({ open, onOpenChange, order, onSaved }: Props) 
               />
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right space-y-1">
+            {form.price_table_id && (
+              <p className="text-xs text-muted-foreground">
+                Tabela: {priceTables.find((t) => t.id === form.price_table_id)?.table_name || '—'}
+              </p>
+            )}
             <span className="text-lg font-black text-[#005B2E]">
               Valor Total: R$ {totalValue.toFixed(2)}
             </span>

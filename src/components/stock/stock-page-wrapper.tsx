@@ -1,12 +1,14 @@
 import { type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
+import { useSystemParams } from '@/hooks/use-system-params'
 import { AdminLogin } from '@/components/admin-login'
 import { Button } from '@/components/ui/button'
 import { Loader2, ArrowLeft, Boxes } from 'lucide-react'
 
 export function StockPageWrapper({ children, title }: { children: ReactNode; title?: string }) {
   const { isAuthenticated, loading } = useAuth()
+  const { getParamBool } = useSystemParams()
 
   if (loading) {
     return (
@@ -35,6 +37,11 @@ export function StockPageWrapper({ children, title }: { children: ReactNode; tit
           </div>
         )}
       </div>
+      {getParamBool('Estoque', 'allow_negative_stock', false) && (
+        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+          Atenção: Estoque negativo permitido por configuração do sistema.
+        </div>
+      )}
       {children}
     </div>
   )

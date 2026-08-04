@@ -11,6 +11,7 @@ import { PurchasingReports } from '@/components/purchasing/purchasing-reports'
 import { StockReport } from '@/components/purchasing/stock-report'
 import { ShoppingCart } from 'lucide-react'
 import { PricingSimulations } from '@/components/pricing/pricing-simulations'
+import { useSystemParams } from '@/hooks/use-system-params'
 
 type SubTab =
   | 'requests'
@@ -39,6 +40,8 @@ const SUB_TABS: { id: SubTab; label: string }[] = [
 
 export function PurchasingPanel() {
   const [activeTab, setActiveTab] = useState<SubTab>('requests')
+  const { getParamBool } = useSystemParams()
+  const requireApproval = getParamBool('Compras', 'require_approval', true)
 
   const renderContent = () => {
     switch (activeTab) {
@@ -72,6 +75,11 @@ export function PurchasingPanel() {
       <div className="flex items-center gap-2">
         <ShoppingCart className="w-5 h-5 text-[#005B2E]" />
         <h2 className="text-xl font-black text-foreground">Gestão de Compras</h2>
+        {requireApproval && (
+          <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded font-medium">
+            Aprovação obrigatória
+          </span>
+        )}
       </div>
       <div className="flex flex-wrap gap-2">
         {SUB_TABS.map((tab) => (

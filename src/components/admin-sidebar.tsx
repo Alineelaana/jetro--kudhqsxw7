@@ -213,7 +213,9 @@ export function AdminSidebar({
   const { user } = useAuth()
   const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
-  const [openMenus, setOpenMenus] = useState<Set<string>>(new Set(['Vendas', 'Estoque']))
+  const [openMenus, setOpenMenus] = useState<Set<string>>(
+    new Set(['Vendas', 'Estoque', 'Configurações']),
+  )
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)
   const { favorites, toggleFavorite, isFavorite } = useMenuFavorites(user?.id as string)
