@@ -23,6 +23,14 @@ import TermosDeUso from './pages/TermosDeUso'
 import PoliticaCookies from './pages/PoliticaCookies'
 import Products from './pages/Products'
 import Cadastros from './pages/Cadastros'
+import SalesDashboardPage from './pages/sales/SalesDashboardPage'
+import SalesOrdersPage from './pages/sales/SalesOrdersPage'
+import InvoicingPage from './pages/sales/InvoicingPage'
+import NfePage from './pages/sales/NfePage'
+import NfcePage from './pages/sales/NfcePage'
+import ContractsPage from './pages/sales/ContractsPage'
+import SalesReturnsPage from './pages/sales/SalesReturnsPage'
+import SalesHistoryPage from './pages/sales/SalesHistoryPage'
 import Layout from './components/Layout'
 
 const App = () => (
@@ -41,6 +49,14 @@ const App = () => (
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/admin/produtos" element={<Products />} />
                     <Route path="/admin/cadastros" element={<Cadastros />} />
+                    <Route path="/admin/vendas" element={<SalesDashboardPage />} />
+                    <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                    <Route path="/admin/vendas/faturamento" element={<InvoicingPage />} />
+                    <Route path="/admin/vendas/nfe" element={<NfePage />} />
+                    <Route path="/admin/vendas/nfce" element={<NfcePage />} />
+                    <Route path="/admin/vendas/contratos" element={<ContractsPage />} />
+                    <Route path="/admin/vendas/devolucoes" element={<SalesReturnsPage />} />
+                    <Route path="/admin/vendas/historico" element={<SalesHistoryPage />} />
                     <Route path="/admin/cadastro" element={<AdminRegister />} />
                     <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                     <Route path="/cliente/login" element={<ClientLogin />} />

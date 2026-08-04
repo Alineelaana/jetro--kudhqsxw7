@@ -21,3 +21,8 @@ export function canEditPartners(role: string | undefined): boolean {
 export function canDeletePartners(role: string | undefined): boolean {
   return role === 'SUP'
 }
+
+export function canViewSales(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
