@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T00:05:07.839Z",
+  "generatedAt": "2026-08-04T00:18:13.324Z",
   "collections": [
     {
       "name": "users",
@@ -2193,6 +2193,639 @@
         "CREATE INDEX idx_products_ncm ON products (ncm)",
         "CREATE INDEX idx_products_name ON products (name)",
         "CREATE INDEX idx_products_active ON products (active)"
+      ]
+    },
+    {
+      "name": "purchase_requests",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "request_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "requester",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "requester_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cost_center",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "department",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "priority",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "justification",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "attachments",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_purchase_requests_status ON purchase_requests (status)",
+        "CREATE INDEX idx_purchase_requests_created ON purchase_requests (created)"
+      ]
+    },
+    {
+      "name": "quotations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "quotation_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "request_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "request_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_quotes",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "winning_supplier_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "winning_supplier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "highlights",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "attachments",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_quotations_status ON quotations (status)",
+        "CREATE INDEX idx_quotations_created ON quotations (created)",
+        "CREATE INDEX idx_quotations_request_id ON quotations (request_id)"
+      ]
+    },
+    {
+      "name": "purchase_orders",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quotation_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "request_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "buyer",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "buyer_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_condition",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_method",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivery_forecast",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "freight",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "discounts",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "other_expenses",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "products_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "attachments",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_purchase_orders_status ON purchase_orders (status)",
+        "CREATE INDEX idx_purchase_orders_created ON purchase_orders (created)",
+        "CREATE INDEX idx_purchase_orders_supplier_id ON purchase_orders (supplier_id)"
+      ]
+    },
+    {
+      "name": "purchase_invoices",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "invoice_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_key",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_doc_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_series",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "divergences",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "stock_updated",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cost_updated",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payable_generated",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "attachments",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_purchase_invoices_status ON purchase_invoices (status)",
+        "CREATE INDEX idx_purchase_invoices_created ON purchase_invoices (created)",
+        "CREATE INDEX idx_purchase_invoices_order_id ON purchase_invoices (order_id)"
+      ]
+    },
+    {
+      "name": "purchase_returns",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "return_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_doc_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "attachments",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_purchase_returns_status ON purchase_returns (status)",
+        "CREATE INDEX idx_purchase_returns_created ON purchase_returns (created)",
+        "CREATE INDEX idx_purchase_returns_supplier_id ON purchase_returns (supplier_id)"
       ]
     }
   ]
