@@ -34,6 +34,7 @@ import ContractsPage from './pages/sales/ContractsPage'
 import SalesReturnsPage from './pages/sales/SalesReturnsPage'
 import SalesHistoryPage from './pages/sales/SalesHistoryPage'
 import StockPage from './pages/StockPage'
+import WmsScreen from './pages/WmsScreen'
 import Layout from './components/Layout'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
@@ -130,6 +131,30 @@ const App = () => (
                       <Route
                         path="/admin/estoque/reabastecimento"
                         element={<StockPage screen="replenishment" />}
+                      />
+                      <Route
+                        path="/admin/estoque/wms-alertas"
+                        element={<WmsScreen screen="wms-alerts" />}
+                      />
+                      <Route
+                        path="/admin/estoque/wms-relatorios"
+                        element={<WmsScreen screen="wms-reports" />}
+                      />
+                      <Route
+                        path="/admin/estoque/wms-pallets"
+                        element={<WmsScreen screen="wms-pallets" />}
+                      />
+                      <Route
+                        path="/admin/estoque/wms-volumes"
+                        element={<WmsScreen screen="wms-volumes" />}
+                      />
+                      <Route
+                        path="/admin/estoque/wms-coletores"
+                        element={<WmsScreen screen="wms-collectors" />}
+                      />
+                      <Route
+                        path="/admin/estoque/wms-operadores"
+                        element={<WmsScreen screen="wms-operators" />}
                       />
                       <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
                         <Route index element={<Navigate to="dados-empresa" replace />} />

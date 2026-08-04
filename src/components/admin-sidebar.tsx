@@ -103,6 +103,12 @@ const STOCK_SUBMENU: SubItem[] = [
   { to: '/admin/estoque/enderecamento', label: 'Endereçamento' },
   { to: '/admin/estoque/ondas', label: 'Ondas de Separação' },
   { to: '/admin/estoque/reabastecimento', label: 'Reabastecimento' },
+  { to: '/admin/estoque/wms-alertas', label: 'Alertas Operacionais' },
+  { to: '/admin/estoque/wms-relatorios', label: 'Relatórios WMS' },
+  { to: '/admin/estoque/wms-pallets', label: 'Gestão de Pallets' },
+  { to: '/admin/estoque/wms-volumes', label: 'Gestão de Volumes' },
+  { to: '/admin/estoque/wms-coletores', label: 'Gestão de Coletores' },
+  { to: '/admin/estoque/wms-operadores', label: 'Gestão de Operadores' },
 ]
 
 const CONFIG_SUBMENU: SubItem[] = [

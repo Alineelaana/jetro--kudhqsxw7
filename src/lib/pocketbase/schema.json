@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T15:03:25.965Z",
+  "generatedAt": "2026-08-04T17:41:54.586Z",
   "collections": [
     {
       "name": "users",
@@ -9497,11 +9497,453 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "read",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_wms_oa_resolved ON wms_operational_alerts (resolved)",
         "CREATE INDEX idx_wms_oa_created ON wms_operational_alerts (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_pallets",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "codigo_unico",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "etiqueta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lote",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "peso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "volume",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "localizacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "historico",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "filial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deposito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_pallets_situacao ON wms_pallets (situacao)",
+        "CREATE INDEX idx_wms_pallets_created ON wms_pallets (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_volumes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lote",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "peso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dimensoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pallet_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "localizacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "filial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deposito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_volumes_situacao ON wms_volumes (situacao)",
+        "CREATE INDEX idx_wms_volumes_created ON wms_volumes (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_collectors",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "codigo_equipamento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "modelo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "numero_serie",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operador_atual",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_entrega",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ultima_comunicacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bateria",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "turno",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_collectors_status ON wms_collectors (status)",
+        "CREATE INDEX idx_wms_collectors_created ON wms_collectors (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_operators",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "operador",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "turno",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "area",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "coletor_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tarefas_pendentes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tarefas_concluidas",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produtividade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "divergencias",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tempo_medio_tarefa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_operators_situacao ON wms_operators (situacao)",
+        "CREATE INDEX idx_wms_operators_created ON wms_operators (created DESC)"
       ]
     }
   ]
