@@ -8,6 +8,7 @@ import { PurchaseInvoicesPanel } from '@/components/purchasing/purchase-invoices
 import { PurchaseReturnsPanel } from '@/components/purchasing/purchase-returns-panel'
 import { PurchasingDashboard } from '@/components/purchasing/purchasing-dashboard'
 import { PurchasingReports } from '@/components/purchasing/purchasing-reports'
+import { StockReport } from '@/components/purchasing/stock-report'
 import { ShoppingCart } from 'lucide-react'
 
 type SubTab =
@@ -19,6 +20,7 @@ type SubTab =
   | 'returns'
   | 'dashboard'
   | 'reports'
+  | 'stock_report'
 
 const SUB_TABS: { id: SubTab; label: string }[] = [
   { id: 'requests', label: 'Solicitações de Compra' },
@@ -29,6 +31,7 @@ const SUB_TABS: { id: SubTab; label: string }[] = [
   { id: 'returns', label: 'Devoluções ao Fornecedor' },
   { id: 'dashboard', label: 'Dashboard de Compras' },
   { id: 'reports', label: 'Relatórios' },
+  { id: 'stock_report', label: 'Relatório de Estoque' },
 ]
 
 export function PurchasingPanel() {
@@ -52,6 +55,8 @@ export function PurchasingPanel() {
         return <PurchasingDashboard />
       case 'reports':
         return <PurchasingReports />
+      case 'stock_report':
+        return <StockReport />
       default:
         return <PurchaseRequestsPanel />
     }

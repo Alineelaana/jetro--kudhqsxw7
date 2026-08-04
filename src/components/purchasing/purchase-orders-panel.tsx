@@ -33,7 +33,19 @@ import {
   type PurchaseOrder,
   type OrderItem,
 } from '@/lib/purchasing-types'
-import { Plus, Search, Pencil, Loader2, FileText, X, Printer, Mail, Check } from 'lucide-react'
+import { PurchaseOrderImportDialog } from '@/components/purchasing/purchase-order-import-dialog'
+import {
+  Plus,
+  Search,
+  Pencil,
+  Loader2,
+  FileText,
+  X,
+  Printer,
+  Mail,
+  Check,
+  Upload,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 const emptyItem: OrderItem = {
@@ -69,6 +81,7 @@ export function PurchaseOrdersPanel() {
     other_expenses: '0',
   })
   const [items, setItems] = useState<OrderItem[]>([{ ...emptyItem }])
+  const [importOpen, setImportOpen] = useState(false)
 
   const load = async () => {
     try {
@@ -123,6 +136,26 @@ export function PurchaseOrdersPanel() {
     setItems([{ ...emptyItem }])
     setFormOpen(true)
   }
+  const handleImportConfirm = (importedItems: OrderItem[]) => {
+    setEditing(null)
+    setForm({
+      supplier_id: '',
+      supplier_name: '',
+      company: '',
+      branch: '',
+      buyer: (user?.name as string) || '',
+      payment_condition: '',
+      payment_method: '',
+      delivery_forecast: '',
+      freight: '0',
+      discounts: '0',
+      other_expenses: '0',
+    })
+    setItems(importedItems.length > 0 ? importedItems : [{ ...emptyItem }])
+    setImportOpen(false)
+    setFormOpen(true)
+  }
+
   const handleEdit = (o: PurchaseOrder) => {
     setEditing(o)
     setForm({
@@ -247,12 +280,21 @@ export function PurchaseOrdersPanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-lg font-bold">Pedidos de Compra</h3>
-        <Button
-          onClick={handleNew}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Novo Pedido
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setImportOpen(true)}
+            className="border-[#005B2E] text-[#005B2E] font-bold"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Importar Planilha
+          </Button>
+          <Button
+            onClick={handleNew}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Novo Pedido
+          </Button>
+        </div>
       </div>
       <Card className="border-2 border-[#005B2E]/20">
         <CardContent className="py-4 space-y-3">
@@ -369,6 +411,11 @@ export function PurchaseOrdersPanel() {
           </div>
         </Card>
       )}
+      <PurchaseOrderImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onConfirm={handleImportConfirm}
+      />
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
