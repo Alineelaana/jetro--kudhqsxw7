@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T14:50:49.458Z",
+  "generatedAt": "2026-08-04T15:03:25.965Z",
   "collections": [
     {
       "name": "users",
@@ -8655,6 +8655,853 @@
       "indexes": [
         "CREATE INDEX idx_wms_repl_status ON wms_replenishments (status)",
         "CREATE INDEX idx_wms_repl_created ON wms_replenishments (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_receipt_checks",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "numero_conferencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "receipt_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "codigo_barras",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lote",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_fabricacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_validade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_esperada",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_recebida",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_conferida",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "diferenca",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_divergencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "decisao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_rc_status ON wms_receipt_checks (status)",
+        "CREATE INDEX idx_wms_rc_created ON wms_receipt_checks (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_separations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "numero_separacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "wave_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pedido",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rota",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "localizacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lote",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_solicitada",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_separada",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operador",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prioridade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estrategia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_sep_status ON wms_separations (status)",
+        "CREATE INDEX idx_wms_sep_created ON wms_separations (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_expedition_checks",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "numero_conferencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pedido",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "codigo_barras",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lote",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_separada",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_conferida",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "diferenca",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "volume",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_divergencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_ec_status ON wms_expedition_checks (status)",
+        "CREATE INDEX idx_wms_ec_created ON wms_expedition_checks (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_shippings",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "numero_expedicao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pedido",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nota_fiscal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "transportadora",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motorista",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "veiculo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rota",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "doca",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_volumes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "peso_bruto",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "peso_liquido",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "romaneio_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_ship_status ON wms_shippings (status)",
+        "CREATE INDEX idx_wms_ship_created ON wms_shippings (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_romaneios",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "numero_romaneio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rota",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "transportadora",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motorista",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "veiculo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pedidos",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "clientes",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notas_fiscais",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_volumes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "peso_total",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_rom_status ON wms_romaneios (status)",
+        "CREATE INDEX idx_wms_rom_created ON wms_romaneios (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_blind_counts",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "numero_contagem",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "inventario_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "localizacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lote",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_contada",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "primeira_contagem",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "segunda_contagem",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operador_primeira",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operador_segunda",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "divergencia",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_bc_status ON wms_blind_counts (status)",
+        "CREATE INDEX idx_wms_bc_created ON wms_blind_counts (created DESC)"
+      ]
+    },
+    {
+      "name": "wms_operational_alerts",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'SUP'"
+      },
+      "fields": [
+        {
+          "name": "tipo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "severidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "mensagem",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_wms_oa_resolved ON wms_operational_alerts (resolved)",
+        "CREATE INDEX idx_wms_oa_created ON wms_operational_alerts (created DESC)"
       ]
     }
   ]
