@@ -1,9 +1,18 @@
-import { useState, useMemo, type ComponentType } from 'react'
+import {
+  useState,
+  useMemo,
+  useEffect,
+  type ComponentType,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
+import { useMenuHistory } from '@/hooks/use-menu-history'
 import { canViewSales, canViewStock } from '@/lib/permissions'
 import { Input } from '@/components/ui/input'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import {
   LayoutDashboard,
   FileText,
@@ -108,28 +117,36 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
   },
 ]
 
+function getItemKey(item: FlatItem): string {
+  return item.to || item.id || item.label
+}
+
 export function AdminSidebar({
   activeTab,
   onTabChange,
   onNavigate,
+  collapsed = false,
 }: {
   activeTab: string
   onTabChange: (tab: string) => void
   onNavigate?: () => void
+  collapsed?: boolean
 }) {
   const { user } = useAuth()
   const [search, setSearch] = useState('')
+  const [activeIndex, setActiveIndex] = useState(0)
   const [openMenus, setOpenMenus] = useState<Set<string>>(new Set(['Vendas', 'Estoque']))
+  const [searchOpen, setSearchOpen] = useState(false)
+  const { history, recordVisit } = useMenuHistory(user?.id as string)
 
   const allFlatItems = useMemo<FlatItem[]>(() => {
     const items: FlatItem[] = []
     for (const section of SECTIONS) {
       for (const item of section.items) {
-        if (item.permission && !item.permission(user?.role)) continue
+        if (item.permission && !item.permission(user?.role as string)) continue
         if (item.submenu) {
-          for (const sub of item.submenu) {
+          for (const sub of item.submenu)
             items.push({ label: sub.label, to: sub.to, parentLabel: item.label })
-          }
         } else if (item.to) {
           items.push({ label: item.label, to: item.to })
         } else if (item.id) {
@@ -143,8 +160,23 @@ export function AdminSidebar({
   const filteredItems = useMemo<FlatItem[] | null>(() => {
     const q = search.trim().toLowerCase()
     if (!q) return null
-    return allFlatItems.filter((item) => item.label.toLowerCase().includes(q))
-  }, [search, allFlatItems])
+    const matches = allFlatItems.filter((item) => item.label.toLowerCase().includes(q))
+    matches.sort((a, b) => {
+      const aKey = getItemKey(a)
+      const bKey = getItemKey(b)
+      const aCount = history[aKey]?.count || 0
+      const bCount = history[bKey]?.count || 0
+      if (bCount !== aCount) return bCount - aCount
+      const aLast = history[aKey]?.lastVisited || 0
+      const bLast = history[bKey]?.lastVisited || 0
+      return bLast - aLast
+    })
+    return matches
+  }, [search, allFlatItems, history])
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [search])
 
   const toggleMenu = (label: string) =>
     setOpenMenus((prev) => {
@@ -154,11 +186,235 @@ export function AdminSidebar({
       return next
     })
 
+  const handleTabChange = (tab: string) => {
+    recordVisit(tab)
+    onTabChange(tab)
+  }
+
   const handleSearchItem = (item: FlatItem) => {
-    if (item.id) {
-      onTabChange(item.id)
-    }
+    recordVisit(getItemKey(item))
+    if (item.id) onTabChange(item.id)
     onNavigate?.()
+    setSearch('')
+    setSearchOpen(false)
+  }
+
+  const handleKeyDown = (e: ReactKeyboardEvent) => {
+    if (!filteredItems || filteredItems.length === 0) {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setSearch('')
+      }
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((prev) => (prev + 1) % filteredItems.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length)
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      const item = filteredItems[activeIndex]
+      if (item) handleSearchItem(item)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setSearch('')
+    }
+  }
+
+  const renderSearchResults = (onClose?: () => void) => {
+    if (!filteredItems) return null
+    if (filteredItems.length === 0)
+      return (
+        <div className="px-3 py-8 text-center text-sm text-gray-400">Nenhuma tela encontrada</div>
+      )
+    return (
+      <div className="flex flex-col gap-0.5">
+        {filteredItems.map((item, idx) => {
+          const isActive = idx === activeIndex
+          const visits = history[getItemKey(item)]?.count || 0
+          if (item.to)
+            return (
+              <Link
+                key={`${item.to}-${idx}`}
+                to={item.to}
+                onClick={() => {
+                  recordVisit(item.to!)
+                  onNavigate?.()
+                  setSearch('')
+                  onClose?.()
+                }}
+                className={cn(
+                  'px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between',
+                  isActive
+                    ? 'bg-gray-100 text-[#005B2E]'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                )}
+              >
+                <span>
+                  {item.parentLabel && (
+                    <span className="text-xs text-gray-400 block">{item.parentLabel}</span>
+                  )}
+                  {item.label}
+                </span>
+                {visits > 0 && <span className="text-xs text-amber-500">★</span>}
+              </Link>
+            )
+          return (
+            <button
+              key={`${item.id}-${idx}`}
+              onClick={() => handleSearchItem(item)}
+              className={cn(
+                'px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left w-full flex items-center justify-between',
+                isActive ? 'bg-[#005B2E] text-white' : 'text-gray-600 hover:bg-gray-100',
+              )}
+            >
+              <span>
+                {item.parentLabel && (
+                  <span className="text-xs text-gray-400 block">{item.parentLabel}</span>
+                )}
+                {item.label}
+              </span>
+              {visits > 0 && <span className="text-xs text-amber-400">★</span>}
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
+  if (collapsed) {
+    return (
+      <nav className="flex flex-col items-center gap-1 p-2">
+        <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+          <PopoverTrigger asChild>
+            <button
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+              aria-label="Buscar tela"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="right" align="start" className="w-72 p-3">
+            <div className="relative mb-2">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                autoFocus
+                type="text"
+                placeholder="Buscar tela..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="pl-8 pr-8 h-9 text-sm bg-gray-50 border-gray-200"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <div className="max-h-80 overflow-y-auto">
+              {renderSearchResults(() => setSearchOpen(false))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <div className="h-px w-6 bg-gray-200 my-1" />
+
+        {SECTIONS.map((section) => (
+          <div key={section.title} className="flex flex-col items-center gap-1">
+            {section.items.map((item) => {
+              if (item.permission && !item.permission(user?.role as string)) return null
+              const Icon = item.icon
+
+              if (item.submenu) {
+                return (
+                  <div key={item.label} className="relative group">
+                    <button
+                      onClick={() => toggleMenu(item.label)}
+                      className={cn(
+                        'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
+                        openMenus.has(item.label)
+                          ? 'bg-gray-100 text-[#005B2E]'
+                          : 'text-gray-600 hover:bg-gray-100',
+                      )}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                    <div
+                      className={cn(
+                        'absolute left-full ml-2 top-0 z-50 bg-white rounded-lg shadow-lg border p-1 min-w-[200px]',
+                        openMenus.has(item.label) ? 'block' : 'hidden group-hover:block',
+                      )}
+                    >
+                      <div className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase">
+                        {item.label}
+                      </div>
+                      {item.submenu.map((sub) => (
+                        <Link
+                          key={sub.to}
+                          to={sub.to}
+                          onClick={() => {
+                            recordVisit(sub.to)
+                            onNavigate?.()
+                          }}
+                          className="block px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+
+              if (item.to) {
+                return (
+                  <Tooltip key={item.label}>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={item.to}
+                        onClick={() => {
+                          recordVisit(item.to!)
+                          onNavigate?.()
+                        }}
+                        className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+                      >
+                        <Icon className="w-4 h-4" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{item.label}</TooltipContent>
+                  </Tooltip>
+                )
+              }
+
+              return (
+                <Tooltip key={item.label}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => handleTabChange(item.id!)}
+                      className={cn(
+                        'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
+                        activeTab === item.id
+                          ? 'bg-[#005B2E] text-white'
+                          : 'text-gray-600 hover:bg-gray-100',
+                      )}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">{item.label}</TooltipContent>
+                </Tooltip>
+              )
+            })}
+          </div>
+        ))}
+      </nav>
+    )
   }
 
   return (
@@ -174,12 +430,8 @@ export function AdminSidebar({
           placeholder="Buscar tela..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="pl-8 pr-8 h-9 text-sm bg-gray-50 border-gray-200"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && filteredItems && filteredItems.length > 0) {
-              handleSearchItem(filteredItems[0])
-            }
-          }}
         />
         {search && (
           <button
@@ -194,42 +446,7 @@ export function AdminSidebar({
 
       {filteredItems !== null ? (
         filteredItems.length > 0 ? (
-          <div className="flex flex-col gap-0.5">
-            {filteredItems.map((item, idx) => {
-              if (item.to) {
-                return (
-                  <Link
-                    key={`${item.to}-${idx}`}
-                    to={item.to}
-                    onClick={() => onNavigate?.()}
-                    className="px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
-                  >
-                    {item.parentLabel && (
-                      <span className="text-xs text-gray-400 block">{item.parentLabel}</span>
-                    )}
-                    {item.label}
-                  </Link>
-                )
-              }
-              return (
-                <button
-                  key={`${item.id}-${idx}`}
-                  onClick={() => handleSearchItem(item)}
-                  className={cn(
-                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left w-full',
-                    activeTab === item.id
-                      ? 'bg-[#005B2E] text-white'
-                      : 'text-gray-600 hover:bg-gray-100',
-                  )}
-                >
-                  {item.parentLabel && (
-                    <span className="text-xs text-gray-400 block">{item.parentLabel}</span>
-                  )}
-                  {item.label}
-                </button>
-              )
-            })}
-          </div>
+          renderSearchResults()
         ) : (
           <div className="px-3 py-8 text-center text-sm text-gray-400">Nenhuma tela encontrada</div>
         )
@@ -241,7 +458,7 @@ export function AdminSidebar({
                 {section.title}
               </div>
               {section.items.map((item) => {
-                if (item.permission && !item.permission(user?.role)) return null
+                if (item.permission && !item.permission(user?.role as string)) return null
                 const Icon = item.icon
 
                 if (item.submenu) {
@@ -267,7 +484,10 @@ export function AdminSidebar({
                             <Link
                               key={sub.to}
                               to={sub.to}
-                              onClick={() => onNavigate?.()}
+                              onClick={() => {
+                                recordVisit(sub.to)
+                                onNavigate?.()
+                              }}
                               className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
                             >
                               {sub.label}
@@ -284,7 +504,10 @@ export function AdminSidebar({
                     <Link
                       key={item.label}
                       to={item.to}
-                      onClick={() => onNavigate?.()}
+                      onClick={() => {
+                        recordVisit(item.to!)
+                        onNavigate?.()
+                      }}
                       className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
                     >
                       <Icon className="w-4 h-4" />
@@ -296,7 +519,7 @@ export function AdminSidebar({
                 return (
                   <button
                     key={item.label}
-                    onClick={() => onTabChange(item.id!)}
+                    onClick={() => handleTabChange(item.id!)}
                     className={cn(
                       'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                       activeTab === item.id

@@ -15,7 +15,9 @@ import { BackupPanel } from '@/components/backup-panel'
 import { PurchasingPanel } from '@/components/purchasing/purchasing-panel'
 import { PricingPanel } from '@/components/pricing/pricing-panel'
 import { ContractsOperationsPanel } from '@/components/contracts-operations-panel'
-import { LogOut, Menu, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useSidebarMode } from '@/hooks/use-sidebar-mode'
+import { LogOut, Menu, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const PANELS: Record<string, ComponentType> = {
   dashboard: DashboardsPanel,
@@ -53,17 +55,46 @@ export function AdminDashboard() {
   const { user, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { collapsed, toggle } = useSidebarMode(user?.id as string)
 
   const ActivePanel = PANELS[activeTab] ?? DashboardsPanel
 
   return (
     <div className="flex">
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r shrink-0 self-start sticky top-0 h-screen overflow-y-auto">
-        <div className="p-4 border-b">
-          <h1 className="text-xl font-bold text-[#005B2E]">VeloraLog</h1>
-          <p className="text-xs text-gray-500 mt-0.5">{user?.name}</p>
+      <aside
+        className={cn(
+          'hidden lg:flex flex-col bg-white border-r shrink-0 self-start sticky top-0 h-screen',
+          collapsed ? 'w-16 overflow-visible' : 'w-64 overflow-y-auto',
+        )}
+      >
+        <div className={cn('border-b', collapsed ? 'p-2' : 'p-4')}>
+          <div
+            className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between')}
+          >
+            {!collapsed && (
+              <div>
+                <h1 className="text-xl font-bold text-[#005B2E]">VeloraLog</h1>
+                <p className="text-xs text-gray-500 mt-0.5">{user?.name}</p>
+              </div>
+            )}
+            {collapsed && <span className="text-xl font-bold text-[#005B2E]">V</span>}
+            <button
+              onClick={toggle}
+              className={cn(
+                'text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors',
+                collapsed && 'mt-2',
+              )}
+              title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            >
+              {collapsed ? (
+                <PanelLeftOpen className="w-4 h-4" />
+              ) : (
+                <PanelLeftClose className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         </div>
-        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} collapsed={collapsed} />
       </aside>
 
       {mobileOpen && (

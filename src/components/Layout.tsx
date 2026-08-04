@@ -5,11 +5,9 @@ import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
 
 function isInternalPath(pathname: string): boolean {
-  if (pathname === '/admin' || pathname === '/cliente') return true
-  if (pathname.startsWith('/admin/produtos')) return true
-  if (pathname.startsWith('/admin/cadastros')) return true
-  if (pathname.startsWith('/admin/vendas')) return true
-  if (pathname.startsWith('/admin/estoque')) return true
+  if (pathname.startsWith('/admin')) return true
+  if (pathname.startsWith('/cliente')) return true
+  if (pathname.startsWith('/_')) return true
   return false
 }
 
