@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T23:18:43.700Z",
+  "generatedAt": "2026-08-04T23:29:45.767Z",
   "collections": [
     {
       "name": "users",
@@ -4929,6 +4929,18 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "parent_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "departamento",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -5009,6 +5021,58 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "nivel",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "grupo",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "Ativo",
+            "Passivo",
+            "Patrimônio Líquido",
+            "Receitas",
+            "Custos",
+            "Despesas",
+            "Contas de Compensação"
+          ]
+        },
+        {
+          "name": "tipo_conta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "exige_centro_custo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "exige_projeto",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conta_referencial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Ativo", "Inativo"]
         }
       ],
       "indexes": [
