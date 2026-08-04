@@ -1,6 +1,33 @@
 migrate(
   (app) => {
-    var expCol = app.findCollectionByNameOrId('stock_expeditions')
+    var expCol
+    try {
+      expCol = app.findCollectionByNameOrId('stock_expeditions')
+    } catch (_) {
+      expCol = new Collection({
+        name: 'stock_expeditions',
+        type: 'base',
+        listRule: '@request.auth.id != ""',
+        viewRule: '@request.auth.id != ""',
+        createRule: '@request.auth.id != ""',
+        updateRule: '@request.auth.id != ""',
+        deleteRule: '@request.auth.id != ""',
+        fields: [
+          { name: 'produto_id', type: 'text' },
+          { name: 'produto_nome', type: 'text' },
+          { name: 'quantidade', type: 'number', min: 0, onlyInt: true },
+          { name: 'destinatario', type: 'text' },
+          { name: 'transportadora', type: 'text' },
+          { name: 'status', type: 'text' },
+          { name: 'data_expedicao', type: 'text' },
+          { name: 'observacoes', type: 'text' },
+          { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+          { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+        ],
+      })
+      app.save(expCol)
+    }
+
     var fieldsToAdd = [
       { name: 'motorista', ctor: TextField },
       { name: 'veiculo', ctor: TextField },
@@ -52,24 +79,26 @@ migrate(
     }
   },
   (app) => {
-    var expCol = app.findCollectionByNameOrId('stock_expeditions')
-    var names = [
-      'motorista',
-      'veiculo',
-      'romaneio',
-      'pedido',
-      'cliente',
-      'data_saida',
-      'data_entrega_real',
-      'codigo_rastreamento',
-      'quantidade_volumes',
-      'historico',
-      'comprovante',
-    ]
-    for (var i = 0; i < names.length; i++) {
-      var f = expCol.fields.getByName(names[i])
-      if (f) expCol.fields.remove(f)
-    }
-    app.save(expCol)
+    try {
+      var expCol = app.findCollectionByNameOrId('stock_expeditions')
+      var names = [
+        'motorista',
+        'veiculo',
+        'romaneio',
+        'pedido',
+        'cliente',
+        'data_saida',
+        'data_entrega_real',
+        'codigo_rastreamento',
+        'quantidade_volumes',
+        'historico',
+        'comprovante',
+      ]
+      for (var i = 0; i < names.length; i++) {
+        var f = expCol.fields.getByName(names[i])
+        if (f) expCol.fields.remove(f)
+      }
+      app.save(expCol)
+    } catch (_) {}
   },
 )

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T02:52:11.073Z",
+  "generatedAt": "2026-08-04T03:05:14.430Z",
   "collections": [
     {
       "name": "users",
@@ -6022,6 +6022,148 @@
         "CREATE INDEX idx_sales_returns_status ON sales_returns (status)",
         "CREATE INDEX idx_sales_returns_created ON sales_returns (created DESC)"
       ]
+    },
+    {
+      "name": "stock_expeditions",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": "@request.auth.id != \"\""
+      },
+      "fields": [
+        {
+          "name": "produto_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "destinatario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "transportadora",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_expedicao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "motorista",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "veiculo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "romaneio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pedido",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_saida",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_entrega_real",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "codigo_rastreamento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_volumes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "historico",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comprovante",
+          "type": "file",
+          "required": false,
+          "system": false
+        }
+      ],
+      "indexes": []
     }
   ]
 }
