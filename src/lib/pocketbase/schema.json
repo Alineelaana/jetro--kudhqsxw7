@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T13:08:49.982Z",
+  "generatedAt": "2026-08-04T13:16:24.463Z",
   "collections": [
     {
       "name": "users",
@@ -3487,13 +3487,6 @@
           "system": false
         },
         {
-          "name": "table_type",
-          "type": "select",
-          "required": true,
-          "system": false,
-          "selectValues": ["varejo", "atacado", "distribuidor", "promocional", "especial"]
-        },
-        {
           "name": "product_id",
           "type": "text",
           "required": true,
@@ -3548,11 +3541,138 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "table_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "varejo",
+            "atacado",
+            "distribuidor",
+            "promocional",
+            "especial",
+            "cliente_especifico",
+            "regiao",
+            "canal_venda",
+            "representante",
+            "outra"
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "filial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "moeda",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tabela_base",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "percentual_ajuste",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_inicial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_final",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "parent_table_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prioridade",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rules",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "rascunho",
+            "aguardando_aprovacao",
+            "ativa",
+            "inativa",
+            "expirada",
+            "cancelada"
+          ]
         }
       ],
       "indexes": [
         "CREATE INDEX idx_price_tables_product_id ON price_tables (product_id)",
-        "CREATE INDEX idx_price_tables_table_type ON price_tables (table_type)"
+        "CREATE INDEX idx_price_tables_table_type ON price_tables (table_type)",
+        "CREATE INDEX `idx_price_tables_code` ON `price_tables` (code)",
+        "CREATE INDEX `idx_price_tables_status_v2` ON `price_tables` (status)",
+        "CREATE INDEX `idx_price_tables_empresa` ON `price_tables` (empresa)",
+        "CREATE INDEX `idx_price_tables_filial` ON `price_tables` (filial)",
+        "CREATE INDEX `idx_price_tables_prioridade` ON `price_tables` (prioridade)"
       ]
     },
     {
@@ -3687,7 +3807,7 @@
         "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
         "update": null,
-        "delete": "@request.auth.role = 'SUP'"
+        "delete": null
       },
       "fields": [
         {

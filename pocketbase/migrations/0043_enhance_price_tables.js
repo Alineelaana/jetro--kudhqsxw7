@@ -3,7 +3,7 @@ migrate(
     var col = app.findCollectionByNameOrId('price_tables')
 
     var oldType = col.fields.getByName('table_type')
-    if (oldType) col.fields.remove(oldType)
+    if (oldType) col.fields.removeById(oldType.id)
     col.fields.add(
       new SelectField({
         name: 'table_type',
@@ -100,7 +100,7 @@ migrate(
     ]
     for (var k = 0; k < fields.length; k++) {
       var f = col.fields.getByName(fields[k])
-      if (f) col.fields.remove(f)
+      if (f) col.fields.removeById(f.id)
     }
     app.save(col)
   },
