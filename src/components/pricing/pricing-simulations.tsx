@@ -30,8 +30,28 @@ import {
   type PricingSimulation,
 } from '@/lib/pricing-types'
 import type { Product } from '@/lib/product-types'
-import { Plus, Trash2, Loader2, FlaskConical, TrendingUp, Pencil, Save, X } from 'lucide-react'
+import {
+  Plus,
+  Trash2,
+  Loader2,
+  FlaskConical,
+  TrendingUp,
+  Pencil,
+  Save,
+  X,
+  Download,
+} from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import {
+  exportPricingSimulationsCsv,
+  exportPricingSimulationsPdf,
+} from '@/lib/pricing-simulations-export'
 
 const SCENARIO_TYPES = [
   { value: 'a_vista', label: 'Venda à Vista' },
@@ -340,7 +360,40 @@ export function PricingSimulations() {
 
           <Card className="border-2 border-[#005B2E]/20">
             <CardHeader>
-              <CardTitle className="text-base text-[#005B2E]">Simulações Salvas</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base text-[#005B2E]">Simulações Salvas</CardTitle>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="border-[#005B2E] text-[#005B2E]">
+                      <Download className="w-4 h-4 mr-2" /> Exportar
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (productSims.length === 0) {
+                          toast({ title: 'Nenhum dado para exportar', variant: 'destructive' })
+                          return
+                        }
+                        exportPricingSimulationsCsv(productSims)
+                      }}
+                    >
+                      Exportar Excel (CSV)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (productSims.length === 0) {
+                          toast({ title: 'Nenhum dado para exportar', variant: 'destructive' })
+                          return
+                        }
+                        exportPricingSimulationsPdf(productSims, userName)
+                      }}
+                    >
+                      Exportar PDF
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </CardHeader>
             <CardContent>
               {productSims.length === 0 ? (

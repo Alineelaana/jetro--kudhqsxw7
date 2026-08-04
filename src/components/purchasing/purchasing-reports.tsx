@@ -23,6 +23,7 @@ import {
   type PurchaseInvoice,
 } from '@/lib/purchasing-types'
 import { printPurchasingReport, exportPurchasingXls } from '@/lib/purchasing-reports-export'
+import { exportCsv } from '@/lib/csv-export'
 import { Printer, FileDown, FileSpreadsheet, Loader2, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -264,6 +265,23 @@ export function PurchasingReports() {
             className="border-[#005B2E] text-[#005B2E]"
           >
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (!report.rows.length) {
+                toast.error('Nenhum dado para exportar')
+                return
+              }
+              exportCsv(
+                report.title.toLowerCase().replace(/\s+/g, '_'),
+                report.headers,
+                report.rows,
+              )
+            }}
+            className="border-[#005B2E] text-[#005B2E]"
+          >
+            <FileDown className="w-4 h-4 mr-2" /> CSV
           </Button>
         </div>
       </div>

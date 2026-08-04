@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { useMenuHistory } from '@/hooks/use-menu-history'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
+import { useMenuBadges } from '@/hooks/use-menu-badges'
 import { canViewSales, canViewStock } from '@/lib/permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -154,6 +155,24 @@ function StarToggle({ isPinned, onToggle }: { isPinned: boolean; onToggle: () =>
   )
 }
 
+function MenuBadge({ count }: { count: number }) {
+  if (count <= 0) return null
+  return (
+    <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shrink-0">
+      {count > 99 ? '99+' : count}
+    </span>
+  )
+}
+
+function CollapsedBadge({ count }: { count: number }) {
+  if (count <= 0) return null
+  return (
+    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+      {count > 9 ? '9+' : count}
+    </span>
+  )
+}
+
 export function AdminSidebar({
   activeTab,
   onTabChange,
@@ -172,6 +191,7 @@ export function AdminSidebar({
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)
   const { favorites, toggleFavorite, isFavorite } = useMenuFavorites(user?.id as string)
+  const badges = useMenuBadges(user?.id as string)
 
   const allFlatItems = useMemo<FlatItem[]>(() => {
     const items: FlatItem[] = []
@@ -480,14 +500,15 @@ export function AdminSidebar({
                     <button
                       onClick={() => toggleMenu(item.label)}
                       className={cn(
-                        'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
+                        'relative flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
                         openMenus.has(item.label)
                           ? 'bg-gray-100 text-[#005B2E]'
                           : 'text-gray-600 hover:bg-gray-100',
                       )}
                     >
                       <Icon className="w-4 h-4" />
-                    </button>
+                      <CollapsedBadge count={badges[item.label] || 0} />
+                    </button>{' '}
                     <div
                       className={cn(
                         'absolute left-full ml-2 top-0 z-50 bg-white rounded-lg shadow-lg border p-1 min-w-[200px]',
@@ -529,9 +550,10 @@ export function AdminSidebar({
                           recordVisit(item.to!)
                           onNavigate?.()
                         }}
-                        className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
+                        className="relative flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors"
                       >
                         <Icon className="w-4 h-4" />
+                        <CollapsedBadge count={badges[item.label] || 0} />
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent side="right">{item.label}</TooltipContent>
@@ -545,13 +567,14 @@ export function AdminSidebar({
                     <button
                       onClick={() => handleTabChange(item.id!)}
                       className={cn(
-                        'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
+                        'relative flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
                         activeTab === item.id
                           ? 'bg-[#005B2E] text-white'
                           : 'text-gray-600 hover:bg-gray-100',
                       )}
                     >
                       <Icon className="w-4 h-4" />
+                      <CollapsedBadge count={badges[item.id!] || 0} />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="right">{item.label}</TooltipContent>
@@ -627,12 +650,12 @@ export function AdminSidebar({
                         className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                       >
                         <Icon className="w-4 h-4" />
-                        {item.label}
+                        <span className="flex-1 flex items-center gap-2">
+                          {item.label}
+                          <MenuBadge count={badges[item.label] || 0} />
+                        </span>
                         <ChevronDown
-                          className={cn(
-                            'w-4 h-4 ml-auto transition-transform',
-                            isOpen && 'rotate-180',
-                          )}
+                          className={cn('w-4 h-4 transition-transform', isOpen && 'rotate-180')}
                         />
                       </button>
                       {isOpen && (
@@ -673,6 +696,7 @@ export function AdminSidebar({
                     >
                       <Icon className="w-4 h-4" />
                       <span className="flex-1">{item.label}</span>
+                      <MenuBadge count={badges[item.label] || 0} />
                       <StarToggle
                         isPinned={isFavorite(item.to!)}
                         onToggle={() => toggleFavorite(item.to!)}
@@ -694,6 +718,7 @@ export function AdminSidebar({
                   >
                     <Icon className="w-4 h-4" />
                     <span className="flex-1">{item.label}</span>
+                    <MenuBadge count={badges[item.id!] || 0} />
                     <StarToggle
                       isPinned={isFavorite(item.id!)}
                       onToggle={() => toggleFavorite(item.id!)}
