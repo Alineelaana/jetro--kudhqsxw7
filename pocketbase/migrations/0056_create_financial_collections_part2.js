@@ -28,6 +28,9 @@ migrate(
     function T(n) {
       return { name: n, type: 'text' }
     }
+    function N(n) {
+      return { name: n, type: 'number' }
+    }
     function J(n) {
       return { name: n, type: 'json' }
     }

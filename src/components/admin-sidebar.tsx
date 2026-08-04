@@ -184,6 +184,7 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         ],
         permission: canViewFinancial,
       },
+      {
         label: 'Logística',
         icon: Truck,
         submenu: [
