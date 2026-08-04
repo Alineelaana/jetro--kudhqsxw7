@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T23:55:14.887Z",
+  "generatedAt": "2026-08-04T00:05:07.839Z",
   "collections": [
     {
       "name": "users",
@@ -2003,6 +2003,186 @@
         {
           "name": "min_stock",
           "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "manufacturer_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "subcategory",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cost_price",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profit_margin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "commission",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "max_discount",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cest",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cfop",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "origin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cst_csosn",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "icms_aliquot",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ipi",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pis",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cofins",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lot",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validity",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "main_supplier",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "supplier_product_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "last_cost",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "last_purchase",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "replenishment_time",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "internal_observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "max_stock",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "allow_lot_control",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "allow_validity_control",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "allow_serial_number",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "main_photo",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "technical_sheet",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "documents",
+          "type": "file",
           "required": false,
           "system": false
         }
