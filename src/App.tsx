@@ -38,6 +38,7 @@ import StockPage from './pages/StockPage'
 import WmsScreen from './pages/WmsScreen'
 import Layout from './components/Layout'
 import Logistics from './pages/Logistics'
+import Financial from './pages/Financial'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
 import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
@@ -258,6 +259,68 @@ const App = () => (
                         <Route path="seguranca" element={<SegurancaScreen />} />
                         <Route path="backup" element={<BackupScreen />} />
                       </Route>
+                      <Route path="/admin/financeiro" element={<Financial screen="dashboard" />} />
+                      <Route
+                        path="/admin/financeiro/contas-receber"
+                        element={<Financial screen="receivables" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/contas-pagar"
+                        element={<Financial screen="payables" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/fluxo-caixa"
+                        element={<Financial screen="cash_flow" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/conciliacao"
+                        element={<Financial screen="reconciliation" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/tesouraria"
+                        element={<Financial screen="treasury" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/cheques"
+                        element={<Financial screen="checks" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/cartoes"
+                        element={<Financial screen="cards" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/boletos"
+                        element={<Financial screen="boletos" />}
+                      />
+                      <Route path="/admin/financeiro/pix" element={<Financial screen="pix" />} />
+                      <Route
+                        path="/admin/financeiro/cobrancas"
+                        element={<Financial screen="collections" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/caixa"
+                        element={<Financial screen="cash_register" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/movimentacoes"
+                        element={<Financial screen="movements" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/transferencias"
+                        element={<Financial screen="transfers" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/aprovacoes"
+                        element={<Financial screen="approvals" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/fechamento"
+                        element={<Financial screen="closing" />}
+                      />
+                      <Route
+                        path="/admin/financeiro/relatorios"
+                        element={<Financial screen="reports" />}
+                      />
                       <Route path="/admin/notificacoes" element={<Notifications />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />

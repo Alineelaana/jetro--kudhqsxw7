@@ -25,6 +25,7 @@ import {
 } from '@/lib/permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
+import { canViewFinancial } from '@/lib/financial-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -53,6 +54,7 @@ import {
   Table,
   Bell,
   Truck,
+  Wallet,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -159,6 +161,29 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         permission: canViewPriceTables,
       },
       {
+        label: 'Financeiro',
+        icon: Wallet,
+        submenu: [
+          { to: '/admin/financeiro', label: 'Dashboard Financeiro' },
+          { to: '/admin/financeiro/contas-receber', label: 'Contas a Receber' },
+          { to: '/admin/financeiro/contas-pagar', label: 'Contas a Pagar' },
+          { to: '/admin/financeiro/fluxo-caixa', label: 'Fluxo de Caixa' },
+          { to: '/admin/financeiro/conciliacao', label: 'Conciliação Bancária' },
+          { to: '/admin/financeiro/tesouraria', label: 'Tesouraria' },
+          { to: '/admin/financeiro/cheques', label: 'Controle de Cheques' },
+          { to: '/admin/financeiro/cartoes', label: 'Cartões' },
+          { to: '/admin/financeiro/boletos', label: 'Boletos' },
+          { to: '/admin/financeiro/pix', label: 'PIX' },
+          { to: '/admin/financeiro/cobrancas', label: 'Cobranças' },
+          { to: '/admin/financeiro/caixa', label: 'Caixa' },
+          { to: '/admin/financeiro/movimentacoes', label: 'Movimentações Financeiras' },
+          { to: '/admin/financeiro/transferencias', label: 'Transferências entre Contas' },
+          { to: '/admin/financeiro/aprovacoes', label: 'Aprovações Financeiras' },
+          { to: '/admin/financeiro/fechamento', label: 'Fechamento Financeiro' },
+          { to: '/admin/financeiro/relatorios', label: 'Relatórios Financeiros' },
+        ],
+        permission: canViewFinancial,
+      },
         label: 'Logística',
         icon: Truck,
         submenu: [
@@ -269,7 +294,7 @@ export function AdminSidebar({
   const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [openMenus, setOpenMenus] = useState<Set<string>>(
-    new Set(['Vendas', 'Estoque', 'Configurações', 'Logística']),
+    new Set(['Vendas', 'Estoque', 'Configurações', 'Logística', 'Financeiro']),
   )
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)
