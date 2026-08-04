@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T03:56:27.675Z",
+  "generatedAt": "2026-08-04T04:07:46.170Z",
   "collections": [
     {
       "name": "users",
@@ -1470,8 +1470,8 @@
         "list": "@request.auth.role = 'SUP'",
         "view": "@request.auth.role = 'SUP'",
         "create": null,
-        "update": null,
-        "delete": null
+        "update": "@request.auth.id = '___never___'",
+        "delete": "@request.auth.id = '___never___'"
       },
       "fields": [
         {
@@ -1559,6 +1559,80 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "criticidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Baixa", "Média", "Alta", "Crítica"]
+        },
+        {
+          "name": "origem",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "Área da Empresa",
+            "Portal do Cliente",
+            "Portal do Fornecedor",
+            "Aplicativo",
+            "API",
+            "Integração",
+            "Importação",
+            "Exportação",
+            "Inteligência Artificial",
+            "Automação",
+            "Fluxo Inteligente"
+          ]
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "browser",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "os",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "device",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "justification",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_suspicious",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "archived",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1567,7 +1641,12 @@
         "CREATE INDEX idx_audit_logs_action ON audit_logs (action)",
         "CREATE INDEX idx_audit_logs_user_role ON audit_logs (user_role)",
         "CREATE INDEX idx_audit_logs_user_name ON audit_logs (user_name)",
-        "CREATE INDEX idx_audit_logs_target_collection ON audit_logs (target_collection)"
+        "CREATE INDEX idx_audit_logs_target_collection ON audit_logs (target_collection)",
+        "CREATE INDEX `idx_audit_logs_criticidade` ON `audit_logs` (criticidade)",
+        "CREATE INDEX `idx_audit_logs_origem` ON `audit_logs` (origem)",
+        "CREATE INDEX `idx_audit_logs_session_id` ON `audit_logs` (session_id)",
+        "CREATE INDEX `idx_audit_logs_ip_address` ON `audit_logs` (ip_address)",
+        "CREATE INDEX `idx_audit_logs_archived` ON `audit_logs` (archived)"
       ]
     },
     {
@@ -6552,6 +6631,202 @@
         "CREATE INDEX idx_pricing_risk_user ON pricing_risk_monitor (user_name)",
         "CREATE INDEX idx_pricing_risk_index ON pricing_risk_monitor (risk_index)",
         "CREATE INDEX idx_pricing_risk_created ON pricing_risk_monitor (created)"
+      ]
+    },
+    {
+      "name": "audit_sessions",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.role = 'SUP'",
+        "view": "@request.auth.role = 'SUP'",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "session_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "login_time",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "logout_time",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ip_address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "browser",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "os",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "device",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "origin",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "Área da Empresa",
+            "Portal do Cliente",
+            "Portal do Fornecedor",
+            "Aplicativo",
+            "API",
+            "Integração",
+            "Importação",
+            "Exportação",
+            "Inteligência Artificial",
+            "Automação",
+            "Fluxo Inteligente"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_audit_sessions_session_id ON audit_sessions (session_id)",
+        "CREATE INDEX idx_audit_sessions_user_id ON audit_sessions (user_id)"
+      ]
+    },
+    {
+      "name": "audit_alerts",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.role = 'SUP'",
+        "view": "@request.auth.role = 'SUP'",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "alert_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "severity",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["info", "warning", "critical"]
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "audit_log_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_audit_alerts_alert_type ON audit_alerts (alert_type)",
+        "CREATE INDEX idx_audit_alerts_resolved ON audit_alerts (resolved)"
       ]
     }
   ]

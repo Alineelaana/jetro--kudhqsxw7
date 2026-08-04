@@ -12,6 +12,14 @@ onRecordCreateRequest(
     try {
       authUser = e.auth
     } catch (_) {}
+    var session_id = ''
+    try {
+      var _ah = (e.requestInfo().headers || {})['authorization'] || ''
+      var _tk = _ah.replace(/^Bearer\s+/i, '')
+      if (_tk) {
+        session_id = $security.sha256(_tk).substring(0, 16)
+      }
+    } catch (_) {}
 
     e.next()
 
@@ -175,6 +183,7 @@ onRecordCreateRequest(
       log.set('new_value', newData)
       log.set('ip_address', ip)
       log.set('user_agent', ua)
+      log.set('session_id', session_id)
       $app.save(log)
     } catch (err) {
       $app.logger().error('audit create log failed', 'error', String(err))
