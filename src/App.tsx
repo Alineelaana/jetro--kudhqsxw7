@@ -39,6 +39,7 @@ import WmsScreen from './pages/WmsScreen'
 import Layout from './components/Layout'
 import Logistics from './pages/Logistics'
 import Financial from './pages/Financial'
+import RH from './pages/RH'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
 import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
@@ -321,6 +322,18 @@ const App = () => (
                         path="/admin/financeiro/relatorios"
                         element={<Financial screen="reports" />}
                       />
+                      <Route path="/admin/rh" element={<RH screen="dashboard" />} />
+                      <Route path="/admin/rh/colaboradores" element={<RH screen="employees" />} />
+                      <Route path="/admin/rh/cargos" element={<RH screen="positions" />} />
+                      <Route path="/admin/rh/departamentos" element={<RH screen="departments" />} />
+                      <Route path="/admin/rh/ponto" element={<RH screen="time_control" />} />
+                      <Route path="/admin/rh/ferias" element={<RH screen="vacations" />} />
+                      <Route path="/admin/rh/folha" element={<RH screen="payroll" />} />
+                      <Route path="/admin/rh/beneficios" element={<RH screen="benefits" />} />
+                      <Route path="/admin/rh/treinamentos" element={<RH screen="trainings" />} />
+                      <Route path="/admin/rh/documentos" element={<RH screen="documents" />} />
+                      <Route path="/admin/rh/aprovacoes" element={<RH screen="approvals" />} />
+                      <Route path="/admin/rh/relatorios" element={<RH screen="reports" />} />
                       <Route path="/admin/notificacoes" element={<Notifications />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />

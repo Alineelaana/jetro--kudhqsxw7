@@ -26,6 +26,7 @@ import {
 import { canViewLogistics } from '@/lib/logistics-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
+import { canViewRH } from '@/lib/rh-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -55,6 +56,7 @@ import {
   Bell,
   Truck,
   Wallet,
+  UserCog,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -132,6 +134,21 @@ const CONFIG_SUBMENU: SubItem[] = [
   { to: '/admin/configuracoes/backup', label: 'Backup' },
 ]
 
+const RH_SUBMENU: SubItem[] = [
+  { to: '/admin/rh', label: 'Dashboard de RH' },
+  { to: '/admin/rh/colaboradores', label: 'Colaboradores' },
+  { to: '/admin/rh/cargos', label: 'Cargos' },
+  { to: '/admin/rh/departamentos', label: 'Departamentos' },
+  { to: '/admin/rh/ponto', label: 'Controle de Ponto' },
+  { to: '/admin/rh/ferias', label: 'Férias' },
+  { to: '/admin/rh/folha', label: 'Folha de Pagamento' },
+  { to: '/admin/rh/beneficios', label: 'Benefícios' },
+  { to: '/admin/rh/treinamentos', label: 'Treinamentos' },
+  { to: '/admin/rh/documentos', label: 'Documentos' },
+  { to: '/admin/rh/aprovacoes', label: 'Aprovações de RH' },
+  { to: '/admin/rh/relatorios', label: 'Relatórios de RH' },
+]
+
 const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operacional',
@@ -207,6 +224,12 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
           { to: '/admin/logistica/relatorios', label: 'Relatórios' },
         ],
         permission: canViewLogistics,
+      },
+      {
+        label: 'RH',
+        icon: UserCog,
+        submenu: RH_SUBMENU,
+        permission: canViewRH,
       },
     ],
   },
