@@ -1,4 +1,6 @@
 import { canConsultCosts } from '@/lib/permissions'
+import { parseNum, calcPrices, type PricingConfig } from '@/lib/pricing-types'
+import type { Product } from '@/lib/product-types'
 
 export function canViewPrices(role: string | undefined): boolean {
   if (!role) return false
@@ -70,12 +72,8 @@ export function canExportPricing(role: string | undefined): boolean {
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
 
-export function checkSmartBlocks(
-  cfg: Partial<import('@/lib/pricing-types').PricingConfig>,
-  product: Partial<import('@/lib/product-types').Product>,
-): string[] {
+export function checkSmartBlocks(cfg: Partial<PricingConfig>, product: Partial<Product>): string[] {
   const blocks: string[] = []
-  const { parseNum, calcPrices } = require('@/lib/pricing-types')
   const computed = calcPrices(cfg)
   if (parseNum(cfg.suggested_price) > 0 && parseNum(cfg.suggested_price) < computed.final_cost)
     blocks.push('Preço abaixo do custo')
