@@ -12,6 +12,10 @@ import { LogisticsOccurrences } from '@/components/logistics/logistics-occurrenc
 import { LogisticsProofDelivery } from '@/components/logistics/logistics-proof-delivery'
 import { LogisticsCosts } from '@/components/logistics/logistics-costs'
 import { LogisticsReports } from '@/components/logistics/logistics-reports'
+import { LogisticsRoutePlanning } from '@/components/logistics/logistics-route-planning'
+import { LogisticsIndicators } from '@/components/logistics/logistics-indicators'
+import { LogisticsReverseLogistics } from '@/components/logistics/logistics-reverse-logistics'
+import { LogisticsDriverApp } from '@/components/logistics/logistics-driver-app'
 import { WmsRomaneios } from '@/components/stock/wms-romaneios'
 
 const TITLES: Record<string, string> = {
@@ -28,6 +32,10 @@ const TITLES: Record<string, string> = {
   proof: 'Comprovantes de Entrega',
   costs: 'Custos Logísticos',
   reports: 'Relatórios Logísticos',
+  route_planning: 'Planejamento de Rotas',
+  indicators: 'Indicadores de Desempenho',
+  reverse_logistics: 'Logística Reversa',
+  driver_app: 'Aplicativo do Motorista',
 }
 
 export default function Logistics({ screen }: { screen: string }) {
@@ -61,6 +69,14 @@ export default function Logistics({ screen }: { screen: string }) {
         return <LogisticsCosts />
       case 'reports':
         return <LogisticsReports />
+      case 'route_planning':
+        return <LogisticsRoutePlanning />
+      case 'indicators':
+        return <LogisticsIndicators />
+      case 'reverse_logistics':
+        return <LogisticsReverseLogistics />
+      case 'driver_app':
+        return <LogisticsDriverApp />
       default:
         return <LogisticsDashboard />
     }

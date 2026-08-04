@@ -266,3 +266,45 @@ export interface LogisticsOccurrence {
   created: string
   updated: string
 }
+
+export const REVERSE_LOGISTICS_STATUS = [
+  'Solicitada',
+  'Aprovada',
+  'Coleta Agendada',
+  'Coletada',
+  'Em Conferência',
+  'Entrada no Estoque',
+  'Tratamento Fiscal',
+  'Finalizada',
+  'Cancelada',
+] as const
+
+export const REVERSE_LOGISTICS_TYPES = [
+  'Produto Recusado',
+  'Produto Avariado',
+  'Troca',
+  'Devolução Total',
+  'Devolução Parcial',
+  'Retorno de Embalagem',
+  'Retorno de Pallet',
+  'Assistência Técnica',
+] as const
+
+export interface LogisticsReverseOperation {
+  id: string
+  numero_operacao: string
+  tipo_operacao: string
+  origem: string
+  documento_origem: string
+  cliente_fornecedor: string
+  produto: string
+  quantidade: string
+  motivo: string
+  status: string
+  data_solicitacao: string
+  data_coleta: string
+  responsavel: string
+  observacoes: string
+  created: string
+  updated: string
+}

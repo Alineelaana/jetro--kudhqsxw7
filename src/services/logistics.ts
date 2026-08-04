@@ -81,3 +81,10 @@ export const getCosts = (): Promise<Record<string, unknown>[]> =>
   pb.collection('logistics_costs').getFullList({ sort: '-created' })
 export const createCost = (data: Record<string, unknown>) =>
   pb.collection('logistics_costs').create(data)
+
+export const getReverseOperations = (): Promise<Record<string, unknown>[]> =>
+  pb.collection('logistics_reverse_operations').getFullList({ sort: '-created' })
+export const createReverseOperation = (data: Record<string, unknown>) =>
+  pb.collection('logistics_reverse_operations').create(data)
+export const updateReverseOperation = (id: string, data: Record<string, unknown>) =>
+  pb.collection('logistics_reverse_operations').update(id, data)

@@ -120,6 +120,22 @@ const App = () => (
                         element={<Logistics screen="costs" />}
                       />
                       <Route
+                        path="/admin/logistica/planejamento"
+                        element={<Logistics screen="route_planning" />}
+                      />
+                      <Route
+                        path="/admin/logistica/indicadores"
+                        element={<Logistics screen="indicators" />}
+                      />
+                      <Route
+                        path="/admin/logistica/reversa"
+                        element={<Logistics screen="reverse_logistics" />}
+                      />
+                      <Route
+                        path="/admin/logistica/app-motorista"
+                        element={<Logistics screen="driver_app" />}
+                      />
+                      <Route
                         path="/admin/logistica/relatorios"
                         element={<Logistics screen="reports" />}
                       />
