@@ -37,6 +37,7 @@ import {
 } from '@/lib/price-table-permissions'
 import { Loader2, Plus, Eye, Pencil, Copy, CheckCircle, XCircle, Ban, Search } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { PriceTableFormDialog } from '@/components/pricing/price-table-form-dialog'
 
 export function PricingTables() {
   const { user } = useAuth()

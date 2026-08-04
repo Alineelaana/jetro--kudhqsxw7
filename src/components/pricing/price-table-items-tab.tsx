@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select'
 import { getProducts } from '@/services/products'
 import { getPriceTablesList } from '@/services/price-tables'
-import { formatCurrency, type PriceTableItem } from '@/lib/price-table-types'
+import { formatCurrency, parseItems, type PriceTableItem } from '@/lib/price-table-types'
 import type { Product } from '@/lib/product-types'
 import { Plus, Trash2, Percent, DollarSign, Download, Copy, AlertTriangle } from 'lucide-react'
 
@@ -134,8 +134,11 @@ export function PriceTableItemsTab({ items, setItems, canViewCosts }: Props) {
     try {
       const t = await getPriceTablesList()
       const src = t.find((x) => x.id === copyTableId)
-      if (src && Array.isArray(src.items)) {
-        setItems([...items, ...(src.items as PriceTableItem[])])
+      if (src) {
+        const srcItems = parseItems(src.items)
+        if (srcItems.length > 0) {
+          setItems([...items, ...srcItems])
+        }
       }
       setCopyTableId('')
     } catch {

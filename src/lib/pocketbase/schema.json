@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T13:32:28.036Z",
+  "generatedAt": "2026-08-04T13:34:51.991Z",
   "collections": [
     {
       "name": "users",
@@ -3489,7 +3489,7 @@
         {
           "name": "product_id",
           "type": "text",
-          "required": true,
+          "required": false,
           "system": false
         },
         {
@@ -3545,7 +3545,7 @@
         {
           "name": "table_type",
           "type": "select",
-          "required": true,
+          "required": false,
           "system": false,
           "selectValues": [
             "varejo",
