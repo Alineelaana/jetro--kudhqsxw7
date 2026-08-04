@@ -373,7 +373,7 @@ migrate(
         { name: 'annual_reset', type: 'bool' },
       ],
       [
-        "CREATE UNIQUE INDEX idx_numerations_unique ON numerations (document_type, company, branch, prefix) WHERE document_type != ''",
+        'CREATE UNIQUE INDEX idx_numerations_unique ON numerations (document_type, company, branch, prefix)',
       ],
     )
 
