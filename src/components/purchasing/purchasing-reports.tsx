@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -41,6 +42,7 @@ export function PurchasingReports() {
   const { user } = useAuth()
   const [reportType, setReportType] = useState('requests')
   const [loading, setLoading] = useState(false)
+  const [dataError, setDataError] = useState(false)
   const [requests, setRequests] = useState<PurchaseRequest[]>([])
   const [quotations, setQuotations] = useState<Quotation[]>([])
   const [orders, setOrders] = useState<PurchaseOrder[]>([])
@@ -48,6 +50,7 @@ export function PurchasingReports() {
 
   useEffect(() => {
     setLoading(true)
+    setDataError(false)
     Promise.all([
       getPurchaseRequests(),
       getQuotations(),
@@ -60,7 +63,9 @@ export function PurchasingReports() {
         setOrders(o as unknown as PurchaseOrder[])
         setInvoices(i as unknown as PurchaseInvoice[])
       })
-      .catch(() => {})
+      .catch(() => {
+        setDataError(true)
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -279,7 +284,24 @@ export function PurchasingReports() {
           </Select>
         </CardContent>
       </Card>
-      {loading ? (
+      {dataError ? (
+        <Card className="border-2 border-dashed border-red-300">
+          <CardContent className="py-16 text-center">
+            <FileText className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <p className="text-lg font-bold text-red-700">Erro ao carregar dados.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Não foi possível carregar os dados dos relatórios. Tente novamente mais tarde.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4 border-[#005B2E] text-[#005B2E]"
+              onClick={() => window.location.reload()}
+            >
+              Tentar novamente
+            </Button>
+          </CardContent>
+        </Card>
+      ) : loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
         </div>
