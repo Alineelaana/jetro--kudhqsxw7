@@ -35,6 +35,8 @@ export async function getConformidadeData(): Promise<ConformidadeResult> {
     actionPlans,
     psychosocial,
     nonConformities,
+    positions,
+    trainingParticipants,
   ] = await Promise.all([
     safeList(
       'rh_employees',
@@ -52,6 +54,8 @@ export async function getConformidadeData(): Promise<ConformidadeResult> {
     safeList('sst_action_plans'),
     safeList('sst_psychosocial_assessments'),
     safeList('sst_non_conformities'),
+    safeList('rh_positions'),
+    safeList('rh_training_participants'),
   ])
 
   const alerts: ConformidadeAlert[] = []
@@ -125,6 +129,16 @@ export async function getConformidadeData(): Promise<ConformidadeResult> {
         module: 'DP',
       })
 
+    const irregularBank = empTime.find((t) => (t.banco_horas || '').startsWith('-'))
+    if (irregularBank)
+      alerts.push({
+        type: 'banco_horas_irregular',
+        severity: 'Média',
+        employee_name: name,
+        description: 'Banco de horas irregular (negativo)',
+        module: 'DP',
+      })
+
     const empEpis = (epis as any[]).filter((e) => e.employee_name === name)
     if (empEpis.length === 0)
       alerts.push({
@@ -147,6 +161,32 @@ export async function getConformidadeData(): Promise<ConformidadeResult> {
         description: 'Documento obrigatório vencido',
         module: 'DP',
       })
+
+    const empPositions = (positions as any[]).filter((p) => p.name === emp.cargo)
+    for (const pos of empPositions) {
+      let mandatory: any[] = []
+      try {
+        mandatory =
+          typeof pos.treinamentos_obrigatorios === 'string'
+            ? JSON.parse(pos.treinamentos_obrigatorios)
+            : pos.treinamentos_obrigatorios || []
+      } catch {
+        /* intentionally ignored */
+      }
+      if (Array.isArray(mandatory) && mandatory.length > 0) {
+        const empTrainingCount = (trainingParticipants as any[]).filter(
+          (tp) => tp.employee_name === name,
+        ).length
+        if (empTrainingCount === 0)
+          alerts.push({
+            type: 'cargo_sem_treinamento',
+            severity: 'Média',
+            employee_name: name,
+            description: `Cargo "${emp.cargo}" exige treinamentos obrigatórios não realizados`,
+            module: 'RH',
+          })
+      }
+    }
   }
 
   const expiredPgr = (pgrs as any[]).find(
@@ -191,6 +231,21 @@ export async function getConformidadeData(): Promise<ConformidadeResult> {
       severity: n.gravidade === 'Alta' ? 'Alta' : 'Média',
       description: `Não conformidade em aberto: ${n.descricao}`,
       module: 'SST',
+    }),
+  )
+
+  const mandatoryTrainings = (trainings as any[]).filter((t) => t.obrigatorio)
+  const overdueTrainings = mandatoryTrainings.filter((t) => {
+    if (['Concluído', 'Cancelado'].includes(t.situacao)) return false
+    if (t.data && new Date(t.data) < now) return true
+    return false
+  })
+  overdueTrainings.forEach((t) =>
+    alerts.push({
+      type: 'treinamento_obrigatorio_vencido',
+      severity: 'Média',
+      description: `Treinamento obrigatório vencido: ${t.name}`,
+      module: 'RH',
     }),
   )
 

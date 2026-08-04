@@ -72,7 +72,7 @@ export async function simulatePayroll(competencia: string): Promise<PayrollSimul
     pb
       .collection('rh_employees')
       .getFullList({
-        filter: 'situacao = "Ativo" || situacao = "Em Experiencia"',
+        filter: 'situacao = "Ativo" || situacao = "Em Experiência" || situacao = "Em Experiencia"',
       })
       .catch(() => []),
     pb

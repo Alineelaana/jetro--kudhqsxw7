@@ -40,6 +40,7 @@ import Layout from './components/Layout'
 import Logistics from './pages/Logistics'
 import Financial from './pages/Financial'
 import RH from './pages/RH'
+import Conformidade from './pages/Conformidade'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
 import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
@@ -334,6 +335,7 @@ const App = () => (
                       <Route path="/admin/rh/documentos" element={<RH screen="documents" />} />
                       <Route path="/admin/rh/aprovacoes" element={<RH screen="approvals" />} />
                       <Route path="/admin/rh/relatorios" element={<RH screen="reports" />} />
+                      <Route path="/admin/conformidade" element={<Conformidade />} />
                       <Route path="/admin/notificacoes" element={<Notifications />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
