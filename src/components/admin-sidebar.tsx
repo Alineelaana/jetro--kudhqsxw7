@@ -29,6 +29,7 @@ import {
   DollarSign,
   Briefcase,
   Settings,
+  Cog,
   Shield,
   Archive,
   Bot,
@@ -88,6 +89,22 @@ const STOCK_SUBMENU: SubItem[] = [
   { to: '/admin/estoque/expedicao', label: 'Expedição' },
 ]
 
+const CONFIG_SUBMENU: SubItem[] = [
+  { to: '/admin/configuracoes/dados-empresa', label: 'Dados da Empresa' },
+  { to: '/admin/configuracoes/parametros', label: 'Parâmetros' },
+  { to: '/admin/configuracoes/permissoes', label: 'Permissões' },
+  { to: '/admin/configuracoes/logs', label: 'Logs' },
+  { to: '/admin/configuracoes/integracoes', label: 'Integrações' },
+  { to: '/admin/configuracoes/apis', label: 'APIs' },
+  { to: '/admin/configuracoes/importacao-exportacao', label: 'Import/Export' },
+  { to: '/admin/configuracoes/modelos-email', label: 'Modelos de E-mail' },
+  { to: '/admin/configuracoes/modelos-documentos', label: 'Modelos de Docs' },
+  { to: '/admin/configuracoes/notificacoes', label: 'Notificações' },
+  { to: '/admin/configuracoes/numeracoes', label: 'Numerações' },
+  { to: '/admin/configuracoes/seguranca', label: 'Segurança' },
+  { to: '/admin/configuracoes/backup', label: 'Backup' },
+]
+
 const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operacional',
@@ -125,6 +142,7 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { id: 'audit', label: 'Auditoria', icon: Shield },
       { id: 'backups', label: 'Backups', icon: Database },
       { id: 'ai', label: 'Treinamento IA', icon: Bot },
+      { label: 'Configurações', icon: Cog, submenu: CONFIG_SUBMENU },
     ],
   },
 ]

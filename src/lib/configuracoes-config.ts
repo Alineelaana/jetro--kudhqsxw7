@@ -89,19 +89,27 @@ export const PERMISSION_ACTIONS = [
   'Alterar configurações',
 ]
 export const CONFIG_SCREENS = [
-  { key: 'empresa', path: '/admin/configuracoes', label: 'Dados da Empresa' },
-  { key: 'parametros', path: '/admin/configuracoes/parametros', label: 'Parâmetros' },
+  { key: 'dados-empresa', path: '/admin/configuracoes/dados-empresa', label: 'Dados da Empresa' },
+  { key: 'parametros', path: '/admin/configuracoes/parametros', label: 'Parâmetros do Sistema' },
   { key: 'permissoes', path: '/admin/configuracoes/permissoes', label: 'Permissões' },
   { key: 'logs', path: '/admin/configuracoes/logs', label: 'Logs' },
   { key: 'integracoes', path: '/admin/configuracoes/integracoes', label: 'Integrações' },
   { key: 'apis', path: '/admin/configuracoes/apis', label: 'APIs' },
-  { key: 'import-export', path: '/admin/configuracoes/import-export', label: 'Import/Export' },
-  { key: 'email-modelos', path: '/admin/configuracoes/email-modelos', label: 'Modelos de E-mail' },
-  { key: 'doc-modelos', path: '/admin/configuracoes/doc-modelos', label: 'Modelos de Docs' },
+  {
+    key: 'importacao-exportacao',
+    path: '/admin/configuracoes/importacao-exportacao',
+    label: 'Importação e Exportação',
+  },
+  { key: 'modelos-email', path: '/admin/configuracoes/modelos-email', label: 'Modelos de E-mail' },
+  {
+    key: 'modelos-documentos',
+    path: '/admin/configuracoes/modelos-documentos',
+    label: 'Modelos de Documentos',
+  },
   { key: 'notificacoes', path: '/admin/configuracoes/notificacoes', label: 'Notificações' },
   { key: 'numeracoes', path: '/admin/configuracoes/numeracoes', label: 'Numerações' },
   { key: 'seguranca', path: '/admin/configuracoes/seguranca', label: 'Segurança' },
-  { key: 'backup', path: '/admin/configuracoes/backup', label: 'Backup' },
+  { key: 'backup', path: '/admin/configuracoes/backup', label: 'Backup e Restauração' },
 ]
 
 export interface ConfigField {
@@ -266,5 +274,44 @@ export const NUMERATION_CONFIG: ConfigCrudConfig = {
     { name: 'next_number', label: 'Próximo Número', type: 'number', required: true },
     { name: 'digit_count', label: 'Qtd. Dígitos', type: 'number' },
     { name: 'annual_reset', label: 'Reinício Anual', type: 'boolean' },
+  ],
+}
+
+export const PERMISSOES_CONFIG: ConfigCrudConfig = {
+  collection: 'perfis_permissoes',
+  title: 'Perfil de Permissão',
+  nameField: 'name',
+  fields: [
+    { name: 'name', label: 'Nome do Perfil', type: 'text', required: true },
+    { name: 'code', label: 'Código', type: 'text', required: true },
+    { name: 'description', label: 'Descrição', type: 'textarea', span: 2 },
+    { name: 'permissions', label: 'Permissões (JSON)', type: 'textarea', span: 2 },
+  ],
+}
+
+export const INTEGRATIONS_CONFIG: ConfigCrudConfig = {
+  collection: 'integrations',
+  title: 'Integração',
+  nameField: 'name',
+  fields: [
+    { name: 'name', label: 'Nome', type: 'text', required: true },
+    { name: 'type', label: 'Tipo', type: 'text' },
+    {
+      name: 'environment',
+      label: 'Ambiente',
+      type: 'select',
+      options: ['producao', 'homologacao', 'sandbox'],
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      options: INTEGRATION_STATUSES,
+    },
+    { name: 'company', label: 'Empresa', type: 'text' },
+    { name: 'branch', label: 'Filial', type: 'text' },
+    { name: 'responsible', label: 'Responsável', type: 'text' },
+    { name: 'observations', label: 'Observações', type: 'textarea', span: 2 },
+    { name: 'credentials', label: 'Credenciais (JSON)', type: 'textarea', span: 2 },
   ],
 }

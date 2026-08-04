@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -34,6 +34,23 @@ import SalesReturnsPage from './pages/sales/SalesReturnsPage'
 import SalesHistoryPage from './pages/sales/SalesHistoryPage'
 import StockPage from './pages/StockPage'
 import Layout from './components/Layout'
+import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
+import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
+import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
+import { ConfigCrudScreen } from '@/components/configuracoes/config-crud-screen'
+import { LogsScreen } from '@/components/configuracoes/logs-screen'
+import { ApisScreen } from '@/components/configuracoes/apis-screen'
+import { ImportExportScreen } from '@/components/configuracoes/import-export-screen'
+import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
+import { BackupScreen } from '@/components/configuracoes/backup-screen'
+import {
+  PERMISSOES_CONFIG,
+  INTEGRATIONS_CONFIG,
+  EMAIL_TEMPLATE_CONFIG,
+  DOC_TEMPLATE_CONFIG,
+  NOTIFICATION_CONFIG,
+  NUMERATION_CONFIG,
+} from '@/lib/configuracoes-config'
 
 const App = () => (
   <BrowserRouter>
@@ -95,6 +112,40 @@ const App = () => (
                       path="/admin/estoque/expedicao"
                       element={<StockPage screen="expedition" />}
                     />
+                    <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
+                      <Route index element={<Navigate to="dados-empresa" replace />} />
+                      <Route path="dados-empresa" element={<EmpresaScreen />} />
+                      <Route path="parametros" element={<ParametrosScreen />} />
+                      <Route
+                        path="permissoes"
+                        element={<ConfigCrudScreen config={PERMISSOES_CONFIG} />}
+                      />
+                      <Route path="logs" element={<LogsScreen />} />
+                      <Route
+                        path="integracoes"
+                        element={<ConfigCrudScreen config={INTEGRATIONS_CONFIG} />}
+                      />
+                      <Route path="apis" element={<ApisScreen />} />
+                      <Route path="importacao-exportacao" element={<ImportExportScreen />} />
+                      <Route
+                        path="modelos-email"
+                        element={<ConfigCrudScreen config={EMAIL_TEMPLATE_CONFIG} />}
+                      />
+                      <Route
+                        path="modelos-documentos"
+                        element={<ConfigCrudScreen config={DOC_TEMPLATE_CONFIG} />}
+                      />
+                      <Route
+                        path="notificacoes"
+                        element={<ConfigCrudScreen config={NOTIFICATION_CONFIG} />}
+                      />
+                      <Route
+                        path="numeracoes"
+                        element={<ConfigCrudScreen config={NUMERATION_CONFIG} />}
+                      />
+                      <Route path="seguranca" element={<SegurancaScreen />} />
+                      <Route path="backup" element={<BackupScreen />} />
+                    </Route>
                     <Route path="/admin/cadastro" element={<AdminRegister />} />
                     <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                     <Route path="/cliente/login" element={<ClientLogin />} />
