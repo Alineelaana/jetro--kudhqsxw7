@@ -1,6 +1,6 @@
 onRecordAfterCreateSuccess((e) => {
   var criticidade = e.record.getString('criticidade')
-  if (criticidade !== 'Crítica') {
+  if (criticidade !== 'Critica') {
     e.next()
     return
   }
@@ -9,6 +9,20 @@ onRecordAfterCreateSuccess((e) => {
   var module = e.record.getString('module')
   var targetSummary = e.record.getString('target_summary') || ''
   var logId = e.record.id
+  var userName = e.record.getString('user_name') || 'Desconhecido'
+  var ipAddress = e.record.getString('ip_address') || '---'
+  var browser = e.record.getString('browser') || '---'
+  var os = e.record.getString('os') || '---'
+  var sessionId = e.record.getString('session_id') || '---'
+
+  var emailEnabled = false
+  var notifyEmail = ''
+  try {
+    var rec = $app.findFirstRecordByData('settings', 'key', 'audit_alert_config')
+    var config = JSON.parse(rec.getString('value'))
+    emailEnabled = config.email_notifications_enabled === true
+    notifyEmail = config.notification_email || ''
+  } catch (_) {}
 
   try {
     var supUsers = $app.findRecordsByFilter(
@@ -25,9 +39,13 @@ onRecordAfterCreateSuccess((e) => {
     }
 
     var notifCol = $app.findCollectionByNameOrId('notifications')
-    var title = 'Evento Crítico de Auditoria'
+    var title = 'Evento Critico de Auditoria'
     var message = action + ' em ' + module
-    if (targetSummary) message += ' — ' + targetSummary
+    if (targetSummary) message += ' - ' + targetSummary
+    message += '\nUsuario: ' + userName
+    message += '\nIP: ' + ipAddress
+    message += '\nNavegador: ' + browser + ' / ' + os
+    message += '\nSessao: ' + sessionId
 
     for (var i = 0; i < supUsers.length; i++) {
       try {
@@ -42,6 +60,22 @@ onRecordAfterCreateSuccess((e) => {
     }
   } catch (err) {
     $app.logger().error('incident notification failed', 'error', String(err))
+  }
+
+  if (emailEnabled && notifyEmail) {
+    $app
+      .logger()
+      .info(
+        'critical incident email notification queued',
+        'email',
+        notifyEmail,
+        'action',
+        action,
+        'module',
+        module,
+        'log_id',
+        logId,
+      )
   }
 
   e.next()

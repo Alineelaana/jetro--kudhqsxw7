@@ -17,6 +17,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { getAuditLogs, type AuditLog } from '@/services/audit-logs'
 import { AUDIT_MODULE_OPTIONS, AUDIT_ACTION_OPTIONS, AUDIT_ROLE_OPTIONS } from '@/lib/audit-helpers'
 import { exportAuditExcel, exportAuditPdf } from '@/lib/audit-export'
+import { AuditSettingsPanel } from '@/components/audit-settings-panel'
 import {
   Loader2,
   FileDown,
@@ -25,6 +26,7 @@ import {
   ShieldCheck,
   Eye,
   AlertCircle,
+  Settings,
 } from 'lucide-react'
 
 export function AuditPanel() {
@@ -44,6 +46,7 @@ export function AuditPanel() {
   const [fAction, setFAction] = useState('')
   const [fRole, setFRole] = useState('')
   const [fKeyword, setFKeyword] = useState('')
+  const [showSettings, setShowSettings] = useState(false)
 
   const authorName = (user?.name as string) || (user?.email as string) || 'Usuário'
 
@@ -110,6 +113,17 @@ export function AuditPanel() {
     )
   }
 
+  if (showSettings) {
+    return (
+      <div className="space-y-4">
+        <Button variant="ghost" onClick={() => setShowSettings(false)} className="text-[#005B2E]">
+          ← Voltar para Auditoria
+        </Button>
+        <AuditSettingsPanel />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -117,6 +131,13 @@ export function AuditPanel() {
           <ShieldCheck className="w-5 h-5 text-[#005B2E]" /> Auditoria do Sistema
         </h2>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowSettings(true)}
+            className="border-[#005B2E] text-[#005B2E] font-bold"
+          >
+            <Settings className="w-4 h-4 mr-2" /> Configurações
+          </Button>
           <Button
             onClick={() => exportAuditExcel(logs, authorName)}
             className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
