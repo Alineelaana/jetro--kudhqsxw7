@@ -5,32 +5,15 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 import { getProductsForStock, getStockMovements, getStockBatches } from '@/services/stock'
 import { useRealtime } from '@/hooks/use-realtime'
 import { daysUntilExpiry } from '@/lib/stock-types'
+import { StockFilterBar, EMPTY_FILTERS, type StockFilterValues } from './stock-filter-bar'
 import { Loader2, Package, AlertTriangle, Boxes, TrendingDown, Ban, Clock } from 'lucide-react'
 
-interface ProductStock {
-  id: string
-  name: string
-  code: string
-  stock: number
-  min_stock: number
-  max_stock: number
-  price: string
-  cost_price: string
-  estoque_reservado: number
-  estoque_separacao: number
-  estoque_conferencia: number
-  estoque_transito: number
-  estoque_bloqueado: number
-  estoque_avariado: number
-  category: string
-  brand: string
-}
-
 export function StockDashboard() {
-  const [products, setProducts] = useState<ProductStock[]>([])
-  const [movements, setMovements] = useState<unknown[]>([])
-  const [batches, setBatches] = useState<unknown[]>([])
+  const [products, setProducts] = useState<any[]>([])
+  const [movements, setMovements] = useState<any[]>([])
+  const [batches, setBatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState<StockFilterValues>(EMPTY_FILTERS)
 
   const load = async () => {
     try {
@@ -39,9 +22,9 @@ export function StockDashboard() {
         getStockMovements(),
         getStockBatches(),
       ])
-      setProducts(p as ProductStock[])
-      setMovements(m)
-      setBatches(b)
+      setProducts(p as any[])
+      setMovements(m as any[])
+      setBatches(b as any[])
     } catch {
       setProducts([])
     }
@@ -54,33 +37,65 @@ export function StockDashboard() {
   useRealtime('stock_movements', () => load())
   useRealtime('stock_batches', () => load())
 
+  const f = useMemo(() => {
+    const term = filters.produto.toLowerCase().trim()
+    const cat = filters.categoria.toLowerCase().trim()
+    const mar = filters.marca.toLowerCase().trim()
+    const emp = filters.empresa.toLowerCase().trim()
+    const fil = filters.filial.toLowerCase().trim()
+    const dep = filters.deposito.toLowerCase().trim()
+    const loc = filters.localizacao.toLowerCase().trim()
+    const lote = filters.lote.toLowerCase().trim()
+
+    const fp = products.filter((p) => {
+      if (term && !(p.name?.toLowerCase().includes(term) || p.code?.toLowerCase().includes(term)))
+        return false
+      if (cat && !p.category?.toLowerCase().includes(cat)) return false
+      if (mar && !p.brand?.toLowerCase().includes(mar)) return false
+      return true
+    })
+    const fm = movements.filter((m) => {
+      if (emp && !m.empresa?.toLowerCase().includes(emp)) return false
+      if (fil && !m.filial?.toLowerCase().includes(fil)) return false
+      if (dep && !m.deposito?.toLowerCase().includes(dep)) return false
+      if (loc && !m.localizacao?.toLowerCase().includes(loc)) return false
+      if (lote && !m.lote?.toLowerCase().includes(lote)) return false
+      if (filters.dataInicio && new Date(m.created) < new Date(filters.dataInicio)) return false
+      if (filters.dataFim && new Date(m.created) > new Date(filters.dataFim + 'T23:59:59'))
+        return false
+      return true
+    })
+    const fb = batches.filter((b) => {
+      if (lote && !b.numero_lote?.toLowerCase().includes(lote)) return false
+      if (emp && !b.empresa?.toLowerCase().includes(emp)) return false
+      if (loc && !b.localizacao?.toLowerCase().includes(loc)) return false
+      return true
+    })
+    return { fp, fm, fb }
+  }, [products, movements, batches, filters])
+
   const stats = useMemo(() => {
-    const totalProducts = products.length
-    const totalStockValue = products.reduce(
-      (s, p) => s + (parseFloat(p.price?.replace(',', '.') || '0') || 0) * (p.stock || 0),
+    const totalProducts = f.fp.length
+    const totalStockValue = f.fp.reduce(
+      (s, p) => s + (parseFloat(String(p.price || '0').replace(',', '.')) || 0) * (p.stock || 0),
       0,
     )
-    const noStock = products.filter((p) => !p.stock || p.stock === 0).length
-    const lowStock = products.filter((p) => p.min_stock > 0 && p.stock < p.min_stock).length
-    const overStock = products.filter((p) => p.max_stock > 0 && p.stock > p.max_stock).length
-    const reserved = products.reduce((s, p) => s + (p.estoque_reservado || 0), 0)
-    const picking = products.reduce((s, p) => s + (p.estoque_separacao || 0), 0)
-    const checking = products.reduce((s, p) => s + (p.estoque_conferencia || 0), 0)
-    const blocked = products.reduce((s, p) => s + (p.estoque_bloqueado || 0), 0)
-    const todayMov = movements.filter((m: Record<string, unknown>) => {
-      const d = new Date(m.created as string)
-      return d.toDateString() === new Date().toDateString()
+    const noStock = f.fp.filter((p) => !p.stock || p.stock === 0).length
+    const lowStock = f.fp.filter((p) => p.min_stock > 0 && p.stock < p.min_stock).length
+    const overStock = f.fp.filter((p) => p.max_stock > 0 && p.stock > p.max_stock).length
+    const reserved = f.fp.reduce((s, p) => s + (p.estoque_reservado || 0), 0)
+    const picking = f.fp.reduce((s, p) => s + (p.estoque_separacao || 0), 0)
+    const checking = f.fp.reduce((s, p) => s + (p.estoque_conferencia || 0), 0)
+    const blocked = f.fp.reduce((s, p) => s + (p.estoque_bloqueado || 0), 0)
+    const todayMov = f.fm.filter(
+      (m) => new Date(m.created).toDateString() === new Date().toDateString(),
+    ).length
+    const nearExpiry = f.fb.filter((b) => {
+      const d = daysUntilExpiry(b.data_validade)
+      return d >= 0 && d <= 30
     }).length
-    const allBatches = batches as Array<{ data_validade: string; situacao: string }>
-    const nearExpiry = allBatches.filter((b) => {
-      const days = daysUntilExpiry(b.data_validade)
-      return days >= 0 && days <= 30
-    }).length
-    const expired = allBatches.filter((b) => {
-      const days = daysUntilExpiry(b.data_validade)
-      return days < 0
-    }).length
-    const blockedLots = allBatches.filter((b) => b.situacao === 'Bloqueado').length
+    const expired = f.fb.filter((b) => daysUntilExpiry(b.data_validade) < 0).length
+    const blockedLots = f.fb.filter((b) => b.situacao === 'Bloqueado').length
     return {
       totalProducts,
       totalStockValue,
@@ -96,7 +111,7 @@ export function StockDashboard() {
       expired,
       blockedLots,
     }
-  }, [products, movements, batches])
+  }, [f])
 
   if (loading)
     return (
@@ -128,7 +143,7 @@ export function StockDashboard() {
   ]
 
   const categoryChart = Object.entries(
-    products.reduce<Record<string, number>>((acc, p) => {
+    f.fp.reduce<Record<string, number>>((acc, p) => {
       const cat = p.category || 'Sem Categoria'
       acc[cat] = (acc[cat] || 0) + (p.stock || 0)
       return acc
@@ -140,6 +155,11 @@ export function StockDashboard() {
 
   return (
     <div className="space-y-4">
+      <StockFilterBar
+        filters={filters}
+        onChange={setFilters}
+        onClear={() => setFilters(EMPTY_FILTERS)}
+      />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {cards.map((c, i) => (
           <Card key={i} className="border-2" style={{ borderColor: `${c.color}33` }}>

@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { getStockPickings, updateStockPicking, createStockPicking } from '@/services/stock'
+import {
+  getStockPickings,
+  updateStockPicking,
+  createStockPicking,
+  getProductsForStock,
+} from '@/services/stock'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
-import { PICKING_STATUS, PRIORITY_OPTIONS, type StockPicking } from '@/lib/stock-types'
-import { Loader2, Search, Plus } from 'lucide-react'
+import { type StockPicking } from '@/lib/stock-types'
+import { StockBarcodeInput } from './stock-barcode-input'
+import { Loader2, Search, Plus, CheckCircle2, XCircle, ScanBarcode } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
   'Aguardando Separação': 'bg-amber-100 text-amber-700',
@@ -18,12 +24,28 @@ const STATUS_COLORS: Record<string, string> = {
   Cancelada: 'bg-gray-100 text-gray-600',
 }
 
+interface PickItem {
+  produto_nome: string
+  produto_codigo: string
+  lote: string
+  validade: string
+  localizacao: string
+  quantidade: number
+  produto_ok: boolean
+  lote_ok: boolean
+  validade_ok: boolean
+  quantidade_ok: boolean
+  localizacao_ok: boolean
+}
+
 export function StockPicking() {
   const { user } = useAuth()
   const userName = (user?.name as string) || 'Sistema'
   const [records, setRecords] = useState<StockPicking[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [products, setProducts] = useState<any[]>([])
+  const [scanResult, setScanResult] = useState<string | null>(null)
 
   const load = async () => {
     try {
@@ -37,16 +59,32 @@ export function StockPicking() {
     load()
   }, [])
   useRealtime('stock_pickings', () => load())
+  useEffect(() => {
+    getProductsForStock()
+      .then((p) => setProducts(p as any[]))
+      .catch(() => {})
+  }, [])
 
   const filtered = records.filter((r) => {
-    const term = search.toLowerCase().trim()
+    const t = search.toLowerCase().trim()
     return (
-      !term ||
-      (r.numero_separacao || '').toLowerCase().includes(term) ||
-      (r.cliente_destino || '').toLowerCase().includes(term) ||
-      (r.documento_origem || '').toLowerCase().includes(term)
+      !t ||
+      (r.numero_separacao || '').toLowerCase().includes(t) ||
+      (r.cliente_destino || '').toLowerCase().includes(t) ||
+      (r.documento_origem || '').toLowerCase().includes(t)
     )
   })
+
+  const handleScan = (code: string) => {
+    const product = products.find((p) => p.ean === code || p.code === code)
+    if (product) {
+      setScanResult(`✓ Produto encontrado: ${product.name}`)
+      toast({ title: 'Produto identificado', description: product.name })
+    } else {
+      setScanResult(`✗ Produto não encontrado: ${code}`)
+      toast({ title: 'Produto não encontrado', variant: 'destructive' })
+    }
+  }
 
   const handleStatus = async (id: string, status: string) => {
     try {
@@ -57,7 +95,6 @@ export function StockPicking() {
       toast({ title: 'Erro', variant: 'destructive' })
     }
   }
-
   const handleNew = async () => {
     try {
       await createStockPicking({
@@ -88,6 +125,44 @@ export function StockPicking() {
 
   return (
     <div className="space-y-4">
+      <Card className="border-2 border-[#005B2E]/20">
+        <CardContent className="py-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <ScanBarcode className="w-5 h-5 text-[#005B2E]" />
+            <span className="text-sm font-semibold text-[#005B2E]">
+              Leitura de Código de Barras
+            </span>
+          </div>
+          <StockBarcodeInput onScan={handleScan} />
+          {scanResult && (
+            <p
+              className={`text-xs ${scanResult.startsWith('✓') ? 'text-emerald-600' : 'text-red-600'}`}
+            >
+              {scanResult}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Produto correto
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Lote correto
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Validade OK
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Quantidade
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Localização
+            </span>
+            <span className="flex items-center gap-1">
+              <XCircle className="w-3 h-3 text-red-500" /> Divergência
+            </span>
+          </div>
+        </CardContent>
+      </Card>
       <div className="flex items-center justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

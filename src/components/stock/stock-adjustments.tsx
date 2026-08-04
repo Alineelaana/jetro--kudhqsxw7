@@ -18,12 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getStockAdjustments, createStockAdjustment, updateStockAdjustment } from '@/services/stock'
+import {
+  getStockAdjustments,
+  createStockAdjustment,
+  updateStockAdjustment,
+  getProductsForStock,
+} from '@/services/stock'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
-import { ADJUSTMENT_TYPES, ADJUSTMENT_STATUS, type StockAdjustment } from '@/lib/stock-types'
-import { Plus, Loader2, Search } from 'lucide-react'
+import { ADJUSTMENT_TYPES, type StockAdjustment } from '@/lib/stock-types'
+import { Plus, Loader2, Search, Paperclip } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
   Pendente: 'bg-amber-100 text-amber-700',
@@ -40,6 +45,8 @@ export function StockAdjustments() {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
+  const [attachment, setAttachment] = useState<File | null>(null)
+  const [products, setProducts] = useState<any[]>([])
   const [submitting, setSubmitting] = useState(false)
 
   const load = async () => {
@@ -54,13 +61,18 @@ export function StockAdjustments() {
     load()
   }, [])
   useRealtime('stock_adjustments', () => load())
+  useEffect(() => {
+    getProductsForStock()
+      .then((p) => setProducts(p as any[]))
+      .catch(() => {})
+  }, [])
 
   const filtered = records.filter((r) => {
-    const term = search.toLowerCase().trim()
+    const t = search.toLowerCase().trim()
     return (
-      !term ||
-      (r.numero_ajuste || '').toLowerCase().includes(term) ||
-      (r.produto_nome || '').toLowerCase().includes(term)
+      !t ||
+      (r.numero_ajuste || '').toLowerCase().includes(t) ||
+      (r.produto_nome || '').toLowerCase().includes(t)
     )
   })
 
@@ -71,14 +83,50 @@ export function StockAdjustments() {
       responsavel: userName,
       status: 'Pendente',
       quantidade: '0',
+      saldo_anterior: '0',
+      saldo_atual: '0',
     })
+    setAttachment(null)
     setOpen(true)
+  }
+
+  const handleProductSelect = (productId: string) => {
+    const p = products.find((x) => x.id === productId)
+    if (p) {
+      const stock = p.stock || 0
+      setForm({
+        ...form,
+        produto_id: p.id,
+        produto_nome: p.name || '',
+        produto_codigo: p.code || '',
+        lote: p.lot || '',
+        validade: p.validity || '',
+        localizacao: p.location || '',
+        saldo_anterior: String(stock),
+        saldo_atual: String(stock),
+      })
+    }
   }
 
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
-      await createStockAdjustment({ ...form, quantidade: parseInt(form.quantidade) || 0 })
+      const qty = parseInt(form.quantidade) || 0
+      const saldoAnt = parseInt(form.saldo_anterior) || 0
+      const isSaida = ['Saída', 'Perda', 'Avaria', 'Quebra', 'Vencimento'].includes(
+        form.tipo_ajuste || '',
+      )
+      const saldoAtual = isSaida ? saldoAnt - qty : saldoAnt + qty
+      const formData = new FormData()
+      Object.entries({
+        ...form,
+        quantidade: String(qty),
+        saldo_anterior: String(saldoAnt),
+        saldo_atual: String(saldoAtual),
+        aprovador: '',
+      }).forEach(([k, v]) => formData.append(k, v))
+      if (attachment) formData.append('attachments', attachment)
+      await createStockAdjustment(formData)
       toast({ title: 'Ajuste criado' })
       setOpen(false)
       load()
@@ -87,7 +135,6 @@ export function StockAdjustments() {
     }
     setSubmitting(false)
   }
-
   const handleStatus = async (id: string, status: string) => {
     try {
       await updateStockAdjustment(id, { status, aprovador: userName })
@@ -132,7 +179,10 @@ export function StockAdjustments() {
                 <th className="text-left px-3 py-2 font-bold">Número</th>
                 <th className="text-left px-3 py-2 font-bold">Produto</th>
                 <th className="text-left px-3 py-2 font-bold hidden md:table-cell">Tipo</th>
+                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">Lote</th>
                 <th className="text-right px-3 py-2 font-bold">Qtd.</th>
+                <th className="text-right px-3 py-2 font-bold hidden lg:table-cell">Saldo Ant.</th>
+                <th className="text-right px-3 py-2 font-bold hidden lg:table-cell">Saldo Atual</th>
                 <th className="text-left px-3 py-2 font-bold">Status</th>
                 <th className="text-center px-3 py-2 font-bold">Ações</th>
               </tr>
@@ -145,7 +195,14 @@ export function StockAdjustments() {
                   </td>
                   <td className="px-3 py-2 font-medium">{r.produto_nome || '—'}</td>
                   <td className="px-3 py-2 text-xs hidden md:table-cell">{r.tipo_ajuste}</td>
+                  <td className="px-3 py-2 text-xs hidden md:table-cell">{r.lote || '—'}</td>
                   <td className="px-3 py-2 text-right font-bold">{r.quantidade}</td>
+                  <td className="px-3 py-2 text-right hidden lg:table-cell">
+                    {r.saldo_anterior || 0}
+                  </td>
+                  <td className="px-3 py-2 text-right hidden lg:table-cell font-bold">
+                    {r.saldo_atual || 0}
+                  </td>
                   <td className="px-3 py-2">
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[r.status] || 'bg-gray-100'}`}
@@ -184,7 +241,7 @@ export function StockAdjustments() {
         </div>
       </Card>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-[#005B2E]">Novo Ajuste de Estoque</DialogTitle>
           </DialogHeader>
@@ -210,12 +267,18 @@ export function StockAdjustments() {
             </div>
             <div className="space-y-1">
               <Label className="text-sm font-semibold">Produto</Label>
-              <Input
-                value={form.produto_nome || ''}
-                onChange={(e) => setForm({ ...form, produto_nome: e.target.value })}
-                placeholder="Nome do produto"
-                className="focus-visible:ring-[#005B2E]"
-              />
+              <Select onValueChange={handleProductSelect}>
+                <SelectTrigger className="focus-visible:ring-[#005B2E]">
+                  <SelectValue placeholder="Selecione o produto" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} ({p.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -246,6 +309,51 @@ export function StockAdjustments() {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold">Lote</Label>
+                <Input
+                  value={form.lote || ''}
+                  onChange={(e) => setForm({ ...form, lote: e.target.value })}
+                  className="focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold">Validade</Label>
+                <Input
+                  type="date"
+                  value={form.validade || ''}
+                  onChange={(e) => setForm({ ...form, validade: e.target.value })}
+                  className="focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold">Localização</Label>
+                <Input
+                  value={form.localizacao || ''}
+                  onChange={(e) => setForm({ ...form, localizacao: e.target.value })}
+                  className="focus-visible:ring-[#005B2E]"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold">Saldo Anterior</Label>
+                <Input
+                  value={form.saldo_anterior || '0'}
+                  disabled
+                  className="focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold">Saldo Atual</Label>
+                <Input
+                  value={form.saldo_atual || '0'}
+                  disabled
+                  className="focus-visible:ring-[#005B2E]"
+                />
+              </div>
+            </div>
             <div className="space-y-1">
               <Label className="text-sm font-semibold">Motivo</Label>
               <Input
@@ -262,6 +370,17 @@ export function StockAdjustments() {
                 rows={2}
                 className="focus-visible:ring-[#005B2E]"
               />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-sm font-semibold">Anexo</Label>
+              <div className="flex items-center gap-2">
+                <Paperclip className="w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="file"
+                  onChange={(e) => setAttachment(e.target.files?.[0] || null)}
+                  className="text-xs focus-visible:ring-[#005B2E]"
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>

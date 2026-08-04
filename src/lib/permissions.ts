@@ -31,3 +31,73 @@ export function canViewStock(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
+
+export function canConsultCosts(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+export function canMakeMovements(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canCreateInventories(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canApproveInventories(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canCreateTransfers(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canApproveTransfers(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canMakeAdjustments(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canApproveAdjustments(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canBlockLots(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canUnblockLots(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canPickOrders(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'SDR'].includes(role)
+}
+
+export function canCheckProducts(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canDispatchExpedition(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canAllowNegativeStock(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canExportInfo(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}

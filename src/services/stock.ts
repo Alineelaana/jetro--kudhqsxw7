@@ -148,3 +148,22 @@ export async function updateStockExpedition(
 export async function getProductsForStock() {
   return pb.collection('products').getFullList({ sort: '-created' })
 }
+
+export async function suggestLots(productId: string, quantity: number, rule?: string) {
+  return pb.send('/backend/v1/stock/lots/suggest', {
+    method: 'POST',
+    body: JSON.stringify({ product_id: productId, quantity, rule }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function getStockInventoriesDetail(id: string): Promise<StockInventory> {
+  return pb.collection('stock_inventories').getOne(id) as Promise<StockInventory>
+}
+
+export async function updateStockInventoryItems(
+  id: string,
+  itens: unknown[],
+): Promise<StockInventory> {
+  return pb.collection('stock_inventories').update(id, { itens }) as Promise<StockInventory>
+}

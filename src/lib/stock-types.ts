@@ -324,16 +324,42 @@ export interface StockExpedition {
   peso_liquido: string
   status: string
   responsavel: string
-  empresa: string
-  filial: string
-  deposito: string
   romaneio: string
   observacoes: string
   historico: unknown[]
+  empresa: string
+  filial: string
+  deposito: string
+  comprovante: string
+  data_saida: string
+  data_entrega_real: string
+  codigo_rastreamento: string
   created: string
   updated: string
 }
 
+export interface InventoryItem {
+  produto_id: string
+  produto_codigo: string
+  produto_nome: string
+  lote: string
+  validade: string
+  localizacao: string
+  quantidade_sistema: number
+  quantidade_contada: number
+  diferenca: number
+  motivo_diferenca: string
+}
+
+export interface TransferItem {
+  produto_id: string
+  produto_codigo: string
+  produto_nome: string
+  lote: string
+  validade: string
+  quantidade_disponivel: number
+  quantidade_transferir: number
+}
 export function daysUntilExpiry(validade: string): number {
   if (!validade) return 9999
   const d = new Date(validade)

@@ -11,12 +11,17 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { getStockTransfers, createStockTransfer, updateStockTransfer } from '@/services/stock'
+import {
+  getStockTransfers,
+  createStockTransfer,
+  updateStockTransfer,
+  getProductsForStock,
+} from '@/services/stock'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
-import { TRANSFER_STATUS, type StockTransfer } from '@/lib/stock-types'
-import { Plus, Loader2, Search } from 'lucide-react'
+import { type StockTransfer, type TransferItem } from '@/lib/stock-types'
+import { Plus, Loader2, Search, Trash2 } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
   Rascunho: 'bg-gray-100 text-gray-700',
@@ -36,6 +41,8 @@ export function StockTransfers() {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
+  const [items, setItems] = useState<TransferItem[]>([])
+  const [products, setProducts] = useState<any[]>([])
   const [submitting, setSubmitting] = useState(false)
 
   const load = async () => {
@@ -50,13 +57,18 @@ export function StockTransfers() {
     load()
   }, [])
   useRealtime('stock_transfers', () => load())
+  useEffect(() => {
+    getProductsForStock()
+      .then((p) => setProducts(p as any[]))
+      .catch(() => {})
+  }, [])
 
   const filtered = records.filter((r) => {
-    const term = search.toLowerCase().trim()
+    const t = search.toLowerCase().trim()
     return (
-      !term ||
-      (r.numero_transferencia || '').toLowerCase().includes(term) ||
-      (r.responsavel || '').toLowerCase().includes(term)
+      !t ||
+      (r.numero_transferencia || '').toLowerCase().includes(t) ||
+      (r.responsavel || '').toLowerCase().includes(t)
     )
   })
 
@@ -67,13 +79,36 @@ export function StockTransfers() {
       responsavel: userName,
       status: 'Rascunho',
     })
+    setItems([])
     setOpen(true)
+  }
+  const addItem = (p: any) => {
+    setItems([
+      ...items,
+      {
+        produto_id: p.id,
+        produto_codigo: p.code || '',
+        produto_nome: p.name || '',
+        lote: p.lot || '',
+        validade: p.validity || '',
+        quantidade_disponivel: p.stock || 0,
+        quantidade_transferir: 0,
+      },
+    ])
+  }
+  const updateItem = (idx: number, field: keyof TransferItem, val: string | number) => {
+    const n = [...items]
+    ;(n[idx] as any)[field] = val
+    setItems(n)
+  }
+  const removeItem = (idx: number) => {
+    setItems(items.filter((_, i) => i !== idx))
   }
 
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
-      await createStockTransfer({ ...form, itens: [], fiscal_integrado: false })
+      await createStockTransfer({ ...form, itens: items, fiscal_integrado: false })
       toast({ title: 'Transferência criada' })
       setOpen(false)
       load()
@@ -82,7 +117,6 @@ export function StockTransfers() {
     }
     setSubmitting(false)
   }
-
   const handleStatus = async (id: string, status: string) => {
     try {
       await updateStockTransfer(id, { status })
@@ -180,6 +214,16 @@ export function StockTransfers() {
                         <Button
                           size="sm"
                           variant="ghost"
+                          onClick={() => handleStatus(r.id, 'Em Separação')}
+                          className="text-purple-600 h-7 text-xs"
+                        >
+                          Separar
+                        </Button>
+                      )}
+                      {r.status === 'Em Separação' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           onClick={() => handleStatus(r.id, 'Em Trânsito')}
                           className="text-cyan-600 h-7 text-xs"
                         >
@@ -205,7 +249,7 @@ export function StockTransfers() {
         </div>
       </Card>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-[#005B2E]">Nova Transferência</DialogTitle>
           </DialogHeader>
@@ -263,6 +307,54 @@ export function StockTransfers() {
                   onChange={(e) => setForm({ ...form, deposito_destino: e.target.value })}
                   className="focus-visible:ring-[#005B2E]"
                 />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-sm font-semibold">Itens da Transferência</Label>
+              <div className="border rounded p-2 space-y-2 max-h-60 overflow-y-auto">
+                {items.map((it, idx) => (
+                  <div key={idx} className="grid grid-cols-12 gap-1 items-center text-xs">
+                    <span className="col-span-3 truncate">{it.produto_nome}</span>
+                    <Input
+                      placeholder="Lote"
+                      value={it.lote}
+                      onChange={(e) => updateItem(idx, 'lote', e.target.value)}
+                      className="col-span-2 h-7 text-xs focus-visible:ring-[#005B2E]"
+                    />
+                    <span className="col-span-2 text-right">Disp: {it.quantidade_disponivel}</span>
+                    <Input
+                      type="number"
+                      placeholder="Qtd"
+                      value={it.quantidade_transferir}
+                      onChange={(e) =>
+                        updateItem(idx, 'quantidade_transferir', Number(e.target.value))
+                      }
+                      className="col-span-2 h-7 text-xs focus-visible:ring-[#005B2E]"
+                    />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => removeItem(idx)}
+                      className="col-span-1 text-red-600 h-7 p-0"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+                <select
+                  onChange={(e) => {
+                    const p = products.find((x) => x.id === e.target.value)
+                    if (p) addItem(p)
+                  }}
+                  className="w-full text-xs border rounded p-1"
+                >
+                  <option value="">+ Adicionar produto...</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.code})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="space-y-1">
