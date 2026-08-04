@@ -1,45 +1,65 @@
-onRecordAfterUpdateSuccess((e) => {
-  var wave = e.record
-  var oldStatus = ''
-  try {
-    oldStatus = wave.original().getString('status') || ''
-  } catch (_) {}
-  var newStatus = wave.getString('status') || ''
-  if (oldStatus === newStatus || newStatus !== 'Liberada') return e.next()
+routerAdd(
+  'POST',
+  '/backend/v1/wms/waves/{waveId}/release',
+  (e) => {
+    try {
+      const waveId = e.request.pathValue('waveId')
+      if (!waveId) return e.badRequestError('waveId is required')
 
-  var items = wave.get('itens')
-  if (!items || items.length === 0) return e.next()
+      let wave
+      try {
+        wave = $app.findRecordById('wms_waves', waveId)
+      } catch (err) {
+        return e.notFoundError('Wave not found')
+      }
 
-  try {
-    var sepCol = $app.findCollectionByNameOrId('wms_separations')
-    var waveNum = wave.getString('numero_wave') || ''
+      const currentStatus = wave.getString('status')
+      if (currentStatus !== 'pending' && currentStatus !== 'draft') {
+        return e.badRequestError('Wave cannot be released from status: ' + currentStatus)
+      }
 
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i]
-      if (!item) continue
+      wave.set('status', 'released')
 
-      var sep = new Record(sepCol)
-      sep.set('numero_separacao', 'SEP-' + waveNum + '-' + (i + 1))
-      sep.set('wave_id', wave.id)
-      sep.set('pedido', item.pedido || '')
-      sep.set('cliente', item.cliente || '')
-      sep.set('rota', '')
-      sep.set('produto_id', item.produto_id || '')
-      sep.set('produto_nome', item.produto_nome || '')
-      sep.set('produto_codigo', item.produto_codigo || '')
-      sep.set('localizacao', item.localizacao || '')
-      sep.set('lote', item.lote || '')
-      sep.set('validade', item.validade || '')
-      sep.set('quantidade_solicitada', item.quantidade || 0)
-      sep.set('quantidade_separada', 0)
-      sep.set('operador', '')
-      sep.set('prioridade', wave.getString('prioridade') || 'Normal')
-      sep.set('estrategia', 'Por Onda')
-      sep.set('status', 'Aguardando Separação')
-      $app.save(sep)
+      try {
+        const releasedBy = e.auth?.id || ''
+        if (releasedBy) {
+          wave.set('released_by', releasedBy)
+        }
+      } catch (_) {}
+
+      try {
+        const now = new Date().toISOString()
+        wave.set('released_at', now)
+      } catch (_) {}
+
+      $app.save(wave)
+
+      let items = []
+      try {
+        items = $app.findRecordsByFilter('wms_wave_items', 'wave = {:waveId}', 'created', 500, 0, {
+          waveId: waveId,
+        })
+      } catch (_) {}
+
+      for (const item of items) {
+        try {
+          if (item.getString('status') === 'pending' || item.getString('status') === '') {
+            item.set('status', 'released')
+            $app.save(item)
+          }
+        } catch (_) {}
+      }
+
+      return e.json(200, {
+        success: true,
+        waveId: waveId,
+        status: 'released',
+        itemsUpdated: items.length,
+      })
+    } catch (err) {
+      $app.logger().error('wms_wave_release failed', 'error', String(err))
+      return e.json(500, { error: 'Failed to release wave' })
     }
-  } catch (err) {
-    $app.logger().error('wms_wave_release failed', 'error', String(err))
-  }
-  return e.next()
-}, 'wms_waves')
+  },
+  $apis.requireAuth(),
+)
