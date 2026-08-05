@@ -67,6 +67,21 @@ export const PROPOSAL_STATUS = [
   'Expirada',
   'Cancelada',
 ] as const
+export const PAYMENT_OPTIONS = [
+  'À vista',
+  '30 dias',
+  '30/60 dias',
+  '30/60/90 dias',
+  'Parcelado',
+] as const
+export const DEADLINE_OPTIONS = [
+  'Imediata',
+  '7 dias',
+  '15 dias',
+  '30 dias',
+  '45 dias',
+  '60 dias',
+] as const
 export const GOAL_TYPES = [
   'Vendas',
   'Leads',
