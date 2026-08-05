@@ -42,6 +42,7 @@ import Financial from './pages/Financial'
 import RH from './pages/RH'
 import Conformidade from './pages/Conformidade'
 import Fiscal from './pages/Fiscal'
+import CRM from './pages/CRM'
 import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
 import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
 import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
@@ -409,6 +410,24 @@ const App = () => (
                         path="/admin/fiscal/relatorios"
                         element={<Fiscal screen="relatorios" />}
                       />
+                      <Route path="/admin/crm" element={<CRM screen="dashboard" />} />
+                      <Route path="/admin/crm/leads" element={<CRM screen="leads" />} />
+                      <Route
+                        path="/admin/crm/oportunidades"
+                        element={<CRM screen="oportunidades" />}
+                      />
+                      <Route path="/admin/crm/funil" element={<CRM screen="funil" />} />
+                      <Route path="/admin/crm/agenda" element={<CRM screen="agenda" />} />
+                      <Route path="/admin/crm/propostas" element={<CRM screen="propostas" />} />
+                      <Route path="/admin/crm/historico" element={<CRM screen="historico" />} />
+                      <Route path="/admin/crm/atividades" element={<CRM screen="atividades" />} />
+                      <Route
+                        path="/admin/crm/motivos-perda"
+                        element={<CRM screen="motivos-perda" />}
+                      />
+                      <Route path="/admin/crm/metas" element={<CRM screen="metas" />} />
+                      <Route path="/admin/crm/automacao" element={<CRM screen="automacao" />} />
+                      <Route path="/admin/crm/relatorios" element={<CRM screen="relatorios" />} />
                       <Route path="/admin/notificacoes" element={<Notifications />} />
                       <Route path="/admin/ia/dashboard" element={<AIModule screen="dashboard" />} />
                       <Route

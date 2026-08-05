@@ -236,3 +236,128 @@ export async function getCrmDashboardData() {
     }
   }
 }
+
+export async function moveOpportunityStage(
+  oppId: string,
+  newStageId: string,
+  oldStageId: string,
+  oldStageEnteredAt: string,
+  userName: string,
+) {
+  const now = new Date().toISOString()
+  const timeInStage = oldStageEnteredAt
+    ? Math.round((Date.now() - new Date(oldStageEnteredAt).getTime()) / 3600000)
+    : 0
+  await updateOpportunity(oppId, { stage_id: newStageId, stage_entered_at: now })
+  await createHistoryEntry({
+    entity_type: 'opportunity',
+    entity_id: oppId,
+    type: 'stage_change',
+    description: `Etapa alterada — tempo na etapa anterior: ${timeInStage}h`,
+    user_name: userName,
+    date: now,
+    company: 'Velora Log',
+    filial: 'Matriz',
+  })
+}
+
+export async function getConsolidatedHistory(filter?: string) {
+  const [history, activities, proposals] = await Promise.all([
+    getHistory(filter).catch(() => []),
+    getActivities().catch(() => []),
+    getProposals().catch(() => []),
+  ])
+  const items: Array<Record<string, unknown>> = []
+  history.forEach((h) =>
+    items.push({
+      id: h.id,
+      source: 'Histórico',
+      date: h.date || h.created,
+      type: h.type,
+      responsible: h.user_name,
+      subject: h.entity_name,
+      result: h.description,
+    }),
+  )
+  activities.forEach((a) =>
+    items.push({
+      id: a.id,
+      source: 'Atividade',
+      date: a.scheduled_date || a.created,
+      type: a.type,
+      responsible: a.responsible_name,
+      subject: a.title,
+      result: a.result,
+    }),
+  )
+  proposals.forEach((p) =>
+    items.push({
+      id: p.id,
+      source: 'Proposta',
+      date: p.created,
+      type: 'Proposta',
+      responsible: p.responsible_name,
+      subject: p.title,
+      result: p.status,
+    }),
+  )
+  items.sort((a, b) => new Date(b.date as string).getTime() - new Date(a.date as string).getTime())
+  return items
+}
+
+export function callCrmAI(type: string, data: Record<string, unknown>) {
+  return pb.send('/backend/v1/crm/ai-assist', {
+    method: 'POST',
+    body: JSON.stringify({ type, data }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function getCrmReportData() {
+  const [leads, opps, proposals, activities, stages, lossReasons] = await Promise.all([
+    getLeads().catch(() => []),
+    getOpportunities().catch(() => []),
+    getProposals().catch(() => []),
+    getActivities().catch(() => []),
+    getFunnelStages().catch(() => []),
+    getLossReasons().catch(() => []),
+  ])
+  const leadsBySource = Object.entries(
+    leads.reduce(
+      (acc, l) => {
+        const k = l.lead_source || '—'
+        acc[k] = (acc[k] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    ),
+  ).map(([name, count]) => ({ name, count }))
+  const leadsByStatus = Object.entries(
+    leads.reduce(
+      (acc, l) => {
+        const k = l.status || '—'
+        acc[k] = (acc[k] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    ),
+  ).map(([name, count]) => ({ name, count }))
+  const wonOpps = opps.filter((o) => o.status === 'Ganha')
+  const lostOpps = opps.filter((o) => o.status === 'Perdida')
+  const funnelValue = opps
+    .filter((o) => !['Ganha', 'Perdida', 'Cancelada'].includes(o.status))
+    .reduce((s, o) => s + (parseFloat(o.estimated_value) || 0), 0)
+  return {
+    leads,
+    opps,
+    proposals,
+    activities,
+    stages,
+    lossReasons,
+    leadsBySource,
+    leadsByStatus,
+    wonOpps,
+    lostOpps,
+    funnelValue,
+  }
+}

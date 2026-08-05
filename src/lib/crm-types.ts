@@ -37,24 +37,118 @@ export const ACTIVITY_TYPES = [
   'Ligação',
   'Reunião',
   'Visita',
+  'Videoconferência',
   'E-mail',
   'WhatsApp',
-  'Proposta',
   'Follow-up',
+  'Apresentação',
+  'Demonstração',
+  'Tarefa Interna',
   'Outro',
 ] as const
-export const ACTIVITY_STATUS = ['Pendente', 'Concluída', 'Cancelada', 'Reagendada'] as const
+export const ACTIVITY_STATUS = [
+  'Agendada',
+  'Em Andamento',
+  'Concluída',
+  'Reagendada',
+  'Não Realizada',
+  'Cancelada',
+] as const
 export const ACTIVITY_PRIORITIES = ['Baixa', 'Normal', 'Alta', 'Urgente'] as const
 export const PROPOSAL_STATUS = [
-  'Rascunho',
+  'Em Elaboração',
   'Aguardando Aprovação',
-  'Aprovada',
-  'Rejeitada',
+  'Aprovada Internamente',
   'Enviada',
+  'Visualizada',
+  'Em Negociação',
   'Aceita',
+  'Rejeitada',
   'Expirada',
+  'Cancelada',
 ] as const
-export const GOAL_TYPES = ['Vendas', 'Leads', 'Oportunidades', 'Propostas'] as const
+export const GOAL_TYPES = [
+  'Vendas',
+  'Leads',
+  'Oportunidades',
+  'Propostas',
+  'Valor Vendido',
+  'Margem',
+  'Taxa de Conversão',
+  'Ticket Médio',
+] as const
+export const GOAL_DIMENSIONS = [
+  'Vendedor',
+  'Equipe',
+  'Produto',
+  'Serviço',
+  'Categoria',
+  'Região',
+  'Empresa',
+  'Filial',
+] as const
+export const AGENDA_VIEWS = [
+  'Diária',
+  'Semanal',
+  'Mensal',
+  'Por Responsável',
+  'Por Equipe',
+] as const
+export const CRM_REPORT_TYPES = [
+  'Leads por Origem',
+  'Leads por Responsável',
+  'Leads por Situação',
+  'Taxa de Conversão',
+  'Oportunidades por Etapa',
+  'Oportunidades Ganhas',
+  'Oportunidades Perdidas',
+  'Motivos de Perda',
+  'Valor do Funil',
+  'Previsão de Vendas',
+  'Tempo Médio de Fechamento',
+  'Propostas Enviadas',
+  'Propostas Aceitas',
+  'Atividades Comerciais',
+  'Produtividade por Vendedor',
+  'Metas Comerciais',
+  'Clientes sem Contato',
+  'Histórico de Atendimento',
+] as const
+export const AUTOMATION_ACTIONS = [
+  'Distribuir leads entre vendedores',
+  'Criar atividade ao receber novo lead',
+  'Enviar lembrete de follow-up',
+  'Alertar oportunidade parada',
+  'Alterar etapa por ação concluída',
+  'Criar tarefa após proposta enviada',
+  'Criar pós-venda após oportunidade ganha',
+  'Reativar leads sem contato',
+  'Notificar gestor sobre oportunidade de alto valor',
+] as const
+export const DEFAULT_LOSS_REASONS = [
+  'Preço',
+  'Prazo',
+  'Concorrência',
+  'Falta de Interesse',
+  'Sem Orçamento',
+  'Produto Inadequado',
+  'Cliente sem Retorno',
+  'Condição Comercial',
+  'Localização',
+  'Outro',
+] as const
+export interface CrmProposalItem {
+  id: string
+  product_service: string
+  quantity: string
+  table_price: string
+  unit_price: string
+  discount: string
+  addition: string
+  total: string
+  margin: string
+  observations: string
+}
 export const AUTOMATION_TRIGGERS = [
   'Lead Criado',
   'Lead Qualificado',
@@ -256,13 +350,16 @@ export const OPP_STATUS_COLORS: Record<string, string> = {
   Cancelada: 'bg-red-100 text-red-700',
 }
 export const PROPOSAL_STATUS_COLORS: Record<string, string> = {
-  Rascunho: 'bg-gray-100 text-gray-600',
+  'Em Elaboração': 'bg-gray-100 text-gray-600',
   'Aguardando Aprovação': 'bg-amber-100 text-amber-700',
-  Aprovada: 'bg-green-100 text-green-700',
-  Rejeitada: 'bg-red-100 text-red-700',
-  Enviada: 'bg-blue-100 text-blue-700',
+  'Aprovada Internamente': 'bg-blue-100 text-blue-700',
+  Enviada: 'bg-cyan-100 text-cyan-700',
+  Visualizada: 'bg-indigo-100 text-indigo-700',
+  'Em Negociação': 'bg-purple-100 text-purple-700',
   Aceita: 'bg-emerald-100 text-emerald-700',
+  Rejeitada: 'bg-red-100 text-red-700',
   Expirada: 'bg-gray-100 text-gray-600',
+  Cancelada: 'bg-red-100 text-red-700',
 }
 export const TEMPERATURE_COLORS: Record<string, string> = {
   Frio: 'bg-blue-100 text-blue-700',
