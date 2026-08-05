@@ -343,88 +343,96 @@ migrate(
     ]
 
     for (const colDef of collections) {
-      const col = new Collection({
-        name: colDef.name,
-        type: 'base',
-        listRule: colDef.rules.listRule,
-        viewRule: colDef.rules.viewRule,
-        createRule: colDef.rules.createRule,
-        updateRule: colDef.rules.updateRule,
-        deleteRule: colDef.rules.deleteRule,
-        fields: colDef.fields,
-      })
-      app.save(col)
+      try {
+        const col = new Collection({
+          name: colDef.name,
+          type: 'base',
+          listRule: colDef.rules.listRule,
+          viewRule: colDef.rules.viewRule,
+          createRule: colDef.rules.createRule,
+          updateRule: colDef.rules.updateRule,
+          deleteRule: colDef.rules.deleteRule,
+          fields: colDef.fields,
+        })
+        app.save(col)
+      } catch (err) {
+        console.log('Failed to create collection ' + colDef.name + ': ' + String(err))
+      }
     }
 
     try {
       const settingsCol = app.findCollectionByNameOrId('ai_module_settings')
-      const existing = app.findRecordsByFilter('ai_module_settings', "id != ''", '', 1, 0)
-      if (!existing || existing.length === 0) {
-        const rec = new Record(settingsCol)
-        rec.set('assistant_name', 'Srta. Velora')
-        rec.set('language', 'Português')
-        rec.set('communication_tone', 'Profissional e amigável')
-        rec.set('working_hours', '24/7')
-        rec.set('interaction_limit', 1000)
-        rec.set('response_time', 5)
-        rec.set('transfer_time', 30)
-        rec.set('autonomy_level', 'Consultar e Sugerir')
-        rec.set('actions_requiring_confirmation', [])
-        rec.set('actions_requiring_approval', [])
-        rec.set('history_retention', 365)
-        rec.set('allowed_channels', ['chat', 'whatsapp'])
-        rec.set('empresas', [])
-        rec.set('perfis_acesso', ['SUP'])
-        app.save(rec)
+      if (settingsCol) {
+        const existing = app.findRecordsByFilter('ai_module_settings', "id != ''", '', 1, 0)
+        if (!existing || existing.length === 0) {
+          const rec = new Record(settingsCol)
+          rec.set('assistant_name', 'Srta. Velora')
+          rec.set('language', 'Português')
+          rec.set('communication_tone', 'Profissional e amigável')
+          rec.set('working_hours', '24/7')
+          rec.set('interaction_limit', 1000)
+          rec.set('response_time', 5)
+          rec.set('transfer_time', 30)
+          rec.set('autonomy_level', 'Consultar e Sugerir')
+          rec.set('actions_requiring_confirmation', [])
+          rec.set('actions_requiring_approval', [])
+          rec.set('history_retention', 365)
+          rec.set('allowed_channels', ['chat', 'whatsapp'])
+          rec.set('empresas', [])
+          rec.set('perfis_acesso', ['SUP'])
+          app.save(rec)
+        }
       }
     } catch (_) {}
 
     try {
       const agentsCol = app.findCollectionByNameOrId('ai_agents')
-      const seedAgents = [
-        {
-          name: 'Assistente Geral',
-          description: 'Assistente principal para consultas gerais',
-          objective: 'Atender consultas e direcionar para módulos',
-          agent_type: 'Atendimento ao Cliente',
-          status: 'Ativo',
-          module: 'Geral',
-        },
-        {
-          name: 'Agente Financeiro',
-          description: 'Consultas sobre contas e fluxo de caixa',
-          objective: 'Auxiliar no módulo financeiro',
-          agent_type: 'Financeiro',
-          status: 'Em Configuração',
-          module: 'financeiro',
-        },
-        {
-          name: 'Agente de Vendas',
-          description: 'Suporte a pedidos e clientes',
-          objective: 'Apoiar a equipe comercial',
-          agent_type: 'Vendas',
-          status: 'Pausado',
-          module: 'vendas',
-        },
-      ]
-      for (const s of seedAgents) {
-        try {
-          app.findFirstRecordByData('ai_agents', 'name', s.name)
-        } catch (_) {
-          const rec = new Record(agentsCol)
-          rec.set('name', s.name)
-          rec.set('description', s.description)
-          rec.set('objective', s.objective)
-          rec.set('agent_type', s.agent_type)
-          rec.set('status', s.status)
-          rec.set('module', s.module)
-          rec.set('knowledge_base', [])
-          rec.set('allowed_tools', [])
-          rec.set('permissions', {})
-          rec.set('identity', {})
-          rec.set('objectives', {})
-          rec.set('integrations', {})
-          app.save(rec)
+      if (agentsCol) {
+        const seedAgents = [
+          {
+            name: 'Assistente Geral',
+            description: 'Assistente principal para consultas gerais',
+            objective: 'Atender consultas e direcionar para módulos',
+            agent_type: 'Atendimento ao Cliente',
+            status: 'Ativo',
+            module: 'Geral',
+          },
+          {
+            name: 'Agente Financeiro',
+            description: 'Consultas sobre contas e fluxo de caixa',
+            objective: 'Auxiliar no módulo financeiro',
+            agent_type: 'Financeiro',
+            status: 'Em Configuração',
+            module: 'financeiro',
+          },
+          {
+            name: 'Agente de Vendas',
+            description: 'Suporte a pedidos e clientes',
+            objective: 'Apoiar a equipe comercial',
+            agent_type: 'Vendas',
+            status: 'Pausado',
+            module: 'vendas',
+          },
+        ]
+        for (const s of seedAgents) {
+          try {
+            app.findFirstRecordByData('ai_agents', 'name', s.name)
+          } catch (_) {
+            const rec = new Record(agentsCol)
+            rec.set('name', s.name)
+            rec.set('description', s.description)
+            rec.set('objective', s.objective)
+            rec.set('agent_type', s.agent_type)
+            rec.set('status', s.status)
+            rec.set('module', s.module)
+            rec.set('knowledge_base', [])
+            rec.set('allowed_tools', [])
+            rec.set('permissions', {})
+            rec.set('identity', {})
+            rec.set('objectives', {})
+            rec.set('integrations', {})
+            app.save(rec)
+          }
         }
       }
     } catch (_) {}
