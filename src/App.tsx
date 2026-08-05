@@ -53,6 +53,7 @@ import { PermissionMatrixScreen } from '@/components/configuracoes/permission-ma
 import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
 import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
+import AIModule from './pages/AIModule'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -409,6 +410,34 @@ const App = () => (
                         element={<Fiscal screen="relatorios" />}
                       />
                       <Route path="/admin/notificacoes" element={<Notifications />} />
+                      <Route path="/admin/ia/dashboard" element={<AIModule screen="dashboard" />} />
+                      <Route
+                        path="/admin/ia/assistente"
+                        element={<AIModule screen="assistant" />}
+                      />
+                      <Route path="/admin/ia/agentes" element={<AIModule screen="agents" />} />
+                      <Route
+                        path="/admin/ia/automacoes"
+                        element={<AIModule screen="automations" />}
+                      />
+                      <Route path="/admin/ia/fluxos" element={<AIModule screen="flows" />} />
+                      <Route
+                        path="/admin/ia/base-conhecimento"
+                        element={<AIModule screen="knowledge" />}
+                      />
+                      <Route
+                        path="/admin/ia/treinamento"
+                        element={<AIModule screen="training" />}
+                      />
+                      <Route path="/admin/ia/historico" element={<AIModule screen="history" />} />
+                      <Route
+                        path="/admin/ia/aprovacoes"
+                        element={<AIModule screen="approvals" />}
+                      />
+                      <Route
+                        path="/admin/ia/configuracoes"
+                        element={<AIModule screen="settings" />}
+                      />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                       <Route path="/cliente/login" element={<ClientLogin />} />

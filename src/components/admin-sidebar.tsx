@@ -28,6 +28,7 @@ import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewFiscal } from '@/lib/permissions'
 import { canViewRH } from '@/lib/rh-permissions'
+import { canViewAiModule } from '@/lib/ai-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -58,6 +59,7 @@ import {
   Truck,
   Wallet,
   UserCog,
+  Brain,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -265,6 +267,23 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         submenu: RH_SUBMENU,
         permission: canViewRH,
       },
+      {
+        label: 'Inteligência Artificial',
+        icon: Brain,
+        submenu: [
+          { to: '/admin/ia/dashboard', label: 'Dashboard de IA' },
+          { to: '/admin/ia/assistente', label: 'Assistente IA' },
+          { to: '/admin/ia/agentes', label: 'Agentes' },
+          { to: '/admin/ia/automacoes', label: 'Automações' },
+          { to: '/admin/ia/fluxos', label: 'Fluxos Inteligentes' },
+          { to: '/admin/ia/base-conhecimento', label: 'Base de Conhecimento' },
+          { to: '/admin/ia/treinamento', label: 'Treinamento da IA' },
+          { to: '/admin/ia/historico', label: 'Histórico de Interações' },
+          { to: '/admin/ia/aprovacoes', label: 'Aprovações da IA' },
+          { to: '/admin/ia/configuracoes', label: 'Configurações da IA' },
+        ],
+        permission: canViewAiModule,
+      },
     ],
   },
   {
@@ -352,7 +371,15 @@ export function AdminSidebar({
   const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [openMenus, setOpenMenus] = useState<Set<string>>(
-    new Set(['Vendas', 'Estoque', 'Configurações', 'Logística', 'Financeiro', 'Fiscal']),
+    new Set([
+      'Vendas',
+      'Estoque',
+      'Configurações',
+      'Logística',
+      'Financeiro',
+      'Fiscal',
+      'Inteligência Artificial',
+    ]),
   )
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)

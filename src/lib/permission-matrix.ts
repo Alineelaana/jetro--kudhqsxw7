@@ -16,6 +16,7 @@ import {
   canManageCms,
   canManageAiTraining,
   canViewPurchasing,
+  canViewAiModule,
 } from '@/lib/permissions'
 import {
   canViewPriceTables,
@@ -649,6 +650,12 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     label: 'Financeiro - Consultar Todas as Empresas/Filiais',
     category: 'Financeiro',
     view: canViewAllBranches,
+  },
+  {
+    key: 'ai_module',
+    label: 'Inteligência Artificial - Acessar Módulo',
+    category: 'IA',
+    view: canViewAiModule,
   },
 ]
 
