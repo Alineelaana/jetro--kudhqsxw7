@@ -64,6 +64,34 @@ migrate(
     }
 
     mk(
+      'ai_module_settings',
+      [
+        T('assistant_name'),
+        T('language'),
+        T('communication_tone'),
+        T('working_hours'),
+        N('interaction_limit'),
+        N('response_time'),
+        N('transfer_time'),
+        S('autonomy_level', [
+          'Somente Consultar',
+          'Consultar e Sugerir',
+          'Preparar Ações',
+          'Executar com Confirmação',
+          'Executar Ações Autorizadas',
+        ]),
+        J('actions_requiring_confirmation'),
+        J('actions_requiring_approval'),
+        N('history_retention'),
+        J('allowed_channels'),
+        J('empresas'),
+        J('perfis_acesso'),
+      ],
+      supRules,
+      [],
+    )
+
+    mk(
       'ai_agents',
       [
         T('name'),
@@ -225,34 +253,6 @@ migrate(
     )
 
     mk(
-      'ai_module_settings',
-      [
-        T('assistant_name'),
-        T('language'),
-        T('communication_tone'),
-        T('working_hours'),
-        N('interaction_limit'),
-        N('response_time'),
-        N('transfer_time'),
-        S('autonomy_level', [
-          'Somente Consultar',
-          'Consultar e Sugerir',
-          'Preparar Ações',
-          'Executar com Confirmação',
-          'Executar Ações Autorizadas',
-        ]),
-        J('actions_requiring_confirmation'),
-        J('actions_requiring_approval'),
-        N('history_retention'),
-        J('allowed_channels'),
-        J('empresas'),
-        J('perfis_acesso'),
-      ],
-      supRules,
-      [],
-    )
-
-    mk(
       'ai_training_v2',
       [
         T('question'),
@@ -273,73 +273,49 @@ migrate(
           'Rejeitado',
           'Inativo',
         ]),
-        T('approved_by'),
-        T('approved_at'),
-        T('rejected_reason'),
         T('responsible'),
         T('empresa'),
         T('filial'),
-        N('version'),
+        J('tags'),
+        T('category'),
       ],
       stdRules,
       [],
     )
 
     try {
+      app.findFirstRecordByData('ai_module_settings', 'assistant_name', 'Assistente Virtual')
+    } catch (_) {
       var settingsCol = app.findCollectionByNameOrId('ai_module_settings')
-      var existing = app.findRecordsByFilter('ai_module_settings', '', '', 1, 0)
-      if (existing.length === 0) {
-        var rec = new Record(settingsCol)
-        rec.set('assistant_name', 'Assistente Virtual VeloraLog')
-        rec.set('language', 'Português (Brasil)')
-        rec.set('communication_tone', 'Profissional e cordial')
-        rec.set('working_hours', 'Seg-Sex 08:00-18:00')
-        rec.set('autonomy_level', 'Consultar e Sugerir')
-        rec.set('history_retention', 90)
-        rec.set('allowed_channels', ['chat', 'whatsapp', 'portal'])
-        rec.set('empresas', [])
-        rec.set('perfis_acesso', ['SUP', 'PADRAO', 'COMERCIAL'])
-        app.save(rec)
-      }
-    } catch (_) {}
-
-    try {
-      var agentsCol = app.findCollectionByNameOrId('ai_agents')
-      var existingAgent = app.findFirstRecordByData('ai_agents', 'name', 'Assistente Geral')
-      if (!existingAgent) {
-        var agentRec = new Record(agentsCol)
-        agentRec.set('name', 'Assistente Geral')
-        agentRec.set('description', 'Agente de IA para atendimento geral')
-        agentRec.set('objective', 'Auxiliar em consultas e operações do sistema')
-        agentRec.set('module', 'Geral')
-        agentRec.set('agent_type', 'assistant')
-        agentRec.set('status', 'Em Configuração')
-        agentRec.set('behavior_model', 'GPT-4')
-        agentRec.set('knowledge_base', [])
-        agentRec.set('allowed_tools', [])
-        agentRec.set('permissions', { read: true, write: false })
-        agentRec.set('identity', { name: 'Assistente Geral', avatar: '' })
-        agentRec.set('objectives', [])
-        agentRec.set('integrations', [])
-        app.save(agentRec)
-      }
-    } catch (_) {}
+      var settingsRecord = new Record(settingsCol)
+      settingsRecord.set('assistant_name', 'Assistente Virtual')
+      settingsRecord.set('language', 'pt-BR')
+      settingsRecord.set('communication_tone', 'Profissional e Amigável')
+      settingsRecord.set('working_hours', 'Seg-Sex 08:00-18:00')
+      settingsRecord.set('interaction_limit', 100)
+      settingsRecord.set('response_time', 30)
+      settingsRecord.set('transfer_time', 300)
+      settingsRecord.set('autonomy_level', 'Consultar e Sugerir')
+      settingsRecord.set('history_retention', 90)
+      app.save(settingsRecord)
+    }
   },
   (app) => {
-    var cols = [
-      'ai_agents',
-      'ai_automations',
-      'ai_smart_flows',
-      'ai_knowledge_base',
-      'ai_interactions',
-      'ai_approvals',
-      'ai_module_settings',
+    var collections = [
       'ai_training_v2',
+      'ai_approvals',
+      'ai_interactions',
+      'ai_knowledge_base',
+      'ai_smart_flows',
+      'ai_automations',
+      'ai_agents',
+      'ai_module_settings',
     ]
-    for (var i = 0; i < cols.length; i++) {
+    collections.forEach(function (name) {
       try {
-        app.delete(app.findCollectionByNameOrId(cols[i]))
+        var col = app.findCollectionByNameOrId(name)
+        app.delete(col)
       } catch (_) {}
-    }
+    })
   },
 )
