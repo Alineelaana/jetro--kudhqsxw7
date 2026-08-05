@@ -6,25 +6,6 @@ migrate(
       { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
       { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
     ]
-    function mk(name, fields, rules, indexes) {
-      try {
-        app.findCollectionByNameOrId(name)
-        return
-      } catch (_) {}
-      app.save(
-        new Collection({
-          name: name,
-          type: 'base',
-          listRule: rules[0],
-          viewRule: rules[1],
-          createRule: rules[2],
-          updateRule: rules[3],
-          deleteRule: rules[4],
-          fields: fields.concat(ad),
-          indexes: indexes || [],
-        }),
-      )
-    }
     var usersId = '_pb_users_auth_'
 
     var _cleanupCols = [
@@ -42,7 +23,28 @@ migrate(
       } catch (_) {}
     })
 
-    mk(
+    function createCol(name, fields, rules, indexes) {
+      if (app.hasTable(name)) {
+        try {
+          app.delete(app.findCollectionByNameOrId(name))
+        } catch (_) {}
+      }
+      var col = new Collection({
+        name: name,
+        type: 'base',
+        listRule: rules[0],
+        viewRule: rules[1],
+        createRule: rules[2],
+        updateRule: rules[3],
+        deleteRule: rules[4],
+        fields: fields.concat(ad),
+        indexes: indexes || [],
+      })
+      app.save(col)
+      return app.findCollectionByNameOrId(name).id
+    }
+
+    var setoresId = createCol(
       'atendimento_setores',
       [
         { name: 'nome', type: 'text', required: true },
@@ -54,9 +56,7 @@ migrate(
       ['CREATE INDEX idx_atend_setores_active ON atendimento_setores (active)'],
     )
 
-    var setoresId = app.findCollectionByNameOrId('atendimento_setores').id
-
-    mk(
+    var motivosId = createCol(
       'atendimento_motivos',
       [
         { name: 'nome', type: 'text', required: true },
@@ -68,9 +68,7 @@ migrate(
       ['CREATE INDEX idx_atend_motivos_active ON atendimento_motivos (active)'],
     )
 
-    var motivosId = app.findCollectionByNameOrId('atendimento_motivos').id
-
-    mk(
+    var fluxosId = createCol(
       'fluxos_inteligentes',
       [
         { name: 'nome', type: 'text', required: true },
@@ -97,9 +95,7 @@ migrate(
       ['CREATE INDEX idx_fluxos_status ON fluxos_inteligentes (status)'],
     )
 
-    var fluxosId = app.findCollectionByNameOrId('fluxos_inteligentes').id
-
-    mk(
+    var etapasId = createCol(
       'fluxo_etapas',
       [
         {
@@ -126,9 +122,7 @@ migrate(
       ['CREATE INDEX idx_fluxo_etapas_fluxo ON fluxo_etapas (fluxo_id)'],
     )
 
-    var etapasId = app.findCollectionByNameOrId('fluxo_etapas').id
-
-    mk(
+    var scId = createCol(
       'service_centers',
       [
         { name: 'protocol', type: 'text', required: true },
@@ -175,9 +169,7 @@ migrate(
       ],
     )
 
-    var scId = app.findCollectionByNameOrId('service_centers').id
-
-    mk(
+    createCol(
       'atendimento_historico',
       [
         {
@@ -199,7 +191,7 @@ migrate(
       ['CREATE INDEX idx_atend_hist_atend ON atendimento_historico (atendimento_id)'],
     )
 
-    mk(
+    createCol(
       'fluxo_etapa_status',
       [
         {
