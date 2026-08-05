@@ -27,6 +27,21 @@ migrate(
     }
     var usersId = '_pb_users_auth_'
 
+    var _cleanupCols = [
+      'fluxo_etapa_status',
+      'atendimento_historico',
+      'service_centers',
+      'fluxo_etapas',
+      'fluxos_inteligentes',
+      'atendimento_motivos',
+      'atendimento_setores',
+    ]
+    _cleanupCols.forEach(function (name) {
+      try {
+        app.delete(app.findCollectionByNameOrId(name))
+      } catch (_) {}
+    })
+
     mk(
       'atendimento_setores',
       [
