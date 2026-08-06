@@ -56,6 +56,124 @@ Este documento descreve a **arquitetura conceitual** da plataforma — independe
 
 ---
 
+## 2.2 Official Platform Tree (Perspectiva de Produto)
+
+A plataforma é organizada sob uma perspectiva de produto em cinco áreas principais. Cada área agrupa componentes e módulos que compartilham propósito e contexto de negócio.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     VELORA LOG — PLATFORM TREE                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. PLATAFORMA (Core)                                               │
+│     ├── Shared Platform Services                                    │
+│     │   ├── Empresas & Filiais                                      │
+│     │   ├── Usuários & Permissões                                   │
+│     │   ├── Produtos & Clientes & Fornecedores                      │
+│     │   ├── Auditoria & Notificações                                │
+│     │   ├── IA & Automações & Integrações                           │
+│     │   ├── Documentos & Anexos & Comentários                       │
+│     │   ├── Tarefas & Workflows & Aprovações                        │
+│     │   ├── Configurações & Templates                               │
+│     │   ├── Moedas & Câmbio                                         │
+│     │   ├── Qualidade & Comércio Exterior                           │
+│     │   ├── Dashboards & KPIs & Feature Flags                       │
+│     │   └── Backups & Restore                                       │
+│     ├── Configuration Center                                        │
+│     ├── Multi-tenancy & Multi-empresa                               │
+│     └── Segurança & LGPD                                            │
+│                                                                      │
+│  2. GESTÃO EMPRESARIAL                                              │
+│     ├── Comercial (Pedidos, Faturamento, NF-e/NFC-e/NFS-e)         │
+│     ├── Compras (Requisições, Cotações, Pedidos, Recebimento)      │
+│     ├── Financeiro (Contas, Fluxo de Caixa, Conciliação)           │
+│     ├── Estoque & WMS (Produtos, Lotes, Inventário, Expedição)     │
+│     ├── Logística (Rotas, Entregas, Frota, Comprovantes)           │
+│     ├── Indústria (Compras Internacionais, Importação, MRP, PCP,   │
+│     │              Produção, Qualidade, Rastreabilidade)            │
+│     ├── Fiscal (NF-e, NFC-e, NFS-e, Apuração, SPED, Reforma)       │
+│     ├── Contábil (Plano de Contas, DRE, Fechamento)                │
+│     ├── RH & DP & SST (Colaboradores, Folha, Ponto, Conformidade)  │
+│     ├── CRM (Leads, Oportunidades, Funil, Propostas)               │
+│     ├── Marketing (Campanhas, CMS, Vitrine, Formulários)           │
+│     └── Atendimento / SAC (Tickets, SLA, Classificação IA)         │
+│                                                                      │
+│  3. PORTAIS                                                         │
+│     ├── Portal do Cliente (Self-service, Pedidos, Rastreamento)     │
+│     ├── Portal do Fornecedor (Cotações, Pedidos, Notas)             │
+│     ├── App do Motorista (Entregas, Comprovantes, Offline)          │
+│     └── Área da Empresa (Admin, Dashboard, Gestão)                  │
+│                                                                      │
+│  4. ECOSSISTEMA                                                     │
+│     ├── APIs Públicas (OpenAPI, SDKs, Webhooks)                    │
+│     ├── Marketplace (Plugins, Integrações, Modelos de IA)           │
+│     ├── White Label (Branding, Domínio, Templates)                  │
+│     └── Developer Platform (SDK, Docs, Comunidade)                  │
+│                                                                      │
+│  5. GOVERNANÇA                                                      │
+│     ├── Master Portal (Gestão da Plataforma)                        │
+│     ├── Conselho de Arquitetura (ADRs, Decisões)                    │
+│     ├── Auditoria Inteligente (Logs, Detecção de Anomalias)        │
+│     ├── Observabilidade (APM, Métricas, Health Checks)              │
+│     └── Conformidade (LGPD, Trabalhista, Fiscal)                    │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Shared Platform Services
+
+Os **Shared Platform Services** são serviços de plataforma que não pertencem a nenhum módulo específico. São estruturas centrais, neutras e compartilhadas, utilizadas por múltiplos domínios. Este princípio (Neutralidade dos Módulos) garante que estruturas com potencial de reuso não nasçam acopladas a um módulo.
+
+| Serviço               | Descrição                                                                                                                   | Módulos que utilizam                                 |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **Empresas**          | Cadastro de empresas (multi-empresa)                                                                                        | Todos                                                |
+| **Filiais**           | Cadastro de filiais (multi-filial)                                                                                          | Todos                                                |
+| **Usuários**          | Gestão de usuários e autenticação                                                                                           | Todos                                                |
+| **Permissões**        | Matriz granular de permissões (role × módulo × ação)                                                                        | Todos                                                |
+| **Produtos**          | Catálogo de produtos, variações, códigos                                                                                    | Comercial, Compras, Estoque, Indústria, Fiscal       |
+| **Clientes**          | Cadastro de clientes (PF/PJ)                                                                                                | Comercial, CRM, Financeiro, Portal do Cliente        |
+| **Fornecedores**      | Cadastro de fornecedores/parceiros                                                                                          | Compras, Financeiro, Indústria                       |
+| **Auditoria**         | Logs imutáveis, timeline por registro, detecção de anomalias                                                                | Todos                                                |
+| **IA**                | Camada de IA (agentes, RAG, automações, preditiva)                                                                          | Todos                                                |
+| **Automações**        | Gatilho → condição → ação                                                                                                   | Todos                                                |
+| **Integrações**       | Conectores com sistemas externos (SEFAZ, bancos, transportadoras)                                                           | Todos                                                |
+| **Documentos**        | Geração e gestão de documentos (notas, contratos, propostas)                                                                | Comercial, Fiscal, RH, Indústria                     |
+| **Anexos**            | Gestão de arquivos anexos a qualquer registro                                                                               | Todos                                                |
+| **Comentários**       | Comentários em qualquer registro                                                                                            | Todos                                                |
+| **Tarefas**           | Tarefas vinculadas a registros e usuários                                                                                   | Todos                                                |
+| **Workflows**         | Fluxos de trabalho visuais configuráveis                                                                                    | Todos                                                |
+| **Aprovações**        | Fluxos de aprovação configuráveis                                                                                           | Todos                                                |
+| **Notificações**      | Notificações in-app, e-mail, push                                                                                           | Todos                                                |
+| **Configurações**     | Parâmetros do sistema (Configuration Center)                                                                                | Todos                                                |
+| **Templates**         | Templates de e-mail, documentos, propostas                                                                                  | Todos                                                |
+| **Moedas**            | Cadastro de moedas (`currencies`) — reclassificado de `ind_currencies`                                                      | Financeiro, Compras, Indústria, Comercial            |
+| **Câmbio**            | Taxas de câmbio (`exchange_rates`) — reclassificado de `ind_exchange_rates`                                                 | Financeiro, Compras, Indústria                       |
+| **Qualidade**         | Inspeções (`quality_inspections`) e parâmetros (`quality_parameters`) com campo `modulo_origem` — reclassificado de `ind_*` | Indústria, Compras, Logística, Estoque               |
+| **Comércio Exterior** | Processos de importação (`import_processes`), custos de importação (`import_costs`) — reclassificado de `ind_*`             | Indústria, Compras (futuro: Distribuidores, Trading) |
+| **Dashboards**        | Dashboards configuráveis por usuário/função                                                                                 | Todos                                                |
+| **KPIs**              | Indicadores configuráveis                                                                                                   | Todos                                                |
+| **Feature Flags**     | Controle de funcionalidades por cliente/plano/global                                                                        | Todos                                                |
+
+### 2.4 Reclassificação de Estruturas (ADR-011)
+
+Como aplicação do Princípio da Neutralidade dos Módulos (PLATFORM_PRINCIPLES §4.2) e do Princípio da Evolução Sustentável (§4.1), as seguintes estruturas originalmente concebidas como específicas do módulo Indústria foram reclassificadas como **Shared Platform Services**:
+
+| Estrutura Original (Indústria) | Nova Estrutura (Shared) | Motivo da Reclassificação                                                                                                |
+| ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ind_currencies`               | `currencies`            | Multi-moeda é necessidade transversal (Financeiro, Comercial, Compras, Indústria)                                        |
+| `ind_exchange_rates`           | `exchange_rates`        | Câmbio é serviço compartilhado                                                                                           |
+| `ind_imports`                  | `import_processes`      | Processos de importação utilizáveis por Indústria, Distribuidores, Trading Companies                                     |
+| `ind_import_costs`             | `import_costs`          | Composição de custos de importação é serviço compartilhado                                                               |
+| `ind_quality_inspections`      | `quality_inspections`   | Qualidade aplica-se a recebimento, produção, expedição, devolução, transporte; campo `modulo_origem` identifica contexto |
+| `ind_quality_parameters`       | `quality_parameters`    | Parâmetros de qualidade multi-domínio; campo `modulo_origem`                                                             |
+| `ind_production_lines`         | `production_resources`  | Recursos de produção com campo `tipo` (linha, máquina, centro de trabalho); reutilizável por manutenção, OEE             |
+
+**Campo `modulo_origem`:** As estruturas `quality_inspections` e `quality_parameters` incluem um campo `modulo_origem` que identifica o contexto de origem (recebimento, produção, expedição, devolução, transporte, etc.), permitindo uso multi-domínio sem acoplamento.
+
+**Campo `tipo`:** A estrutura `production_resources` inclui um campo `tipo` que classifica o recurso (linha de produção, máquina, centro de trabalho, etc.), permitindo reuso por módulos de manutenção, OEE e outros.
+
+---
+
 ## 3. Multi-tenancy
 
 ### 3.1 Problema
@@ -464,7 +582,135 @@ Ecossistema de plugins e extensões desenvolvidos por terceiros, distribuídos v
 
 ---
 
-## 13. Gestão deste Documento
+### ADR-011: Reclassificação de Estruturas do Indústria para Shared Platform Services
+
+| Campo             | Valor                                                                                                                                                                                                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Data**          | 2026-08-06                                                                                                                                                                                                                                                                                             |
+| **Problema**      | Estruturas com potencial de reuso foram concebidas como específicas do módulo Indústria                                                                                                                                                                                                                |
+| **Alternativas**  | Manter como específicas do Indústria; reclassificar como Shared Platform Services                                                                                                                                                                                                                      |
+| **Decisão**       | Reclassificar `ind_currencies`→`currencies`, `ind_exchange_rates`→`exchange_rates`, `ind_imports`→`import_processes`, `ind_import_costs`→`import_costs`, `ind_quality_inspections`→`quality_inspections`, `ind_quality_parameters`→`quality_parameters`, `ind_production_lines`→`production_resources` |
+| **Motivos**       | Princípio da Neutralidade dos Módulos; potencial de reuso por múltiplos domínios                                                                                                                                                                                                                       |
+| **Consequências** | Estruturas centralizadas; campo `modulo_origem` para contexto; maior flexibilidade                                                                                                                                                                                                                     |
+| **Aprovador**     | Architecture Council                                                                                                                                                                                                                                                                                   |
+
+### ADR-012: Shared Platform Services como Camada Arquitetural Formal
+
+| Campo             | Valor                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| **Data**          | 2026-08-06                                                                                       |
+| **Problema**      | Estruturas compartilhadas não tinham definição formal de propriedade e governança                |
+| **Alternativas**  | Estruturas sem dono; estruturas pertencentes a módulos; camada formal de serviços compartilhados |
+| **Decisão**       | Criar camada formal de Shared Platform Services com 27 serviços identificados                    |
+| **Motivos**       | Clareza de governança; evitar duplicação; facilitar reuso                                        |
+| **Consequências** | Nenhum módulo é dono de estruturas compartilhadas; governança centralizada                       |
+| **Aprovador**     | Architecture Council                                                                             |
+
+### ADR-013: Official Platform Tree sob Perspectiva de Produto
+
+| Campo             | Valor                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| **Data**          | 2026-08-06                                                                                    |
+| **Problema**      | A organização da plataforma não refletia a perspectiva de produto                             |
+| **Alternativas**  | Organização técnica; organização por perspectiva de produto                                   |
+| **Decisão**       | Organizar em 5 áreas: Plataforma (Core), Gestão Empresarial, Portais, Ecossistema, Governança |
+| **Motivos**       | Clareza para stakeholders; alinhamento produto-arquitetura                                    |
+| **Consequências** | Documentação mais acessível; navegação mais intuitiva                                         |
+| **Aprovador**     | Architecture Council                                                                          |
+
+### ADR-014: MRP Básico como Rota/Hook Calculado
+
+| Campo             | Valor                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| **Data**          | 2026-08-06                                                                                            |
+| **Problema**      | Necessidade de cálculo de necessidade de compras sem over-engineering no MVP                          |
+| **Alternativas**  | Coleção persistente com motor de MRP; rota/hook calculado; solução manual                             |
+| **Decisão**       | MRP básico como rota/hook que cruza BOM × demanda × estoque × POs em aberto × importações em trânsito |
+| **Motivos**       | Simplicidade arquitetural; Evolução Sustentável; deferir complexidade                                 |
+| **Consequências** | Sem persistência desnecessária; cálculo sempre atual; forecasting deferido para V1+                   |
+| **Aprovador**     | Architecture Council                                                                                  |
+
+### ADR-015: Rastreabilidade via Relações Operacionais Reais
+
+| Campo             | Valor                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| **Data**          | 2026-08-06                                                                                       |
+| **Problema**      | Garantir que a rastreabilidade/genealogia seja fonte única de verdade                            |
+| **Alternativas**  | Tabela pré-computada de genealogia; relações operacionais reais com índice técnico               |
+| **Decisão**       | Fonte de verdade nas relações operacionais reais; índices pré-computados apenas para performance |
+| **Motivos**       | Single Source of Truth; consistência; auditabilidade                                             |
+| **Consequências** | Consulta mais complexa mas sempre consistente; índices regeneráveis                              |
+| **Aprovador**     | Architecture Council                                                                             |
+
+### ADR-016: Extensão de Estruturas Existentes para Indústria
+
+| Campo             | Valor                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Data**          | 2026-08-06                                                                                                                                                         |
+| **Problema**      | Suportar compras internacionais, recebimento de matéria-prima e quarentena sem duplicar estruturas                                                                 |
+| **Alternativas**  | Criar estruturas paralelas; estender estruturas existentes                                                                                                         |
+| **Decisão**       | Estender `purchase_orders` (multi-moeda), `wms_receipts`/`stock_checkings` (recebimento matéria-prima), `stock_batches` (quarentena via `situacao` + localizações) |
+| **Motivos**       | Evolução Sustentável (REAPROVEITAR → ESTENDER); evitar duplicação                                                                                                  |
+| **Consequências** | Estruturas mais ricas; menor manutenção; maior consistência                                                                                                        |
+| **Aprovador**     | Architecture Council                                                                                                                                               |
+
+### ADR-017: BOM Versionada e Imutável
+
+| Campo             | Valor                                                                                                            |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Data**          | 2026-08-06                                                                                                       |
+| **Problema**      | Garantir reconstrução exata de como um lote foi produzido                                                        |
+| **Alternativas**  | BOM mutável; BOM versionada imutável                                                                             |
+| **Decisão**       | BOM é imutável após criação; cada versão é um snapshot; cada Ordem de Produção registra `bom_id` + `bom_version` |
+| **Motivos**       | Rastreabilidade; auditabilidade; conformidade                                                                    |
+| **Consequências** | Maior armazenamento; garantia de reconstrução exata                                                              |
+| **Aprovador**     | Architecture Council                                                                                             |
+
+### ADR-018: Quality Inspection como Processo Decisor de Condição de Lote
+
+| Campo             | Valor                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Data**          | 2026-08-06                                                                                                                                                                        |
+| **Problema**      | Decidir condição de lote (aprovado, reprovado, etc.) e alterar disponibilidade                                                                                                    |
+| **Alternativas**  | Quality Inspection como registro apenas; Quality Inspection como processo decisor                                                                                                 |
+| **Decisão**       | `quality_inspections` decide condição (Aprovado, Reprovado, Aprovado com restrição, Necessita nova análise) e altera disponibilidade do lote via estruturas centrais de Stock/WMS |
+| **Motivos**       | Integração real; Single Source of Truth; automação do fluxo                                                                                                                       |
+| **Consequências** | Qualidade altera estado do estoque; fluxo integrado                                                                                                                               |
+| **Aprovador**     | Architecture Council                                                                                                                                                              |
+
+### ADR-019: COMEX como Evolução Futura
+
+| Campo             | Valor                                                                                                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Data**          | 2026-08-06                                                                                                                                                                                             |
+| **Problema**      | Processos de importação têm potencial de uso além da Indústria                                                                                                                                         |
+| **Alternativas**  | Manter importação apenas no Indústria; reclassificar e evoluir para COMEX corporativo                                                                                                                  |
+| **Decisão**       | Processos de importação (`import_processes`) são Shared Platform Services utilizáveis por Indústrias, Distribuidores, Trading Companies, CDs; módulo de Comércio Exterior corporativo no horizonte V2+ |
+| **Motivos**       | Neutralidade de Módulos; potencial de mercado; escalabilidade                                                                                                                                          |
+| **Consequências** | Estruturas centrais preparadas para multi-contexto; COMEX futuro                                                                                                                                       |
+| **Aprovador**     | Architecture Council                                                                                                                                                                                   |
+
+---
+
+## 14. Resumo das Decisões Arquiteturais
+
+> Resumo executivo das principais decisões arquiteturais tomadas na rodada de atualização de documentação (2026-08-06).
+
+| Decisão                                          | ADR     | Princípio Aplicado                              |
+| ------------------------------------------------ | ------- | ----------------------------------------------- |
+| Reclassificação de estruturas Indústria → Shared | ADR-011 | Neutralidade dos Módulos                        |
+| Shared Platform Services como camada formal      | ADR-012 | Neutralidade dos Módulos                        |
+| Official Platform Tree (perspectiva de produto)  | ADR-013 | Simplicidade Arquitetural                       |
+| MRP básico como rota/hook calculado              | ADR-014 | Simplicidade Arquitetural, Evolução Sustentável |
+| Rastreabilidade via relações operacionais reais  | ADR-015 | Single Source of Truth                          |
+| Extensão de estruturas existentes para Indústria | ADR-016 | Evolução Sustentável (ESTENDER)                 |
+| BOM versionada e imutável                        | ADR-017 | Single Source of Truth                          |
+| Quality Inspection como decisor de lote          | ADR-018 | Single Source of Truth                          |
+| COMEX como evolução futura                       | ADR-019 | Neutralidade dos Módulos                        |
+
+---
+
+## 15. Gestão deste Documento
 
 - **Tipo:** Documento vivo
 - **Frequência de revisão:** A cada mudança arquitetural ou nova ADR

@@ -45,7 +45,90 @@ Acreditamos que uma plataforma de gestão deve evoluir além de registrar transa
 
 ---
 
-## 4. Diretivas Arquiteturais
+## 4. Princípios Fundamentais da Plataforma — A "Constituição"
+
+> Esta seção centraliza todos os princípios permanentes da plataforma. Eles são a **Constituição** do projeto — toda decisão de produto, arquitetura e engenharia deve estar alinhada com estes princípios. Em caso de conflito entre um princípio fundamental e qualquer outra diretiva, o princípio fundamental prevalece.
+
+### 4.1 Princípio da Evolução Sustentável
+
+- **Objetivo:** Garantir que a plataforma evolua de forma incremental e sustentável, maximizando o reuso e minimizando a dívida técnica e a duplicação de código/dados.
+- **Regra:** Antes de criar qualquer nova estrutura (coleção, tabela, serviço, componente), a equipe deve seguir a hierarquia de decisão obrigatória: **REAPROVEITAR → ESTENDER → RELACIONAR → CRIAR**.
+  1. **REAPROVEITAR:** Verificar se já existe uma estrutura que atende à necessidade. Se existe, usar.
+  2. **ESTENDER:** Se a estrutura existe mas não atende completamente, estendê-la (adicionar campos, comportamentos) sem quebrar contratos existentes.
+  3. **RELACIONAR:** Se a estrutura não cobre o caso, verificar se é possível relacionar estruturas existentes (ex: criar uma relação entre `purchase_orders` e `import_processes` em vez de criar uma nova coleção de compras internacionais).
+  4. **CRIAR:** Só criar uma nova estrutura quando as três opções anteriores foram avaliadas e documentadas como insuficientes.
+- **Hierarquia de decisão:** REAPROVEITAR > ESTENDER > RELACIONAR > CRIAR. A criação de uma nova estrutura exige justificativa documentada e aprovação do Conselho de Arquitetura.
+- **Exemplos:**
+  - **Correto:** Estender `purchase_orders` com campos de moeda estrangeira para suportar compras internacionais, em vez de criar `ind_international_purchases`.
+  - **Correto:** Reutilizar `stock_batches` para quarentena de matéria-prima (via campo `situacao`) em vez de criar `ind_quarantine_lots`.
+  - **Incorreto:** Criar `ind_currencies` quando uma estrutura central `currencies` pode e deve ser compartilhada por todos os módulos.
+
+### 4.2 Princípio da Neutralidade dos Módulos
+
+- **Objetivo:** Garantir que estruturas com potencial de reuso não nasçam pertencentes a um módulo específico, evitando acoplamento e facilitando o aproveitamento transversal.
+- **Regra:** Nenhum componente deve nascer pertencente a um módulo específico quando existe potencial razoável de reuso. Toda estrutura candidata a uso multi-domínio deve ser avaliada como candidata a **Shared Platform Service**. Estruturas que atendem a múltiplos domínios (ex: moedas, câmbio, qualidade, documentos, anexos) devem ser centralizadas e neutras, com um campo `modulo_origem` quando necessário para identificar o contexto de origem.
+- **Hierarquia de decisão:** Serviço Compartilhado > Módulo-Específico. A criação de uma estrutura específica de módulo só é aceitável quando não há potencial razoável de reuso por outros módulos.
+- **Exemplos:**
+  - **Correto:** Reclassificar `ind_currencies` → `currencies` (serviço compartilhado), pois Comercial, Financeiro, Compras e Indústria podem precisar de multi-moeda.
+  - **Correto:** Reclassificar `ind_quality_inspections` → `quality_inspections` com campo `modulo_origem`, pois qualidade pode aplicar-se a recebimento, produção, expedição, devolução, transporte, etc.
+  - **Incorreto:** Criar `ind_documents` quando a plataforma já tem ou precisa de um serviço compartilhado de documentos.
+
+### 4.3 Princípio: Configurar antes de Customizar
+
+- **Objetivo:** Maximizar a flexibilidade da plataforma sem aumentar a dívida técnica de código.
+- **Regra:** Toda regra de negócio, fluxo, parâmetro, numeração, template ou comportamento deve ser configurável via interface (Configuration Center) antes de exigir desenvolvimento de código. Se uma regra de negócio exige código, isso é uma falha de produto que deve ser corrigida.
+- **Hierarquia de decisão:** Configuração > Customização de Código. Código só é aceitável quando a configuração é comprovadamente insuficiente e a necessidade é validada pelo Conselho de Arquitetura.
+- **Exemplos:**
+  - **Correto:** Permitir configurar alíquotas de impostos, limites de desconto e fluxos de aprovação via interface.
+  - **Incorreto:** Exigir um novo deploy para alterar a alíquota de ICMS de um produto.
+
+### 4.4 Princípio: Single Source of Truth (Fonte Única de Verdade)
+
+- **Objetivo:** Garantir que cada dado da plataforma tenha uma única fonte autoritativa, eliminando inconsistências e conflitos.
+- **Regra:** Nenhum dado deve ser duplicado como fonte de verdade. Estruturas pré-computadas ou indexadas (ex: índices de rastreabilidade) são permitidas apenas como otimização técnica de performance, nunca como segunda fonte de verdade. A verdade sempre reside nas relações operacionais reais.
+- **Hierarquia de decisão:** Fonte Operacional Real > Estrutura Pré-computada. Qualquer estrutura pré-computada deve ser regenerável a partir das relações operacionais reais.
+- **Exemplos:**
+  - **Correto:** A rastreabilidade/genealogia de lotes é derivada das relações reais (Fornecedor → Importação → Recebimento → Lote de Matéria-Prima → Inspeção → Movimentação → Ordem de Produção → Consumo → Lote Acabado → Expedição → Cliente). Qualquer índice de rastreabilidade é puramente técnico para performance.
+  - **Incorreto:** Manter uma tabela `product_genealogy` como fonte de verdade separada das relações operacionais.
+
+### 4.5 Princípio: Conselho de Arquitetura
+
+- **Objetivo:** Garantir que decisões estruturais com impacto de longo prazo sejam coletivas, documentadas e rastreáveis.
+- **Regra:** Toda decisão estrutural que possa impactar o produto nos próximos 5 anos deve ser apresentada para aprovação do Conselho de Arquitetura antes da implementação, documentada como ADR (Architecture Decision Record).
+- **Hierarquia de decisão:** Conselho > Indivíduo. Nenhuma decisão estrutural relevante pode ser tomada unilateralmente.
+- **Exemplos:**
+  - **Correto:** A reclassificação de estruturas do Indústria para Shared Platform Services foi documentada como ADR-011 e aprovada pelo Conselho.
+  - **Incorreto:** Um desenvolvedor criar uma nova coleção sem documentar a decisão.
+
+### 4.6 Princípio: Regra das 5 Perguntas
+
+- **Objetivo:** Garantir que toda funcionalidade relevante seja validada antes da implementação.
+- **Regra:** Antes de implementar qualquer funcionalidade relevante, responder: (1) Qual problema ela resolve? (2) Existe uma solução mais simples? (3) Escala? (4) Aumenta a dívida técnica? (5) Como será em 5 anos?
+- **Hierarquia de decisão:** Validação > Implementação. Nenhuma funcionalidade relevante é implementada sem responder às 5 perguntas.
+- **Exemplos:**
+  - **Correto:** Antes de criar o MRP básico, a equipe validou que ele resolve a necessidade de cálculo de compra, que uma rota/hook é mais simples que uma coleção persistente, e que a previsão avançada pode ser adicionada em V1+.
+
+### 4.7 Princípio: Simplicidade Arquitetural
+
+- **Objetivo:** Manter a arquitetura o mais simples possível, evitando over-engineering e complexidade desnecessária.
+- **Regra:** A solução mais simples que resolve o problema é a correta. Complexidade só é aceitável quando justificada por um requisito real e validada pelo Conselho de Arquitetura.
+- **Hierarquia de decisão:** Simples > Complexo. A complexidade deve ser justificada, não assumida.
+- **Exemplos:**
+  - **Correto:** O MRP básico no MVP é uma rota/hook calculado, não uma coleção persistente com motor de planejamento completo. A complexidade de forecasting é deferida para V1+.
+  - **Incorreto:** Construir um motor de MRP completo com previsão de demanda por IA no MVP quando um cálculo simples de necessidade líquida atende às dores atuais.
+
+### 4.8 Princípio: Documentos Vivos
+
+- **Objetivo:** Garantir que a documentação seja sempre precisa, atual e rastreável.
+- **Regra:** Toda documentação é um documento vivo — versionada, revisada e atualizada a cada mudança significativa. A documentação é tratada como código: está versionada, passa por review e deve refletir o estado atual do produto. Qualquer desenvolvedor novo deve entender a plataforma lendo apenas a documentação.
+- **Hierarquia de decisão:** Documentação Atualizada > Documentação Perfeita. É melhor ter documentação imperfeita mas atualizada do que documentação perfeita mas desatualizada.
+- **Exemplos:**
+  - **Correto:** Após a decisão de reclassificar estruturas do Indústria para Shared Platform Services, todos os seis documentos oficiais foram atualizados simultaneamente para refletir a mudança.
+  - **Incorreto:** Uma decisão arquitetural é tomada mas a documentação não é atualizada, levando a inconsistências.
+
+---
+
+## 5. Diretivas Arquiteturais
 
 ### 4.1 Multi-tenancy Preparado para Instâncias Dedicadas
 
@@ -373,7 +456,42 @@ A plataforma se inspira nas melhores práticas de empresas SaaS world-class:
 
 ---
 
-## 14. Gestão deste Documento
+## 14. Resumo das Decisões Arquiteturais
+
+> Esta seção resume as principais decisões arquiteturais tomadas na rodada de atualização da documentação (2026-08-06), mapeando cada uma ao seu respectivo ADR quando aplicável.
+
+| #   | Decisão                                                                        | Contexto                                                                                                                                                                                                                                                                                                                                                                                           | ADR     | Documentos Afetados                                    |
+| --- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------ |
+| 1   | Reclassificação de estruturas do Indústria para Shared Platform Services       | `ind_currencies`→`currencies`, `ind_exchange_rates`→`exchange_rates`, `ind_imports`→`import_processes`, `ind_import_costs`→`import_costs`, `ind_quality_inspections`→`quality_inspections`, `ind_quality_parameters`→`quality_parameters`, `ind_production_lines`→`production_resources`                                                                                                           | ADR-011 | PLATFORM_PRINCIPLES §4.2, ARCHITECTURE §2.4, PRD §3.11 |
+| 2   | Shared Platform Services como camada formal                                    | Estruturas compartilhadas (Empresas, Filiais, Usuários, Permissões, Produtos, Clientes, Fornecedores, Auditoria, IA, Automações, Integrações, Documentos, Anexos, Comentários, Tarefas, Workflows, Aprovações, Notificações, Configurações, Templates, Moedas, Câmbio, Qualidade, Comércio Exterior, Dashboards, KPIs, Feature Flags) são serviços de plataforma, não pertencentes a nenhum módulo | ADR-012 | ARCHITECTURE §2.3, PLATFORM_PRINCIPLES §4.2            |
+| 3   | Official Platform Tree sob perspectiva de produto                              | Organização em 5 áreas: Plataforma (Core), Gestão Empresarial, Portais, Ecossistema, Governança                                                                                                                                                                                                                                                                                                    | ADR-013 | ARCHITECTURE §2.2                                      |
+| 4   | MRP básico como rota/hook calculado                                            | Não criar coleção persistente para MRP no MVP; cálculo cruza BOM × demanda × estoque × POs em aberto × importações em trânsito                                                                                                                                                                                                                                                                     | ADR-014 | PRD §3.11, ROADMAP MVP                                 |
+| 5   | Rastreabilidade/Genealogia via relações operacionais reais                     | Fonte de verdade nas relações reais; índices pré-computados são apenas otimização técnica                                                                                                                                                                                                                                                                                                          | ADR-015 | PRD §3.11, PLATFORM_PRINCIPLES §4.4                    |
+| 6   | Extensão de `purchase_orders` para compras internacionais                      | Não duplicar; estender com campos de multi-moeda (moeda original, valor em moeda estrangeira, câmbio, data/referência do câmbio, valor convertido em BRL, diferença cambial, composição de landing cost em moeda de origem e base)                                                                                                                                                                 | ADR-016 | PRD §3.11                                              |
+| 7   | Extensão de `wms_receipts`/`stock_checkings` para recebimento de matéria-prima | Não criar recibos paralelos; estender estruturas existentes do WMS                                                                                                                                                                                                                                                                                                                                 | ADR-016 | PRD §3.11                                              |
+| 8   | Quarentena via `stock_batches.situacao` + localizações tipo quarentena         | Não criar coleção de quarentena; reutilizar `stock_batches` com campo `situacao` e localizações classificadas como quarentena                                                                                                                                                                                                                                                                      | ADR-016 | PRD §3.11                                              |
+| 9   | BOM versionada e imutável                                                      | Cada versão de BOM é imutável; cada Ordem de Produção registra `bom_id` + `bom_version` para reconstrução exata                                                                                                                                                                                                                                                                                    | ADR-017 | PRD §3.11                                              |
+| 10  | Quality Inspection como processo decisor de condição de lote                   | `quality_inspections` decide condição (Aprovado, Reprovado, Aprovado com restrição, Necessita nova análise) e altera disponibilidade do lote via estruturas centrais de Stock/WMS                                                                                                                                                                                                                  | ADR-018 | PRD §3.11                                              |
+| 11  | `quality_inspections`/`quality_parameters` com campo `modulo_origem`           | Preparado para uso multi-domínio (recebimento, produção, expedição, devolução, transporte, etc.)                                                                                                                                                                                                                                                                                                   | ADR-011 | PRD §3.11, ARCHITECTURE §2.4                           |
+| 12  | Traceabilidade imediata sem depender do módulo Recall                          | A consulta de rastreabilidade deve identificar lote problemático → produtos acabados impactados → estoque existente → pedidos/NFs → clientes, sem aguardar o módulo Recall (deferido para V1)                                                                                                                                                                                                      | ADR-015 | PRD §3.11, ROADMAP V1                                  |
+| 13  | `production_resources` com campo `tipo`                                        | Linhas de produção reclassificadas como recursos de produção com campo `tipo` (linha, máquina, centro de trabalho, etc.)                                                                                                                                                                                                                                                                           | ADR-011 | ARCHITECTURE §2.4, PRD §3.11                           |
+| 14  | COMEX como evolução futura                                                     | Processos de importação utilizáveis por Indústrias, Distribuidores, Trading Companies, Centros de Distribuição e outros; módulo de Comércio Exterior corporativo no horizonte V2+                                                                                                                                                                                                                  | ADR-019 | PRODUCT_VISION_2035 §5.3, ROADMAP V2                   |
+
+### Novos ADRs desta rodada
+
+- **ADR-011:** Reclassificação de estruturas do Indústria para Shared Platform Services (Neutralidade de Módulos)
+- **ADR-012:** Shared Platform Services como camada arquitetural formal
+- **ADR-013:** Official Platform Tree sob perspectiva de produto
+- **ADR-014:** MRP básico como rota/hook calculado (não coleção persistente)
+- **ADR-015:** Rastreabilidade/Genealogia via relações operacionais reais (Single Source of Truth)
+- **ADR-016:** Extensão de estruturas existentes para Indústria (Evolução Sustentável)
+- **ADR-017:** BOM versionada e imutável
+- **ADR-018:** Quality Inspection como processo decisor de condição de lote
+- **ADR-019:** COMEX como evolução futura do módulo de importação
+
+---
+
+## 15. Gestão deste Documento
 
 - **Tipo:** Documento vivo (living document)
 - **Frequência de revisão:** A cada release maior ou mudança estratégica

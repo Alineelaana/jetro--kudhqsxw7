@@ -327,6 +327,69 @@ A Velora Log é uma Plataforma Inteligente de Gestão Empresarial que une ERP, I
 
 ---
 
+### 3.11 Domínio Indústria
+
+**Objetivo:** Gerenciar todo o ciclo industrial — desde a compra internacional de matéria-prima até a produção e rastreabilidade completa do produto acabado — com multi-moeda, landing cost, controle de qualidade e genealogia de lotes.
+
+**Funcionalidades (Ordem de Prioridade Aprovada para MVP):**
+
+1. **Compras Internacionais:** Extensão de `purchase_orders` (não duplicação) para suportar compras em moeda estrangeira com campos: moeda original, valor em moeda estrangeira, taxa de câmbio, data/referência do câmbio, valor convertido em BRL, diferença cambial quando aplicável, e composição de landing cost em moeda de origem e moeda base.
+2. **Importação:** Gestão de processos de importação via estrutura central `import_processes` (Shared Platform Service), com tracking de status (em trânsito, desembaraçado, entregue) e vinculação ao pedido de compra internacional.
+3. **Multi-moeda / Câmbio Básico:** Cadastro de moedas (`currencies`) e taxas de câmbio (`exchange_rates`) como Shared Platform Services, com conversão automática e registro de diferenças cambiais.
+4. **Landing Cost:** Composição de custos de importação (`import_costs`) incluindo frete internacional, seguro, impostos de importação, despesas aduaneiras, armazenagem portual, e rateio por item/produto.
+5. **Recebimento Integrado ao WMS:** Extensão de `wms_receipts`/`stock_checkings` (não criação de recibos paralelos) para recebimento de matéria-prima, com vinculação ao processo de importação e ao pedido de compra internacional.
+6. **Estoque por Lote e Validade:** Reutilização de `stock_batches` para controle de lotes de matéria-prima e produto acabado, com controle FIFO/FEFO já existente na plataforma.
+7. **Quarentena:** Reutilização de `stock_batches.situacao` + localizações tipo quarentena (não criação de coleção de quarentena). Lotes em quarentena têm disponibilidade bloqueada até decisão de qualidade.
+8. **Controle de Qualidade:** Estruturas centrais `quality_inspections` e `quality_parameters` (Shared Platform Services) com campo `modulo_origem` preparado para multi-domínio (recebimento, produção, expedição, devolução, transporte, etc.). A Quality Inspection é o processo que decide a condição do lote (Aprovado, Reprovado, Aprovado com restrição, Necessita nova análise) e altera a disponibilidade do lote através das estruturas centrais de Stock/WMS.
+9. **Ficha Técnica / BOM Versionada:** BOM (Bill of Materials) versionada e imutável. Cada versão de BOM é um snapshot imutável. Cada Ordem de Produção registra explicitamente `bom_id` + `bom_version`, permitindo a reconstrução exata de como um determinado lote foi produzido, mesmo quando a BOM é posteriormente alterada.
+10. **MRP Básico (Rota/Hook Calculado):** O MRP básico é implementado como uma **rota/hook calculado**, não como uma coleção persistente. O cálculo cruza: BOM × demanda (pedidos de venda, previsões manuais) × estoque atual × pedidos de compra em aberto × importações em trânsito, para computar a necessidade líquida de compra. Forecasting avançado e IA preditiva são deferidos para versões posteriores (V1+).
+11. **PCP (Planejamento e Controle de Produção):** Planejamento de produção baseado em demandas e capacidade de recursos (`production_resources` com campo `tipo` — linha, máquina, centro de trabalho).
+12. **Ordem de Produção:** Criação de ordens de produção vinculadas a uma BOM versionada específica, com registro de `bom_id` + `bom_version`, recursos alocados, e período planejado.
+13. **Consumo / Apontamento Real de Matéria-Prima:** Registro do consumo efetivo de matéria-prima por lote na ordem de produção, criando a relação real entre lote de matéria-prima consumido e lote de produto acabado produzido.
+14. **Geração de Lote de Produto Acabado:** Criação do lote de produto acabado em `stock_batches`, com genealogia vinculada aos lotes de matéria-prima consumidos.
+15. **Custos Previstos × Realizados:** Comparação entre o custo previsto (BOM + landing cost + custos de produção) e o custo realizado (consumo real + custos efetivos), com análise de variâncias.
+16. **Rastreabilidade / Genealogia Completa:** A rastreabilidade é construída a partir de **relações operacionais reais**, não de uma tabela pré-computada. A cadeia completa é: Fornecedor → Importação → Recebimento → Lote de Matéria-Prima → Inspeção/Liberação → Movimentação de Estoque → Ordem de Produção → Consumo Efetivo de Lote → Produção → Lote de Produto Acabado → Expedição → Pedido/NF → Cliente. Qualquer estrutura pré-computada/indexada é puramente técnica para performance e nunca uma segunda fonte de verdade. A consulta de rastreabilidade deve suportar identificação imediata de: lote problemático → produtos acabados impactados → estoque existente → pedidos/NFs → clientes que o receberam, **sem depender do módulo Recall** (fluxo completo de Recall deferido para V1).
+17. **Indicadores Essenciais:** OTIF de produção, eficiência de consumo (previsto × realizado), taxa de aprovação de qualidade, tempo de ciclo, lead time de importação, custo unitário por lote.
+18. **Auditoria Completa:** Toda ação do módulo Indústria registrada na auditoria central da plataforma, com timeline cronológica por registro (pedido de compra internacional, processo de importação, recebimento, inspeção, ordem de produção, lote).
+
+**Estruturas Compartilhadas (Shared Platform Services) utilizadas pelo Indústria:**
+
+- `currencies` — cadastro de moedas (reclassificado de `ind_currencies`)
+- `exchange_rates` — taxas de câmbio (reclassificado de `ind_exchange_rates`)
+- `import_processes` — processos de importação (reclassificado de `ind_imports`)
+- `import_costs` — custos de importação/landing cost (reclassificado de `ind_import_costs`)
+- `quality_inspections` — inspeções de qualidade com campo `modulo_origem` (reclassificado de `ind_quality_inspections`)
+- `quality_parameters` — parâmetros de qualidade com campo `modulo_origem` (reclassificado de `ind_quality_parameters`)
+- `production_resources` — recursos de produção com campo `tipo` (reclassificado de `ind_production_lines`)
+
+**Estruturas Estendidas (não duplicadas):**
+
+- `purchase_orders` — estendido com campos de multi-moeda para compras internacionais
+- `wms_receipts` / `stock_checkings` — estendidos para recebimento de matéria-prima
+- `stock_batches` — reutilizado para quarentena (via campo `situacao`) e lotes de produto acabado
+- Localizações do WMS — reutilizadas para localizações tipo quarentena
+
+**Estruturas Específicas do Indústria (MVP):**
+
+- BOM versionada (imutável por versão)
+- Ordens de Produção (com `bom_id` + `bom_version`)
+- Apontamentos de produção (consumo real de matéria-prima)
+
+**KPIs Indústria:**
+
+- OTIF de produção (On-Time In-Full)
+- Eficiência de consumo (previsto × realizado)
+- Taxa de aprovação de qualidade (%)
+- Tempo de ciclo médio
+- Lead time de importação (dias)
+- Custo unitário por lote
+- Variância de custo (previsto × realizado)
+
+**Dependências:** Compras, Estoque/WMS, Financeiro, Fiscal, Logística
+**Aceitação:** O gestor industrial consegue rastrear qualquer lote de produto acabado até a origem da matéria-prima, passando por importação, recebimento, inspeção, produção e expedição, com identificação imediata de clientes impactados em caso de problema.
+
+---
+
 ## 4. Agentes de IA
 
 ### 4.1 Visão de Agentes

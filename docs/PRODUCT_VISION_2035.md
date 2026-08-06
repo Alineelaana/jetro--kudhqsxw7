@@ -144,6 +144,48 @@ Em 2036, a Velora Log não será um único produto. Será um **ecossistema de pr
 
 ### 5.3 Produtos Verticais (Futuro)
 
+### 5.3.1 Visão Industrial
+
+Em 2036, a Velora Log será a plataforma de gestão inteligente preferida por indústrias de médio e grande porte na América Latina. O módulo Indústria terá evoluído de um conjunto de funcionalidades MVP (compras internacionais, MRP básico, produção, rastreabilidade) para uma solução industrial completa com:
+
+- **IA prescritiva de produção:** A plataforma não apenas prevê demanda e calcula MRP, mas sugere ativamente otimizações de produção, realocação de recursos e ajustes de BOM com justificativa e nível de confiança.
+- **Manutenção preditiva e OEE:** Sensores IoT integrados alimentam modelos de IA que preveem falhas de equipamentos antes que ocorram, maximizando o OEE (Overall Equipment Effectiveness).
+- **Otimização autônoma de cadeia de suprimentos:** A IA gerencia a cadeia de suprimentos end-to-end — desde a previsão de demanda de matéria-prima até a otimização de rotas de produção — com supervisão humana mínima.
+- **Rastreabilidade total e recall automatizado:** Qualquer lote é rastreável em segundos, do fornecedor da matéria-prima ao cliente final. O recall é automatizado com notificação instantânea a todos os clientes impactados.
+- **Multi-indústria e multi-moeda avançada:** Parameterização para diferentes tipos de indústria (transformação, montagem, processo contínuo, batelada) com hedging cambial e gestão de exposição cambial.
+
+### 5.3.2 COMEX — Comércio Exterior como Evolução Natural
+
+Os processos de importação (`import_processes`), originalmente concebidos para o módulo Indústria, foram reclassificados como **Shared Platform Services** precisamente porque seu potencial de uso transcende a indústria. Em 2036, o COMEX (Comércio Exterior) será um módulo corporativo completo utilizado por:
+
+- **Indústrias:** Importação de matéria-prima e exportação de produtos acabados
+- **Distribuidores:** Importação de produtos para revenda
+- **Trading Companies:** Operações de comércio exterior como atividade principal
+- **Centros de Distribuição:** Gestão de mercadorias importadas
+- **Varejistas:** Importação direta de produtos
+
+O COMEX corporativo incluirá:
+
+- Importação e exportação integradas
+- Gestão de regimes aduaneiros especiais (Drawback, RECOPI, Linha Azul)
+- Compliance aduaneiro automatizado
+- Hedging cambial e gestão de exposição
+- Integração com brokers e despachantes
+- Tracking end-to-end (origem → destino final)
+
+### 5.3.3 Direção de Neutralidade dos Módulos
+
+A reclassificação de estruturas do Indústria para Shared Platform Services (ADR-011) estabelece um precedente que guiará toda a evolução futura da plataforma: **nenhum componente deve nascer pertencente a um módulo específico quando existe potencial razoável de reuso**.
+
+Em 2036, esta direção significa:
+
+- A maioria das estruturas de dados são Shared Platform Services, não pertencentes a nenhum módulo
+- Novos módulos são compostos por configuração e relacionamento de serviços compartilhados, não por criação de novas estruturas
+- O princípio REAPROVEITAR → ESTENDER → RELACIONAR → CRIAR é aplicado rigorosamente em toda nova funcionalidade
+- A plataforma é um ecossistema de serviços compartilhados que se combinam para formar módulos de negócio, não uma coleção de módulos isolados
+
+Esta direção garante que a plataforma permaneça coesa, consistente e evolua de forma sustentável mesmo com milhares de clientes e centenas de módulos no marketplace.
+
 | Produto                  | Descrição                          |
 | ------------------------ | ---------------------------------- |
 | **Velora Log Agro**      | Solução para agronegócio           |

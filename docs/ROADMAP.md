@@ -26,20 +26,21 @@ Este roadmap segue o princípio **Produto antes de Tecnologia**. Cada marco defi
 
 **Valor entregue:** O cliente gerencia sua empresa inteira em um único sistema, com dados conectados e dashboards de decisão.
 
-| Entrega                      | Descrição                                            | Dependências         | PRD Ref      |
-| ---------------------------- | ---------------------------------------------------- | -------------------- | ------------ |
-| Gestão Empresarial Core      | Comercial, Financeiro, Estoque, Compras, Logística   | —                    | PRD §3.1–3.5 |
-| Multi-empresa e Multi-filial | Estrutura organizacional completa                    | Gestão Core          | PRD §3.8     |
-| Configuration Center Básico  | Parâmetros, permissões, numerações                   | Gestão Core          | PRD §7       |
-| Auditoria e Logs             | Registro completo de ações                           | Plataforma           | PRD §3.8     |
-| CMS do Site                  | Gestão de conteúdo, vitrine, formulário de orçamento | Plataforma           | PRD §3.6     |
-| Chat de Atendimento          | Chat com clientes via site                           | Plataforma           | PRD §3.9     |
-| Assistente de IA (Consultar) | Chat com IA que responde sobre dados                 | Gestão Core          | PRD §4, §8   |
-| Portal do Cliente            | Self-service básico                                  | Comercial, Logística | PRD §10.6    |
-| App do Motorista             | Entregas e comprovantes                              | Logística            | PRD §3.5     |
-| Fiscal Básico                | NF-e, NFC-e, NFS-e                                   | Comercial            | PRD §3.1     |
-| RH Básico                    | Colaboradores, ponto, folha                          | Plataforma           | PRD §3.7     |
-| Backups e Restore            | Proteção de dados                                    | Plataforma           | PRD §3.8     |
+| Entrega                      | Descrição                                                                                                                                                                                                                                                                                                    | Dependências                         | PRD Ref      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
+| Gestão Empresarial Core      | Comercial, Financeiro, Estoque, Compras, Logística                                                                                                                                                                                                                                                           | —                                    | PRD §3.1–3.5 |
+| Multi-empresa e Multi-filial | Estrutura organizacional completa                                                                                                                                                                                                                                                                            | Gestão Core                          | PRD §3.8     |
+| Configuration Center Básico  | Parâmetros, permissões, numerações                                                                                                                                                                                                                                                                           | Gestão Core                          | PRD §7       |
+| Auditoria e Logs             | Registro completo de ações                                                                                                                                                                                                                                                                                   | Plataforma                           | PRD §3.8     |
+| CMS do Site                  | Gestão de conteúdo, vitrine, formulário de orçamento                                                                                                                                                                                                                                                         | Plataforma                           | PRD §3.6     |
+| Chat de Atendimento          | Chat com clientes via site                                                                                                                                                                                                                                                                                   | Plataforma                           | PRD §3.9     |
+| Assistente de IA (Consultar) | Chat com IA que responde sobre dados                                                                                                                                                                                                                                                                         | Gestão Core                          | PRD §4, §8   |
+| Portal do Cliente            | Self-service básico                                                                                                                                                                                                                                                                                          | Comercial, Logística                 | PRD §10.6    |
+| App do Motorista             | Entregas e comprovantes                                                                                                                                                                                                                                                                                      | Logística                            | PRD §3.5     |
+| Fiscal Básico                | NF-e, NFC-e, NFS-e                                                                                                                                                                                                                                                                                           | Comercial                            | PRD §3.1     |
+| RH Básico                    | Colaboradores, ponto, folha                                                                                                                                                                                                                                                                                  | Plataforma                           | PRD §3.7     |
+| Backups e Restore            | Proteção de dados                                                                                                                                                                                                                                                                                            | Plataforma                           | PRD §3.8     |
+| Módulo Indústria (MVP)       | Compras internacionais, importação, multi-moeda/câmbio, landing cost, recebimento WMS, estoque por lote, quarentena, qualidade, BOM versionada, MRP básico (rota/hook), PCP, ordem de produção, apontamento, lote acabado, custos previstos × realizados, rastreabilidade/genealogia, indicadores, auditoria | Compras, Estoque, Financeiro, Fiscal | PRD §3.11    |
 
 **Critério de aceitação MVP:** Um cliente consegue operar toda sua empresa (vender, comprar, estocar, entregar, pagar, receber) na plataforma, com dashboards e assistente de IA.
 
@@ -51,23 +52,24 @@ Este roadmap segue o princípio **Produto antes de Tecnologia**. Cada marco defi
 
 **Valor entregue:** A plataforma começa a trabalhar pelo cliente, sugerindo ações e automatizando tarefas repetitivas.
 
-| Entrega                         | Descrição                                               | Dependências  | PRD Ref        |
-| ------------------------------- | ------------------------------------------------------- | ------------- | -------------- |
-| Agentes Especializados          | Agentes por domínio (Vendas, Estoque, Financeiro, etc.) | MVP           | PRD §4         |
-| Automações Inteligentes         | Gatilho → condição → ação com IA                        | MVP           | PRD §3.9, §7   |
-| Smart Flows                     | Fluxos visuais com estágios de IA                       | MVP           | PRD §3.9       |
-| Base de Conhecimento            | RAG com documentos do cliente                           | MVP           | PRD §3.9       |
-| Dashboards Executivos           | Diretoria e Presidência                                 | MVP           | PRD §6.2       |
-| Inteligência Preditiva Básica   | Previsão de vendas, estoque, caixa                      | V1 Agentes    | PRD §9.1       |
-| Inteligência Prescritiva Básica | Sugestões de ação com confiança                         | V1 Preditiva  | PRD §9.2       |
-| Aprovações de IA                | Fluxo de aprovação para ações de IA                     | V1 Agentes    | PRD §3.9       |
-| WMS Avançado                    | Ondas, reposição automática, mapa                       | MVP Estoque   | PRD §3.4       |
-| Gestão de Frota Completa        | Telemetria, custos, indicadores                         | MVP Logística | PRD §3.5       |
-| Fiscal Avançado                 | Apuração, SPED, reforma tributária                      | MVP Fiscal    | PRD §3.1       |
-| Contábil                        | Plano de contas, DRE, fechamento                        | V1 Financeiro | PRD §3.3       |
-| CRM Completo                    | Funil, propostas, atividades                            | MVP Comercial | PRD §3.1       |
-| Centro de Atendimento           | SAC com SLA, classificação IA                           | MVP Chat      | PRD §3.9       |
-| Conformidade                    | LGPD, trabalhista, SST                                  | MVP RH        | PRD §3.7, §3.8 |
+| Entrega                         | Descrição                                                                                                                                                     | Dependências  | PRD Ref        |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | -------------- |
+| Agentes Especializados          | Agentes por domínio (Vendas, Estoque, Financeiro, etc.)                                                                                                       | MVP           | PRD §4         |
+| Automações Inteligentes         | Gatilho → condição → ação com IA                                                                                                                              | MVP           | PRD §3.9, §7   |
+| Smart Flows                     | Fluxos visuais com estágios de IA                                                                                                                             | MVP           | PRD §3.9       |
+| Base de Conhecimento            | RAG com documentos do cliente                                                                                                                                 | MVP           | PRD §3.9       |
+| Dashboards Executivos           | Diretoria e Presidência                                                                                                                                       | MVP           | PRD §6.2       |
+| Inteligência Preditiva Básica   | Previsão de vendas, estoque, caixa                                                                                                                            | V1 Agentes    | PRD §9.1       |
+| Inteligência Prescritiva Básica | Sugestões de ação com confiança                                                                                                                               | V1 Preditiva  | PRD §9.2       |
+| Aprovações de IA                | Fluxo de aprovação para ações de IA                                                                                                                           | V1 Agentes    | PRD §3.9       |
+| WMS Avançado                    | Ondas, reposição automática, mapa                                                                                                                             | MVP Estoque   | PRD §3.4       |
+| Gestão de Frota Completa        | Telemetria, custos, indicadores                                                                                                                               | MVP Logística | PRD §3.5       |
+| Fiscal Avançado                 | Apuração, SPED, reforma tributária                                                                                                                            | MVP Fiscal    | PRD §3.1       |
+| Contábil                        | Plano de contas, DRE, fechamento                                                                                                                              | V1 Financeiro | PRD §3.3       |
+| CRM Completo                    | Funil, propostas, atividades                                                                                                                                  | MVP Comercial | PRD §3.1       |
+| Centro de Atendimento           | SAC com SLA, classificação IA                                                                                                                                 | MVP Chat      | PRD §3.9       |
+| Módulo Indústria V1             | Recall completo (workflow de recall com notificação automática a clientes), MRP avançado com forecasting de demanda, IA preditiva para otimização de produção | MVP Indústria | PRD §3.11      |
+| Conformidade                    | LGPD, trabalhista, SST                                                                                                                                        | MVP RH        | PRD §3.7, §3.8 |
 
 **Critério de aceitação V1:** A IA sugere ações que o usuário aprova, e 30%+ das tarefas repetitivas são automatizadas.
 
@@ -79,21 +81,23 @@ Este roadmap segue o princípio **Produto antes de Tecnologia**. Cada marco defi
 
 **Valor entregue:** A plataforma deixa de ser apenas um produto e torna-se um ecossistema onde terceiros criam valor.
 
-| Entrega                      | Descrição                                 | Dependências   | PRD Ref               |
-| ---------------------------- | ----------------------------------------- | -------------- | --------------------- |
-| APIs Públicas                | OpenAPI, SDKs, webhooks, sandbox          | V1             | PRD §10.5             |
-| Marketplace                  | Plugins, integrações, modelos de IA       | V1 APIs        | PRD §10.4             |
-| Mobile App                   | App nativo para gestão móvel              | V1             | PRD §3.8              |
-| White Label Completo         | Branding, domínio, templates por parceiro | V1             | PRD §11               |
-| Master Portal Completo       | Gestão total da plataforma                | V1             | PRD §12               |
-| Inteligência Auto-Analítica  | Plataforma analisa próprio uso            | V1             | PRD §8, PLATFORM §8.3 |
-| Feature Flags Avançadas      | Canary, A/B testing, rollback             | V1             | ARCH §5               |
-| Multi-moeda                  | Operações em diferentes moedas            | V1 Financeiro  | PRD §3.3              |
-| Multi-idioma                 | Interface em múltiplos idiomas            | V1             | PRD §3.8              |
-| IA com Execução Autorizada   | Nível 5 de autonomia                      | V1             | PRD §4.3              |
-| Marketplace de Modelos de IA | Modelos especializados por setor          | V2 Marketplace | PRD §10.4             |
-| Plugin SDK                   | Kit de desenvolvimento para plugins       | V2 Marketplace | ARCH §11              |
-| App do Motorista Avançado    | Offline, navegação, coleta de prova       | V1 App         | PRD §3.5              |
+| Entrega                         | Descrição                                                                                                                             | Dependências   | PRD Ref                 |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ----------------------- |
+| APIs Públicas                   | OpenAPI, SDKs, webhooks, sandbox                                                                                                      | V1             | PRD §10.5               |
+| Marketplace                     | Plugins, integrações, modelos de IA                                                                                                   | V1 APIs        | PRD §10.4               |
+| Mobile App                      | App nativo para gestão móvel                                                                                                          | V1             | PRD §3.8                |
+| White Label Completo            | Branding, domínio, templates por parceiro                                                                                             | V1             | PRD §11                 |
+| Master Portal Completo          | Gestão total da plataforma                                                                                                            | V1             | PRD §12                 |
+| Inteligência Auto-Analítica     | Plataforma analisa próprio uso                                                                                                        | V1             | PRD §8, PLATFORM §8.3   |
+| Feature Flags Avançadas         | Canary, A/B testing, rollback                                                                                                         | V1             | ARCH §5                 |
+| Multi-moeda                     | Operações em diferentes moedas                                                                                                        | V1 Financeiro  | PRD §3.3                |
+| Multi-idioma                    | Interface em múltiplos idiomas                                                                                                        | V1             | PRD §3.8                |
+| IA com Execução Autorizada      | Nível 5 de autonomia                                                                                                                  | V1             | PRD §4.3                |
+| Marketplace de Modelos de IA    | Modelos especializados por setor                                                                                                      | V2 Marketplace | PRD §10.4               |
+| Plugin SDK                      | Kit de desenvolvimento para plugins                                                                                                   | V2 Marketplace | ARCH §11                |
+| App do Motorista Avançado       | Offline, navegação, coleta de prova                                                                                                   | V1 App         | PRD §3.5                |
+| Indústria V2 — Manutenção e OEE | Gestão de manutenção, OEE (Overall Equipment Effectiveness), IA preditiva para falhas de equipamento, regras aduaneiras configuráveis | V1 Indústria   | PRD §3.11               |
+| COMEX — Comércio Exterior       | Evolução de import_processes para módulo corporativo de Comércio Exterior (Trading, Distribuidores, CDs)                              | V1 Indústria   | PRD §3.11, ARCH ADR-019 |
 
 **Critério de aceitação V2:** Existem plugins de terceiros no marketplace e clientes integram sistemas via APIs públicas.
 
@@ -105,18 +109,19 @@ Este roadmap segue o princípio **Produto antes de Tecnologia**. Cada marco defi
 
 **Valor entregue:** Enterprise clientes operam com instância dedicada, IA preditiva avançada e SLA garantido.
 
-| Entrega                        | Descrição                              | Dependências | PRD Ref         |
-| ------------------------------ | -------------------------------------- | ------------ | --------------- |
-| Instância Dedicada             | Migração transparente para Enterprise  | V2           | ARCH §3         |
-| IA Multimodal                  | Texto, imagem, voz, vídeo              | V2           | PRD §4, ARCH §8 |
-| Modelos Locais                 | IA on-premise para Enterprise          | V2           | ARCH §8.3       |
-| Colaboração entre Agentes      | Agentes conversam entre si             | V2           | PRD §4          |
-| IA com Aprendizado Contínuo    | Aprende com feedback e resultados      | V2           | PRD §3.9        |
-| Analytics Avançado             | BI completo, ML customizado            | V2           | PRD §6          |
-| Integrações Governamentais     | E-social, SPED avançado, DCTF          | V2 Fiscal    | PRD §3.1        |
-| SLA e Monitoramento Enterprise | 99.99% uptime, suporte dedicado        | V2           | PRD §10.1       |
-| Auditoria com IA Avançada      | Detecção de fraude em tempo real       | V1           | ARCH §7.6       |
-| Plataforma de Desenvolvedores  | SDK completo, documentação, comunidade | V2 APIs      | PRD §10.5       |
+| Entrega                        | Descrição                                                                                                                          | Dependências | PRD Ref         |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- |
+| Instância Dedicada             | Migração transparente para Enterprise                                                                                              | V2           | ARCH §3         |
+| IA Multimodal                  | Texto, imagem, voz, vídeo                                                                                                          | V2           | PRD §4, ARCH §8 |
+| Modelos Locais                 | IA on-premise para Enterprise                                                                                                      | V2           | ARCH §8.3       |
+| Colaboração entre Agentes      | Agentes conversam entre si                                                                                                         | V2           | PRD §4          |
+| IA com Aprendizado Contínuo    | Aprende com feedback e resultados                                                                                                  | V2           | PRD §3.9        |
+| Analytics Avançado             | BI completo, ML customizado                                                                                                        | V2           | PRD §6          |
+| Integrações Governamentais     | E-social, SPED avançado, DCTF                                                                                                      | V2 Fiscal    | PRD §3.1        |
+| SLA e Monitoramento Enterprise | 99.99% uptime, suporte dedicado                                                                                                    | V2           | PRD §10.1       |
+| Auditoria com IA Avançada      | Detecção de fraude em tempo real                                                                                                   | V1           | ARCH §7.6       |
+| Plataforma de Desenvolvedores  | SDK completo, documentação, comunidade                                                                                             | V2 APIs      | PRD §10.5       |
+| Indústria V3 — IA Prescritiva  | IA prescritiva para produção, parameterização multi-indústria e multi-moeda avançada, otimização autônoma de cadeia de suprimentos | V2 Indústria | PRD §3.11       |
 
 **Critério de aceitação V3:** Enterprise clientes operam em instância dedicada com IA que aprende continuamente.
 

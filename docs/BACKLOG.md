@@ -211,6 +211,91 @@
   3. Alertas contextuais
   4. KPIs configuráveis
 
+### BLK-MVP-018: Módulo Indústria — Compras Internacionais e Multi-moeda
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-011, ADR-016
+- **Descrição:** Estender `purchase_orders` para compras internacionais com multi-moeda (moeda original, valor em moeda estrangeira, câmbio, data/referência, valor BRL, diferença cambial, landing cost). Estruturas `currencies` e `exchange_rates` como Shared Platform Services.
+- **Critérios de Aceitação:**
+  1. Pedido de compra criado em moeda estrangeira com conversão automática para BRL
+  2. Taxa de câmbio registrada com data/referência
+  3. Diferença cambial calculada quando aplicável
+  4. Landing cost composto em moeda de origem e base
+
+### BLK-MVP-019: Módulo Indústria — Importação e Landing Cost
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-011
+- **Descrição:** Gestão de processos de importação via `import_processes` (Shared Platform Service) com tracking de status e vinculação ao pedido de compra. Composição de custos via `import_costs`.
+- **Critérios de Aceitação:**
+  1. Processo de importação criado e vinculado ao pedido de compra internacional
+  2. Status rastreado (em trânsito, desembaraçado, entregue)
+  3. Landing cost composto (frete internacional, seguro, impostos, despesas aduaneiras)
+  4. Rateio de custos por item/produto
+
+### BLK-MVP-020: Módulo Indústria — Recebimento, Quarentena e Qualidade
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-016, ADR-018
+- **Descrição:** Extensão de `wms_receipts`/`stock_checkings` para recebimento de matéria-prima. Quarentena via `stock_batches.situacao` + localizações tipo quarentena. Qualidade via `quality_inspections`/`quality_parameters` com `modulo_origem`.
+- **Critérios de Aceitação:**
+  1. Recebimento de matéria-prima integrado ao WMS (sem recibos paralelos)
+  2. Lote em quarentena tem disponibilidade bloqueada
+  3. Quality Inspection decide condição (Aprovado, Reprovado, Aprovado com restrição, Necessita nova análise)
+  4. Inspeção altera disponibilidade do lote via estruturas centrais de Stock/WMS
+  5. Campo `modulo_origem` identifica contexto da inspeção
+
+### BLK-MVP-021: Módulo Indústria — BOM Versionada e MRP Básico
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-014, ADR-017
+- **Descrição:** BOM versionada e imutável. MRP básico como rota/hook calculado (não coleção persistente) cruzando BOM × demanda × estoque × POs em aberto × importações em trânsito.
+- **Critérios de Aceitação:**
+  1. BOM criada como versão imutável
+  2. MRP calcula necessidade líquida de compra sem persistência
+  3. Cálculo considera BOM, demanda, estoque, POs em aberto e importações em trânsito
+  4. Resultado do MRP é sempre atual (não há dados desatualizados)
+
+### BLK-MVP-022: Módulo Indústria — PCP, Ordem de Produção e Apontamento
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-017
+- **Descrição:** Planejamento de produção com `production_resources` (campo `tipo`). Ordem de Produção com `bom_id` + `bom_version`. Apontamento real de consumo de matéria-prima por lote.
+- **Critérios de Aceitação:**
+  1. Ordem de produção criada com BOM versionada específica (`bom_id` + `bom_version`)
+  2. Consumo real de matéria-prima registrado por lote
+  3. Mesmo se a BOM for alterada depois, a ordem preserva a versão usada
+  4. Recursos de produção alocados com campo `tipo`
+
+### BLK-MVP-023: Módulo Indústria — Rastreabilidade e Genealogia Completa
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-015
+- **Descrição:** Rastreabilidade construída a partir de relações operacionais reais (Fornecedor → Importação → Recebimento → Lote MP → Inspeção → Movimentação → OP → Consumo → Lote PA → Expedição → Pedido/NF → Cliente).
+- **Critérios de Aceitação:**
+  1. Consulta identifica lote problemático → produtos acabados impactados → estoque existente → pedidos/NFs → clientes
+  2. Funciona sem depender do módulo Recall (deferido para V1)
+  3. Qualquer índice pré-computado é regenerável a partir das relações reais
+  4. Não há segunda fonte de verdade
+
+### BLK-MVP-024: Módulo Indústria — Custos, Indicadores e Auditoria
+
+- **Prioridade:** P1
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-005
+- **Descrição:** Custos previstos × realizados com análise de variâncias. Indicadores essenciais (OTIF produção, eficiência, qualidade, ciclo, lead time importação, custo unitário). Auditoria completa com timeline.
+- **Critérios de Aceitação:**
+  1. Comparação de custo previsto × realizado com variâncias
+  2. Indicadores calculados e exibidos em dashboard
+  3. Toda ação do módulo Indústria registrada na auditoria central
+  4. Timeline cronológica por registro (pedido, importação, recebimento, inspeção, OP, lote)
+
 ### BLK-MVP-017: Sistema de Notificações
 
 - **Prioridade:** P1
@@ -335,6 +420,30 @@
   3. Roteamento por setor/motivo
   4. Indicadores de atendimento
 
+### BLK-V1-011: Módulo Indústria — Recall Completo
+
+- **Prioridade:** P1
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-015
+- **Descrição:** Workflow completo de recall com notificação automática a clientes, bloqueio de estoque e gestão de devoluções.
+- **Critérios de Aceitação:**
+  1. Recall iniciado a partir de lote problemático
+  2. Clientes que receberam o lote são notificados automaticamente
+  3. Estoque existente do lote é bloqueado
+  4. Devoluções gerenciadas via fluxo de logística reversa
+
+### BLK-V1-012: Módulo Indústria — MRP Avançado com Forecasting
+
+- **Prioridade:** P1
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-014
+- **Descrição:** MRP com forecasting de demanda baseado em histórico, sazonalidade e tendências. IA preditiva para otimização de produção.
+- **Critérios de Aceitação:**
+  1. Previsão de demanda com 80%+ de acerto
+  2. MRP considera previsão além de pedidos confirmados
+  3. Sugestões de produção otimizadas por IA
+  4. Nível de confiança em cada previsão
+
 ### BLK-V1-010: Conformidade (LGPD, Trabalhista, SST)
 
 - **Prioridade:** P1
@@ -423,6 +532,42 @@
   3. Detecta gargalos de performance
   4. Recomenda configurações baseadas em clientes similares
 
+### BLK-V2-008: Módulo Indústria — Manutenção e OEE
+
+- **Prioridade:** P2
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-011
+- **Descrição:** Gestão de manutenção de equipamentos, OEE (Overall Equipment Effectiveness), IA preditiva para falhas.
+- **Critérios de Aceitação:**
+  1. Manutenção preventiva e corretiva gerenciada
+  2. OEE calculado (disponibilidade × performance × qualidade)
+  3. IA preditiva alerta falhas iminentes
+  4. Integração com `production_resources`
+
+### BLK-V2-009: Módulo Indústria — Regras Aduaneiras Configuráveis
+
+- **Prioridade:** P2
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-019
+- **Descrição:** Regras aduaneiras configuráveis sem código para diferentes países e regimes.
+- **Critérios de Aceitação:**
+  1. Regras de importação configuráveis por país
+  2. Alíquotas e tributos configuráveis
+  3. Regimes aduaneiros suportados
+  4. Sem necessidade de código para novas regras
+
+### BLK-V2-010: COMEX — Comércio Exterior Corporativo
+
+- **Prioridade:** P2
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-019
+- **Descrição:** Evolução de `import_processes` para módulo corporativo de Comércio Exterior, utilizável por Indústrias, Distribuidores, Trading Companies e Centros de Distribuição.
+- **Critérios de Aceitação:**
+  1. Processos de importação utilizáveis por múltiplos perfis de empresa
+  2. Suporte a Trading Companies
+  3. Multi-empresa e multi-filial para operações de comércio exterior
+  4. Integração com módulos existentes (Compras, Financeiro, Fiscal)
+
 ### BLK-V2-007: IA com Execução Autorizada
 
 - **Prioridade:** P2
@@ -499,6 +644,18 @@
   3. Aprendizado por domínio
   4. Privacy: aprendizado opt-in
 
+### BLK-V3-007: Módulo Indústria — IA Prescritiva e Otimização Autônoma
+
+- **Prioridade:** P3
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-003, ADR-014
+- **Descrição:** IA prescritiva para produção com sugestões de otimização, parameterização multi-indústria e multi-moeda avançada, otimização autônoma de cadeia de suprimentos.
+- **Critérios de Aceitação:**
+  1. IA sugere otimizações de produção com justificativa e nível de confiança
+  2. Parameterização para múltiplos tipos de indústria
+  3. Multi-moeda avançada com hedging cambial
+  4. Otimização autônoma de cadeia de suprimentos com supervisão humana
+
 ### BLK-V3-006: Developer Platform
 
 - **Prioridade:** P3
@@ -557,6 +714,19 @@
 | BLK-V3-004  | §4         | ADR-003          | V3     | P3         |
 | BLK-V3-005  | §3.9       | ADR-003          | V3     | P3         |
 | BLK-V3-006  | §10.5      | ADR-002, ADR-008 | V3     | P3         |
+| BLK-V3-007  | §3.11      | ADR-003, ADR-014 | V3     | P3         |
+| BLK-MVP-018 | §3.11      | ADR-011, ADR-016 | MVP    | P0         |
+| BLK-MVP-019 | §3.11      | ADR-011          | MVP    | P0         |
+| BLK-MVP-020 | §3.11      | ADR-016, ADR-018 | MVP    | P0         |
+| BLK-MVP-021 | §3.11      | ADR-014, ADR-017 | MVP    | P0         |
+| BLK-MVP-022 | §3.11      | ADR-017          | MVP    | P0         |
+| BLK-MVP-023 | §3.11      | ADR-015          | MVP    | P0         |
+| BLK-MVP-024 | §3.11      | ADR-005          | MVP    | P1         |
+| BLK-V1-011  | §3.11      | ADR-015          | V1     | P1         |
+| BLK-V1-012  | §3.11      | ADR-014          | V1     | P1         |
+| BLK-V2-008  | §3.11      | ADR-011          | V2     | P2         |
+| BLK-V2-009  | §3.11      | ADR-019          | V2     | P2         |
+| BLK-V2-010  | §3.11      | ADR-019          | V2     | P2         |
 
 ---
 
