@@ -142,6 +142,17 @@ Em 2036, a Velora Log não será um único produto. Será um **ecossistema de pr
 | **Velora Log AI Studio**   | Studio para criar agentes customizados    | Enterprise                |
 | **Velora Log Data Hub**    | Data warehouse como serviço               | Enterprise                |
 
+### 5.2.1 Plataforma como Núcleo Operacional — Visão Multi-Canais
+
+A Platforma é o **núcleo operacional central do ecossistema**. Todos os Canais Digitais consomem os serviços da Plataforma através de APIs seguras e Shared Platform Services. A Plataforma é a **fonte única de verdade** para toda informação de negócio.
+
+- **Plataforma = Fonte Única de Verdade:** Toda informação de negócio (clientes, pedidos, estoque, financeiro, etc.) reside na Plataforma. Canais não possuem dados próprios — apenas apresentam e capturam interações.
+- **Canais Digitais = Pontos de Entrada e Relacionamento:** VeloraLog, sites institucionais, landing pages, Portal do Cliente, Portal do Fornecedor, aplicativo mobile, WhatsApp, Instagram, Facebook, chatbots, marketplace e APIs públicas são todos pontos de entrada que consomem serviços centrais.
+- **Agnóstica de Canal:** A Plataforma não conhece canais específicos — apenas o conceito de Canal Digital. Novos canais são conectados sem alterar a Plataforma.
+- **Segurança Centralizada:** Autenticação, autorização e auditoria são responsabilidade da Plataforma, não do canal.
+
+> Em 2036, a Plataforma será o cérebro operacional de cada empresa cliente, e os Canais Digitais serão as múltiplas portas de entrada pelas quais clientes, parceiros e sistemas interagem com esse cérebro.
+
 ### 5.3 Produtos Verticais (Futuro)
 
 ### 5.3.1 Visão Industrial

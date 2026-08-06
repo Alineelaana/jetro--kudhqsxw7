@@ -126,6 +126,19 @@ Acreditamos que uma plataforma de gestão deve evoluir além de registrar transa
   - **Correto:** Após a decisão de reclassificar estruturas do Indústria para Shared Platform Services, todos os seis documentos oficiais foram atualizados simultaneamente para refletir a mudança.
   - **Incorreto:** Uma decisão arquitetural é tomada mas a documentação não é atualizada, levando a inconsistências.
 
+### 4.9 Princípio: Estratégia Evolutiva da Plataforma
+
+- **Objetivo:** Garantir que decisões de arquitetura representem a visão de longo prazo do produto e não sejam restringidas pela infraestrutura atual, estabelecendo uma separação clara entre a Arquitetura Conceitual e a Implementação Atual.
+- **Regra:** A arquitetura da plataforma deve refletir a visão de produto de longo prazo. Limitações da infraestrutura atual (provedor cloud, capacidade de deployment, restrições de domínio, etc.) são documentadas como **restrições temporárias de implementação**, nunca como limitações de arquitetura. A arquitetura conceitual permanece válida independentemente da infraestrutura em uso.
+- **Hierarquia de decisão:** Arquitetura Conceitual (visão de longo prazo) > Implementação Atual (infraestrutura temporária). A Implementação Atual nunca restringe nem redefine a Arquitetura Conceitual.
+- **Dois conceitos distintos:**
+  1. **Arquitetura Conceitual:** A plataforma é desenhada para múltiplos Canais Digitais independentes que consomem Shared Platform Services. Esta é a visão oficial de longo prazo e não muda com a infraestrutura em uso.
+  2. **Implementação Atual:** Deploy temporário em projeto único, compatível com os limites da infraestrutura atual (Skip Cloud). A implementação atual não altera a arquitetura — apenas a materializa parcialmente enquanto a infraestrutura evolui.
+- **Exemplos:**
+  - **Correto:** A arquitetura conceitual define múltiplos Canais Digitais; a implementação atual usa um único projeto Skip Cloud como restrição temporária. Quando a infraestrutura permitir, a separação física é ativada sem redesenho da arquitetura.
+  - **Incorreto:** Limitar a arquitetura a um único canal porque o provedor cloud atual só suporta um projeto, tratando a limitação de infraestrutura como se fosse uma decisão de arquitetura permanente.
+  - **Incorreto:** Redesenhar a arquitetura quando a infraestrutura mudar, em vez de simplesmente ativar a separação que já estava prevista na arquitetura conceitual.
+
 ---
 
 ## 5. Diretivas Arquiteturais
@@ -476,6 +489,7 @@ A plataforma se inspira nas melhores práticas de empresas SaaS world-class:
 | 12  | Traceabilidade imediata sem depender do módulo Recall                          | A consulta de rastreabilidade deve identificar lote problemático → produtos acabados impactados → estoque existente → pedidos/NFs → clientes, sem aguardar o módulo Recall (deferido para V1)                                                                                                                                                                                                      | ADR-015 | PRD §3.11, ROADMAP V1                                  |
 | 13  | `production_resources` com campo `tipo`                                        | Linhas de produção reclassificadas como recursos de produção com campo `tipo` (linha, máquina, centro de trabalho, etc.)                                                                                                                                                                                                                                                                           | ADR-011 | ARCHITECTURE §2.4, PRD §3.11                           |
 | 14  | COMEX como evolução futura                                                     | Processos de importação utilizáveis por Indústrias, Distribuidores, Trading Companies, Centros de Distribuição e outros; módulo de Comércio Exterior corporativo no horizonte V2+                                                                                                                                                                                                                  | ADR-019 | PRODUCT_VISION_2035 §5.3, ROADMAP V2                   |
+| 15  | Arquitetura de Canais Digitais da Plataforma                                   | Arquitetura conceitual multi-canais (CLIENTES → CANAIS DIGITAIS → Shared Platform Services → Plataforma). VeloraLog é o primeiro Canal Digital. Implementação atual em projeto único é restrição temporária de infraestrutura, não de arquitetura. Futura separação física sem redesenho.                                                                                                          | ADR-020 | PLATFORM_PRINCIPLES §4.9, ARCHITECTURE §2.5, ROADMAP   |
 
 ### Novos ADRs desta rodada
 
@@ -488,6 +502,7 @@ A plataforma se inspira nas melhores práticas de empresas SaaS world-class:
 - **ADR-017:** BOM versionada e imutável
 - **ADR-018:** Quality Inspection como processo decisor de condição de lote
 - **ADR-019:** COMEX como evolução futura do módulo de importação
+- **ADR-020:** Arquitetura de Canais Digitais da Plataforma (Estratégia Evolutiva)
 
 ---
 

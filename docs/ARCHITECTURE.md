@@ -124,35 +124,36 @@ A plataforma é organizada sob uma perspectiva de produto em cinco áreas princi
 
 Os **Shared Platform Services** são serviços de plataforma que não pertencem a nenhum módulo específico. São estruturas centrais, neutras e compartilhadas, utilizadas por múltiplos domínios. Este princípio (Neutralidade dos Módulos) garante que estruturas com potencial de reuso não nasçam acopladas a um módulo.
 
-| Serviço               | Descrição                                                                                                                   | Módulos que utilizam                                 |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **Empresas**          | Cadastro de empresas (multi-empresa)                                                                                        | Todos                                                |
-| **Filiais**           | Cadastro de filiais (multi-filial)                                                                                          | Todos                                                |
-| **Usuários**          | Gestão de usuários e autenticação                                                                                           | Todos                                                |
-| **Permissões**        | Matriz granular de permissões (role × módulo × ação)                                                                        | Todos                                                |
-| **Produtos**          | Catálogo de produtos, variações, códigos                                                                                    | Comercial, Compras, Estoque, Indústria, Fiscal       |
-| **Clientes**          | Cadastro de clientes (PF/PJ)                                                                                                | Comercial, CRM, Financeiro, Portal do Cliente        |
-| **Fornecedores**      | Cadastro de fornecedores/parceiros                                                                                          | Compras, Financeiro, Indústria                       |
-| **Auditoria**         | Logs imutáveis, timeline por registro, detecção de anomalias                                                                | Todos                                                |
-| **IA**                | Camada de IA (agentes, RAG, automações, preditiva)                                                                          | Todos                                                |
-| **Automações**        | Gatilho → condição → ação                                                                                                   | Todos                                                |
-| **Integrações**       | Conectores com sistemas externos (SEFAZ, bancos, transportadoras)                                                           | Todos                                                |
-| **Documentos**        | Geração e gestão de documentos (notas, contratos, propostas)                                                                | Comercial, Fiscal, RH, Indústria                     |
-| **Anexos**            | Gestão de arquivos anexos a qualquer registro                                                                               | Todos                                                |
-| **Comentários**       | Comentários em qualquer registro                                                                                            | Todos                                                |
-| **Tarefas**           | Tarefas vinculadas a registros e usuários                                                                                   | Todos                                                |
-| **Workflows**         | Fluxos de trabalho visuais configuráveis                                                                                    | Todos                                                |
-| **Aprovações**        | Fluxos de aprovação configuráveis                                                                                           | Todos                                                |
-| **Notificações**      | Notificações in-app, e-mail, push                                                                                           | Todos                                                |
-| **Configurações**     | Parâmetros do sistema (Configuration Center)                                                                                | Todos                                                |
-| **Templates**         | Templates de e-mail, documentos, propostas                                                                                  | Todos                                                |
-| **Moedas**            | Cadastro de moedas (`currencies`) — reclassificado de `ind_currencies`                                                      | Financeiro, Compras, Indústria, Comercial            |
-| **Câmbio**            | Taxas de câmbio (`exchange_rates`) — reclassificado de `ind_exchange_rates`                                                 | Financeiro, Compras, Indústria                       |
-| **Qualidade**         | Inspeções (`quality_inspections`) e parâmetros (`quality_parameters`) com campo `modulo_origem` — reclassificado de `ind_*` | Indústria, Compras, Logística, Estoque               |
-| **Comércio Exterior** | Processos de importação (`import_processes`), custos de importação (`import_costs`) — reclassificado de `ind_*`             | Indústria, Compras (futuro: Distribuidores, Trading) |
-| **Dashboards**        | Dashboards configuráveis por usuário/função                                                                                 | Todos                                                |
-| **KPIs**              | Indicadores configuráveis                                                                                                   | Todos                                                |
-| **Feature Flags**     | Controle de funcionalidades por cliente/plano/global                                                                        | Todos                                                |
+| Serviço               | Descrição                                                                                                                           | Módulos que utilizam                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **Empresas**          | Cadastro de empresas (multi-empresa)                                                                                                | Todos                                                |
+| **Filiais**           | Cadastro de filiais (multi-filial)                                                                                                  | Todos                                                |
+| **Usuários**          | Gestão de usuários e autenticação                                                                                                   | Todos                                                |
+| **Permissões**        | Matriz granular de permissões (role × módulo × ação)                                                                                | Todos                                                |
+| **Produtos**          | Catálogo de produtos, variações, códigos                                                                                            | Comercial, Compras, Estoque, Indústria, Fiscal       |
+| **Clientes**          | Cadastro de clientes (PF/PJ)                                                                                                        | Comercial, CRM, Financeiro, Portal do Cliente        |
+| **Fornecedores**      | Cadastro de fornecedores/parceiros                                                                                                  | Compras, Financeiro, Indústria                       |
+| **Auditoria**         | Logs imutáveis, timeline por registro, detecção de anomalias                                                                        | Todos                                                |
+| **IA**                | Camada de IA (agentes, RAG, automações, preditiva)                                                                                  | Todos                                                |
+| **Automações**        | Gatilho → condição → ação                                                                                                           | Todos                                                |
+| **Integrações**       | Conectores com sistemas externos (SEFAZ, bancos, transportadoras)                                                                   | Todos                                                |
+| **Documentos**        | Geração e gestão de documentos (notas, contratos, propostas)                                                                        | Comercial, Fiscal, RH, Indústria                     |
+| **Anexos**            | Gestão de arquivos anexos a qualquer registro                                                                                       | Todos                                                |
+| **Comentários**       | Comentários em qualquer registro                                                                                                    | Todos                                                |
+| **Tarefas**           | Tarefas vinculadas a registros e usuários                                                                                           | Todos                                                |
+| **Workflows**         | Fluxos de trabalho visuais configuráveis                                                                                            | Todos                                                |
+| **Aprovações**        | Fluxos de aprovação configuráveis                                                                                                   | Todos                                                |
+| **Notificações**      | Notificações in-app, e-mail, push                                                                                                   | Todos                                                |
+| **Configurações**     | Parâmetros do sistema (Configuration Center)                                                                                        | Todos                                                |
+| **Templates**         | Templates de e-mail, documentos, propostas                                                                                          | Todos                                                |
+| **Moedas**            | Cadastro de moedas (`currencies`) — reclassificado de `ind_currencies`                                                              | Financeiro, Compras, Indústria, Comercial            |
+| **Câmbio**            | Taxas de câmbio (`exchange_rates`) — reclassificado de `ind_exchange_rates`                                                         | Financeiro, Compras, Indústria                       |
+| **Qualidade**         | Inspeções (`quality_inspections`) e parâmetros (`quality_parameters`) com campo `modulo_origem` — reclassificado de `ind_*`         | Indústria, Compras, Logística, Estoque               |
+| **Comércio Exterior** | Processos de importação (`import_processes`), custos de importação (`import_costs`) — reclassificado de `ind_*`                     | Indústria, Compras (futuro: Distribuidores, Trading) |
+| **Dashboards**        | Dashboards configuráveis por usuário/função                                                                                         | Todos                                                |
+| **KPIs**              | Indicadores configuráveis                                                                                                           | Todos                                                |
+| **Feature Flags**     | Controle de funcionalidades por cliente/plano/global                                                                                | Todos                                                |
+| **Canais Digitais**   | Registro, configuração e auditoria de canais digitais que consomem serviços da plataforma (VeloraLog, Portais, App, WhatsApp, etc.) | Marketing, Comercial, Atendimento, Plataforma        |
 
 ### 2.4 Reclassificação de Estruturas (ADR-011)
 
@@ -171,6 +172,112 @@ Como aplicação do Princípio da Neutralidade dos Módulos (PLATFORM_PRINCIPLES
 **Campo `modulo_origem`:** As estruturas `quality_inspections` e `quality_parameters` incluem um campo `modulo_origem` que identifica o contexto de origem (recebimento, produção, expedição, devolução, transporte, etc.), permitindo uso multi-domínio sem acoplamento.
 
 **Campo `tipo`:** A estrutura `production_resources` inclui um campo `tipo` que classifica o recurso (linha de produção, máquina, centro de trabalho, etc.), permitindo reuso por módulos de manutenção, OEE e outros.
+
+---
+
+## 2.5 Arquitetura de Canais Digitais (ADR-020)
+
+### 2.5.1 Visão Conceitual Multi-Canais
+
+A plataforma é desenhada conceitualmente para suportar **múltiplos Canais Digitais independentes** que consomem Shared Platform Services. A arquitetura conceitual multi-canais é:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          CLIENTES                                    │
+│   (Pessoas e Empresas que interagem com a plataforma)                │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                     CANAIS DIGITAIS                                  │
+│   VeloraLog │ Sites Institucionais │ Landing Pages │ Portal do       │
+│   Cliente │ Portal do Fornecedor │ App Mobile │ WhatsApp │          │
+│   Instagram │ Facebook │ Chatbots │ Marketplace │ APIs Públicas │   │
+│   Integrações Externas                                              │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │  APIs REST seguras + Webhooks
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                SHARED PLATFORM SERVICES                              │
+│   Empresas │ Filiais │ Usuários │ Permissões │ Produtos │ Clientes  │
+│   Fornecedores │ Auditoria │ IA │ Automações │ Integrações │         │
+│   Documentos │ Notificações │ Configurações │ Canais Digitais │      │
+│   Moedas │ Câmbio │ Qualidade │ Dashboards │ Feature Flags           │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│           PLATAFORMA INTELIGENTE DE GESTÃO EMPRESARIAL               │
+│   Comercial │ Compras │ Financeiro │ Estoque │ Logística │ RH │      │
+│   Fiscal │ Contábil │ CRM │ Atendimento │ Indústria                  │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                    GESTÃO EMPRESARIAL                                │
+│   Regras de negócio, fluxos, cálculos, decisões                      │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                         IA                                           │
+│   Agentes │ RAG │ Automações │ Preditiva │ Prescritiva              │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                      AUDITORIA                                       │
+│   Logs imutáveis │ Timeline │ Detecção de anomalias                  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 2.5.2 Princípio: A Plataforma Não Conhece Canais Específicos
+
+A Plataforma **não conhece nenhum canal específico** — ela apenas conhece o conceito de **Canal Digital**. Todo canal que consome os serviços da plataforma é tratado de forma genérica e neutra, através de APIs seguras e Shared Platform Services. Isto significa:
+
+- A Plataforma não possui lógica acoplada a "VeloraLog", "Portal do Cliente" ou "App Mobile".
+- Qualquer canal pode ser adicionado, removido ou modificado sem alterar o core da Plataforma.
+- A autenticação, autorização e auditoria são centralizadas na Plataforma, não no canal.
+
+### 2.5.3 VeloraLog como Primeiro Canal Digital
+
+**VeloraLog não é mais "o site do sistema".** VeloraLog passa a ser o **primeiro Canal Digital da Plataforma**, mantendo seu próprio domínio (logistica-premium-es), sem recursos administrativos. Como Canal Digital, VeloraLog:
+
+- Consome os Shared Platform Services da Plataforma através de APIs seguras.
+- Foca na experiência do cliente (orçamento via WhatsApp, conteúdo institucional, vitrine).
+- Não contém lógica de gestão empresarial — apenas apresenta dados e captura interações.
+- Pode ser substituído ou complementado por outros canais sem impacto na Plataforma.
+
+### 2.5.4 Canal Digital como Shared Platform Service
+
+O conceito de **Canal Digital** é incorporado à lista de Shared Platform Services (§2.3). O serviço de Canal Digital gerencia:
+
+- Registro e configuração de canais ativos.
+- Autenticação e autorização por canal.
+- Roteamento de interações para os serviços apropriados.
+- Auditoria de interações originadas em cada canal.
+
+### 2.5.5 Future-Proofing: Novos Canais Sem Redesenho
+
+A arquitetura deve garantir que os seguintes canais possam ser conectados no futuro usando o mesmo padrão arquitetural, **sem alterar a Plataforma**:
+
+- Sites institucionais adicionais
+- Landing pages de campanha
+- Portal do Cliente (self-service)
+- Portal do Fornecedor (cotações, pedidos, notas)
+- Aplicativo mobile (gestão e cliente)
+- WhatsApp Business
+- Instagram / Facebook
+- Chatbots
+- Marketplace
+- APIs públicas (para parceiros e integradores)
+- Integrações externas (sistemas de terceiros)
+
+### 2.5.6 Implementação Atual vs. Arquitetura Conceitual
+
+| Aspecto              | Arquitetura Conceitual (Oficial)        | Implementação Atual (Temporária)       |
+| -------------------- | --------------------------------------- | -------------------------------------- |
+| **Canais**           | Múltiplos Canais Digitais independentes | VeloraLog como único canal ativo       |
+| **Deploy**           | Projetos separados por canal            | Projeto único no Skip Cloud            |
+| **Domínio**          | Domínio próprio por canal               | Domínio único compartilhado            |
+| **Infraestrutura**   | Agnóstica                               | Skip Cloud (PocketBase)                |
+| **Separação física** | Prevista na arquitetura                 | Restrição temporária de infraestrutura |
+
+> **Regra de ouro:** A Implementação Atual nunca redefine a Arquitetura Conceitual. Limitações de infraestrutura são restrições temporárias documentadas, não decisões de arquitetura. (PLATFORM_PRINCIPLES §4.9)
 
 ---
 
@@ -690,6 +797,18 @@ Ecossistema de plugins e extensões desenvolvidos por terceiros, distribuídos v
 | **Consequências** | Estruturas centrais preparadas para multi-contexto; COMEX futuro                                                                                                                                       |
 | **Aprovador**     | Architecture Council                                                                                                                                                                                   |
 
+### ADR-020: Arquitetura de Canais Digitais da Plataforma
+
+| Campo             | Valor                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Data**          | 2026-08-06                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Problema**      | A plataforma precisa suportar múltiplos canais digitais (sites, portais, app, WhatsApp, marketplace, APIs) sem acoplar a arquitetura a um canal específico, e a infraestrutura atual (Skip Cloud) impõe restrições temporárias que não devem limitar a arquitetura conceitual de longo prazo                                                                                                                                                                                                       |
+| **Alternativas**  | (A) Arquitetura acoplada a VeloraLog como único canal permanente; (B) Arquitetura multi-canais conceitual com implementação temporária em projeto único; (C) Aguardar evolução da infraestrutura antes de definir a arquitetura                                                                                                                                                                                                                                                                    |
+| **Decisão**       | (B) Arquitetura conceitual multi-canais (CLIENTES → CANAIS DIGITAIS → Shared Platform Services → Plataforma Inteligente de Gestão Empresarial → Gestão Empresarial → IA → Auditoria). A Plataforma apenas conhece o conceito de Canal Digital, não canais específicos. VeloraLog torna-se o primeiro Canal Digital. Canal Digital é incorporado aos Shared Platform Services. Implementação atual em projeto único no Skip Cloud é uma restrição temporária de infraestrutura, não de arquitetura. |
+| **Motivos**       | Estratégia Evolutiva da Plataforma (§4.9): a arquitetura representa a visão de longo prazo e não é limitada pela infraestrutura atual; future-proofing para novos canais sem redesenho; neutralidade e desacoplamento                                                                                                                                                                                                                                                                              |
+| **Consequências** | (1) VeloraLog perde features administrativas e torna-se Canal Digital puro; (2) Novos canais conectáveis sem alterar a Plataforma; (3) Limitações do Skip Cloud documentadas como restrições temporárias; (4) Futura separação física de projetos ativável sem redesenho de arquitetura; (5) Canal Digital adicionado aos Shared Platform Services                                                                                                                                                 |
+| **Aprovador**     | Architecture Council                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+
 ---
 
 ## 14. Resumo das Decisões Arquiteturais
@@ -707,6 +826,7 @@ Ecossistema de plugins e extensões desenvolvidos por terceiros, distribuídos v
 | BOM versionada e imutável                        | ADR-017 | Single Source of Truth                          |
 | Quality Inspection como decisor de lote          | ADR-018 | Single Source of Truth                          |
 | COMEX como evolução futura                       | ADR-019 | Neutralidade dos Módulos                        |
+| Arquitetura de Canais Digitais da Plataforma     | ADR-020 | Estratégia Evolutiva da Plataforma              |
 
 ---
 

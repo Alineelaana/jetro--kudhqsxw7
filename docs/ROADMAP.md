@@ -256,7 +256,35 @@ Multi-tenancy (P0)
 
 ---
 
-## 6. Gestão deste Documento
+## 6. Restrições Temporárias de Implementação (ADR-020)
+
+> As limitações abaixo são **restrições temporárias de infraestrutura**, não limitações de arquitetura. A Arquitetura Conceitual (multi-canais, separação física, domínios próprios) permanece válida e será ativada quando a infraestrutura suportar. (PLATFORM_PRINCIPLES §4.9)
+
+### 6.1 Limitações Atuais do Skip Cloud
+
+| #   | Limitação                                                      | Impacto                                         | Classificação        |
+| --- | -------------------------------------------------------------- | ----------------------------------------------- | -------------------- |
+| 1   | Backend URL contém `internal` (`*.shrd00.internal.goskip.dev`) | Acessibilidade externa não confirmada           | Restrição temporária |
+| 2   | Sem controle manual de CORS                                    | Configuração de cross-origin limitada           | Restrição temporária |
+| 3   | Sem rate limiting nativo                                       | Exige implementação via hooks customizados      | Restrição temporária |
+| 4   | Domínio customizado exige plano premium                        | VeloraLog opera em subdomínio do Skip           | Restrição temporária |
+| 5   | Sem instância dedicada por projeto                             | Isolamento físico não disponível no plano atual | Restrição temporária |
+| 6   | Deployment restrito ao Skip Cloud                              | Não é possível deployar em outro provedor       | Restrição temporária |
+
+### 6.2 Evolução de Infraestrutura Futura
+
+A futura **separação física de projetos** (um projeto por Canal Digital) é uma **evolução de infraestrutura**, não de arquitetura. Quando a infraestrutura suportar:
+
+1. Cada Canal Digital recebe seu próprio projeto/deploy.
+2. A Plataforma opera em projeto dedicado (ou instância dedicada para Enterprise).
+3. Canais consomem a Plataforma via APIs seguras, exatamente como previsto na arquitetura conceitual.
+4. **Nenhum redesenho de arquitetura é necessário** — apenas a ativação da separação já prevista no ADR-020.
+
+> **Regra:** A infraestrutura evolui para acompanhar a arquitetura. A arquitetura nunca é limitada pela infraestrutura.
+
+---
+
+## 7. Gestão deste Documento
 
 - **Tipo:** Documento vivo
 - **Frequência de revisão:** Trimestral ou a cada release
