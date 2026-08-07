@@ -53,3 +53,10 @@ export function canExportSA(role: string | undefined): boolean {
   if (!role) return false
   return SA_VIEW_ROLES.includes(role)
 }
+export function canAdminSA(role: string | undefined): boolean {
+  if (!role) return false
+  return SA_ADMIN_ROLES.includes(role)
+}
+export function canConfigureSA(role: string | undefined): boolean {
+  return role === 'SUP'
+}
