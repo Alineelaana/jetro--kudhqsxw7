@@ -13,7 +13,10 @@ onServe((e) => {
       var res = $http.send({
         url: baseUrl + '/backend/v1/industrial/intelligence/detect',
         method: 'POST',
-        headers: { Authorization: token, 'Content-Type': 'application/json' },
+        headers: {
+          'X-Internal-Secret': token,
+          'Content-Type': 'application/json',
+        },
         body: '{}',
         timeout: 120,
       })
@@ -21,7 +24,19 @@ onServe((e) => {
       if (res.statusCode === 200) {
         $app.logger().info('intelligence auto-detect completed')
       } else {
-        $app.logger().error('intelligence auto-detect failed', 'status', res.statusCode)
+        var errBody = ''
+        try {
+          errBody = String(res.body || '')
+        } catch (_) {}
+        $app
+          .logger()
+          .error(
+            'intelligence auto-detect failed',
+            'status',
+            res.statusCode,
+            'body',
+            errBody.substring(0, 200),
+          )
       }
     } catch (err) {
       $app.logger().error('intelligence cron error', 'error', String(err))
