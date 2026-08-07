@@ -208,13 +208,108 @@ export async function getStockIntelligence(filters: BIFilters = {}): Promise<Gen
           { key: 'stock', label: 'Estoque' },
           { key: 'min_stock', label: 'Mínimo' },
         ],
-        rows: lowStock
-          .slice(0, 10)
-          .map((p) => ({
-            name: p.name || '—',
-            stock: String(p.stock ?? 0),
-            min_stock: String(p.min_stock ?? 0),
-          })),
+        rows: lowStock.slice(0, 10).map((p) => ({
+          name: p.name || '—',
+          stock: String(p.stock ?? 0),
+          min_stock: String(p.min_stock ?? 0),
+        })),
+      },
+    ],
+  }
+}
+
+export async function getLogisticsIntelligence(
+  filters: BIFilters = {},
+): Promise<GenericCenterData> {
+  const [deliveries, vehicles, expeditions, occurrences] = await Promise.all([
+    safeList('logistics_deliveries'),
+    safeList('logistics_vehicles'),
+    safeList('stock_expeditions'),
+    safeList('logistics_occurrences'),
+  ])
+  const fd = applyFilters(deliveries, filters)
+  const fv = applyFilters(vehicles, filters)
+  const fe = applyFilters(expeditions, filters)
+  const fo = applyFilters(occurrences, filters)
+  const delivered = fd.filter((d) =>
+    ['Entregue', 'Concluída', 'Concluido'].includes(d.status as string),
+  )
+  const inTransit = fd.filter((d) =>
+    ['Em Trânsito', 'Em Transito', 'Rota'].includes(d.status as string),
+  )
+  const late = fd.filter(
+    (d) =>
+      d.delivery_date &&
+      new Date(d.delivery_date as string) < new Date() &&
+      !['Entregue', 'Concluída', 'Concluido', 'Cancelada'].includes(d.status as string),
+  )
+  const onTime = fd
+    .filter((d) => ['Entregue', 'Concluída', 'Concluido'].includes(d.status as string))
+    .filter((d) => {
+      if (!d.delivery_date || !d.estimated_date) return true
+      return new Date(d.delivery_date as string) <= new Date(d.estimated_date as string)
+    })
+  const availableVehicles = fv.filter((v) =>
+    ['Disponível', 'Disponivel', 'Ativo'].includes(v.situacao as string),
+  )
+  const maintenanceVehicles = fv.filter((v) =>
+    ['Em Manutenção', 'Em Manutencao'].includes(v.situacao as string),
+  )
+  const openOccurrences = fo.filter(
+    (o) => !['Resolvida', 'Fechada', 'Concluída'].includes(o.status as string),
+  )
+  return {
+    stats: [
+      { label: 'Total de Entregas', value: String(fd.length), color: 'text-blue-600' },
+      { label: 'Entregues', value: String(delivered.length), color: 'text-emerald-600' },
+      { label: 'Em Trânsito', value: String(inTransit.length), color: 'text-cyan-600' },
+      { label: 'Atrasadas', value: String(late.length), color: 'text-red-600' },
+      {
+        label: 'OTIF',
+        value:
+          delivered.length > 0 ? `${((onTime.length / delivered.length) * 100).toFixed(1)}%` : '0%',
+        color: 'text-[#005B2E]',
+      },
+      {
+        label: 'Veículos Disponíveis',
+        value: String(availableVehicles.length),
+        color: 'text-purple-600',
+      },
+      {
+        label: 'Veículos em Manutenção',
+        value: String(maintenanceVehicles.length),
+        color: 'text-amber-600',
+      },
+      {
+        label: 'Ocorrências em Aberto',
+        value: String(openOccurrences.length),
+        color: 'text-red-600',
+      },
+    ],
+    tables: [
+      {
+        title: 'Entregas por Status',
+        columns: [
+          { key: 'status', label: 'Status' },
+          { key: 'count', label: 'Quantidade' },
+        ],
+        rows: groupCount(fd, 'status'),
+      },
+      {
+        title: 'Veículos por Situação',
+        columns: [
+          { key: 'situacao', label: 'Situação' },
+          { key: 'count', label: 'Quantidade' },
+        ],
+        rows: groupCount(fv, 'situacao'),
+      },
+      {
+        title: 'Expedições por Status',
+        columns: [
+          { key: 'status', label: 'Status' },
+          { key: 'count', label: 'Quantidade' },
+        ],
+        rows: groupCount(fe, 'status'),
       },
     ],
   }

@@ -153,13 +153,11 @@ export async function getCommercialIntelligence(
     conversao: sales.conversionRate,
     comparativoMesAnterior:
       projecao > 0 ? ((projecao - sales.revenue) / Math.max(sales.revenue, 1)) * 100 : 0,
-    breakdownRca: topVendedores
-      .slice(0, 5)
-      .map((v) => ({
-        name: v.name,
-        value: v.value,
-        projecao: (v.value / Math.max(dayOfMonth, 1)) * daysInMonth,
-      })),
+    breakdownRca: topVendedores.slice(0, 5).map((v) => ({
+      name: v.name,
+      value: v.value,
+      projecao: (v.value / Math.max(dayOfMonth, 1)) * daysInMonth,
+    })),
     breakdownProduto: produtosRentaveis.map((p) => ({
       name: p.name,
       value: p.value,
