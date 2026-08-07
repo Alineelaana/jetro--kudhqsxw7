@@ -13,6 +13,7 @@ export function FinancialLayout({ children, title }: { children: ReactNode; titl
         <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
       </div>
     )
+  }
 
   if (!isAuthenticated) {
     return <AdminLogin />
