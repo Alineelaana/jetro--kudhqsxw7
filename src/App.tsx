@@ -80,6 +80,10 @@ import {
   NUMERATION_CONFIG,
 } from '@/lib/configuracoes-config'
 import Controladoria from './pages/Controladoria'
+import Atendimento from './pages/Atendimento'
+import DP from './pages/DP'
+import SST from './pages/SST'
+import Promotions from './pages/Promotions'
 
 const App = () => (
   <BrowserRouter>
@@ -784,6 +788,16 @@ const App = () => (
                         <Route
                           path="/admin/controladoria/configuracoes"
                           element={<Controladoria screen="configuracoes" />}
+                        />
+                        <Route
+                          path="/admin/atendimento"
+                          element={<Atendimento screen="dashboard" />}
+                        />
+                        <Route path="/admin/dp" element={<DP screen="dashboard" />} />
+                        <Route path="/admin/sst" element={<SST screen="dashboard" />} />
+                        <Route
+                          path="/admin/promocoes"
+                          element={<Promotions screen="dashboard" />}
                         />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />

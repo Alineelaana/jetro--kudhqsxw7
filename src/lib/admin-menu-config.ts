@@ -20,6 +20,10 @@ import {
   TrendingUp,
   Layers,
   ShieldCheck,
+  Headset,
+  UserCog,
+  HardHat,
+  Percent,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -66,6 +70,7 @@ export const ADMIN_MENU: MenuGroup[] = [
     items: [
       { label: 'Dashboard', icon: LayoutDashboard, route: '/admin' },
       { label: 'Notificações', icon: Bell, route: '/admin/notificacoes' },
+      { label: 'Atendimento', icon: Headset, route: '/admin/atendimento' },
     ],
   },
   {
@@ -92,6 +97,7 @@ export const ADMIN_MENU: MenuGroup[] = [
         perm: canViewPriceTables,
       },
       { label: 'CRM', icon: Users, route: '/admin/crm', perm: canViewCRM },
+      { label: 'Promoções', icon: Percent, route: '/admin/promocoes', perm: canViewSales },
     ],
   },
   {
@@ -138,6 +144,8 @@ export const ADMIN_MENU: MenuGroup[] = [
       { label: 'Fiscal', icon: FileCheck, route: '/admin/fiscal', perm: canViewFiscal },
       { label: 'Conformidade', icon: ShieldCheck, route: '/admin/conformidade' },
       { label: 'Recursos Humanos', icon: HeartPulse, route: '/admin/rh', perm: canViewRH },
+      { label: 'Departamento Pessoal', icon: UserCog, route: '/admin/dp', perm: canViewRH },
+      { label: 'SST', icon: HardHat, route: '/admin/sst', perm: canViewRH },
     ],
   },
   {

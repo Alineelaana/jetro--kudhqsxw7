@@ -14,6 +14,7 @@ function MenuLink({
   onToggleFavorite,
   isActive,
   isChildActive,
+  currentPathname,
 }: {
   entry: MenuEntry
   userRole: string | undefined
@@ -21,6 +22,7 @@ function MenuLink({
   onToggleFavorite: (key: string) => void
   isActive: boolean
   isChildActive: boolean
+  currentPathname: string
 }) {
   const Icon = entry.icon as ComponentType<{ className?: string }>
   const hasChildren = !!entry.children?.length
@@ -64,7 +66,7 @@ function MenuLink({
                 to={child.route}
                 className={cn(
                   'block px-2 py-1 rounded text-xs transition-colors',
-                  isActive && window.location.pathname === child.route
+                  currentPathname === child.route
                     ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
                     : 'text-gray-500 hover:text-[#005B2E] hover:bg-gray-50',
                 )}
@@ -124,6 +126,7 @@ export function AdminSidebar() {
                 onToggleFavorite={toggleFavorite}
                 isActive={pathname === item.route}
                 isChildActive={pathname.startsWith(item.route + '/') || pathname === item.route}
+                currentPathname={pathname}
               />
             ))}
           </div>
@@ -158,6 +161,7 @@ export function AdminSidebar() {
                         onToggleFavorite={toggleFavorite}
                         isActive={isActive}
                         isChildActive={isChildActive}
+                        currentPathname={pathname}
                       />
                     )
                   })}
