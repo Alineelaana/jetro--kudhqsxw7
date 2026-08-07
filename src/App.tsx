@@ -13,6 +13,7 @@ import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
 import AdminRegister from './pages/AdminRegister'
 import AdminPasswordRecovery from './pages/AdminPasswordRecovery'
+import CertificationDomain01 from './pages/CertificationDomain01'
 import ClientLogin from './pages/ClientLogin'
 import ClientRegister from './pages/ClientRegister'
 import PasswordRecovery from './pages/PasswordRecovery'
@@ -80,6 +81,10 @@ const App = () => (
                     <Route element={<Layout />}>
                       <Route path="/" element={<Index />} />
                       <Route path="/admin" element={<Admin />} />
+                      <Route
+                        path="/admin/certificacao/dominio-01"
+                        element={<CertificationDomain01 />}
+                      />
                       <Route path="/admin/produtos" element={<Products />} />
                       <Route path="/admin/cadastros" element={<Cadastros />} />
                       <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
