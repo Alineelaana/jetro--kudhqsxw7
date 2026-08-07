@@ -59,6 +59,7 @@ import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
+import VariableRemuneration from './pages/VariableRemuneration'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { CapacityPanel } from '@/components/industry/capacity-panel'
@@ -577,6 +578,46 @@ const App = () => (
                         <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
                         <Route path="/admin/cadastro" element={<AdminRegister />} />
                         <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
+                        <Route
+                          path="/admin/remuneracao"
+                          element={<VariableRemuneration screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/regras"
+                          element={<VariableRemuneration screen="rules" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/apuracao"
+                          element={<VariableRemuneration screen="apuration" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/simulador"
+                          element={<VariableRemuneration screen="simulator" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/aprovacoes"
+                          element={<VariableRemuneration screen="approvals" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/historico"
+                          element={<VariableRemuneration screen="history" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/contestacoes"
+                          element={<VariableRemuneration screen="contests" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/campanhas"
+                          element={<VariableRemuneration screen="campaigns" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/ranking"
+                          element={<VariableRemuneration screen="ranking" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/metas"
+                          element={<VariableRemuneration screen="goals" />}
+                        />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />

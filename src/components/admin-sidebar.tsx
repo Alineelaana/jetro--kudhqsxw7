@@ -30,6 +30,7 @@ import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewRH } from '@/lib/rh-permissions'
 import { canViewAiModule } from '@/lib/ai-permissions'
 import { canViewIndustry } from '@/lib/industrial-permissions'
+import { canViewVR } from '@/lib/variable-remuneration-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -62,6 +63,7 @@ import {
   UserCog,
   Brain,
   Factory,
+  Coins,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -346,6 +348,17 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Gestão de Pessoas',
     items: [{ label: 'RH', icon: UserCog, submenu: RH_SUBMENU, permission: canViewRH }],
+  },
+  {
+    title: 'Remuneração',
+    items: [
+      {
+        to: '/admin/remuneracao',
+        label: 'Remuneração Variável',
+        icon: Coins,
+        permission: canViewVR,
+      },
+    ],
   },
   {
     title: 'Inteligência',
