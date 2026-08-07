@@ -23,93 +23,89 @@ migrate(
       ]
     }
 
-    app.save(
-      new Collection(
-        Object.assign(
-          {
-            name: 'supplier_allowance_agreements',
-            type: 'base',
-            fields: [
-              {
-                name: 'supplier',
-                type: 'relation',
-                collectionId: partnersId,
-                maxSelect: 1,
-                required: true,
-              },
-              {
-                name: 'agreement_type',
-                type: 'select',
-                values: ['rebate', 'verba_mercado', 'coop', 'bonificacao', 'outros'],
-                maxSelect: 1,
-                required: true,
-              },
-              { name: 'value', type: 'text' },
-              { name: 'percent', type: 'text' },
-              { name: 'currency', type: 'text' },
-              { name: 'start_date', type: 'text' },
-              { name: 'end_date', type: 'text' },
-              {
-                name: 'status',
-                type: 'select',
-                values: ['rascunho', 'ativo', 'pausado', 'encerrado', 'cancelado'],
-                maxSelect: 1,
-              },
-              { name: 'workflow_state', type: 'text' },
-              { name: 'company', type: 'text' },
-              { name: 'branch', type: 'text' },
-              { name: 'responsible_user', type: 'text' },
-              { name: 'approval_data', type: 'json' },
-              { name: 'history', type: 'json' },
-              { name: 'observations', type: 'text' },
-            ].concat(ad()),
-            indexes: [
-              'CREATE INDEX idx_saa_supplier ON supplier_allowance_agreements (supplier)',
-              'CREATE INDEX idx_saa_status ON supplier_allowance_agreements (status)',
-              'CREATE INDEX idx_saa_type ON supplier_allowance_agreements (agreement_type)',
-            ],
-          },
-          authRules(),
-        ),
+    var agreementsCol = new Collection(
+      Object.assign(
+        {
+          name: 'supplier_allowance_agreements',
+          type: 'base',
+          fields: [
+            {
+              name: 'supplier',
+              type: 'relation',
+              collectionId: partnersId,
+              maxSelect: 1,
+              required: true,
+            },
+            {
+              name: 'agreement_type',
+              type: 'select',
+              values: ['rebate', 'verba_mercado', 'coop', 'bonificacao', 'outros'],
+              maxSelect: 1,
+              required: true,
+            },
+            { name: 'value', type: 'text' },
+            { name: 'percent', type: 'text' },
+            { name: 'currency', type: 'text' },
+            { name: 'start_date', type: 'text' },
+            { name: 'end_date', type: 'text' },
+            {
+              name: 'status',
+              type: 'select',
+              values: ['rascunho', 'ativo', 'pausado', 'encerrado', 'cancelado'],
+              maxSelect: 1,
+            },
+            { name: 'workflow_state', type: 'text' },
+            { name: 'company', type: 'text' },
+            { name: 'branch', type: 'text' },
+            { name: 'responsible_user', type: 'text' },
+            { name: 'approval_data', type: 'json' },
+            { name: 'history', type: 'json' },
+            { name: 'observations', type: 'text' },
+          ].concat(ad()),
+          indexes: [
+            'CREATE INDEX idx_saa_supplier ON supplier_allowance_agreements (supplier)',
+            'CREATE INDEX idx_saa_status ON supplier_allowance_agreements (status)',
+            'CREATE INDEX idx_saa_type ON supplier_allowance_agreements (agreement_type)',
+          ],
+        },
+        authRules(),
       ),
     )
+    app.save(agreementsCol)
+    var agreementsId = agreementsCol.id
 
-    var agreementsId = app.findCollectionByNameOrId('supplier_allowance_agreements').id
-
-    app.save(
-      new Collection(
-        Object.assign(
-          {
-            name: 'supplier_allowance_accounts',
-            type: 'base',
-            fields: [
-              {
-                name: 'supplier',
-                type: 'relation',
-                collectionId: partnersId,
-                maxSelect: 1,
-                required: true,
-              },
-              { name: 'agreement', type: 'relation', collectionId: agreementsId, maxSelect: 1 },
-              { name: 'opening_balance', type: 'text' },
-              { name: 'current_balance', type: 'text' },
-              { name: 'accrued_total', type: 'text' },
-              { name: 'settled_total', type: 'text' },
-              { name: 'consumed_total', type: 'text' },
-              { name: 'company', type: 'text' },
-              { name: 'branch', type: 'text' },
-            ].concat(ad()),
-            indexes: [
-              'CREATE INDEX idx_sac_supplier ON supplier_allowance_accounts (supplier)',
-              'CREATE INDEX idx_sac_agreement ON supplier_allowance_accounts (agreement)',
-            ],
-          },
-          authRules(),
-        ),
+    var accountsCol = new Collection(
+      Object.assign(
+        {
+          name: 'supplier_allowance_accounts',
+          type: 'base',
+          fields: [
+            {
+              name: 'supplier',
+              type: 'relation',
+              collectionId: partnersId,
+              maxSelect: 1,
+              required: true,
+            },
+            { name: 'agreement', type: 'relation', collectionId: agreementsId, maxSelect: 1 },
+            { name: 'opening_balance', type: 'text' },
+            { name: 'current_balance', type: 'text' },
+            { name: 'accrued_total', type: 'text' },
+            { name: 'settled_total', type: 'text' },
+            { name: 'consumed_total', type: 'text' },
+            { name: 'company', type: 'text' },
+            { name: 'branch', type: 'text' },
+          ].concat(ad()),
+          indexes: [
+            'CREATE INDEX idx_sac_supplier ON supplier_allowance_accounts (supplier)',
+            'CREATE INDEX idx_sac_agreement ON supplier_allowance_accounts (agreement)',
+          ],
+        },
+        authRules(),
       ),
     )
-
-    var accountsId = app.findCollectionByNameOrId('supplier_allowance_accounts').id
+    app.save(accountsCol)
+    var accountsId = accountsCol.id
 
     app.save(
       new Collection(
@@ -166,51 +162,49 @@ migrate(
       ),
     )
 
-    app.save(
-      new Collection(
-        Object.assign(
-          {
-            name: 'supplier_allowance_accruals',
-            type: 'base',
-            fields: [
-              {
-                name: 'account',
-                type: 'relation',
-                collectionId: accountsId,
-                maxSelect: 1,
-                required: true,
-              },
-              { name: 'agreement', type: 'relation', collectionId: agreementsId, maxSelect: 1 },
-              { name: 'supplier', type: 'relation', collectionId: partnersId, maxSelect: 1 },
-              { name: 'competence_period', type: 'text', required: true },
-              { name: 'volume', type: 'text' },
-              { name: 'mix', type: 'text' },
-              { name: 'margin', type: 'text' },
-              { name: 'earned_value', type: 'text' },
-              { name: 'calculation_breakdown', type: 'json' },
-              {
-                name: 'status',
-                type: 'select',
-                values: ['rascunho', 'pendente', 'aprovado', 'rejeitado', 'liquidado'],
-                maxSelect: 1,
-              },
-              { name: 'approved_by', type: 'text' },
-              { name: 'approved_at', type: 'text' },
-              { name: 'history', type: 'json' },
-            ].concat(ad()),
-            indexes: [
-              'CREATE INDEX idx_saar_account ON supplier_allowance_accruals (account)',
-              'CREATE INDEX idx_saar_agreement ON supplier_allowance_accruals (agreement)',
-              'CREATE INDEX idx_saar_period ON supplier_allowance_accruals (competence_period)',
-              'CREATE INDEX idx_saar_status ON supplier_allowance_accruals (status)',
-            ],
-          },
-          authRules(),
-        ),
+    var accrualsCol = new Collection(
+      Object.assign(
+        {
+          name: 'supplier_allowance_accruals',
+          type: 'base',
+          fields: [
+            {
+              name: 'account',
+              type: 'relation',
+              collectionId: accountsId,
+              maxSelect: 1,
+              required: true,
+            },
+            { name: 'agreement', type: 'relation', collectionId: agreementsId, maxSelect: 1 },
+            { name: 'supplier', type: 'relation', collectionId: partnersId, maxSelect: 1 },
+            { name: 'competence_period', type: 'text', required: true },
+            { name: 'volume', type: 'text' },
+            { name: 'mix', type: 'text' },
+            { name: 'margin', type: 'text' },
+            { name: 'earned_value', type: 'text' },
+            { name: 'calculation_breakdown', type: 'json' },
+            {
+              name: 'status',
+              type: 'select',
+              values: ['rascunho', 'pendente', 'aprovado', 'rejeitado', 'liquidado'],
+              maxSelect: 1,
+            },
+            { name: 'approved_by', type: 'text' },
+            { name: 'approved_at', type: 'text' },
+            { name: 'history', type: 'json' },
+          ].concat(ad()),
+          indexes: [
+            'CREATE INDEX idx_saar_account ON supplier_allowance_accruals (account)',
+            'CREATE INDEX idx_saar_agreement ON supplier_allowance_accruals (agreement)',
+            'CREATE INDEX idx_saar_period ON supplier_allowance_accruals (competence_period)',
+            'CREATE INDEX idx_saar_status ON supplier_allowance_accruals (status)',
+          ],
+        },
+        authRules(),
       ),
     )
-
-    var accrualsId = app.findCollectionByNameOrId('supplier_allowance_accruals').id
+    app.save(accrualsCol)
+    var accrualsId = accrualsCol.id
 
     app.save(
       new Collection(
