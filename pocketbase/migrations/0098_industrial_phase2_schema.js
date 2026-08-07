@@ -14,26 +14,25 @@ migrate(
         }),
       )
     }
-    var poStatus = poCol.fields.getByName('status')
-    if (poStatus) poCol.fields.remove(poStatus)
-    poCol.fields.add(
-      new SelectField({
-        name: 'status',
-        values: [
-          'rascunho',
-          'planejada',
-          'liberada',
-          'em_producao',
-          'parcial',
-          'inspecao',
-          'concluida',
-          'fechada',
-          'cancelada',
-        ],
-        maxSelect: 1,
-        required: true,
-      }),
-    )
+    if (!poCol.fields.getByName('status'))
+      poCol.fields.add(
+        new SelectField({
+          name: 'status',
+          values: [
+            'rascunho',
+            'planejada',
+            'liberada',
+            'em_producao',
+            'parcial',
+            'inspecao',
+            'concluida',
+            'fechada',
+            'cancelada',
+          ],
+          maxSelect: 1,
+          required: true,
+        }),
+      )
     if (!poCol.fields.getByName('released_by'))
       poCol.fields.add(new TextField({ name: 'released_by' }))
     if (!poCol.fields.getByName('released_at'))
@@ -51,28 +50,27 @@ migrate(
     app.save(poCol)
 
     var apCol = app.findCollectionByNameOrId('industrial_apontamentos')
-    var apType = apCol.fields.getByName('type')
-    if (apType) apCol.fields.remove(apType)
-    apCol.fields.add(
-      new SelectField({
-        name: 'type',
-        values: [
-          'inicio',
-          'pausa',
-          'retomada',
-          'producao',
-          'fim',
-          'consumo',
-          'parada',
-          'manutencao',
-          'refugo',
-          'perda',
-          'qualidade',
-          'rework',
-        ],
-        maxSelect: 1,
-      }),
-    )
+    if (!apCol.fields.getByName('type'))
+      apCol.fields.add(
+        new SelectField({
+          name: 'type',
+          values: [
+            'inicio',
+            'pausa',
+            'retomada',
+            'producao',
+            'fim',
+            'consumo',
+            'parada',
+            'manutencao',
+            'refugo',
+            'perda',
+            'qualidade',
+            'rework',
+          ],
+          maxSelect: 1,
+        }),
+      )
     if (!apCol.fields.getByName('team_name')) apCol.fields.add(new TextField({ name: 'team_name' }))
     if (!apCol.fields.getByName('stoppage_reason'))
       apCol.fields.add(new TextField({ name: 'stoppage_reason' }))
