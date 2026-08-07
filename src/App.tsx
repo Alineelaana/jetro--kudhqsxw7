@@ -59,6 +59,7 @@ import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
+import PlatformLayer from './pages/PlatformLayer'
 import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
 import { IndustryLayout } from '@/components/industry/industry-layout'
@@ -581,6 +582,7 @@ const App = () => (
                           element={<Industry screen="executivo" />}
                         />
                         <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
+                        <Route path="/admin/platform-layer" element={<PlatformLayer />} />
                         <Route path="/admin/cadastro" element={<AdminRegister />} />
                         <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                         <Route

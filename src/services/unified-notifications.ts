@@ -63,9 +63,11 @@ export async function getUnifiedNotifications(): Promise<UnifiedNotification[]> 
   }
 
   for (const n of notifications as Notification[]) {
+    const notifType: 'approval' | 'expiration' | 'system' =
+      n.type === 'approval_pending' ? 'approval' : 'system'
     items.push({
       id: `system-${n.id}`,
-      type: 'system',
+      type: notifType,
       title: n.title,
       message: n.message || '',
       link: n.link || undefined,
