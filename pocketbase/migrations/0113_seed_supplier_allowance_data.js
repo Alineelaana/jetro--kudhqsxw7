@@ -1,6 +1,6 @@
 migrate(
   (app) => {
-    var supplier = null
+    let supplier = null
     try {
       supplier = app.findFirstRecordByData(
         'partners',
@@ -9,7 +9,7 @@ migrate(
       )
     } catch (_) {}
     if (!supplier) {
-      var partnersCol = app.findCollectionByNameOrId('partners')
+      const partnersCol = app.findCollectionByNameOrId('partners')
       supplier = new Record(partnersCol)
       supplier.set('full_name', 'Gran Romano Indústria de Alimentos')
       supplier.set('company_name', 'Gran Romano Indústria de Alimentos LTDA')
@@ -22,8 +22,9 @@ migrate(
       app.save(supplier)
     }
 
-    var agCol = app.findCollectionByNameOrId('supplier_allowance_agreements')
-    var ag1 = null
+    const agCol = app.findCollectionByNameOrId('supplier_allowance_agreements')
+
+    let ag1 = null
     try {
       ag1 = app.findFirstRecordByFilter(
         'supplier_allowance_agreements',
@@ -44,13 +45,13 @@ migrate(
       ag1.set('company', 'Velora Log')
       ag1.set('branch', 'Matriz')
       ag1.set('responsible_user', 'Admin')
-      ag1.set('approval_data', JSON.stringify({}))
-      ag1.set('history', JSON.stringify([]))
+      ag1.set('approval_data', {})
+      ag1.set('history', [])
       ag1.set('observations', 'Acordo de rebate sobre volume de compras')
       app.save(ag1)
     }
 
-    var ag2 = null
+    let ag2 = null
     try {
       ag2 = app.findFirstRecordByFilter(
         'supplier_allowance_agreements',
@@ -71,14 +72,14 @@ migrate(
       ag2.set('company', 'Velora Log')
       ag2.set('branch', 'Matriz')
       ag2.set('responsible_user', 'Admin')
-      ag2.set('approval_data', JSON.stringify({}))
-      ag2.set('history', JSON.stringify([]))
+      ag2.set('approval_data', {})
+      ag2.set('history', [])
       ag2.set('observations', 'Verba de cooperação marketing')
       app.save(ag2)
     }
 
-    var accCol = app.findCollectionByNameOrId('supplier_allowance_accounts')
-    var acc1 = null
+    const accCol = app.findCollectionByNameOrId('supplier_allowance_accounts')
+    let acc1 = null
     try {
       acc1 = app.findFirstRecordByFilter(
         'supplier_allowance_accounts',
@@ -99,14 +100,14 @@ migrate(
       app.save(acc1)
     }
 
-    var movCol = app.findCollectionByNameOrId('supplier_allowance_movements')
+    const movCol = app.findCollectionByNameOrId('supplier_allowance_movements')
     try {
       app.findFirstRecordByFilter(
         'supplier_allowance_movements',
         'account = "' + acc1.id + '" && movement_type = "apuracao"',
       )
     } catch (_) {
-      var mov = new Record(movCol)
+      const mov = new Record(movCol)
       mov.set('account', acc1.id)
       mov.set('agreement', ag1.id)
       mov.set('movement_type', 'apuracao')
@@ -129,7 +130,7 @@ migrate(
         'account = "' + acc1.id + '" && movement_type = "consumo"',
       )
     } catch (_) {
-      var mov2 = new Record(movCol)
+      const mov2 = new Record(movCol)
       mov2.set('account', acc1.id)
       mov2.set('agreement', ag1.id)
       mov2.set('movement_type', 'consumo')
@@ -146,11 +147,11 @@ migrate(
       app.save(mov2)
     }
 
-    var acrCol = app.findCollectionByNameOrId('supplier_allowance_accruals')
+    const acrCol = app.findCollectionByNameOrId('supplier_allowance_accruals')
     try {
       app.findFirstRecordByFilter('supplier_allowance_accruals', 'account = "' + acc1.id + '"')
     } catch (_) {
-      var acr = new Record(acrCol)
+      const acr = new Record(acrCol)
       acr.set('account', acc1.id)
       acr.set('agreement', ag1.id)
       acr.set('supplier', supplier.id)
@@ -159,18 +160,15 @@ migrate(
       acr.set('mix', '5')
       acr.set('margin', '22')
       acr.set('earned_value', '1000')
-      acr.set(
-        'calculation_breakdown',
-        JSON.stringify({ base: '50000', rate: '2%', result: '1000' }),
-      )
+      acr.set('calculation_breakdown', { base: '50000', rate: '2%', result: '1000' })
       acr.set('status', 'aprovado')
       acr.set('approved_by', 'Admin')
       acr.set('approved_at', new Date().toISOString())
-      acr.set('history', JSON.stringify([]))
+      acr.set('history', [])
       app.save(acr)
     }
 
-    var agentTools = [
+    const agentTools = [
       { collection: 'partners', perms: { list: true, read: true }, actAs: 'admin' },
       {
         collection: 'supplier_allowance_agreements',
@@ -251,16 +249,16 @@ migrate(
     try {
       $ai.agents.delete(app, 'adapta-verbas-fornecedores')
     } catch (_) {}
-    var cols = [
+    const cols = [
       'supplier_allowance_accruals',
       'supplier_allowance_movements',
       'supplier_allowance_accounts',
       'supplier_allowance_agreements',
     ]
-    for (var i = 0; i < cols.length; i++) {
+    for (let i = 0; i < cols.length; i++) {
       try {
-        var recs = app.findRecordsByFilter(cols[i], "id != ''", '-created', 100, 0)
-        for (var j = 0; j < recs.length; j++) {
+        const recs = app.findRecordsByFilter(cols[i], "id != ''", '-created', 100, 0)
+        for (let j = 0; j < recs.length; j++) {
           try {
             app.delete(recs[j])
           } catch (_) {}
