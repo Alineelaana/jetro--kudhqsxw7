@@ -21,6 +21,8 @@ import {
   Wrench,
   ShieldCheck,
   GitBranch,
+  ListOrdered,
+  Crown,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -45,6 +47,8 @@ const NAV_ITEMS = [
   { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)', icon: BarChart3 },
   { to: '/admin/industria/manutencao', label: 'Manutenção', icon: Wrench },
   { to: '/admin/industria/engenharia', label: 'Engenharia (ECR/ECO)', icon: ShieldCheck },
+  { to: '/admin/industria/fases', label: 'Fases de Produção', icon: ListOrdered },
+  { to: '/admin/industria/executivo', label: 'Visão Executiva', icon: Crown },
 ]
 
 export function IndustryLayout({ children }: { children?: ReactNode }) {

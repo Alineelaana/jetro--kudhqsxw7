@@ -87,3 +87,28 @@ export function canCloseOrder(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO'].includes(role)
 }
+
+export function canManagePhases(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canManageDemand(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'COMERCIAL'].includes(role)
+}
+
+export function canViewExecutiveDashboard(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+}
+
+export function canPerformQualityCheck(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canFeedPhaseCosts(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO', 'PADRAO'].includes(role)
+}
