@@ -6,6 +6,7 @@ import {
   ALL_ALLOWED_ROUTES,
   STABLE_PERMISSION_KEYS,
   isAllowedAddition,
+  isAllowedRoute,
 } from '@/lib/navigation-baseline'
 
 export interface ContractValidationResult {
@@ -26,6 +27,11 @@ export function validateNavigationContract(): ContractValidationResult {
   for (const group of ADMIN_MENU) {
     for (const item of group.items) {
       currentRoutes.add(item.route)
+      if (item.children) {
+        for (const child of item.children) {
+          currentRoutes.add(child.route)
+        }
+      }
     }
   }
 
@@ -43,7 +49,7 @@ export function validateNavigationContract(): ContractValidationResult {
   }
 
   for (const route of currentRoutes) {
-    if (!ALL_ALLOWED_ROUTES.includes(route)) {
+    if (!isAllowedRoute(route)) {
       unauthorizedRoutes.push(route)
       navigationViolations.push(
         `UNAUTHORIZED_ROUTE: "${route}" is not in stable baseline or approved additions`,

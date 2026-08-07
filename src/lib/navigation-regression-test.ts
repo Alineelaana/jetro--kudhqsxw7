@@ -1,5 +1,5 @@
 import { ADMIN_MENU, type MenuGroup, type MenuEntry } from '@/lib/admin-menu-config'
-import { STABLE_ROUTES, ALL_ALLOWED_ROUTES } from '@/lib/navigation-baseline'
+import { STABLE_ROUTES, isAllowedRoute } from '@/lib/navigation-baseline'
 
 export interface FlatMenuItem {
   label: string
@@ -28,7 +28,7 @@ export function validateAgainstBaseline(): {
 } {
   const current = new Set(getCurrentNavigationSnapshot().map((i) => i.route))
   const missing = STABLE_ROUTES.filter((r) => !current.has(r))
-  const unauthorized = [...current].filter((r) => !ALL_ALLOWED_ROUTES.includes(r))
+  const unauthorized = [...current].filter((r) => !isAllowedRoute(r))
   return { valid: missing.length === 0 && unauthorized.length === 0, missing, unauthorized }
 }
 

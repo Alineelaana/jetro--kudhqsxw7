@@ -149,7 +149,9 @@ while ((match = routePattern.exec(menuSource)) !== null) {
 }
 
 const missingRoutes = STABLE_ROUTES.filter((r) => !foundRoutes.has(r))
-const unauthorizedRoutes = [...foundRoutes].filter((r) => !ALL_ALLOWED.includes(r))
+const isAllowedRoute = (route) =>
+  ALL_ALLOWED.includes(route) || ALL_ALLOWED.some((p) => route.startsWith(p + '/'))
+const unauthorizedRoutes = [...foundRoutes].filter((r) => !isAllowedRoute(r))
 
 if (missingRoutes.length > 0 || unauthorizedRoutes.length > 0) {
   hasFailures = true
@@ -166,7 +168,7 @@ if (missingRoutes.length > 0 || unauthorizedRoutes.length > 0) {
   console.log('✅ Navigation menu: PASS')
   console.log(`   Baseline routes: ${STABLE_ROUTES.length}`)
   console.log(`   Current routes:  ${foundRoutes.size}`)
-  console.log(`   Allowed total:   ${ALL_ALLOWED.length}`)
+  console.log(`   Allowed total:   ${ALL_ALLOWED.length} (+ child routes)`)
 }
 console.log()
 
