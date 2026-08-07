@@ -55,6 +55,7 @@ import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
 import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
+import Industry from './pages/Industry'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -456,6 +457,36 @@ const App = () => (
                       <Route
                         path="/admin/ia/configuracoes"
                         element={<AIModule screen="settings" />}
+                      />
+                      <Route path="/admin/industria" element={<Industry screen="dashboard" />} />
+                      <Route
+                        path="/admin/industria/catalogo"
+                        element={<Industry screen="catalogo" />}
+                      />
+                      <Route
+                        path="/admin/industria/especificacoes"
+                        element={<Industry screen="especificacoes" />}
+                      />
+                      <Route
+                        path="/admin/industria/conversoes"
+                        element={<Industry screen="conversoes" />}
+                      />
+                      <Route path="/admin/industria/bom" element={<Industry screen="bom" />} />
+                      <Route
+                        path="/admin/industria/formulacoes"
+                        element={<Industry screen="formulacoes" />}
+                      />
+                      <Route
+                        path="/admin/industria/recursos"
+                        element={<Industry screen="recursos" />}
+                      />
+                      <Route
+                        path="/admin/industria/roteiros"
+                        element={<Industry screen="roteiros" />}
+                      />
+                      <Route
+                        path="/admin/industria/custos"
+                        element={<Industry screen="custos" />}
                       />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />

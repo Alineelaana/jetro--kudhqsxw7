@@ -797,6 +797,36 @@ Ecossistema de plugins e extensões desenvolvidos por terceiros, distribuídos v
 | **Consequências** | Estruturas centrais preparadas para multi-contexto; COMEX futuro                                                                                                                                       |
 | **Aprovador**     | Architecture Council                                                                                                                                                                                   |
 
+### ADR-021: Engenharia & Produtos — Fase 0 do Módulo Indústria
+
+| Campo             | Valor                                                                                                                                                                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Data**          | 2026-08-06                                                                                                                                                                                                                                            |
+| **Problema**      | Estabelecer a fundação estrutural do Módulo Indústria com Single Source of Truth para definição técnica de itens antes de MRP, PCP, Compras, Produção e Rastreabilidade                                                                               |
+| **Alternativas**  | (A) JSON ad-hoc em `products`; (B) Catálogo paralelo de itens industriais; (C) Extensão aditiva de `products` + estruturas versionadas dedicadas                                                                                                      |
+| **Decisão**       | (C) Item como entidade canônica central via `products` estendido; especificações, BOM, roteiros, conversões e custos em coleções dedicadas versionadas                                                                                                |
+| **Motivos**       | REAPROVEITAR (`products`), ESTENDER (adicionar `item_type`, `is_industrial`), Single Source of Truth, rastreabilidade histórica via versionamento imutável                                                                                            |
+| **Consequências** | (1) `products` estendido aditivamente; (2) Specs/BOM/Roteiros são versionados e imutáveis quando ativados; (3) Item ≠ Recurso Produtivo; (4) Especificação ≠ Inspeção; (5) Custo industrial → pricing → preço; (6) Conversões de unidade com vigência |
+| **Aprovador**     | Architecture Council                                                                                                                                                                                                                                  |
+
+**Pontos validados:**
+
+1. Engenharia & Produtos como subdomínio do Módulo Indústria
+2. Catálogo de Itens via `products` (estendido, não duplicado)
+3. Item como entidade canônica central
+4. Especificações técnicas configuráveis, versionadas, auditáveis e pesquisáveis
+5. Classificação neutra inicial ("Não Classificado")
+6. Item separado de Recurso Produtivo (`production_resources`)
+7. BOM → Versão → Componentes (imutável quando ativada)
+8. Formulação como especialização controlada da BOM (`type = "estrutura" | "formulacao"`)
+9. Roteiros de produção versionados desde o MVP
+10. Conversões de unidade globais e por Item com vigência
+11. Custos industriais: Custo Padrão (snapshot imutável) × Custo Realizado
+12. Especificação (Engineering/Item) × Inspeção (Shared Quality Service) separados
+13. Rastreabilidade histórica completa sem depender do estado atual dos registros
+
+---
+
 ### ADR-020: Arquitetura de Canais Digitais da Plataforma
 
 | Campo             | Valor                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |

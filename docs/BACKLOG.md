@@ -296,6 +296,27 @@
   3. Toda ação do módulo Indústria registrada na auditoria central
   4. Timeline cronológica por registro (pedido, importação, recebimento, inspeção, OP, lote)
 
+### BLK-MVP-025: Módulo Indústria — Fase 0: Engenharia & Produtos
+
+- **Prioridade:** P0
+- **PRD Ref:** §3.11
+- **Arch Ref:** ADR-021
+- **Descrição:** Estabelecimento da Single Source of Truth para a definição técnica de itens (Catálogo de Itens via `products` estendido), especificações técnicas configuráveis e versionadas, conversões de unidade (global e por Item com vigência), BOM/estruturas e formulações versionadas, recursos produtivos (separados do Item), roteiros e operações de produção versionados, integração com qualidade (Especificação × Inspeção), estrutura de custos industriais (padrão × realizado) e rastreabilidade histórica completa. Forma a fundação estrutural exigida antes de MRP, PCP, Compras/Importação, Estoque, Produção, Qualidade, Custos e Rastreabilidade.
+- **Critérios de Aceitação:**
+  1. `products` estendido com `item_type` (default "Não Classificado") e `is_industrial` (default false); sem `industrial_data` JSON; sem catálogo paralelo
+  2. `spec_groups`, `spec_attributes`, `spec_values` existem com versionamento, vigência, status e responsável
+  3. `unit_conversions` suporta conversões globais e por Item com vigência
+  4. `bom_versions` e `bom_components` existem; versões ativadas são imutáveis; componentes referenciam o Item canônico
+  5. Formulações implementadas como BOM com `type = "formulacao"`; campos de formulação explícitos e pesquisáveis
+  6. `production_resources` separado do Item; tipos: linha, máquina, equipamento, célula, estação, centro produtivo
+  7. `production_routes` e `production_route_operations` versionados desde o MVP
+  8. `quality_inspections` referenciam a versão da especificação em vigor; Especificação ≠ Inspeção
+  9. `industrial_costs` diferencia Custo Padrão (snapshot imutável) de Custo Realizado; análise de variâncias por componente
+  10. Rastreabilidade: cadeia especificação → BOM → roteiro → lote → inspeção → OP → consumo → lote acabado é reproduzível sem depender do estado atual dos registros
+  11. Seeds idempotentes para piloto Gran Romano (azeitona, salmoura, pote, tampa, rótulo, caixa, produto acabado, BOM completa, roteiro real)
+  12. Ordem de implementação: (1) Catálogo de Itens; (2) Especificações; (3) Conversões; (4) BOM; (5) Formulações; (6) Recursos Produtivos; (7) Roteiros; (8) Qualidade; (9) Custos; (10) Integração e Rastreabilidade
+- **Ordem de Implementação MVP Indústria:** Fase 0 (BLK-MVP-025) → Fase A: Suprimentos (BLK-MVP-018, BLK-MVP-019) → Fase B: Recebimento & Qualidade (BLK-MVP-020) → Fase C: Planejamento & Produção (BLK-MVP-021, BLK-MVP-022) → Fase D: Gestão (BLK-MVP-023, BLK-MVP-024)
+
 ### BLK-MVP-017: Sistema de Notificações
 
 - **Prioridade:** P1
@@ -722,6 +743,7 @@
 | BLK-MVP-022 | §3.11      | ADR-017          | MVP    | P0         |
 | BLK-MVP-023 | §3.11      | ADR-015          | MVP    | P0         |
 | BLK-MVP-024 | §3.11      | ADR-005          | MVP    | P1         |
+| BLK-MVP-025 | §3.11      | ADR-021          | MVP    | P0         |
 | BLK-V1-011  | §3.11      | ADR-015          | V1     | P1         |
 | BLK-V1-012  | §3.11      | ADR-014          | V1     | P1         |
 | BLK-V2-008  | §3.11      | ADR-011          | V2     | P2         |

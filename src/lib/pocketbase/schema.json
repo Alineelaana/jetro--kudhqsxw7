@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T23:32:17.856Z",
+  "generatedAt": "2026-08-07T00:08:00.011Z",
   "collections": [
     {
       "name": "users",
@@ -2321,6 +2321,27 @@
         {
           "name": "documents",
           "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "item_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "Não Classificado",
+            "Matéria-prima",
+            "Embalagem",
+            "Produto Acabado",
+            "Insumo",
+            "Componente",
+            "Subproduto"
+          ]
+        },
+        {
+          "name": "is_industrial",
+          "type": "bool",
           "required": false,
           "system": false
         }
@@ -4855,6 +4876,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "is_industrial",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
