@@ -32,6 +32,7 @@ import { canViewRH } from '@/lib/rh-permissions'
 import { canViewAiModule } from '@/lib/ai-permissions'
 import { canViewIndustry } from '@/lib/industrial-permissions'
 import { canViewVR } from '@/lib/variable-remuneration-permissions'
+import { canViewBI } from '@/lib/bi-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -65,6 +66,7 @@ import {
   Brain,
   Factory,
   Coins,
+  BarChart3,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -387,6 +389,25 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         label: 'Remuneração Variável',
         icon: Coins,
         permission: canViewVR,
+      },
+    ],
+  },
+  {
+    title: 'BI / Analytics',
+    items: [
+      {
+        label: 'BI / Analytics',
+        icon: BarChart3,
+        submenu: [
+          { to: '/admin/bi', label: 'Dashboard' },
+          { to: '/admin/bi/cross-module', label: 'Visão Cruzada' },
+          { to: '/admin/bi/sales', label: 'Analytics de Vendas' },
+          { to: '/admin/bi/stock', label: 'Analytics de Estoque' },
+          { to: '/admin/bi/financial', label: 'Analytics Financeiro' },
+          { to: '/admin/bi/industrial', label: 'Analytics Industrial' },
+          { to: '/admin/bi/saved-views', label: 'Relatórios Salvos' },
+        ],
+        permission: canViewBI,
       },
     ],
   },

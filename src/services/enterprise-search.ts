@@ -155,6 +155,14 @@ const ENTITIES: EntityConfig[] = [
     route: '/admin/notificacoes',
     filterFields: ['title', 'message'],
   },
+  {
+    collection: 'bi_reports',
+    type: 'Relatório BI',
+    labelFields: ['name'],
+    descFields: ['description', 'report_type'],
+    route: '/admin/bi/saved-views',
+    filterFields: ['name', 'description', 'report_type'],
+  },
 ]
 
 function esc(v: string): string {

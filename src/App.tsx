@@ -60,6 +60,7 @@ import AIModule from './pages/AIModule'
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
 import VariableRemuneration from './pages/VariableRemuneration'
+import BI from './pages/BI'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { CapacityPanel } from '@/components/industry/capacity-panel'
@@ -622,6 +623,16 @@ const App = () => (
                           path="/admin/remuneracao/metas"
                           element={<VariableRemuneration screen="goals" />}
                         />
+                        <Route path="/admin/bi" element={<BI screen="dashboard" />} />
+                        <Route
+                          path="/admin/bi/cross-module"
+                          element={<BI screen="cross-module" />}
+                        />
+                        <Route path="/admin/bi/sales" element={<BI screen="sales" />} />
+                        <Route path="/admin/bi/stock" element={<BI screen="stock" />} />
+                        <Route path="/admin/bi/financial" element={<BI screen="financial" />} />
+                        <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
+                        <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
