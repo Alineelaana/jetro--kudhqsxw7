@@ -56,7 +56,6 @@ import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
 import Industry from './pages/Industry'
-import Phase0Recovery from './pages/Phase0Recovery'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -460,7 +459,6 @@ const App = () => (
                         element={<AIModule screen="settings" />}
                       />
                       <Route path="/admin/industria" element={<Industry screen="dashboard" />} />
-                      <Route path="/admin/phase0" element={<Phase0Recovery />} />
                       <Route
                         path="/admin/industria/catalogo"
                         element={<Industry screen="catalogo" />}
