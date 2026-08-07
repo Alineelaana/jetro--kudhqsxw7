@@ -448,6 +448,10 @@ const App = () => (
                           element={<CRM screen="oportunidades" />}
                         />
                         <Route path="/admin/crm/funil" element={<CRM screen="funil" />} />
+                        <Route
+                          path="/admin/crm/funil-config"
+                          element={<CRM screen="funil-config" />}
+                        />
                         <Route path="/admin/crm/agenda" element={<CRM screen="agenda" />} />
                         <Route path="/admin/crm/propostas" element={<CRM screen="propostas" />} />
                         <Route path="/admin/crm/historico" element={<CRM screen="historico" />} />

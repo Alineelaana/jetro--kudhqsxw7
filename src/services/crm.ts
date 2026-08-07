@@ -361,3 +361,17 @@ export async function getCrmReportData() {
     funnelValue,
   }
 }
+
+export function logCRMAudit(action: string, module: string, targetId: string, summary: string) {
+  pb.send('/backend/v1/audit/create', {
+    method: 'POST',
+    body: JSON.stringify({
+      action,
+      module: `crm_${module}`,
+      target_collection: `crm_${module}`,
+      target_id: targetId,
+      target_summary: summary,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {})
+}

@@ -13,6 +13,7 @@ import {
   Cell,
 } from 'recharts'
 import { getCrmDashboardData } from '@/services/crm'
+import { CrmErpIntegrationPanel } from '@/components/crm/crm-erp-integration-panel'
 import { useRealtime } from '@/hooks/use-realtime'
 import {
   Users,
@@ -190,6 +191,7 @@ export function CrmDashboard() {
           </CardContent>
         </Card>
       </div>
+      <CrmErpIntegrationPanel />
     </div>
   )
 }

@@ -12,7 +12,18 @@ import {
 import { getProposals, deleteProposal, updateProposal } from '@/services/crm'
 import { useRealtime } from '@/hooks/use-realtime'
 import { PROPOSAL_STATUS, PROPOSAL_STATUS_COLORS, type CrmProposal } from '@/lib/crm-types'
-import { Plus, Search, Loader2, Pencil, Trash2, FileText, Send, Copy } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Loader2,
+  Pencil,
+  Trash2,
+  FileText,
+  Send,
+  Copy,
+  ShoppingCart,
+} from 'lucide-react'
+import { convertProposalToOrder } from '@/services/crm-enterprise'
 import { toast } from '@/hooks/use-toast'
 import { CrmProposalDialog } from '@/components/crm/crm-proposal-dialog'
 import { cn } from '@/lib/utils'
@@ -68,6 +79,23 @@ export function CrmProposals() {
     setDialogOpen(true)
   }
 
+  const handleConvert = async (r: CrmProposal) => {
+    if (r.converted_order_id) {
+      toast({ title: 'Proposta já convertida', description: `Pedido: ${r.converted_order_number}` })
+      return
+    }
+    try {
+      await convertProposalToOrder(r.id, 'Sistema')
+      toast({ title: 'Proposta convertida em pedido!' })
+      load()
+    } catch (err) {
+      toast({
+        title: 'Erro ao converter',
+        description: err instanceof Error ? err.message : 'Erro',
+        variant: 'destructive',
+      })
+    }
+  }
   const handleDelete = async (r: CrmProposal) => {
     try {
       await deleteProposal(r.id)
@@ -191,6 +219,16 @@ export function CrmProposals() {
                           className="text-[#005B2E] h-8 w-8 p-0"
                         >
                           <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleConvert(r)}
+                          disabled={!!r.converted_order_id}
+                          className="text-green-600 h-8 w-8 p-0"
+                          title="Converter em Pedido"
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
                         </Button>
                         <Button
                           size="sm"

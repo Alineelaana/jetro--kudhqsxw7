@@ -6,6 +6,13 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { type CrmOpportunity, type CrmFunnelStage } from '@/lib/crm-types'
 import { Loader2, AlertTriangle, Plus } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { toast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import { CrmOpportunityDialog } from '@/components/crm/crm-opportunity-dialog'
@@ -33,6 +40,7 @@ export function CrmFunnel() {
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<CrmOpportunity | null>(null)
+  const [funnelFilter, setFunnelFilter] = useState('all')
 
   const load = async () => {
     try {
@@ -80,11 +88,27 @@ export function CrmFunnel() {
       </div>
     )
 
+  const filteredStages =
+    funnelFilter === 'all'
+      ? stages
+      : stages.filter((s) => !s.funnel_type || s.funnel_type === funnelFilter)
   const activeOpps = opps.filter((o) => !['Ganha', 'Perdida', 'Cancelada'].includes(o.status))
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Select value={funnelFilter} onValueChange={setFunnelFilter}>
+          <SelectTrigger className="w-48 focus-visible:ring-[#005B2E]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Funis</SelectItem>
+            <SelectItem value="geral">Geral</SelectItem>
+            <SelectItem value="empresa">Por Empresa</SelectItem>
+            <SelectItem value="equipe">Por Equipe</SelectItem>
+            <SelectItem value="segmento">Por Segmento</SelectItem>
+          </SelectContent>
+        </Select>
         <Button
           onClick={() => {
             setEditing(null)
@@ -97,7 +121,7 @@ export function CrmFunnel() {
       </div>
       <div className="overflow-x-auto pb-4">
         <div className="flex gap-3 min-w-max">
-          {stages.map((stage) => {
+          {filteredStages.map((stage) => {
             const stageOpps = activeOpps.filter((o) => o.stage_id === stage.id)
             const stageValue = stageOpps.reduce(
               (s, o) => s + (parseFloat(o.estimated_value) || 0),

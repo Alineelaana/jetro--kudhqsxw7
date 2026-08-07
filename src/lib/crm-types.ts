@@ -206,6 +206,8 @@ export interface CrmLead {
   converted: boolean
   client_id: string
   opportunity_id: string
+  contacts: unknown[]
+  attachments: string[]
   created: string
   updated: string
 }
@@ -241,6 +243,8 @@ export interface CrmOpportunity {
   order_id: string
   contract_id: string
   stage_entered_at: string
+  expected_margin: string
+  weighted_value: string
   created: string
   updated: string
 }
@@ -251,6 +255,10 @@ export interface CrmFunnelStage {
   probability: number
   color: string
   sla_days: number
+  funnel_type: string
+  company: string
+  team: string
+  segment: string
   active: boolean
 }
 export interface CrmActivity {
@@ -298,6 +306,13 @@ export interface CrmProposal {
   rejected_reason: string
   company: string
   filial: string
+  version: number
+  parent_version_id: string
+  approval_status: string
+  approval_user: string
+  approval_date: string
+  converted_order_id: string
+  converted_order_number: string
   created: string
   updated: string
 }

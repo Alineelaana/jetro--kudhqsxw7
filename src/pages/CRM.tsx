@@ -9,12 +9,14 @@ import { CrmHistory } from '@/components/crm/crm-history'
 import { CrmActivities } from '@/components/crm/crm-activities'
 import { CrmGenericScreen } from '@/components/crm/crm-generic-screen'
 import { CrmReports } from '@/components/crm/crm-reports'
+import { CrmFunnelConfig } from '@/components/crm/crm-funnel-config'
 
 const TITLES: Record<string, string> = {
   dashboard: 'Dashboard do CRM',
   leads: 'Gestão de Leads',
   oportunidades: 'Oportunidades',
   funil: 'Funil de Vendas',
+  'funil-config': 'Configuração de Funis',
   agenda: 'Agenda Comercial',
   propostas: 'Propostas',
   historico: 'Histórico de Atendimento',
@@ -37,6 +39,8 @@ export default function CRM({ screen }: { screen: string }) {
         return <CrmOpportunities />
       case 'funil':
         return <CrmFunnel />
+      case 'funil-config':
+        return <CrmFunnelConfig />
       case 'agenda':
         return <CrmAgenda />
       case 'propostas':
