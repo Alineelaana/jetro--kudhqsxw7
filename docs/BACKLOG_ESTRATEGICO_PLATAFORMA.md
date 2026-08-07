@@ -42,18 +42,21 @@ Uma oportunidade só é registrada quando atende **pelo menos um** dos critério
 | **Domínio**    | 03 — Segurança                                                     |
 | **Critério**   | Aumento de segurança                                               |
 
-### BEP-002: Adicionar Campos Autodate em Collections Base
+### BEP-002: Adicionar Campos Autodate em Collections Base ✅ Implementado
 
-| Campo          | Valor                                                |
-| -------------- | ---------------------------------------------------- |
-| **Título**     | Garantir autodate em toda collection base            |
-| **Descrição**  | Adicionar `created`/`updated` autodate onde ausentes |
-| **Motivo**     | NC-CRIT-001: Queries com sort/filter falham          |
-| **Benefício**  | Sort e filter funcionam em todas as collections      |
-| **Impacto**    | Desenvolvimento, Operação                            |
-| **Prioridade** | P0                                                   |
-| **Domínio**    | 02 — Banco de Dados                                  |
-| **Critério**   | Redução de débito técnico                            |
+| Campo          | Valor                                                                  |
+| -------------- | ---------------------------------------------------------------------- |
+| **Título**     | Garantir autodate em toda collection base                              |
+| **Descrição**  | Adicionar `created`/`updated` autodate onde ausentes                   |
+| **Motivo**     | NC-CRIT-001: Queries com sort/filter falham                            |
+| **Benefício**  | Sort e filter funcionam em todas as collections                        |
+| **Impacto**    | Desenvolvimento, Operação                                              |
+| **Prioridade** | P0                                                                     |
+| **Domínio**    | 02 — Banco de Dados                                                    |
+| **Critério**   | Redução de débito técnico                                              |
+| **Status**     | ✅ Implementado — Migration 0092 aplicada                              |
+| **Evidência**  | Migration `0092_add_autodate_fields.js`; hook `autodate_verify.js`     |
+| **Validação**  | 5 níveis: estrutural, persistência, funcional, integração, arquitetura |
 
 ### BEP-003: Investigar Gap de Migration 0037
 
