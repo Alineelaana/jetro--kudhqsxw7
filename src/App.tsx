@@ -56,6 +56,7 @@ import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
 import Industry from './pages/Industry'
+import Phase0Foundation from './pages/Phase0Foundation'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -488,6 +489,7 @@ const App = () => (
                         path="/admin/industria/custos"
                         element={<Industry screen="custos" />}
                       />
+                      <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />
                       <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                       <Route path="/cliente/login" element={<ClientLogin />} />
