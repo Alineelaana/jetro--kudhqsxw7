@@ -11,6 +11,7 @@ import { BiCommercial } from '@/components/bi/centers/bi-commercial'
 import { BiGenericCenter } from '@/components/bi/centers/bi-center-configs'
 import { BiAiAdapta } from '@/components/bi/bi-ai-adapta'
 import { BiCustomDashboards } from '@/components/bi/bi-custom-dashboards'
+import { BiReportCenter } from '@/components/bi/bi-report-center'
 
 interface BIProps {
   screen?: string
@@ -148,6 +149,12 @@ export default function BI({ screen = 'dashboard' }: BIProps) {
       return (
         <BiLayout title="Relatórios Salvos">
           <BiSavedViews />
+        </BiLayout>
+      )
+    case 'report-center':
+      return (
+        <BiLayout title="Central Corporativa de Relatórios">
+          <BiReportCenter />
         </BiLayout>
       )
     default:

@@ -52,6 +52,7 @@ const NAV_SECTIONS = [
     items: [
       { to: '/admin/bi/custom-dashboards', label: 'Dashboards Personalizados', icon: '🎨' },
       { to: '/admin/bi/saved-views', label: 'Relatórios Salvos', icon: '🔖' },
+      { to: '/admin/bi/report-center', label: 'Central de Relatórios', icon: '📋' },
       { to: '/admin/bi/ai-adapta', label: 'IA ADAPTA', icon: '🤖' },
     ],
   },
