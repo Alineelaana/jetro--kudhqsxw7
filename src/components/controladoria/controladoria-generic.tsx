@@ -43,9 +43,6 @@ export function ControladoriaGenericScreen({ configKey }: { configKey: string })
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
 
-  if (!config)
-    return <p className="text-center py-6 text-muted-foreground">Configuração não encontrada.</p>
-
   const canManage =
     configKey === 'reclassifications'
       ? canManageReclassifications(userRole)
@@ -54,6 +51,7 @@ export function ControladoriaGenericScreen({ configKey }: { configKey: string })
         : canManageConsolidation(userRole)
 
   const load = async () => {
+    if (!config) return
     try {
       setRecords((await ctrlGetList(config.collection)) as Record<string, unknown>[])
     } catch {
@@ -62,9 +60,13 @@ export function ControladoriaGenericScreen({ configKey }: { configKey: string })
     setLoading(false)
   }
   useEffect(() => {
+    if (!config) return
     load()
   }, [])
-  useRealtime(config.collection, () => load())
+  useRealtime(config?.collection ?? '', () => load())
+
+  if (!config)
+    return <p className="text-center py-6 text-muted-foreground">Configuração não encontrada.</p>
 
   const handleCreate = async () => {
     const data: Record<string, unknown> = {}
