@@ -15,22 +15,45 @@ const NAV_SECTIONS = [
   {
     title: 'Principal',
     items: [
-      { to: '/admin/bi', label: 'Dashboard', icon: '📊' },
+      { to: '/admin/bi', label: 'Dashboard Executivo', icon: '📊' },
+      { to: '/admin/bi/executive', label: 'Inteligência Executiva', icon: '👑' },
       { to: '/admin/bi/cross-module', label: 'Visão Cruzada', icon: '🔀' },
     ],
   },
   {
-    title: 'Analytics',
+    title: 'Centros de Inteligência',
     items: [
-      { to: '/admin/bi/sales', label: 'Vendas', icon: '📈' },
-      { to: '/admin/bi/stock', label: 'Estoque', icon: '📦' },
-      { to: '/admin/bi/financial', label: 'Financeiro', icon: '💰' },
-      { to: '/admin/bi/industrial', label: 'Industrial', icon: '🏭' },
+      { to: '/admin/bi/commercial', label: 'Comercial', icon: '📈' },
+      { to: '/admin/bi/financial-intel', label: 'Financeira', icon: '💰' },
+      { to: '/admin/bi/industrial-intel', label: 'Industrial', icon: '🏭' },
+      { to: '/admin/bi/logistics-intel', label: 'Logística', icon: '🚚' },
+      { to: '/admin/bi/stock-intel', label: 'Estoque', icon: '📦' },
+      { to: '/admin/bi/fiscal-intel', label: 'Fiscal', icon: '🧾' },
+      { to: '/admin/bi/purchasing-intel', label: 'Compras', icon: '🛒' },
+      { to: '/admin/bi/crm-intel', label: 'CRM', icon: '🎯' },
+      { to: '/admin/bi/trade-intel', label: 'Trade Marketing', icon: '📣' },
+      { to: '/admin/bi/rh-intel', label: 'RH', icon: '👥' },
+      { to: '/admin/bi/quality-intel', label: 'Qualidade', icon: '✅' },
+      { to: '/admin/bi/maintenance-intel', label: 'Manutenção', icon: '🔧' },
+      { to: '/admin/bi/vr-intel', label: 'Remuneração Variável', icon: '🏆' },
+    ],
+  },
+  {
+    title: 'Analytics Clássico',
+    items: [
+      { to: '/admin/bi/sales', label: 'Vendas', icon: '📉' },
+      { to: '/admin/bi/stock', label: 'Estoque (Clássico)', icon: '📋' },
+      { to: '/admin/bi/financial', label: 'Financeiro (Clássico)', icon: '💵' },
+      { to: '/admin/bi/industrial', label: 'Industrial (Clássico)', icon: '⚙️' },
     ],
   },
   {
     title: 'Gestão',
-    items: [{ to: '/admin/bi/saved-views', label: 'Relatórios Salvos', icon: '🔖' }],
+    items: [
+      { to: '/admin/bi/custom-dashboards', label: 'Dashboards Personalizados', icon: '🎨' },
+      { to: '/admin/bi/saved-views', label: 'Relatórios Salvos', icon: '🔖' },
+      { to: '/admin/bi/ai-adapta', label: 'IA ADAPTA', icon: '🤖' },
+    ],
   },
 ]
 

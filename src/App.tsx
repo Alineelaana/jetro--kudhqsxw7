@@ -624,6 +624,46 @@ const App = () => (
                           element={<VariableRemuneration screen="goals" />}
                         />
                         <Route path="/admin/bi" element={<BI screen="dashboard" />} />
+                        <Route path="/admin/bi/executive" element={<BI screen="executive" />} />
+                        <Route path="/admin/bi/commercial" element={<BI screen="commercial" />} />
+                        <Route
+                          path="/admin/bi/financial-intel"
+                          element={<BI screen="financial-intel" />}
+                        />
+                        <Route
+                          path="/admin/bi/industrial-intel"
+                          element={<BI screen="industrial-intel" />}
+                        />
+                        <Route
+                          path="/admin/bi/logistics-intel"
+                          element={<BI screen="logistics-intel" />}
+                        />
+                        <Route path="/admin/bi/stock-intel" element={<BI screen="stock-intel" />} />
+                        <Route
+                          path="/admin/bi/fiscal-intel"
+                          element={<BI screen="fiscal-intel" />}
+                        />
+                        <Route
+                          path="/admin/bi/purchasing-intel"
+                          element={<BI screen="purchasing-intel" />}
+                        />
+                        <Route path="/admin/bi/crm-intel" element={<BI screen="crm-intel" />} />
+                        <Route path="/admin/bi/trade-intel" element={<BI screen="trade-intel" />} />
+                        <Route path="/admin/bi/rh-intel" element={<BI screen="rh-intel" />} />
+                        <Route
+                          path="/admin/bi/quality-intel"
+                          element={<BI screen="quality-intel" />}
+                        />
+                        <Route
+                          path="/admin/bi/maintenance-intel"
+                          element={<BI screen="maintenance-intel" />}
+                        />
+                        <Route path="/admin/bi/vr-intel" element={<BI screen="vr-intel" />} />
+                        <Route
+                          path="/admin/bi/custom-dashboards"
+                          element={<BI screen="custom-dashboards" />}
+                        />
+                        <Route path="/admin/bi/ai-adapta" element={<BI screen="ai-adapta" />} />
                         <Route
                           path="/admin/bi/cross-module"
                           element={<BI screen="cross-module" />}
