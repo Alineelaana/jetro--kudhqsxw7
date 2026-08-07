@@ -9,13 +9,15 @@
 
 ### COR-01: Completar Regras RLS em Todas as Collections
 
-| Atributo         | Valor                                                                                                                   |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **NC**           | NC-CRIT-002                                                                                                             |
-| **Prioridade**   | P0                                                                                                                      |
-| **Esforço**      | Médio (2-3 dias)                                                                                                        |
-| **Ação**         | Auditar todas as collections; definir 5 regras (list/view/create/update/delete). Collections públicas: list/view = `""` |
-| **Encerramento** | Usuário PADRAO consegue listar registros via SDK                                                                        |
+| Atributo         | Valor                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **NC**           | NC-CRIT-002                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Prioridade**   | P0                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Esforço**      | Médio (2-3 dias)                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Ação**         | Auditar todas as collections; definir 5 regras (list/view/create/update/delete). Collections públicas: list/view = `""`                                                                                                                                                                                                                                                                                                                                 |
+| **Encerramento** | Usuário PADRAO consegue listar registros via SDK                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Status**       | ✅ Concluído                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Evidência**    | Migration `0091_complete_rls_rules.js` define regras não-nulas em todas as collections com `null`. Hook `rls_verify.js` expõe endpoint `/backend/v1/rls/verify` que confirma 0 regras null. Service `src/services/rls-verification.ts` integra verificação ao frontend. Collections públicas (settings, services*offered, cms_content, vitrine_items) mantêm leitura pública. Collections de cliente (budget_requests, chat*\*) mantêm criação pública. |
 
 ### COR-02: Implementar MFA (TOTP) para Role SUP
 
@@ -59,10 +61,10 @@
 
 ## Resumo
 
-| #      | Correção                   | Prioridade | Esforço | Status   |
-| ------ | -------------------------- | ---------- | ------- | -------- |
-| COR-01 | RLS completo               | P0         | Médio   | Pendente |
-| COR-02 | MFA admin                  | P0         | Alto    | Pendente |
-| COR-03 | Criptografia campo-a-campo | P1         | Alto    | Pendente |
-| COR-04 | Fechar gaps de permissão   | P1         | Médio   | Pendente |
-| COR-05 | Timeout de sessão          | P2         | Baixo   | Pendente |
+| #      | Correção                   | Prioridade | Esforço | Status       |
+| ------ | -------------------------- | ---------- | ------- | ------------ |
+| COR-01 | RLS completo               | P0         | Médio   | ✅ Concluído |
+| COR-02 | MFA admin                  | P0         | Alto    | Pendente     |
+| COR-03 | Criptografia campo-a-campo | P1         | Alto    | Pendente     |
+| COR-04 | Fechar gaps de permissão   | P1         | Médio   | Pendente     |
+| COR-05 | Timeout de sessão          | P2         | Baixo   | Pendente     |
