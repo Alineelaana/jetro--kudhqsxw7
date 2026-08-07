@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { SaLayout } from '@/components/supplier-allowance/sa-layout'
 import { SaAgreements } from '@/components/supplier-allowance/sa-agreements'
 import { SaAccounts } from '@/components/supplier-allowance/sa-accounts'
@@ -8,9 +9,6 @@ import { SaAppropriations } from '@/components/supplier-allowance/sa-appropriati
 import { SaConsumptions } from '@/components/supplier-allowance/sa-consumptions'
 import { SaSettlements } from '@/components/supplier-allowance/sa-settlements'
 import { SaCockpit } from '@/components/supplier-allowance/sa-cockpit'
-import { SA_TABS } from '@/lib/supplier-allowance-types'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Card, CardContent } from '@/components/ui/card'
 import { Bot, FileText, Settings } from 'lucide-react'
 
 function PlaceholderTab({
@@ -57,66 +55,55 @@ export default function SupplierAllowance({ screen = 'cockpit' }: SupplierAllowa
     setTab(SCREEN_TO_TAB[screen] || 'cockpit')
   }, [screen])
 
-  return (
-    <SaLayout title="Verbas de Fornecedores">
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="flex flex-wrap h-auto gap-1 bg-[#005B2E]/10 p-1">
-          {SA_TABS.map((t) => (
-            <TabsTrigger
-              key={t.id}
-              value={t.id}
-              className="data-[state=active]:bg-[#005B2E] data-[state=active]:text-white text-xs"
-            >
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        <TabsContent value="agreements" className="mt-4">
-          <SaAgreements />
-        </TabsContent>
-        <TabsContent value="accounts" className="mt-4">
-          <SaAccounts />
-        </TabsContent>
-        <TabsContent value="movements" className="mt-4">
-          <SaMovements />
-        </TabsContent>
-        <TabsContent value="accruals" className="mt-4">
-          <SaAccruals />
-        </TabsContent>
-        <TabsContent value="appropriations" className="mt-4">
-          <SaAppropriations />
-        </TabsContent>
-        <TabsContent value="consumptions" className="mt-4">
-          <SaConsumptions />
-        </TabsContent>
-        <TabsContent value="settlements" className="mt-4">
-          <SaSettlements />
-        </TabsContent>
-        <TabsContent value="cockpit" className="mt-4">
-          <SaCockpit />
-        </TabsContent>
-        <TabsContent value="adapta" className="mt-4">
-          <PlaceholderTab
-            icon={Bot}
-            title="ADAPTA Verbas de Fornecedores"
-            message="A inteligência do agente ADAPTA será implementada no Épico 4. Nesta fase, apenas os pontos de integração estão disponíveis."
-          />
-        </TabsContent>
-        <TabsContent value="reports" className="mt-4">
+  const navigate = useNavigate()
+  useEffect(() => {
+    const tabToScreen: Record<string, string> = Object.fromEntries(
+      Object.entries(SCREEN_TO_TAB).map(([k, v]) => [v, k]),
+    )
+    const targetScreen = tabToScreen[tab] || 'cockpit'
+    if (targetScreen !== screen) {
+      navigate(`/admin/verbas/${targetScreen}`, { replace: true })
+    }
+  }, [tab])
+
+  const renderContent = () => {
+    switch (tab) {
+      case 'agreements':
+        return <SaAgreements />
+      case 'accounts':
+        return <SaAccounts />
+      case 'movements':
+        return <SaMovements />
+      case 'accruals':
+        return <SaAccruals />
+      case 'appropriations':
+        return <SaAppropriations />
+      case 'consumptions':
+        return <SaConsumptions />
+      case 'settlements':
+        return <SaSettlements />
+      case 'cockpit':
+        return <SaCockpit />
+      case 'reports':
+        return (
           <PlaceholderTab
             icon={FileText}
             title="Relatórios"
             message="A geração de documentos utiliza exclusivamente o Corporate Document Engine, mantendo o padrão institucional da plataforma."
           />
-        </TabsContent>
-        <TabsContent value="configuracoes" className="mt-4">
+        )
+      case 'configuracoes':
+        return (
           <PlaceholderTab
             icon={Settings}
             title="Configurações"
             message="Configurações do módulo de Verbas de Fornecedores — parâmetros de apuração, liquidação e integrações."
           />
-        </TabsContent>
-      </Tabs>
-    </SaLayout>
-  )
+        )
+      default:
+        return <SaCockpit />
+    }
+  }
+
+  return <SaLayout title="Verbas de Fornecedores">{renderContent()}</SaLayout>
 }

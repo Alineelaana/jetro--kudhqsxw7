@@ -1,4 +1,4 @@
-export const VERBAS_PERMISSION_KEY = 'supplier_allowance'
+export const VERBAS_PERMISSION_KEY = 'supplier_allowances'
 
 export type VerbasPermissionAction =
   | 'view'

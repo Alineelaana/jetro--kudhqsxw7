@@ -19,7 +19,7 @@ import {
 } from '@/lib/supplier-allowance-permissions'
 
 export const VERBAS_MODULE_CONFIG = {
-  key: VERBAS_PERMISSION_KEY,
+  key: 'supplier_allowances',
   label: 'Verbas de Fornecedores',
   icon: 'HandCoins',
   route: '/admin/verbas',
