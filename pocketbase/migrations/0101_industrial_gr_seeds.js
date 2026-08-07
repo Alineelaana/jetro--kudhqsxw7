@@ -30,31 +30,32 @@ migrate(
       try {
         orders = app.findRecordsByFilter('production_orders', '', '-created', 1, 0)
       } catch (_) {}
-      var orderId = ''
-      if (orders.length > 0) orderId = orders[0].id
       var resId = ''
       try {
         var res = app.findRecordsByFilter('production_resources', 'active = true', 'name', 1, 0)
         if (res.length > 0) resId = res[0].id
       } catch (_) {}
 
-      var phases = [
-        { seq: 1, name: 'Preparacao Massa', wc: 'Centro Preparacao', exp: 120 },
-        { seq: 2, name: 'Envase', wc: 'Linha Envase', exp: 180 },
-        { seq: 3, name: 'Acabamento', wc: 'Centro Acabamento', exp: 90 },
-      ]
-      for (var i = 0; i < phases.length; i++) {
-        var ph = new Record(phCol)
-        ph.set('production_order_id', orderId)
-        ph.set('sequence', phases[i].seq)
-        ph.set('operation_name', phases[i].name)
-        ph.set('work_center', phases[i].wc)
-        ph.set('expected_time_minutes', phases[i].exp)
-        ph.set('status', 'pending')
-        ph.set('quality_status', 'pending')
-        ph.set('responsible', 'PCP')
-        if (resId) ph.set('resource_id', resId)
-        app.save(ph)
+      if (orders.length > 0) {
+        var orderId = orders[0].id
+        var phases = [
+          { seq: 1, name: 'Preparacao Massa', wc: 'Centro Preparacao', exp: 120 },
+          { seq: 2, name: 'Envase', wc: 'Linha Envase', exp: 180 },
+          { seq: 3, name: 'Acabamento', wc: 'Centro Acabamento', exp: 90 },
+        ]
+        for (var i = 0; i < phases.length; i++) {
+          var ph = new Record(phCol)
+          ph.set('production_order_id', orderId)
+          ph.set('sequence', phases[i].seq)
+          ph.set('operation_name', phases[i].name)
+          ph.set('work_center', phases[i].wc)
+          ph.set('expected_time_minutes', phases[i].exp)
+          ph.set('status', 'pending')
+          ph.set('quality_status', 'pending')
+          ph.set('responsible', 'PCP')
+          if (resId) ph.set('resource_id', resId)
+          app.save(ph)
+        }
       }
     }
 
