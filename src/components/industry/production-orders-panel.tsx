@@ -27,6 +27,7 @@ import {
   getNextProductionOrderNumber,
 } from '@/services/production-orders'
 import { getIndustrialItems, getBomVersions, getProductionRoutes } from '@/services/industry'
+import { transitionOrder } from '@/services/pcp'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
@@ -35,17 +36,33 @@ import type { ProductionOrder } from '@/services/production-orders'
 const STATUS_LABELS: Record<string, string> = {
   rascunho: 'Rascunho',
   planejada: 'Planejada',
+  liberada: 'Liberada',
   em_producao: 'Em Produção',
+  parcial: 'Parcial',
+  inspecao: 'Inspeção',
   concluida: 'Concluída',
+  fechada: 'Fechada',
   cancelada: 'Cancelada',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   rascunho: 'bg-gray-100 text-gray-600',
   planejada: 'bg-blue-100 text-blue-700',
+  liberada: 'bg-cyan-100 text-cyan-700',
   em_producao: 'bg-amber-100 text-amber-700',
+  parcial: 'bg-orange-100 text-orange-700',
+  inspecao: 'bg-purple-100 text-purple-700',
   concluida: 'bg-emerald-100 text-emerald-700',
+  fechada: 'bg-green-100 text-green-700',
   cancelada: 'bg-red-100 text-red-700',
+}
+
+const ORDER_TYPE_LABELS: Record<string, string> = {
+  producao: 'Produção',
+  rework: 'Retrabalho',
+  piloto: 'Piloto',
+  complementar: 'Complementar',
+  terceirizada: 'Terceirizada',
 }
 
 export function ProductionOrdersPanel() {
@@ -116,7 +133,7 @@ export function ProductionOrdersPanel() {
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
-      await updateProductionOrder(id, { status })
+      await transitionOrder(id, status)
       toast({ title: 'Status atualizado' })
       load()
     } catch {
@@ -163,8 +180,11 @@ export function ProductionOrdersPanel() {
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>Resp: {o.responsible || '—'}</span>
                 {o.start_date && <span>• Início: {o.start_date}</span>}
+                {o.order_type && (
+                  <span>• Tipo: {ORDER_TYPE_LABELS[o.order_type] || o.order_type}</span>
+                )}
               </div>
-              <div className="flex gap-1 mt-2">
+              <div className="flex gap-1 mt-2 flex-wrap">
                 {o.status === 'rascunho' && (
                   <Button
                     size="sm"
@@ -180,22 +200,80 @@ export function ProductionOrdersPanel() {
                     size="sm"
                     variant="outline"
                     className="h-7 text-xs"
+                    onClick={() => handleStatusChange(o.id, 'liberada')}
+                  >
+                    Liberar
+                  </Button>
+                )}
+                {o.status === 'liberada' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
                     onClick={() => handleStatusChange(o.id, 'em_producao')}
                   >
                     Iniciar
                   </Button>
                 )}
                 {o.status === 'em_producao' && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(o.id, 'parcial')}
+                    >
+                      Parcial
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(o.id, 'inspecao')}
+                    >
+                      Inspeção
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(o.id, 'concluida')}
+                    >
+                      Concluir
+                    </Button>
+                  </>
+                )}
+                {o.status === 'parcial' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => handleStatusChange(o.id, 'em_producao')}
+                  >
+                    Retomar
+                  </Button>
+                )}
+                {o.status === 'inspecao' && (
                   <Button
                     size="sm"
                     variant="outline"
                     className="h-7 text-xs"
                     onClick={() => handleStatusChange(o.id, 'concluida')}
                   >
-                    Concluir
+                    Aprovar
                   </Button>
                 )}
-                {o.status !== 'concluida' && o.status !== 'cancelada' && (
+                {o.status === 'concluida' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => handleStatusChange(o.id, 'fechada')}
+                  >
+                    Fechar
+                  </Button>
+                )}
+                {o.status !== 'concluida' && o.status !== 'cancelada' && o.status !== 'fechada' && (
                   <Button
                     size="sm"
                     variant="outline"

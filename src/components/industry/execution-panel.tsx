@@ -33,6 +33,13 @@ const TYPE_LABELS: Record<string, string> = {
   retomada: 'Retomada',
   producao: 'Producao',
   fim: 'Fim',
+  consumo: 'Consumo',
+  parada: 'Parada',
+  manutencao: 'Manutencao',
+  refugo: 'Refugo',
+  perda: 'Perda',
+  qualidade: 'Qualidade',
+  rework: 'Retrabalho',
 }
 const TYPE_COLORS: Record<string, string> = {
   inicio: 'bg-blue-100 text-blue-700',
@@ -40,6 +47,13 @@ const TYPE_COLORS: Record<string, string> = {
   retomada: 'bg-cyan-100 text-cyan-700',
   producao: 'bg-emerald-100 text-emerald-700',
   fim: 'bg-gray-100 text-gray-600',
+  consumo: 'bg-purple-100 text-purple-700',
+  parada: 'bg-red-100 text-red-700',
+  manutencao: 'bg-orange-100 text-orange-700',
+  refugo: 'bg-pink-100 text-pink-700',
+  perda: 'bg-rose-100 text-rose-700',
+  qualidade: 'bg-indigo-100 text-indigo-700',
+  rework: 'bg-yellow-100 text-yellow-700',
 }
 
 export function ExecutionPanel() {
@@ -88,6 +102,8 @@ export function ExecutionPanel() {
         type: String(fd.get('type') || 'producao'),
         quantity_produced: Number(fd.get('quantity_produced') || 0),
         quantity_rejected: Number(fd.get('quantity_rejected') || 0),
+        team_name: String(fd.get('team_name') || ''),
+        stoppage_reason: String(fd.get('stoppage_reason') || ''),
         notes: String(fd.get('notes') || ''),
         lot_number: String(fd.get('lot_number') || ''),
         responsible: (user?.name as string) || 'Admin',
@@ -239,6 +255,16 @@ export function ExecutionPanel() {
             <div>
               <Label className="text-sm font-semibold">Lote</Label>
               <Input name="lot_number" className="focus-visible:ring-[#005B2E]" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-sm font-semibold">Equipe</Label>
+                <Input name="team_name" className="focus-visible:ring-[#005B2E]" />
+              </div>
+              <div>
+                <Label className="text-sm font-semibold">Motivo Parada</Label>
+                <Input name="stoppage_reason" className="focus-visible:ring-[#005B2E]" />
+              </div>
             </div>
             <div>
               <Label className="text-sm font-semibold">Observacoes</Label>

@@ -6,6 +6,10 @@ import { Link } from 'react-router-dom'
 import { IndustryDashboard } from '@/components/industry/industry-dashboard'
 import { ItemCatalogPanel } from '@/components/industry/item-catalog-panel'
 import { BomPanel } from '@/components/industry/bom-panel'
+import { BomEngineeringPanel } from '@/components/industry/bom-engineering-panel'
+import { EngineeringPanel } from '@/components/industry/engineering-panel'
+import { MasterPlanPanel } from '@/components/industry/master-plan-panel'
+import { ApsPanel } from '@/components/industry/aps-panel'
 import { ProductionResourcesPanel } from '@/components/industry/production-resources-panel'
 import { ProductionRoutesPanel } from '@/components/industry/production-routes-panel'
 import { IndustrialCostsPanel } from '@/components/industry/industrial-costs-panel'
@@ -59,6 +63,14 @@ function IndustryContent({ screen }: { screen: string }) {
     case 'bom':
     case 'formulacoes':
       return <BomPanel />
+    case 'engenharia-bom':
+      return <BomEngineeringPanel />
+    case 'engenharia':
+      return <EngineeringPanel />
+    case 'plano-mestre':
+      return <MasterPlanPanel />
+    case 'aps':
+      return <ApsPanel />
     case 'recursos':
       return <ProductionResourcesPanel />
     case 'roteiros':

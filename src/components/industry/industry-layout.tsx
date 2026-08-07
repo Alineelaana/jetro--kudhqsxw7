@@ -14,6 +14,7 @@ import {
   Factory,
   ClipboardList,
   Calendar,
+  CalendarClock,
   Brain,
   Activity,
   BarChart3,
@@ -28,10 +29,13 @@ const NAV_ITEMS = [
   { to: '/admin/industria/especificacoes', label: 'Especificações', icon: FileCheck },
   { to: '/admin/industria/conversoes', label: 'Conversões de Unidade', icon: ArrowLeftRight },
   { to: '/admin/industria/bom', label: 'BOM / Estruturas', icon: Layers },
+  { to: '/admin/industria/engenharia-bom', label: 'Engenharia BOM', icon: GitBranch },
   { to: '/admin/industria/formulacoes', label: 'Formulações', icon: FlaskConical },
   { to: '/admin/industria/recursos', label: 'Recursos Produtivos', icon: Cog },
   { to: '/admin/industria/roteiros', label: 'Roteiros de Produção', icon: Route },
   { to: '/admin/industria/capacidade', label: 'Capacidade Produtiva', icon: Calendar },
+  { to: '/admin/industria/plano-mestre', label: 'Plano Mestre', icon: Calendar },
+  { to: '/admin/industria/aps', label: 'APS & Cronograma', icon: CalendarClock },
   { to: '/admin/industria/planejamento', label: 'Planejamento & MRP', icon: Brain },
   { to: '/admin/industria/custos', label: 'Custos Industriais', icon: DollarSign },
   { to: '/admin/industria/ordens-producao', label: 'Ordens de Produção', icon: ClipboardList },
@@ -40,6 +44,7 @@ const NAV_ITEMS = [
   { to: '/admin/industria/rastreabilidade', label: 'Rastreabilidade', icon: GitBranch },
   { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)', icon: BarChart3 },
   { to: '/admin/industria/manutencao', label: 'Manutenção', icon: Wrench },
+  { to: '/admin/industria/engenharia', label: 'Engenharia (ECR/ECO)', icon: ShieldCheck },
 ]
 
 export function IndustryLayout({ children }: { children?: ReactNode }) {

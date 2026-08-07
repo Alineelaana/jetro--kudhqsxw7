@@ -47,3 +47,43 @@ export function canViewTraceability(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'COMERCIAL'].includes(role)
 }
+
+export function canManageEngineeringChanges(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'COMERCIAL'].includes(role)
+}
+
+export function canApproveRevision(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canManageMasterPlan(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'COMERCIAL'].includes(role)
+}
+
+export function canManageAPS(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canManageSimulations(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'COMERCIAL'].includes(role)
+}
+
+export function canAdjustIndustrialCosts(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO'].includes(role)
+}
+
+export function canReleaseOrder(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}
+
+export function canCloseOrder(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO'].includes(role)
+}

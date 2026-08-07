@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, BarChart3, TrendingUp, Gauge, Zap, Clock } from 'lucide-react'
+import { Loader2, BarChart3, TrendingUp, Gauge, Zap, Clock, Wrench, Package } from 'lucide-react'
 import { getKpis } from '@/services/industrial-extended'
 import { useRealtime } from '@/hooks/use-realtime'
 import type { IndustrialKpi } from '@/lib/industrial-extended-types'
@@ -98,7 +98,56 @@ export function KpisPanel() {
             )}
             {kpiCard('Lead Time', latest.lead_time_minutes || '—', 'min', Clock, 'text-amber-600')}
             {kpiCard('Setup Time', latest.setup_time_minutes || '—', 'min', Clock, 'text-red-600')}
+            {kpiCard('MTBF', latest.mtbf_hours?.toFixed(1) || '—', 'h', Gauge, 'text-cyan-600')}
+            {kpiCard('MTTR', latest.mttr_hours?.toFixed(1) || '—', 'h', Wrench, 'text-orange-600')}
+            {kpiCard(
+              'Eficiencia Maquina',
+              latest.machine_efficiency?.toFixed(1) || '—',
+              '%',
+              Gauge,
+              'text-blue-600',
+            )}
+            {kpiCard(
+              'Eficiencia Linha',
+              latest.line_efficiency?.toFixed(1) || '—',
+              '%',
+              TrendingUp,
+              'text-emerald-600',
+            )}
+            {kpiCard(
+              'Prod. Prevista',
+              latest.forecast_production || '—',
+              '',
+              Package,
+              'text-purple-600',
+            )}
+            {kpiCard('Prod. Real', latest.actual_production || '—', '', Package, 'text-[#005B2E]')}
           </div>
+          <Card className="border-2 border-[#005B2E]/20">
+            <CardContent className="py-4">
+              <h3 className="font-bold text-[#005B2E] mb-3">Indicadores Estendidos</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Eficiencia Operador:</span>{' '}
+                  <span className="font-bold">
+                    {latest.operator_efficiency?.toFixed(1) || '—'}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Tempo Medio Prod.:</span>{' '}
+                  <span className="font-bold">{latest.avg_production_time || '—'}min</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Gargalos:</span>{' '}
+                  <span className="font-bold text-red-600">{latest.bottleneck_count || 0}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Custo/Ordem:</span>{' '}
+                  <span className="font-bold">R$ {latest.cost_per_order || '—'}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           <Card className="border-2 border-[#005B2E]/20">
             <CardContent className="py-4">
               <h3 className="font-bold text-[#005B2E] mb-3">Producao</h3>
