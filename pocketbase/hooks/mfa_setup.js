@@ -1,32 +1,3 @@
-function padLeft(s, n, c) {
-  s = String(s)
-  while (s.length < n) s = c + s
-  return s
-}
-
-function generateSecret() {
-  var rand = $security.randomString(20)
-  var hex = ''
-  for (var i = 0; i < rand.length; i++) {
-    hex += padLeft(rand.charCodeAt(i).toString(16), 2, '0')
-  }
-  return hex
-}
-
-function base32EncodeHex(hexStr) {
-  var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
-  var bits = ''
-  for (var i = 0; i + 1 < hexStr.length; i += 2) {
-    bits += padLeft(parseInt(hexStr.substring(i, i + 2), 16).toString(2), 8, '0')
-  }
-  while (bits.length % 5 !== 0) bits += '0'
-  var result = ''
-  for (var j = 0; j < bits.length; j += 5) {
-    result += alphabet[parseInt(bits.substring(j, j + 5), 2)]
-  }
-  return result
-}
-
 routerAdd(
   'POST',
   '/backend/v1/mfa/setup',
@@ -37,8 +8,28 @@ routerAdd(
     var role = authUser.getString('role') || ''
     if (role !== 'SUP') return e.forbiddenError('MFA is only available for admin users')
 
-    var secretHex = generateSecret()
-    var secretBase32 = base32EncodeHex(secretHex)
+    var rand = $security.randomString(20)
+    var hex = ''
+    for (var i = 0; i < rand.length; i++) {
+      var h = rand.charCodeAt(i).toString(16)
+      while (h.length < 2) h = '0' + h
+      hex += h
+    }
+    var secretHex = hex
+
+    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+    var bits = ''
+    for (var i2 = 0; i2 + 1 < secretHex.length; i2 += 2) {
+      var b = parseInt(secretHex.substring(i2, i2 + 2), 16).toString(2)
+      while (b.length < 8) b = '0' + b
+      bits += b
+    }
+    while (bits.length % 5 !== 0) bits += '0'
+    var secretBase32 = ''
+    for (var j = 0; j < bits.length; j += 5) {
+      secretBase32 += alphabet[parseInt(bits.substring(j, j + 5), 2)]
+    }
+
     var email = authUser.email || ''
     var label = 'VeloraLog:' + email
     var otpauthUrl =

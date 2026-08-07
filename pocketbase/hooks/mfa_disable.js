@@ -1,29 +1,3 @@
-function padLeft(s, n, c) {
-  s = String(s)
-  while (s.length < n) s = c + s
-  return s
-}
-
-function generateTOTP(secretHex, timeStep) {
-  var timeBytes = ''
-  for (var i = 7; i >= 0; i--) {
-    timeBytes += String.fromCharCode((timeStep >>> (i * 8)) & 0xff)
-  }
-  var hmac = $security.hs256(timeBytes, secretHex)
-  var offset = parseInt(hmac.substring(hmac.length - 1), 16)
-  var truncated = parseInt(hmac.substring(offset * 2, offset * 2 + 8), 16) & 0x7fffffff
-  return padLeft(String(truncated % 1000000), 6, '0')
-}
-
-function verifyTOTP(secretHex, code) {
-  var now = Math.floor(new Date().getTime() / 1000)
-  var currentStep = Math.floor(now / 30)
-  for (var delta = -1; delta <= 1; delta++) {
-    if (generateTOTP(secretHex, currentStep + delta) === code) return true
-  }
-  return false
-}
-
 routerAdd(
   'POST',
   '/backend/v1/mfa/disable',
@@ -38,7 +12,27 @@ routerAdd(
     var secret = record.getString('mfa_secret')
     if (!secret) return e.badRequestError('MFA not set up')
 
-    if (!verifyTOTP(secret, code)) {
+    var now = Math.floor(new Date().getTime() / 1000)
+    var currentStep = Math.floor(now / 30)
+    var verified = false
+    for (var delta = -1; delta <= 1; delta++) {
+      var timeStep = currentStep + delta
+      var timeBytes = ''
+      for (var i = 7; i >= 0; i--) {
+        timeBytes += String.fromCharCode((timeStep >>> (i * 8)) & 0xff)
+      }
+      var hmac = $security.hs256(timeBytes, secret)
+      var offset = parseInt(hmac.substring(hmac.length - 1), 16)
+      var truncated = parseInt(hmac.substring(offset * 2, offset * 2 + 8), 16) & 0x7fffffff
+      var totp = String(truncated % 1000000)
+      while (totp.length < 6) totp = '0' + totp
+      if (totp === code) {
+        verified = true
+        break
+      }
+    }
+
+    if (!verified) {
       return e.json(401, { error: 'Invalid MFA code' })
     }
 
