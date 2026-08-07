@@ -3,6 +3,12 @@ import { AdminLogin } from '@/components/admin-login'
 import { Button } from '@/components/ui/button'
 import { Loader2, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { IndustryDashboard } from '@/components/industry/industry-dashboard'
+import { ItemCatalogPanel } from '@/components/industry/item-catalog-panel'
+import { BomPanel } from '@/components/industry/bom-panel'
+import { ProductionResourcesPanel } from '@/components/industry/production-resources-panel'
+import { ProductionRoutesPanel } from '@/components/industry/production-routes-panel'
+import { IndustrialCostsPanel } from '@/components/industry/industrial-costs-panel'
 
 interface Props {
   screen?: string
@@ -39,33 +45,19 @@ export default function Industry({ screen = 'dashboard' }: Props) {
 
 function IndustryContent({ screen }: { screen: string }) {
   switch (screen) {
-    case 'dashboard': {
-      const { IndustryDashboard } = require('@/components/industry/industry-dashboard')
+    case 'dashboard':
       return <IndustryDashboard />
-    }
-    case 'catalogo': {
-      const { ItemCatalogPanel } = require('@/components/industry/item-catalog-panel')
+    case 'catalogo':
       return <ItemCatalogPanel />
-    }
     case 'bom':
-    case 'formulacoes': {
-      const { BomPanel } = require('@/components/industry/bom-panel')
+    case 'formulacoes':
       return <BomPanel />
-    }
-    case 'recursos': {
-      const {
-        ProductionResourcesPanel,
-      } = require('@/components/industry/production-resources-panel')
+    case 'recursos':
       return <ProductionResourcesPanel />
-    }
-    case 'roteiros': {
-      const { ProductionRoutesPanel } = require('@/components/industry/production-routes-panel')
+    case 'roteiros':
       return <ProductionRoutesPanel />
-    }
-    case 'custos': {
-      const { IndustrialCostsPanel } = require('@/components/industry/industrial-costs-panel')
+    case 'custos':
       return <IndustrialCostsPanel />
-    }
     case 'especificacoes':
     case 'conversoes':
     default:
