@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T20:34:58.976Z",
+  "generatedAt": "2026-08-07T20:40:14.785Z",
   "collections": [
     {
       "name": "users",
@@ -2045,6 +2045,9 @@
             "integration_error",
             "certificate_expiring",
             "processing_failure",
+            "workflow_step",
+            "agenda_reminder",
+            "monitoring_alert",
             "other"
           ]
         }
