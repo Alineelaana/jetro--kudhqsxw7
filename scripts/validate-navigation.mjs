@@ -32,11 +32,8 @@ const STABLE_ROUTES = [
   '/admin/phase0-foundation',
   '/admin/platform-layer',
 ]
-const ALLOWED_ADDITIONS = ['/admin/controladoria', '/admin/verbas']
-const ALL_ALLOWED = [...STABLE_ROUTES, ...ALLOWED_ADDITIONS]
+const ALL_ALLOWED = [...STABLE_ROUTES]
 
-const STABLE_PERM_PREFIXES = ['', 'wms_', 'log_', 'fin_', 'ind_', 'ai_']
-const ALLOWED_PERM_PREFIXES = ['ctrl_', 'supplier_allowances_']
 const STABLE_PERM_KEYS = [
   'dashboard',
   'budgets',
@@ -135,10 +132,9 @@ const permPath = resolve(root, 'src/lib/permission-matrix.ts')
 let hasFailures = false
 
 console.log('\n🔍 NAVIGATION CONTRACT VALIDATION')
-console.log('   Baseline: post-migration 0111 (pre-Verbas/Controladoria)')
-console.log('   Allowed additions: Controladoria (0115), Verbas (0112)\n')
+console.log('   Baseline: OFFICIAL BASELINE (pure historical, no additions)')
+console.log('   No additions allowed — pure baseline only\n')
 
-// --- Validate navigation menu ---
 if (!existsSync(menuPath)) {
   console.error('❌ Cannot find admin-menu-config.ts')
   process.exit(1)
@@ -163,7 +159,7 @@ if (missingRoutes.length > 0 || unauthorizedRoutes.length > 0) {
     missingRoutes.forEach((r) => console.error(`     - ${r}`))
   }
   if (unauthorizedRoutes.length > 0) {
-    console.error('   Unauthorized routes (not in baseline or approved additions):')
+    console.error('   Unauthorized routes (not in baseline):')
     unauthorizedRoutes.forEach((r) => console.error(`     - ${r}`))
   }
 } else {
@@ -174,7 +170,6 @@ if (missingRoutes.length > 0 || unauthorizedRoutes.length > 0) {
 }
 console.log()
 
-// --- Validate permission matrix ---
 if (!existsSync(permPath)) {
   console.error('❌ Cannot find permission-matrix.ts')
   process.exit(1)
@@ -188,9 +183,7 @@ while ((match = keyPattern.exec(permSource)) !== null) {
 }
 
 const missingPerms = STABLE_PERM_KEYS.filter((k) => !foundPermKeys.has(k))
-const unauthorizedPerms = [...foundPermKeys].filter(
-  (k) => !STABLE_PERM_KEYS.includes(k) && !ALLOWED_PERM_PREFIXES.some((p) => k.startsWith(p)),
-)
+const unauthorizedPerms = [...foundPermKeys].filter((k) => !STABLE_PERM_KEYS.includes(k))
 
 if (missingPerms.length > 0 || unauthorizedPerms.length > 0) {
   hasFailures = true
@@ -208,27 +201,21 @@ if (missingPerms.length > 0 || unauthorizedPerms.length > 0) {
   console.log(`   Baseline keys: ${STABLE_PERM_KEYS.length}`)
   console.log(`   Current keys:  ${foundPermKeys.size}`)
   const additions = [...foundPermKeys].filter((k) => !STABLE_PERM_KEYS.includes(k))
-  console.log(`   Additions:     ${additions.length} (Controladoria + Verbas)`)
+  console.log(`   Additions:     ${additions.length} (should be 0)`)
 }
 console.log()
 
-// --- Validate App.tsx routes exist ---
 const appPath = resolve(root, 'src/App.tsx')
 if (existsSync(appPath)) {
   const appSource = readFileSync(appPath, 'utf-8')
   const missingAppRoutes = STABLE_ROUTES.filter(
     (r) => !appSource.includes(`path="${r}"`) && !appSource.includes(`path="${r}" `),
   )
-  // Also check allowed additions
-  const missingAdditionRoutes = ALLOWED_ADDITIONS.filter(
-    (r) => !appSource.includes(`path="${r}"`) && !appSource.includes(`path="${r}" `),
-  )
-  const allMissing = [...missingAppRoutes, ...missingAdditionRoutes]
-  if (allMissing.length > 0) {
+  if (missingAppRoutes.length > 0) {
     hasFailures = true
     console.error('❌ ROUTER VALIDATION FAILED')
     console.error('   Routes missing from App.tsx:')
-    allMissing.forEach((r) => console.error(`     - ${r}`))
+    missingAppRoutes.forEach((r) => console.error(`     - ${r}`))
   } else {
     console.log('✅ Router (App.tsx): PASS')
     console.log(`   All ${ALL_ALLOWED.length} routes found in router`)
@@ -236,7 +223,6 @@ if (existsSync(appPath)) {
   console.log()
 }
 
-// --- Summary ---
 if (hasFailures) {
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.error('❌ CONTRACT VALIDATION: FAILED')

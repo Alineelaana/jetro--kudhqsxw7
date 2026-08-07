@@ -6,8 +6,6 @@ import {
   Tag,
   Users,
   DollarSign,
-  HandCoins,
-  Calculator,
   Truck,
   Boxes,
   Factory,
@@ -42,8 +40,6 @@ import {
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
 import { canViewIndustry } from '@/lib/industrial-permissions'
-import { canViewSA } from '@/lib/supplier-allowance-permissions'
-import { canViewControladoria } from '@/lib/controladoria-permissions'
 import { canViewCRM } from '@/lib/crm-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { canViewRH } from '@/lib/rh-permissions'
@@ -104,30 +100,6 @@ export const ADMIN_MENU: MenuGroup[] = [
     title: 'Financeiro',
     items: [
       { label: 'Financeiro', icon: DollarSign, route: '/admin/financeiro', perm: canViewFinancial },
-      {
-        label: 'Verbas de Fornecedores',
-        icon: HandCoins,
-        route: '/admin/verbas',
-        perm: canViewSA,
-        children: [
-          { label: 'Cockpit', route: '/admin/verbas/cockpit' },
-          { label: 'Acordos', route: '/admin/verbas/acordos' },
-          { label: 'Conta Corrente', route: '/admin/verbas/conta-corrente' },
-          { label: 'Movimentações', route: '/admin/verbas/movimentacoes' },
-          { label: 'Apurações', route: '/admin/verbas/apuracoes' },
-          { label: 'Apropriações', route: '/admin/verbas/apropriacoes' },
-          { label: 'Consumos', route: '/admin/verbas/consumos' },
-          { label: 'Liquidações', route: '/admin/verbas/liquidacoes' },
-          { label: 'Relatórios', route: '/admin/verbas/relatorios' },
-          { label: 'Configurações', route: '/admin/verbas/configuracoes' },
-        ],
-      },
-      {
-        label: 'Controladoria',
-        icon: Calculator,
-        route: '/admin/controladoria',
-        perm: canViewControladoria,
-      },
     ],
   },
   {

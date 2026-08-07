@@ -62,7 +62,6 @@ import Phase0Foundation from './pages/Phase0Foundation'
 import PlatformLayer from './pages/PlatformLayer'
 import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
-import SupplierAllowance from './pages/SupplierAllowance'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { CapacityPanel } from '@/components/industry/capacity-panel'
@@ -79,7 +78,6 @@ import {
   NOTIFICATION_CONFIG,
   NUMERATION_CONFIG,
 } from '@/lib/configuracoes-config'
-import Controladoria from './pages/Controladoria'
 import Atendimento from './pages/Atendimento'
 import DP from './pages/DP'
 import SST from './pages/SST'
@@ -681,114 +679,6 @@ const App = () => (
                         <Route path="/admin/bi/financial" element={<BI screen="financial" />} />
                         <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
                         <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
-                        <Route
-                          path="/admin/verbas"
-                          element={<SupplierAllowance screen="cockpit" />}
-                        />
-                        <Route
-                          path="/admin/verbas/cockpit"
-                          element={<SupplierAllowance screen="cockpit" />}
-                        />
-                        <Route
-                          path="/admin/verbas/acordos"
-                          element={<SupplierAllowance screen="acordos" />}
-                        />
-                        <Route
-                          path="/admin/verbas/conta-corrente"
-                          element={<SupplierAllowance screen="conta-corrente" />}
-                        />
-                        <Route
-                          path="/admin/verbas/movimentacoes"
-                          element={<SupplierAllowance screen="movimentacoes" />}
-                        />
-                        <Route
-                          path="/admin/verbas/apuracoes"
-                          element={<SupplierAllowance screen="apuracoes" />}
-                        />
-                        <Route
-                          path="/admin/verbas/apropriacoes"
-                          element={<SupplierAllowance screen="apropriacoes" />}
-                        />
-                        <Route
-                          path="/admin/verbas/consumos"
-                          element={<SupplierAllowance screen="consumos" />}
-                        />
-                        <Route
-                          path="/admin/verbas/liquidacoes"
-                          element={<SupplierAllowance screen="liquidacoes" />}
-                        />
-                        <Route
-                          path="/admin/verbas/relatorios"
-                          element={<SupplierAllowance screen="relatorios" />}
-                        />
-                        <Route
-                          path="/admin/verbas/configuracoes"
-                          element={<SupplierAllowance screen="configuracoes" />}
-                        />
-                        <Route
-                          path="/admin/controladoria"
-                          element={<Controladoria screen="dashboard" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/dre"
-                          element={<Controladoria screen="dre" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/kpis"
-                          element={<Controladoria screen="kpis" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/drivers"
-                          element={<Controladoria screen="drivers" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/budget"
-                          element={<Controladoria screen="budget" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/forecast"
-                          element={<Controladoria screen="forecast" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/fechamento"
-                          element={<Controladoria screen="fechamento" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/simulador"
-                          element={<Controladoria screen="simulador" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/consolidacao"
-                          element={<Controladoria screen="consolidacao" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/materialidade"
-                          element={<Controladoria screen="materialidade" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/reclassificacoes"
-                          element={<Controladoria screen="reclassificacoes" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/visoes-salvas"
-                          element={<Controladoria screen="visoes-salvas" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/adapta"
-                          element={<Controladoria screen="adapta" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/balanco"
-                          element={<Controladoria screen="balanco" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/fluxo-caixa"
-                          element={<Controladoria screen="fluxo-caixa" />}
-                        />
-                        <Route
-                          path="/admin/controladoria/configuracoes"
-                          element={<Controladoria screen="configuracoes" />}
-                        />
                         <Route
                           path="/admin/atendimento"
                           element={<Atendimento screen="dashboard" />}

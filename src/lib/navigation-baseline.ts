@@ -21,18 +21,6 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
   { route: '/admin/crm', label: 'CRM', group: 'Comercial', classification: 'A' },
   { route: '/admin/promocoes', label: 'Promoções', group: 'Comercial', classification: 'A' },
   { route: '/admin/financeiro', label: 'Financeiro', group: 'Financeiro', classification: 'A' },
-  {
-    route: '/admin/controladoria',
-    label: 'Controladoria',
-    group: 'Financeiro',
-    classification: 'C',
-  },
-  {
-    route: '/admin/verbas',
-    label: 'Verbas de Fornecedores',
-    group: 'Financeiro',
-    classification: 'C',
-  },
   { route: '/admin/logistica', label: 'Logística', group: 'Operação', classification: 'A' },
   { route: '/admin/estoque', label: 'Estoque', group: 'Operação', classification: 'A' },
   { route: '/admin/industria', label: 'Indústria', group: 'Operação', classification: 'A' },
@@ -177,8 +165,8 @@ export const STABLE_PERMISSION_KEYS: string[] = [
   'ind_executive',
 ]
 
-export const ALLOWED_ADDITION_PREFIXES = ['ctrl_', 'supplier_allowances_']
+export const ALLOWED_ADDITION_PREFIXES: string[] = []
 
-export function isAllowedAddition(key: string): boolean {
-  return ALLOWED_ADDITION_PREFIXES.some((p) => key.startsWith(p))
+export function isAllowedAddition(_key: string): boolean {
+  return false
 }
