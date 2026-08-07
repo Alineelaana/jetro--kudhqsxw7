@@ -1,4 +1,5 @@
 import { ADMIN_MENU, type MenuGroup, type MenuEntry } from '@/lib/admin-menu-config'
+import { STABLE_ROUTES, ALL_ALLOWED_ROUTES } from '@/lib/navigation-baseline'
 
 export interface FlatMenuItem {
   label: string
@@ -18,6 +19,17 @@ export function flattenMenu(menu: MenuGroup[]): FlatMenuItem[] {
       childRoutes: item.children?.map((c) => c.route) ?? [],
     })),
   )
+}
+
+export function validateAgainstBaseline(): {
+  valid: boolean
+  missing: string[]
+  unauthorized: string[]
+} {
+  const current = new Set(getCurrentNavigationSnapshot().map((i) => i.route))
+  const missing = STABLE_ROUTES.filter((r) => !current.has(r))
+  const unauthorized = [...current].filter((r) => !ALL_ALLOWED_ROUTES.includes(r))
+  return { valid: missing.length === 0 && unauthorized.length === 0, missing, unauthorized }
 }
 
 export interface NavigationDiff {

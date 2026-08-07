@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
 import { SaLayout } from '@/components/supplier-allowance/sa-layout'
 import { SaAgreements } from '@/components/supplier-allowance/sa-agreements'
 import { SaAccounts } from '@/components/supplier-allowance/sa-accounts'
@@ -9,7 +10,7 @@ import { SaAppropriations } from '@/components/supplier-allowance/sa-appropriati
 import { SaConsumptions } from '@/components/supplier-allowance/sa-consumptions'
 import { SaSettlements } from '@/components/supplier-allowance/sa-settlements'
 import { SaCockpit } from '@/components/supplier-allowance/sa-cockpit'
-import { Bot, FileText, Settings } from 'lucide-react'
+import { FileText, Settings } from 'lucide-react'
 
 function PlaceholderTab({
   icon: Icon,
