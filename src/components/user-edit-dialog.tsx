@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { updateUser } from '@/services/users'
+import { updateUser, getEmpresas, getFiliais } from '@/services/users'
 import { Loader2, Upload, KeyRound } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -29,6 +29,10 @@ interface UserEditDialogProps {
     email: string
     role: string
     cpf: string
+    empresa_id?: string
+    filial_id?: string
+    cargo?: string
+    departamento?: string
   } | null
   onSuccess: () => void
 }
@@ -63,6 +67,12 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [avatar, setAvatar] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [empresaId, setEmpresaId] = useState('')
+  const [filialId, setFilialId] = useState('')
+  const [cargo, setCargo] = useState('')
+  const [departamento, setDepartamento] = useState('')
+  const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
+  const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
 
   useEffect(() => {
     if (user) {
@@ -73,8 +83,28 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setNewPassword('')
       setAvatar(null)
       setError('')
+      setEmpresaId(user.empresa_id || '')
+      setFilialId(user.filial_id || '')
+      setCargo(user.cargo || '')
+      setDepartamento(user.departamento || '')
     }
   }, [user])
+
+  useEffect(() => {
+    getEmpresas()
+      .then((data) => setEmpresas(data as unknown as { id: string; name: string }[]))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (empresaId) {
+      getFiliais(empresaId)
+        .then((data) => setFiliais(data as unknown as { id: string; name: string }[]))
+        .catch(() => setFiliais([]))
+    } else {
+      setFiliais([])
+    }
+  }, [empresaId])
 
   const handleCpfChange = (v: string) => {
     const formatted = formatCPF(v)
@@ -107,6 +137,10 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
         cpf: cpf.replace(/\D/g, ''),
         password: newPassword || undefined,
         avatar,
+        empresa_id: empresaId,
+        filial_id: filialId,
+        cargo: cargo.trim() || undefined,
+        departamento: departamento.trim() || undefined,
       })
       toast({
         title: 'Usuário Atualizado',
@@ -172,6 +206,66 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
                   <SelectItem value="Vendedor">Vendedor</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Empresa</Label>
+              <Select
+                value={empresaId}
+                onValueChange={(v) => {
+                  setEmpresaId(v)
+                  setFilialId('')
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as empresas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todas as empresas</SelectItem>
+                  {empresas.map((em) => (
+                    <SelectItem key={em.id} value={em.id}>
+                      {em.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Filial</Label>
+              <Select value={filialId} onValueChange={setFilialId} disabled={!empresaId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as filiais" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todas as filiais</SelectItem>
+                  {filiais.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Cargo</Label>
+              <Input
+                value={cargo}
+                onChange={(e) => setCargo(e.target.value)}
+                placeholder="Cargo do funcionário"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Departamento</Label>
+              <Input
+                value={departamento}
+                onChange={(e) => setDepartamento(e.target.value)}
+                placeholder="Departamento"
+                className="focus-visible:ring-[#005B2E]"
+              />
             </div>
           </div>
           <div className="space-y-1.5">

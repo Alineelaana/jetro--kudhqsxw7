@@ -8,6 +8,10 @@ export interface CreateUserData {
   cpf?: string
   avatar?: File | null
   active?: boolean
+  empresa_id?: string
+  filial_id?: string
+  departamento?: string
+  cargo?: string
 }
 
 export async function getUsers() {
@@ -27,6 +31,10 @@ export async function createUser(data: CreateUserData): Promise<void> {
   if (data.avatar) {
     recordData.avatar = data.avatar
   }
+  if (data.empresa_id !== undefined) recordData.empresa_id = data.empresa_id
+  if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
+  if (data.departamento !== undefined) recordData.departamento = data.departamento
+  if (data.cargo !== undefined) recordData.cargo = data.cargo
   await pb.collection('users').create(recordData)
 }
 
@@ -41,6 +49,10 @@ export interface UpdateUserData {
   password?: string
   avatar?: File | null
   active?: boolean
+  empresa_id?: string
+  filial_id?: string
+  departamento?: string
+  cargo?: string
 }
 
 export async function updateUser(userId: string, data: UpdateUserData): Promise<void> {
@@ -56,6 +68,10 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   if (data.avatar) {
     recordData.avatar = data.avatar
   }
+  if (data.empresa_id !== undefined) recordData.empresa_id = data.empresa_id
+  if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
+  if (data.departamento !== undefined) recordData.departamento = data.departamento
+  if (data.cargo !== undefined) recordData.cargo = data.cargo
   await pb.collection('users').update(userId, recordData)
 }
 
@@ -72,4 +88,13 @@ export async function updateAttendantStatus(userId: string, status: string): Pro
 
 export async function deleteUser(id: string): Promise<void> {
   await pb.collection('users').delete(id)
+}
+
+export async function getEmpresas() {
+  return pb.collection('empresas').getFullList({ sort: 'name' })
+}
+
+export async function getFiliais(empresaId?: string) {
+  const filter = empresaId ? `empresa_id = "${empresaId}"` : undefined
+  return pb.collection('filiais').getFullList({ sort: 'name', filter })
 }

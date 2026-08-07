@@ -52,6 +52,11 @@ interface UserRecord {
   avatar: string
   created: string
   active?: boolean
+  empresa_id?: string
+  filial_id?: string
+  mfa_enabled?: boolean
+  cargo?: string
+  departamento?: string
 }
 
 export function UserManagement() {
@@ -327,11 +332,27 @@ export function UserManagement() {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-foreground">{u.name || '—'}</p>
+                          {u.mfa_enabled && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                              MFA
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground">{u.email}</p>
-                        {u.cpf && (
-                          <p className="text-xs text-muted-foreground">CPF: {formatCPF(u.cpf)}</p>
-                        )}
+                        <div className="flex flex-wrap gap-x-3">
+                          {u.cpf && (
+                            <p className="text-xs text-muted-foreground">CPF: {formatCPF(u.cpf)}</p>
+                          )}
+                          {u.empresa_id && (
+                            <p className="text-xs text-muted-foreground">Empresa: {u.empresa_id}</p>
+                          )}
+                          {u.filial_id && (
+                            <p className="text-xs text-muted-foreground">Filial: {u.filial_id}</p>
+                          )}
+                          {u.cargo && (
+                            <p className="text-xs text-muted-foreground">Cargo: {u.cargo}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
 

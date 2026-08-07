@@ -97,6 +97,8 @@ export interface MatrixScreen {
   create?: (role: string | undefined) => boolean
   edit?: (role: string | undefined) => boolean
   delete?: (role: string | undefined) => boolean
+  approve?: (role: string | undefined) => boolean
+  scope: 'ALL' | 'EMPRESA' | 'FILIAL'
 }
 
 const all = () => true
@@ -104,7 +106,7 @@ const sup = (r: string | undefined) => r === 'SUP'
 const supPadrao = (r: string | undefined) => !!r && ['SUP', 'PADRAO'].includes(r)
 
 export const MATRIX_SCREENS: MatrixScreen[] = [
-  { key: 'dashboard', label: 'Dashboard', category: 'Operacional', view: all },
+  { key: 'dashboard', label: 'Dashboard', category: 'Operacional', view: all, scope: 'ALL' },
   {
     key: 'budgets',
     label: 'Orçamentos',
@@ -113,6 +115,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: all,
     edit: (r) => !!r && ['SUP', 'PADRAO', 'SDR', 'COMERCIAL'].includes(r),
     delete: sup,
+    scope: 'ALL',
   },
   {
     key: 'services',
@@ -122,9 +125,10 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: sup,
     edit: sup,
     delete: sup,
+    scope: 'ALL',
   },
-  { key: 'chat', label: 'Chat', category: 'Operacional', view: all },
-  { key: 'notifications', label: 'Notificações', category: 'Operacional', view: all },
+  { key: 'chat', label: 'Chat', category: 'Operacional', view: all, scope: 'ALL' },
+  { key: 'notifications', label: 'Notificações', category: 'Operacional', view: all, scope: 'ALL' },
   {
     key: 'partners',
     label: 'Parceiros',
@@ -133,6 +137,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canRegisterPartners,
     edit: canEditPartners,
     delete: canDeletePartners,
+    scope: 'EMPRESA',
   },
   {
     key: 'cadastros',
@@ -142,6 +147,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canManageConfiguracoes,
     edit: canManageConfiguracoes,
     delete: canManageConfiguracoes,
+    scope: 'EMPRESA',
   },
   {
     key: 'products',
@@ -151,6 +157,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: supPadrao,
     edit: supPadrao,
     delete: sup,
+    scope: 'EMPRESA',
   },
   {
     key: 'sales',
@@ -160,6 +167,8 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canViewSales,
     edit: canViewSales,
     delete: sup,
+    approve: (r) => !!r && ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(r),
+    scope: 'EMPRESA',
   },
   {
     key: 'stock',
@@ -169,6 +178,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canMakeMovements,
     edit: canMakeAdjustments,
     delete: sup,
+    scope: 'FILIAL',
   },
   {
     key: 'contracts',
@@ -178,6 +188,8 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canViewSales,
     edit: canViewSales,
     delete: sup,
+    approve: (r) => !!r && ['SUP', 'COMERCIAL'].includes(r),
+    scope: 'EMPRESA',
   },
   {
     key: 'purchasing',
@@ -187,6 +199,8 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canViewPurchasing,
     edit: canViewPurchasing,
     delete: sup,
+    approve: (r) => !!r && ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(r),
+    scope: 'EMPRESA',
   },
   {
     key: 'pricing',
@@ -196,6 +210,8 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canConsultCosts,
     edit: canConsultCosts,
     delete: sup,
+    approve: (r) => !!r && ['SUP', 'COMERCIAL'].includes(r),
+    scope: 'EMPRESA',
   },
   {
     key: 'price_tables',
@@ -205,6 +221,8 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canCreatePriceTable,
     edit: canEditPriceTable,
     delete: sup,
+    approve: (r) => !!r && ['SUP', 'COMERCIAL'].includes(r),
+    scope: 'EMPRESA',
   },
   {
     key: 'users',
@@ -214,6 +232,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canManageUsers,
     edit: canManageUsers,
     delete: canManageUsers,
+    scope: 'ALL',
   },
   {
     key: 'cms',
@@ -223,8 +242,15 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canManageCms,
     edit: canManageCms,
     delete: canManageCms,
+    scope: 'ALL',
   },
-  { key: 'audit', label: 'Auditoria', category: 'Administração', view: canViewAuditLogs },
+  {
+    key: 'audit',
+    label: 'Auditoria',
+    category: 'Administração',
+    view: canViewAuditLogs,
+    scope: 'ALL',
+  },
   {
     key: 'backups',
     label: 'Backups',
@@ -233,6 +259,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canManageBackups,
     edit: canManageBackups,
     delete: canManageBackups,
+    scope: 'ALL',
   },
   {
     key: 'ai_training',
@@ -242,6 +269,7 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canManageAiTraining,
     edit: canManageAiTraining,
     delete: canManageAiTraining,
+    scope: 'ALL',
   },
   {
     key: 'configuracoes',
@@ -251,8 +279,15 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     create: canManageConfiguracoes,
     edit: canManageConfiguracoes,
     delete: canManageConfiguracoes,
+    scope: 'ALL',
   },
-  { key: 'wms_consultar', label: 'WMS - Consultar', category: 'WMS', view: canViewWms },
+  {
+    key: 'wms_consultar',
+    label: 'WMS - Consultar',
+    category: 'WMS',
+    view: canViewWms,
+    scope: 'FILIAL',
+  },
   {
     key: 'wms_recebimento',
     label: 'WMS - Registrar Recebimento',

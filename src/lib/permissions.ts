@@ -173,3 +173,72 @@ export function canViewAiModule(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
+
+export function canApprove(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+}
+
+export function canCancelCritical(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+}
+
+export function canReverse(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canSettle(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO'].includes(role)
+}
+
+export function canExportData(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+export function canImportData(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO'].includes(role)
+}
+
+export function canReopenPeriod(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canViewSensitiveData(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO'].includes(role)
+}
+
+export function canAccessReports(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+export function canAdminSettings(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canDeleteCritical(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canChangePermissions(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canDisableMfa(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canChangeCost(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO'].includes(role)
+}
+
+export function canChangePrice(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'COMERCIAL'].includes(role)
+}

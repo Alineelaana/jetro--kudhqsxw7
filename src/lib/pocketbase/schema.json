@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T14:35:53.144Z",
+  "generatedAt": "2026-08-07T16:45:49.609Z",
   "collections": [
     {
       "name": "users",
@@ -117,7 +117,9 @@
         "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
         "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''",
         "CREATE INDEX `idx_users_role` ON `users` (role)",
-        "CREATE UNIQUE INDEX `idx_users_cpf` ON `users` (cpf) WHERE cpf != ''"
+        "CREATE UNIQUE INDEX `idx_users_cpf` ON `users` (cpf) WHERE cpf != ''",
+        "CREATE INDEX `idx_users_empresa_id` ON `users` (empresa_id)",
+        "CREATE INDEX `idx_users_filial_id` ON `users` (filial_id)"
       ]
     },
     {
@@ -2376,8 +2378,8 @@
       "name": "purchase_requests",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
@@ -2589,8 +2591,8 @@
       "name": "purchase_orders",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
@@ -3009,8 +3011,8 @@
       "name": "pricing_config",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
@@ -5722,8 +5724,8 @@
       "name": "sales_orders",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.id != ''"
@@ -7169,8 +7171,8 @@
       "name": "system_parameters",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
@@ -7273,8 +7275,8 @@
       "name": "integrations",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
@@ -7449,8 +7451,8 @@
       "name": "api_credentials",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
