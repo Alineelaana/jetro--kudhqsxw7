@@ -19,7 +19,7 @@
 
 > **Regra permanente de engenharia — referência: PLATFORM_PRINCIPLES §4.10, ARCHITECTURE ADR-022**
 
-Todo item de backlog só recebe o status **✅ Implementado** quando todos os cinco níveis de validação aplicáveis forem comprovados por evidência técnica:
+A validação de todo item de backlog ocorre em **cinco níveis**:
 
 1. **Existência Estrutural** — a estrutura existe fisicamente.
 2. **Persistência** — a estrutura está presente e operacional no schema vivo do banco (não basta a migração estar "applied").
@@ -27,13 +27,17 @@ Todo item de backlog só recebe o status **✅ Implementado** quando todos os ci
 4. **Integração** — integra-se com hooks, regras de acesso, relações e demais módulos.
 5. **Conformidade Arquitetural** — alinhada com princípios e ADRs da plataforma.
 
-**Quatro status oficiais:** ✅ Implementado · 🟡 Parcialmente Implementado · ❌ Não Implementado · ⚪ Não Evidenciado
+**Quatro status oficiais do requisito:** ✅ Implementado · 🟡 Parcialmente Implementado · ❌ Não Implementado · ⚪ Não Evidenciado. "Não Aplicável" **não é um quinto status do requisito** — é uma classificação de nível de validação.
+
+**Regra de status do requisito:** Status do requisito = **Implementado** quando todos os níveis aplicáveis estiverem comprovados por evidência técnica **e** todo nível "Não Aplicável" possuir justificativa registrada.
 
 **Regra de ouro:** "Concluído" é um estado comprovado por evidências, e não uma declaração de desenvolvimento.
 
-**Exceção "Não Aplicável":** Um nível que não se aplica ao requisito deve ser marcado explicitamente como **Não Aplicável** com justificativa, e não prejudica o cálculo de aderência.
+**"Não Aplicável":** Refere-se a **um dos cinco níveis de validação** de um requisito, não ao requisito como um todo. Um nível que não se aplica ao requisito deve ser marcado explicitamente como **Não Aplicável** com justificativa técnica documentada. Um nível "Não Aplicável" (com justificativa) é excluído do cálculo de aderência do requisito, mas **não remove o requisito do denominador do cálculo de conclusão da fase**.
 
-**Cálculo de aderência:** `Aderência = (níveis ✅ Implementado) / (níveis aplicáveis) × 100`. Item com 100% recebe status global **Implementado**; aderência < 100% impede esse status.
+**Cálculo de aderência (por requisito):** `Aderência = (níveis ✅ Implementado) / (níveis aplicáveis) × 100`. Níveis "Não Aplicável" (com justificativa) não contam no numerador nem no denominador. Item com 100% recebe status global **Implementado**; aderência < 100% impede esse status.
+
+**Cálculo de conclusão da fase:** `Percentual de Conclusão da Fase = Número de requisitos classificados como Implementado ÷ Total de requisitos da fase × 100`. Um nível "Não Aplicável" **não remove o requisito do denominador**. Apenas um requisito inteiro formalmente classificado como fora do escopo (com decisão documentada e justificativa específica) pode ser removido do denominador da fase.
 
 ---
 

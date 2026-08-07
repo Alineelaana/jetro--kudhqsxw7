@@ -161,3 +161,64 @@ A lista de 27 Shared Platform Services definida em ARCHITECTURE §2.3 foi verifi
 | Sem requisitos conflitantes ou duplicados | ✅ Aprovado |
 
 **Veredicto:** Documentação consistente e pronta para revisão do Product Owner.
+
+---
+
+## 9. Verificação de Consistência — Princípio do Aceite Baseado em Evidências (ADR-022)
+
+> **Verificação pós-correção — 2026-08-07**
+> Responsável: Architecture Council
+
+### 9.1 Escopo
+
+Verificação de consistência entre os três registros de governança do **Princípio do Aceite Baseado em Evidências — Validação em Cinco Níveis**:
+
+1. `PLATFORM_PRINCIPLES.md` §4.10
+2. `ARCHITECTURE.md` ADR-022
+3. `BACKLOG.md` §1 (Convenções)
+
+### 9.2 Correção 1 — Data do ADR-022
+
+| Registro             | Antes                               | Depois                                         | Status       |
+| -------------------- | ----------------------------------- | ---------------------------------------------- | ------------ |
+| ARCHITECTURE ADR-022 | Data: 2026-08-07 (sem campo Status) | Data: 2026-08-07 + Status: Aceito — 2026-08-07 | ✅ Corrigido |
+
+### 9.3 Correção 2 — Regra "Não Aplicável"
+
+| Aspecto                                                           | PLATFORM_PRINCIPLES §4.10 | ARCHITECTURE ADR-022 | BACKLOG §1     | Status         |
+| ----------------------------------------------------------------- | ------------------------- | -------------------- | -------------- | -------------- |
+| "Não Aplicável" refere-se a nível, não ao requisito               | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Nível "Não Aplicável" excluído do cálculo de aderência            | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Nível "Não Aplicável" NÃO remove requisito do denominador da fase | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Apenas requisito inteiro fora do escopo remove do denominador     | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+
+### 9.4 Correção 3 — Regra de Status do Requisito
+
+| Aspecto                                                    | PLATFORM_PRINCIPLES §4.10 | ARCHITECTURE ADR-022 | BACKLOG §1     | Status         |
+| ---------------------------------------------------------- | ------------------------- | -------------------- | -------------- | -------------- |
+| Status = Implementado requer níveis aplicáveis comprovados | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Status = Implementado requer justificativa em níveis "N/A" | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| "Não Aplicável" não é quinto status do requisito           | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Quatro status oficiais permanecem: ✅🟡❌⚪                | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+
+### 9.5 Correção 4 — Fórmula de Conclusão da Fase
+
+| Aspecto                                                   | PLATFORM_PRINCIPLES §4.10 | ARCHITECTURE ADR-022 | BACKLOG §1     | Status         |
+| --------------------------------------------------------- | ------------------------- | -------------------- | -------------- | -------------- |
+| Fórmula: Implementado ÷ Total de requisitos × 100         | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Nível "Não Aplicável" não remove requisito do denominador | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+| Remoção do denominador exige decisão documentada          | ✅ Explicitado            | ✅ Explicitado       | ✅ Explicitado | ✅ Consistente |
+
+### 9.6 Resultado da Verificação
+
+| Critério                                                          | Status      |
+| ----------------------------------------------------------------- | ----------- |
+| Data do ADR-022 corrigida para 2026                               | ✅ Aprovado |
+| "Não Aplicável" = classificação de nível, não status de requisito | ✅ Aprovado |
+| Regra de status do requisito consistente nos três registros       | ✅ Aprovado |
+| Fórmula de conclusão da fase consistente nos três registros       | ✅ Aprovado |
+| "Não Aplicável" não remove requisito do denominador da fase       | ✅ Aprovado |
+| Quatro status oficiais preservados                                | ✅ Aprovado |
+| Sem divergências entre os três registros                          | ✅ Aprovado |
+
+**Veredicto:** Os três registros (PLATFORM_PRINCIPLES §4.10, ARCHITECTURE ADR-022, BACKLOG §1) estão consistentes entre si. As três correções foram aplicadas e verificadas. Não há divergências.

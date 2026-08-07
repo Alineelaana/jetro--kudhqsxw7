@@ -159,15 +159,19 @@ Todo nível de validação recebe exatamente um dos quatro status:
 
 **Definição de "Não Evidenciado":** ⚪ Não Evidenciado significa que não há evidência técnica suficiente para determinar o status do nível. Não é uma falha em si, mas impede que o item receba **Implementado**. A ausência de evidência deve ser resolvida com a produção de evidência, não com a presunção de que funciona.
 
+**"Não Aplicável" não é um quinto status:** "Não Aplicável" é uma classificação de **nível de validação**, não um status de requisito. Os quatro status oficiais do requisito permanecem: ✅ Implementado, 🟡 Parcialmente Implementado, ❌ Não Implementado e ⚪ Não Evidenciado. Quando um nível é classificado como "Não Aplicável" (com justificativa registrada), ele é excluído do cálculo de aderência daquele requisito, mas o requisito permanece no denominador do cálculo de conclusão da fase.
+
 #### Regra de Aceite: Status "Implementado"
 
-Um item só pode receber o status **✅ Implementado** quando **todos os cinco níveis aplicáveis** tiverem sido comprovados por evidência técnica. Não é suficiente que o código exista ou que o desenvolvedor declare conclusão — a evidência deve ser produzida e verificável.
+**Status do requisito = Implementado quando todos os níveis aplicáveis estiverem comprovados e todo nível "Não Aplicável" possuir justificativa registrada.**
+
+Um item só pode receber o status **✅ Implementado** quando **todos os níveis aplicáveis** tiverem sido comprovados por evidência técnica **e** todo nível classificado como "Não Aplicável" possuir justificativa técnica registrada. Não é suficiente que o código exista ou que o desenvolvedor declare conclusão — a evidência deve ser produzida e verificável. Um requisito com, por exemplo, Persistência = Não Aplicável (com justificativa) e os demais quatro níveis aplicáveis comprovados pode receber status **Implementado**.
 
 #### Exceção: "Não Aplicável"
 
 Se um nível não se aplica a um requisito específico (ex: um requisimento puramente documentacional pode não ter Nível 2 — Persistência), ele deve ser explicitamente marcado como **Não Aplicável**, com justificativa técnica documentada. Um nível marcado como **Não Aplicável** **não prejudica o cálculo de aderência** — ele é simplesmente excluído do denominador.
 
-#### Regra de Cálculo de Aderência (Completion Percentage)
+#### Regra de Cálculo de Aderência (Por Requisito)
 
 A porcentagem de aderência de um item é calculada como:
 
@@ -178,16 +182,32 @@ Aderência = (níveis com status ✅ Implementado) / (total de níveis aplicáve
 Onde:
 
 - **Numerador:** contagem de níveis com status ✅ Implementado.
-- **Denominador:** contagem de níveis aplicáveis (exclui níveis marcados como Não Aplicável).
+- **Denominador:** contagem de níveis aplicáveis (exclui níveis marcados como "Não Aplicável" com justificativa registrada).
 - Níveis com status 🟡, ❌ ou ⚪ contam como zero no numerador.
-- Um item com 100% de aderência (todos os níveis aplicáveis como ✅) recebe o status global **Implementado**.
+- Níveis "Não Aplicável" (com justificativa) não contam no numerador nem no denominador deste cálculo.
+- Um item com 100% de aderência (todos os níveis aplicáveis como ✅ e todo nível "Não Aplicável" com justificativa) recebe o status global **Implementado**.
 - Aderência < 100% impede o status **Implementado** — o item recebe 🟡, ❌ ou ⚪ conforme o caso.
+
+#### Regra de Cálculo de Conclusão da Fase
+
+O percentual de conclusão da fase é calculado como:
+
+```
+Percentual de Conclusão da Fase = Número de requisitos classificados como Implementado ÷ Total de requisitos da fase × 100
+```
+
+Onde:
+
+- **Numerador:** contagem de requisitos com status global ✅ Implementado.
+- **Denominador:** total de requisitos da fase.
+- Um nível "Não Aplicável" **não remove o requisito do denominador** da fase.
+- Apenas um requisito inteiro formalmente classificado como fora do escopo (com decisão documentada e justificativa específica) pode ser removido do denominador da fase.
 
 #### Exemplos
 
 - **Correto:** Uma migração que cria uma coleção é marcada como ✅ Implementado somente após: (1) o arquivo de migração existir, (2) a coleção estar presente no schema vivo do banco, (3) um registro poder ser criado e listado, (4) as regras de acesso funcionarem, (5) a coleção não duplicar estrutura existente.
 - **Incorreto:** Uma migração marcada como "applied" recebe ✅ Implementado sem verificar se a coleção existe no schema live (Nível 2 ausente).
-- **Correto:** Um requisito documentacional marca o Nível 2 (Persistência) como **Não Aplicável** com justificativa "Requisito puramente documentacional, sem estrutura de dados", e o cálculo de aderência usa apenas os níveis 1, 3, 4 e 5 como denominador.
+- **Correto:** Um requisito documentacional marca o Nível 2 (Persistência) como **Não Aplicável** com justificativa "Requisito puramente documentacional, sem estrutura de dados". O cálculo de aderência usa apenas os níveis 1, 3, 4 e 5 como denominador. Com os quatro níveis aplicáveis comprovados, o requisito recebe status **Implementado** e permanece no denominador do cálculo de conclusão da fase.
 
 ### 4.9 Princípio: Estratégia Evolutiva da Plataforma
 
