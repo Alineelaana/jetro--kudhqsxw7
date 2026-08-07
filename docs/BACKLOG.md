@@ -15,6 +15,26 @@
 - **Arch Ref:** Referência à decisão arquitetural em ARCHITECTURE.md
 - **Critérios de Aceitação:** Mensuráveis e testáveis
 
+### Aceite Baseado em Evidências — Validação em Cinco Níveis
+
+> **Regra permanente de engenharia — referência: PLATFORM_PRINCIPLES §4.10, ARCHITECTURE ADR-022**
+
+Todo item de backlog só recebe o status **✅ Implementado** quando todos os cinco níveis de validação aplicáveis forem comprovados por evidência técnica:
+
+1. **Existência Estrutural** — a estrutura existe fisicamente.
+2. **Persistência** — a estrutura está presente e operacional no schema vivo do banco (não basta a migração estar "applied").
+3. **Implementação Funcional** — a funcionalidade opera conforme especificado.
+4. **Integração** — integra-se com hooks, regras de acesso, relações e demais módulos.
+5. **Conformidade Arquitetural** — alinhada com princípios e ADRs da plataforma.
+
+**Quatro status oficiais:** ✅ Implementado · 🟡 Parcialmente Implementado · ❌ Não Implementado · ⚪ Não Evidenciado
+
+**Regra de ouro:** "Concluído" é um estado comprovado por evidências, e não uma declaração de desenvolvimento.
+
+**Exceção "Não Aplicável":** Um nível que não se aplica ao requisito deve ser marcado explicitamente como **Não Aplicável** com justificativa, e não prejudica o cálculo de aderência.
+
+**Cálculo de aderência:** `Aderência = (níveis ✅ Implementado) / (níveis aplicáveis) × 100`. Item com 100% recebe status global **Implementado**; aderência < 100% impede esse status.
+
 ---
 
 ## 2. MVP — Backlog

@@ -126,6 +126,69 @@ Acreditamos que uma plataforma de gestão deve evoluir além de registrar transa
   - **Correto:** Após a decisão de reclassificar estruturas do Indústria para Shared Platform Services, todos os seis documentos oficiais foram atualizados simultaneamente para refletir a mudança.
   - **Incorreto:** Uma decisão arquitetural é tomada mas a documentação não é atualizada, levando a inconsistências.
 
+### 4.10 Princípio do Aceite Baseado em Evidências — Validação em Cinco Níveis
+
+- **Objetivo:** Garantir que toda entrega da plataforma só seja considerada concluída quando comprovada por evidências técnicas em todos os níveis aplicáveis, eliminando a prática de declarar "concluído" sem verificação verificável.
+- **Regra de Ouro:** **"Concluído" é um estado comprovado por evidências, e não uma declaração de desenvolvimento.**
+- **Hierarquia de decisão:** Evidência > Declaração. Nenhuma entrega recebe o status **Implementado** sem a comprovação de todos os cinco níveis aplicáveis.
+
+#### Cinco Níveis de Validação
+
+Todo requisito, item de backlog, migração ou entrega funcional deve ser validado nos seguintes níveis, em ordem:
+
+| Nível | Nome                          | O que verifica                                                                                                                           | Exemplo de evidência                                       |
+| ----- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 1     | **Existência Estrutural**     | A estrutura (coleção, campo, índice, arquivo, componente) existe fisicamente no ambiente                                                 | Schema do banco, tree do repositório, output de `describe` |
+| 2     | **Persistência**              | A estrutura sobrevive a ciclos de criação/leitura/atualização/exclusão e está presente no schema vivo, não apenas no arquivo de migração | Query ao banco live, registro criado e listado com sucesso |
+| 3     | **Implementação Funcional**   | A funcionalidade opera conforme especificado — cria, edita, lista, filtra, ordena, valida                                                | Teste funcional, fluxo end-to-end, screenshot              |
+| 4     | **Integração**                | A funcionalidade integra-se corretamente com os demais módulos, hooks, serviços e regras de acesso                                       | Hook dispara, regra de acesso aplica, relação expande      |
+| 5     | **Conformidade Arquitetural** | A entrega está alinhada com os princípios e ADRs da plataforma (Neutralidade, Single Source of Truth, Evolução Sustentável, etc.)        | ADR referenciado, princípio citado, sem duplicação         |
+
+**Nível 2 (Persistência) como verificação independente do Nível 1 (Existência Estrutural):** A persistência é um nível independente e obrigatório porque verifica que a estrutura não apenas existe no arquivo de migração (Nível 1), mas está efetivamente presente e operacional no schema vivo do banco de dados. Este endereça diretamente o achado crítico da Fase 0 (BLK-MVP-025), onde migrações foram marcadas como "applied" mas as coleções estavam ausentes do schema live. A migração aplicada não é evidência de existência — apenas a presença no schema vivo é.
+
+#### Quatro Status Oficiais
+
+Todo nível de validação recebe exatamente um dos quatro status:
+
+| Status                           | Significado                                                                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| ✅ **Implementado**              | O nível foi totalmente comprovado por evidência técnica verificável                                       |
+| 🟡 **Parcialmente Implementado** | O nível possui evidência parcial — some aspectos estão comprovados, outros não                            |
+| ❌ **Não Implementado**          | O nível não foi implementado ou a evidência demonstra que não funciona                                    |
+| ⚪ **Não Evidenciado**           | Não há evidência técnica disponível para avaliar o nível — **não é um erro**, é a ausência de comprovação |
+
+**Definição de "Não Evidenciado":** ⚪ Não Evidenciado significa que não há evidência técnica suficiente para determinar o status do nível. Não é uma falha em si, mas impede que o item receba **Implementado**. A ausência de evidência deve ser resolvida com a produção de evidência, não com a presunção de que funciona.
+
+#### Regra de Aceite: Status "Implementado"
+
+Um item só pode receber o status **✅ Implementado** quando **todos os cinco níveis aplicáveis** tiverem sido comprovados por evidência técnica. Não é suficiente que o código exista ou que o desenvolvedor declare conclusão — a evidência deve ser produzida e verificável.
+
+#### Exceção: "Não Aplicável"
+
+Se um nível não se aplica a um requisito específico (ex: um requisimento puramente documentacional pode não ter Nível 2 — Persistência), ele deve ser explicitamente marcado como **Não Aplicável**, com justificativa técnica documentada. Um nível marcado como **Não Aplicável** **não prejudica o cálculo de aderência** — ele é simplesmente excluído do denominador.
+
+#### Regra de Cálculo de Aderência (Completion Percentage)
+
+A porcentagem de aderência de um item é calculada como:
+
+```
+Aderência = (níveis com status ✅ Implementado) / (total de níveis aplicáveis) × 100
+```
+
+Onde:
+
+- **Numerador:** contagem de níveis com status ✅ Implementado.
+- **Denominador:** contagem de níveis aplicáveis (exclui níveis marcados como Não Aplicável).
+- Níveis com status 🟡, ❌ ou ⚪ contam como zero no numerador.
+- Um item com 100% de aderência (todos os níveis aplicáveis como ✅) recebe o status global **Implementado**.
+- Aderência < 100% impede o status **Implementado** — o item recebe 🟡, ❌ ou ⚪ conforme o caso.
+
+#### Exemplos
+
+- **Correto:** Uma migração que cria uma coleção é marcada como ✅ Implementado somente após: (1) o arquivo de migração existir, (2) a coleção estar presente no schema vivo do banco, (3) um registro poder ser criado e listado, (4) as regras de acesso funcionarem, (5) a coleção não duplicar estrutura existente.
+- **Incorreto:** Uma migração marcada como "applied" recebe ✅ Implementado sem verificar se a coleção existe no schema live (Nível 2 ausente).
+- **Correto:** Um requisito documentacional marca o Nível 2 (Persistência) como **Não Aplicável** com justificativa "Requisito puramente documentacional, sem estrutura de dados", e o cálculo de aderência usa apenas os níveis 1, 3, 4 e 5 como denominador.
+
 ### 4.9 Princípio: Estratégia Evolutiva da Plataforma
 
 - **Objetivo:** Garantir que decisões de arquitetura representem a visão de longo prazo do produto e não sejam restringidas pela infraestrutura atual, estabelecendo uma separação clara entre a Arquitetura Conceitual e a Implementação Atual.
