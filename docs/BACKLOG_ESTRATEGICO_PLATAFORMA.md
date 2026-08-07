@@ -495,10 +495,10 @@ Uma oportunidade só é registrada quando atende **pelo menos um** dos critério
 
 | Prioridade | Quantidade | IDs                                                                                                                                            |
 | ---------- | :--------: | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0         |     3      | BEP-001, BEP-002, BEP-005, BEP-025                                                                                                             |
-| P1         |     11     | BEP-003, BEP-004, BEP-006, BEP-007, BEP-010, BEP-018, BEP-019, BEP-020, BEP-021, BEP-022, BEP-023, BEP-026, BEP-027, BEP-028, BEP-029, BEP-032 |
-| P2         |     10     | BEP-008, BEP-011, BEP-012, BEP-013, BEP-015, BEP-024, BEP-030, BEP-031, BEP-033, BEP-034, BEP-035                                              |
-| P3         |     3      | BEP-009, BEP-014, BEP-016, BEP-017                                                                                                             |
+| P0         |     4      | BEP-001, BEP-002, BEP-005, BEP-025                                                                                                             |
+| P1         |     16     | BEP-003, BEP-004, BEP-006, BEP-007, BEP-010, BEP-018, BEP-019, BEP-020, BEP-021, BEP-022, BEP-023, BEP-026, BEP-027, BEP-028, BEP-029, BEP-032 |
+| P2         |     11     | BEP-008, BEP-011, BEP-012, BEP-013, BEP-015, BEP-024, BEP-030, BEP-031, BEP-033, BEP-034, BEP-035                                              |
+| P3         |     4      | BEP-009, BEP-014, BEP-016, BEP-017                                                                                                             |
 | **Total**  |   **35**   |                                                                                                                                                |
 
 ---
