@@ -29,6 +29,7 @@ import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewFiscal } from '@/lib/permissions'
 import { canViewRH } from '@/lib/rh-permissions'
 import { canViewAiModule } from '@/lib/ai-permissions'
+import { canViewIndustry } from '@/lib/industrial-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -60,6 +61,7 @@ import {
   Wallet,
   UserCog,
   Brain,
+  Factory,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -284,6 +286,34 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         ],
         permission: canViewAiModule,
       },
+      {
+        label: 'Industrial',
+        icon: Factory,
+        submenu: [
+          { to: '/admin/industria', label: 'Dashboard Industrial' },
+          { to: '/admin/industria/catalogo', label: 'Catálogo de Itens' },
+          { to: '/admin/industria/bom', label: 'BOM / Estruturas' },
+          { to: '/admin/industria/engenharia-bom', label: 'Engenharia BOM' },
+          { to: '/admin/industria/formulacoes', label: 'Formulações' },
+          { to: '/admin/industria/engenharia', label: 'Engenharia (ECR/ECO)' },
+          { to: '/admin/industria/recursos', label: 'Recursos Produtivos' },
+          { to: '/admin/industria/roteiros', label: 'Roteiros' },
+          { to: '/admin/industria/capacidade', label: 'Capacidade Produtiva' },
+          { to: '/admin/industria/plano-mestre', label: 'Plano Mestre' },
+          { to: '/admin/industria/aps', label: 'APS & Cronograma' },
+          { to: '/admin/industria/planejamento', label: 'Planejamento / MRP' },
+          { to: '/admin/industria/custos', label: 'Custos Industriais' },
+          { to: '/admin/industria/ordens-producao', label: 'Ordens de Produção' },
+          { to: '/admin/industria/execucao', label: 'Execução / Apontamentos' },
+          { to: '/admin/industria/fases', label: 'Fases de Produção' },
+          { to: '/admin/industria/qualidade', label: 'Qualidade Industrial' },
+          { to: '/admin/industria/rastreabilidade', label: 'Rastreabilidade' },
+          { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)' },
+          { to: '/admin/industria/manutencao', label: 'Manutenção' },
+          { to: '/admin/industria/executivo', label: 'Visão Executiva' },
+        ],
+        permission: canViewIndustry,
+      },
     ],
   },
   {
@@ -379,6 +409,7 @@ export function AdminSidebar({
       'Financeiro',
       'Fiscal',
       'Inteligência Artificial',
+      'Industrial',
     ]),
   )
   const [searchOpen, setSearchOpen] = useState(false)

@@ -3,8 +3,6 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import {
   Package,
-  FileCheck,
-  ArrowLeftRight,
   Layers,
   FlaskConical,
   Cog,
@@ -28,11 +26,10 @@ import {
 const NAV_ITEMS = [
   { to: '/admin/industria', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/industria/catalogo', label: 'Catálogo de Itens', icon: Package },
-  { to: '/admin/industria/especificacoes', label: 'Especificações', icon: FileCheck },
-  { to: '/admin/industria/conversoes', label: 'Conversões de Unidade', icon: ArrowLeftRight },
   { to: '/admin/industria/bom', label: 'BOM / Estruturas', icon: Layers },
   { to: '/admin/industria/engenharia-bom', label: 'Engenharia BOM', icon: GitBranch },
   { to: '/admin/industria/formulacoes', label: 'Formulações', icon: FlaskConical },
+  { to: '/admin/industria/engenharia', label: 'Engenharia (ECR/ECO)', icon: ShieldCheck },
   { to: '/admin/industria/recursos', label: 'Recursos Produtivos', icon: Cog },
   { to: '/admin/industria/roteiros', label: 'Roteiros de Produção', icon: Route },
   { to: '/admin/industria/capacidade', label: 'Capacidade Produtiva', icon: Calendar },
@@ -42,12 +39,11 @@ const NAV_ITEMS = [
   { to: '/admin/industria/custos', label: 'Custos Industriais', icon: DollarSign },
   { to: '/admin/industria/ordens-producao', label: 'Ordens de Produção', icon: ClipboardList },
   { to: '/admin/industria/execucao', label: 'Execução & Apontamentos', icon: Activity },
+  { to: '/admin/industria/fases', label: 'Fases de Produção', icon: ListOrdered },
   { to: '/admin/industria/qualidade', label: 'Qualidade Industrial', icon: ShieldCheck },
   { to: '/admin/industria/rastreabilidade', label: 'Rastreabilidade', icon: GitBranch },
   { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)', icon: BarChart3 },
   { to: '/admin/industria/manutencao', label: 'Manutenção', icon: Wrench },
-  { to: '/admin/industria/engenharia', label: 'Engenharia (ECR/ECO)', icon: ShieldCheck },
-  { to: '/admin/industria/fases', label: 'Fases de Produção', icon: ListOrdered },
   { to: '/admin/industria/executivo', label: 'Visão Executiva', icon: Crown },
 ]
 
@@ -57,8 +53,8 @@ export function IndustryLayout({ children }: { children?: ReactNode }) {
       <div className="flex items-center gap-3 mb-6">
         <Factory className="w-7 h-7 text-[#005B2E]" />
         <div>
-          <h1 className="text-2xl font-black text-foreground">Engenharia & Produtos</h1>
-          <p className="text-sm text-muted-foreground">Módulo Indústria — Fase 0</p>
+          <h1 className="text-2xl font-black text-foreground">Industrial</h1>
+          <p className="text-sm text-muted-foreground">Módulo Industrial</p>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-6">

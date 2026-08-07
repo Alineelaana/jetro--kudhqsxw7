@@ -505,8 +505,16 @@ const App = () => (
                         />
                         <Route path="/admin/industria/bom" element={<Industry screen="bom" />} />
                         <Route
+                          path="/admin/industria/engenharia-bom"
+                          element={<Industry screen="engenharia-bom" />}
+                        />
+                        <Route
                           path="/admin/industria/formulacoes"
                           element={<Industry screen="formulacoes" />}
+                        />
+                        <Route
+                          path="/admin/industria/engenharia"
+                          element={<Industry screen="engenharia" />}
                         />
                         <Route
                           path="/admin/industria/recursos"
@@ -517,72 +525,50 @@ const App = () => (
                           element={<Industry screen="roteiros" />}
                         />
                         <Route
+                          path="/admin/industria/capacidade"
+                          element={<Industry screen="capacidade" />}
+                        />
+                        <Route
+                          path="/admin/industria/plano-mestre"
+                          element={<Industry screen="plano-mestre" />}
+                        />
+                        <Route path="/admin/industria/aps" element={<Industry screen="aps" />} />
+                        <Route
+                          path="/admin/industria/planejamento"
+                          element={<Industry screen="planejamento" />}
+                        />
+                        <Route
                           path="/admin/industria/custos"
                           element={<Industry screen="custos" />}
                         />
                         <Route
                           path="/admin/industria/ordens-producao"
-                          element={
-                            <IndustryLayout>
-                              <ProductionOrdersPanel />
-                            </IndustryLayout>
-                          }
-                        />
-                        <Route
-                          path="/admin/industria/capacidade"
-                          element={
-                            <IndustryLayout>
-                              <CapacityPanel />
-                            </IndustryLayout>
-                          }
-                        />
-                        <Route
-                          path="/admin/industria/planejamento"
-                          element={
-                            <IndustryLayout>
-                              <PlanningPanel />
-                            </IndustryLayout>
-                          }
+                          element={<Industry screen="ordens-producao" />}
                         />
                         <Route
                           path="/admin/industria/execucao"
-                          element={
-                            <IndustryLayout>
-                              <ExecutionPanel />
-                            </IndustryLayout>
-                          }
+                          element={<Industry screen="execucao" />}
+                        />
+                        <Route
+                          path="/admin/industria/fases"
+                          element={<Industry screen="fases" />}
                         />
                         <Route
                           path="/admin/industria/qualidade"
-                          element={
-                            <IndustryLayout>
-                              <QualityExtendedPanel />
-                            </IndustryLayout>
-                          }
+                          element={<Industry screen="qualidade" />}
                         />
                         <Route
                           path="/admin/industria/rastreabilidade"
-                          element={
-                            <IndustryLayout>
-                              <TraceabilityPanel />
-                            </IndustryLayout>
-                          }
+                          element={<Industry screen="rastreabilidade" />}
                         />
-                        <Route
-                          path="/admin/industria/kpis"
-                          element={
-                            <IndustryLayout>
-                              <KpisPanel />
-                            </IndustryLayout>
-                          }
-                        />
+                        <Route path="/admin/industria/kpis" element={<Industry screen="kpis" />} />
                         <Route
                           path="/admin/industria/manutencao"
-                          element={
-                            <IndustryLayout>
-                              <MaintenancePanel />
-                            </IndustryLayout>
-                          }
+                          element={<Industry screen="manutencao" />}
+                        />
+                        <Route
+                          path="/admin/industria/executivo"
+                          element={<Industry screen="executivo" />}
                         />
                         <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
                         <Route path="/admin/cadastro" element={<AdminRegister />} />
