@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useMenuHistory } from '@/hooks/use-menu-history'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useMenuBadges } from '@/hooks/use-menu-badges'
+import { useModuleSections } from '@/hooks/use-module-sections'
 import {
   canViewSales,
   canViewStock,
@@ -71,6 +72,7 @@ type IconType = ComponentType<{ className?: string }>
 interface SubItem {
   to: string
   label: string
+  group?: string
 }
 interface NavItem {
   id?: string
@@ -234,32 +236,60 @@ const FINANCIAL_SUBMENU: SubItem[] = [
 ]
 
 const FISCAL_SUBMENU: SubItem[] = [
-  { to: '/admin/fiscal', label: 'Dashboard Fiscal' },
-  { to: '/admin/fiscal/entrada', label: 'Entrada de Notas' },
-  { to: '/admin/fiscal/nfe', label: 'Emissão de NF-e' },
-  { to: '/admin/fiscal/nfse', label: 'Emissão de NFS-e' },
-  { to: '/admin/fiscal/nfce', label: 'NFC-e' },
-  { to: '/admin/fiscal/cte', label: 'CT-e' },
-  { to: '/admin/fiscal/mdfe', label: 'MDF-e' },
-  { to: '/admin/fiscal/apuracao', label: 'Apuração de Impostos' },
-  { to: '/admin/fiscal/reforma-dashboard', label: 'Reforma: Dashboard' },
-  { to: '/admin/fiscal/reforma-cbs-ibs', label: 'Reforma: CBS/IBS' },
-  { to: '/admin/fiscal/reforma-seletivo', label: 'Reforma: Imposto Seletivo' },
-  { to: '/admin/fiscal/reforma-classificacao', label: 'Reforma: Classificação' },
-  { to: '/admin/fiscal/reforma-regras', label: 'Reforma: Regras' },
-  { to: '/admin/fiscal/reforma-transicao', label: 'Reforma: Transição' },
-  { to: '/admin/fiscal/reforma-creditos', label: 'Reforma: Créditos/Débitos' },
-  { to: '/admin/fiscal/reforma-simulador', label: 'Reforma: Simulador' },
-  { to: '/admin/fiscal/reforma-validacao', label: 'Reforma: Validação' },
-  { to: '/admin/fiscal/sped', label: 'SPED' },
-  { to: '/admin/fiscal/livros', label: 'Livros Fiscais' },
-  { to: '/admin/fiscal/correcao', label: 'Carta de Correção' },
-  { to: '/admin/fiscal/manifestacao', label: 'Manifestação' },
-  { to: '/admin/fiscal/documentos', label: 'Documentos Fiscais' },
-  { to: '/admin/fiscal/inutilizacao', label: 'Inutilização' },
-  { to: '/admin/fiscal/certificados', label: 'Certificados Digitais' },
-  { to: '/admin/fiscal/configuracoes', label: 'Configurações Fiscais' },
-  { to: '/admin/fiscal/relatorios', label: 'Relatórios Fiscais' },
+  { to: '/admin/fiscal', label: 'Dashboard Fiscal', group: 'Visão Geral' },
+  { to: '/admin/fiscal/entrada', label: 'Entrada de Notas', group: 'Documentos' },
+  { to: '/admin/fiscal/nfe', label: 'Emissão de NF-e', group: 'Documentos' },
+  { to: '/admin/fiscal/nfse', label: 'Emissão de NFS-e', group: 'Documentos' },
+  { to: '/admin/fiscal/nfce', label: 'NFC-e', group: 'Documentos' },
+  { to: '/admin/fiscal/cte', label: 'CT-e', group: 'Documentos' },
+  { to: '/admin/fiscal/mdfe', label: 'MDF-e', group: 'Documentos' },
+  { to: '/admin/fiscal/documentos', label: 'Documentos Fiscais', group: 'Documentos' },
+  { to: '/admin/fiscal/apuracao', label: 'Apuração de Impostos', group: 'Apuração' },
+  { to: '/admin/fiscal/sped', label: 'SPED', group: 'Apuração' },
+  { to: '/admin/fiscal/livros', label: 'Livros Fiscais', group: 'Apuração' },
+  {
+    to: '/admin/fiscal/reforma-dashboard',
+    label: 'Reforma: Dashboard',
+    group: 'Reforma Tributária',
+  },
+  { to: '/admin/fiscal/reforma-cbs-ibs', label: 'Reforma: CBS/IBS', group: 'Reforma Tributária' },
+  {
+    to: '/admin/fiscal/reforma-seletivo',
+    label: 'Reforma: Imposto Seletivo',
+    group: 'Reforma Tributária',
+  },
+  {
+    to: '/admin/fiscal/reforma-classificacao',
+    label: 'Reforma: Classificação',
+    group: 'Reforma Tributária',
+  },
+  { to: '/admin/fiscal/reforma-regras', label: 'Reforma: Regras', group: 'Reforma Tributária' },
+  {
+    to: '/admin/fiscal/reforma-transicao',
+    label: 'Reforma: Transição',
+    group: 'Reforma Tributária',
+  },
+  {
+    to: '/admin/fiscal/reforma-creditos',
+    label: 'Reforma: Créditos/Débitos',
+    group: 'Reforma Tributária',
+  },
+  {
+    to: '/admin/fiscal/reforma-simulador',
+    label: 'Reforma: Simulador',
+    group: 'Reforma Tributária',
+  },
+  {
+    to: '/admin/fiscal/reforma-validacao',
+    label: 'Reforma: Validação',
+    group: 'Reforma Tributária',
+  },
+  { to: '/admin/fiscal/correcao', label: 'Carta de Correção', group: 'Gestão' },
+  { to: '/admin/fiscal/manifestacao', label: 'Manifestação', group: 'Gestão' },
+  { to: '/admin/fiscal/inutilizacao', label: 'Inutilização', group: 'Gestão' },
+  { to: '/admin/fiscal/certificados', label: 'Certificados Digitais', group: 'Gestão' },
+  { to: '/admin/fiscal/configuracoes', label: 'Configurações Fiscais', group: 'Gestão' },
+  { to: '/admin/fiscal/relatorios', label: 'Relatórios Fiscais', group: 'Gestão' },
 ]
 
 const AI_SUBMENU: SubItem[] = [
@@ -461,19 +491,9 @@ export function AdminSidebar({
   const { user } = useAuth()
   const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
-  const [openMenus, setOpenMenus] = useState<Set<string>>(
-    new Set([
-      'CRM',
-      'Vendas',
-      'Estoque',
-      'Industrial',
-      'Logística',
-      'Financeiro',
-      'Fiscal',
-      'RH',
-      'Inteligência Artificial',
-      'Configurações',
-    ]),
+  const { expanded: openMenus, toggle: toggleMenu } = useModuleSections(
+    'admin-sidebar',
+    user?.id as string,
   )
   const [searchOpen, setSearchOpen] = useState(false)
   const { history, recordVisit } = useMenuHistory(user?.id as string)
@@ -526,14 +546,6 @@ export function AdminSidebar({
   useEffect(() => {
     setActiveIndex(0)
   }, [search])
-
-  const toggleMenu = (label: string) =>
-    setOpenMenus((prev) => {
-      const next = new Set(prev)
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-      return next
-    })
 
   const handleTabChange = (tab: string) => {
     recordVisit(tab)
@@ -947,23 +959,40 @@ export function AdminSidebar({
                       </button>
                       {isOpen && (
                         <div className="ml-7 flex flex-col gap-0.5 mt-0.5">
-                          {item.submenu.map((sub) => (
-                            <Link
-                              key={sub.to}
-                              to={sub.to}
-                              onClick={() => {
-                                recordVisit(sub.to)
-                                onNavigate?.()
-                              }}
-                              className="flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors group"
-                            >
-                              <span>{sub.label}</span>
-                              <StarToggle
-                                isPinned={isFavorite(sub.to)}
-                                onToggle={() => toggleFavorite(sub.to)}
-                              />
-                            </Link>
-                          ))}
+                          {item.submenu
+                            .reduce<{ group: string; items: SubItem[] }[]>((acc, sub) => {
+                              const g = sub.group || ''
+                              const last = acc[acc.length - 1]
+                              if (last && last.group === g) last.items.push(sub)
+                              else acc.push({ group: g, items: [sub] })
+                              return acc
+                            }, [])
+                            .map((grp, gi) => (
+                              <div key={gi}>
+                                {grp.group && (
+                                  <div className="px-3 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                                    {grp.group}
+                                  </div>
+                                )}
+                                {grp.items.map((sub) => (
+                                  <Link
+                                    key={sub.to}
+                                    to={sub.to}
+                                    onClick={() => {
+                                      recordVisit(sub.to)
+                                      onNavigate?.()
+                                    }}
+                                    className="flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-[#005B2E] transition-colors group"
+                                  >
+                                    <span>{sub.label}</span>
+                                    <StarToggle
+                                      isPinned={isFavorite(sub.to)}
+                                      onToggle={() => toggleFavorite(sub.to)}
+                                    />
+                                  </Link>
+                                ))}
+                              </div>
+                            ))}
                         </div>
                       )}
                     </div>

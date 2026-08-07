@@ -1,9 +1,8 @@
 import { type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
-import { Button } from '@/components/ui/button'
-import { Loader2, ArrowLeft, FileText } from 'lucide-react'
+import { Loader2, FileText } from 'lucide-react'
+import { ModulePageHeader } from '@/components/enterprise/module-page-header'
 
 export function FiscalLayout({ children, title }: { children: ReactNode; title: string }) {
   const { isAuthenticated, loading } = useAuth()
@@ -19,17 +18,11 @@ export function FiscalLayout({ children, title }: { children: ReactNode; title: 
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <Button variant="ghost" asChild>
-          <Link to="/admin">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Voltar ao painel
-          </Link>
-        </Button>
-        <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-[#005B2E]" />
-          <h2 className="text-xl font-black text-foreground">{title}</h2>
-        </div>
-      </div>
+      <ModulePageHeader
+        title={title}
+        icon={FileText}
+        breadcrumbs={[{ label: 'Admin', to: '/admin' }, { label: 'Fiscal' }, { label: title }]}
+      />
       {children}
     </div>
   )

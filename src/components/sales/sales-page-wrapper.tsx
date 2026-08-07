@@ -1,9 +1,8 @@
 import { type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
-import { Button } from '@/components/ui/button'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { ModulePageHeader } from '@/components/enterprise/module-page-header'
 
 export function SalesPageWrapper({ children }: { children: ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
@@ -22,13 +21,10 @@ export function SalesPageWrapper({ children }: { children: ReactNode }) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-6">
-        <Button variant="ghost" asChild>
-          <Link to="/admin">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Voltar ao painel
-          </Link>
-        </Button>
-      </div>
+      <ModulePageHeader
+        title="Vendas"
+        breadcrumbs={[{ label: 'Admin', to: '/admin' }, { label: 'Vendas' }]}
+      />
       {children}
     </div>
   )
