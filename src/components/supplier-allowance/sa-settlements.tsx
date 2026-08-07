@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SA_COLLECTIONS, saGetList, saUpdate, settleAllowance } from '@/services/supplier-allowance'
+import {
+  SA_COLLECTIONS,
+  saGetList,
+  settleAllowance,
+  workflowTransition,
+} from '@/services/supplier-allowance'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { canSettle, canApproveSettlement } from '@/lib/supplier-allowance-permissions'
@@ -32,6 +37,7 @@ export function SaSettlements() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [approving, setApproving] = useState<string | null>(null)
   const [form, setForm] = useState({ accrual_id: '', settlement_type: 'credito' })
 
   const load = async () => {
@@ -71,15 +77,20 @@ export function SaSettlements() {
   }
 
   const handleApprove = async (id: string, approve: boolean) => {
+    setApproving(id)
     try {
-      await saUpdate(SA_COLLECTIONS.settlements, id, {
-        status: approve ? 'liquidado' : 'rejeitado',
+      await workflowTransition({
+        entity_collection: SA_COLLECTIONS.settlements,
+        entity_id: id,
+        action: approve ? 'approve' : 'reject',
+        notes: approve ? 'Liquidado via Workflow Engine' : 'Rejeitado via Workflow Engine',
       })
-      toast.success(approve ? 'Liquidado' : 'Rejeitado')
+      toast.success(approve ? 'Liquidado via Workflow' : 'Rejeitado via Workflow')
       load()
     } catch {
-      toast.error('Erro')
+      toast.error('Erro na transição de workflow')
     }
+    setApproving(null)
   }
 
   if (loading)
@@ -102,6 +113,11 @@ export function SaSettlements() {
           </Button>
         )}
       </div>
+      <p className="text-xs text-muted-foreground bg-blue-50 border border-blue-200 rounded p-2">
+        Liquidações são processadas pelo Corporate Workflow Engine. O domínio de Verbas nunca possui
+        contas a pagar — a liquidação financeira é solicitada ao módulo Financeiro via Platform
+        Layer.
+      </p>
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -151,14 +167,20 @@ export function SaSettlements() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            disabled={approving === r.id}
                             onClick={() => handleApprove(r.id, true)}
                             className="text-emerald-600"
                           >
-                            <Check className="w-4 h-4" />
+                            {approving === r.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
+                            disabled={approving === r.id}
                             onClick={() => handleApprove(r.id, false)}
                             className="text-red-600"
                           >

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -20,13 +20,13 @@ import {
 import {
   SA_COLLECTIONS,
   saGetList,
-  saUpdate,
   accrueAllowances,
+  workflowTransition,
 } from '@/services/supplier-allowance'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { canAccrue, canApproveAccrual } from '@/lib/supplier-allowance-permissions'
-import { ACCRUAL_STATUS, formatBRL } from '@/lib/supplier-allowance-types'
+import { formatBRL } from '@/lib/supplier-allowance-types'
 import { Calculator, Search, Loader2, Check, X } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -38,6 +38,7 @@ export function SaAccruals() {
   const [search, setSearch] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [accruing, setAccruing] = useState(false)
+  const [approving, setApproving] = useState<string | null>(null)
   const [form, setForm] = useState({ agreement_id: '', competence_period: '' })
 
   const load = async () => {
@@ -77,17 +78,20 @@ export function SaAccruals() {
   }
 
   const handleApprove = async (id: string, approve: boolean) => {
+    setApproving(id)
     try {
-      await saUpdate(SA_COLLECTIONS.accruals, id, {
-        status: approve ? 'aprovado' : 'rejeitado',
-        approved_by: user?.name || '',
-        approved_at: new Date().toISOString(),
+      await workflowTransition({
+        entity_collection: SA_COLLECTIONS.accruals,
+        entity_id: id,
+        action: approve ? 'approve' : 'reject',
+        notes: approve ? 'Aprovado via Workflow Engine' : 'Rejeitado via Workflow Engine',
       })
-      toast.success(approve ? 'Aprovado' : 'Rejeitado')
+      toast.success(approve ? 'Aprovado via Workflow' : 'Rejeitado via Workflow')
       load()
     } catch {
-      toast.error('Erro')
+      toast.error('Erro na transição de workflow')
     }
+    setApproving(null)
   }
 
   if (loading)
@@ -110,6 +114,10 @@ export function SaAccruals() {
           </Button>
         )}
       </div>
+      <p className="text-xs text-muted-foreground bg-blue-50 border border-blue-200 rounded p-2">
+        Alterações de status são processadas exclusivamente pelo Corporate Workflow Engine,
+        garantindo auditoria, rastreabilidade e notificações automáticas.
+      </p>
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -159,14 +167,20 @@ export function SaAccruals() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            disabled={approving === r.id}
                             onClick={() => handleApprove(r.id, true)}
                             className="text-emerald-600"
                           >
-                            <Check className="w-4 h-4" />
+                            {approving === r.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
+                            disabled={approving === r.id}
                             onClick={() => handleApprove(r.id, false)}
                             className="text-red-600"
                           >

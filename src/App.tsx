@@ -62,6 +62,7 @@ import Phase0Foundation from './pages/Phase0Foundation'
 import PlatformLayer from './pages/PlatformLayer'
 import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
+import SupplierAllowance from './pages/SupplierAllowance'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { CapacityPanel } from '@/components/industry/capacity-panel'
@@ -675,6 +676,7 @@ const App = () => (
                         <Route path="/admin/bi/financial" element={<BI screen="financial" />} />
                         <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
                         <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
+                        <Route path="/admin/verbas" element={<SupplierAllowance />} />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />

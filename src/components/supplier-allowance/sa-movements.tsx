@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -17,12 +17,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SA_COLLECTIONS, saGetList, saCreate } from '@/services/supplier-allowance'
+import { SA_COLLECTIONS, saGetList, saCreate, estornoMovement } from '@/services/supplier-allowance'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
-import { MOVEMENT_TYPES, DIRECTIONS, formatBRL } from '@/lib/supplier-allowance-types'
-import { Plus, Search, Loader2, ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { DIRECTIONS, formatBRL } from '@/lib/supplier-allowance-types'
+import { Plus, Search, Loader2, ArrowDownLeft, ArrowUpRight, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
+
+const MANUAL_MOVEMENT_TYPES = [
+  { value: 'lancamento', label: 'Lançamento' },
+  { value: 'ajuste', label: 'Ajuste' },
+]
 
 export function SaMovements() {
   const { user } = useAuth()
@@ -31,6 +36,9 @@ export function SaMovements() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [estornoTarget, setEstornoTarget] = useState<any | null>(null)
+  const [estornoReason, setEstornoReason] = useState('')
+  const [estornoLoading, setEstornoLoading] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
 
   const load = async () => {
@@ -69,12 +77,30 @@ export function SaMovements() {
         workflow_state: 'completed',
         source: 'usuario',
       })
-      toast.success('Movimento registrado')
+      toast.success('Lançamento registrado')
       setDialogOpen(false)
       load()
     } catch {
       toast.error('Erro ao registrar')
     }
+  }
+
+  const handleEstorno = async () => {
+    if (!estornoReason.trim()) {
+      toast.error('Informe o motivo do estorno')
+      return
+    }
+    setEstornoLoading(true)
+    try {
+      await estornoMovement(estornoTarget.id, estornoReason)
+      toast.success('Estorno registrado')
+      setEstornoTarget(null)
+      setEstornoReason('')
+      load()
+    } catch {
+      toast.error('Erro ao estornar')
+    }
+    setEstornoLoading(false)
   }
 
   if (loading)
@@ -87,7 +113,7 @@ export function SaMovements() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h3 className="text-lg font-bold">Movimentações</h3>
+        <h3 className="text-lg font-bold">Movimentações — Corporate Ledger</h3>
         <Button
           onClick={() => {
             setForm({ movement_type: 'lancamento', direction: 'credito', currency: 'BRL' })
@@ -95,9 +121,13 @@ export function SaMovements() {
           }}
           className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
         >
-          <Plus className="w-4 h-4 mr-2" /> Novo Movimento
+          <Plus className="w-4 h-4 mr-2" /> Novo Lançamento
         </Button>
       </div>
+      <p className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded p-2">
+        As movimentações são imutáveis. Estornos e ajustes criam novos lançamentos corretivos,
+        preservando o histórico completo.
+      </p>
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -117,12 +147,13 @@ export function SaMovements() {
                 <th className="text-left px-3 py-3 font-bold">Valor</th>
                 <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Documento</th>
                 <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Data</th>
+                <th className="text-center px-3 py-3 font-bold">Estorno</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground">
                     Nenhum movimento encontrado
                   </td>
                 </tr>
@@ -149,6 +180,21 @@ export function SaMovements() {
                     <td className="px-3 py-3 hidden sm:table-cell text-xs">
                       {r.created ? new Date(r.created).toLocaleDateString('pt-BR') : '—'}
                     </td>
+                    <td className="px-3 py-3 text-center">
+                      {r.movement_type !== 'estorno' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setEstornoTarget(r)
+                            setEstornoReason('')
+                          }}
+                          className="text-amber-600 hover:bg-amber-50"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
@@ -159,7 +205,7 @@ export function SaMovements() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#005B2E]">Novo Movimento</DialogTitle>
+            <DialogTitle className="text-[#005B2E]">Novo Lançamento</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
@@ -191,7 +237,7 @@ export function SaMovements() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {MOVEMENT_TYPES.map((t) => (
+                    {MANUAL_MOVEMENT_TYPES.map((t) => (
                       <SelectItem key={t.value} value={t.value}>
                         {t.label}
                       </SelectItem>
@@ -228,14 +274,6 @@ export function SaMovements() {
               />
             </div>
             <div>
-              <Label>Nº Documento</Label>
-              <Input
-                value={form.document_number || ''}
-                onChange={(e) => setForm({ ...form, document_number: e.target.value })}
-                className="focus-visible:ring-[#005B2E]"
-              />
-            </div>
-            <div>
               <Label>Observações</Label>
               <Input
                 value={form.observations || ''}
@@ -250,6 +288,62 @@ export function SaMovements() {
             </Button>
             <Button onClick={handleSave} className="bg-[#005B2E] hover:bg-[#01361D] text-white">
               Registrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={!!estornoTarget}
+        onOpenChange={(o) => {
+          if (!o) setEstornoTarget(null)
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#005B2E]">Estornar Movimento</DialogTitle>
+          </DialogHeader>
+          {estornoTarget && (
+            <div className="space-y-3">
+              <div className="bg-muted rounded p-3 text-sm space-y-1">
+                <p>
+                  <strong>Tipo:</strong> {estornoTarget.movement_type}
+                </p>
+                <p>
+                  <strong>Direção:</strong> {estornoTarget.direction}
+                </p>
+                <p>
+                  <strong>Valor:</strong> R$ {formatBRL(estornoTarget.value)}
+                </p>
+                <p>
+                  <strong>Documento:</strong> {estornoTarget.document_number || '—'}
+                </p>
+              </div>
+              <div>
+                <Label>Motivo do Estorno *</Label>
+                <Input
+                  value={estornoReason}
+                  onChange={(e) => setEstornoReason(e.target.value)}
+                  placeholder="Descreva o motivo..."
+                  className="focus-visible:ring-[#005B2E]"
+                />
+              </div>
+              <p className="text-xs text-amber-600">
+                Um novo movimento de estorno será criado com direção oposta, preservando o
+                histórico.
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEstornoTarget(null)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleEstorno}
+              disabled={estornoLoading}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {estornoLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Confirmar
+              Estorno
             </Button>
           </DialogFooter>
         </DialogContent>

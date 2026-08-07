@@ -78,3 +78,37 @@ export async function consumeAllowance(data: {
     headers: { 'Content-Type': 'application/json' },
   })
 }
+
+export async function workflowTransition(data: {
+  entity_collection: string
+  entity_id: string
+  action: string
+  notes?: string
+}): Promise<any> {
+  return pb.send('/backend/v1/supplier-allowance/workflow-transition', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export async function estornoMovement(movementId: string, reason: string): Promise<any> {
+  const movement: any = await saGetOne(SA_COLLECTIONS.movements, movementId)
+  const oppositeDirection = movement.direction === 'credito' ? 'debito' : 'credito'
+  return saCreate(SA_COLLECTIONS.movements, {
+    account: movement.account,
+    agreement: movement.agreement || '',
+    movement_type: 'estorno',
+    direction: oppositeDirection,
+    value: movement.value,
+    currency: movement.currency || 'BRL',
+    document_type: 'estorno',
+    document_number: 'EST-' + (movement.document_number || movement.id.substring(0, 8)),
+    related_movement: movementId,
+    user: movement.user || 'sistema',
+    timestamp: new Date().toISOString(),
+    workflow_state: 'completed',
+    source: 'usuario',
+    observations: 'Estorno: ' + reason,
+  })
+}
