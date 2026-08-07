@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T13:47:45.163Z",
+  "generatedAt": "2026-08-07T13:58:19.406Z",
   "collections": [
     {
       "name": "users",
@@ -108,9 +108,9 @@
       "apiRules": {
         "list": "",
         "view": "",
-        "create": null,
-        "update": null,
-        "delete": null
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -148,9 +148,9 @@
       "apiRules": {
         "list": "",
         "view": "",
-        "create": null,
-        "update": null,
-        "delete": null
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -1045,7 +1045,7 @@
         "list": "@request.auth.id != \"\"",
         "view": "@request.auth.id != \"\"",
         "create": "@request.auth.role = 'SUP'",
-        "update": null,
+        "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -1469,7 +1469,7 @@
       "apiRules": {
         "list": "@request.auth.role = 'SUP'",
         "view": "@request.auth.role = 'SUP'",
-        "create": null,
+        "create": "@request.auth.id != ''",
         "update": "@request.auth.id = '___never___'",
         "delete": "@request.auth.id = '___never___'"
       },
@@ -1670,8 +1670,8 @@
         "list": "@request.auth.role = 'SUP'",
         "view": "@request.auth.role = 'SUP'",
         "create": "@request.auth.role = 'SUP'",
-        "update": null,
-        "delete": null
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -3878,8 +3878,8 @@
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
-        "update": null,
-        "delete": null
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -6623,8 +6623,8 @@
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
-        "update": null,
-        "delete": null
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -6818,7 +6818,7 @@
         "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
-        "delete": null
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -6957,9 +6957,9 @@
       "apiRules": {
         "list": "@request.auth.role = 'SUP'",
         "view": "@request.auth.role = 'SUP'",
-        "create": null,
-        "update": null,
-        "delete": null
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
@@ -7067,9 +7067,9 @@
       "apiRules": {
         "list": "@request.auth.role = 'SUP'",
         "view": "@request.auth.role = 'SUP'",
-        "create": null,
+        "create": "@request.auth.id != ''",
         "update": "@request.auth.role = 'SUP'",
-        "delete": null
+        "delete": "@request.auth.id != ''"
       },
       "fields": [
         {
