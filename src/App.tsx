@@ -61,6 +61,13 @@ import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
+import { CapacityPanel } from '@/components/industry/capacity-panel'
+import { PlanningPanel } from '@/components/industry/planning-panel'
+import { ExecutionPanel } from '@/components/industry/execution-panel'
+import { QualityExtendedPanel } from '@/components/industry/quality-extended-panel'
+import { TraceabilityPanel } from '@/components/industry/traceability-panel'
+import { KpisPanel } from '@/components/industry/kpis-panel'
+import { MaintenancePanel } from '@/components/industry/maintenance-panel'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -518,6 +525,62 @@ const App = () => (
                           element={
                             <IndustryLayout>
                               <ProductionOrdersPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/capacidade"
+                          element={
+                            <IndustryLayout>
+                              <CapacityPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/planejamento"
+                          element={
+                            <IndustryLayout>
+                              <PlanningPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/execucao"
+                          element={
+                            <IndustryLayout>
+                              <ExecutionPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/qualidade"
+                          element={
+                            <IndustryLayout>
+                              <QualityExtendedPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/rastreabilidade"
+                          element={
+                            <IndustryLayout>
+                              <TraceabilityPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/kpis"
+                          element={
+                            <IndustryLayout>
+                              <KpisPanel />
+                            </IndustryLayout>
+                          }
+                        />
+                        <Route
+                          path="/admin/industria/manutencao"
+                          element={
+                            <IndustryLayout>
+                              <MaintenancePanel />
                             </IndustryLayout>
                           }
                         />

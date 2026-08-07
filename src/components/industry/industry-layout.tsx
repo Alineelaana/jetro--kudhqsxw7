@@ -13,6 +13,13 @@ import {
   LayoutDashboard,
   Factory,
   ClipboardList,
+  Calendar,
+  Brain,
+  Activity,
+  BarChart3,
+  Wrench,
+  ShieldCheck,
+  GitBranch,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -24,8 +31,15 @@ const NAV_ITEMS = [
   { to: '/admin/industria/formulacoes', label: 'Formulações', icon: FlaskConical },
   { to: '/admin/industria/recursos', label: 'Recursos Produtivos', icon: Cog },
   { to: '/admin/industria/roteiros', label: 'Roteiros de Produção', icon: Route },
+  { to: '/admin/industria/capacidade', label: 'Capacidade Produtiva', icon: Calendar },
+  { to: '/admin/industria/planejamento', label: 'Planejamento & MRP', icon: Brain },
   { to: '/admin/industria/custos', label: 'Custos Industriais', icon: DollarSign },
   { to: '/admin/industria/ordens-producao', label: 'Ordens de Produção', icon: ClipboardList },
+  { to: '/admin/industria/execucao', label: 'Execução & Apontamentos', icon: Activity },
+  { to: '/admin/industria/qualidade', label: 'Qualidade Industrial', icon: ShieldCheck },
+  { to: '/admin/industria/rastreabilidade', label: 'Rastreabilidade', icon: GitBranch },
+  { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)', icon: BarChart3 },
+  { to: '/admin/industria/manutencao', label: 'Manutenção', icon: Wrench },
 ]
 
 export function IndustryLayout({ children }: { children?: ReactNode }) {

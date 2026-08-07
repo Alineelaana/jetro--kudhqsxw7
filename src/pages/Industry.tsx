@@ -9,6 +9,13 @@ import { BomPanel } from '@/components/industry/bom-panel'
 import { ProductionResourcesPanel } from '@/components/industry/production-resources-panel'
 import { ProductionRoutesPanel } from '@/components/industry/production-routes-panel'
 import { IndustrialCostsPanel } from '@/components/industry/industrial-costs-panel'
+import { CapacityPanel } from '@/components/industry/capacity-panel'
+import { PlanningPanel } from '@/components/industry/planning-panel'
+import { ExecutionPanel } from '@/components/industry/execution-panel'
+import { KpisPanel } from '@/components/industry/kpis-panel'
+import { MaintenancePanel } from '@/components/industry/maintenance-panel'
+import { QualityExtendedPanel } from '@/components/industry/quality-extended-panel'
+import { TraceabilityPanel } from '@/components/industry/traceability-panel'
 
 interface Props {
   screen?: string
@@ -58,6 +65,23 @@ function IndustryContent({ screen }: { screen: string }) {
       return <ProductionRoutesPanel />
     case 'custos':
       return <IndustrialCostsPanel />
+    case 'capacidade':
+      return <CapacityPanel />
+    case 'planejamento':
+    case 'mrp':
+      return <PlanningPanel />
+    case 'execucao':
+    case 'apontamentos':
+      return <ExecutionPanel />
+    case 'qualidade':
+      return <QualityExtendedPanel />
+    case 'rastreabilidade':
+      return <TraceabilityPanel />
+    case 'kpis':
+    case 'indicadores':
+      return <KpisPanel />
+    case 'manutencao':
+      return <MaintenancePanel />
     case 'especificacoes':
     case 'conversoes':
     default:
