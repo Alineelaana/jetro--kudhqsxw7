@@ -170,6 +170,63 @@ migrate(
       app.save(acr)
     }
 
+    var agentTools = [
+      { collection: 'partners', perms: { list: true, read: true }, actAs: 'admin' },
+      {
+        collection: 'supplier_allowance_agreements',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      {
+        collection: 'supplier_allowance_accounts',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      {
+        collection: 'supplier_allowance_movements',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      {
+        collection: 'supplier_allowance_accruals',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      {
+        collection: 'supplier_allowance_appropriations',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      {
+        collection: 'supplier_allowance_consumptions',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      {
+        collection: 'supplier_allowance_settlements',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      },
+      { collection: 'purchase_orders', perms: { list: true, read: true }, actAs: 'admin' },
+    ]
+
+    try {
+      app.findCollectionByNameOrId('financial_payables')
+      agentTools.push({
+        collection: 'financial_payables',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      })
+    } catch (_) {}
+    try {
+      app.findCollectionByNameOrId('promotion_rules')
+      agentTools.push({
+        collection: 'promotion_rules',
+        perms: { list: true, read: true },
+        actAs: 'admin',
+      })
+    } catch (_) {}
+
     $ai.agents.define(app, {
       slug: 'adapta-verbas-fornecedores',
       name: 'ADAPTA — Verbas de Fornecedores',
@@ -177,47 +234,7 @@ migrate(
       systemPrompt:
         'Voce e a ADAPTA Verbas de Fornecedores, assistente especializada em gestao de verbas de fornecedores do ERP VeloraLog. Responda APENAS com base em dados reais das colecoes de verbas. Sempre cite a fonte dos dados (nome da colecao e registros consultados). Se nao houver dados suficientes, declare explicitamente. Estruture respostas em topicos claros. Use formatacao markdown.',
       tier: 'fast',
-      tools: [
-        { collection: 'partners', perms: { list: true, read: true }, actAs: 'admin' },
-        {
-          collection: 'supplier_allowance_agreements',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        {
-          collection: 'supplier_allowance_accounts',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        {
-          collection: 'supplier_allowance_movements',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        {
-          collection: 'supplier_allowance_accruals',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        {
-          collection: 'supplier_allowance_appropriations',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        {
-          collection: 'supplier_allowance_consumptions',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        {
-          collection: 'supplier_allowance_settlements',
-          perms: { list: true, read: true },
-          actAs: 'admin',
-        },
-        { collection: 'purchase_orders', perms: { list: true, read: true }, actAs: 'admin' },
-        { collection: 'financial_payables', perms: { list: true, read: true }, actAs: 'admin' },
-        { collection: 'promotion_rules', perms: { list: true, read: true }, actAs: 'admin' },
-      ],
+      tools: agentTools,
       memory: [
         {
           type: 'text',

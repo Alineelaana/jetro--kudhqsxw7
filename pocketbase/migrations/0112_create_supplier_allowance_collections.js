@@ -3,9 +3,17 @@ migrate(
     var partnersId = app.findCollectionByNameOrId('partners').id
     var productsId = app.findCollectionByNameOrId('products').id
     var centrosCustoId = app.findCollectionByNameOrId('centros_custo').id
-    var financialPayablesId = app.findCollectionByNameOrId('financial_payables').id
     var purchaseOrdersId = app.findCollectionByNameOrId('purchase_orders').id
-    var promotionRulesId = app.findCollectionByNameOrId('promotion_rules').id
+
+    var financialPayablesId = ''
+    try {
+      financialPayablesId = app.findCollectionByNameOrId('financial_payables').id
+    } catch (_) {}
+
+    var promotionRulesId = ''
+    try {
+      promotionRulesId = app.findCollectionByNameOrId('promotion_rules').id
+    } catch (_) {}
 
     function authRules() {
       return {
@@ -206,32 +214,37 @@ migrate(
     app.save(accrualsCol)
     var accrualsId = accrualsCol.id
 
+    var appropriationsFields = [
+      { name: 'account', type: 'relation', collectionId: accountsId, maxSelect: 1, required: true },
+      { name: 'accrual', type: 'relation', collectionId: accrualsId, maxSelect: 1 },
+      { name: 'product', type: 'relation', collectionId: productsId, maxSelect: 1 },
+    ]
+    if (centrosCustoId) {
+      appropriationsFields.push({
+        name: 'cost_center',
+        type: 'relation',
+        collectionId: centrosCustoId,
+        maxSelect: 1,
+      })
+    } else {
+      appropriationsFields.push({ name: 'cost_center', type: 'text' })
+    }
+    appropriationsFields.push({ name: 'allocated_value', type: 'text', required: true })
+    appropriationsFields.push({ name: 'reason', type: 'text' })
+    appropriationsFields.push({
+      name: 'status',
+      type: 'select',
+      values: ['pendente', 'aprovado', 'rejeitado'],
+      maxSelect: 1,
+    })
+
     app.save(
       new Collection(
         Object.assign(
           {
             name: 'supplier_allowance_appropriations',
             type: 'base',
-            fields: [
-              {
-                name: 'account',
-                type: 'relation',
-                collectionId: accountsId,
-                maxSelect: 1,
-                required: true,
-              },
-              { name: 'accrual', type: 'relation', collectionId: accrualsId, maxSelect: 1 },
-              { name: 'product', type: 'relation', collectionId: productsId, maxSelect: 1 },
-              { name: 'cost_center', type: 'relation', collectionId: centrosCustoId, maxSelect: 1 },
-              { name: 'allocated_value', type: 'text', required: true },
-              { name: 'reason', type: 'text' },
-              {
-                name: 'status',
-                type: 'select',
-                values: ['pendente', 'aprovado', 'rejeitado'],
-                maxSelect: 1,
-              },
-            ].concat(ad()),
+            fields: appropriationsFields.concat(ad()),
             indexes: [
               'CREATE INDEX idx_sap_account ON supplier_allowance_appropriations (account)',
               'CREATE INDEX idx_sap_accrual ON supplier_allowance_appropriations (accrual)',
@@ -242,50 +255,50 @@ migrate(
       ),
     )
 
+    var settlementFields = [
+      { name: 'account', type: 'relation', collectionId: accountsId, maxSelect: 1, required: true },
+      { name: 'accrual', type: 'relation', collectionId: accrualsId, maxSelect: 1 },
+      { name: 'supplier', type: 'relation', collectionId: partnersId, maxSelect: 1 },
+      { name: 'settled_value', type: 'text', required: true },
+      {
+        name: 'settlement_type',
+        type: 'select',
+        values: ['credito', 'abatimento', 'nota_credito', 'pagamento'],
+        maxSelect: 1,
+      },
+    ]
+    if (financialPayablesId) {
+      settlementFields.push({
+        name: 'payable',
+        type: 'relation',
+        collectionId: financialPayablesId,
+        maxSelect: 1,
+      })
+    } else {
+      settlementFields.push({ name: 'payable', type: 'text' })
+    }
+    settlementFields.push({
+      name: 'purchase_credit',
+      type: 'relation',
+      collectionId: purchaseOrdersId,
+      maxSelect: 1,
+    })
+    settlementFields.push({ name: 'workflow_state', type: 'text' })
+    settlementFields.push({
+      name: 'status',
+      type: 'select',
+      values: ['rascunho', 'pendente', 'aprovado', 'rejeitado', 'liquidado', 'cancelado'],
+      maxSelect: 1,
+    })
+    settlementFields.push({ name: 'history', type: 'json' })
+
     app.save(
       new Collection(
         Object.assign(
           {
             name: 'supplier_allowance_settlements',
             type: 'base',
-            fields: [
-              {
-                name: 'account',
-                type: 'relation',
-                collectionId: accountsId,
-                maxSelect: 1,
-                required: true,
-              },
-              { name: 'accrual', type: 'relation', collectionId: accrualsId, maxSelect: 1 },
-              { name: 'supplier', type: 'relation', collectionId: partnersId, maxSelect: 1 },
-              { name: 'settled_value', type: 'text', required: true },
-              {
-                name: 'settlement_type',
-                type: 'select',
-                values: ['credito', 'abatimento', 'nota_credito', 'pagamento'],
-                maxSelect: 1,
-              },
-              {
-                name: 'payable',
-                type: 'relation',
-                collectionId: financialPayablesId,
-                maxSelect: 1,
-              },
-              {
-                name: 'purchase_credit',
-                type: 'relation',
-                collectionId: purchaseOrdersId,
-                maxSelect: 1,
-              },
-              { name: 'workflow_state', type: 'text' },
-              {
-                name: 'status',
-                type: 'select',
-                values: ['rascunho', 'pendente', 'aprovado', 'rejeitado', 'liquidado', 'cancelado'],
-                maxSelect: 1,
-              },
-              { name: 'history', type: 'json' },
-            ].concat(ad()),
+            fields: settlementFields.concat(ad()),
             indexes: [
               'CREATE INDEX idx_sas_account ON supplier_allowance_settlements (account)',
               'CREATE INDEX idx_sas_accrual ON supplier_allowance_settlements (accrual)',
@@ -298,33 +311,38 @@ migrate(
       ),
     )
 
+    var consumptionFields = [
+      { name: 'account', type: 'relation', collectionId: accountsId, maxSelect: 1, required: true },
+      { name: 'agreement', type: 'relation', collectionId: agreementsId, maxSelect: 1 },
+      { name: 'product', type: 'relation', collectionId: productsId, maxSelect: 1 },
+      { name: 'purchase', type: 'relation', collectionId: purchaseOrdersId, maxSelect: 1 },
+    ]
+    if (promotionRulesId) {
+      consumptionFields.push({
+        name: 'promotion',
+        type: 'relation',
+        collectionId: promotionRulesId,
+        maxSelect: 1,
+      })
+    } else {
+      consumptionFields.push({ name: 'promotion', type: 'text' })
+    }
+    consumptionFields.push({ name: 'consumed_value', type: 'text', required: true })
+    consumptionFields.push({ name: 'reason', type: 'text' })
+    consumptionFields.push({
+      name: 'status',
+      type: 'select',
+      values: ['pendente', 'aprovado', 'rejeitado'],
+      maxSelect: 1,
+    })
+
     app.save(
       new Collection(
         Object.assign(
           {
             name: 'supplier_allowance_consumptions',
             type: 'base',
-            fields: [
-              {
-                name: 'account',
-                type: 'relation',
-                collectionId: accountsId,
-                maxSelect: 1,
-                required: true,
-              },
-              { name: 'agreement', type: 'relation', collectionId: agreementsId, maxSelect: 1 },
-              { name: 'product', type: 'relation', collectionId: productsId, maxSelect: 1 },
-              { name: 'purchase', type: 'relation', collectionId: purchaseOrdersId, maxSelect: 1 },
-              { name: 'promotion', type: 'relation', collectionId: promotionRulesId, maxSelect: 1 },
-              { name: 'consumed_value', type: 'text', required: true },
-              { name: 'reason', type: 'text' },
-              {
-                name: 'status',
-                type: 'select',
-                values: ['pendente', 'aprovado', 'rejeitado'],
-                maxSelect: 1,
-              },
-            ].concat(ad()),
+            fields: consumptionFields.concat(ad()),
             indexes: [
               'CREATE INDEX idx_sac2_account ON supplier_allowance_consumptions (account)',
               'CREATE INDEX idx_sac2_agreement ON supplier_allowance_consumptions (agreement)',
