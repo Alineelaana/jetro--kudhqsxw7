@@ -7,9 +7,10 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { type FieldErrors } from '@/lib/pocketbase/errors'
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'
+import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 
 export function AdminLogin() {
-  const { login } = useAuth()
+  const { login, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -50,6 +51,10 @@ export function AdminLogin() {
   }
 
   const hasFieldError = !!fieldErrors.email || !!fieldErrors.username || !!fieldErrors.password
+
+  if (mfaRequired) {
+    return <MfaVerifyScreen onVerify={mfaLoginVerify} onCancel={mfaCancel} />
+  }
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">

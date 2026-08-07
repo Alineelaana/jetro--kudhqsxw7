@@ -58,6 +58,8 @@ import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
+import { IndustryLayout } from '@/components/industry/industry-layout'
+import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -490,6 +492,14 @@ const App = () => (
                       <Route
                         path="/admin/industria/custos"
                         element={<Industry screen="custos" />}
+                      />
+                      <Route
+                        path="/admin/industria/ordens-producao"
+                        element={
+                          <IndustryLayout>
+                            <ProductionOrdersPanel />
+                          </IndustryLayout>
+                        }
                       />
                       <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
                       <Route path="/admin/cadastro" element={<AdminRegister />} />

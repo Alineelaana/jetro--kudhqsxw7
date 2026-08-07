@@ -8,10 +8,13 @@ interface AuthContextType {
   isAuthenticated: boolean
   isAdmin: boolean
   userRole: string
+  mfaRequired: boolean
   login: (
     username: string,
     password: string,
   ) => Promise<{ error: string | null; fieldErrors: FieldErrors }>
+  mfaLoginVerify: (code: string) => Promise<{ error: string | null }>
+  mfaCancel: () => void
   signUp: (
     name: string,
     email: string,
@@ -54,6 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     pb.authStore.isValid && initialRecord?.active !== false,
   )
+  const [mfaRequired, setMfaRequired] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -134,6 +138,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           error: 'Sua conta está inativa. Entre em contato com um administrador.',
           fieldErrors: {},
         }
+      }
+
+      const mfaEnabled = record?.mfa_enabled === true
+      const hasSecret = !!(record?.mfa_secret as string)
+      if (mfaEnabled && hasSecret) {
+        setUser(record)
+        setMfaRequired(true)
+        setIsAuthenticated(false)
+        return { error: null, fieldErrors: {} }
       }
 
       setUser(record)
@@ -236,6 +249,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const mfaLoginVerify = async (code: string) => {
+    try {
+      await pb.send('/backend/v1/mfa/login-verify', {
+        method: 'POST',
+        body: JSON.stringify({ code }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+      setMfaRequired(false)
+      setIsAuthenticated(true)
+      return { error: null }
+    } catch {
+      return { error: 'Código MFA inválido. Tente novamente.' }
+    }
+  }
+
+  const mfaCancel = () => {
+    pb.authStore.clear()
+    setUser(null)
+    setIsAuthenticated(false)
+    setMfaRequired(false)
+  }
+
   const signOut = () => {
     pb.send('/backend/v1/audit/auth', {
       method: 'POST',
@@ -245,6 +280,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     pb.authStore.clear()
     setUser(null)
     setIsAuthenticated(false)
+    setMfaRequired(false)
   }
 
   const userRole =
@@ -253,7 +289,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, isAdmin, userRole, login, signUp, signOut, loading }}
+      value={{
+        user,
+        isAuthenticated,
+        isAdmin,
+        userRole,
+        mfaRequired,
+        login,
+        mfaLoginVerify,
+        mfaCancel,
+        signUp,
+        signOut,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>

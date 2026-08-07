@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import {
   Package,
@@ -11,6 +12,7 @@ import {
   DollarSign,
   LayoutDashboard,
   Factory,
+  ClipboardList,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -23,9 +25,10 @@ const NAV_ITEMS = [
   { to: '/admin/industria/recursos', label: 'Recursos Produtivos', icon: Cog },
   { to: '/admin/industria/roteiros', label: 'Roteiros de Produção', icon: Route },
   { to: '/admin/industria/custos', label: 'Custos Industriais', icon: DollarSign },
+  { to: '/admin/industria/ordens-producao', label: 'Ordens de Produção', icon: ClipboardList },
 ]
 
-export function IndustryLayout() {
+export function IndustryLayout({ children }: { children?: ReactNode }) {
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       <div className="flex items-center gap-3 mb-6">
@@ -58,9 +61,7 @@ export function IndustryLayout() {
             ))}
           </div>
         </nav>
-        <div className="flex-1 min-w-0">
-          <Outlet />
-        </div>
+        <div className="flex-1 min-w-0">{children || <Outlet />}</div>
       </div>
     </div>
   )

@@ -85,18 +85,21 @@ Uma oportunidade só é registrada quando atende **pelo menos um** dos critério
 | **Domínio**      | 02 — Banco de Dados                                      |
 | **Critério**     | Melhoria de performance                                  |
 
-### BEP-005: Implementar MFA para Administradores
+### BEP-005: Implementar MFA para Administradores ✅ Implementado
 
-| Campo          | Valor                                                 |
-| -------------- | ----------------------------------------------------- |
-| **Título**     | MFA (TOTP) obrigatório para role SUP                  |
-| **Descrição**  | Implementar TOTP, tela de setup, verificação no login |
-| **Motivo**     | NC-HIGH-003: Sem MFA para admin                       |
-| **Benefício**  | Acesso admin requer segunda camada                    |
-| **Impacto**    | Segurança                                             |
-| **Prioridade** | P0                                                    |
-| **Domínio**    | 03 — Segurança                                        |
-| **Critério**   | Aumento de segurança                                  |
+| Campo          | Valor                                                                                                                                                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Título**     | MFA (TOTP) obrigatório para role SUP                                                                                                                                                                                         |
+| **Descrição**  | Implementar TOTP, tela de setup, verificação no login                                                                                                                                                                        |
+| **Motivo**     | NC-HIGH-003: Sem MFA para admin                                                                                                                                                                                              |
+| **Benefício**  | Acesso admin requer segunda camada                                                                                                                                                                                           |
+| **Impacto**    | Segurança                                                                                                                                                                                                                    |
+| **Prioridade** | P0                                                                                                                                                                                                                           |
+| **Domínio**    | 03 — Segurança                                                                                                                                                                                                               |
+| **Critério**   | Aumento de segurança                                                                                                                                                                                                         |
+| **Status**     | ✅ Implementado — Sprint Técnica 1                                                                                                                                                                                           |
+| **Evidência**  | Migration `0093_bep005_mfa_fields.js`; hooks `mfa_setup.js`, `mfa_verify.js`, `mfa_disable.js`, `mfa_status.js`; frontend `mfa-enrollment-dialog.tsx`, `mfa-verify-screen.tsx`; `security_config.mfa_required_for_admins`    |
+| **Validação**  | 5 níveis: estrutural (migrations + hooks), persistência (campos no schema vivo), funcional (fluxo de setup e login MFA), integração (audit logs, RLS preservada), arquitetural (reutiliza users collection, security_config) |
 
 ### BEP-006: Criptografia Campo-a-Campo para Dados LGPD
 
@@ -347,18 +350,21 @@ Uma oportunidade só é registrada quando atende **pelo menos um** dos critério
 | **Domínio**    | 15 — TI/IA                                                           |
 | **Critério**   | Vantagem competitiva                                                 |
 
-### BEP-025: Criar Collection production_orders
+### BEP-025: Criar Collection production_orders ✅ Implementado
 
-| Campo          | Valor                                                        |
-| -------------- | ------------------------------------------------------------ |
-| **Título**     | Collection para ordens de produção com BOM versionada        |
-| **Descrição**  | Criar collection com bom_id, bom_version, status, quantidade |
-| **Motivo**     | NC-HIGH-007: production_orders ausente                       |
-| **Benefício**  | Execução de produção implementada                            |
-| **Impacto**    | Indústria                                                    |
-| **Prioridade** | P0                                                           |
-| **Domínio**    | 12 — Indústria                                               |
-| **Critério**   | Aumento de produtividade                                     |
+| Campo          | Valor                                                                                                                                                                                                                                                                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Título**     | Collection para ordens de produção com BOM versionada                                                                                                                                                                                                                                                                               |
+| **Descrição**  | Criar collection com bom_id, bom_version, status, quantidade                                                                                                                                                                                                                                                                        |
+| **Motivo**     | NC-HIGH-007: production_orders ausente                                                                                                                                                                                                                                                                                              |
+| **Benefício**  | Execução de produção implementada                                                                                                                                                                                                                                                                                                   |
+| **Impacto**    | Indústria                                                                                                                                                                                                                                                                                                                           |
+| **Prioridade** | P0                                                                                                                                                                                                                                                                                                                                  |
+| **Domínio**    | 12 — Indústria                                                                                                                                                                                                                                                                                                                      |
+| **Critério**   | Aumento de produtividade                                                                                                                                                                                                                                                                                                            |
+| **Status**     | ✅ Implementado — Sprint Técnica 1                                                                                                                                                                                                                                                                                                  |
+| **Evidência**  | Migration `0094_bep025_production_orders.js`; hook `production_order_number_next.js`; service `src/services/production-orders.ts`; panel `src/components/industry/production-orders-panel.tsx`; rota `/admin/industria/ordens-producao`                                                                                             |
+| **Validação**  | 5 níveis: estrutural (migration + hook + service + panel), persistência (collection no schema vivo), funcional (CRUD de ordens, transições de status), integração (relações com products, bom_versions, production_routes), arquitetural (reutiliza collections existentes via RelationField, RLS consistente com módulo Indústria) |
 
 ### BEP-026: Implementar Hook MRP
 
