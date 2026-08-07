@@ -677,7 +677,50 @@ const App = () => (
                         <Route path="/admin/bi/financial" element={<BI screen="financial" />} />
                         <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
                         <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
-                        <Route path="/admin/verbas" element={<SupplierAllowance />} />
+                        <Route
+                          path="/admin/verbas"
+                          element={<SupplierAllowance screen="cockpit" />}
+                        />
+                        <Route
+                          path="/admin/verbas/cockpit"
+                          element={<SupplierAllowance screen="cockpit" />}
+                        />
+                        <Route
+                          path="/admin/verbas/acordos"
+                          element={<SupplierAllowance screen="acordos" />}
+                        />
+                        <Route
+                          path="/admin/verbas/conta-corrente"
+                          element={<SupplierAllowance screen="conta-corrente" />}
+                        />
+                        <Route
+                          path="/admin/verbas/movimentacoes"
+                          element={<SupplierAllowance screen="movimentacoes" />}
+                        />
+                        <Route
+                          path="/admin/verbas/apuracoes"
+                          element={<SupplierAllowance screen="apuracoes" />}
+                        />
+                        <Route
+                          path="/admin/verbas/apropriacoes"
+                          element={<SupplierAllowance screen="apropriacoes" />}
+                        />
+                        <Route
+                          path="/admin/verbas/consumos"
+                          element={<SupplierAllowance screen="consumos" />}
+                        />
+                        <Route
+                          path="/admin/verbas/liquidacoes"
+                          element={<SupplierAllowance screen="liquidacoes" />}
+                        />
+                        <Route
+                          path="/admin/verbas/relatorios"
+                          element={<SupplierAllowance screen="relatorios" />}
+                        />
+                        <Route
+                          path="/admin/verbas/configuracoes"
+                          element={<SupplierAllowance screen="configuracoes" />}
+                        />
                         <Route
                           path="/admin/controladoria"
                           element={<Controladoria screen="dashboard" />}
@@ -729,6 +772,18 @@ const App = () => (
                         <Route
                           path="/admin/controladoria/adapta"
                           element={<Controladoria screen="adapta" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/balanco"
+                          element={<Controladoria screen="balanco" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/fluxo-caixa"
+                          element={<Controladoria screen="fluxo-caixa" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/configuracoes"
+                          element={<Controladoria screen="configuracoes" />}
                         />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />

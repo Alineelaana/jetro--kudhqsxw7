@@ -26,6 +26,18 @@ const NAV_SECTIONS = [
         icon: '🔒',
         stage: 'Consolidação',
       },
+      {
+        to: '/admin/controladoria/balanco',
+        label: 'Balanço',
+        icon: '⚖️',
+        stage: 'Consolidação',
+      },
+      {
+        to: '/admin/controladoria/fluxo-caixa',
+        label: 'Fluxo de Caixa Gerencial',
+        icon: '💧',
+        stage: 'Análise',
+      },
     ],
   },
   {
@@ -66,6 +78,12 @@ const NAV_SECTIONS = [
         label: 'ADAPTA Financeira',
         icon: '🤖',
         stage: 'Tomada de Decisão',
+      },
+      {
+        to: '/admin/controladoria/configuracoes',
+        label: 'Configurações',
+        icon: '⚙️',
+        stage: 'Configuração',
       },
     ],
   },

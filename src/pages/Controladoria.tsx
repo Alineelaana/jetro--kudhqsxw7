@@ -26,6 +26,9 @@ const TITLES: Record<string, string> = {
   reclassificacoes: 'Reclassificações Gerenciais',
   'visoes-salvas': 'Visões Salvas',
   adapta: 'ADAPTA Financeira',
+  balanco: 'Balanço Patrimonial',
+  'fluxo-caixa': 'Fluxo de Caixa Gerencial',
+  configuracoes: 'Configurações da Controladoria',
 }
 
 export default function Controladoria({ screen = 'dashboard' }: ControladoriaPageProps) {
@@ -79,6 +82,34 @@ export default function Controladoria({ screen = 'dashboard' }: ControladoriaPag
               Análises salvas com filtros, colunas, agrupamentos e comparações.
             </p>
             <ControladoriaGenericScreen configKey="materiality" />
+          </div>
+        )
+      case 'balanco':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Balanço Patrimonial — demonstração consolidada do patrimônio da empresa.
+            </p>
+            <ControladoriaGenericScreen configKey="consolidation" />
+          </div>
+        )
+      case 'fluxo-caixa':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Fluxo de Caixa Gerencial — projeção de entradas e saídas baseada nos dados oficiais.
+            </p>
+            <ControladoriaGenericScreen configKey="consolidation" />
+          </div>
+        )
+      case 'configuracoes':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Configurações da Controladoria — parâmetros de DRE, KPIs, materialidade e
+              consolidação.
+            </p>
+            <ControladoriaGenericScreen configKey="reclassifications" />
           </div>
         )
       default:

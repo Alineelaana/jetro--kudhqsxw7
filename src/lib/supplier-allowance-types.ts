@@ -63,6 +63,7 @@ export const SA_TABS = [
   { id: 'cockpit', label: 'Cockpit Executivo' },
   { id: 'adapta', label: 'ADAPTA Verbas' },
   { id: 'reports', label: 'Relatórios' },
+  { id: 'configuracoes', label: 'Configurações' },
 ] as const
 
 export function formatBRL(v: string | number | undefined | null): string {

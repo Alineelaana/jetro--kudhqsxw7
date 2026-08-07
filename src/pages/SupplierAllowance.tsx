@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SaLayout } from '@/components/supplier-allowance/sa-layout'
 import { SaAgreements } from '@/components/supplier-allowance/sa-agreements'
 import { SaAccounts } from '@/components/supplier-allowance/sa-accounts'
@@ -11,7 +11,7 @@ import { SaCockpit } from '@/components/supplier-allowance/sa-cockpit'
 import { SA_TABS } from '@/lib/supplier-allowance-types'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
-import { Bot, FileText } from 'lucide-react'
+import { Bot, FileText, Settings } from 'lucide-react'
 
 function PlaceholderTab({
   icon: Icon,
@@ -33,8 +33,29 @@ function PlaceholderTab({
   )
 }
 
-export default function SupplierAllowance() {
-  const [tab, setTab] = useState('agreements')
+const SCREEN_TO_TAB: Record<string, string> = {
+  cockpit: 'cockpit',
+  acordos: 'agreements',
+  'conta-corrente': 'accounts',
+  movimentacoes: 'movements',
+  apuracoes: 'accruals',
+  apropriacoes: 'appropriations',
+  consumos: 'consumptions',
+  liquidacoes: 'settlements',
+  relatorios: 'reports',
+  configuracoes: 'configuracoes',
+}
+
+interface SupplierAllowancePageProps {
+  screen?: string
+}
+
+export default function SupplierAllowance({ screen = 'cockpit' }: SupplierAllowancePageProps) {
+  const [tab, setTab] = useState(SCREEN_TO_TAB[screen] || 'cockpit')
+
+  useEffect(() => {
+    setTab(SCREEN_TO_TAB[screen] || 'cockpit')
+  }, [screen])
 
   return (
     <SaLayout title="Verbas de Fornecedores">
@@ -86,6 +107,13 @@ export default function SupplierAllowance() {
             icon={FileText}
             title="Relatórios"
             message="A geração de documentos utiliza exclusivamente o Corporate Document Engine, mantendo o padrão institucional da plataforma."
+          />
+        </TabsContent>
+        <TabsContent value="configuracoes" className="mt-4">
+          <PlaceholderTab
+            icon={Settings}
+            title="Configurações"
+            message="Configurações do módulo de Verbas de Fornecedores — parâmetros de apuração, liquidação e integrações."
           />
         </TabsContent>
       </Tabs>

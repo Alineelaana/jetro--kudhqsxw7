@@ -33,6 +33,8 @@ import { canViewAiModule } from '@/lib/ai-permissions'
 import { canViewIndustry } from '@/lib/industrial-permissions'
 import { canViewVR } from '@/lib/variable-remuneration-permissions'
 import { canViewBI } from '@/lib/bi-permissions'
+import { canViewControladoria } from '@/lib/controladoria-permissions'
+import { canViewSA } from '@/lib/supplier-allowance-permissions'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -67,6 +69,8 @@ import {
   Factory,
   Coins,
   BarChart3,
+  Calculator,
+  HandCoins,
 } from 'lucide-react'
 
 type IconType = ComponentType<{ className?: string }>
@@ -307,6 +311,34 @@ const AI_SUBMENU: SubItem[] = [
   { to: '/admin/ia/configuracoes', label: 'Configurações da IA' },
 ]
 
+const CONTROLADORIA_SUBMENU: SubItem[] = [
+  { to: '/admin/controladoria', label: 'Cockpit Executivo' },
+  { to: '/admin/controladoria/dre', label: 'DRE' },
+  { to: '/admin/controladoria/balanco', label: 'Balanço' },
+  { to: '/admin/controladoria/fluxo-caixa', label: 'Fluxo de Caixa Gerencial' },
+  { to: '/admin/controladoria/budget', label: 'Budget' },
+  { to: '/admin/controladoria/forecast', label: 'Forecast' },
+  { to: '/admin/controladoria/simulador', label: 'Simulações' },
+  { to: '/admin/controladoria/kpis', label: 'KPIs' },
+  { to: '/admin/controladoria/drivers', label: 'Drivers' },
+  { to: '/admin/controladoria/materialidade', label: 'Materialidade' },
+  { to: '/admin/controladoria/consolidacao', label: 'Consolidação' },
+  { to: '/admin/controladoria/configuracoes', label: 'Configurações' },
+]
+
+const VERBAS_SUBMENU: SubItem[] = [
+  { to: '/admin/verbas/cockpit', label: 'Cockpit' },
+  { to: '/admin/verbas/acordos', label: 'Acordos' },
+  { to: '/admin/verbas/conta-corrente', label: 'Conta Corrente' },
+  { to: '/admin/verbas/movimentacoes', label: 'Movimentações' },
+  { to: '/admin/verbas/apuracoes', label: 'Apurações' },
+  { to: '/admin/verbas/apropriacoes', label: 'Apropriações' },
+  { to: '/admin/verbas/consumos', label: 'Consumos' },
+  { to: '/admin/verbas/liquidacoes', label: 'Liquidações' },
+  { to: '/admin/verbas/relatorios', label: 'Relatórios' },
+  { to: '/admin/verbas/configuracoes', label: 'Configurações' },
+]
+
 const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Empresa',
@@ -374,6 +406,18 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
         label: 'Custos e Precificação',
         icon: DollarSign,
         permission: canConsultCosts,
+      },
+      {
+        label: 'Controladoria & Performance Empresarial',
+        icon: Calculator,
+        submenu: CONTROLADORIA_SUBMENU,
+        permission: canViewControladoria,
+      },
+      {
+        label: 'Verbas de Fornecedores',
+        icon: HandCoins,
+        submenu: VERBAS_SUBMENU,
+        permission: canViewSA,
       },
     ],
   },

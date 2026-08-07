@@ -168,7 +168,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Acordo de Verba',
     labelFields: ['agreement_type'],
     descFields: ['status', 'company'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/acordos',
     filterFields: ['agreement_type', 'status', 'company'],
   },
   {
@@ -176,7 +176,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Conta Corrente de Verba',
     labelFields: ['company'],
     descFields: ['current_balance', 'accrued_total'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/conta-corrente',
     filterFields: ['company', 'branch'],
   },
   {
@@ -184,7 +184,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Movimentação de Verba',
     labelFields: ['document_number'],
     descFields: ['movement_type', 'value', 'direction'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/movimentacoes',
     filterFields: ['document_number', 'movement_type', 'direction'],
   },
   {
@@ -192,7 +192,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Apuração de Verba',
     labelFields: ['competence_period'],
     descFields: ['earned_value', 'status'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/apuracoes',
     filterFields: ['competence_period', 'status'],
   },
   {
@@ -200,7 +200,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Liquidação de Verba',
     labelFields: ['settlement_type'],
     descFields: ['settled_value', 'status'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/liquidacoes',
     filterFields: ['settlement_type', 'status'],
   },
   {
@@ -208,7 +208,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Apropriação de Verba',
     labelFields: ['reason'],
     descFields: ['allocated_value', 'status'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/apropriacoes',
     filterFields: ['reason', 'status'],
   },
   {
@@ -216,7 +216,7 @@ const ENTITIES: EntityConfig[] = [
     type: 'Consumo de Verba',
     labelFields: ['reason'],
     descFields: ['consumed_value', 'status'],
-    route: '/admin/verbas',
+    route: '/admin/verbas/consumos',
     filterFields: ['reason', 'status'],
   },
   {
@@ -274,6 +274,38 @@ const ENTITIES: EntityConfig[] = [
     descFields: ['target_dre_line', 'period'],
     route: '/admin/controladoria/reclassificacoes',
     filterFields: ['source_account_name', 'source_account_code', 'period'],
+  },
+  {
+    collection: 'controladoria_budgets',
+    type: 'Budget',
+    labelFields: ['period'],
+    descFields: ['dre_line_key', 'value'],
+    route: '/admin/controladoria/budget',
+    filterFields: ['period', 'dre_line_key', 'cost_center'],
+  },
+  {
+    collection: 'controladoria_forecasts',
+    type: 'Forecast',
+    labelFields: ['period'],
+    descFields: ['forecast_type', 'value'],
+    route: '/admin/controladoria/forecast',
+    filterFields: ['period', 'forecast_type', 'dre_line_key'],
+  },
+  {
+    collection: 'controladoria_consolidation',
+    type: 'Consolidação',
+    labelFields: ['group_name'],
+    descFields: ['period', 'status'],
+    route: '/admin/controladoria/consolidacao',
+    filterFields: ['group_name', 'period', 'consolidation_type'],
+  },
+  {
+    collection: 'controladoria_materiality',
+    type: 'Materialidade',
+    labelFields: ['indicator_name'],
+    descFields: ['criticality', 'limit'],
+    route: '/admin/controladoria/materialidade',
+    filterFields: ['indicator_name', 'criticality', 'relevance'],
   },
 ]
 
