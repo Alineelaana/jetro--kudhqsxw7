@@ -1,0 +1,76 @@
+import pb from '@/lib/pocketbase/client'
+
+export const CTRL_COLLECTIONS = {
+  dreStructure: 'controladoria_dre_structure',
+  accountMapping: 'controladoria_account_mapping',
+  reclassifications: 'controladoria_reclassifications',
+  resultVersions: 'controladoria_result_versions',
+  budgets: 'controladoria_budgets',
+  forecasts: 'controladoria_forecasts',
+  closing: 'controladoria_closing',
+  snapshots: 'controladoria_snapshots',
+  kpis: 'controladoria_kpis',
+  drivers: 'controladoria_drivers',
+  materiality: 'controladoria_materiality',
+  simulations: 'controladoria_simulations',
+  consolidation: 'controladoria_consolidation',
+  comments: 'controladoria_comments',
+  savedViews: 'controladoria_saved_views',
+} as const
+
+export const ctrlGetList = (c: string) => pb.collection(c).getFullList({ sort: '-created' })
+export const ctrlCreate = (c: string, d: Record<string, unknown>) => pb.collection(c).create(d)
+export const ctrlUpdate = (c: string, id: string, d: Record<string, unknown>) =>
+  pb.collection(c).update(id, d)
+export const ctrlDelete = (c: string, id: string) => pb.collection(c).delete(id)
+
+export const getDREStructure = () =>
+  pb.collection(CTRL_COLLECTIONS.dreStructure).getFullList({ sort: 'order' })
+export const getAccountMappings = () => ctrlGetList(CTRL_COLLECTIONS.accountMapping)
+export const getReclassifications = () => ctrlGetList(CTRL_COLLECTIONS.reclassifications)
+export const getResultVersions = () => ctrlGetList(CTRL_COLLECTIONS.resultVersions)
+export const getBudgets = () => ctrlGetList(CTRL_COLLECTIONS.budgets)
+export const getForecasts = () => ctrlGetList(CTRL_COLLECTIONS.forecasts)
+export const getClosings = () => ctrlGetList(CTRL_COLLECTIONS.closing)
+export const getSnapshots = () => ctrlGetList(CTRL_COLLECTIONS.snapshots)
+export const getKPIs = () => pb.collection(CTRL_COLLECTIONS.kpis).getFullList({ sort: 'category' })
+export const getDrivers = () =>
+  pb.collection(CTRL_COLLECTIONS.drivers).getFullList({ sort: 'type,category' })
+export const getMateriality = () => ctrlGetList(CTRL_COLLECTIONS.materiality)
+export const getSimulations = () => ctrlGetList(CTRL_COLLECTIONS.simulations)
+export const getConsolidations = () => ctrlGetList(CTRL_COLLECTIONS.consolidation)
+export const getComments = () => ctrlGetList(CTRL_COLLECTIONS.comments)
+export const getSavedViews = () => ctrlGetList(CTRL_COLLECTIONS.savedViews)
+
+export function logControladoriaAudit(action: string, targetId: string, summary: string) {
+  pb.send('/backend/v1/audit/create', {
+    method: 'POST',
+    body: JSON.stringify({
+      action,
+      module: 'controladoria',
+      target_collection: 'controladoria',
+      target_id: targetId,
+      target_summary: summary,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {})
+}
+
+export const createSnapshot = (
+  closingId: string,
+  period: string,
+  data: Record<string, unknown>,
+) => {
+  const user = pb.authStore.record as Record<string, unknown> | null
+  return ctrlCreate(CTRL_COLLECTIONS.snapshots, {
+    period,
+    version_type: 'oficial',
+    data: JSON.stringify(data),
+    hash: JSON.stringify(data).length.toString(36),
+    created_by: user?.id || '',
+    created_by_name: (user?.name as string) || 'Sistema',
+    closing_id: closingId,
+    company: '',
+    branch: '',
+  })
+}

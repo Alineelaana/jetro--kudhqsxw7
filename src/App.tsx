@@ -79,6 +79,7 @@ import {
   NOTIFICATION_CONFIG,
   NUMERATION_CONFIG,
 } from '@/lib/configuracoes-config'
+import Controladoria from './pages/Controladoria'
 
 const App = () => (
   <BrowserRouter>
@@ -677,6 +678,58 @@ const App = () => (
                         <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
                         <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
                         <Route path="/admin/verbas" element={<SupplierAllowance />} />
+                        <Route
+                          path="/admin/controladoria"
+                          element={<Controladoria screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/dre"
+                          element={<Controladoria screen="dre" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/kpis"
+                          element={<Controladoria screen="kpis" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/drivers"
+                          element={<Controladoria screen="drivers" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/budget"
+                          element={<Controladoria screen="budget" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/forecast"
+                          element={<Controladoria screen="forecast" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/fechamento"
+                          element={<Controladoria screen="fechamento" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/simulador"
+                          element={<Controladoria screen="simulador" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/consolidacao"
+                          element={<Controladoria screen="consolidacao" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/materialidade"
+                          element={<Controladoria screen="materialidade" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/reclassificacoes"
+                          element={<Controladoria screen="reclassificacoes" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/visoes-salvas"
+                          element={<Controladoria screen="visoes-salvas" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/adapta"
+                          element={<Controladoria screen="adapta" />}
+                        />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
