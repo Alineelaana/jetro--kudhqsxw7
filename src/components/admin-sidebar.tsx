@@ -46,7 +46,6 @@ import {
   Briefcase,
   Settings,
   Cog,
-  ShieldCheck,
   Shield,
   Archive,
   Bot,
@@ -293,12 +292,6 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { id: 'users', label: 'Usuários', icon: Settings, permission: canManageUsers },
       { id: 'cms', label: 'CMS', icon: Archive, permission: canManageCms },
       { id: 'audit', label: 'Auditoria', icon: Shield, permission: canViewAuditLogs },
-      {
-        to: '/admin/certificacao/dominio-01',
-        label: 'Certificação D01',
-        icon: ShieldCheck,
-        permission: canViewAuditLogs,
-      },
       { id: 'backups', label: 'Backups', icon: Database, permission: canManageBackups },
       { id: 'ai', label: 'Treinamento IA', icon: Bot, permission: canManageAiTraining },
       {
