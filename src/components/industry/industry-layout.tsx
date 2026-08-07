@@ -21,6 +21,7 @@ import {
   GitBranch,
   ListOrdered,
   Crown,
+  SlidersHorizontal,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -44,6 +45,7 @@ const NAV_ITEMS = [
   { to: '/admin/industria/rastreabilidade', label: 'Rastreabilidade', icon: GitBranch },
   { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)', icon: BarChart3 },
   { to: '/admin/industria/manutencao', label: 'Manutenção', icon: Wrench },
+  { to: '/admin/industria/calibracao', label: 'Calibração de Alertas', icon: SlidersHorizontal },
   { to: '/admin/industria/executivo', label: 'Visão Executiva', icon: Crown },
 ]
 

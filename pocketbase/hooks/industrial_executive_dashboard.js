@@ -164,6 +164,27 @@ routerAdd(
         totalDemand = $app.countRecords('industrial_demand')
       } catch (_) {}
 
+      var maintCount = 0
+      var maintDowntime = 0
+      var maintResources = []
+      try {
+        var maintRecs = $app.findRecordsByFilter(
+          'maintenance_schedules',
+          'status = "em_andamento" || status = "atrasada"',
+          '',
+          500,
+          0,
+        )
+        var maintResSet = {}
+        for (var mi = 0; mi < maintRecs.length; mi++) {
+          maintCount++
+          maintDowntime += maintRecs[mi].getFloat('estimated_downtime_hours') || 0
+          var mrid = maintRecs[mi].getString('resource_id') || ''
+          if (mrid) maintResSet[mrid] = true
+        }
+        maintResources = Object.keys(maintResSet)
+      } catch (_) {}
+
       return e.json(200, {
         most_productive_machine: bestMachine,
         highest_operator_productivity: bestOperator,
@@ -179,6 +200,11 @@ routerAdd(
         total_orders: orders ? orders.length : 0,
         total_phases: phases.length,
         total_demand: totalDemand,
+        maintenance_impact: {
+          machines_under_maintenance: maintCount,
+          estimated_downtime_hours: maintDowntime,
+          affected_resources: maintResources,
+        },
       })
     } catch (err) {
       $app.logger().error('Executive dashboard failed', 'error', String(err))

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Search, Loader2, GitBranch, ArrowDown, ArrowUp } from 'lucide-react'
+import { Search, Loader2, GitBranch, ArrowDown, ArrowUp, ShieldAlert } from 'lucide-react'
+import { TraceabilityRecallDialog } from '@/components/industry/traceability-recall-dialog'
 import { getTraceability } from '@/services/industrial-extended'
 import { useRealtime } from '@/hooks/use-realtime'
 
@@ -10,6 +11,7 @@ export function TraceabilityPanel() {
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [recallOpen, setRecallOpen] = useState(false)
 
   const load = async () => {
     try {
@@ -54,14 +56,24 @@ export function TraceabilityPanel() {
       </div>
       <Card className="border-2 border-[#005B2E]/20">
         <CardContent className="py-4">
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por lote, serial, operador, produto, OP..."
-              className="pl-10 focus-visible:ring-[#005B2E]"
-            />
+          <div className="flex gap-2 mb-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por lote, serial, operador, produto, OP..."
+                className="pl-10 focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <Button
+              onClick={() => setRecallOpen(true)}
+              variant="outline"
+              className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold shrink-0"
+            >
+              <ShieldAlert className="w-4 h-4 mr-2" />
+              Recall / Auditoria
+            </Button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -121,6 +133,7 @@ export function TraceabilityPanel() {
         </CardContent>
       </Card>
       <p className="text-sm text-muted-foreground">{filtered.length} registro(s) encontrado(s)</p>
+      <TraceabilityRecallDialog open={recallOpen} onOpenChange={setRecallOpen} />
     </div>
   )
 }

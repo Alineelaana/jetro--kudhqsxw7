@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Wrench, Plus, Loader2, AlertCircle } from 'lucide-react'
+import { Wrench, Plus, Loader2, AlertCircle, Gauge } from 'lucide-react'
 import {
   getMaintenanceSchedules,
   createMaintenanceSchedule,
@@ -131,6 +131,49 @@ export function MaintenancePanel() {
             <p className="text-sm font-semibold text-red-700">
               {schedules.filter((s) => s.status === 'atrasada').length} manutencao(oes) atrasada(s)!
             </p>
+          </CardContent>
+        </Card>
+      )}
+      {schedules.filter((s) => s.status === 'em_andamento' || s.status === 'atrasada').length >
+        0 && (
+        <Card className="border-2 border-amber-200 bg-amber-50/50">
+          <CardContent className="py-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Gauge className="w-5 h-5 text-amber-600" />
+              <p className="text-sm font-semibold text-amber-700">Impacto na Produção</p>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-xl font-black text-amber-600">
+                  {
+                    schedules.filter((s) => s.status === 'em_andamento' || s.status === 'atrasada')
+                      .length
+                  }
+                </p>
+                <p className="text-xs text-muted-foreground">Máquinas indisponíveis</p>
+              </div>
+              <div>
+                <p className="text-xl font-black text-amber-600">
+                  {schedules
+                    .filter((s) => s.status === 'em_andamento' || s.status === 'atrasada')
+                    .reduce((sum, s) => sum + (s.estimated_downtime_hours || 0), 0)}
+                  h
+                </p>
+                <p className="text-xs text-muted-foreground">Tempo parado estimado</p>
+              </div>
+              <div>
+                <p className="text-xl font-black text-amber-600">
+                  {
+                    new Set(
+                      schedules
+                        .filter((s) => s.status === 'em_andamento' || s.status === 'atrasada')
+                        .map((s) => s.resource_id),
+                    ).size
+                  }
+                </p>
+                <p className="text-xs text-muted-foreground">Recursos afetados</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}

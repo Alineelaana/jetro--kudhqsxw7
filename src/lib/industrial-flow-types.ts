@@ -97,6 +97,11 @@ export interface ExecutiveDashboardData {
   total_orders: number
   total_phases: number
   total_demand: number
+  maintenance_impact: {
+    machines_under_maintenance: number
+    estimated_downtime_hours: number
+    affected_resources: string[]
+  } | null
 }
 
 export interface TraceabilityNode {

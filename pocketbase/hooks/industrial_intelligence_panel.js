@@ -107,16 +107,31 @@ routerAdd(
 
     // MÁQUINAS
     var resources = safeFilter('production_resources', '', '', 500)
+    var maintRecs = safeFilter(
+      'maintenance_schedules',
+      'status = "em_andamento" || status = "atrasada"',
+      '',
+      500,
+    )
+    var maintSet = {}
+    for (var mri = 0; mri < maintRecs.length; mri++) {
+      var mrid2 = maintRecs[mri].getString('resource_id') || ''
+      if (mrid2) maintSet[mrid2] = true
+    }
     var activeMachines = 0,
       idleMachines = 0,
-      overloadedMachines = 0
+      overloadedMachines = 0,
+      maintenanceMachines = 0
     var machineList = []
     for (var m = 0; m < resources.length; m++) {
       var mActive = resources[m].get('active') !== false
       var mLoad = apsMap[resources[m].id] || 0
       var mName = resources[m].getString('name') || resources[m].id
       var mStatus = 'idle'
-      if (mLoad >= 5) {
+      if (maintSet[resources[m].id]) {
+        mStatus = 'maintenance'
+        maintenanceMachines++
+      } else if (mLoad >= 5) {
         mStatus = 'overloaded'
         overloadedMachines++
       } else if (mLoad > 0) {
@@ -132,6 +147,7 @@ routerAdd(
       active: activeMachines,
       idle: idleMachines,
       overloaded: overloadedMachines,
+      maintenance: maintenanceMachines,
       list: machineList.slice(0, 10),
     }
 

@@ -11,6 +11,7 @@ import {
   Wrench,
   Clock,
   DollarSign,
+  Gauge,
 } from 'lucide-react'
 import { getExecutiveDashboard } from '@/services/industrial-flow'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -104,11 +105,40 @@ export function ExecutiveDashboard() {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {data.maintenance_impact && data.maintenance_impact.machines_under_maintenance > 0 && (
+          <Card className="border-2 border-amber-200">
+            <CardContent className="py-4">
+              <h3 className="font-bold text-amber-700 mb-3 flex items-center gap-2">
+                <Gauge className="w-4 h-4" /> Impacto de Manutenção
+              </h3>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <p className="text-2xl font-black text-amber-600">
+                    {data.maintenance_impact.machines_under_maintenance}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Máquinas indisponíveis</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-amber-600">
+                    {data.maintenance_impact.estimated_downtime_hours}h
+                  </p>
+                  <p className="text-xs text-muted-foreground">Tempo parado</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-amber-600">
+                    {data.maintenance_impact.affected_resources.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Recursos afetados</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         <Card className="border-2 border-[#005B2E]/20">
           <CardContent className="py-4">
             <h3 className="font-bold text-[#005B2E] mb-3 flex items-center gap-2">
-              <Wrench className="w-4 h-4" /> Máquina Mais Produtiva
-            </h3>
+              <Clock className="w-4 h-4" /> Ordens Atrasadas
+            </h3>{' '}
             {data.most_productive_machine ? (
               <div>
                 <p className="text-lg font-black">{data.most_productive_machine.name}</p>

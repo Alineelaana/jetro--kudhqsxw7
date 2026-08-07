@@ -196,6 +196,35 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
   var dt = new Date()
   var todayStr = dt.toISOString().substring(0, 10)
 
+  var TH = {
+    loss_threshold: 10,
+    total_loss_threshold: 50,
+    capacity_saturation: 5,
+    bottleneck_ops: 3,
+    critical_delay_days: 7,
+    at_risk_days: 3,
+    wip_threshold: 10,
+    cost_deviation: 10000,
+    low_productivity: 10,
+    high_productivity: 50,
+    idle_ratio: 0.4,
+    min_oee: 60,
+  }
+  try {
+    var thRecs = $app.findRecordsByFilter(
+      'industrial_threshold_config',
+      'active = true',
+      '',
+      100,
+      0,
+    )
+    for (var thi = 0; thi < thRecs.length; thi++) {
+      var thKey = thRecs[thi].getString('key')
+      var thVal = parseFloat(thRecs[thi].getString('value'))
+      if (!isNaN(thVal) && TH[thKey] !== undefined) TH[thKey] = thVal
+    }
+  } catch (_) {}
+
   // === PRODUCTION ORDERS ===
   try {
     var orders = $app.findRecordsByFilter(
@@ -242,10 +271,10 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
           mkAlert(
             'predicted_delay',
             o.id,
-            daysLate > 7 ? 'critical' : 'warning',
+            daysLate > TH.critical_delay_days ? 'critical' : 'warning',
             'OP Atrasada: ' + orderNum,
             'Ordem ' + orderNum + ' atrasada ' + daysLate + ' dia(s)',
-            daysLate > 7 ? 'urgent' : 'high',
+            daysLate > TH.critical_delay_days ? 'urgent' : 'high',
             'production_orders',
             'Data de término ' + ed + ' excedida há ' + daysLate + ' dias',
             { order_number: orderNum, end_date: ed, days_late: daysLate },
@@ -308,7 +337,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
           )
         } else {
           var daysLeft = Math.ceil((d - dt) / 86400000)
-          if (daysLeft <= 3 && !hasActive) {
+          if (daysLeft <= TH.at_risk_days && !hasActive) {
             atRiskCount++
             mkInsight(
               'order_at_risk',
@@ -377,7 +406,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
       wipCount++
     }
 
-    if (wipCount > 10) {
+    if (wipCount > TH.wip_threshold) {
       mkInsight(
         'elevated_wip',
         'global',
@@ -445,7 +474,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
       if (lossQty > 0) {
         lossMap[opName] = (lossMap[opName] || 0) + lossQty
         lossTotal += lossQty
-        if (lossQty > 10) {
+        if (lossQty > TH.loss_threshold) {
           mkAlert(
             'excess_losses',
             ph.id,
@@ -597,7 +626,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
         )
       }
     }
-    if (lossTotal > 50) {
+    if (lossTotal > TH.total_loss_threshold) {
       mkPrediction(
         'loss_increase_trend',
         'global',
@@ -741,7 +770,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
           { machine_id: bk[b] },
         )
       }
-      if (load >= 3) {
+      if (load >= TH.bottleneck_ops) {
         mkInsight(
           'bottleneck',
           bk[b],
@@ -815,7 +844,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
           )
         }
       }
-      if (totalRes > 0 && idleCount / totalRes > 0.4) {
+      if (totalRes > 0 && idleCount / totalRes > TH.idle_ratio) {
         mkInsight(
           'low_capacity_utilization',
           'global',
@@ -1018,7 +1047,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
           mkAlert(
             'delayed_supplier',
             po.id,
-            poDaysLate > 7 ? 'critical' : 'warning',
+            poDaysLate > TH.critical_delay_days ? 'critical' : 'warning',
             'Fornecedor Atrasado: ' + supplier,
             'PC ' + poNum + ' atrasada ' + poDaysLate + ' dia(s)',
             'high',
@@ -1082,7 +1111,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
       var tc = parseFloat(c.getString('total_cost') || c.getString('amount') || '0') || 0
       if (itemId) costMap[itemId] = (costMap[itemId] || 0) + tc
       totalCost += tc
-      if (tc > 10000) {
+      if (tc > TH.cost_deviation) {
         var cName = ''
         try {
           var cp = $app.findRecordById('products', itemId)
@@ -1177,7 +1206,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
     }
     var opKeys = Object.keys(opMap)
     for (var ok = 0; ok < opKeys.length; ok++) {
-      if (opMap[opKeys[ok]] < 10) {
+      if (opMap[opKeys[ok]] < TH.low_productivity) {
         mkInsight(
           'low_productivity_operator',
           opKeys[ok],
@@ -1220,7 +1249,7 @@ routerAdd('POST', '/backend/v1/industrial/intelligence/detect', (e) => {
     }
     var teamKeys = Object.keys(teamMap)
     for (var tk = 0; tk < teamKeys.length; tk++) {
-      if (teamMap[teamKeys[tk]] > 50) {
+      if (teamMap[teamKeys[tk]] > TH.high_productivity) {
         mkInsight(
           'best_performing_team',
           teamKeys[tk],

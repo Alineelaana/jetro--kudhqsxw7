@@ -567,6 +567,10 @@ const App = () => (
                           element={<Industry screen="manutencao" />}
                         />
                         <Route
+                          path="/admin/industria/calibracao"
+                          element={<Industry screen="calibracao" />}
+                        />
+                        <Route
                           path="/admin/industria/executivo"
                           element={<Industry screen="executivo" />}
                         />

@@ -22,6 +22,7 @@ import { TraceabilityPanel } from '@/components/industry/traceability-panel'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { ProductionPhasesPanel } from '@/components/industry/production-phases-panel'
 import { ExecutiveDashboard } from '@/components/industry/executive-dashboard'
+import { ThresholdCalibrationPanel } from '@/components/industry/threshold-calibration-panel'
 
 interface Props {
   screen?: string
@@ -93,6 +94,8 @@ function IndustryContent({ screen }: { screen: string }) {
       return <KpisPanel />
     case 'manutencao':
       return <MaintenancePanel />
+    case 'calibracao':
+      return <ThresholdCalibrationPanel />
     case 'executivo':
       return <ExecutiveDashboard />
     case 'especificacoes':
