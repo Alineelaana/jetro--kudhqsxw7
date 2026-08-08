@@ -1,6 +1,11 @@
 import pb from '@/lib/pocketbase/client'
 import type { DRELineResult, DREResult, BIFilters } from '@/lib/bi-types'
-import { getDREStructure, getAccountMappings, getReclassifications } from './controladoria'
+import {
+  getDREStructure,
+  getAccountMappings,
+  getReclassifications,
+  getMargins,
+} from './controladoria'
 
 type Rec = Record<string, unknown>
 
@@ -188,4 +193,118 @@ export function reconcileDRE(dre: DREResult): {
     detail: 'Todas as linhas calculadas são consistentes',
   })
   return { reconciled: checks.every((c) => c.passed), checks }
+}
+
+export async function computeEbitda(period: string): Promise<{
+  ebitda: number
+  margin: number
+  components: Array<{ key: string; label: string; value: number }>
+}> {
+  const dre = await computeDRE(period, 'gerencial')
+  const ebitda = dre.totals.ebitda
+  const margin = dre.totals.receita_liquida > 0 ? (ebitda / dre.totals.receita_liquida) * 100 : 0
+  const components = dre.lines
+    .filter((l) => ['resultado_operacional', 'depreciacao'].includes(l.line_key))
+    .map((l) => ({ key: l.line_key, label: l.label, value: l.value }))
+  return { ebitda, margin, components }
+}
+
+export async function computeMarginsByDimension(
+  dimension: string,
+  _period: string,
+): Promise<
+  Array<{
+    entity_name: string
+    revenue: number
+    cost: number
+    margin: number
+    margin_percent: number
+  }>
+> {
+  const margins = await getMargins(dimension).catch(() => [])
+  return (margins as Rec[]).map((m) => {
+    const revenue = parseNum(m.revenue)
+    const cost = parseNum(m.cost)
+    const margin = revenue - cost
+    const margin_percent = revenue > 0 ? (margin / revenue) * 100 : 0
+    return { entity_name: m.entity_name as string, revenue, cost, margin, margin_percent }
+  })
+}
+
+export async function computeProjection(period: string): Promise<{
+  realized: number
+  budget: number
+  forecast: number
+  method: string
+}> {
+  const dre = await computeDRE(period, 'contabil').catch(() => null)
+  const budgets = await pb
+    .collection('controladoria_budgets')
+    .getFullList({ filter: `period = "${period}"` })
+    .catch(() => [])
+  const forecasts = await pb
+    .collection('controladoria_forecasts')
+    .getFullList({ filter: `period = "${period}"` })
+    .catch(() => [])
+  const realized = dre?.totals.receita_liquida || 0
+  const budget = (budgets as Rec[]).reduce((s, b) => s + parseNum(b.value), 0)
+  const forecast = (forecasts as Rec[]).reduce((s, f) => s + parseNum(f.value), 0)
+  return { realized, budget, forecast: forecast || realized * 1.1, method: 'historical_avg' }
+}
+
+export async function computeVariationAnalysis(
+  period: string,
+): Promise<
+  Array<{
+    line_key: string
+    label: string
+    current: number
+    previous: number
+    variation: number
+    variation_pct: number
+    is_material: boolean
+  }>
+> {
+  const current = await computeDRE(period, 'contabil')
+  const [y, m] = period.split('-').map(Number)
+  const d = new Date(y, m - 2, 1)
+  const prevPeriod = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+  const previous = await computeDRE(prevPeriod, 'contabil')
+  const materiality = await pb
+    .collection('controladoria_materiality')
+    .getFullList()
+    .catch(() => [])
+  const threshold = (materiality as Rec[]).find((mt) => mt.indicator_name === 'Receita')
+  const limit = parseNum(threshold?.limit || '5')
+  return current.lines.map((l) => {
+    const prev = previous.lines.find((p) => p.line_key === l.line_key)
+    const prevVal = prev?.value || 0
+    const variation = l.value - prevVal
+    const variation_pct = prevVal !== 0 ? (variation / Math.abs(prevVal)) * 100 : 0
+    return {
+      line_key: l.line_key,
+      label: l.label,
+      current: l.value,
+      previous: prevVal,
+      variation,
+      variation_pct,
+      is_material: Math.abs(variation_pct) >= limit,
+    }
+  })
+}
+
+export async function drillDownDRELine(
+  lineKey: string,
+  _period: string,
+): Promise<Record<string, unknown>[]> {
+  const mappings = await getAccountMappings()
+  const lineAccounts = (mappings as Rec[]).filter((m) => m.dre_line_key === lineKey)
+  if (lineAccounts.length === 0) return []
+  const codes = lineAccounts.map((m) => m.account_code as string)
+  const filter = codes.map((c) => `conta_debito = "${c}"`).join(' || ')
+  if (!filter) return []
+  return pb
+    .collection('contabil_lancamentos')
+    .getFullList({ filter })
+    .catch(() => []) as Promise<Record<string, unknown>[]>
 }

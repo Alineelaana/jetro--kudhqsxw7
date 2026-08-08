@@ -64,3 +64,27 @@ export function canManageReclassifications(role: string | undefined): boolean {
 export function canApproveReclassification(role: string | undefined): boolean {
   return role === 'SUP'
 }
+export function canManageResultCenters(role: string | undefined): boolean {
+  if (!role) return false
+  return CTRL_EDIT.includes(role)
+}
+export function canManageEbitdaConfig(role: string | undefined): boolean {
+  if (!role) return false
+  return CTRL_EDIT.includes(role)
+}
+export function canViewMargins(role: string | undefined): boolean {
+  if (!role) return false
+  return CTRL_VIEW.includes(role)
+}
+export function canViewVariances(role: string | undefined): boolean {
+  if (!role) return false
+  return CTRL_VIEW.includes(role)
+}
+export function canManageComments(role: string | undefined): boolean {
+  if (!role) return false
+  return CTRL_VIEW.includes(role)
+}
+export function canManageSavedViews(role: string | undefined): boolean {
+  if (!role) return false
+  return CTRL_VIEW.includes(role)
+}

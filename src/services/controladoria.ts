@@ -74,3 +74,41 @@ export const createSnapshot = (
     branch: '',
   })
 }
+
+export const CTRL_NEW_COLLECTIONS = {
+  resultCenters: 'controladoria_result_centers',
+  ebitdaConfig: 'controladoria_ebitda_config',
+  margins: 'controladoria_margins',
+} as const
+
+export const getResultCenters = () =>
+  pb.collection(CTRL_NEW_COLLECTIONS.resultCenters).getFullList({ sort: 'code' })
+export const createResultCenter = (d: Record<string, unknown>) =>
+  ctrlCreate(CTRL_NEW_COLLECTIONS.resultCenters, d)
+export const updateResultCenter = (id: string, d: Record<string, unknown>) =>
+  ctrlUpdate(CTRL_NEW_COLLECTIONS.resultCenters, id, d)
+export const deleteResultCenter = (id: string) => ctrlDelete(CTRL_NEW_COLLECTIONS.resultCenters, id)
+
+export const getEbitdaConfigs = () => ctrlGetList(CTRL_NEW_COLLECTIONS.ebitdaConfig)
+export const createEbitdaConfig = (d: Record<string, unknown>) =>
+  ctrlCreate(CTRL_NEW_COLLECTIONS.ebitdaConfig, d)
+
+export const getMargins = (dimension?: string) =>
+  dimension
+    ? pb
+        .collection(CTRL_NEW_COLLECTIONS.margins)
+        .getFullList({ filter: `dimension = "${dimension}"`, sort: '-created' })
+    : ctrlGetList(CTRL_NEW_COLLECTIONS.margins)
+
+export const createComment = (d: Record<string, unknown>) =>
+  ctrlCreate(CTRL_COLLECTIONS.comments, d)
+export const deleteComment = (id: string) => ctrlDelete(CTRL_COLLECTIONS.comments, id)
+
+export const createSavedView = (d: Record<string, unknown>) =>
+  ctrlCreate(CTRL_COLLECTIONS.savedViews, d)
+export const deleteSavedView = (id: string) => ctrlDelete(CTRL_COLLECTIONS.savedViews, id)
+
+export const getBudgetsByPeriod = (period: string) =>
+  pb.collection(CTRL_COLLECTIONS.budgets).getFullList({ filter: `period = "${period}"` })
+export const getForecastsByPeriod = (period: string) =>
+  pb.collection(CTRL_COLLECTIONS.forecasts).getFullList({ filter: `period = "${period}"` })

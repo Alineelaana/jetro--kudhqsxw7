@@ -367,4 +367,83 @@ export const CTRL_SCREEN_CONFIGS: Record<string, CtrlScreenConfig> = {
       { name: 'results', label: 'Resultados (JSON)', type: 'textarea', span: 2 },
     ],
   },
+  result_centers: {
+    collection: 'controladoria_result_centers',
+    title: 'Centros de Resultado',
+    nameLabel: 'Nome',
+    statusField: 'is_active',
+    fields: [
+      { name: 'code', label: 'Código', type: 'text', required: true },
+      { name: 'name', label: 'Nome', type: 'text', required: true, span: 2 },
+      {
+        name: 'type',
+        label: 'Tipo',
+        type: 'select',
+        options: [
+          'Distribuição',
+          'Indústria',
+          'E-commerce',
+          'Loja',
+          'Filial',
+          'CD',
+          'Unidade de Negócio',
+        ],
+      },
+      { name: 'parent_code', label: 'Centro Superior', type: 'text' },
+      { name: 'responsible', label: 'Responsável', type: 'text' },
+      { name: 'company', label: 'Empresa', type: 'text' },
+      { name: 'branch', label: 'Filial', type: 'text' },
+      { name: 'is_active', label: 'Ativo', type: 'switch' },
+    ],
+  },
+  ebitda: {
+    collection: 'controladoria_ebitda_config',
+    title: 'Configuração EBITDA',
+    nameLabel: 'Nome',
+    statusField: 'is_active',
+    fields: [
+      { name: 'name', label: 'Nome', type: 'text', required: true, span: 2 },
+      { name: 'formula_expression', label: 'Fórmula', type: 'text', required: true, span: 2 },
+      { name: 'margin_target', label: 'Meta Margem (%)', type: 'text' },
+      { name: 'period', label: 'Período', type: 'text' },
+      { name: 'description', label: 'Descrição', type: 'textarea', span: 2 },
+      { name: 'is_active', label: 'Ativo', type: 'switch' },
+    ],
+  },
+}
+
+export interface ResultCenter {
+  id: string
+  code: string
+  name: string
+  type: string
+  parent_code: string
+  responsible: string
+  is_active: boolean
+  company: string
+  branch: string
+}
+export interface EbitdaConfig {
+  id: string
+  name: string
+  formula_expression: string
+  components: Record<string, unknown>
+  margin_target: string
+  description: string
+  is_active: boolean
+  company: string
+  period: string
+}
+export interface MarginResult {
+  id: string
+  dimension: string
+  entity_id: string
+  entity_name: string
+  period: string
+  revenue: string
+  cost: string
+  margin_value: string
+  margin_percent: string
+  methodology: string
+  cost_breakdown: Record<string, unknown>
 }
