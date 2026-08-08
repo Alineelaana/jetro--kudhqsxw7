@@ -108,6 +108,23 @@ export interface QueueItem {
   collectionRecord: any | null
   vendedor: string
   gerente: string
+  cidade: string
+  uf: string
+  regiao: string
+  supervisor: string
+  cnpj_cpf: string
+  cobrador: string
+}
+
+export interface FilterOptions {
+  vendedores: string[]
+  gerentes: string[]
+  supervisores: string[]
+  cidades: string[]
+  regioes: string[]
+  ufs: string[]
+  cobradores: string[]
+  statuses: string[]
 }
 
 export interface AlcadaProfile {

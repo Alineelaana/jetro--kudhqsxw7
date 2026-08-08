@@ -8,6 +8,7 @@ import { CollectionExecutiveHeader } from './collection-executive-header'
 import { CollectionQueue } from './collection-queue'
 import { CollectionClientPanel } from './collection-client-panel'
 import { CollectionRightPanel } from './collection-right-panel'
+import { CollectionFilterBar } from './collection-filter-bar'
 import {
   ContactDialog,
   PromiseDialog,
@@ -116,6 +117,11 @@ export function CollectionCenterScreen() {
           </Button>
         </div>
       </div>
+      <CollectionFilterBar
+        filters={cc.filters}
+        onFilterChange={cc.setFilters}
+        filterOptions={cc.filterOptions}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
         <div className="lg:col-span-3">
           <CollectionQueue

@@ -14,7 +14,9 @@ import {
   type QueueItem,
   type ExecutiveStats,
   type PriorizacaoRule,
+  type FilterOptions,
 } from '@/lib/collection-center-types'
+import { loadVendedoresForFilter, loadPartnersMap } from '@/services/collection-center-filters'
 
 export function useCollectionCenter() {
   const [receivables, setReceivables] = useState<any[]>([])
@@ -25,17 +27,23 @@ export function useCollectionCenter() {
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [sortBy, setSortBy] = useState('maior_valor')
   const [priorizacaoRules, setPriorizacaoRules] = useState<PriorizacaoRule[]>([])
+  const [partnersMap, setPartnersMap] = useState<Record<string, any>>({})
+  const [vendedoresMap, setVendedoresMap] = useState<Record<string, any>>({})
   const { mergeFilter } = useOrgFilter()
 
   const loadData = useCallback(async () => {
     try {
       const orgFilter = mergeFilter()
-      const [recs, cols] = await Promise.all([
+      const [recs, cols, pMap, vMap] = await Promise.all([
         getOverdueReceivables(orgFilter || undefined),
         getCollectionRecords(),
+        loadPartnersMap(),
+        loadVendedoresForFilter(),
       ])
       setReceivables(recs)
       setCollections(cols)
+      setPartnersMap(pMap)
+      setVendedoresMap(vMap)
     } catch {
       setReceivables([])
       setCollections([])
@@ -89,6 +97,7 @@ export function useCollectionCenter() {
     }
     let items = Object.entries(grouped).map(([cliente, recs]) => {
       const col = collections.find((c) => c.cliente === cliente) || null
+      const partner = partnersMap[cliente.toLowerCase()] || null
       const valorVencido = recs.reduce((s, r) => s + computeSaldo(r), 0)
       const diasAtraso = Math.max(...recs.map((r) => computeAgingDays(r.data_vencimento)))
       const risco = col?.risk_classification || computeRisk(diasAtraso, valorVencido)
@@ -99,6 +108,9 @@ export function useCollectionCenter() {
           : col?.promise_status === 'Quebrada'
             ? 'Quebrada'
             : ''
+      const vendedorName =
+        (col as any)?.vendedor || recs[0]?.vendedor || recs[0]?.salesperson_name || ''
+      const vendedorRecord = vendedoresMap[vendedorName.toLowerCase()] || null
       return {
         cliente,
         clientId: col?.client_id || '',
@@ -112,8 +124,14 @@ export function useCollectionCenter() {
         promessaExistente,
         receivables: recs,
         collectionRecord: col,
-        vendedor: (col as any)?.vendedor || recs[0]?.vendedor || recs[0]?.salesperson_name || '',
+        vendedor: vendedorName,
         gerente: (col as any)?.gerente || (col as any)?.responsavel_cobranca || '',
+        cidade: partner?.address_city || '',
+        uf: partner?.address_state || '',
+        regiao: vendedorRecord?.regiao || partner?.address_state || '',
+        supervisor: vendedorRecord?.supervisor || '',
+        cnpj_cpf: partner?.cnpj || partner?.cpf || '',
+        cobrador: (col as any)?.responsavel_cobranca || '',
       }
     })
 
@@ -121,6 +139,97 @@ export function useCollectionCenter() {
       items = items.filter((i) => i.cliente.toLowerCase().includes(filters.cliente.toLowerCase()))
     if (filters.risco) items = items.filter((i) => i.risco === filters.risco)
     if (filters.prioridade) items = items.filter((i) => i.prioridade === filters.prioridade)
+    if (filters.vendedor) items = items.filter((i) => i.vendedor === filters.vendedor)
+    if (filters.gerente) items = items.filter((i) => i.gerente === filters.gerente)
+    if (filters.supervisor) items = items.filter((i) => i.supervisor === filters.supervisor)
+    if (filters.cidade) items = items.filter((i) => i.cidade === filters.cidade)
+    if (filters.regiao) items = items.filter((i) => i.regiao === filters.regiao)
+    if (filters.uf) items = items.filter((i) => i.uf === filters.uf)
+    if (filters.cnpj_cpf)
+      items = items.filter((i) => i.cnpj_cpf.toLowerCase().includes(filters.cnpj_cpf.toLowerCase()))
+    if (filters.cobrador) items = items.filter((i) => i.cobrador === filters.cobrador)
+    if (filters.empresa)
+      items = items.filter((i) => i.receivables.some((r) => (r.empresa || '') === filters.empresa))
+    if (filters.filial)
+      items = items.filter((i) => i.receivables.some((r) => (r.filial || '') === filters.filial))
+    if (filters.titulo)
+      items = items.filter((i) =>
+        i.receivables.some((r) =>
+          (r.numero_titulo || '').toLowerCase().includes(filters.titulo.toLowerCase()),
+        ),
+      )
+    if (filters.nf)
+      items = items.filter((i) =>
+        i.receivables.some((r) =>
+          String(r.nf || r.numero_nf || r.documento || '')
+            .toLowerCase()
+            .includes(filters.nf.toLowerCase()),
+        ),
+      )
+    if (filters.pedido)
+      items = items.filter((i) =>
+        i.receivables.some((r) =>
+          String(r.pedido || r.order_number || '')
+            .toLowerCase()
+            .includes(filters.pedido.toLowerCase()),
+        ),
+      )
+    if (filters.vencimento_start)
+      items = items.filter((i) =>
+        i.receivables.some((r) => (r.data_vencimento || '') >= filters.vencimento_start),
+      )
+    if (filters.vencimento_end)
+      items = items.filter((i) =>
+        i.receivables.some((r) => (r.data_vencimento || '') <= filters.vencimento_end),
+      )
+    if (filters.dias_atraso_min) {
+      const min = parseInt(filters.dias_atraso_min, 10)
+      if (!isNaN(min)) items = items.filter((i) => i.diasAtraso >= min)
+    }
+    if (filters.dias_atraso_max) {
+      const max = parseInt(filters.dias_atraso_max, 10)
+      if (!isNaN(max)) items = items.filter((i) => i.diasAtraso <= max)
+    }
+    if (filters.faixa_aging)
+      items = items.filter((i) => getAgingBucket(i.diasAtraso) === filters.faixa_aging)
+    if (filters.valor_min) {
+      const min = parseFloat(filters.valor_min)
+      if (!isNaN(min)) items = items.filter((i) => i.valorVencido >= min)
+    }
+    if (filters.valor_max) {
+      const max = parseFloat(filters.valor_max)
+      if (!isNaN(max)) items = items.filter((i) => i.valorVencido <= max)
+    }
+    if (filters.promessa) {
+      if (filters.promessa === 'Sem promessa')
+        items = items.filter((i) => !i.collectionRecord?.promise_status)
+      else items = items.filter((i) => i.collectionRecord?.promise_status === filters.promessa)
+    }
+    if (filters.acordo) {
+      if (filters.acordo === 'com_acordo')
+        items = items.filter(
+          (i) =>
+            i.collectionRecord?.status === 'Negociação' ||
+            i.collectionRecord?.status === 'Renegociado',
+        )
+      else
+        items = items.filter(
+          (i) =>
+            i.collectionRecord?.status !== 'Negociação' &&
+            i.collectionRecord?.status !== 'Renegociado',
+        )
+    }
+    if (filters.disputa) {
+      if (filters.disputa === 'Sem disputa')
+        items = items.filter(
+          (i) =>
+            !i.collectionRecord?.dispute_status ||
+            i.collectionRecord?.dispute_status === 'Cancelada',
+        )
+      else items = items.filter((i) => i.collectionRecord?.dispute_status === filters.disputa)
+    }
+    if (filters.status)
+      items = items.filter((i) => i.receivables.some((r) => r.status === filters.status))
     if (filters.cardFilter) {
       const cf = filters.cardFilter
       if (cf === 'promessas_hoje')
@@ -200,7 +309,7 @@ export function useCollectionCenter() {
       }
     })
     return items
-  }, [receivables, collections, filters, sortBy, priorizacaoRules])
+  }, [receivables, collections, filters, sortBy, priorizacaoRules, partnersMap, vendedoresMap])
 
   const stats = useMemo<ExecutiveStats>(() => {
     const today = new Date().toISOString().split('T')[0]
@@ -239,6 +348,39 @@ export function useCollectionCenter() {
     }
   }, [queueItems, receivables, collections])
 
+  const filterOptions = useMemo<FilterOptions>(() => {
+    const vendedores = new Set<string>()
+    const gerentes = new Set<string>()
+    const supervisores = new Set<string>()
+    const cidades = new Set<string>()
+    const regioes = new Set<string>()
+    const ufs = new Set<string>()
+    const cobradores = new Set<string>()
+    const statuses = new Set<string>()
+    for (const item of queueItems) {
+      if (item.vendedor) vendedores.add(item.vendedor)
+      if (item.gerente) gerentes.add(item.gerente)
+      if (item.supervisor) supervisores.add(item.supervisor)
+      if (item.cidade) cidades.add(item.cidade)
+      if (item.regiao) regioes.add(item.regiao)
+      if (item.uf) ufs.add(item.uf)
+      if (item.cobrador) cobradores.add(item.cobrador)
+      for (const r of item.receivables) {
+        if (r.status) statuses.add(r.status)
+      }
+    }
+    return {
+      vendedores: [...vendedores].sort(),
+      gerentes: [...gerentes].sort(),
+      supervisores: [...supervisores].sort(),
+      cidades: [...cidades].sort(),
+      regioes: [...regioes].sort(),
+      ufs: [...ufs].sort(),
+      cobradores: [...cobradores].sort(),
+      statuses: [...statuses].sort(),
+    }
+  }, [queueItems])
+
   const selectedClient = useMemo(
     () => queueItems.find((i) => i.cliente === selectedCliente) || null,
     [queueItems, selectedCliente],
@@ -272,6 +414,7 @@ export function useCollectionCenter() {
     selectClient,
     toggleTitle,
     applyCardFilter,
+    filterOptions,
     refresh: loadData,
   }
 }
