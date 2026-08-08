@@ -337,8 +337,9 @@ migrate(
     ]
     for (var i = 0; i < cols.length; i++) {
       try {
-        app.delete(app.findCollectionByNameOrId(cols[i]))
-      } catch (_) {}
+        var col = app.findCollectionByNameOrId(cols[i])
+        app.delete(col)
+      } catch (e) {}
     }
   },
 )
