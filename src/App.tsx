@@ -695,7 +695,86 @@ const App = () => (
                         />
                         <Route path="/admin/precificacao" element={<Precificacao />} />
                         <Route path="/admin/auditoria" element={<Auditoria />} />
-                        <Route path="/admin/controladoria" element={<Controladoria />} />
+                        <Route
+                          path="/admin/controladoria"
+                          element={<Controladoria screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/dre"
+                          element={<Controladoria screen="dre" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/dre-analitica"
+                          element={<Controladoria screen="dre-analitica" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/kpis"
+                          element={<Controladoria screen="kpis" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/drivers"
+                          element={<Controladoria screen="drivers" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/budget"
+                          element={<Controladoria screen="budget" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/forecast"
+                          element={<Controladoria screen="forecast" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/fechamento"
+                          element={<Controladoria screen="fechamento" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/simulador"
+                          element={<Controladoria screen="simulador" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/consolidacao"
+                          element={<Controladoria screen="consolidacao" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/materialidade"
+                          element={<Controladoria screen="materialidade" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/reclassificacoes"
+                          element={<Controladoria screen="reclassificacoes" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/visoes-salvas"
+                          element={<Controladoria screen="visoes-salvas" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/comentarios"
+                          element={<Controladoria screen="comentarios" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/centros-resultado"
+                          element={<Controladoria screen="centros-resultado" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/ebitda"
+                          element={<Controladoria screen="ebitda" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/adapta"
+                          element={<Controladoria screen="adapta" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/balanco"
+                          element={<Controladoria screen="balanco" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/fluxo-caixa"
+                          element={<Controladoria screen="fluxo-caixa" />}
+                        />
+                        <Route
+                          path="/admin/controladoria/configuracoes"
+                          element={<Controladoria screen="configuracoes" />}
+                        />
                         <Route path="/admin/verbas-fornecedores" element={<SupplierAllowance />} />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />

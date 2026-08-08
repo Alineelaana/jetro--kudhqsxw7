@@ -3,6 +3,7 @@ export const RESULT_VERSIONS = [
   'oficial',
   'contabil',
   'gerencial',
+  'analitica',
   'orcado',
   'forecast',
   'rolling_forecast',

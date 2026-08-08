@@ -17,9 +17,21 @@ const NAV_SECTIONS = [
     items: [
       { to: '/admin/controladoria', label: 'Cockpit Executivo', icon: '📊', stage: 'Análise' },
       { to: '/admin/controladoria/dre', label: 'DRE', icon: '📋', stage: 'Apuração' },
+      {
+        to: '/admin/controladoria/dre-analitica',
+        label: 'DRE Analítica',
+        icon: '🔍',
+        stage: 'Apuração',
+      },
       { to: '/admin/controladoria/kpis', label: 'KPIs Corporativos', icon: '📈', stage: 'Análise' },
+      { to: '/admin/controladoria/ebitda', label: 'EBITDA', icon: '💎', stage: 'Análise' },
       { to: '/admin/controladoria/drivers', label: 'Drivers', icon: '🎯', stage: 'Análise' },
-      { to: '/admin/controladoria/budget', label: 'Orçamento', icon: '💰', stage: 'Orçamento' },
+      {
+        to: '/admin/controladoria/budget',
+        label: 'Orçado × Realizado',
+        icon: '💰',
+        stage: 'Orçamento',
+      },
       { to: '/admin/controladoria/forecast', label: 'Forecast', icon: '🔮', stage: 'Análise' },
       {
         to: '/admin/controladoria/fechamento',
@@ -72,6 +84,18 @@ const NAV_SECTIONS = [
         to: '/admin/controladoria/visoes-salvas',
         label: 'Visões Salvas',
         icon: '🔖',
+        stage: 'Análise',
+      },
+      {
+        to: '/admin/controladoria/centros-resultado',
+        label: 'Centros de Resultado',
+        icon: '🏢',
+        stage: 'Análise',
+      },
+      {
+        to: '/admin/controladoria/comentarios',
+        label: 'Comentários',
+        icon: '💬',
         stage: 'Análise',
       },
       {

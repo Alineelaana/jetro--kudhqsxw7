@@ -252,9 +252,7 @@ export async function computeProjection(period: string): Promise<{
   return { realized, budget, forecast: forecast || realized * 1.1, method: 'historical_avg' }
 }
 
-export async function computeVariationAnalysis(
-  period: string,
-): Promise<
+export async function computeVariationAnalysis(period: string): Promise<
   Array<{
     line_key: string
     label: string

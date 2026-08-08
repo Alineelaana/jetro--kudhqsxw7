@@ -7,6 +7,11 @@ import { ControladoriaSimulator } from '@/components/controladoria/controladoria
 import { ControladoriaDrivers } from '@/components/controladoria/controladoria-drivers'
 import { ControladoriaGenericScreen } from '@/components/controladoria/controladoria-generic'
 import { ControladoriaAdapta } from '@/components/controladoria/controladoria-adapta'
+import { ControladoriaBudget } from '@/components/controladoria/controladoria-budget'
+import { ControladoriaForecast } from '@/components/controladoria/controladoria-forecast'
+import { ControladoriaSavedViews } from '@/components/controladoria/controladoria-saved-views'
+import { ControladoriaComments } from '@/components/controladoria/controladoria-comments'
+import { ControladoriaEbitda } from '@/components/controladoria/controladoria-ebitda'
 
 interface ControladoriaPageProps {
   screen?: string
@@ -15,9 +20,10 @@ interface ControladoriaPageProps {
 const TITLES: Record<string, string> = {
   dashboard: 'Cockpit Executivo',
   dre: 'DRE — Contábil / Gerencial / Analítica',
+  'dre-analitica': 'DRE Analítica',
   kpis: 'KPIs Corporativos',
   drivers: 'Drivers Empresariais',
-  budget: 'Orçamento (Budget)',
+  budget: 'Orçado × Realizado',
   forecast: 'Forecast & Projeções',
   fechamento: 'Fechamento Gerencial',
   simulador: 'Simulador Corporativo',
@@ -25,6 +31,9 @@ const TITLES: Record<string, string> = {
   materialidade: 'Motor de Materialidade',
   reclassificacoes: 'Reclassificações Gerenciais',
   'visoes-salvas': 'Visões Salvas',
+  comentarios: 'Comentários da Controladoria',
+  'centros-resultado': 'Centros de Resultado',
+  ebitda: 'EBITDA',
   adapta: 'ADAPTA Financeira',
   balanco: 'Balanço Patrimonial',
   'fluxo-caixa': 'Fluxo de Caixa Gerencial',
@@ -40,6 +49,8 @@ export default function Controladoria({ screen = 'dashboard' }: ControladoriaPag
         return <ControladoriaCockpit />
       case 'dre':
         return <ControladoriaDRE />
+      case 'dre-analitica':
+        return <ControladoriaDRE />
       case 'kpis':
         return <ControladoriaKPIs />
       case 'drivers':
@@ -48,6 +59,18 @@ export default function Controladoria({ screen = 'dashboard' }: ControladoriaPag
         return <ControladoriaClosing />
       case 'simulador':
         return <ControladoriaSimulator />
+      case 'budget':
+        return <ControladoriaBudget />
+      case 'forecast':
+        return <ControladoriaForecast />
+      case 'visoes-salvas':
+        return <ControladoriaSavedViews />
+      case 'comentarios':
+        return <ControladoriaComments />
+      case 'ebitda':
+        return <ControladoriaEbitda />
+      case 'centros-resultado':
+        return <ControladoriaGenericScreen configKey="result_centers" />
       case 'consolidacao':
         return <ControladoriaGenericScreen configKey="consolidation" />
       case 'materialidade':
@@ -56,34 +79,6 @@ export default function Controladoria({ screen = 'dashboard' }: ControladoriaPag
         return <ControladoriaGenericScreen configKey="reclassifications" />
       case 'adapta':
         return <ControladoriaAdapta />
-      case 'budget':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Orçamento corporativo — dados consumidos das versões de resultado oficiais.
-            </p>
-            <ControladoriaGenericScreen configKey="reclassifications" />
-          </div>
-        )
-      case 'forecast':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Forecast — projeção = realizado até hoje + projeção restante. Sempre identificado como
-              estimativa.
-            </p>
-            <ControladoriaGenericScreen configKey="consolidation" />
-          </div>
-        )
-      case 'visoes-salvas':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Análises salvas com filtros, colunas, agrupamentos e comparações.
-            </p>
-            <ControladoriaGenericScreen configKey="materiality" />
-          </div>
-        )
       case 'balanco':
         return (
           <div className="space-y-4">
