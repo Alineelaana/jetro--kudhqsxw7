@@ -752,6 +752,108 @@ const App = () => (
                         <Route path="/admin/dp/relatorios" element={<DP screen="reports" />} />
                         <Route path="/admin/dp/adapta" element={<DP screen="adapta" />} />
                         <Route path="/admin/sst" element={<SST screen="dashboard" />} />
+                        <Route path="/admin/sst/cockpit" element={<SST screen="cockpit" />} />
+                        <Route
+                          path="/admin/sst/esocial-monitor"
+                          element={<SST screen="esocial_monitor" />}
+                        />
+                        <Route
+                          path="/admin/sst/compliance"
+                          element={<SST screen="compliance_dashboard" />}
+                        />
+                        <Route
+                          path="/admin/sst/training-matrix"
+                          element={<SST screen="training_matrix" />}
+                        />
+                        <Route path="/admin/sst/adapta" element={<SST screen="adapta" />} />
+                        <Route path="/admin/sst/reports" element={<SST screen="reports" />} />
+                        <Route path="/admin/sst/gro" element={<SST screen="gro" />} />
+                        <Route
+                          path="/admin/sst/risk-inventory"
+                          element={<SST screen="risk_inventory" />}
+                        />
+                        <Route
+                          path="/admin/sst/risk-matrix"
+                          element={<SST screen="risk_matrix_config" />}
+                        />
+                        <Route
+                          path="/admin/sst/action-plans"
+                          element={<SST screen="action_plans" />}
+                        />
+                        <Route
+                          path="/admin/sst/work-environments"
+                          element={<SST screen="work_environments" />}
+                        />
+                        <Route
+                          path="/admin/sst/exposure-groups"
+                          element={<SST screen="exposure_groups" />}
+                        />
+                        <Route
+                          path="/admin/sst/environmental-assessments"
+                          element={<SST screen="environmental_assessments" />}
+                        />
+                        <Route path="/admin/sst/ltcat" element={<SST screen="ltcat" />} />
+                        <Route path="/admin/sst/pcmso" element={<SST screen="pcmso" />} />
+                        <Route path="/admin/sst/aso" element={<SST screen="aso" />} />
+                        <Route
+                          path="/admin/sst/medical-records"
+                          element={<SST screen="medical_records" />}
+                        />
+                        <Route path="/admin/sst/epis" element={<SST screen="epis" />} />
+                        <Route path="/admin/sst/epcs" element={<SST screen="epcs" />} />
+                        <Route path="/admin/sst/accidents" element={<SST screen="accidents" />} />
+                        <Route path="/admin/sst/cat" element={<SST screen="cat" />} />
+                        <Route path="/admin/sst/incidents" element={<SST screen="incidents" />} />
+                        <Route path="/admin/sst/cipa" element={<SST screen="cipa" />} />
+                        <Route path="/admin/sst/sesmt" element={<SST screen="sesmt" />} />
+                        <Route path="/admin/sst/ergonomics" element={<SST screen="ergonomics" />} />
+                        <Route
+                          path="/admin/sst/inspections"
+                          element={<SST screen="inspections" />}
+                        />
+                        <Route path="/admin/sst/apr" element={<SST screen="apr" />} />
+                        <Route
+                          path="/admin/sst/work-permits"
+                          element={<SST screen="work_permits" />}
+                        />
+                        <Route path="/admin/sst/lockout" element={<SST screen="lockout" />} />
+                        <Route
+                          path="/admin/sst/confined-spaces"
+                          element={<SST screen="confined_spaces" />}
+                        />
+                        <Route
+                          path="/admin/sst/height-work"
+                          element={<SST screen="height_work" />}
+                        />
+                        <Route
+                          path="/admin/sst/emergencies"
+                          element={<SST screen="emergencies" />}
+                        />
+                        <Route path="/admin/sst/brigade" element={<SST screen="brigade" />} />
+                        <Route
+                          path="/admin/sst/moc"
+                          element={<SST screen="management_of_change" />}
+                        />
+                        <Route path="/admin/sst/nr-catalog" element={<SST screen="nr_catalog" />} />
+                        <Route
+                          path="/admin/sst/non-conformities"
+                          element={<SST screen="non_conformities" />}
+                        />
+                        <Route
+                          path="/admin/sst/psychosocial-assessments"
+                          element={<SST screen="psychosocial_assessments" />}
+                        />
+                        <Route path="/admin/sst/dds" element={<SST screen="dds" />} />
+                        <Route
+                          path="/admin/sst/vaccination"
+                          element={<SST screen="vaccination" />}
+                        />
+                        <Route
+                          path="/admin/sst/certificates"
+                          element={<SST screen="certificates" />}
+                        />
+                        <Route path="/admin/sst/documents" element={<SST screen="documents" />} />
+                        <Route path="/admin/sst/indicators" element={<SST screen="indicators" />} />
                         <Route
                           path="/admin/promocoes"
                           element={<Promotions screen="dashboard" />}

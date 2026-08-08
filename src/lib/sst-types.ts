@@ -1,4 +1,5 @@
 import type { RhScreenConfig } from '@/lib/rh-types'
+import { SST_ENTERPRISE_SCREEN_CONFIGS } from '@/lib/sst-enterprise-types'
 
 export const SST_SCREEN_CONFIGS: Record<string, RhScreenConfig> = {
   nr1: {
@@ -394,4 +395,5 @@ export const SST_SCREEN_CONFIGS: Record<string, RhScreenConfig> = {
       { name: 'validade_certificado', label: 'Validade Certificado', type: 'text' },
     ],
   },
+  ...SST_ENTERPRISE_SCREEN_CONFIGS,
 }
