@@ -876,6 +876,10 @@ const App = () => (
                           element={<TradeMarketing screen="actions" />}
                         />
                         <Route
+                          path="/admin/trade-marketing/verbas-fornecedor"
+                          element={<TradeMarketing screen="verbas" />}
+                        />
+                        <Route
                           path="/admin/trade-marketing/materiais"
                           element={<TradeMarketing screen="materials" />}
                         />

@@ -14,6 +14,7 @@ import { TmCalendar } from '@/components/trade-marketing/tm-calendar'
 import { TmMaterials } from '@/components/trade-marketing/tm-materials'
 import { TmAccountability } from '@/components/trade-marketing/tm-accountability'
 import { TmAdapta } from '@/components/trade-marketing/tm-adapta'
+import { TmVerbasFornecedor } from '@/components/trade-marketing/tm-verbas-fornecedor'
 import type { TradeMarketingAction } from '@/lib/trade-marketing-types'
 import { STATUS_COLORS } from '@/lib/trade-marketing-types'
 
@@ -21,6 +22,7 @@ const TABS = [
   { id: 'dashboard', label: 'Dashboard', route: '/admin/trade-marketing' },
   { id: 'calendar', label: 'Calendário', route: '/admin/trade-marketing/calendario' },
   { id: 'actions', label: 'Ações', route: '/admin/trade-marketing/acoes' },
+  { id: 'verbas', label: 'Verbas', route: '/admin/trade-marketing/verbas-fornecedor' },
   { id: 'materials', label: 'Materiais', route: '/admin/trade-marketing/materiais' },
   { id: 'accountability', label: 'Prestação', route: '/admin/trade-marketing/prestacao-contas' },
   { id: 'annual-plan', label: 'Planejamento', route: '/admin/trade-marketing/planejamento-anual' },
@@ -110,6 +112,8 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
         )
       case 'actions':
         return <ActionsTable actions={actions} />
+      case 'verbas':
+        return <TmVerbasFornecedor />
       case 'materials':
         return <TmMaterials />
       case 'accountability':
