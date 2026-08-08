@@ -55,7 +55,7 @@ export function TmLayout({
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       <ModulePageHeader
-        title="Trade & Marketing"
+        title="Trade Marketing"
         icon={Megaphone}
         breadcrumbs={[{ label: 'Admin', to: '/admin' }, { label: 'Trade & Marketing' }]}
       />

@@ -60,7 +60,7 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
       case 'cockpit':
         return <TmDashboard actions={actions} />
       case 'calendar':
-        return <TmCalendar />
+        return <TmCalendar actions={actions} onEdit={() => {}} />
       case 'kanban':
         return <TmKanban actions={actions} />
       case 'list':

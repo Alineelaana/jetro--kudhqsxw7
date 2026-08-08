@@ -269,7 +269,7 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
   },
   {
     route: '/admin/trade-marketing',
-    label: 'Trade & Marketing',
+    label: 'Trade Marketing',
     group: 'Comercial',
     classification: 'A',
   },

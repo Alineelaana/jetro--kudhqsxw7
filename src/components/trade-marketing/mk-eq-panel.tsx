@@ -160,7 +160,7 @@ export function MkExternalQuotationsPanel() {
         icon={Megaphone}
         breadcrumbs={[
           { label: 'Admin', to: '/admin' },
-          { label: 'Trade & Marketing' },
+          { label: 'Trade Marketing' },
           { label: 'Cotações Externas' },
         ]}
       />

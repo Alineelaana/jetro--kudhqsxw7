@@ -125,7 +125,7 @@ export const ADMIN_MENU: MenuGroup[] = [
       },
       { label: 'Promoções', icon: Percent, route: '/admin/promocoes', perm: canViewSales },
       {
-        label: 'Trade & Marketing',
+        label: 'Trade Marketing',
         icon: Megaphone,
         route: '/admin/trade-marketing',
         perm: canViewTradeMarketing,
