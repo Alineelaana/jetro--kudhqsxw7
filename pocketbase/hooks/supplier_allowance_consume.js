@@ -9,6 +9,8 @@ routerAdd(
     var reason = body.reason || ''
     var purchaseId = body.purchase_id || ''
     var promotionId = body.promotion_id || ''
+    var program = body.program || ''
+    var competencePeriod = body.competence_period || ''
 
     if (!accountId) return e.badRequestError('account_id is required')
     if (!agreementId) return e.badRequestError('agreement_id is required')
@@ -18,8 +20,47 @@ routerAdd(
       var currentBalance = parseFloat(account.getString('current_balance') || '0')
       var consumed = parseFloat(consumedValue)
 
+      if (isNaN(consumed) || consumed <= 0) {
+        return e.badRequestError('Valor de consumo deve ser maior que zero.')
+      }
+
       if (consumed > currentBalance) {
-        return e.badRequestError('Saldo insuficiente. Disponível: ' + currentBalance)
+        return e.badRequestError(
+          'Saldo insuficiente. Disponivel: R$ ' +
+            currentBalance +
+            '. Operacao BLOQUEADA pelo Corporate Ledger.',
+        )
+      }
+
+      if (program) {
+        var accountProgram = account.getString('program') || ''
+        if (accountProgram && accountProgram !== program) {
+          return e.badRequestError(
+            'Programa nao corresponde a conta. Nao e possivel consumir saldo de outro programa. Operacao BLOQUEADA.',
+          )
+        }
+      }
+
+      try {
+        var agreement = $app.findRecordById('supplier_allowance_agreements', agreementId)
+        var agSupplier = agreement.getString('supplier')
+        var accSupplier = account.getString('supplier')
+        if (agSupplier && accSupplier && agSupplier !== accSupplier) {
+          return e.badRequestError(
+            'Fornecedor do acordo nao corresponde ao fornecedor da conta. ' +
+              'Nao e possivel consumir saldo de outro fornecedor. Operacao BLOQUEADA.',
+          )
+        }
+      } catch (_) {}
+
+      if (competencePeriod) {
+        var now = new Date()
+        var currentPeriod = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0')
+        if (competencePeriod > currentPeriod) {
+          return e.badRequestError(
+            'Nao e possivel utilizar verba de competencia futura. Operacao BLOQUEADA.',
+          )
+        }
       }
 
       var conCol = $app.findCollectionByNameOrId('supplier_allowance_consumptions')
@@ -50,6 +91,13 @@ routerAdd(
       mov.set('workflow_state', 'completed')
       mov.set('source', 'usuario')
       mov.set('observations', reason)
+      if (program) mov.set('program', program)
+      if (competencePeriod) mov.set('competence_period', competencePeriod)
+      if (body.category) mov.set('category', body.category)
+      if (body.buyer_name) mov.set('buyer_name', body.buyer_name)
+      if (body.brand) mov.set('brand', body.brand)
+      if (body.product_name) mov.set('product_name', body.product_name)
+      if (body.supplier_name) mov.set('supplier_name', body.supplier_name)
       $app.save(mov)
 
       return e.json(200, {

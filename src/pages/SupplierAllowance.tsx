@@ -11,6 +11,9 @@ import { SaTradeExpenses } from '@/components/supplier-allowance/sa-trade-expens
 import { SaAdhocCredits } from '@/components/supplier-allowance/sa-adhoc-credits'
 import { SaDocuments } from '@/components/supplier-allowance/sa-documents'
 import { SaReportVersions } from '@/components/supplier-allowance/sa-report-versions'
+import { SaCorporateAudit } from '@/components/supplier-allowance/sa-corporate-audit'
+import { SaCurrentAccounts } from '@/components/supplier-allowance/sa-current-accounts'
+import { SaAdaptaChat } from '@/components/supplier-allowance/sa-adapta-chat'
 
 const SCREEN_TITLES: Record<string, string> = {
   dashboard: 'Cockpit',
@@ -26,6 +29,9 @@ const SCREEN_TITLES: Record<string, string> = {
   'adhoc-credits': 'Créditos Avulsos',
   documents: 'Documentos',
   'report-versions': 'Versionamento de Relatórios',
+  'corporate-audit': 'Auditoria Corporativa de Verbas',
+  'current-accounts': 'Contas Correntes',
+  'adapta-chat': 'ADAPTA Verbas',
 }
 
 interface SupplierAllowanceProps {
@@ -61,6 +67,12 @@ export default function SupplierAllowance({ screen = 'dashboard' }: SupplierAllo
         return <SaDocuments />
       case 'report-versions':
         return <SaReportVersions />
+      case 'corporate-audit':
+        return <SaCorporateAudit />
+      case 'current-accounts':
+        return <SaCurrentAccounts />
+      case 'adapta-chat':
+        return <SaAdaptaChat />
       case 'cockpit':
         return <SaCockpit />
       default:

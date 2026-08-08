@@ -14,6 +14,31 @@ routerAdd(
     try {
       var accrual = $app.findRecordById('supplier_allowance_accruals', accrualId)
       var accountId = accrual.getString('account')
+      var allocatedNum = parseFloat(allocatedValue || '0')
+
+      if (isNaN(allocatedNum) || allocatedNum <= 0) {
+        return e.badRequestError('Valor alocado deve ser maior que zero.')
+      }
+
+      var account = $app.findRecordById('supplier_allowance_accounts', accountId)
+      var availableBalance = parseFloat(account.getString('current_balance') || '0')
+
+      if (allocatedNum > availableBalance) {
+        return e.badRequestError(
+          'Saldo insuficiente para aplicacao em precos. Disponivel: R$ ' +
+            availableBalance +
+            '. Solicitado: R$ ' +
+            allocatedNum +
+            '. Operacao BLOQUEADA pelo Corporate Ledger.',
+        )
+      }
+
+      var accStatus = accrual.getString('status')
+      if (accStatus !== 'aprovado') {
+        return e.badRequestError(
+          'Apuracao nao aprovada. Verba nao pode ser aplicada antes da aprovacao. Operacao BLOQUEADA.',
+        )
+      }
 
       var appCol = $app.findCollectionByNameOrId('supplier_allowance_appropriations')
       var appropriation = new Record(appCol)

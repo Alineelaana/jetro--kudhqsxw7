@@ -1086,6 +1086,18 @@ const App = () => (
                           element={<SupplierAllowance screen="documents" />}
                         />
                         <Route
+                          path="/admin/verbas/auditoria-corporativa"
+                          element={<SupplierAllowance screen="corporate-audit" />}
+                        />
+                        <Route
+                          path="/admin/verbas/contas-correntes"
+                          element={<SupplierAllowance screen="current-accounts" />}
+                        />
+                        <Route
+                          path="/admin/verbas/adapta"
+                          element={<SupplierAllowance screen="adapta-chat" />}
+                        />
+                        <Route
                           path="/admin/verbas/versionamento-relatorios"
                           element={<SupplierAllowance screen="report-versions" />}
                         />

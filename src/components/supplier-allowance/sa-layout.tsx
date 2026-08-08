@@ -25,6 +25,9 @@ const VERBAS_NAV_ITEMS = [
   { label: 'Créditos Avulsos', route: '/admin/verbas/creditos-avulsos' },
   { label: 'Documentos', route: '/admin/verbas/documentos' },
   { label: 'Versionamento', route: '/admin/verbas/versionamento-relatorios' },
+  { label: 'Contas Correntes', route: '/admin/verbas/contas-correntes' },
+  { label: 'Auditoria Corporativa', route: '/admin/verbas/auditoria-corporativa' },
+  { label: 'ADAPTA Verbas', route: '/admin/verbas/adapta' },
 ]
 
 export function SaLayout({
