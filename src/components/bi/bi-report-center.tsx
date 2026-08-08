@@ -161,6 +161,78 @@ const REPORTS: ReportEntry[] = [
     route: '/admin/bi/vr-intel',
     icon: '🏆',
   },
+  {
+    id: 'bi-projection',
+    category: 'Comercial',
+    label: 'Projeção de Vendas',
+    description: 'Projeção baseada em faturamento e dias úteis',
+    route: '/admin/bi/projection',
+    icon: '📈',
+  },
+  {
+    id: 'ctrl-dre',
+    category: 'Controladoria',
+    label: 'DRE',
+    description: 'Demonstração de Resultado do Exercício',
+    route: '/admin/controladoria/dre',
+    icon: '📋',
+  },
+  {
+    id: 'ctrl-balanco',
+    category: 'Controladoria',
+    label: 'Balanço Patrimonial',
+    description: 'Ativo, Passivo e Patrimônio Líquido',
+    route: '/admin/controladoria/balanco',
+    icon: '⚖️',
+  },
+  {
+    id: 'ctrl-fluxo',
+    category: 'Controladoria',
+    label: 'Fluxo de Caixa Gerencial',
+    description: 'Saldo inicial, a receber, a pagar e projetado',
+    route: '/admin/controladoria/fluxo-caixa',
+    icon: '💵',
+  },
+  {
+    id: 'ctrl-ebitda',
+    category: 'Controladoria',
+    label: 'EBITDA',
+    description: 'Margem EBITDA e componentes',
+    route: '/admin/controladoria/ebitda',
+    icon: '💎',
+  },
+  {
+    id: 'ctrl-budget',
+    category: 'Controladoria',
+    label: 'Orçado × Realizado',
+    description: 'Comparativo orçamento vs realizado',
+    route: '/admin/controladoria/budget',
+    icon: '📊',
+  },
+  {
+    id: 'ctrl-closing',
+    category: 'Controladoria',
+    label: 'Fechamento Gerencial',
+    description: 'Workflow de fechamento periódico',
+    route: '/admin/controladoria/fechamento',
+    icon: '🔒',
+  },
+  {
+    id: 'ctrl-simulator',
+    category: 'Controladoria',
+    label: 'Simulador Corporativo',
+    description: 'Cenários simulados sobre dados oficiais',
+    route: '/admin/controladoria/simulador',
+    icon: '🔮',
+  },
+  {
+    id: 'ctrl-consolidacao',
+    category: 'Controladoria',
+    label: 'Consolidação',
+    description: 'Consolidação de empresas e eliminações',
+    route: '/admin/controladoria/consolidacao',
+    icon: '🏛️',
+  },
 ]
 
 const CATEGORIES = [
@@ -176,6 +248,7 @@ const CATEGORIES = [
   'Trade',
   'Qualidade',
   'Comissões',
+  'Controladoria',
 ]
 
 export function BiReportCenter() {

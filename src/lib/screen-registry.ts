@@ -14,7 +14,7 @@ const RECOVERED_ROUTES = new Set<string>([
   '/admin/precificacao',
   '/admin/auditoria',
   '/admin/controladoria',
-  '/admin/verbas-fornecedores',
+  '/admin/verbas',
 ])
 
 export function buildScreenRegistry(): ScreenEntry[] {

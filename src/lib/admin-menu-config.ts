@@ -41,6 +41,8 @@ import {
   canManageAiTraining,
   canViewAuditLogs,
   canManageBackups,
+  canConsultCosts,
+  canViewConformidade,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -50,6 +52,10 @@ import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { canViewRH } from '@/lib/rh-permissions'
 import { canViewTradeMarketing } from '@/lib/trade-marketing-permissions'
 import { canViewSA } from '@/lib/supplier-allowance-permissions'
+import { canViewBI } from '@/lib/bi-permissions'
+import { canViewControladoria } from '@/lib/controladoria-permissions'
+import { canViewVR } from '@/lib/variable-remuneration-permissions'
+import { canViewAtendimentoModule } from '@/lib/atendimento-permissions'
 
 export interface MenuChild {
   label: string
@@ -73,7 +79,12 @@ export const ADMIN_MENU: MenuGroup[] = [
     items: [
       { label: 'Dashboard', icon: LayoutDashboard, route: '/admin' },
       { label: 'Notificações', icon: Bell, route: '/admin/notificacoes' },
-      { label: 'Atendimento', icon: Headset, route: '/admin/atendimento' },
+      {
+        label: 'Atendimento',
+        icon: Headset,
+        route: '/admin/atendimento',
+        perm: canViewAtendimentoModule,
+      },
     ],
   },
   {
@@ -96,7 +107,12 @@ export const ADMIN_MENU: MenuGroup[] = [
       },
       { label: 'Produtos', icon: Package, route: '/admin/produtos' },
       { label: 'Cadastros', icon: FileText, route: '/admin/cadastros', perm: canViewConfiguracoes },
-      { label: 'Precificação', icon: Calculator, route: '/admin/precificacao' },
+      {
+        label: 'Precificação',
+        icon: Calculator,
+        route: '/admin/precificacao',
+        perm: canConsultCosts,
+      },
       {
         label: 'Tabelas de Preços',
         icon: Tag,
@@ -133,6 +149,9 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Dashboard', route: '/admin/trade-marketing' },
           { label: 'Calendário', route: '/admin/trade-marketing/calendario' },
           { label: 'Ações', route: '/admin/trade-marketing/acoes' },
+          { label: 'Conta Corrente', route: '/admin/trade-marketing/conta-corrente' },
+          { label: 'Aplicação em Produtos', route: '/admin/trade-marketing/aplicacao-produtos' },
+          { label: 'Prestação de Contas', route: '/admin/trade-marketing/prestacao-contas' },
           { label: 'Materiais', route: '/admin/trade-marketing/materiais' },
           { label: 'Planejamento Anual', route: '/admin/trade-marketing/planejamento-anual' },
           { label: 'ADAPTA Marketing', route: '/admin/trade-marketing/adapta' },
@@ -159,6 +178,13 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Prestação de Contas', route: '/admin/verbas/prestacao-contas' },
           { label: 'Verbas por Fornecedor', route: '/admin/verbas/por-fornecedor' },
           { label: 'Cotações Externas', route: '/admin/verbas/cotacoes-externas' },
+          { label: 'Gastos de Trade', route: '/admin/verbas/gastos-trade' },
+          { label: 'Créditos Avulsos', route: '/admin/verbas/creditos-avulsos' },
+          { label: 'Documentos', route: '/admin/verbas/documentos' },
+          { label: 'Auditoria Corporativa', route: '/admin/verbas/auditoria-corporativa' },
+          { label: 'Contas Correntes', route: '/admin/verbas/contas-correntes' },
+          { label: 'ADAPTA Verbas', route: '/admin/verbas/adapta' },
+          { label: 'Versionamento', route: '/admin/verbas/versionamento-relatorios' },
         ],
       },
     ],
@@ -309,7 +335,12 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Relatórios', route: '/admin/fiscal/relatorios' },
         ],
       },
-      { label: 'Conformidade', icon: ShieldCheck, route: '/admin/conformidade' },
+      {
+        label: 'Conformidade',
+        icon: ShieldCheck,
+        route: '/admin/conformidade',
+        perm: canViewConformidade,
+      },
       {
         label: 'Recursos Humanos',
         icon: HeartPulse,
@@ -458,6 +489,7 @@ export const ADMIN_MENU: MenuGroup[] = [
         label: 'Controladoria',
         icon: PieChart,
         route: '/admin/controladoria',
+        perm: canViewControladoria,
         children: [
           { label: 'Cockpit Executivo', route: '/admin/controladoria' },
           { label: 'DRE', route: '/admin/controladoria/dre' },
@@ -485,6 +517,7 @@ export const ADMIN_MENU: MenuGroup[] = [
         label: 'BI',
         icon: BarChart3,
         route: '/admin/bi',
+        perm: canViewBI,
         children: [
           { label: 'Executive', route: '/admin/bi/executive' },
           { label: 'Commercial', route: '/admin/bi/commercial' },
@@ -533,6 +566,7 @@ export const ADMIN_MENU: MenuGroup[] = [
         label: 'Remuneração Variável',
         icon: TrendingUp,
         route: '/admin/remuneracao',
+        perm: canViewVR,
         children: [
           { label: 'Regras', route: '/admin/remuneracao/regras' },
           { label: 'Apuração', route: '/admin/remuneracao/apuracao' },

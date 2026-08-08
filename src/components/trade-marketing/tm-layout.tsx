@@ -33,6 +33,16 @@ const SECONDARY_LINKS = [
   },
   { id: 'materials', label: 'Materiais', route: '/admin/trade-marketing/materiais' },
   {
+    id: 'conta-corrente',
+    label: 'Conta Corrente',
+    route: '/admin/trade-marketing/conta-corrente',
+  },
+  {
+    id: 'aplicacao-produtos',
+    label: 'Aplicação em Produtos',
+    route: '/admin/trade-marketing/aplicacao-produtos',
+  },
+  {
     id: 'accountability',
     label: 'Prestação de Contas',
     route: '/admin/trade-marketing/prestacao-contas',

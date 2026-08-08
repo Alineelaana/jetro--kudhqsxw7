@@ -242,3 +242,8 @@ export function canChangePrice(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'COMERCIAL'].includes(role)
 }
+
+export function canViewConformidade(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
