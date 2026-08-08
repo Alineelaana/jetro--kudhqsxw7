@@ -120,3 +120,53 @@ export function canManageMOC(role: string | undefined): boolean {
   if (!role) return false
   return SAFETY_ROLES.includes(role)
 }
+
+export function canViewPPP(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}
+
+export function canManageInvestigations(role: string | undefined): boolean {
+  if (!role) return false
+  return SAFETY_ROLES.includes(role)
+}
+
+export function canManageObligations(role: string | undefined): boolean {
+  if (!role) return false
+  return SAFETY_ROLES.includes(role)
+}
+
+export function canManageAuditChecklists(role: string | undefined): boolean {
+  if (!role) return false
+  return SAFETY_ROLES.includes(role)
+}
+
+export function canViewNR10Data(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}
+
+export function canViewNR12Data(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}
+
+export function canViewNR13Data(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}
+
+export function canViewNR11Data(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}
+
+export function canViewNR15Data(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}
+
+export function canViewNR16Data(role: string | undefined): boolean {
+  if (!role) return false
+  return VIEW_ROLES.includes(role)
+}

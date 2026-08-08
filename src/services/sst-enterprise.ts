@@ -45,6 +45,57 @@ export const getConfinedSpaces = () => sstGetList(SST_ENTERPRISE_COLLECTIONS.con
 export const getHeightWork = () => sstGetList(SST_ENTERPRISE_COLLECTIONS.heightWork)
 export const getSSTAuditTrail = () => sstGetList(SST_ENTERPRISE_COLLECTIONS.auditTrail)
 
+export const SST_EXTENSION_COLLECTIONS = {
+  ppp: 'sst_ppp',
+  investigations: 'sst_investigations',
+  nr10Electrical: 'sst_nr10_electrical',
+  nr12Machines: 'sst_nr12_machines',
+  nr13Boilers: 'sst_nr13_boilers',
+  nr11MaterialHandling: 'sst_nr11_material_handling',
+  nr15Insalubridade: 'sst_nr15_insalubridade',
+  nr16Periculosidade: 'sst_nr16_periculosidade',
+  obligations: 'sst_obligations',
+  auditChecklists: 'sst_audit_checklists',
+} as const
+
+export const getPpp = () => sstGetList(SST_EXTENSION_COLLECTIONS.ppp)
+export const getInvestigations = () => sstGetList(SST_EXTENSION_COLLECTIONS.investigations)
+export const getNr10Electrical = () => sstGetList(SST_EXTENSION_COLLECTIONS.nr10Electrical)
+export const getNr12Machines = () => sstGetList(SST_EXTENSION_COLLECTIONS.nr12Machines)
+export const getNr13Boilers = () => sstGetList(SST_EXTENSION_COLLECTIONS.nr13Boilers)
+export const getNr11MaterialHandling = () =>
+  sstGetList(SST_EXTENSION_COLLECTIONS.nr11MaterialHandling)
+export const getNr15Insalubridade = () => sstGetList(SST_EXTENSION_COLLECTIONS.nr15Insalubridade)
+export const getNr16Periculosidade = () => sstGetList(SST_EXTENSION_COLLECTIONS.nr16Periculosidade)
+export const getSstObligations = () => sstGetList(SST_EXTENSION_COLLECTIONS.obligations)
+export const getAuditChecklists = () => sstGetList(SST_EXTENSION_COLLECTIONS.auditChecklists)
+
+export async function getOverdueObligations() {
+  const items = await getSstObligations()
+  const now = new Date()
+  return items.filter(
+    (o: any) => o.data_prevista && new Date(o.data_prevista) < now && o.situacao !== 'Concluída',
+  )
+}
+
+export async function getUpcomingObligations(days: number = 30) {
+  const items = await getSstObligations()
+  const now = new Date()
+  const future = new Date(now.getTime() + days * 86400000)
+  return items.filter((o: any) => {
+    if (!o.data_prevista || o.situacao === 'Concluída') return false
+    const d = new Date(o.data_prevista)
+    return d >= now && d <= future
+  })
+}
+
+export async function getInvestigationsByAccident(accidentId: string) {
+  return pb.collection(SST_EXTENSION_COLLECTIONS.investigations).getFullList({
+    filter: `accident_id = "${accidentId}"`,
+    sort: '-created',
+  }) as Promise<any[]>
+}
+
 export function getMedicalRecords() {
   return pb.collection(SST_ENTERPRISE_COLLECTIONS.medicalRecords).getFullList({ sort: '-created' })
 }

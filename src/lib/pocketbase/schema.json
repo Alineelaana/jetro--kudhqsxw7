@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T02:30:40.168Z",
+  "generatedAt": "2026-08-08T02:39:07.305Z",
   "collections": [
     {
       "name": "users",
@@ -17054,6 +17054,102 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "filial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estabelecimento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "perigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "evento_perigoso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "numero_trabalhadores_expostos",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "probabilidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "severidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nivel_risco",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "controles_recomendados",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prazo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "evidencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "metodologia_avaliacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risco_inicial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risco_residual",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "hierarquia_controle",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_sst_ri_set ON sst_risk_inventory (setor)"]
