@@ -86,6 +86,7 @@ import Precificacao from './pages/Precificacao'
 import Auditoria from './pages/Auditoria'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
+import TradeMarketing from './pages/TradeMarketing'
 
 const App = () => (
   <BrowserRouter>
@@ -861,6 +862,34 @@ const App = () => (
                         <Route
                           path="/admin/promocoes"
                           element={<Promotions screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing"
+                          element={<TradeMarketing screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/calendario"
+                          element={<TradeMarketing screen="calendar" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/acoes"
+                          element={<TradeMarketing screen="actions" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/materiais"
+                          element={<TradeMarketing screen="materials" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/prestacao-contas"
+                          element={<TradeMarketing screen="accountability" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/planejamento-anual"
+                          element={<TradeMarketing screen="annual-plan" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/adapta"
+                          element={<TradeMarketing screen="adapta" />}
                         />
                         <Route path="/admin/precificacao" element={<Precificacao />} />
                         <Route path="/admin/auditoria" element={<Auditoria />} />

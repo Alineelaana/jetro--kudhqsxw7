@@ -26,6 +26,7 @@ import {
   FileSearch,
   PieChart,
   Handshake,
+  Megaphone,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -47,6 +48,7 @@ import { canViewIndustry } from '@/lib/industrial-permissions'
 import { canViewCRM } from '@/lib/crm-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
 import { canViewRH } from '@/lib/rh-permissions'
+import { canViewTradeMarketing } from '@/lib/trade-marketing-permissions'
 
 export interface MenuChild {
   label: string
@@ -121,6 +123,21 @@ export const ADMIN_MENU: MenuGroup[] = [
         ],
       },
       { label: 'Promoções', icon: Percent, route: '/admin/promocoes', perm: canViewSales },
+      {
+        label: 'Trade & Marketing',
+        icon: Megaphone,
+        route: '/admin/trade-marketing',
+        perm: canViewTradeMarketing,
+        children: [
+          { label: 'Dashboard', route: '/admin/trade-marketing' },
+          { label: 'Calendário', route: '/admin/trade-marketing/calendario' },
+          { label: 'Ações', route: '/admin/trade-marketing/acoes' },
+          { label: 'Materiais', route: '/admin/trade-marketing/materiais' },
+          { label: 'Prestação de Contas', route: '/admin/trade-marketing/prestacao-contas' },
+          { label: 'Planejamento Anual', route: '/admin/trade-marketing/planejamento-anual' },
+          { label: 'ADAPTA Marketing', route: '/admin/trade-marketing/adapta' },
+        ],
+      },
     ],
   },
   {
