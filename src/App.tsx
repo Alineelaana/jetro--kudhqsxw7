@@ -82,6 +82,10 @@ import Atendimento from './pages/Atendimento'
 import DP from './pages/DP'
 import SST from './pages/SST'
 import Promotions from './pages/Promotions'
+import Precificacao from './pages/Precificacao'
+import Auditoria from './pages/Auditoria'
+import Controladoria from './pages/Controladoria'
+import SupplierAllowance from './pages/SupplierAllowance'
 
 const App = () => (
   <BrowserRouter>
@@ -689,6 +693,10 @@ const App = () => (
                           path="/admin/promocoes"
                           element={<Promotions screen="dashboard" />}
                         />
+                        <Route path="/admin/precificacao" element={<Precificacao />} />
+                        <Route path="/admin/auditoria" element={<Auditoria />} />
+                        <Route path="/admin/controladoria" element={<Controladoria />} />
+                        <Route path="/admin/verbas-fornecedores" element={<SupplierAllowance />} />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />

@@ -22,6 +22,10 @@ import {
   UserCog,
   HardHat,
   Percent,
+  Calculator,
+  FileSearch,
+  PieChart,
+  Handshake,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -89,6 +93,7 @@ export const ADMIN_MENU: MenuGroup[] = [
       },
       { label: 'Produtos', icon: Package, route: '/admin/produtos' },
       { label: 'Cadastros', icon: FileText, route: '/admin/cadastros', perm: canViewConfiguracoes },
+      { label: 'Precificação', icon: Calculator, route: '/admin/precificacao' },
       {
         label: 'Tabelas de Preços',
         icon: Tag,
@@ -121,6 +126,7 @@ export const ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Financeiro',
     items: [
+      { label: 'Verbas de Fornecedores', icon: Handshake, route: '/admin/verbas-fornecedores' },
       {
         label: 'Financeiro',
         icon: DollarSign,
@@ -291,6 +297,7 @@ export const ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Inteligência',
     items: [
+      { label: 'Controladoria', icon: PieChart, route: '/admin/controladoria' },
       {
         label: 'BI',
         icon: BarChart3,
@@ -358,6 +365,7 @@ export const ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Administração',
     items: [
+      { label: 'Auditoria', icon: FileSearch, route: '/admin/auditoria', perm: canViewAuditLogs },
       {
         label: 'Configurações',
         icon: Settings,

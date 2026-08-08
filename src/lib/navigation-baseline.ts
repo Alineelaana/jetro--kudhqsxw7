@@ -65,6 +65,30 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
     group: 'Administração',
     classification: 'A',
   },
+  {
+    route: '/admin/precificacao',
+    label: 'Precificação',
+    group: 'Comercial',
+    classification: 'A',
+  },
+  {
+    route: '/admin/auditoria',
+    label: 'Auditoria',
+    group: 'Administração',
+    classification: 'A',
+  },
+  {
+    route: '/admin/controladoria',
+    label: 'Controladoria',
+    group: 'Inteligência',
+    classification: 'A',
+  },
+  {
+    route: '/admin/verbas-fornecedores',
+    label: 'Verbas de Fornecedores',
+    group: 'Financeiro',
+    classification: 'A',
+  },
 ]
 
 export const STABLE_ROUTES: string[] = NAVIGATION_BASELINE.filter(
@@ -169,4 +193,9 @@ export const ALLOWED_ADDITION_PREFIXES: string[] = []
 
 export function isAllowedAddition(_key: string): boolean {
   return false
+}
+
+export function isAllowedRoute(route: string): boolean {
+  if (ALL_ALLOWED_ROUTES.includes(route)) return true
+  return ALL_ALLOWED_ROUTES.some((base) => route.startsWith(base + '/'))
 }
