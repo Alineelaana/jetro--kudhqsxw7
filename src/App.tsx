@@ -64,6 +64,7 @@ import PlatformLayer from './pages/PlatformLayer'
 import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
 import Performance from './pages/Performance'
+import ValidityAlerts from './pages/ValidityAlerts'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { CapacityPanel } from '@/components/industry/capacity-panel'
@@ -753,6 +754,22 @@ const App = () => (
                         <Route
                           path="/admin/performance/chat"
                           element={<Performance screen="chat" />}
+                        />
+                        <Route
+                          path="/admin/validade"
+                          element={<ValidityAlerts screen="alerts" />}
+                        />
+                        <Route
+                          path="/admin/validade/dashboard"
+                          element={<ValidityAlerts screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/validade/regras"
+                          element={<ValidityAlerts screen="regras" />}
+                        />
+                        <Route
+                          path="/admin/validade/chat"
+                          element={<ValidityAlerts screen="chat" />}
                         />
                         <Route
                           path="/admin/atendimento"

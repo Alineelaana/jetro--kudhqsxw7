@@ -27,6 +27,7 @@ import {
   PieChart,
   Handshake,
   Megaphone,
+  CalendarClock,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -56,6 +57,7 @@ import { canViewBI } from '@/lib/bi-permissions'
 import { canViewControladoria } from '@/lib/controladoria-permissions'
 import { canViewVR } from '@/lib/variable-remuneration-permissions'
 import { canViewAtendimentoModule } from '@/lib/atendimento-permissions'
+import { canViewValidityAlerts } from '@/lib/validity-permissions'
 
 export interface MenuChild {
   label: string
@@ -605,6 +607,12 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Segurança', route: '/admin/configuracoes/seguranca' },
           { label: 'Backup', route: '/admin/configuracoes/backup' },
         ],
+      },
+      {
+        label: 'Validade e Vencimentos',
+        icon: CalendarClock,
+        route: '/admin/validade',
+        perm: canViewValidityAlerts,
       },
       { label: 'Phase0 Foundation', icon: Layers, route: '/admin/phase0-foundation' },
       { label: 'Platform Layer', icon: Layers, route: '/admin/platform-layer' },

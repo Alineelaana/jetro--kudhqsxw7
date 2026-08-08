@@ -20,6 +20,7 @@ onServe((e) => {
       module: 'industry',
     },
     { name: 'promotion_evaluate', type: 'cron', schedule: '0 */6 * * *', module: 'promotions' },
+    { name: 'validity_alerts_detect', type: 'cron', schedule: '0 6 * * *', module: 'validity' },
   ]
 
   try {
