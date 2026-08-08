@@ -60,6 +60,9 @@ migrate(
         record.set('active', s.active)
         record.set('empresa', '')
         record.set('filial', '')
+        record.set('name', s.role + ' - Regra Padrão')
+        record.set('vigencia_inicio', '2024-01-01')
+        record.set('vigencia_fim', '2099-12-31')
         app.save(record)
       }
     }
