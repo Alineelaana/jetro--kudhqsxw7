@@ -21,6 +21,10 @@ const VERBAS_NAV_ITEMS = [
   { label: 'Prestação de Contas', route: '/admin/verbas/prestacao-contas' },
   { label: 'Verbas por Fornecedor', route: '/admin/verbas/por-fornecedor' },
   { label: 'Cotações Externas', route: '/admin/verbas/cotacoes-externas' },
+  { label: 'Gastos de Trade', route: '/admin/verbas/gastos-trade' },
+  { label: 'Créditos Avulsos', route: '/admin/verbas/creditos-avulsos' },
+  { label: 'Documentos', route: '/admin/verbas/documentos' },
+  { label: 'Versionamento', route: '/admin/verbas/versionamento-relatorios' },
 ]
 
 export function SaLayout({

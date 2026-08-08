@@ -86,6 +86,30 @@ export const VERBAS_PERMISSION_SCREENS: VerbasPermissionScreen[] = [
     route: '/admin/verbas/configuracoes',
     actions: ['view', 'config'],
   },
+  {
+    key: 'trade-expenses',
+    label: 'Gastos de Trade',
+    route: '/admin/verbas/gastos-trade',
+    actions: ['view', 'create', 'export'],
+  },
+  {
+    key: 'adhoc-credits',
+    label: 'Créditos Avulsos',
+    route: '/admin/verbas/creditos-avulsos',
+    actions: ['view', 'create', 'export'],
+  },
+  {
+    key: 'documents',
+    label: 'Documentos',
+    route: '/admin/verbas/documentos',
+    actions: ['view', 'create'],
+  },
+  {
+    key: 'report-versions',
+    label: 'Versionamento de Relatórios',
+    route: '/admin/verbas/versionamento-relatorios',
+    actions: ['view', 'create'],
+  },
 ]
 
 export function buildVerbasPermissionKey(

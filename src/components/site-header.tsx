@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import { Menu, MessageCircle } from 'lucide-react'
+import { GitHubConnectionButton } from '@/components/github-connection-button'
 import logoGreenBg from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-a43e3.png'
 
 const NAV_LINKS = [
@@ -62,6 +63,7 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
+            <GitHubConnectionButton />
             <Button
               asChild
               size="sm"

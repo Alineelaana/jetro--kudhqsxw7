@@ -1073,6 +1073,22 @@ const App = () => (
                           path="/admin/verbas/cotacoes-externas"
                           element={<TradeMarketing screen="cotacoes-externas" />}
                         />
+                        <Route
+                          path="/admin/verbas/gastos-trade"
+                          element={<SupplierAllowance screen="trade-expenses" />}
+                        />
+                        <Route
+                          path="/admin/verbas/creditos-avulsos"
+                          element={<SupplierAllowance screen="adhoc-credits" />}
+                        />
+                        <Route
+                          path="/admin/verbas/documentos"
+                          element={<SupplierAllowance screen="documents" />}
+                        />
+                        <Route
+                          path="/admin/verbas/versionamento-relatorios"
+                          element={<SupplierAllowance screen="report-versions" />}
+                        />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />

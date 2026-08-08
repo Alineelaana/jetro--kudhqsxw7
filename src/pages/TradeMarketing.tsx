@@ -42,7 +42,7 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
   useEffect(() => {
     if (screen === 'calendar') {
       setActiveTab('calendar')
-    } else if (['dashboard', 'actions', 'annual-plan'].includes(screen)) {
+    } else if (['dashboard', 'actions'].includes(screen)) {
       setActiveTab('cockpit')
     } else {
       setActiveTab(screen)
