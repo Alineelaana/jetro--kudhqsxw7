@@ -12,6 +12,7 @@ import { BiGenericCenter } from '@/components/bi/centers/bi-center-configs'
 import { BiAiAdapta } from '@/components/bi/bi-ai-adapta'
 import { BiCustomDashboards } from '@/components/bi/bi-custom-dashboards'
 import { BiReportCenter } from '@/components/bi/bi-report-center'
+import { BiProjection } from '@/components/bi/bi-projection'
 
 interface BIProps {
   screen?: string
@@ -143,6 +144,12 @@ export default function BI({ screen = 'dashboard' }: BIProps) {
       return (
         <BiLayout title="Visão Cruzada">
           <BiCrossModule />
+        </BiLayout>
+      )
+    case 'projection':
+      return (
+        <BiLayout title="Projeção de Vendas">
+          <BiProjection />
         </BiLayout>
       )
     case 'saved-views':

@@ -679,6 +679,7 @@ const App = () => (
                           path="/admin/bi/cross-module"
                           element={<BI screen="cross-module" />}
                         />
+                        <Route path="/admin/bi/projection" element={<BI screen="projection" />} />
                         <Route path="/admin/bi/sales" element={<BI screen="sales" />} />
                         <Route path="/admin/bi/stock" element={<BI screen="stock" />} />
                         <Route path="/admin/bi/financial" element={<BI screen="financial" />} />

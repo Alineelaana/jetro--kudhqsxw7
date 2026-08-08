@@ -18,6 +18,7 @@ const NAV_SECTIONS = [
       { to: '/admin/bi', label: 'Dashboard Executivo', icon: '📊' },
       { to: '/admin/bi/executive', label: 'Inteligência Executiva', icon: '👑' },
       { to: '/admin/bi/cross-module', label: 'Visão Cruzada', icon: '🔀' },
+      { to: '/admin/bi/projection', label: 'Projeção de Vendas', icon: '📈' },
     ],
   },
   {
