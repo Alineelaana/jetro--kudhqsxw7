@@ -31,6 +31,63 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
     group: 'Fiscal & RH',
     classification: 'A',
   },
+  {
+    route: '/admin/rh/organograma',
+    label: 'Organograma',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  { route: '/admin/rh/posicoes', label: 'Posições', group: 'Fiscal & RH', classification: 'C' },
+  {
+    route: '/admin/rh/competencias',
+    label: 'Competências',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  {
+    route: '/admin/rh/avaliacao-competencias',
+    label: 'Avaliação de Competências',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  { route: '/admin/rh/calibracao', label: 'Calibração', group: 'Fiscal & RH', classification: 'C' },
+  { route: '/admin/rh/feedback', label: 'Feedback', group: 'Fiscal & RH', classification: 'C' },
+  { route: '/admin/rh/pdi', label: 'PDI', group: 'Fiscal & RH', classification: 'C' },
+  { route: '/admin/rh/carreira', label: 'Carreira', group: 'Fiscal & RH', classification: 'C' },
+  { route: '/admin/rh/sucessao', label: 'Sucessão', group: 'Fiscal & RH', classification: 'C' },
+  { route: '/admin/rh/nine-box', label: 'Matriz 9 Box', group: 'Fiscal & RH', classification: 'C' },
+  {
+    route: '/admin/rh/talent-review',
+    label: 'Talent Review',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  { route: '/admin/rh/onboarding', label: 'Onboarding', group: 'Fiscal & RH', classification: 'C' },
+  {
+    route: '/admin/rh/offboarding',
+    label: 'Offboarding',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  {
+    route: '/admin/rh/reconhecimento',
+    label: 'Reconhecimento',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  {
+    route: '/admin/rh/engajamento',
+    label: 'Engajamento',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  {
+    route: '/admin/rh/cockpit',
+    label: 'Cockpit Executivo RH',
+    group: 'Fiscal & RH',
+    classification: 'C',
+  },
+  { route: '/admin/rh/adapta', label: 'ADAPTA RH', group: 'Fiscal & RH', classification: 'C' },
   { route: '/admin/rh', label: 'Recursos Humanos', group: 'Fiscal & RH', classification: 'A' },
   { route: '/admin/dp', label: 'Departamento Pessoal', group: 'Fiscal & RH', classification: 'A' },
   { route: '/admin/sst', label: 'SST', group: 'Fiscal & RH', classification: 'A' },
@@ -196,10 +253,14 @@ export const RECOVERED_ROUTES: string[] = [
   '/admin/verbas-fornecedores',
 ]
 
-export const ALLOWED_ADDITION_PREFIXES: string[] = []
+export const ALLOWED_ADDITION_PREFIXES: string[] = ['/admin/rh/']
 
 export function isAllowedAddition(_key: string): boolean {
   return false
+}
+
+export function isAllowedRhRoute(route: string): boolean {
+  return route.startsWith('/admin/rh/')
 }
 
 export function isAllowedRoute(route: string): boolean {
