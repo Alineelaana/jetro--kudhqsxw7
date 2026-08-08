@@ -110,14 +110,10 @@ export const createSavedView = (d: Record<string, unknown>) =>
 export const deleteSavedView = (id: string) => ctrlDelete(CTRL_COLLECTIONS.savedViews, id)
 
 export const getBudgetsByPeriod = (period: string, orgFilter?: string) =>
-  pb
-    .collection(CTRL_COLLECTIONS.budgets)
-    .getFullList({
-      filter: orgFilter ? `period = "${period}" && (${orgFilter})` : `period = "${period}"`,
-    })
+  pb.collection(CTRL_COLLECTIONS.budgets).getFullList({
+    filter: orgFilter ? `period = "${period}" && (${orgFilter})` : `period = "${period}"`,
+  })
 export const getForecastsByPeriod = (period: string, orgFilter?: string) =>
-  pb
-    .collection(CTRL_COLLECTIONS.forecasts)
-    .getFullList({
-      filter: orgFilter ? `period = "${period}" && (${orgFilter})` : `period = "${period}"`,
-    })
+  pb.collection(CTRL_COLLECTIONS.forecasts).getFullList({
+    filter: orgFilter ? `period = "${period}" && (${orgFilter})` : `period = "${period}"`,
+  })

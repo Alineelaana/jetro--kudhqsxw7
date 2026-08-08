@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Search, Star } from 'lucide-react'
 import { logBIAudit } from '@/services/bi'
 import { cn } from '@/lib/utils'
+import { EXPORT_INVENTORY, INVENTORY_SUMMARY } from '@/lib/corporate-document-engine/inventory'
 
 interface ReportEntry {
   id: string
