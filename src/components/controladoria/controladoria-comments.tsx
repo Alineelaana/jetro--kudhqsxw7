@@ -16,6 +16,7 @@ import { getComments, createComment, deleteComment } from '@/services/controlado
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { canManageComments } from '@/lib/controladoria-permissions'
+import { useOrgFilter } from '@/hooks/use-org-filter'
 
 const ENTITY_TYPES: Record<string, string> = {
   dre_line: 'Linha DRE',
@@ -25,7 +26,9 @@ const ENTITY_TYPES: Record<string, string> = {
 }
 
 export function ControladoriaComments() {
-  const { user, userRole } = useAuth()
+  const { user, userRole: authRole } = useAuth()
+  const userRole = authRole || (user?.role as string) || undefined
+  const { empresaId, filialId, isGlobal } = useOrgFilter()
   const [comments, setComments] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
@@ -33,7 +36,13 @@ export function ControladoriaComments() {
 
   const load = async () => {
     try {
-      setComments((await getComments()) as Record<string, unknown>[])
+      const filterParts: string[] = []
+      if (!isGlobal) {
+        if (filialId) filterParts.push(`(company = "${empresaId}" && branch = "${filialId}")`)
+        else if (empresaId) filterParts.push(`company = "${empresaId}"`)
+      }
+      const orgFilter = filterParts.length > 0 ? filterParts.join(' || ') : undefined
+      setComments((await getComments(orgFilter)) as Record<string, unknown>[])
     } catch {
       /* ignore */
     }
@@ -55,8 +64,8 @@ export function ControladoriaComments() {
       comment: form.comment || '',
       user_name: (user?.name as string) || 'Usuário',
       user_role: (user?.role as string) || '',
-      company: '',
-      branch: '',
+      company: empresaId || '',
+      branch: filialId || '',
     })
     setOpen(false)
     setForm({})

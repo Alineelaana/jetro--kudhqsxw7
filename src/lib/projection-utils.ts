@@ -149,3 +149,19 @@ export const EMPTY_FILTERS: ProjectionFilters = {
   canal: '',
   origem_venda: '',
 }
+
+export interface ComparativePeriod {
+  key: string
+  label: string
+  competencia: string
+  faturado: number
+  vendido: number
+  projecao: number
+  meta: number
+  pct_meta: number
+  hasData: boolean
+}
+
+export interface ComparativeData {
+  periods: ComparativePeriod[]
+}

@@ -1,5 +1,10 @@
 import pb from '@/lib/pocketbase/client'
-import type { ProjectionData, ProjectionFilters, BusinessDaysConfig } from '@/lib/projection-utils'
+import type {
+  ProjectionData,
+  ProjectionFilters,
+  BusinessDaysConfig,
+  ComparativeData,
+} from '@/lib/projection-utils'
 
 export async function getProjectionData(
   filters: Partial<ProjectionFilters>,
@@ -49,6 +54,23 @@ export async function saveBusinessDaysConfig(data: {
     body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' },
   })
+}
+
+export async function getComparativeData(
+  filters: Partial<ProjectionFilters>,
+): Promise<ComparativeData> {
+  const params = new URLSearchParams()
+  if (filters.empresa) params.set('empresa', filters.empresa)
+  if (filters.filial) params.set('filial', filters.filial)
+  if (filters.competencia) params.set('competencia', filters.competencia)
+  if (filters.rca) params.set('rca', filters.rca)
+  if (filters.gerente) params.set('gerente', filters.gerente)
+  if (filters.fornecedor) params.set('fornecedor', filters.fornecedor)
+  if (filters.produto) params.set('produto', filters.produto)
+  if (filters.regiao) params.set('regiao', filters.regiao)
+  if (filters.cliente) params.set('cliente', filters.cliente)
+  const qs = params.toString()
+  return pb.send(`/backend/v1/projection/comparative${qs ? `?${qs}` : ''}`, { method: 'GET' })
 }
 
 export function logProjectionExport(format: string, filters: Partial<ProjectionFilters>) {

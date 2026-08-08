@@ -5,18 +5,20 @@ import { Loader2, Download, Image as ImageIcon } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useCorporateDocuments } from '@/hooks/use-corporate-documents'
-import { getProjectionData, logProjectionExport } from '@/services/projection'
+import { getProjectionData, getComparativeData, logProjectionExport } from '@/services/projection'
 import { ProjectionFilters } from './projection/projection-filters'
 import { ProjectionKPIs } from './projection/projection-kpis'
 import { ProjectionTable } from './projection/projection-table'
 import { ProjectionCharts } from './projection/projection-charts'
 import { ProjectionConfigDialog } from './projection/projection-config-dialog'
+import { ProjectionComparative } from './projection/projection-comparative'
 import {
   DIMENSIONS,
   EMPTY_FILTERS,
   PROJECTION_FORMULA,
   type ProjectionData,
   type ProjectionFilters as FilterType,
+  type ComparativeData,
 } from '@/lib/projection-utils'
 import type { ExportFormat, DocumentSection } from '@/lib/corporate-document-engine/types'
 import { toast } from 'sonner'
@@ -30,12 +32,20 @@ export function BiProjection() {
   const [dimension, setDimension] = useState('rca')
   const [configOpen, setConfigOpen] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [comparative, setComparative] = useState<ComparativeData | null>(null)
+  const [compLoading, setCompLoading] = useState(false)
 
   const load = async () => {
     try {
-      setData(await getProjectionData(filters))
+      const [projData, compData] = await Promise.all([
+        getProjectionData(filters),
+        getComparativeData(filters).catch(() => null),
+      ])
+      setData(projData)
+      setComparative(compData)
     } catch {
       setData(null)
+      setComparative(null)
     }
     setLoading(false)
   }
@@ -151,6 +161,12 @@ export function BiProjection() {
       </p>
       <ProjectionKPIs kpis={data.kpis} />
       <ProjectionCharts kpis={data.kpis} rows={currentRows} dailyEvolution={data.daily_evolution} />
+      <ProjectionComparative
+        data={comparative}
+        loading={compLoading}
+        currentFaturado={data.kpis.faturado}
+        currentProjecao={data.kpis.projecao}
+      />
       <Tabs value={dimension} onValueChange={setDimension}>
         <TabsList className="flex-wrap">
           {DIMENSIONS.map((d) => (

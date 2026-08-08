@@ -15,84 +15,11 @@ function parseNum(v: unknown): number {
 }
 
 export async function computeDRE(period: string, version: string = 'contabil'): Promise<DREResult> {
-  const [structure, mappings, lancamentos, reclassifications] = await Promise.all([
-    getDREStructure(),
-    getAccountMappings(),
-    pb
-      .collection('contabil_lancamentos')
-      .getFullList()
-      .catch(() => []),
-    getReclassifications(),
-  ])
-
-  const mappingMap = new Map<string, string>()
-  for (const m of mappings as Rec[]) {
-    if (m.is_active !== false && m.dre_line_key) {
-      mappingMap.set(m.account_code as string, m.dre_line_key as string)
-    }
-  }
-
-  const reclassMap = new Map<string, string>()
-  for (const r of reclassifications as Rec[]) {
-    if (r.status === 'approved' && r.period === period) {
-      reclassMap.set(r.source_account_code as string, r.target_dre_line as string)
-    }
-  }
-
-  const lineValues: Record<string, number> = {}
-  for (const s of structure as Rec[]) {
-    lineValues[s.line_key as string] = 0
-  }
-
-  for (const l of lancamentos as Rec[]) {
-    const conta = l.conta_debito as string
-    let lineKey = mappingMap.get(conta)
-    if (version === 'gerencial') {
-      lineKey = reclassMap.get(conta) || lineKey
-    }
-    if (lineKey && lineValues[lineKey] !== undefined) {
-      const val = parseNum(l.valor)
-      lineValues[lineKey] += val
-    }
-  }
-
-  const lines: DRELineResult[] = (structure as Rec[]).map((s) => {
-    const key = s.line_key as string
-    const isCalc = s.is_calculated === true
-    let value = lineValues[key] || 0
-    if (isCalc && s.formula_expression) {
-      value = evalFormula(s.formula_expression as string, lineValues)
-    }
-    if (s.sign === 'negative') value = -Math.abs(value)
-    return {
-      line_key: key,
-      label: s.label as string,
-      group: s.group as string,
-      order: s.order as number,
-      value,
-      is_calculated: isCalc,
-      sign: s.sign as string,
-    }
+  return pb.send('/backend/v1/dre/compute', {
+    method: 'POST',
+    body: JSON.stringify({ period, version }),
+    headers: { 'Content-Type': 'application/json' },
   })
-
-  const receitaLiquida =
-    lineValues['receita_liquida'] || evalFormula('receita_bruta - deducoes - impostos', lineValues)
-  lines.forEach((l) => {
-    l.percentage_of_revenue = receitaLiquida > 0 ? (l.value / receitaLiquida) * 100 : 0
-  })
-
-  return {
-    version,
-    period,
-    lines: lines.sort((a, b) => a.order - b.order),
-    totals: {
-      receita_liquida: receitaLiquida,
-      lucro_bruto: lineValues['lucro_bruto'] || evalFormula('receita_liquida - cmv', lineValues),
-      resultado_operacional: lineValues['resultado_operacional'] || 0,
-      ebitda: lineValues['ebitda'] || 0,
-      resultado_liquido: lineValues['resultado_liquido'] || 0,
-    },
-  }
 }
 
 function evalFormula(expr: string, values: Record<string, number>): number {

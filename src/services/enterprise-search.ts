@@ -1,6 +1,7 @@
 import pb from '@/lib/pocketbase/client'
 import { SA_COLLECTIONS } from '@/services/supplier-allowance'
 import { canViewSA } from '@/lib/supplier-allowance-permissions'
+import { canViewControladoria } from '@/lib/controladoria-permissions'
 
 export interface SearchResult {
   id: string
@@ -176,6 +177,87 @@ const SEARCH_ENTITIES = [
     labelField: 'settlement_type',
     descField: 'status',
     permFn: canViewSA,
+  },
+  {
+    collection: 'controladoria_dre_structure',
+    type: 'DRE',
+    route: '/admin/controladoria/dre',
+    fields: ['line_key', 'label', 'group'],
+    labelField: 'label',
+    descField: 'group',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'controladoria_kpis',
+    type: 'KPI Controladoria',
+    route: '/admin/controladoria/kpis',
+    fields: ['name', 'formula', 'category', 'responsible'],
+    labelField: 'name',
+    descField: 'category',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'controladoria_closing',
+    type: 'Fechamento',
+    route: '/admin/controladoria/fechamento',
+    fields: ['period', 'status', 'responsible'],
+    labelField: 'period',
+    descField: 'status',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'controladoria_budgets',
+    type: 'Orçado',
+    route: '/admin/controladoria/budget',
+    fields: ['period', 'dre_line_key', 'value'],
+    labelField: 'dre_line_key',
+    descField: 'period',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'controladoria_simulations',
+    type: 'Simulação',
+    route: '/admin/controladoria/simulador',
+    fields: ['scenario_name', 'scenario_type', 'status'],
+    labelField: 'scenario_name',
+    descField: 'scenario_type',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'controladoria_consolidation',
+    type: 'Consolidação',
+    route: '/admin/controladoria/consolidacao',
+    fields: ['group_name', 'period', 'status'],
+    labelField: 'group_name',
+    descField: 'period',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'controladoria_result_centers',
+    type: 'Centro de Resultado',
+    route: '/admin/controladoria/centros-resultado',
+    fields: ['code', 'name', 'type', 'responsible'],
+    labelField: 'name',
+    descField: 'code',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'contabil_lancamentos',
+    type: 'Lançamento Contábil',
+    route: '/admin/controladoria/dre',
+    fields: ['conta_debito', 'conta_credito', 'historico', 'valor'],
+    labelField: 'historico',
+    descField: 'conta_debito',
+    permFn: canViewControladoria,
+  },
+  {
+    collection: 'plano_contas',
+    type: 'Plano de Contas',
+    route: '/admin/controladoria',
+    fields: ['code', 'name', 'type', 'grupo'],
+    labelField: 'name',
+    descField: 'code',
+    permFn: canViewControladoria,
   },
 ]
 
