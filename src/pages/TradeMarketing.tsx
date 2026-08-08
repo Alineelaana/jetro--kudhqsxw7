@@ -15,6 +15,7 @@ import { TmMaterials } from '@/components/trade-marketing/tm-materials'
 import { TmAccountability } from '@/components/trade-marketing/tm-accountability'
 import { TmAdapta } from '@/components/trade-marketing/tm-adapta'
 import { TmVerbasFornecedor } from '@/components/trade-marketing/tm-verbas-fornecedor'
+import { MkExternalQuotationsPanel } from '@/components/trade-marketing/mk-eq-panel'
 import type { TradeMarketingAction } from '@/lib/trade-marketing-types'
 import { STATUS_COLORS } from '@/lib/trade-marketing-types'
 
@@ -27,6 +28,7 @@ const TABS = [
   { id: 'accountability', label: 'Prestação', route: '/admin/trade-marketing/prestacao-contas' },
   { id: 'annual-plan', label: 'Planejamento', route: '/admin/trade-marketing/planejamento-anual' },
   { id: 'adapta', label: 'ADAPTA', route: '/admin/trade-marketing/adapta' },
+  { id: 'cotacoes-externas', label: 'Cotações', route: '/admin/trade-marketing/cotacoes-externas' },
 ]
 
 function ActionsTable({ actions }: { actions: TradeMarketingAction[] }) {
@@ -122,6 +124,8 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
         return <AnnualPlanPlaceholder />
       case 'adapta':
         return <TmAdapta />
+      case 'cotacoes-externas':
+        return <MkExternalQuotationsPanel />
       default:
         return <TmDashboard actions={actions} />
     }
