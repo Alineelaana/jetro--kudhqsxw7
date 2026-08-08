@@ -2,6 +2,7 @@ import { type ReactNode, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { useBackNavigation } from '@/hooks/use-back-navigation'
 
 interface BreadcrumbItem {
   label: string
@@ -25,6 +26,7 @@ export function ModulePageHeader({
   backLabel = 'Voltar ao painel',
   children,
 }: ModulePageHeaderProps) {
+  const goBack = useBackNavigation(backTo)
   return (
     <div className="mb-6 space-y-3">
       {breadcrumbs.length > 0 && (
@@ -45,10 +47,8 @@ export function ModulePageHeader({
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="ghost" asChild>
-            <Link to={backTo}>
-              <ArrowLeft className="w-4 h-4 mr-1" /> {backLabel}
-            </Link>
+          <Button variant="ghost" onClick={goBack}>
+            <ArrowLeft className="w-4 h-4 mr-1" /> {backLabel}
           </Button>
           {Icon && (
             <div className="flex items-center gap-2">

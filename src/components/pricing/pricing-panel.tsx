@@ -13,6 +13,7 @@ import { PricingRiskMonitor } from '@/components/pricing/pricing-risk-monitor'
 import { PricingCostComparator } from '@/components/pricing/pricing-cost-comparator'
 import { PricingAISuggestions } from '@/components/pricing/pricing-ai-suggestions'
 import { Calculator } from 'lucide-react'
+import { AdminBackButton } from '@/components/admin-back-button'
 
 type SubTab =
   | 'products'
@@ -80,6 +81,7 @@ export function PricingPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
+        <AdminBackButton fallback="/admin" />
         <Calculator className="w-5 h-5 text-[#005B2E]" />
         <h2 className="text-xl font-black text-foreground">Precificação</h2>
       </div>

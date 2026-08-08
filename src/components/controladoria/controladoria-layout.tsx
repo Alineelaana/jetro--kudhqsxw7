@@ -9,6 +9,7 @@ import { Loader2, Calculator } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { canViewControladoria } from '@/lib/controladoria-permissions'
 import { useModuleSections } from '@/hooks/use-module-sections'
+import { AdminBackButton } from '@/components/admin-back-button'
 
 const NAV_SECTIONS = [
   {
@@ -104,6 +105,9 @@ export function ControladoriaLayout({ children, title }: { children: ReactNode; 
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="mb-2">
+        <AdminBackButton fallback="/admin" label="Voltar" />
+      </div>
       <ModulePageHeader
         title={title}
         icon={Calculator}

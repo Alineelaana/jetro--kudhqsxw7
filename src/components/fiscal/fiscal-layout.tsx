@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
 import { Loader2, FileText } from 'lucide-react'
 import { ModulePageHeader } from '@/components/enterprise/module-page-header'
+import { AdminBackButton } from '@/components/admin-back-button'
 
 export function FiscalLayout({ children, title }: { children: ReactNode; title: string }) {
   const { isAuthenticated, loading } = useAuth()
@@ -18,6 +19,9 @@ export function FiscalLayout({ children, title }: { children: ReactNode; title: 
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-2">
+        <AdminBackButton fallback="/admin" label="Voltar" />
+      </div>
       <ModulePageHeader
         title={title}
         icon={FileText}

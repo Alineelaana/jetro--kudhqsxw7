@@ -1,111 +1,19 @@
-import { type ComponentType } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { ChevronDown, Star } from 'lucide-react'
+import { ChevronDown, Search, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { useModuleSections } from '@/hooks/use-module-sections'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
+import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { ADMIN_MENU, type MenuEntry } from '@/lib/admin-menu-config'
+import { MenuLink } from '@/components/admin-menu-link'
+import { Input } from '@/components/ui/input'
 
-interface MenuLinkProps {
-  entry: MenuEntry
-  userRole: string | undefined
-  isFavorite: boolean
-  onToggleFavorite: (key: string) => void
-  isActive: boolean
-  isChildActive: boolean
-  currentPathname: string
-  isExpanded: boolean
-  onToggleExpand: (key: string) => void
-}
-
-function MenuLink({
-  entry,
-  userRole,
-  isFavorite,
-  onToggleFavorite,
-  isActive,
-  isChildActive,
-  currentPathname,
-  isExpanded,
-  onToggleExpand,
-}: MenuLinkProps) {
-  const Icon = entry.icon as ComponentType<{ className?: string }>
-  const hasChildren = !!entry.children?.length
-  const favKey = entry.route
-  const visible = !entry.perm || entry.perm(userRole)
-  if (!visible) return null
-
-  const linkClass = cn(
-    'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
-    isActive || isChildActive
-      ? 'bg-[#005B2E] text-white font-semibold'
-      : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
-  )
-
-  if (hasChildren) {
-    return (
-      <div>
-        <div className="flex items-center">
-          <Link to={entry.route} className={linkClass}>
-            <Icon className="w-4 h-4 shrink-0" />
-            <span className="truncate">{entry.label}</span>
-          </Link>
-          <button onClick={() => onToggleExpand(favKey)} className="p-1 rounded hover:bg-gray-100">
-            <ChevronDown
-              className={cn(
-                'w-3.5 h-3.5 transition-transform text-gray-400',
-                isExpanded && 'rotate-180',
-              )}
-            />
-          </button>
-          <button
-            onClick={() => onToggleFavorite(favKey)}
-            className="p-1 rounded hover:bg-gray-100"
-          >
-            <Star
-              className={cn(
-                'w-3 h-3',
-                isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300',
-              )}
-            />
-          </button>
-        </div>
-        {isExpanded && (
-          <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5">
-            {entry.children!.map((child) => (
-              <Link
-                key={child.route}
-                to={child.route}
-                className={cn(
-                  'block px-2 py-1 rounded text-xs transition-colors',
-                  currentPathname === child.route
-                    ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
-                    : 'text-gray-500 hover:text-[#005B2E] hover:bg-gray-50',
-                )}
-              >
-                {child.label}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex items-center">
-      <Link to={entry.route} className={linkClass}>
-        <Icon className="w-4 h-4 shrink-0" />
-        <span className="truncate">{entry.label}</span>
-      </Link>
-      <button onClick={() => onToggleFavorite(favKey)} className="p-1 rounded hover:bg-gray-100">
-        <Star
-          className={cn('w-3 h-3', isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300')}
-        />
-      </button>
-    </div>
-  )
+interface SearchResult {
+  label: string
+  route: string
+  parent: string
 }
 
 export function AdminSidebar() {
@@ -117,6 +25,29 @@ export function AdminSidebar() {
     user?.id as string,
   )
   const { isFavorite, toggleFavorite } = useMenuFavorites(user?.id as string)
+  const { collapsed, toggle: toggleSidebar } = useSidebarMode(user?.id as string)
+  const [searchQuery, setSearchQuery] = useState('')
+  const isSearching = searchQuery.trim().length > 0
+
+  const searchResults = useMemo<SearchResult[]>(() => {
+    if (!isSearching) return []
+    const q = searchQuery.toLowerCase()
+    const results: SearchResult[] = []
+    for (const group of ADMIN_MENU) {
+      for (const item of group.items) {
+        if (item.perm && !item.perm(userRole)) continue
+        if (item.label.toLowerCase().includes(q))
+          results.push({ label: item.label, route: item.route, parent: group.title })
+        if (item.children) {
+          for (const child of item.children) {
+            if (child.label.toLowerCase().includes(q))
+              results.push({ label: child.label, route: child.route, parent: item.label })
+          }
+        }
+      }
+    }
+    return results
+  }, [searchQuery, isSearching, userRole])
 
   const favItems = ADMIN_MENU.flatMap((g) => g.items).filter((item) => isFavorite(item.route))
 
@@ -125,7 +56,6 @@ export function AdminSidebar() {
     const isChildActive = item.children
       ? pathname.startsWith(item.route + '/') || pathname === item.route
       : false
-    const itemExpanded = isItemExpanded(item.route) || isChildActive
     return (
       <MenuLink
         key={item.route}
@@ -136,57 +66,131 @@ export function AdminSidebar() {
         isActive={isActive}
         isChildActive={isChildActive}
         currentPathname={pathname}
-        isExpanded={itemExpanded}
+        isExpanded={isItemExpanded(item.route) || isChildActive}
         onToggleExpand={toggleItem}
       />
     )
   }
 
+  if (collapsed) {
+    return (
+      <div className="w-12 shrink-0 border-r border-gray-200 bg-white flex flex-col items-center py-3">
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded hover:bg-gray-100"
+          title="Mostrar menu"
+        >
+          <PanelLeftOpen className="w-4 h-4 text-gray-500" />
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <aside className="w-60 shrink-0 border-r border-gray-200 bg-white h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto">
-      <nav className="p-2 space-y-1">
-        {favItems.length > 0 && (
-          <div className="pb-2 border-b border-gray-100">
-            <div className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase">Favoritos</div>
-            {favItems.map((item) => {
-              const childActive = pathname.startsWith(item.route + '/') || pathname === item.route
+    <aside className="w-60 shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+      <div className="p-2 border-b border-gray-100 shrink-0 space-y-1">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Buscar tela..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-7 pr-7 h-8 text-xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            >
+              <X className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+            </button>
+          )}
+        </div>
+        <button
+          onClick={toggleSidebar}
+          className="flex items-center gap-1.5 px-2 py-1 text-xs text-gray-500 hover:text-[#005B2E] hover:bg-gray-50 rounded w-full transition-colors"
+        >
+          <PanelLeftClose className="w-3.5 h-3.5" /> Esconder menu
+        </button>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+        {isSearching ? (
+          <div className="space-y-0.5">
+            {searchResults.length === 0 ? (
+              <div className="px-3 py-4 text-center text-xs text-gray-400">
+                Nenhuma tela encontrada
+              </div>
+            ) : (
+              searchResults.map((r) => (
+                <Link
+                  key={r.route}
+                  to={r.route}
+                  onClick={() => setSearchQuery('')}
+                  className={cn(
+                    'block px-3 py-1.5 rounded text-sm transition-colors',
+                    pathname === r.route
+                      ? 'bg-[#005B2E] text-white font-semibold'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                  )}
+                >
+                  <div className="truncate">{r.label}</div>
+                  <div className="text-xs text-gray-400 truncate">{r.parent}</div>
+                </Link>
+              ))
+            )}
+          </div>
+        ) : (
+          <>
+            {favItems.length > 0 && (
+              <div className="pb-2 border-b border-gray-100">
+                <div className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase">
+                  Favoritos
+                </div>
+                {favItems.map((item) => {
+                  const childActive =
+                    pathname.startsWith(item.route + '/') || pathname === item.route
+                  return (
+                    <MenuLink
+                      key={`fav-${item.route}`}
+                      entry={item}
+                      userRole={userRole}
+                      isFavorite={true}
+                      onToggleFavorite={toggleFavorite}
+                      isActive={pathname === item.route}
+                      isChildActive={childActive}
+                      currentPathname={pathname}
+                      isExpanded={isItemExpanded(item.route) || childActive}
+                      onToggleExpand={toggleItem}
+                    />
+                  )
+                })}
+              </div>
+            )}
+            {ADMIN_MENU.map((group) => {
+              const expanded =
+                isExpanded(group.title) ||
+                group.items.some((item) => pathname.startsWith(item.route))
               return (
-                <MenuLink
-                  key={`fav-${item.route}`}
-                  entry={item}
-                  userRole={userRole}
-                  isFavorite={true}
-                  onToggleFavorite={toggleFavorite}
-                  isActive={pathname === item.route}
-                  isChildActive={childActive}
-                  currentPathname={pathname}
-                  isExpanded={isItemExpanded(item.route) || childActive}
-                  onToggleExpand={toggleItem}
-                />
+                <div key={group.title} className="border-b border-gray-100 last:border-b-0">
+                  <button
+                    onClick={() => toggle(group.title)}
+                    className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide hover:text-gray-600"
+                  >
+                    {group.title}
+                    <ChevronDown
+                      className={cn('w-3.5 h-3.5 transition-transform', expanded && 'rotate-180')}
+                    />
+                  </button>
+                  {expanded && (
+                    <div className="flex flex-col gap-0.5 pb-2">{group.items.map(renderItem)}</div>
+                  )}
+                </div>
               )
             })}
-          </div>
+          </>
         )}
-        {ADMIN_MENU.map((group) => {
-          const expanded =
-            isExpanded(group.title) || group.items.some((item) => pathname.startsWith(item.route))
-          return (
-            <div key={group.title} className="border-b border-gray-100 last:border-b-0">
-              <button
-                onClick={() => toggle(group.title)}
-                className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide hover:text-gray-600"
-              >
-                {group.title}
-                <ChevronDown
-                  className={cn('w-3.5 h-3.5 transition-transform', expanded && 'rotate-180')}
-                />
-              </button>
-              {expanded && (
-                <div className="flex flex-col gap-0.5 pb-2">{group.items.map(renderItem)}</div>
-              )}
-            </div>
-          )
-        })}
       </nav>
     </aside>
   )

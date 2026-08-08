@@ -28,6 +28,7 @@ import {
   AlertCircle,
   Settings,
 } from 'lucide-react'
+import { AdminBackButton } from '@/components/admin-back-button'
 
 export function AuditPanel() {
   const { isAdmin, user } = useAuth()
@@ -127,9 +128,12 @@ export function AuditPanel() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-xl font-black text-foreground flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-[#005B2E]" /> Auditoria do Sistema
-        </h2>
+        <div className="flex items-center gap-2">
+          <AdminBackButton fallback="/admin" />
+          <h2 className="text-xl font-black text-foreground flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-[#005B2E]" /> Auditoria do Sistema
+          </h2>
+        </div>
         <div className="flex gap-2">
           <Button
             variant="outline"

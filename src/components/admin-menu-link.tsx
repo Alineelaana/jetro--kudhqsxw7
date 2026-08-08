@@ -1,0 +1,106 @@
+import { type ComponentType } from 'react'
+import { Link } from 'react-router-dom'
+import { ChevronDown, Star } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { type MenuEntry } from '@/lib/admin-menu-config'
+
+export interface MenuLinkProps {
+  entry: MenuEntry
+  userRole: string | undefined
+  isFavorite: boolean
+  onToggleFavorite: (key: string) => void
+  isActive: boolean
+  isChildActive: boolean
+  currentPathname: string
+  isExpanded: boolean
+  onToggleExpand: (key: string) => void
+}
+
+export function MenuLink({
+  entry,
+  userRole,
+  isFavorite,
+  onToggleFavorite,
+  isActive,
+  isChildActive,
+  currentPathname,
+  isExpanded,
+  onToggleExpand,
+}: MenuLinkProps) {
+  const Icon = entry.icon as ComponentType<{ className?: string }>
+  const hasChildren = !!entry.children?.length
+  const favKey = entry.route
+  const visible = !entry.perm || entry.perm(userRole)
+  if (!visible) return null
+
+  const linkClass = cn(
+    'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
+    isActive || isChildActive
+      ? 'bg-[#005B2E] text-white font-semibold'
+      : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+  )
+
+  if (hasChildren) {
+    return (
+      <div>
+        <div className="flex items-center">
+          <Link to={entry.route} className={linkClass}>
+            <Icon className="w-4 h-4 shrink-0" />
+            <span className="truncate">{entry.label}</span>
+          </Link>
+          <button onClick={() => onToggleExpand(favKey)} className="p-1 rounded hover:bg-gray-100">
+            <ChevronDown
+              className={cn(
+                'w-3.5 h-3.5 transition-transform text-gray-400',
+                isExpanded && 'rotate-180',
+              )}
+            />
+          </button>
+          <button
+            onClick={() => onToggleFavorite(favKey)}
+            className="p-1 rounded hover:bg-gray-100"
+          >
+            <Star
+              className={cn(
+                'w-3 h-3',
+                isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300',
+              )}
+            />
+          </button>
+        </div>
+        {isExpanded && (
+          <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5">
+            {entry.children!.map((child) => (
+              <Link
+                key={child.route}
+                to={child.route}
+                className={cn(
+                  'block px-2 py-1 rounded text-xs transition-colors',
+                  currentPathname === child.route
+                    ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
+                    : 'text-gray-500 hover:text-[#005B2E] hover:bg-gray-50',
+                )}
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center">
+      <Link to={entry.route} className={linkClass}>
+        <Icon className="w-4 h-4 shrink-0" />
+        <span className="truncate">{entry.label}</span>
+      </Link>
+      <button onClick={() => onToggleFavorite(favKey)} className="p-1 rounded hover:bg-gray-100">
+        <Star
+          className={cn('w-3 h-3', isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300')}
+        />
+      </button>
+    </div>
+  )
+}
