@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T18:34:43.232Z",
+  "generatedAt": "2026-08-08T18:42:42.657Z",
   "collections": [
     {
       "name": "users",
@@ -339,6 +339,12 @@
         {
           "name": "request_number",
           "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sales_channel",
+          "type": "text",
           "required": false,
           "system": false
         }
@@ -893,6 +899,27 @@
           "type": "json",
           "required": false,
           "system": false
+        },
+        {
+          "name": "rca_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "televendas_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "responsavel_comercial_digital_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
         }
       ],
       "indexes": [
@@ -900,7 +927,10 @@
         "CREATE INDEX idx_partners_cpf ON partners (cpf)",
         "CREATE INDEX idx_partners_cnpj ON partners (cnpj)",
         "CREATE INDEX idx_partners_email ON partners (email)",
-        "CREATE INDEX idx_partners_active ON partners (active)"
+        "CREATE INDEX idx_partners_active ON partners (active)",
+        "CREATE INDEX `idx_partners_rca` ON `partners` (rca_id)",
+        "CREATE INDEX `idx_partners_televendas` ON `partners` (televendas_id)",
+        "CREATE INDEX `idx_partners_resp_digital` ON `partners` (responsavel_comercial_digital_id)"
       ]
     },
     {
@@ -5933,6 +5963,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "sales_channel",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

@@ -57,21 +57,17 @@ migrate(
     try {
       commissionRules = app.findCollectionByNameOrId('commission_rules')
     } catch (_) {
-      try {
-        commissionRules = app.findCollectionByNameOrId('Commission_Rules')
-      } catch (_) {
-        commissionRules = new Collection({
-          name: 'commission_rules',
-          type: 'base',
-          listRule: "@request.auth.id != ''",
-          viewRule: "@request.auth.id != ''",
-          createRule: "@request.auth.id != ''",
-          updateRule: "@request.auth.id != ''",
-          deleteRule: "@request.auth.id != ''",
-          fields: [],
-          indexes: [],
-        })
-      }
+      commissionRules = new Collection({
+        name: 'commission_rules',
+        type: 'base',
+        listRule: "@request.auth.id != ''",
+        viewRule: "@request.auth.id != ''",
+        createRule: "@request.auth.id != ''",
+        updateRule: "@request.auth.id != ''",
+        deleteRule: "@request.auth.id != ''",
+        fields: [],
+        indexes: [],
+      })
     }
 
     if (!commissionRules.fields.getByName('role')) {
