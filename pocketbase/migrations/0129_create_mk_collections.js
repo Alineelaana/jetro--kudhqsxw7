@@ -1,26 +1,26 @@
 migrate(
   (app) => {
     function mk(name, fields, indexes) {
-      app.save(
-        new Collection({
-          name: name,
-          type: 'base',
-          listRule: "@request.auth.id != ''",
-          viewRule: "@request.auth.id != ''",
-          createRule: "@request.auth.id != ''",
-          updateRule: "@request.auth.id != ''",
-          deleteRule: "@request.auth.id != ''",
-          fields: fields.concat([
-            { name: 'supplier', type: 'text' },
-            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-          ]),
-          indexes: indexes || [],
-        }),
-      )
+      var col = new Collection({
+        name: name,
+        type: 'base',
+        listRule: "@request.auth.id != ''",
+        viewRule: "@request.auth.id != ''",
+        createRule: "@request.auth.id != ''",
+        updateRule: "@request.auth.id != ''",
+        deleteRule: "@request.auth.id != ''",
+        fields: fields.concat([
+          { name: 'supplier', type: 'text' },
+          { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+          { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+        ]),
+        indexes: indexes || [],
+      })
+      app.save(col)
+      return col
     }
 
-    mk(
+    var atCol = mk(
       'mk_action_types',
       [
         { name: 'name', type: 'text', required: true },
@@ -348,14 +348,16 @@ migrate(
       ['CREATE INDEX idx_mk_bl_action ON mk_budget_lines (action_id)'],
     )
 
-    var tmCol = app.findCollectionByNameOrId('trade_marketing_actions')
-    if (!tmCol.fields.getByName('roi')) tmCol.fields.add(new TextField({ name: 'roi' }))
-    if (!tmCol.fields.getByName('action_type_id'))
-      tmCol.fields.add(new TextField({ name: 'action_type_id' }))
-    if (!tmCol.fields.getByName('photos')) tmCol.fields.add(new JSONField({ name: 'photos' }))
-    if (!tmCol.fields.getByName('participants'))
-      tmCol.fields.add(new JSONField({ name: 'participants' }))
-    app.save(tmCol)
+    try {
+      var tmCol = app.findCollectionByNameOrId('trade_marketing_actions')
+      if (!tmCol.fields.getByName('roi')) tmCol.fields.add(new TextField({ name: 'roi' }))
+      if (!tmCol.fields.getByName('action_type_id'))
+        tmCol.fields.add(new TextField({ name: 'action_type_id' }))
+      if (!tmCol.fields.getByName('photos')) tmCol.fields.add(new JSONField({ name: 'photos' }))
+      if (!tmCol.fields.getByName('participants'))
+        tmCol.fields.add(new JSONField({ name: 'participants' }))
+      app.save(tmCol)
+    } catch (_) {}
 
     var types = [
       'Degustação',
@@ -382,7 +384,6 @@ migrate(
       'Sell-in',
       'Sell-out',
     ]
-    var atCol = app.findCollectionByNameOrId('mk_action_types')
     for (var i = 0; i < types.length; i++) {
       try {
         app.findFirstRecordByData('mk_action_types', 'name', types[i])
