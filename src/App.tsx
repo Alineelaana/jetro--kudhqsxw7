@@ -63,6 +63,7 @@ import Phase0Foundation from './pages/Phase0Foundation'
 import PlatformLayer from './pages/PlatformLayer'
 import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
+import Performance from './pages/Performance'
 import { IndustryLayout } from '@/components/industry/industry-layout'
 import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
 import { CapacityPanel } from '@/components/industry/capacity-panel'
@@ -690,6 +691,68 @@ const App = () => (
                         <Route
                           path="/admin/bi/report-center"
                           element={<BI screen="report-center" />}
+                        />
+                        <Route
+                          path="/admin/performance"
+                          element={<Performance screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/performance/comercial"
+                          element={<Performance screen="comercial" />}
+                        />
+                        <Route
+                          path="/admin/performance/financeiro"
+                          element={<Performance screen="financeiro" />}
+                        />
+                        <Route
+                          path="/admin/performance/fiscal"
+                          element={<Performance screen="fiscal" />}
+                        />
+                        <Route
+                          path="/admin/performance/compras"
+                          element={<Performance screen="compras" />}
+                        />
+                        <Route
+                          path="/admin/performance/estoque"
+                          element={<Performance screen="estoque" />}
+                        />
+                        <Route
+                          path="/admin/performance/logistica"
+                          element={<Performance screen="logistica" />}
+                        />
+                        <Route
+                          path="/admin/performance/producao"
+                          element={<Performance screen="producao" />}
+                        />
+                        <Route
+                          path="/admin/performance/marketing"
+                          element={<Performance screen="marketing" />}
+                        />
+                        <Route path="/admin/performance/rh" element={<Performance screen="rh" />} />
+                        <Route path="/admin/performance/ti" element={<Performance screen="ti" />} />
+                        <Route
+                          path="/admin/performance/administrativo"
+                          element={<Performance screen="administrativo" />}
+                        />
+                        <Route
+                          path="/admin/performance/estrategico"
+                          element={<Performance screen="estrategico" />}
+                        />
+                        <Route
+                          path="/admin/performance/geral"
+                          element={<Performance screen="geral" />}
+                        />
+                        <Route
+                          path="/admin/performance/gamification"
+                          element={<Performance screen="gamification" />}
+                        />
+                        <Route
+                          path="/admin/performance/config"
+                          element={<Performance screen="config" />}
+                        />
+                        <Route
+                          path="/admin/performance/chat"
+                          element={<Performance screen="chat" />}
                         />
                         <Route
                           path="/admin/atendimento"
