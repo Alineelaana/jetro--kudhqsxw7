@@ -189,6 +189,13 @@ export const STABLE_PERMISSION_KEYS: string[] = [
   'ind_executive',
 ]
 
+export const RECOVERED_ROUTES: string[] = [
+  '/admin/precificacao',
+  '/admin/auditoria',
+  '/admin/controladoria',
+  '/admin/verbas-fornecedores',
+]
+
 export const ALLOWED_ADDITION_PREFIXES: string[] = []
 
 export function isAllowedAddition(_key: string): boolean {

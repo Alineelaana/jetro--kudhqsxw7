@@ -31,6 +31,10 @@ const STABLE_ROUTES = [
   '/admin/configuracoes',
   '/admin/phase0-foundation',
   '/admin/platform-layer',
+  '/admin/precificacao',
+  '/admin/auditoria',
+  '/admin/controladoria',
+  '/admin/verbas-fornecedores',
 ]
 const ALL_ALLOWED = [...STABLE_ROUTES]
 
@@ -132,7 +136,7 @@ const permPath = resolve(root, 'src/lib/permission-matrix.ts')
 let hasFailures = false
 
 console.log('\n🔍 NAVIGATION CONTRACT VALIDATION')
-console.log('   Baseline: OFFICIAL BASELINE (pure historical, no additions)')
+console.log('   Baseline: OFFICIAL BASELINE (28 routes: 24 stable + 4 recovered)')
 console.log('   No additions allowed — pure baseline only\n')
 
 if (!existsSync(menuPath)) {

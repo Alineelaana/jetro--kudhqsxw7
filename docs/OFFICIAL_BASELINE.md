@@ -50,6 +50,19 @@
 
 ---
 
+## 2b. Recovered Modules (Post-Baseline Additions, Now Protected)
+
+| #   | Module                 | Route                        | Group         | Classification |
+| --- | ---------------------- | ---------------------------- | ------------- | -------------- |
+| R1  | Precificação           | `/admin/precificacao`        | Comercial     | A (recovered)  |
+| R2  | Auditoria              | `/admin/auditoria`           | Administração | A (recovered)  |
+| R3  | Controladoria          | `/admin/controladoria`       | Inteligência  | A (recovered)  |
+| R4  | Verbas de Fornecedores | `/admin/verbas-fornecedores` | Financeiro    | A (recovered)  |
+
+**Total recovered: 4 modules (28 protected routes total)**
+
+---
+
 ## 3. Removed Modules (Checkpointed, Not Active)
 
 | Module                                       | Reason                                     | Checkpoint Location                                      |
