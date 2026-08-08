@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useOrgFilter } from '@/hooks/use-org-filter'
+import pb from '@/lib/pocketbase/client'
 import { getOverdueReceivables, getCollectionRecords } from '@/services/collection-center'
 import {
   computeSaldo,
@@ -12,6 +13,7 @@ import {
   priorityOrder,
   type QueueItem,
   type ExecutiveStats,
+  type PriorizacaoRule,
 } from '@/lib/collection-center-types'
 
 export function useCollectionCenter() {
@@ -22,6 +24,7 @@ export function useCollectionCenter() {
   const [selectedTitleIds, setSelectedTitleIds] = useState<string[]>([])
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [sortBy, setSortBy] = useState('maior_valor')
+  const [priorizacaoRules, setPriorizacaoRules] = useState<PriorizacaoRule[]>([])
   const { mergeFilter } = useOrgFilter()
 
   const loadData = useCallback(async () => {
@@ -42,9 +45,39 @@ export function useCollectionCenter() {
 
   useEffect(() => {
     loadData()
+    const loadPriorizacao = async () => {
+      try {
+        const records = await pb.collection('system_parameters').getFullList({
+          filter: 'module = "collection_center" && key = "fila_priorizacao" && active != false',
+        })
+        if (records.length > 0) {
+          const config = JSON.parse((records[0] as any).value || '{"rules":[]}')
+          setPriorizacaoRules(config.rules || [])
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    loadPriorizacao()
   }, [loadData])
   useRealtime('financial_receivables', () => loadData())
   useRealtime('financial_collections', () => loadData())
+  useRealtime('system_parameters', () => {
+    const reload = async () => {
+      try {
+        const records = await pb.collection('system_parameters').getFullList({
+          filter: 'module = "collection_center" && key = "fila_priorizacao" && active != false',
+        })
+        if (records.length > 0) {
+          const config = JSON.parse((records[0] as any).value || '{"rules":[]}')
+          setPriorizacaoRules(config.rules || [])
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    reload()
+  })
 
   const queueItems = useMemo<QueueItem[]>(() => {
     const grouped: Record<string, any[]> = {}
@@ -79,6 +112,8 @@ export function useCollectionCenter() {
         promessaExistente,
         receivables: recs,
         collectionRecord: col,
+        vendedor: (col as any)?.vendedor || recs[0]?.vendedor || recs[0]?.salesperson_name || '',
+        gerente: (col as any)?.gerente || (col as any)?.responsavel_cobranca || '',
       }
     })
 
@@ -100,6 +135,44 @@ export function useCollectionCenter() {
     }
 
     items.sort((a, b) => {
+      if (priorizacaoRules.length > 0) {
+        for (const rule of priorizacaoRules) {
+          let cmp = 0
+          switch (rule.key) {
+            case 'maior_valor':
+              cmp = b.valorVencido - a.valorVencido
+              break
+            case 'maior_atraso':
+              cmp = b.diasAtraso - a.diasAtraso
+              break
+            case 'promessa_quebrada':
+              cmp =
+                (b.collectionRecord?.promise_status === 'Quebrada' ? 1 : 0) -
+                (a.collectionRecord?.promise_status === 'Quebrada' ? 1 : 0)
+              break
+            case 'maior_risco':
+              cmp = riskOrder(b.risco) - riskOrder(a.risco)
+              break
+            case 'prioridade':
+              cmp = priorityOrder(b.prioridade) - priorityOrder(a.prioridade)
+              break
+            case 'mais_antigo_sem_contato':
+              cmp = (a.ultimoContato || '9999').localeCompare(b.ultimoContato || '9999')
+              break
+            case 'proxima_acao':
+              cmp = (a.proximaAcao || 'zzz').localeCompare(b.proximaAcao || 'zzz')
+              break
+            case 'vendedor':
+              cmp = (a.vendedor || 'zzz').localeCompare(b.vendedor || 'zzz')
+              break
+            case 'gerente':
+              cmp = (a.gerente || 'zzz').localeCompare(b.gerente || 'zzz')
+              break
+          }
+          if (cmp !== 0) return cmp
+        }
+        return 0
+      }
       switch (sortBy) {
         case 'maior_valor':
           return b.valorVencido - a.valorVencido
@@ -118,12 +191,16 @@ export function useCollectionCenter() {
           return (a.ultimoContato || '9999').localeCompare(b.ultimoContato || '9999')
         case 'proxima_acao':
           return (a.proximaAcao || 'zzz').localeCompare(b.proximaAcao || 'zzz')
+        case 'vendedor':
+          return (a.vendedor || 'zzz').localeCompare(b.vendedor || 'zzz')
+        case 'gerente':
+          return (a.gerente || 'zzz').localeCompare(b.gerente || 'zzz')
         default:
           return 0
       }
     })
     return items
-  }, [receivables, collections, filters, sortBy])
+  }, [receivables, collections, filters, sortBy, priorizacaoRules])
 
   const stats = useMemo<ExecutiveStats>(() => {
     const today = new Date().toISOString().split('T')[0]

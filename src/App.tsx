@@ -90,6 +90,8 @@ import Auditoria from './pages/Auditoria'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
 import TradeMarketing from './pages/TradeMarketing'
+import CollectionCenterConfig from './pages/CollectionCenterConfig'
+import CollectionCenterCertification from './pages/CollectionCenterCertification'
 
 const App = () => (
   <BrowserRouter>
@@ -338,6 +340,14 @@ const App = () => (
                         <Route
                           path="/admin/financeiro/cobrancas"
                           element={<Financial screen="collections" />}
+                        />
+                        <Route
+                          path="/admin/financeiro/cobranca-config"
+                          element={<CollectionCenterConfig />}
+                        />
+                        <Route
+                          path="/admin/financeiro/cobranca-certificacao"
+                          element={<CollectionCenterCertification />}
                         />
                         <Route
                           path="/admin/financeiro/caixa"

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T22:42:37.069Z",
+  "generatedAt": "2026-08-08T23:29:05.222Z",
   "collections": [
     {
       "name": "users",
@@ -7753,6 +7753,25 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "cobranca_tipo",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["pre_vencimento", "vencimento", "promessa_quebrada", "aviso_final"]
+        },
+        {
+          "name": "destinatarios",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "canais",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_emailtpl_category ON email_templates (category)"]

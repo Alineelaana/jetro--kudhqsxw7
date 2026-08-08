@@ -74,6 +74,8 @@ export const SORT_OPTIONS = [
   { key: 'prioridade', label: 'Prioridade' },
   { key: 'mais_antigo_sem_contato', label: 'Mais antigo sem contato' },
   { key: 'proxima_acao', label: 'Próxima ação' },
+  { key: 'vendedor', label: 'Vendedor' },
+  { key: 'gerente', label: 'Gerente' },
 ] as const
 
 export const QUICK_ACTIONS = [
@@ -104,6 +106,30 @@ export interface QueueItem {
   promessaExistente: string
   receivables: any[]
   collectionRecord: any | null
+  vendedor: string
+  gerente: string
+}
+
+export interface AlcadaProfile {
+  percent: number
+  valor: number
+}
+
+export interface AlcadasConfig {
+  cobrador: AlcadaProfile
+  supervisor: AlcadaProfile
+  gerente: AlcadaProfile
+}
+
+export interface PriorizacaoRule {
+  key: string
+  label: string
+  weight: number
+  order: number
+}
+
+export interface PriorizacaoConfig {
+  rules: PriorizacaoRule[]
 }
 
 export interface ExecutiveStats {

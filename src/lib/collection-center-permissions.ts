@@ -59,3 +59,28 @@ export function canAdminCollection(role: string | undefined): boolean {
 export function canConfigureCollection(role: string | undefined): boolean {
   return role === 'SUP' || role === 'FINANCEIRO'
 }
+
+export function getAlcadaProfile(role: string | undefined): string {
+  if (!role) return 'cobrador'
+  if (role === 'SUP') return 'gerente'
+  if (role === 'FINANCEIRO' || role === 'PADRAO') return 'supervisor'
+  return 'cobrador'
+}
+
+export function getDiscountLimitFromConfig(
+  role: string | undefined,
+  alcadas: Record<string, { percent: number; valor: number }> | null,
+): { percent: number; valor: number } {
+  if (!alcadas) return { percent: 0, valor: 0 }
+  const profile = getAlcadaProfile(role)
+  return alcadas[profile] || alcadas['cobrador'] || { percent: 0, valor: 0 }
+}
+
+export function canApplyDiscountWithAlcada(
+  role: string | undefined,
+  discountPercent: number,
+  alcadas: Record<string, { percent: number; valor: number }> | null,
+): boolean {
+  const limit = getDiscountLimitFromConfig(role, alcadas)
+  return discountPercent <= limit.percent
+}
