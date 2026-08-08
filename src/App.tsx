@@ -899,6 +899,14 @@ const App = () => (
                           path="/admin/trade-marketing/cotacoes-externas"
                           element={<TradeMarketing screen="cotacoes-externas" />}
                         />
+                        <Route
+                          path="/admin/trade-marketing/conta-corrente"
+                          element={<SupplierAllowance screen="accounts" />}
+                        />
+                        <Route
+                          path="/admin/trade-marketing/aplicacao-produtos"
+                          element={<SupplierAllowance screen="appropriations" />}
+                        />
                         <Route path="/admin/precificacao" element={<Precificacao />} />
                         <Route path="/admin/auditoria" element={<Auditoria />} />
                         <Route
@@ -981,7 +989,46 @@ const App = () => (
                           path="/admin/controladoria/configuracoes"
                           element={<Controladoria screen="configuracoes" />}
                         />
-                        <Route path="/admin/verbas-fornecedores" element={<SupplierAllowance />} />
+                        <Route
+                          path="/admin/verbas-fornecedores"
+                          element={<SupplierAllowance screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/gestao"
+                          element={<SupplierAllowance screen="agreements" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/acordos"
+                          element={<SupplierAllowance screen="agreements" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/conta-corrente"
+                          element={<SupplierAllowance screen="accounts" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/movimentacoes"
+                          element={<SupplierAllowance screen="movements" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/apropriacoes"
+                          element={<SupplierAllowance screen="accruals" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/aplicacao-produtos"
+                          element={<SupplierAllowance screen="appropriations" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/consumos"
+                          element={<SupplierAllowance screen="consumptions" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/prestacao-contas"
+                          element={<SupplierAllowance screen="settlements" />}
+                        />
+                        <Route
+                          path="/admin/verbas-fornecedores/cockpit"
+                          element={<SupplierAllowance screen="cockpit" />}
+                        />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />

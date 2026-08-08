@@ -201,6 +201,42 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
     group: 'Financeiro',
     classification: 'A',
   },
+  {
+    route: '/admin/verbas-fornecedores/gestao',
+    label: 'Gestão de Verbas',
+    group: 'Financeiro',
+    classification: 'A',
+  },
+  {
+    route: '/admin/verbas-fornecedores/conta-corrente',
+    label: 'Conta Corrente de Verbas',
+    group: 'Financeiro',
+    classification: 'A',
+  },
+  {
+    route: '/admin/verbas-fornecedores/aplicacao-produtos',
+    label: 'Aplicação de Verba em Produtos',
+    group: 'Financeiro',
+    classification: 'A',
+  },
+  {
+    route: '/admin/verbas-fornecedores/prestacao-contas',
+    label: 'Prestação de Contas de Verbas',
+    group: 'Financeiro',
+    classification: 'A',
+  },
+  {
+    route: '/admin/trade-marketing/conta-corrente',
+    label: 'Conta Corrente',
+    group: 'Comercial',
+    classification: 'A',
+  },
+  {
+    route: '/admin/trade-marketing/aplicacao-produtos',
+    label: 'Aplicação de Verba em Produtos',
+    group: 'Comercial',
+    classification: 'A',
+  },
 ]
 
 export const STABLE_ROUTES: string[] = NAVIGATION_BASELINE.filter(
