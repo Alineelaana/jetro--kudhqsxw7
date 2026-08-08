@@ -18,7 +18,8 @@ export const CTRL_COLLECTIONS = {
   savedViews: 'controladoria_saved_views',
 } as const
 
-export const ctrlGetList = (c: string) => pb.collection(c).getFullList({ sort: '-created' })
+export const ctrlGetList = (c: string, filter?: string) =>
+  pb.collection(c).getFullList({ sort: '-created', filter: filter || undefined })
 export const ctrlCreate = (c: string, d: Record<string, unknown>) => pb.collection(c).create(d)
 export const ctrlUpdate = (c: string, id: string, d: Record<string, unknown>) =>
   pb.collection(c).update(id, d)
@@ -39,8 +40,8 @@ export const getDrivers = () =>
 export const getMateriality = () => ctrlGetList(CTRL_COLLECTIONS.materiality)
 export const getSimulations = () => ctrlGetList(CTRL_COLLECTIONS.simulations)
 export const getConsolidations = () => ctrlGetList(CTRL_COLLECTIONS.consolidation)
-export const getComments = () => ctrlGetList(CTRL_COLLECTIONS.comments)
-export const getSavedViews = () => ctrlGetList(CTRL_COLLECTIONS.savedViews)
+export const getComments = (filter?: string) => ctrlGetList(CTRL_COLLECTIONS.comments, filter)
+export const getSavedViews = (filter?: string) => ctrlGetList(CTRL_COLLECTIONS.savedViews, filter)
 
 export function logControladoriaAudit(action: string, targetId: string, summary: string) {
   pb.send('/backend/v1/audit/create', {
@@ -108,7 +109,15 @@ export const createSavedView = (d: Record<string, unknown>) =>
   ctrlCreate(CTRL_COLLECTIONS.savedViews, d)
 export const deleteSavedView = (id: string) => ctrlDelete(CTRL_COLLECTIONS.savedViews, id)
 
-export const getBudgetsByPeriod = (period: string) =>
-  pb.collection(CTRL_COLLECTIONS.budgets).getFullList({ filter: `period = "${period}"` })
-export const getForecastsByPeriod = (period: string) =>
-  pb.collection(CTRL_COLLECTIONS.forecasts).getFullList({ filter: `period = "${period}"` })
+export const getBudgetsByPeriod = (period: string, orgFilter?: string) =>
+  pb
+    .collection(CTRL_COLLECTIONS.budgets)
+    .getFullList({
+      filter: orgFilter ? `period = "${period}" && (${orgFilter})` : `period = "${period}"`,
+    })
+export const getForecastsByPeriod = (period: string, orgFilter?: string) =>
+  pb
+    .collection(CTRL_COLLECTIONS.forecasts)
+    .getFullList({
+      filter: orgFilter ? `period = "${period}" && (${orgFilter})` : `period = "${period}"`,
+    })

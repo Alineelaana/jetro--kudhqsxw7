@@ -41,9 +41,16 @@ export function canAppropriate(role: string | undefined): boolean {
   if (!role) return false
   return SA_EDIT_ROLES.includes(role)
 }
+const SA_COCKPIT_ROLES = ['SUP', 'FINANCEIRO', 'COMERCIAL']
+const SA_AUDIT_ROLES = ['SUP', 'FINANCEIRO']
+
 export function canViewSACockpit(role: string | undefined): boolean {
   if (!role) return false
-  return SA_VIEW_ROLES.includes(role)
+  return SA_COCKPIT_ROLES.includes(role)
+}
+export function canViewSACorporateAudit(role: string | undefined): boolean {
+  if (!role) return false
+  return SA_AUDIT_ROLES.includes(role)
 }
 export function canUseSAAdapta(role: string | undefined): boolean {
   if (!role) return false

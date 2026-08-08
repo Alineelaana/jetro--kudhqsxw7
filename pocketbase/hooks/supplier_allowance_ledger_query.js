@@ -2,82 +2,78 @@ routerAdd(
   'POST',
   '/backend/v1/supplier-allowance/ledger-query',
   (e) => {
-    var body = e.requestInfo().body || {}
-    var parts = []
-    var filterKeys = [
-      'supplier_name',
-      'buyer_name',
-      'program',
-      'campaign',
-      'action_ref',
-      'category',
-      'brand',
-      'product_name',
-      'cost_center_code',
-      'result_center_code',
-      'competence_period',
-      'movement_type',
-      'workflow_state',
-      'claim_status',
-      'receipt_status',
-      'sales_manager',
-      'supervisor',
-      'seller',
-      'negotiation_responsible',
-      'usage_responsible',
-    ]
-    for (var fi = 0; fi < filterKeys.length; fi++) {
-      var key = filterKeys[fi]
-      if (body[key]) {
-        parts.push(key + ' ~ "' + body[key] + '"')
-      }
-    }
-    if (body.startDate) parts.push('created >= "' + body.startDate + ' 00:00:00"')
-    if (body.endDate) parts.push('created <= "' + body.endDate + ' 23:59:59"')
-    var filterStr = parts.length ? parts.join(' && ') : "id != ''"
+    const body = e.requestInfo().body || {}
 
-    var movements = []
+    const filterParts = []
+    if (body.supplier_name) filterParts.push('supplier_name ~ "' + body.supplier_name + '"')
+    if (body.buyer_name) filterParts.push('buyer_name ~ "' + body.buyer_name + '"')
+    if (body.program) filterParts.push('program ~ "' + body.program + '"')
+    if (body.campaign) filterParts.push('campaign ~ "' + body.campaign + '"')
+    if (body.category) filterParts.push('category ~ "' + body.category + '"')
+    if (body.brand) filterParts.push('brand ~ "' + body.brand + '"')
+    if (body.competence_period)
+      filterParts.push('competence_period = "' + body.competence_period + '"')
+    if (body.seller) filterParts.push('seller ~ "' + body.seller + '"')
+    if (body.sales_manager) filterParts.push('sales_manager ~ "' + body.sales_manager + '"')
+    if (body.supervisor) filterParts.push('supervisor ~ "' + body.supervisor + '"')
+    if (body.cost_center_code)
+      filterParts.push('cost_center_code = "' + body.cost_center_code + '"')
+    if (body.empresa) filterParts.push('company = "' + body.empresa + '"')
+    if (body.filial) filterParts.push('branch = "' + body.filial + '"')
+
+    const filterStr = filterParts.length > 0 ? filterParts.join(' && ') : ''
+
+    let movements = []
     try {
       movements = $app.findRecordsByFilter(
         'supplier_allowance_movements',
         filterStr,
         '-created',
-        500,
+        1000,
         0,
       )
-    } catch (_) {}
-
-    var accounts = []
-    try {
-      accounts = $app.findRecordsByFilter(
-        'supplier_allowance_accounts',
-        "id != ''",
-        '-created',
-        500,
-        0,
-      )
-    } catch (_) {}
-
-    var summaryMap = {}
-    var kpis = {
-      total_earned: 0,
-      total_consumed: 0,
-      total_received: 0,
-      total_claims: 0,
-      total_applied_compras: 0,
-      total_consumed_trade: 0,
-      total_consumed_marketing: 0,
-      total_consumed_bonificacao: 0,
-      total_available: 0,
-      roi: 0,
+    } catch (err) {
+      return e.json(200, {
+        summary: [],
+        analytical: [],
+        kpis: {
+          total_earned: 0,
+          total_consumed: 0,
+          total_received: 0,
+          total_claims: 0,
+          total_applied_compras: 0,
+          total_consumed_trade: 0,
+          total_consumed_marketing: 0,
+          total_consumed_bonificacao: 0,
+          total_available: 0,
+          roi: 0,
+        },
+        total_movements: 0,
+      })
     }
 
-    for (var i = 0; i < movements.length; i++) {
-      var m = movements[i]
-      var sKey = m.getString('supplier_name') || m.getString('account') || '—'
-      if (!summaryMap[sKey]) {
-        summaryMap[sKey] = {
-          supplier_name: sKey,
+    const supplierMap = {}
+    let totalEarned = 0,
+      totalConsumed = 0,
+      totalReceived = 0,
+      totalClaims = 0
+    let totalAppliedCompras = 0,
+      totalConsumedTrade = 0,
+      totalConsumedMarketing = 0,
+      totalConsumedBonificacao = 0
+    const analytical = []
+
+    for (let i = 0; i < movements.length; i++) {
+      const m = movements[i]
+      const supplierName = m.getString('supplier_name') || '\u2014'
+      const direction = m.getString('direction') || ''
+      const movementType = m.getString('movement_type') || ''
+      const category = m.getString('category') || ''
+      const value = parseFloat(m.getString('value') || '0') || 0
+
+      if (!supplierMap[supplierName]) {
+        supplierMap[supplierName] = {
+          supplier_name: supplierName,
           earned: 0,
           consumed: 0,
           received: 0,
@@ -91,90 +87,93 @@ routerAdd(
           committed: 0,
         }
       }
-      var v = parseFloat(m.getString('value') || '0')
-      var d = m.getString('direction')
-      var c = m.getString('category') || ''
-      var t = m.getString('movement_type')
-      if (d === 'credito') {
-        summaryMap[sKey].earned += v
-        if (t === 'lancamento' && m.getString('receipt_status') === 'received')
-          summaryMap[sKey].received += v
-        kpis.total_earned += v
-        if (m.getString('receipt_status') === 'received') kpis.total_received += v
+      const s = supplierMap[supplierName]
+
+      if (direction === 'credito') {
+        s.earned += value
+        totalEarned += value
+        if (movementType === 'lancamento' || movementType === 'settlement') {
+          s.received += value
+          totalReceived += value
+        }
       } else {
-        summaryMap[sKey].consumed += v
-        kpis.total_consumed += v
-        if (c === 'compras') {
-          summaryMap[sKey].applied_compras += v
-          kpis.total_applied_compras += v
+        s.consumed += value
+        totalConsumed += value
+        if (category === 'compras') {
+          s.applied_compras += value
+          totalAppliedCompras += value
         }
-        if (c === 'trade') {
-          summaryMap[sKey].consumed_trade += v
-          kpis.total_consumed_trade += v
+        if (category === 'trade') {
+          s.consumed_trade += value
+          totalConsumedTrade += value
         }
-        if (c === 'marketing') {
-          summaryMap[sKey].consumed_marketing += v
-          kpis.total_consumed_marketing += v
+        if (category === 'marketing') {
+          s.consumed_marketing += value
+          totalConsumedMarketing += value
         }
-        if (c === 'bonificacao') {
-          summaryMap[sKey].consumed_bonificacao += v
-          kpis.total_consumed_bonificacao += v
+        if (category === 'bonificacao') {
+          s.consumed_bonificacao += value
+          totalConsumedBonificacao += value
+        }
+        if (movementType === 'claim') {
+          s.claim += value
+          totalClaims += value
         }
       }
-      if (m.getString('claim_status') === 'pending') {
-        summaryMap[sKey].claim += v
-        kpis.total_claims += v
-      }
-    }
 
-    var summaryArr = []
-    for (var sk in summaryMap) {
-      var s = summaryMap[sk]
-      s.pending_receipt = s.earned - s.received
-      summaryArr.push(s)
-    }
-
-    for (var ai = 0; ai < accounts.length; ai++) {
-      var a = accounts[ai]
-      var bal = parseFloat(a.getString('current_balance') || '0')
-      kpis.total_available += bal
-    }
-    kpis.roi = kpis.total_consumed > 0 ? (kpis.total_earned / kpis.total_consumed) * 100 : 0
-
-    var analytical = []
-    for (var mi = 0; mi < movements.length; mi++) {
-      var mv = movements[mi]
       analytical.push({
-        id: mv.id,
-        created: mv.getString('created'),
-        supplier_name: mv.getString('supplier_name'),
-        buyer_name: mv.getString('buyer_name'),
-        program: mv.getString('program'),
-        campaign: mv.getString('campaign'),
-        movement_type: mv.getString('movement_type'),
-        direction: mv.getString('direction'),
-        value: mv.getString('value'),
-        document_number: mv.getString('document_number'),
-        category: mv.getString('category'),
-        brand: mv.getString('brand'),
-        product_name: mv.getString('product_name'),
-        competence_period: mv.getString('competence_period'),
-        workflow_state: mv.getString('workflow_state'),
-        justification: mv.getString('justification'),
-        user: mv.getString('user'),
-        claim_status: mv.getString('claim_status'),
-        receipt_status: mv.getString('receipt_status'),
-        observations: mv.getString('observations'),
-        sales_manager: mv.getString('sales_manager'),
-        supervisor: mv.getString('supervisor'),
-        seller: mv.getString('seller'),
+        id: m.id,
+        created: m.getString('created') || '',
+        supplier_name: supplierName,
+        buyer_name: m.getString('buyer_name') || '',
+        program: m.getString('program') || '',
+        campaign: m.getString('campaign') || '',
+        movement_type: movementType,
+        direction: direction,
+        value: m.getString('value') || '0',
+        document_number: m.getString('document_number') || '',
+        category: category,
+        brand: m.getString('brand') || '',
+        product_name: m.getString('product_name') || '',
+        competence_period: m.getString('competence_period') || '',
+        workflow_state: m.getString('workflow_state') || '',
+        justification: m.getString('justification') || '',
+        user: m.getString('user') || '',
+        claim_status: m.getString('claim_status') || '',
+        receipt_status: m.getString('receipt_status') || '',
+        observations: m.getString('observations') || '',
+        sales_manager: m.getString('sales_manager') || '',
+        supervisor: m.getString('supervisor') || '',
+        seller: m.getString('seller') || '',
       })
     }
 
+    const summary = []
+    for (const key in supplierMap) {
+      const s = supplierMap[key]
+      s.available = s.earned - s.consumed
+      s.pending_receipt = s.earned - s.received
+      summary.push(s)
+    }
+
+    const totalAvailable = totalEarned - totalConsumed
+    const roi = totalEarned > 0 ? (totalAvailable / totalEarned) * 100 : 0
+
     return e.json(200, {
-      summary: summaryArr,
+      summary: summary,
       analytical: analytical,
-      kpis: kpis,
+      kpis: {
+        total_earned: totalEarned,
+        total_consumed: totalConsumed,
+        total_received: totalReceived,
+        total_claims: totalClaims,
+        total_applied_compras: totalAppliedCompras,
+        total_consumed_trade: totalConsumedTrade,
+        total_consumed_marketing: totalConsumedMarketing,
+        total_consumed_bonificacao: totalConsumedBonificacao,
+        total_available: totalAvailable,
+        roi: roi,
+      },
       total_movements: movements.length,
     })
   },
