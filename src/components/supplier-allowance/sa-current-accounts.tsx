@@ -11,6 +11,8 @@ import {
 import { queryLedger, type LedgerQueryResult } from '@/services/verbas-audit'
 import { formatBRL } from '@/lib/supplier-allowance-types'
 import { Loader2, Search } from 'lucide-react'
+import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 const VIEWS = [
   { value: 'fornecedor', label: 'Por Fornecedor' },
@@ -33,8 +35,9 @@ export function SaCurrentAccounts() {
       if (view === 'trade') filters.category = 'trade'
       if (view === 'marketing') filters.category = 'marketing'
       setData(await queryLedger(filters))
-    } catch {
+    } catch (err) {
       setData(null)
+      toast.error(getErrorMessage(err))
     }
     setLoading(false)
   }

@@ -13,6 +13,8 @@ import { queryLedger, type LedgerQueryResult } from '@/services/verbas-audit'
 import { formatBRL } from '@/lib/supplier-allowance-types'
 import { useAuth } from '@/hooks/use-auth'
 import { Loader2, Search, BarChart3, FileText, ShieldCheck } from 'lucide-react'
+import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 const AUDIT_ROLES = ['SUP', 'FINANCEIRO', 'COMERCIAL']
 
@@ -27,8 +29,9 @@ export function SaCorporateAudit() {
     setLoading(true)
     try {
       setData(await queryLedger(filters))
-    } catch {
+    } catch (err) {
       setData(null)
+      toast.error(getErrorMessage(err))
     }
     setLoading(false)
   }

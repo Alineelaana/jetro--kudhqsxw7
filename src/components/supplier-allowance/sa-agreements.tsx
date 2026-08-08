@@ -32,6 +32,7 @@ import { canCreateAgreements, canDeleteAgreements } from '@/lib/supplier-allowan
 import { AGREEMENT_TYPES, AGREEMENT_STATUS, formatBRL } from '@/lib/supplier-allowance-types'
 import { Plus, Pencil, Trash2, Search, Loader2, FileText } from 'lucide-react'
 import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 export function SaAgreements() {
   const { user } = useAuth()
@@ -96,8 +97,8 @@ export function SaAgreements() {
       }
       setDialogOpen(false)
       load()
-    } catch {
-      toast.error('Erro ao salvar')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
     }
   }
 
@@ -180,8 +181,13 @@ export function SaAgreements() {
                             size="sm"
                             variant="ghost"
                             onClick={async () => {
-                              await saDelete(SA_COLLECTIONS.agreements, r.id)
-                              load()
+                              try {
+                                await saDelete(SA_COLLECTIONS.agreements, r.id)
+                                toast.success('Acordo excluído')
+                                load()
+                              } catch (err) {
+                                toast.error(getErrorMessage(err))
+                              }
                             }}
                             className="text-red-600"
                           >

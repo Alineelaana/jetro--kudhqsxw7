@@ -1,19 +1,39 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Plus, FileCheck, Loader2 } from 'lucide-react'
-import { mkGetList } from '@/services/mk'
+import { mkGetList, mkCreate } from '@/services/mk'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
+import { toast } from 'sonner'
 
 export function TmAccountability() {
   const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<Record<string, string>>({
+    objective: '',
+    supplier: '',
+    investment: '',
+    status: 'rascunho',
+  })
 
   const load = async () => {
     setLoading(true)
     try {
       setItems(await mkGetList('mk_accountability'))
-    } catch {
+    } catch (err) {
       setItems([])
+      toast.error(getErrorMessage(err))
     }
     setLoading(false)
   }
@@ -22,11 +42,33 @@ export function TmAccountability() {
     load()
   }, [])
 
+  const handleSave = async () => {
+    if (!form.objective?.trim()) {
+      toast.error('Informe o objetivo da prestação')
+      return
+    }
+    setSaving(true)
+    try {
+      await mkCreate('mk_accountability', form)
+      toast.success('Prestação de contas criada')
+      setDialogOpen(false)
+      setForm({ objective: '', supplier: '', investment: '', status: 'rascunho' })
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
+    setSaving(false)
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-bold text-[#005B2E]">Prestação de Contas</h2>
-        <Button size="sm" className="bg-[#005B2E] hover:bg-[#01361D]">
+        <Button
+          size="sm"
+          className="bg-[#005B2E] hover:bg-[#01361D]"
+          onClick={() => setDialogOpen(true)}
+        >
           <Plus className="w-4 h-4 mr-1" /> Nova Prestação
         </Button>
       </div>
@@ -66,6 +108,54 @@ export function TmAccountability() {
           ))}
         </div>
       )}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#005B2E]">Nova Prestação de Contas</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Objetivo *</Label>
+              <Input
+                value={form.objective}
+                onChange={(e) => setForm({ ...form, objective: e.target.value })}
+                placeholder="Descreva o objetivo"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div>
+              <Label>Fornecedor</Label>
+              <Input
+                value={form.supplier}
+                onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+                placeholder="Nome do fornecedor"
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+            <div>
+              <Label>Investimento (R$)</Label>
+              <Input
+                type="number"
+                value={form.investment}
+                onChange={(e) => setForm({ ...form, investment: e.target.value })}
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-[#005B2E] hover:bg-[#01361D] text-white"
+            >
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

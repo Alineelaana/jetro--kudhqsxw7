@@ -22,6 +22,7 @@ import { canAppropriate, canApproveAccrual } from '@/lib/supplier-allowance-perm
 import { formatBRL } from '@/lib/supplier-allowance-types'
 import { Plus, Search, Loader2, Check, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 export function SaAppropriations() {
   const { user } = useAuth()
@@ -64,8 +65,8 @@ export function SaAppropriations() {
       toast.success('Apropriação criada')
       setDialogOpen(false)
       load()
-    } catch {
-      toast.error('Erro')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
     }
   }
 
@@ -80,8 +81,8 @@ export function SaAppropriations() {
       })
       toast.success(approve ? 'Aprovado via Workflow' : 'Rejeitado via Workflow')
       load()
-    } catch {
-      toast.error('Erro na transição de workflow')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
     }
     setApproving(null)
   }

@@ -11,6 +11,10 @@ import { TmVerbasFornecedor } from '@/components/trade-marketing/tm-verbas-forne
 import { MkExternalQuotationsPanel } from '@/components/trade-marketing/mk-eq-panel'
 import type { TmFilters, TradeMarketingAction } from '@/lib/trade-marketing-types'
 import pb from '@/lib/pocketbase/client'
+import { TmNewActionDialog } from '@/components/trade-marketing/tm-new-action-dialog'
+import { useAuth } from '@/hooks/use-auth'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
+import { toast } from 'sonner'
 
 const DEFAULT_FILTERS: TmFilters = {
   scope: 'corporate',
@@ -31,12 +35,21 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
   const [activeTab, setActiveTab] = useState<string>('cockpit')
   const [filters, setFilters] = useState<TmFilters>(DEFAULT_FILTERS)
   const [actions, setActions] = useState<TradeMarketingAction[]>([])
+  const { user } = useAuth()
+  const [newActionOpen, setNewActionOpen] = useState(false)
 
-  useEffect(() => {
+  const reloadActions = () => {
     pb.collection('trade_marketing_actions')
       .getFullList({ sort: '-created' })
       .then((data) => setActions(data as TradeMarketingAction[]))
-      .catch(() => setActions([]))
+      .catch((err) => {
+        setActions([])
+        toast.error(getErrorMessage(err))
+      })
+  }
+
+  useEffect(() => {
+    reloadActions()
   }, [])
 
   useEffect(() => {
@@ -49,7 +62,7 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
     }
   }, [screen])
 
-  const handleNew = () => {}
+  const handleNew = () => setNewActionOpen(true)
 
   const handlePrint = () => {
     window.print()
@@ -92,6 +105,12 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
       onFiltersChange={setFilters}
     >
       {renderScreen()}
+      <TmNewActionDialog
+        open={newActionOpen}
+        onOpenChange={setNewActionOpen}
+        onSaved={reloadActions}
+        userName={(user?.name as string) || ''}
+      />
     </TmLayout>
   )
 }

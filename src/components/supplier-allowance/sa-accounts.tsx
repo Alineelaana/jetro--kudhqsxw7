@@ -5,6 +5,8 @@ import { SA_COLLECTIONS, saGetList } from '@/services/supplier-allowance'
 import { useRealtime } from '@/hooks/use-realtime'
 import { formatBRL } from '@/lib/supplier-allowance-types'
 import { Search, Loader2, Wallet } from 'lucide-react'
+import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 export function SaAccounts() {
   const [records, setRecords] = useState<any[]>([])
@@ -14,8 +16,9 @@ export function SaAccounts() {
   const load = async () => {
     try {
       setRecords(await saGetList(SA_COLLECTIONS.accounts))
-    } catch {
+    } catch (err) {
       setRecords([])
+      toast.error(getErrorMessage(err))
     }
     setLoading(false)
   }

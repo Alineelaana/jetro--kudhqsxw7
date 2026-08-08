@@ -19,6 +19,7 @@ import {
   Percent,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 const ICONS: Record<string, typeof TrendingUp> = {
   'trending-up': TrendingUp,
@@ -48,8 +49,8 @@ export function SaCockpit() {
     try {
       const result = await checkVerbasAlerts()
       toast.success(`${result.alerts_created} alerta(s) verificado(s)`)
-    } catch {
-      toast.error('Erro ao verificar alertas')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
     }
     setCheckingAlerts(false)
   }

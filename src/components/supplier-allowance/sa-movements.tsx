@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { DIRECTIONS, formatBRL } from '@/lib/supplier-allowance-types'
 import { Plus, Search, Loader2, ArrowDownLeft, ArrowUpRight, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 const MANUAL_MOVEMENT_TYPES = [
   { value: 'lancamento', label: 'Lançamento' },
@@ -80,12 +81,13 @@ export function SaMovements() {
       toast.success('Lançamento registrado')
       setDialogOpen(false)
       load()
-    } catch {
-      toast.error('Erro ao registrar')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
     }
   }
 
   const handleEstorno = async () => {
+    if (!estornoTarget) return
     if (!estornoReason.trim()) {
       toast.error('Informe o motivo do estorno')
       return
@@ -97,8 +99,8 @@ export function SaMovements() {
       setEstornoTarget(null)
       setEstornoReason('')
       load()
-    } catch {
-      toast.error('Erro ao estornar')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
     }
     setEstornoLoading(false)
   }
