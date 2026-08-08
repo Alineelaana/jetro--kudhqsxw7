@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T22:33:15.363Z",
+  "generatedAt": "2026-08-08T22:42:37.069Z",
   "collections": [
     {
       "name": "users",
@@ -12961,11 +12961,11 @@
       "name": "financial_collections",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || empresa = @request.auth.empresa_id || filial = @request.auth.filial_id || empresa = '')",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || empresa = @request.auth.empresa_id || filial = @request.auth.filial_id || empresa = '')",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
-        "delete": "@request.auth.role = 'SUP'"
+        "delete": "@request.auth.id != '' && @request.auth.role = 'SUP'"
       },
       "fields": [
         {
