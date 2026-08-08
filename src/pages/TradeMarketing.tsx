@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { TmLayout } from '@/components/trade-marketing/tm-layout'
 import { TmDashboard } from '@/components/trade-marketing/tm-dashboard'
 import { TmCalendar } from '@/components/trade-marketing/tm-calendar'
+import { TmKanban } from '@/components/trade-marketing/tm-kanban'
+import { TmLista } from '@/components/trade-marketing/tm-lista'
 import { TmMaterials } from '@/components/trade-marketing/tm-materials'
 import { TmAccountability } from '@/components/trade-marketing/tm-accountability'
 import { TmAdapta } from '@/components/trade-marketing/tm-adapta'
@@ -26,7 +28,7 @@ interface TradeMarketingProps {
 }
 
 export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingProps) {
-  const [activeTab, setActiveTab] = useState('cockpit')
+  const [activeTab, setActiveTab] = useState<string>('cockpit')
   const [filters, setFilters] = useState<TmFilters>(DEFAULT_FILTERS)
   const [actions, setActions] = useState<TradeMarketingAction[]>([])
 
@@ -37,34 +39,44 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
       .catch(() => setActions([]))
   }, [])
 
-  const handleNew = () => {
-    // Placeholder for new action creation flow
-  }
+  useEffect(() => {
+    if (screen === 'calendar') {
+      setActiveTab('calendar')
+    } else if (['dashboard', 'actions', 'annual-plan'].includes(screen)) {
+      setActiveTab('cockpit')
+    } else {
+      setActiveTab(screen)
+    }
+  }, [screen])
+
+  const handleNew = () => {}
 
   const handlePrint = () => {
     window.print()
   }
 
   const renderScreen = () => {
-    switch (screen) {
-      case 'dashboard':
+    switch (activeTab) {
+      case 'cockpit':
         return <TmDashboard actions={actions} />
       case 'calendar':
         return <TmCalendar />
-      case 'actions':
-        return <TmDashboard actions={actions} />
+      case 'kanban':
+        return <TmKanban actions={actions} />
+      case 'list':
+        return <TmLista actions={actions} />
       case 'verbas':
         return <TmVerbasFornecedor />
       case 'materials':
         return <TmMaterials />
       case 'accountability':
         return <TmAccountability />
-      case 'annual-plan':
-        return <TmDashboard actions={actions} />
       case 'adapta':
         return <TmAdapta />
       case 'cotacoes-externas':
         return <MkExternalQuotationsPanel />
+      case 'annual-plan':
+        return <TmDashboard actions={actions} />
       default:
         return <TmDashboard actions={actions} />
     }

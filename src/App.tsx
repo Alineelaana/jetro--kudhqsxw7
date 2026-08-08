@@ -1029,6 +1029,50 @@ const App = () => (
                           path="/admin/verbas-fornecedores/cockpit"
                           element={<SupplierAllowance screen="cockpit" />}
                         />
+                        <Route
+                          path="/admin/verbas"
+                          element={<SupplierAllowance screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/verbas/cockpit"
+                          element={<SupplierAllowance screen="cockpit" />}
+                        />
+                        <Route
+                          path="/admin/verbas/acordos"
+                          element={<SupplierAllowance screen="agreements" />}
+                        />
+                        <Route
+                          path="/admin/verbas/conta-corrente"
+                          element={<SupplierAllowance screen="accounts" />}
+                        />
+                        <Route
+                          path="/admin/verbas/movimentacoes"
+                          element={<SupplierAllowance screen="movements" />}
+                        />
+                        <Route
+                          path="/admin/verbas/apuracoes"
+                          element={<SupplierAllowance screen="accruals" />}
+                        />
+                        <Route
+                          path="/admin/verbas/aplicacao-produtos"
+                          element={<SupplierAllowance screen="appropriations" />}
+                        />
+                        <Route
+                          path="/admin/verbas/consumos"
+                          element={<SupplierAllowance screen="consumptions" />}
+                        />
+                        <Route
+                          path="/admin/verbas/prestacao-contas"
+                          element={<SupplierAllowance screen="settlements" />}
+                        />
+                        <Route
+                          path="/admin/verbas/por-fornecedor"
+                          element={<TradeMarketing screen="verbas" />}
+                        />
+                        <Route
+                          path="/admin/verbas/cotacoes-externas"
+                          element={<TradeMarketing screen="cotacoes-externas" />}
+                        />
                         <Route path="/cliente/login" element={<ClientLogin />} />
                         <Route path="/cliente/cadastro" element={<ClientRegister />} />
                         <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />

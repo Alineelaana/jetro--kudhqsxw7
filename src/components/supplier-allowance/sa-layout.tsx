@@ -11,14 +11,16 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 
 const VERBAS_NAV_ITEMS = [
-  { label: 'Cockpit', route: '/admin/verbas-fornecedores/cockpit' },
-  { label: 'Acordos', route: '/admin/verbas-fornecedores/acordos' },
-  { label: 'Conta Corrente', route: '/admin/verbas-fornecedores/conta-corrente' },
-  { label: 'Movimentações', route: '/admin/verbas-fornecedores/movimentacoes' },
-  { label: 'Apurações', route: '/admin/verbas-fornecedores/apropriacoes' },
-  { label: 'Aplicação em Produtos', route: '/admin/verbas-fornecedores/aplicacao-produtos' },
-  { label: 'Consumos', route: '/admin/verbas-fornecedores/consumos' },
-  { label: 'Liquidações', route: '/admin/verbas-fornecedores/prestacao-contas' },
+  { label: 'Cockpit', route: '/admin/verbas/cockpit' },
+  { label: 'Gestão de Acordos', route: '/admin/verbas/acordos' },
+  { label: 'Conta Corrente', route: '/admin/verbas/conta-corrente' },
+  { label: 'Movimentações', route: '/admin/verbas/movimentacoes' },
+  { label: 'Apurações', route: '/admin/verbas/apuracoes' },
+  { label: 'Aplicação em Produtos', route: '/admin/verbas/aplicacao-produtos' },
+  { label: 'Consumos', route: '/admin/verbas/consumos' },
+  { label: 'Prestação de Contas', route: '/admin/verbas/prestacao-contas' },
+  { label: 'Verbas por Fornecedor', route: '/admin/verbas/por-fornecedor' },
+  { label: 'Cotações Externas', route: '/admin/verbas/cotacoes-externas' },
 ]
 
 export function SaLayout({
@@ -44,7 +46,7 @@ export function SaLayout({
         icon={HandCoins}
         breadcrumbs={[
           { label: 'Admin', to: '/admin' },
-          { label: 'Verbas de Fornecedores', to: '/admin/verbas' },
+          { label: 'Verbas', to: '/admin/verbas' },
           { label: title },
         ]}
       />
