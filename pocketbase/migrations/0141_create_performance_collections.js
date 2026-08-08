@@ -2,22 +2,6 @@ migrate(
   (app) => {
     var R = "@request.auth.id != ''"
     var SA = "@request.auth.role = 'SUP'"
-    var mods = [
-      'comercial',
-      'financeiro',
-      'fiscal',
-      'compras',
-      'estoque',
-      'logistica',
-      'producao',
-      'marketing',
-      'rh',
-      'ti',
-      'administrativo',
-      'estrategico',
-      'geral',
-    ]
-    var entities = ['empresa', 'filial', 'departamento', 'equipe', 'cargo', 'gestor', 'colaborador']
 
     app.save(
       new Collection({
@@ -31,7 +15,27 @@ migrate(
         fields: [
           { name: 'code', type: 'text', required: true },
           { name: 'name', type: 'text', required: true },
-          { name: 'module', type: 'select', values: mods, maxSelect: 1, required: true },
+          {
+            name: 'module',
+            type: 'select',
+            values: [
+              'comercial',
+              'financeiro',
+              'fiscal',
+              'compras',
+              'estoque',
+              'logistica',
+              'producao',
+              'marketing',
+              'rh',
+              'ti',
+              'administrativo',
+              'estrategico',
+              'geral',
+            ],
+            maxSelect: 1,
+            required: true,
+          },
           { name: 'category', type: 'text' },
           { name: 'formula_source', type: 'text' },
           { name: 'unit', type: 'text' },
@@ -70,7 +74,21 @@ migrate(
         updateRule: SA,
         deleteRule: SA,
         fields: [
-          { name: 'entity_type', type: 'select', values: entities, maxSelect: 1, required: true },
+          {
+            name: 'entity_type',
+            type: 'select',
+            values: [
+              'empresa',
+              'filial',
+              'departamento',
+              'equipe',
+              'cargo',
+              'gestor',
+              'colaborador',
+            ],
+            maxSelect: 1,
+            required: true,
+          },
           { name: 'entity_id', type: 'text' },
           { name: 'entity_name', type: 'text' },
           { name: 'company', type: 'text' },
