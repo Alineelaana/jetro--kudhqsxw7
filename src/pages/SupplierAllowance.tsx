@@ -8,11 +8,25 @@ import { SaAppropriations } from '@/components/supplier-allowance/sa-appropriati
 import { SaConsumptions } from '@/components/supplier-allowance/sa-consumptions'
 import { SaSettlements } from '@/components/supplier-allowance/sa-settlements'
 
+const SCREEN_TITLES: Record<string, string> = {
+  dashboard: 'Cockpit',
+  cockpit: 'Cockpit',
+  agreements: 'Acordos de Verba',
+  accounts: 'Conta Corrente',
+  movements: 'Movimentações',
+  accruals: 'Apurações',
+  appropriations: 'Aplicação em Produtos',
+  consumptions: 'Consumos',
+  settlements: 'Liquidações',
+}
+
 interface SupplierAllowanceProps {
   screen?: string
 }
 
 export default function SupplierAllowance({ screen = 'dashboard' }: SupplierAllowanceProps) {
+  const title = SCREEN_TITLES[screen] || 'Verbas de Fornecedores'
+
   const renderScreen = () => {
     switch (screen) {
       case 'dashboard':
@@ -38,5 +52,5 @@ export default function SupplierAllowance({ screen = 'dashboard' }: SupplierAllo
     }
   }
 
-  return <SaLayout>{renderScreen()}</SaLayout>
+  return <SaLayout title={title}>{renderScreen()}</SaLayout>
 }

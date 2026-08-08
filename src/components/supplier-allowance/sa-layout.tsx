@@ -11,19 +11,23 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 
 const VERBAS_NAV_ITEMS = [
-  { label: 'Cockpit', route: '/admin/verbas/cockpit' },
-  { label: 'Acordos', route: '/admin/verbas/acordos' },
-  { label: 'Conta Corrente', route: '/admin/verbas/conta-corrente' },
-  { label: 'Movimentações', route: '/admin/verbas/movimentacoes' },
-  { label: 'Apurações', route: '/admin/verbas/apuracoes' },
-  { label: 'Apropriações', route: '/admin/verbas/apropriacoes' },
-  { label: 'Consumos', route: '/admin/verbas/consumos' },
-  { label: 'Liquidações', route: '/admin/verbas/liquidacoes' },
-  { label: 'Relatórios', route: '/admin/verbas/relatorios' },
-  { label: 'Configurações', route: '/admin/verbas/configuracoes' },
+  { label: 'Cockpit', route: '/admin/verbas-fornecedores/cockpit' },
+  { label: 'Acordos', route: '/admin/verbas-fornecedores/acordos' },
+  { label: 'Conta Corrente', route: '/admin/verbas-fornecedores/conta-corrente' },
+  { label: 'Movimentações', route: '/admin/verbas-fornecedores/movimentacoes' },
+  { label: 'Apurações', route: '/admin/verbas-fornecedores/apropriacoes' },
+  { label: 'Aplicação em Produtos', route: '/admin/verbas-fornecedores/aplicacao-produtos' },
+  { label: 'Consumos', route: '/admin/verbas-fornecedores/consumos' },
+  { label: 'Liquidações', route: '/admin/verbas-fornecedores/prestacao-contas' },
 ]
 
-export function SaLayout({ children, title }: { children: ReactNode; title: string }) {
+export function SaLayout({
+  children,
+  title = 'Verbas de Fornecedores',
+}: {
+  children: ReactNode
+  title?: string
+}) {
   const { isAuthenticated, loading, userRole } = useAuth()
   const location = useLocation()
   if (loading)
