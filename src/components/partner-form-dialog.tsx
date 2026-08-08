@@ -17,6 +17,7 @@ import { PartnerPjFields } from '@/components/partner-pj-fields'
 import { PartnerFinancialDialog } from '@/components/partner-financial-dialog'
 import { PartnerRestrictionControls } from '@/components/partner-restriction-controls'
 import { PartnerTypeManager } from '@/components/partner-type-manager'
+import { PartnerResponsiblesSection } from '@/components/partner-responsibles-section'
 import { type PartnerFieldProps, type PartnerRecord } from '@/components/partner-shared'
 import {
   createPartner,
@@ -45,6 +46,9 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [financialOpen, setFinancialOpen] = useState(false)
+  const [rcaId, setRcaId] = useState('')
+  const [televendasId, setTelevendasId] = useState('')
+  const [responsavelDigitalId, setResponsavelDigitalId] = useState('')
   const isEditing = !!partner
   const isCliente = form.partner_type === 'Cliente'
   const userName = (user?.name as string) || (user?.email as string) || 'Sistema'
@@ -94,6 +98,9 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
     } else {
       setForm(EMPTY_PARTNER_FORM)
     }
+    setRcaId(partner?.rca_id || '')
+    setTelevendasId(partner?.televendas_id || '')
+    setResponsavelDigitalId(partner?.responsavel_comercial_digital_id || '')
     setFiles({})
     setError('')
   }, [partner, open])
@@ -150,6 +157,9 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
       Object.entries(files).forEach(([k, f]) => {
         if (f) formData.append(k, f)
       })
+      formData.append('rca_id', rcaId)
+      formData.append('televendas_id', televendasId)
+      formData.append('responsavel_comercial_digital_id', responsavelDigitalId)
       if (isEditing) {
         await updatePartner(partner.id, formData)
         if (isCliente && password) {
@@ -237,6 +247,15 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
 
             {form.person_type === 'PF' && <PartnerPfFields {...fieldProps} />}
             {form.person_type === 'PJ' && <PartnerPjFields {...fieldProps} />}
+
+            <PartnerResponsiblesSection
+              rcaId={rcaId}
+              televendasId={televendasId}
+              responsavelDigitalId={responsavelDigitalId}
+              onRcaChange={setRcaId}
+              onTelevendasChange={setTelevendasId}
+              onDigitalChange={setResponsavelDigitalId}
+            />
 
             {isCliente && (
               <div className="space-y-1.5">
