@@ -7,7 +7,7 @@ routerAdd(
       if (!userId) return e.unauthorizedError('auth required')
       return e.json(
         200,
-        $ai.agent('performance-intelligence').listMessages({
+        $ai.agent('performance').listMessages({
           conversation_id: e.request.pathValue('conversationId'),
           user_id: userId,
         }),

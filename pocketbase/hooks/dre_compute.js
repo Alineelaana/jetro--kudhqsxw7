@@ -5,6 +5,9 @@ routerAdd(
     var body = e.requestInfo().body || {}
     var period = body.period || ''
     var version = body.version || 'contabil'
+    var orgFilter = body.orgFilter || ''
+
+    if (!period) return e.badRequestError('period is required')
 
     function evalFormula(expr, values) {
       try {
@@ -23,6 +26,29 @@ routerAdd(
         return 0
       }
     }
+
+    function buildPeriodFilter() {
+      var parts = period.split('-')
+      var y = parts[0]
+      var m = parts[1]
+      var start = y + '-' + m + '-01'
+      var nm, ny
+      if (m === '12') {
+        nm = '01'
+        ny = String(parseInt(y) + 1)
+      } else {
+        nm = String(parseInt(m) + 1).padStart(2, '0')
+        ny = y
+      }
+      var end = ny + '-' + nm + '-01'
+      return 'data >= "' + start + '" && data < "' + end + '"'
+    }
+
+    var filterParts = [buildPeriodFilter()]
+    if (orgFilter) filterParts.push('(' + orgFilter + ')')
+    if (body.company) filterParts.push('company = "' + body.company + '"')
+    if (body.branch) filterParts.push('branch = "' + body.branch + '"')
+    var lancFilter = filterParts.join(' && ')
 
     var structure = []
     var mappings = []
@@ -70,7 +96,7 @@ routerAdd(
       try {
         records = $app.findRecordsByFilter(
           'contabil_lancamentos',
-          '',
+          lancFilter,
           '',
           batchSize,
           batch * batchSize,

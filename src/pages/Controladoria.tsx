@@ -12,6 +12,8 @@ import { ControladoriaForecast } from '@/components/controladoria/controladoria-
 import { ControladoriaSavedViews } from '@/components/controladoria/controladoria-saved-views'
 import { ControladoriaComments } from '@/components/controladoria/controladoria-comments'
 import { ControladoriaEbitda } from '@/components/controladoria/controladoria-ebitda'
+import { ControladoriaBalanco } from '@/components/controladoria/controladoria-balanco'
+import { ControladoriaFluxoCaixa } from '@/components/controladoria/controladoria-fluxo-caixa'
 
 interface ControladoriaPageProps {
   screen?: string
@@ -80,33 +82,11 @@ export default function Controladoria({ screen = 'dashboard' }: ControladoriaPag
       case 'adapta':
         return <ControladoriaAdapta />
       case 'balanco':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Balanço Patrimonial — demonstração consolidada do patrimônio da empresa.
-            </p>
-            <ControladoriaGenericScreen configKey="consolidation" />
-          </div>
-        )
+        return <ControladoriaBalanco />
       case 'fluxo-caixa':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Fluxo de Caixa Gerencial — projeção de entradas e saídas baseada nos dados oficiais.
-            </p>
-            <ControladoriaGenericScreen configKey="consolidation" />
-          </div>
-        )
+        return <ControladoriaFluxoCaixa />
       case 'configuracoes':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Configurações da Controladoria — parâmetros de DRE, KPIs, materialidade e
-              consolidação.
-            </p>
-            <ControladoriaGenericScreen configKey="reclassifications" />
-          </div>
-        )
+        return <ControladoriaGenericScreen configKey="configuracoes" />
       default:
         return <ControladoriaCockpit />
     }

@@ -5,9 +5,10 @@ interface Props {
   headers: string[]
   rows: (string | number)[][]
   userName: string
+  filters?: Record<string, string>
 }
 
-export function ControladoriaExportBar({ title, headers, rows, userName }: Props) {
+export function ControladoriaExportBar({ title, headers, rows, userName, filters }: Props) {
   const sections = [
     {
       title,
@@ -23,6 +24,7 @@ export function ControladoriaExportBar({ title, headers, rows, userName }: Props
       sections={sections}
       recordCount={rows.length}
       formats={['pdf', 'excel', 'csv', 'png', 'print']}
+      filters={filters}
     />
   )
 }

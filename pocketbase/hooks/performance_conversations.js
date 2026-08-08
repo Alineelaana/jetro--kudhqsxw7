@@ -7,7 +7,7 @@ routerAdd(
     var limit = parseInt((e.requestInfo().query && e.requestInfo().query.limit) || '20', 10) || 20
     return e.json(
       200,
-      $ai.agent('performance-intelligence').listConversations({ user_id: userId, limit: limit }),
+      $ai.agent('performance').listConversations({ user_id: userId, limit: limit }),
     )
   },
   $apis.requireAuth(),

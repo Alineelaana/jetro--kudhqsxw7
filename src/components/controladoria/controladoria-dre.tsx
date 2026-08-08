@@ -8,17 +8,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, FileDown, ChevronRight, CheckCircle, AlertCircle } from 'lucide-react'
+import { Loader2, ChevronRight, CheckCircle, AlertCircle } from 'lucide-react'
 import {
   computeDRE,
   computeBudgetVsActual,
   computeVariation,
   reconcileDRE,
 } from '@/services/controladoria-analytics'
-import { exportBICsv } from '@/lib/bi-export'
+import { ControladoriaExportBar } from '@/components/controladoria/controladoria-export-bar'
+import { ControladoriaDrillDown } from '@/components/controladoria/controladoria-drill-down'
 import { useAuth } from '@/hooks/use-auth'
+import { useOrgFilter } from '@/hooks/use-org-filter'
 import type { DREResult } from '@/lib/controladoria-types'
-import { RESULT_VERSIONS, STATUS_COLORS } from '@/lib/controladoria-types'
+import { RESULT_VERSIONS } from '@/lib/controladoria-types'
 import { cn } from '@/lib/utils'
 
 function fmt(v: number): string {
@@ -38,28 +40,33 @@ const VERSION_LABELS: Record<string, string> = {
   consolidado: 'Consolidado',
 }
 
+function getPrevPeriod(p: string): string {
+  const [y, m] = p.split('-').map(Number)
+  const d = new Date(y, m - 2, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
 export function ControladoriaDRE() {
   const { user } = useAuth()
+  const { filter: orgFilter } = useOrgFilter()
   const [period, setPeriod] = useState(new Date().toISOString().substring(0, 7))
   const [version, setVersion] = useState('contabil')
   const [comparison, setComparison] = useState('none')
   const [dre, setDre] = useState<DREResult | null>(null)
-  const [prevDre, setPrevDre] = useState<DREResult | null>(null)
   const [budgetVsActual, setBudgetVsActual] = useState<any[]>([])
   const [variation, setVariation] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [drillDownLine, setDrillDownLine] = useState<string | null>(null)
 
   const load = async () => {
     setLoading(true)
     try {
-      const result = await computeDRE(period, version)
+      const result = await computeDRE(period, version, orgFilter)
       setDre(result)
       if (comparison === 'budget') {
         setBudgetVsActual(await computeBudgetVsActual(period, result))
       } else if (comparison === 'previous') {
-        const prevPeriod = getPrevPeriod(period)
-        const prev = await computeDRE(prevPeriod, version)
-        setPrevDre(prev)
+        const prev = await computeDRE(getPrevPeriod(period), version, orgFilter)
         setVariation(await computeVariation(result, prev))
       }
     } catch {
@@ -70,13 +77,7 @@ export function ControladoriaDRE() {
 
   useEffect(() => {
     load()
-  }, [period, version, comparison])
-
-  const getPrevPeriod = (p: string): string => {
-    const [y, m] = p.split('-').map(Number)
-    const d = new Date(y, m - 2, 1)
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-  }
+  }, [period, version, comparison, orgFilter])
 
   if (loading)
     return (
@@ -89,17 +90,6 @@ export function ControladoriaDRE() {
   const reconciliation = reconcileDRE(dre)
   const showComparison =
     comparison === 'budget' ? budgetVsActual : comparison === 'previous' ? variation : []
-
-  const handleExport = () => {
-    const headers = ['Linha', 'Grupo', 'Valor', '% Receita']
-    const rows = dre.lines.map((l) => [
-      l.label,
-      l.group,
-      fmt(l.value),
-      `${fmt(l.percentage_of_revenue || 0)}%`,
-    ])
-    exportBICsv(`DRE_${version}_${period}`, headers, rows, (user?.name as string) || 'Usuário')
-  }
 
   return (
     <div className="space-y-4">
@@ -141,9 +131,18 @@ export function ControladoriaDRE() {
             </SelectContent>
           </Select>
         </div>
-        <Button size="sm" variant="outline" onClick={handleExport}>
-          <FileDown className="w-4 h-4 mr-1" /> Exportar
-        </Button>
+        <ControladoriaExportBar
+          title={`DRE_${version}_${period}`}
+          headers={['Linha', 'Grupo', 'Valor', '% Receita']}
+          rows={dre.lines.map((l) => [
+            l.label,
+            l.group,
+            fmt(l.value),
+            `${fmt(l.percentage_of_revenue || 0)}%`,
+          ])}
+          userName={(user?.name as string) || 'Usuário'}
+          filters={{ periodo: period, versao: version, comparativo: comparison }}
+        />
       </div>
 
       <Card
@@ -200,30 +199,28 @@ export function ControladoriaDRE() {
                     </td>
                     {comparison !== 'none' && (
                       <td className="py-2 px-2 text-right">
-                        {showComparison.find((c) => c.line_key === l.line_key) ? (
-                          <span
-                            className={cn(
-                              'text-xs',
-                              showComparison.find((c) => c.line_key === l.line_key)?.diff_pct > 0
-                                ? 'text-red-600'
-                                : 'text-emerald-600',
-                            )}
-                          >
-                            {fmt(showComparison.find((c) => c.line_key === l.line_key)?.diff || 0)}(
-                            {fmt(
-                              showComparison.find((c) => c.line_key === l.line_key)?.diff_pct || 0,
-                            )}
-                            %)
-                          </span>
-                        ) : (
-                          '—'
-                        )}
+                        {(() => {
+                          const c = showComparison.find((c) => c.line_key === l.line_key)
+                          return c ? (
+                            <span
+                              className={cn(
+                                'text-xs',
+                                c.diff_pct > 0 ? 'text-red-600' : 'text-emerald-600',
+                              )}
+                            >
+                              {fmt(c.diff || 0)}({fmt(c.diff_pct || 0)}%)
+                            </span>
+                          ) : (
+                            '—'
+                          )
+                        })()}
                       </td>
                     )}
                     <td className="py-2 px-2 text-center">
-                      {!l.is_calculated && (
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground inline cursor-pointer hover:text-[#005B2E]" />
-                      )}
+                      <ChevronRight
+                        className="w-3.5 h-3.5 text-muted-foreground inline cursor-pointer hover:text-[#005B2E] transition-colors"
+                        onClick={() => setDrillDownLine(l.line_key)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -245,6 +242,14 @@ export function ControladoriaDRE() {
           </Card>
         ))}
       </div>
+
+      {drillDownLine && (
+        <ControladoriaDrillDown
+          lineKey={drillDownLine}
+          period={period}
+          onClose={() => setDrillDownLine(null)}
+        />
+      )}
     </div>
   )
 }

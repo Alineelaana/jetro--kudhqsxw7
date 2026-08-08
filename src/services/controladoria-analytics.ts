@@ -14,10 +14,14 @@ function parseNum(v: unknown): number {
   return isNaN(n) ? 0 : n
 }
 
-export async function computeDRE(period: string, version: string = 'contabil'): Promise<DREResult> {
+export async function computeDRE(
+  period: string,
+  version: string = 'contabil',
+  orgFilter?: string,
+): Promise<DREResult> {
   return pb.send('/backend/v1/dre/compute', {
     method: 'POST',
-    body: JSON.stringify({ period, version }),
+    body: JSON.stringify({ period, version, orgFilter }),
     headers: { 'Content-Type': 'application/json' },
   })
 }
@@ -220,14 +224,27 @@ export async function computeVariationAnalysis(period: string): Promise<
 
 export async function drillDownDRELine(
   lineKey: string,
-  _period: string,
+  period: string,
+  orgFilter?: string,
 ): Promise<Record<string, unknown>[]> {
   const mappings = await getAccountMappings()
   const lineAccounts = (mappings as Rec[]).filter((m) => m.dre_line_key === lineKey)
   if (lineAccounts.length === 0) return []
   const codes = lineAccounts.map((m) => m.account_code as string)
-  const filter = codes.map((c) => `conta_debito = "${c}"`).join(' || ')
-  if (!filter) return []
+  const codeFilter = codes
+    .map((c) => `conta_debito = "${c}" || conta_credito = "${c}"`)
+    .join(' || ')
+  if (!codeFilter) return []
+  const filters = [codeFilter]
+  if (period) {
+    const [y, m] = period.split('-')
+    const startDate = `${y}-${m}-01`
+    const nextM = m === '12' ? '01' : String(parseInt(m) + 1).padStart(2, '0')
+    const nextY = m === '12' ? String(parseInt(y) + 1) : y
+    filters.push(`data >= "${startDate}" && data < "${nextY}-${nextM}-01"`)
+  }
+  if (orgFilter) filters.push(`(${orgFilter})`)
+  const filter = filters.join(' && ')
   return pb
     .collection('contabil_lancamentos')
     .getFullList({ filter })
