@@ -503,11 +503,13 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Dashboards Custom.', route: '/admin/bi/custom-dashboards' },
           { label: 'AI Adapta', route: '/admin/bi/ai-adapta' },
           { label: 'Cross-Module', route: '/admin/bi/cross-module' },
+          { label: 'Projeção de Vendas', route: '/admin/bi/projection' },
           { label: 'Vendas', route: '/admin/bi/sales' },
           { label: 'Estoque', route: '/admin/bi/stock' },
           { label: 'Financeiro', route: '/admin/bi/financial' },
           { label: 'Industrial', route: '/admin/bi/industrial' },
           { label: 'Views Salvas', route: '/admin/bi/saved-views' },
+          { label: 'Central de Relatórios', route: '/admin/bi/report-center' },
         ],
       },
       {

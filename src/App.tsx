@@ -686,6 +686,10 @@ const App = () => (
                         <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
                         <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
                         <Route
+                          path="/admin/bi/report-center"
+                          element={<BI screen="report-center" />}
+                        />
+                        <Route
                           path="/admin/atendimento"
                           element={<Atendimento screen="dashboard" />}
                         />
