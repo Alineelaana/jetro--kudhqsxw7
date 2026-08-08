@@ -855,6 +855,10 @@ const App = () => (
                         <Route path="/admin/sst/documents" element={<SST screen="documents" />} />
                         <Route path="/admin/sst/indicators" element={<SST screen="indicators" />} />
                         <Route
+                          path="/admin/sst/obligations-calendar"
+                          element={<SST screen="obligations_calendar" />}
+                        />
+                        <Route
                           path="/admin/promocoes"
                           element={<Promotions screen="dashboard" />}
                         />
