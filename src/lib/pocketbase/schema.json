@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T22:11:31.580Z",
+  "generatedAt": "2026-08-08T22:33:15.363Z",
   "collections": [
     {
       "name": "users",
@@ -13065,9 +13065,158 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "aging_bucket",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "collection_priority",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risk_classification",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risk_factors",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "risk_score",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "promise_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "promise_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "promise_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "promise_payment_method",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "promise_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dispute_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dispute_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dispute_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dispute_deadline",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "next_action_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "next_action_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "next_action_time",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "next_action_priority",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "next_action_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contacts_log",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "negotiations_log",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "title_ids",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "collection_type",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_fin_col_status ON financial_collections (status)"]
+      "indexes": [
+        "CREATE INDEX idx_fin_col_status ON financial_collections (status)",
+        "CREATE INDEX `idx_fin_col_priority` ON `financial_collections` (collection_priority)",
+        "CREATE INDEX `idx_fin_col_promise` ON `financial_collections` (promise_status)",
+        "CREATE INDEX `idx_fin_col_risk` ON `financial_collections` (risk_classification)"
+      ]
     },
     {
       "name": "financial_cash_registers",
