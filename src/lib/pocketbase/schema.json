@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T02:06:28.843Z",
+  "generatedAt": "2026-08-08T02:15:55.418Z",
   "collections": [
     {
       "name": "users",
@@ -13837,6 +13837,30 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "categoria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cbo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sindicato",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_vinculo",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -14291,6 +14315,32 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "escala_tipo",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "5x2",
+            "6x1",
+            "12x36",
+            "Turno Fixo",
+            "Turno Alternado",
+            "Horário Flexível"
+          ]
+        },
+        {
+          "name": "compensacao",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "horario_flexivel",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_rh_sc_sit ON rh_scales (situacao)"]
@@ -14606,6 +14656,36 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "workflow_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "calculo_previo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "aviso_data_inicio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "aviso_data_fim",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "verbas_rescisorias",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_rh_dis_emp ON rh_dismissals (employee_id)"]
@@ -14833,6 +14913,66 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "incidencias",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "formula",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "vigencia_inicio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "vigencia_fim",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "categoria_rubrica",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conta_debito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conta_credito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "esocial_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "centro_custo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_rh_pe_sit ON rh_payroll_events (situacao)"]
@@ -15976,6 +16116,33 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "modalidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "Indeterminado",
+            "Determinado",
+            "Experiência",
+            "Temporário",
+            "Aprendiz",
+            "Estágio",
+            "Intermitente"
+          ]
+        },
+        {
+          "name": "experiencia_dias",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "experiencia_fim",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_dp_wc_emp ON dp_work_contracts (employee_name)"]
@@ -16434,6 +16601,25 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "layout_versao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recibo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_operacao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["envio", "retificacao", "exclusao"]
         }
       ],
       "indexes": ["CREATE INDEX idx_dp_es_tipo ON dp_esocial_events (tipo_evento)"]

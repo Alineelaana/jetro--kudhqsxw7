@@ -9,6 +9,33 @@ const SIT_GERAL = ['Ativo', 'Inativo', 'Pendente', 'Concluído', 'Cancelado'] as
 const SIT_DOC = ['Válido', 'Vencido', 'Próximo do Vencimento', 'Arquivado'] as const
 
 export const DP_SCREEN_CONFIGS: Record<string, DpScreenConfig> = {
+  rubricas: {
+    collection: 'rh_payroll_events',
+    title: 'Rubricas',
+    nameLabel: 'Código',
+    statusField: 'situacao',
+    statusOptions: ['Ativo', 'Inativo'],
+    fields: [
+      { name: 'code', label: 'Código', type: 'text', required: true },
+      { name: 'name', label: 'Descrição', type: 'text', required: true },
+      {
+        name: 'tipo',
+        label: 'Natureza',
+        type: 'select',
+        options: ['Provento', 'Desconto', 'Encargo', 'Base de cálculo', 'Informativo'],
+      },
+      { name: 'categoria_rubrica', label: 'Categoria', type: 'text' },
+      { name: 'formula', label: 'Fórmula', type: 'text' },
+      { name: 'forma_calculo', label: 'Forma Cálculo', type: 'text' },
+      { name: 'percentual', label: 'Percentual', type: 'text' },
+      { name: 'vigencia_inicio', label: 'Vigência Início', type: 'date' },
+      { name: 'vigencia_fim', label: 'Vigência Fim', type: 'date' },
+      { name: 'conta_debito', label: 'Conta Débito', type: 'text' },
+      { name: 'conta_credito', label: 'Conta Crédito', type: 'text' },
+      { name: 'esocial_codigo', label: 'Código eSocial', type: 'text' },
+      { name: 'centro_custo', label: 'Centro de Custo', type: 'text' },
+    ],
+  },
   admissions: {
     collection: 'dp_admissions',
     title: 'Admissões',

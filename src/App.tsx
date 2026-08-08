@@ -688,6 +688,69 @@ const App = () => (
                           element={<Atendimento screen="dashboard" />}
                         />
                         <Route path="/admin/dp" element={<DP screen="dashboard" />} />
+                        <Route path="/admin/dp/admissions" element={<DP screen="admissions" />} />
+                        <Route path="/admin/dp/contracts" element={<DP screen="contracts" />} />
+                        <Route
+                          path="/admin/dp/contract-changes"
+                          element={<DP screen="contract_changes" />}
+                        />
+                        <Route path="/admin/dp/jornadas" element={<DP screen="jornadas" />} />
+                        <Route path="/admin/dp/escalas" element={<DP screen="escalas" />} />
+                        <Route path="/admin/dp/ponto" element={<DP screen="time_control" />} />
+                        <Route path="/admin/dp/banco-horas" element={<DP screen="bank_hours" />} />
+                        <Route
+                          path="/admin/dp/horas-extras"
+                          element={<DP screen="horas_extras" />}
+                        />
+                        <Route path="/admin/dp/folha" element={<DP screen="payroll" />} />
+                        <Route path="/admin/dp/rubricas" element={<DP screen="rubricas" />} />
+                        <Route path="/admin/dp/ferias" element={<DP screen="vacations" />} />
+                        <Route path="/admin/dp/13-salario" element={<DP screen="13th_salary" />} />
+                        <Route path="/admin/dp/afastamentos" element={<DP screen="leaves" />} />
+                        <Route path="/admin/dp/licencas" element={<DP screen="licenses" />} />
+                        <Route path="/admin/dp/beneficios" element={<DP screen="benefits" />} />
+                        <Route path="/admin/dp/rescisoes" element={<DP screen="dismissals" />} />
+                        <Route
+                          path="/admin/dp/reintegracao"
+                          element={<DP screen="reinstatement" />}
+                        />
+                        <Route path="/admin/dp/esocial" element={<DP screen="esocial" />} />
+                        <Route
+                          path="/admin/dp/esocial-monitor"
+                          element={<DP screen="esocial_monitor" />}
+                        />
+                        <Route path="/admin/dp/fgts" element={<DP screen="fgts_digital" />} />
+                        <Route path="/admin/dp/encargos" element={<DP screen="charges" />} />
+                        <Route
+                          path="/admin/dp/tabelas-tributarias"
+                          element={<DP screen="tax_tables" />}
+                        />
+                        <Route
+                          path="/admin/dp/consignados"
+                          element={<DP screen="consignments" />}
+                        />
+                        <Route path="/admin/dp/sindicatos" element={<DP screen="unions" />} />
+                        <Route
+                          path="/admin/dp/convencoes"
+                          element={<DP screen="collective_agreements" />}
+                        />
+                        <Route
+                          path="/admin/dp/dissidio"
+                          element={<DP screen="wage_adjustments" />}
+                        />
+                        <Route path="/admin/dp/provisoes" element={<DP screen="provisions" />} />
+                        <Route path="/admin/dp/exames" element={<DP screen="exams" />} />
+                        <Route path="/admin/dp/epis" element={<DP screen="uniforms_epis" />} />
+                        <Route
+                          path="/admin/dp/documentos-obrigatorios"
+                          element={<DP screen="mandatory_docs" />}
+                        />
+                        <Route
+                          path="/admin/dp/esocial-layouts"
+                          element={<DP screen="esocial_layouts" />}
+                        />
+                        <Route path="/admin/dp/relatorios" element={<DP screen="reports" />} />
+                        <Route path="/admin/dp/adapta" element={<DP screen="adapta" />} />
                         <Route path="/admin/sst" element={<SST screen="dashboard" />} />
                         <Route
                           path="/admin/promocoes"
