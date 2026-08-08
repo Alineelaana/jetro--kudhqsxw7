@@ -132,9 +132,16 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Dashboard', route: '/admin/trade-marketing' },
           { label: 'Calendário', route: '/admin/trade-marketing/calendario' },
           { label: 'Ações', route: '/admin/trade-marketing/acoes' },
+          { label: 'Verbas por Fornecedor', route: '/admin/trade-marketing/verbas-fornecedor' },
+          { label: 'Conta Corrente', route: '/admin/trade-marketing/conta-corrente' },
+          {
+            label: 'Aplicação de Verba em Produtos',
+            route: '/admin/trade-marketing/aplicacao-produtos',
+          },
           { label: 'Materiais', route: '/admin/trade-marketing/materiais' },
           { label: 'Prestação de Contas', route: '/admin/trade-marketing/prestacao-contas' },
           { label: 'Planejamento Anual', route: '/admin/trade-marketing/planejamento-anual' },
+          { label: 'Cotações Externas', route: '/admin/trade-marketing/cotacoes-externas' },
           { label: 'ADAPTA Marketing', route: '/admin/trade-marketing/adapta' },
         ],
       },
@@ -143,7 +150,25 @@ export const ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Financeiro',
     items: [
-      { label: 'Verbas de Fornecedores', icon: Handshake, route: '/admin/verbas-fornecedores' },
+      {
+        label: 'Verbas de Fornecedores',
+        icon: Handshake,
+        route: '/admin/verbas-fornecedores',
+        children: [
+          { label: 'Dashboard', route: '/admin/verbas-fornecedores' },
+          { label: 'Gestão de Verbas', route: '/admin/verbas-fornecedores/gestao' },
+          { label: 'Conta Corrente', route: '/admin/verbas-fornecedores/conta-corrente' },
+          { label: 'Movimentações', route: '/admin/verbas-fornecedores/movimentacoes' },
+          { label: 'Apropriações', route: '/admin/verbas-fornecedores/apropriacoes' },
+          {
+            label: 'Aplicação em Produtos',
+            route: '/admin/verbas-fornecedores/aplicacao-produtos',
+          },
+          { label: 'Consumos', route: '/admin/verbas-fornecedores/consumos' },
+          { label: 'Prestação de Contas', route: '/admin/verbas-fornecedores/prestacao-contas' },
+          { label: 'Cockpit', route: '/admin/verbas-fornecedores/cockpit' },
+        ],
+      },
       {
         label: 'Financeiro',
         icon: DollarSign,

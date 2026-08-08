@@ -16,29 +16,23 @@ export default function SupplierAllowance({ screen = 'dashboard' }: SupplierAllo
   const renderScreen = () => {
     switch (screen) {
       case 'dashboard':
-      case 'cockpit':
         return <SaCockpit />
       case 'agreements':
-      case 'gestao':
         return <SaAgreements />
       case 'accounts':
-      case 'conta-corrente':
         return <SaAccounts />
       case 'movements':
-      case 'movimentacoes':
         return <SaMovements />
       case 'accruals':
-      case 'apropriacoes':
         return <SaAccruals />
       case 'appropriations':
-      case 'aplicacao-produtos':
         return <SaAppropriations />
       case 'consumptions':
-      case 'consumos':
         return <SaConsumptions />
       case 'settlements':
-      case 'prestacao-contas':
         return <SaSettlements />
+      case 'cockpit':
+        return <SaCockpit />
       default:
         return <SaCockpit />
     }
