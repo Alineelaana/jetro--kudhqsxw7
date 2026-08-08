@@ -53,43 +53,82 @@ migrate(
     }
     app.save(budgetRequests)
 
-    const commissionRules = new Collection({
-      name: 'commission_rules',
-      type: 'base',
-      listRule: "@request.auth.id != ''",
-      viewRule: "@request.auth.id != ''",
-      createRule: "@request.auth.id != ''",
-      updateRule: "@request.auth.id != ''",
-      deleteRule: "@request.auth.id != ''",
-      fields: [
-        {
+    let commissionRules
+    try {
+      commissionRules = app.findCollectionByNameOrId('commission_rules')
+    } catch (_) {
+      try {
+        commissionRules = app.findCollectionByNameOrId('Commission_Rules')
+      } catch (_) {
+        commissionRules = new Collection({
+          name: 'commission_rules',
+          type: 'base',
+          listRule: "@request.auth.id != ''",
+          viewRule: "@request.auth.id != ''",
+          createRule: "@request.auth.id != ''",
+          updateRule: "@request.auth.id != ''",
+          deleteRule: "@request.auth.id != ''",
+          fields: [],
+          indexes: [],
+        })
+      }
+    }
+
+    if (!commissionRules.fields.getByName('role')) {
+      commissionRules.fields.add(
+        new SelectField({
           name: 'role',
-          type: 'select',
           values: ['RCA', 'Televendas', 'Responsavel Comercial Digital'],
           maxSelect: 1,
           required: true,
-        },
-        { name: 'percentage', type: 'text' },
-        { name: 'split_percentage', type: 'text' },
-        { name: 'priority', type: 'number' },
-        { name: 'applicability', type: 'text' },
-        { name: 'active', type: 'bool' },
-        { name: 'empresa', type: 'text' },
-        { name: 'filial', type: 'text' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE INDEX idx_commission_rules_role ON commission_rules (role)',
-        'CREATE INDEX idx_commission_rules_active ON commission_rules (active)',
-      ],
-    })
+        }),
+      )
+    }
+    if (!commissionRules.fields.getByName('percentage')) {
+      commissionRules.fields.add(new TextField({ name: 'percentage' }))
+    }
+    if (!commissionRules.fields.getByName('split_percentage')) {
+      commissionRules.fields.add(new TextField({ name: 'split_percentage' }))
+    }
+    if (!commissionRules.fields.getByName('priority')) {
+      commissionRules.fields.add(new NumberField({ name: 'priority' }))
+    }
+    if (!commissionRules.fields.getByName('applicability')) {
+      commissionRules.fields.add(new TextField({ name: 'applicability' }))
+    }
+    if (!commissionRules.fields.getByName('active')) {
+      commissionRules.fields.add(new BoolField({ name: 'active' }))
+    }
+    if (!commissionRules.fields.getByName('empresa')) {
+      commissionRules.fields.add(new TextField({ name: 'empresa' }))
+    }
+    if (!commissionRules.fields.getByName('filial')) {
+      commissionRules.fields.add(new TextField({ name: 'filial' }))
+    }
+
+    commissionRules.addIndex('idx_commission_rules_role', false, 'role', '')
+    commissionRules.addIndex('idx_commission_rules_active', false, 'active', '')
+
     app.save(commissionRules)
   },
   (app) => {
     try {
-      const col = app.findCollectionByNameOrId('commission_rules')
-      app.delete(col)
+      const commissionRules = app.findCollectionByNameOrId('commission_rules')
+      commissionRules.removeIndex('idx_commission_rules_role')
+      commissionRules.removeIndex('idx_commission_rules_active')
+      const roleField = commissionRules.fields.getByName('role')
+      if (roleField) commissionRules.fields.remove(roleField)
+      const percentageField = commissionRules.fields.getByName('percentage')
+      if (percentageField) commissionRules.fields.remove(percentageField)
+      const splitPercentageField = commissionRules.fields.getByName('split_percentage')
+      if (splitPercentageField) commissionRules.fields.remove(splitPercentageField)
+      const priorityField = commissionRules.fields.getByName('priority')
+      if (priorityField) commissionRules.fields.remove(priorityField)
+      const applicabilityField = commissionRules.fields.getByName('applicability')
+      if (applicabilityField) commissionRules.fields.remove(applicabilityField)
+      const activeField = commissionRules.fields.getByName('active')
+      if (activeField) commissionRules.fields.remove(activeField)
+      app.save(commissionRules)
     } catch (_) {}
 
     try {
