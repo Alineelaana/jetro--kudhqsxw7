@@ -82,6 +82,9 @@ import Auditoria from './pages/Auditoria'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
 import TradeMarketing from './pages/TradeMarketing'
+import MarketingEnterprise from './pages/MarketingEnterprise'
+import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
+import { getMarketingIntelligence } from '@/services/marketing-bi'
 import CollectionCenterConfig from './pages/CollectionCenterConfig'
 import CollectionCenterCertification from './pages/CollectionCenterCertification'
 
@@ -780,6 +783,17 @@ const App = () => (
                         <Route path="/admin/bi/industrial" element={<BI screen="industrial" />} />
                         <Route path="/admin/bi/saved-views" element={<BI screen="saved-views" />} />
                         <Route
+                          path="/admin/bi/marketing-intel"
+                          element={
+                            <BiCenterWrapper
+                              title="Inteligência de Marketing"
+                              description="Indicadores de marketing enterprise"
+                              loadFunction={getMarketingIntelligence}
+                              realtimeCollection="mk_requests"
+                            />
+                          }
+                        />
+                        <Route
                           path="/admin/bi/report-center"
                           element={<BI screen="report-center" />}
                         />
@@ -1039,6 +1053,42 @@ const App = () => (
                         <Route
                           path="/admin/promocoes"
                           element={<Promotions screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/marketing"
+                          element={<MarketingEnterprise screen="cockpit" />}
+                        />
+                        <Route
+                          path="/admin/marketing/solicitacoes"
+                          element={<MarketingEnterprise screen="requests" />}
+                        />
+                        <Route
+                          path="/admin/marketing/jobs"
+                          element={<MarketingEnterprise screen="jobs" />}
+                        />
+                        <Route
+                          path="/admin/marketing/aprovacao-pecas"
+                          element={<MarketingEnterprise screen="approval" />}
+                        />
+                        <Route
+                          path="/admin/marketing/calendario"
+                          element={<MarketingEnterprise screen="calendar" />}
+                        />
+                        <Route
+                          path="/admin/marketing/midia"
+                          element={<MarketingEnterprise screen="media" />}
+                        />
+                        <Route
+                          path="/admin/marketing/atribuicao"
+                          element={<MarketingEnterprise screen="attribution" />}
+                        />
+                        <Route
+                          path="/admin/marketing/brand"
+                          element={<MarketingEnterprise screen="brand" />}
+                        />
+                        <Route
+                          path="/admin/marketing/biblioteca"
+                          element={<MarketingEnterprise screen="library" />}
                         />
                         <Route
                           path="/admin/trade-marketing"
