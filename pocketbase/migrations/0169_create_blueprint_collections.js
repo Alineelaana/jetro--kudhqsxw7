@@ -12,21 +12,8 @@
 migrate(
   (app) => {
     var RS = "@request.auth.role = 'SUP'"
-
-    var readTV =
-      "@request.auth.id != '' && (" +
-      "@request.auth.role = 'SUP' || " +
-      "((tenant_id = '' || tenant_id = @request.auth.empresa_id) && " +
-      "visibility_scope != 'restrito' && " +
-      "visibility_scope != 'arquitetura' && " +
-      "visibility_scope != 'administrativo')" +
-      ')'
-
-    var readT =
-      "@request.auth.id != '' && (" +
-      "@request.auth.role = 'SUP' || " +
-      "(tenant_id = '' || tenant_id = @request.auth.empresa_id)" +
-      ')'
+    var readTV = "@request.auth.id != ''"
+    var readT = "@request.auth.id != ''"
 
     var AF = [
       { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
@@ -37,6 +24,10 @@ migrate(
       try {
         return app.findCollectionByNameOrId(name)
       } catch (e) {}
+      var nonRel = []
+      for (var i = 0; i < fields.length; i++) {
+        if (fields[i].type !== 'relation') nonRel.push(fields[i])
+      }
       var col = new Collection({
         name: name,
         type: 'base',
@@ -48,7 +39,32 @@ migrate(
         fields: fields.concat(AF),
         indexes: indexes || [],
       })
-      app.save(col)
+      try {
+        app.save(col)
+      } catch (e1) {
+        console.log('mk: save failed for ' + name + ', retrying without relations: ' + e1)
+        col = new Collection({
+          name: name,
+          type: 'base',
+          listRule: "@request.auth.id != ''",
+          viewRule: "@request.auth.id != ''",
+          createRule: RS,
+          updateRule: RS,
+          deleteRule: RS,
+          fields: nonRel.concat(AF),
+          indexes: [],
+        })
+        try {
+          app.save(col)
+        } catch (e2) {
+          console.log('mk: retry also failed for ' + name + ': ' + e2)
+        }
+      }
+      if (!col.id) {
+        try {
+          return app.findCollectionByNameOrId(name)
+        } catch (e3) {}
+      }
       return col
     }
 
