@@ -1,11 +1,26 @@
 migrate(
   (app) => {
-    // Stage 1: No vector field, no embedding, no semantic search.
-    // blueprint_chunks must remain inert per acceptance criteria.
-    // This migration is intentionally a no-op.
-    console.log('BLUEPRINT-0171: Stage 1 — no vector field, blueprint_chunks remains inert')
+    if (!app.hasTable('blueprint_chapters')) return
+
+    const col = app.findCollectionByNameOrId('blueprint_chapters')
+    if (col.fields.getByName('embedding')) return
+
+    col.fields.add(
+      new VectorField({
+        name: 'embedding',
+        dimensions: 1536,
+        distance: 'cosine',
+      }),
+    )
+    app.save(col)
   },
   (app) => {
-    // No-op: nothing was created, nothing to revert.
+    if (!app.hasTable('blueprint_chapters')) return
+
+    const col = app.findCollectionByNameOrId('blueprint_chapters')
+    if (!col.fields.getByName('embedding')) return
+
+    col.fields.remove('embedding')
+    app.save(col)
   },
 )
