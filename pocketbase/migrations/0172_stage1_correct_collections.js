@@ -1,42 +1,43 @@
 migrate(
   (app) => {
-    if (app.hasTable('blueprint_volumes')) {
-      const col = app.findCollectionByNameOrId('blueprint_volumes')
-      let changed = false
-
-      if (!col.fields.getByName('status')) {
-        col.fields.add(new TextField({ name: 'status' }))
-        changed = true
-      }
-      if (!col.fields.getByName('order')) {
-        col.fields.add(new NumberField({ name: 'order' }))
-        changed = true
-      }
-      if (!col.fields.getByName('data')) {
-        col.fields.add(new JSONField({ name: 'data' }))
-        changed = true
-      }
-      if (changed) app.save(col)
-    }
-
     if (app.hasTable('blueprint_chapters')) {
-      const col = app.findCollectionByNameOrId('blueprint_chapters')
-      let changed = false
+      var col = app.findCollectionByNameOrId('blueprint_chapters')
+      var changed = false
 
-      if (!col.fields.getByName('status')) {
-        col.fields.add(new TextField({ name: 'status' }))
+      if (!col.fields.getByName('embedding')) {
+        col.fields.add(
+          new VectorField({
+            name: 'embedding',
+            dimensions: 1536,
+            distance: 'cosine',
+          }),
+        )
         changed = true
       }
-      if (!col.fields.getByName('order')) {
-        col.fields.add(new NumberField({ name: 'order' }))
+
+      if (!col.fields.getByName('chunk_text')) {
+        col.fields.add(new TextField({ name: 'chunk_text' }))
         changed = true
       }
-      if (!col.fields.getByName('data')) {
-        col.fields.add(new JSONField({ name: 'data' }))
-        changed = true
-      }
+
       if (changed) app.save(col)
     }
   },
-  (app) => {},
+  (app) => {
+    if (app.hasTable('blueprint_chapters')) {
+      var col = app.findCollectionByNameOrId('blueprint_chapters')
+      var changed = false
+
+      if (col.fields.getByName('embedding')) {
+        col.fields.removeByName('embedding')
+        changed = true
+      }
+      if (col.fields.getByName('chunk_text')) {
+        col.fields.removeByName('chunk_text')
+        changed = true
+      }
+
+      if (changed) app.save(col)
+    }
+  },
 )
