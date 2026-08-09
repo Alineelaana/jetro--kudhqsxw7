@@ -64,7 +64,11 @@ export function GitHubConnectionButton() {
                 <code className="bg-muted px-1 rounded text-xs">pocketbase/migrations/</code> e os
                 hooks em <code className="bg-muted px-1 rounded text-xs">pocketbase/hooks/</code> já
                 estão versionados localmente no repositório do projeto. Cada migração possui
-                numeração sequencial (0001–0159) e é idempotente.
+                numeração sequencial (0001–0159) e é idempotente. Consulte{' '}
+                <code className="bg-muted px-1 rounded text-xs">
+                  docs/LOCAL_MIGRATION_VERSIONING_GUIDE.md
+                </code>{' '}
+                para o guia completo de versionamento local.
               </p>
             </div>
             <div className="space-y-2">

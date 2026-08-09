@@ -6,6 +6,7 @@ import {
   getDrivers,
   getFreights,
   getOccurrences,
+  getTracking,
 } from '@/services/logistics'
 import { getJourneys } from '@/services/transport-journeys'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -20,6 +21,8 @@ import {
   MapPin,
   Activity,
   Route,
+  Package,
+  Navigation,
 } from 'lucide-react'
 
 interface KpiData {
@@ -35,6 +38,8 @@ interface KpiData {
   avgCostPerDelivery: number
   routesActive: number
   onTimeRate: number
+  cargasFormacao: number
+  rastreamentoAtivo: number
 }
 
 export function TransporteDashboard() {
@@ -43,14 +48,16 @@ export function TransporteDashboard() {
 
   const load = async () => {
     try {
-      const [journeys, deliveries, vehicles, drivers, freights, occurrences] = await Promise.all([
-        getJourneys().catch(() => []),
-        getDeliveries().catch(() => []),
-        getVehicles().catch(() => []),
-        getDrivers().catch(() => []),
-        getFreights().catch(() => []),
-        getOccurrences().catch(() => []),
-      ])
+      const [journeys, deliveries, vehicles, drivers, freights, occurrences, tracking] =
+        await Promise.all([
+          getJourneys().catch(() => []),
+          getDeliveries().catch(() => []),
+          getVehicles().catch(() => []),
+          getDrivers().catch(() => []),
+          getFreights().catch(() => []),
+          getOccurrences().catch(() => []),
+          getTracking().catch(() => []),
+        ])
       const today = new Date().toISOString().split('T')[0]
       setKpi({
         activeJourneys: journeys.filter((j) => !['Finalizada', 'Cancelada'].includes(j.status))
@@ -81,6 +88,12 @@ export function TransporteDashboard() {
                   100,
               )
             : 0,
+        cargasFormacao: journeys.filter((j) =>
+          ['Planejada', 'Aguardando Carregamento', 'Em Carregamento'].includes(j.status),
+        ).length,
+        rastreamentoAtivo: (tracking as any[]).filter((t) =>
+          ['Em Trânsito', 'Saiu para Entrega'].includes(t.status),
+        ).length,
       })
     } catch {
       setKpi(null)
@@ -113,7 +126,19 @@ export function TransporteDashboard() {
       icon: Container,
       color: 'text-indigo-600',
     },
+    {
+      label: 'Cargas em Formação',
+      value: kpi.cargasFormacao,
+      icon: Package,
+      color: 'text-purple-600',
+    },
     { label: 'Em Trânsito', value: kpi.inTransit, icon: MapPin, color: 'text-cyan-600' },
+    {
+      label: 'Rastreamento Ativo',
+      value: kpi.rastreamentoAtivo,
+      icon: Navigation,
+      color: 'text-teal-600',
+    },
     { label: 'Entregues', value: kpi.delivered, icon: CheckCircle, color: 'text-emerald-600' },
     { label: 'Atrasadas', value: kpi.delayed, icon: Clock, color: 'text-red-600' },
     {

@@ -1,122 +1,120 @@
-import pb from '@/lib/pocketbase/client'
+import { getDeliveries, getVehicles, getCosts, getOccurrences } from '@/services/logistics'
+import { getJourneys } from '@/services/transport-journeys'
+import {
+  getWmsReceipts,
+  getWmsSeparations,
+  getWmsShippings,
+  getWmsOperationalAlerts,
+} from '@/services/wms'
+import { getSalesOrders } from '@/services/sales'
 
-export interface LogisticsException {
+export type LogisticsException = {
   id: string
   type: string
-  module: string
-  severity: string
   description: string
+  severity: string
+  module: string
   entity: string
-  status: string
   created: string
 }
 
-export interface LogisticsTransfer {
-  id: string
-  numero_transferencia: string
-  origem: string
-  destino: string
-  tipo: string
-  status: string
-  itens: unknown[]
-  responsavel: string
-  observacoes: string
-  created: string
-  updated: string
-}
+export type LogisticsTransfer = Record<string, unknown>
+export type LogisticsCollection = Record<string, unknown>
 
-export interface LogisticsCollection {
-  id: string
-  numero_coleta: string
-  origem: string
-  tipo: string
-  status: string
-  itens: unknown[]
-  responsavel: string
-  observacoes: string
-  data_prevista: string
-  created: string
-  updated: string
-}
-
-export const getConsolidatedDashboard = async () => {
+export async function getConsolidatedDashboard() {
   const [
     receipts,
+    separations,
+    shippings,
     deliveries,
-    vehicles,
-    occurrences,
-    wmsAlerts,
-    wmsShippings,
     journeys,
+    vehicles,
     costs,
-    wmsSeparations,
+    occurrences,
+    alerts,
+    salesOrders,
   ] = await Promise.all([
-    pb
-      .collection('wms_receipts')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('logistics_deliveries')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('logistics_vehicles')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('logistics_occurrences')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('wms_operational_alerts')
-      .getFullList({ filter: 'resolved=false' })
-      .catch(() => []),
-    pb
-      .collection('wms_shippings')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('transport_journeys')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('logistics_costs')
-      .getFullList()
-      .catch(() => []),
-    pb
-      .collection('wms_separations')
-      .getFullList()
-      .catch(() => []),
+    getWmsReceipts().catch(() => []),
+    getWmsSeparations().catch(() => []),
+    getWmsShippings().catch(() => []),
+    getDeliveries().catch(() => []),
+    getJourneys().catch(() => []),
+    getVehicles().catch(() => []),
+    getCosts().catch(() => []),
+    getOccurrences().catch(() => []),
+    getWmsOperationalAlerts().catch(() => []),
+    getSalesOrders().catch(() => []),
   ])
 
   const today = new Date().toISOString().split('T')[0]
-  const pendingReceipts = receipts.filter((r: any) => r.status === 'Pendente').length
-  const pendingSeparations = wmsSeparations.filter(
-    (s: any) => s.status === 'Aguardando Separação',
+  const delArr = deliveries as any[]
+  const occArr = occurrences as any[]
+  const vehArr = vehicles as any[]
+  const costArr = costs as any[]
+  const jouArr = journeys as any[]
+  const soArr = salesOrders as any[]
+  const alertArr = alerts as any[]
+
+  const pendingReceipts = (receipts as any[]).filter((r) => r.status === 'Pendente').length
+  const pendingSeparations = (separations as any[]).filter(
+    (r) => r.status === 'Aguardando Separação',
   ).length
-  const pendingExpedition = wmsShippings.filter(
-    (s: any) => s.status === 'Aguardando Expedição',
+  const pendingExpedition = (shippings as any[]).filter(
+    (r) => r.status === 'Aguardando Expedição',
   ).length
-  const inTransitDeliveries = deliveries.filter((d: any) =>
+  const inTransitDeliveries = delArr.filter((d) =>
     ['Em Trânsito', 'Saiu para Entrega'].includes(d.status),
   ).length
-  const deliveredToday = deliveries.filter(
-    (d: any) => d.status === 'Entregue' && d.data_realizada?.startsWith(today),
+  const deliveredToday = delArr.filter(
+    (d) => d.status === 'Entregue' && d.data_realizada === today,
   ).length
-  const delayedDeliveries = deliveries.filter((d: any) => {
+  const delayedDeliveries = delArr.filter((d) => {
     if (['Entregue', 'Cancelada'].includes(d.status)) return false
     return d.data_prevista && d.data_prevista < today
   }).length
-  const activeOccurrences = occurrences.filter((o: any) =>
+  const activeOccurrences = occArr.filter((o) =>
     ['Aberta', 'Em Análise'].includes(o.situacao),
   ).length
-  const wmsAlertsCount = wmsAlerts.length
-  const activeJourneys = journeys.filter(
-    (j: any) => !['Finalizada', 'Cancelada'].includes(j.status),
+  const wmsAlertsCount = alertArr.filter((a) => !a.resolved).length
+  const activeJourneys = jouArr.filter(
+    (j) => !['Finalizada', 'Cancelada'].includes(j.status),
   ).length
-  const totalCost = costs.reduce((s: number, c: any) => s + parseFloat(c.valor || '0'), 0)
-  const vehiclesAvailable = vehicles.filter((v: any) => v.situacao === 'Disponível').length
-  const vehiclesInOp = vehicles.filter((v: any) => v.situacao === 'Em Rota').length
+  const totalCost = costArr.reduce((sum, c) => sum + parseFloat(c.valor || '0'), 0)
+  const vehiclesAvailable = vehArr.filter((v) => v.situacao === 'Disponível').length
+  const vehiclesInOp = vehArr.filter((v) => v.situacao === 'Em Rota').length
+
+  const stuckOrders = soArr.filter((o) =>
+    ['Aprovado', 'Estoque Reservado', 'Aguardando Faturamento'].includes(o.status),
+  ).length
+
+  const bottlenecks = [
+    pendingReceipts > 0 ? 1 : 0,
+    pendingSeparations > 0 ? 1 : 0,
+    pendingExpedition > 0 ? 1 : 0,
+    delayedDeliveries > 0 ? 1 : 0,
+    activeOccurrences > 0 ? 1 : 0,
+  ].reduce((a, b) => a + b, 0)
+
+  const totalDeliveries = delArr.length
+  const deliveredCount = delArr.filter((d) => d.status === 'Entregue').length
+  const serviceLevel =
+    totalDeliveries > 0 ? Math.round((deliveredCount / totalDeliveries) * 100) : 0
+
+  const leadTimes = delArr
+    .filter((d) => d.status === 'Entregue' && d.data_prevista && d.data_realizada)
+    .map((d) => {
+      const diff = new Date(d.data_realizada).getTime() - new Date(d.data_prevista).getTime()
+      return Math.max(0, Math.ceil(diff / 86400000))
+    })
+  const avgLeadTime =
+    leadTimes.length > 0 ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length : 0
+
+  const onTimeDeliveries = delArr.filter((d) => {
+    if (d.status !== 'Entregue' || !d.data_prevista || !d.data_realizada) return false
+    return d.data_realizada <= d.data_prevista
+  }).length
+  const onTimeInFull =
+    totalDeliveries > 0 ? Math.round((onTimeDeliveries / totalDeliveries) * 100) : 0
 
   return {
     pendingReceipts,
@@ -131,122 +129,136 @@ export const getConsolidatedDashboard = async () => {
     totalCost,
     vehiclesAvailable,
     vehiclesInOp,
+    stuckOrders,
+    bottlenecks,
+    serviceLevel,
+    avgLeadTime,
+    onTimeInFull,
   }
 }
 
-export const getLogisticsExceptions = async (): Promise<LogisticsException[]> => {
-  const [deliveries, wmsSeparations, wmsAlerts, occurrences, wmsReceipts, journeys] =
-    await Promise.all([
-      pb
-        .collection('logistics_deliveries')
-        .getFullList()
-        .catch(() => []),
-      pb
-        .collection('wms_separations')
-        .getFullList()
-        .catch(() => []),
-      pb
-        .collection('wms_operational_alerts')
-        .getFullList({ filter: 'resolved=false' })
-        .catch(() => []),
-      pb
-        .collection('logistics_occurrences')
-        .getFullList({ filter: 'situacao != "Resolvida" && situacao != "Cancelada"' })
-        .catch(() => []),
-      pb
-        .collection('wms_receipts')
-        .getFullList({ filter: 'status = "Com Divergência"' })
-        .catch(() => []),
-      pb
-        .collection('transport_journeys')
-        .getFullList({ filter: 'status = "Com Ocorrência"' })
-        .catch(() => []),
-    ])
-
+export async function getLogisticsExceptions(): Promise<LogisticsException[]> {
   const exceptions: LogisticsException[] = []
   const today = new Date().toISOString().split('T')[0]
 
-  deliveries.forEach((d: any) => {
-    if (
-      d.status !== 'Entregue' &&
-      d.status !== 'Cancelada' &&
-      d.data_prevista &&
-      d.data_prevista < today
-    ) {
+  const [deliveries, occurrences, receipts, separations, shippings, journeys, alerts] =
+    await Promise.all([
+      getDeliveries().catch(() => []),
+      getOccurrences().catch(() => []),
+      getWmsReceipts().catch(() => []),
+      getWmsSeparations().catch(() => []),
+      getWmsShippings().catch(() => []),
+      getJourneys().catch(() => []),
+      getWmsOperationalAlerts().catch(() => []),
+    ])
+
+  const delArr = deliveries as any[]
+  const occArr = occurrences as any[]
+  const recArr = receipts as any[]
+  const sepArr = separations as any[]
+  const shipArr = shippings as any[]
+  const jouArr = journeys as any[]
+  const alertArr = alerts as any[]
+
+  delArr.forEach((d) => {
+    if (['Entregue', 'Cancelada'].includes(d.status)) return
+    if (d.data_prevista && d.data_prevista < today) {
       exceptions.push({
-        id: `del-${d.id}`,
+        id: `delay-${d.id}`,
         type: 'Entrega Atrasada',
-        module: 'Transporte',
+        description: `${d.numero_entrega || d.pedido || ''} — ${d.cliente || ''} (${d.cidade || ''})`,
         severity: 'Alta',
-        description: `Entrega ${d.numero_entrega} para ${d.cliente} está atrasada`,
-        entity: d.numero_entrega,
-        status: 'Aberta',
-        created: d.created,
+        module: 'Transporte',
+        entity: d.numero_entrega || d.id,
+        created: d.created || today,
       })
     }
   })
-  wmsSeparations.forEach((s: any) => {
+
+  occArr.forEach((o) => {
+    if (['Aberta', 'Em Análise'].includes(o.situacao)) {
+      exceptions.push({
+        id: `occ-${o.id}`,
+        type: o.tipo_ocorrencia || 'Ocorrência',
+        description: `${o.descricao || ''} — ${o.cliente || ''}`,
+        severity: o.situacao === 'Aberta' ? 'Alta' : 'Média',
+        module: 'Transporte',
+        entity: o.entrega || o.id,
+        created: o.created || today,
+      })
+    }
+  })
+
+  recArr.forEach((r) => {
+    if (r.status === 'Pendente') {
+      exceptions.push({
+        id: `receipt-${r.id}`,
+        type: 'Recebimento Pendente',
+        description: `${r.numero_recebimento || ''} — ${r.fornecedor || ''}`,
+        severity: 'Média',
+        module: 'WMS',
+        entity: r.numero_recebimento || r.id,
+        created: r.created || today,
+      })
+    }
+  })
+
+  sepArr.forEach((s) => {
     if (s.status === 'Aguardando Separação') {
       exceptions.push({
         id: `sep-${s.id}`,
         type: 'Separação Pendente',
-        module: 'WMS',
+        description: `${s.numero_separacao || ''} — ${s.cliente || ''} (${s.produto_nome || ''})`,
         severity: 'Média',
-        description: `Separação ${s.numero_separacao} aguardando execução`,
-        entity: s.numero_separacao,
-        status: 'Aberta',
-        created: s.created,
+        module: 'WMS',
+        entity: s.numero_separacao || s.id,
+        created: s.created || today,
       })
     }
   })
-  wmsAlerts.forEach((a: any) => {
-    exceptions.push({
-      id: `wms-${a.id}`,
-      type: a.tipo || 'Alerta WMS',
-      module: 'WMS',
-      severity: a.severidade || 'Média',
-      description: a.mensagem || 'Alerta operacional WMS',
-      entity: a.produto_nome || '—',
-      status: 'Aberta',
-      created: a.created,
-    })
-  })
-  occurrences.forEach((o: any) => {
-    exceptions.push({
-      id: `occ-${o.id}`,
-      type: o.tipo_ocorrencia || 'Ocorrência de Transporte',
-      module: 'Transporte',
-      severity: 'Alta',
-      description: o.descricao || `Ocorrência na entrega ${o.entrega}`,
-      entity: o.entrega || '—',
-      status: o.situacao || 'Aberta',
-      created: o.created,
-    })
-  })
-  wmsReceipts.forEach((r: any) => {
-    exceptions.push({
-      id: `rcv-${r.id}`,
-      type: 'Divergência no Recebimento',
-      module: 'WMS',
-      severity: 'Média',
-      description: `Recebimento ${r.numero_recebimento} com divergência`,
-      entity: r.numero_recebimento,
-      status: 'Aberta',
-      created: r.created,
-    })
-  })
-  journeys.forEach((j: any) => {
-    exceptions.push({
-      id: `jrn-${j.id}`,
-      type: 'Viagem com Ocorrência',
-      module: 'Transporte',
-      severity: 'Alta',
-      description: `Viagem ${j.numero_viagem} registrou ocorrência`,
-      entity: j.numero_viagem,
-      status: 'Aberta',
-      created: j.created,
-    })
+
+  shipArr.forEach((s) => {
+    if (s.status === 'Aguardando Expedição') {
+      exceptions.push({
+        id: `ship-${s.id}`,
+        type: 'Expedição Pendente',
+        description: `${s.numero_expedicao || ''} — ${s.cliente || ''}`,
+        severity: 'Média',
+        module: 'WMS',
+        entity: s.numero_expedicao || s.id,
+        created: s.created || today,
+      })
+    }
   })
 
-  return exceptions.sort((a, b) => (a.created < b.created ? 1 : -1))
+  alertArr.forEach((a) => {
+    if (!a.resolved) {
+      exceptions.push({
+        id: `alert-${a.id}`,
+        type: a.tipo || 'Alerta Operacional',
+        description: a.descricao || a.mensagem || '',
+        severity: a.severity || 'Média',
+        module: 'WMS',
+        entity: a.id,
+        created: a.created || today,
+      })
+    }
+  })
+
+  jouArr.forEach((j) => {
+    if (j.status === 'Com Ocorrência') {
+      exceptions.push({
+        id: `journey-${j.id}`,
+        type: 'Viagem com Ocorrência',
+        description: `${j.numero_viagem} — ${j.rota || ''} (${j.origem || ''} → ${j.destino || ''})`,
+        severity: 'Alta',
+        module: 'Transporte',
+        entity: j.numero_viagem,
+        created: j.created || today,
+      })
+    }
+  })
+
+  const sevOrder: Record<string, number> = { Crítica: 0, Alta: 1, Média: 2, Baixa: 3 }
+  return exceptions.sort((a, b) => (sevOrder[a.severity] ?? 4) - (sevOrder[b.severity] ?? 4))
 }

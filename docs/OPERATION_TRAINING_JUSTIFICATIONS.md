@@ -112,7 +112,55 @@ O campo `origem` identifica de onde veio a ação:
 
 ---
 
-## 5. Contato
+## 5. Validação de Auditoria — Verificação Server-Side
+
+A exigência de justificativa é **imutável e enforcementada no servidor** (PocketBase hooks). Não pode ser bypassada por manipulação de request.
+
+### Hooks que enforcementam justificativa
+
+| Hook                               | Collection              | Ação                       | Enforcement                                  |
+| ---------------------------------- | ----------------------- | -------------------------- | -------------------------------------------- |
+| `network_link_guard.js`            | `partners`              | Vínculo/desvínculo de Rede | `e.badRequestError()` se justificativa vazia |
+| `network_audit_create.js`          | `client_networks`       | Criação de Rede            | Registra justificativa em `audit_logs`       |
+| `network_audit_update.js`          | `client_networks`       | Atualização de Rede        | Registra alterações + justificativa          |
+| `network_restriction_propagate.js` | `partners`              | Restrição por Grupo        | Propaga restrição + justificativa            |
+| `network_release_evaluate.js`      | `financial_receivables` | Liberação automática       | Justificativa automática preenchida          |
+
+### Campos obrigatórios em `audit_logs` para ações de Rede
+
+| Campo               | Descrição                      | Sempre preenchido?               |
+| ------------------- | ------------------------------ | -------------------------------- |
+| `user_id`           | ID do usuário autenticado      | Sim                              |
+| `user_name`         | Nome do usuário                | Sim                              |
+| `user_role`         | Perfil (SUP, FINANCEIRO, etc.) | Sim                              |
+| `action`            | Tipo da ação                   | Sim                              |
+| `module`            | Módulo de origem               | Sim                              |
+| `target_collection` | Collection afetada             | Sim                              |
+| `target_id`         | ID do registro                 | Sim                              |
+| `target_summary`    | Nome/resumo                    | Sim                              |
+| `justification`     | Justificativa do usuário       | Sim — enforcementado server-side |
+| `criticidade`       | Baixa/Média/Alta/Crítica       | Sim                              |
+| `origem`            | Área da Empresa / Automação    | Sim                              |
+| `created`           | Timestamp                      | Sim (autodate)                   |
+
+### Tentativa de bypass
+
+Se um usuário tentar manipular o request para remover a justificativa:
+
+1. O hook `network_link_guard.js` intercepta a requisição **antes** de salvar
+2. Retorna HTTP 400: `"Justificativa é obrigatória para vincular/desvincular cliente a uma Rede/Grupo Econômico"`
+3. Nenhum registro é criado ou alterado
+4. Nenhuma entrada de auditoria é gerada (pois a ação foi bloqueada)
+
+Se o usuário não tiver permissão adequada:
+
+1. O hook verifica o perfil via `system_parameters`
+2. Retorna HTTP 403: `"Sem permissão para vincular/desvincular cliente a uma Rede/Grupo Econômico"`
+3. Uma entrada de auditoria **é** gerada com `is_suspicious: true` e `criticidade: "Alta"`
+
+---
+
+## 6. Contato
 
 Em caso de dúvidas sobre este documento ou sobre os fluxos de Rede/Grupo Econômico e Restrição de Crédito, contate a equipe de Cadastros ou Financeiro.
 

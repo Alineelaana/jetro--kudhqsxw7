@@ -28,6 +28,11 @@ interface KpiData {
   totalCost: number
   vehiclesAvailable: number
   vehiclesInOp: number
+  stuckOrders: number
+  bottlenecks: number
+  serviceLevel: number
+  avgLeadTime: number
+  onTimeInFull: number
 }
 
 export function LogisticsOrchestrationDashboard() {
@@ -104,6 +109,36 @@ export function LogisticsOrchestrationDashboard() {
       color: 'text-orange-600',
     },
     { label: 'Alertas WMS', value: kpi.wmsAlertsCount, icon: AlertTriangle, color: 'text-red-700' },
+    {
+      label: 'Pedidos Parados',
+      value: kpi.stuckOrders,
+      icon: AlertTriangle,
+      color: 'text-red-800',
+    },
+    {
+      label: 'Gargalos Identificados',
+      value: kpi.bottlenecks,
+      icon: AlertTriangle,
+      color: 'text-orange-700',
+    },
+    {
+      label: 'Nível de Serviço',
+      value: `${kpi.serviceLevel}%`,
+      icon: CheckCircle,
+      color: 'text-emerald-700',
+    },
+    {
+      label: 'Lead Time Médio (dias)',
+      value: kpi.avgLeadTime.toFixed(1),
+      icon: Clock,
+      color: 'text-blue-700',
+    },
+    {
+      label: 'OTIF',
+      value: `${kpi.onTimeInFull}%`,
+      icon: CheckCircle,
+      color: 'text-emerald-800',
+    },
     {
       label: 'Custo Total Logístico',
       value: fmtCurrency(kpi.totalCost),
