@@ -82,3 +82,12 @@ export function canExportAiInfo(role: string | undefined): boolean {
 export function canChangeAiSettings(role: string | undefined): boolean {
   return role === 'SUP'
 }
+
+export function canViewAdaptaGovernance(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+export function canEditAdaptaGovernance(role: string | undefined): boolean {
+  return role === 'SUP'
+}

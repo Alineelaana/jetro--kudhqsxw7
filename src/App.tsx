@@ -59,6 +59,7 @@ import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
 import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
+import AdaptaGovernance from './pages/AdaptaGovernance'
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
 import PlatformLayer from './pages/PlatformLayer'
@@ -591,6 +592,7 @@ const App = () => (
                           path="/admin/ia/configuracoes"
                           element={<AIModule screen="settings" />}
                         />
+                        <Route path="/admin/governanca-adapta" element={<AdaptaGovernance />} />
                         <Route path="/admin/industria" element={<Industry screen="dashboard" />} />
                         <Route
                           path="/admin/industria/catalogo"

@@ -599,6 +599,7 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Histórico', route: '/admin/ia/historico' },
           { label: 'Aprovações', route: '/admin/ia/aprovacoes' },
           { label: 'Configurações', route: '/admin/ia/configuracoes' },
+          { label: 'Governança da ADAPTA', route: '/admin/governanca-adapta' },
         ],
       },
       {
