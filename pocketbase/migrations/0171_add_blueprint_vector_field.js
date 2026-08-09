@@ -1,19 +1,11 @@
 migrate(
   (app) => {
-    var col = app.findCollectionByNameOrId('blueprint_chunks')
-    if (!col.fields.getByName('embedding')) {
-      col.fields.add(new VectorField({ name: 'embedding', dimensions: 1536, distance: 'cosine' }))
-      app.save(col)
-    }
-    console.log('BLUEPRINT-0171: vector field added to blueprint_chunks')
+    // Stage 1: No vector field, no embedding, no semantic search.
+    // blueprint_chunks must remain inert per acceptance criteria.
+    // This migration is intentionally a no-op.
+    console.log('BLUEPRINT-0171: Stage 1 — no vector field, blueprint_chunks remains inert')
   },
   (app) => {
-    try {
-      var col = app.findCollectionByNameOrId('blueprint_chunks')
-      if (col.fields.getByName('embedding')) {
-        col.fields.remove('embedding')
-        app.save(col)
-      }
-    } catch (e) {}
+    // No-op: nothing was created, nothing to revert.
   },
 )
