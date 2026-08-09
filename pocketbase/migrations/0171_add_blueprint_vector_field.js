@@ -1,7 +1,7 @@
 migrate(
   (app) => {
-    if (app.hasTable('blueprint_chunks')) {
-      var col = app.findCollectionByNameOrId('blueprint_chunks')
+    try {
+      var col = app.findCollectionByNameOrId('blueprint_chapters')
       if (!col.fields.getByName('embedding')) {
         col.fields.add(
           new VectorField({
@@ -12,15 +12,33 @@ migrate(
         )
         app.save(col)
       }
-    }
+    } catch (_) {}
+
+    try {
+      var volCol = app.findCollectionByNameOrId('blueprint_volumes')
+      if (!volCol.fields.getByName('embedding')) {
+        volCol.fields.add(
+          new VectorField({
+            name: 'embedding',
+            dimensions: 1536,
+            distance: 'cosine',
+          }),
+        )
+        app.save(volCol)
+      }
+    } catch (_) {}
   },
   (app) => {
-    if (app.hasTable('blueprint_chunks')) {
-      var col = app.findCollectionByNameOrId('blueprint_chunks')
-      if (col.fields.getByName('embedding')) {
-        col.fields.removeByName('embedding')
-        app.save(col)
-      }
+    var colNames = ['blueprint_chapters', 'blueprint_volumes']
+    for (var i = 0; i < colNames.length; i++) {
+      try {
+        var col = app.findCollectionByNameOrId(colNames[i])
+        var field = col.fields.getByName('embedding')
+        if (field) {
+          col.fields.remove(field.id)
+          app.save(col)
+        }
+      } catch (_) {}
     }
   },
 )

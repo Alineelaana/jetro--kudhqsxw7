@@ -1,38 +1,48 @@
-/*
- * Migration 0172 — NO-OP (Neutralized)
- *
- * Original name: 0172_stage1_correct_collections.js
- * Original purpose: Add `embedding` (vector) and `chunk_text` fields
- *   to the `blueprint_chapters` collection.
- *
- * Architectural incompatibility:
- *   The approved frozen architecture (migration 0169) designates
- *   `blueprint_chunks` as the exclusive collection for vector embeddings
- *   and semantic search content. Adding an `embedding` vector field to
- *   `blueprint_chapters` violates the separation of concerns between
- *   canonical content storage (`blueprint_chapters`) and chunked
- *   embedding storage (`blueprint_chunks`).
- *
- * Key architectural rule:
- *   Embeddings belong EXCLUSIVELY to the `blueprint_chunks` collection.
- *   The `blueprint_chapters` collection holds canonical content only.
- *
- * Reason for neutralization:
- *   Running this migration would introduce a vector field on the wrong
- *   collection, creating architectural divergence from the approved
- *   Phase 1 design. The migration has been converted to a no-op to
- *   preserve schema integrity.
- *
- * Date of neutralization: 2026-08-09
- * Responsible technical party: Technical Lead — Blueprint Migration Chain
- */
 migrate(
   (app) => {
-    // No-op: intentionally left empty.
-    // Embeddings belong exclusively to blueprint_chunks, not blueprint_chapters.
+    try {
+      app.findCollectionByNameOrId('blueprint_volumes')
+    } catch (_) {
+      var volCol = new Collection({
+        name: 'blueprint_volumes',
+        type: 'base',
+        listRule: "@request.auth.id != ''",
+        viewRule: "@request.auth.id != ''",
+        createRule: "@request.auth.id != ''",
+        updateRule: "@request.auth.id != ''",
+        deleteRule: "@request.auth.id != ''",
+        fields: [
+          { name: 'name', type: 'text', required: true },
+          { name: 'description', type: 'text' },
+          { name: 'chapter', type: 'text' },
+          { name: 'metric_name', type: 'text' },
+          { name: 'target_value', type: 'text' },
+          { name: 'current_value', type: 'text' },
+          { name: 'unit', type: 'text' },
+          { name: 'period', type: 'text' },
+          { name: 'category', type: 'text' },
+          { name: 'sort_order', type: 'number' },
+          { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+          { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+        ],
+      })
+      app.save(volCol)
+    }
+
+    var colsToCheck = ['blueprint_chapters', 'blueprint_versions']
+    for (var i = 0; i < colsToCheck.length; i++) {
+      try {
+        var col = app.findCollectionByNameOrId(colsToCheck[i])
+        if (!col.fields.getByName('status')) {
+          col.fields.add(new TextField({ name: 'status' }))
+          app.save(col)
+        }
+        if (!col.fields.getByName('sort_order')) {
+          col.fields.add(new NumberField({ name: 'sort_order' }))
+          app.save(col)
+        }
+      } catch (_) {}
+    }
   },
-  (app) => {
-    // No-op: intentionally left empty.
-    // No revert logic needed — nothing was ever applied.
-  },
+  (app) => {},
 )
