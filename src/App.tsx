@@ -1091,6 +1091,10 @@ const App = () => (
                           element={<MarketingEnterprise screen="library" />}
                         />
                         <Route
+                          path="/admin/marketing/templates"
+                          element={<MarketingEnterprise screen="templates" />}
+                        />
+                        <Route
                           path="/admin/trade-marketing"
                           element={<TradeMarketing screen="dashboard" />}
                         />

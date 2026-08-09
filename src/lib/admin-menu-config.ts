@@ -159,6 +159,7 @@ export const ADMIN_MENU: MenuGroup[] = [
           { label: 'Atribuição', route: '/admin/marketing/atribuicao' },
           { label: 'Brand', route: '/admin/marketing/brand' },
           { label: 'Biblioteca', route: '/admin/marketing/biblioteca' },
+          { label: 'Templates', route: '/admin/marketing/templates' },
           { label: 'Trade Marketing', route: '/admin/trade-marketing' },
         ],
       },

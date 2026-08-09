@@ -20,9 +20,14 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Loader2, Plus, Search, Megaphone } from 'lucide-react'
-import { getMkRequests, createMkRequest, updateMkRequest } from '@/services/marketing'
+import {
+  getMkRequests,
+  createMkRequest,
+  updateMkRequest,
+  getMkBriefingTemplates,
+} from '@/services/marketing'
 import { MK_REQUEST_TYPES, MK_REQUEST_STATUS, MK_STATUS_COLORS } from '@/lib/marketing-types'
-import type { MkRequest } from '@/lib/marketing-types'
+import type { MkRequest, MkBriefingTemplate } from '@/lib/marketing-types'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { cn } from '@/lib/utils'
@@ -46,6 +51,27 @@ export function MarketingRequestCenter() {
     channel: '',
   })
   const [saving, setSaving] = useState(false)
+  const [templates, setTemplates] = useState<MkBriefingTemplate[]>([])
+
+  useEffect(() => {
+    getMkBriefingTemplates()
+      .then((t) => setTemplates(t.filter((tpl) => tpl.active)))
+      .catch(() => setTemplates([]))
+  }, [])
+
+  const applyTemplate = (templateId: string) => {
+    const tpl = templates.find((t) => t.id === templateId)
+    if (!tpl) return
+    setForm((prev) => ({
+      ...prev,
+      type: tpl.type || prev.type,
+      objective: tpl.objective || '',
+      briefing: tpl.message || '',
+      audience: tpl.audience || '',
+      channel: tpl.channel || '',
+      budget: tpl.budget || '',
+    }))
+  }
 
   const load = useCallback(async () => {
     try {
@@ -162,6 +188,23 @@ export function MarketingRequestCenter() {
             <DialogTitle className="text-[#005B2E]">Nova Solicitação de Marketing</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            {templates.length > 0 && (
+              <div>
+                <Label>Template de Briefing</Label>
+                <Select onValueChange={applyTemplate}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecionar template..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div>
               <Label>Título *</Label>
               <Input

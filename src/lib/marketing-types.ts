@@ -195,6 +195,8 @@ export interface MkContentPiece {
   approver_name: string
   approved_at: string
   published_at: string
+  rejection_reason: string
+  description: string
   created: string
   updated: string
 }
@@ -248,4 +250,27 @@ export interface MkResultAttribution {
   attribution_method: string
   period: string
   created: string
+}
+
+export interface MkBriefingTemplate {
+  id: string
+  name: string
+  type: string
+  objective: string
+  audience: string
+  message: string
+  product: string
+  brand: string
+  campaign: string
+  channel: string
+  region: string
+  period: string
+  budget: string
+  deliverables: string[]
+  references: string[]
+  restrictions: string
+  approvers: string[]
+  active: boolean
+  created: string
+  updated: string
 }

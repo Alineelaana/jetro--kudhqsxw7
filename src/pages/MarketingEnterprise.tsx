@@ -16,6 +16,7 @@ import { MarketingCockpit } from '@/components/marketing/marketing-cockpit'
 import { MarketingEditorialCalendar } from '@/components/marketing/marketing-editorial-calendar'
 import { MarketingLibrary } from '@/components/marketing/marketing-library'
 import { MarketingAttribution } from '@/components/marketing/marketing-attribution'
+import { MarketingBriefingTemplates } from '@/components/marketing/marketing-briefing-templates'
 
 const TABS = [
   { id: 'cockpit', label: 'Cockpit' },
@@ -27,6 +28,7 @@ const TABS = [
   { id: 'attribution', label: 'Atribuição' },
   { id: 'brand', label: 'Brand' },
   { id: 'library', label: 'Biblioteca' },
+  { id: 'templates', label: 'Templates' },
 ]
 
 interface MarketingEnterpriseProps {
@@ -65,6 +67,8 @@ export default function MarketingEnterprise({ screen = 'cockpit' }: MarketingEnt
         return <MarketingBrand />
       case 'library':
         return <MarketingLibrary />
+      case 'templates':
+        return <MarketingBriefingTemplates />
       default:
         return <MarketingCockpit />
     }

@@ -6,6 +6,7 @@ import type {
   MkMediaCampaign,
   MkBrandAsset,
   MkResultAttribution,
+  MkBriefingTemplate,
 } from '@/lib/marketing-types'
 
 function genNumber(prefix: string): string {
@@ -137,8 +138,24 @@ export async function getMkList(
 ): Promise<Record<string, unknown>[]> {
   return pb.collection(collection).getFullList({ sort: '-created', filter })
 }
-export async function getMkBriefingTemplates(): Promise<Record<string, unknown>[]> {
-  return pb.collection('mk_briefing_templates').getFullList({ filter: 'active = true' })
+export async function getMkBriefingTemplates(): Promise<MkBriefingTemplate[]> {
+  return pb.collection('mk_briefing_templates').getFullList({ sort: '-created' }) as Promise<
+    MkBriefingTemplate[]
+  >
+}
+export async function createMkBriefingTemplate(
+  data: Record<string, unknown>,
+): Promise<MkBriefingTemplate> {
+  return pb.collection('mk_briefing_templates').create(data) as Promise<MkBriefingTemplate>
+}
+export async function updateMkBriefingTemplate(
+  id: string,
+  data: Record<string, unknown>,
+): Promise<MkBriefingTemplate> {
+  return pb.collection('mk_briefing_templates').update(id, data) as Promise<MkBriefingTemplate>
+}
+export async function deleteMkBriefingTemplate(id: string): Promise<void> {
+  await pb.collection('mk_briefing_templates').delete(id)
 }
 
 export async function getMkSocialPosts(filter?: string): Promise<Record<string, unknown>[]> {
