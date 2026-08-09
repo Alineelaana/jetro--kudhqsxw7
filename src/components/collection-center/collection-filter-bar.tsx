@@ -256,6 +256,7 @@ export function CollectionFilterBar({
           {renderText('Dias Mín.', 'dias_atraso_min', 'number')}
           {renderText('Dias Máx.', 'dias_atraso_max', 'number')}
           {renderText('Valor Mín.', 'valor_min', 'number')}
+          {renderSelect('Rede', 'rede', filterOptions.redes)}
           {renderText('Valor Máx.', 'valor_max', 'number')}
         </div>
       )}

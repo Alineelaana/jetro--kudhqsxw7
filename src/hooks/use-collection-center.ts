@@ -17,6 +17,7 @@ import {
   type FilterOptions,
 } from '@/lib/collection-center-types'
 import { loadVendedoresForFilter, loadPartnersMap } from '@/services/collection-center-filters'
+import { loadNetworksMap } from '@/services/client-networks'
 
 export function useCollectionCenter() {
   const [receivables, setReceivables] = useState<any[]>([])
@@ -29,21 +30,24 @@ export function useCollectionCenter() {
   const [priorizacaoRules, setPriorizacaoRules] = useState<PriorizacaoRule[]>([])
   const [partnersMap, setPartnersMap] = useState<Record<string, any>>({})
   const [vendedoresMap, setVendedoresMap] = useState<Record<string, any>>({})
+  const [networksMap, setNetworksMap] = useState<Record<string, string>>({})
   const { mergeFilter } = useOrgFilter()
 
   const loadData = useCallback(async () => {
     try {
       const orgFilter = mergeFilter()
-      const [recs, cols, pMap, vMap] = await Promise.all([
+      const [recs, cols, pMap, vMap, nMap] = await Promise.all([
         getOverdueReceivables(orgFilter || undefined),
         getCollectionRecords(),
         loadPartnersMap(),
         loadVendedoresForFilter(),
+        loadNetworksMap(),
       ])
       setReceivables(recs)
       setCollections(cols)
       setPartnersMap(pMap)
       setVendedoresMap(vMap)
+      setNetworksMap(nMap)
     } catch {
       setReceivables([])
       setCollections([])
@@ -95,6 +99,33 @@ export function useCollectionCenter() {
       if (!grouped[key]) grouped[key] = []
       grouped[key].push(r)
     }
+    const netMembers: Record<string, string[]> = {}
+    const netOverdue: Record<string, number> = {}
+    const netRestricted: Record<string, number> = {}
+    const netRegular: Record<string, number> = {}
+    for (const [cn, p] of Object.entries(partnersMap)) {
+      const nid = (p as any)?.network_id
+      if (!nid) continue
+      if (!netMembers[nid]) {
+        netMembers[nid] = []
+        netOverdue[nid] = 0
+        netRestricted[nid] = 0
+        netRegular[nid] = 0
+      }
+      netMembers[nid].push(cn)
+      if ((p as any)?.financial_restriction) netRestricted[nid]++
+      else netRegular[nid]++
+    }
+    for (const [cliente, recs] of Object.entries(grouped)) {
+      const p = partnersMap[cliente.toLowerCase()]
+      const nid = p?.network_id
+      if (!nid) continue
+      for (const r of recs) {
+        if (computeAgingDays(r.data_vencimento) > 0) {
+          netOverdue[nid] = (netOverdue[nid] || 0) + computeSaldo(r)
+        }
+      }
+    }
     let items = Object.entries(grouped).map(([cliente, recs]) => {
       const col = collections.find((c) => c.cliente === cliente) || null
       const partner = partnersMap[cliente.toLowerCase()] || null
@@ -132,6 +163,16 @@ export function useCollectionCenter() {
         supervisor: vendedorRecord?.supervisor || '',
         cnpj_cpf: partner?.cnpj || partner?.cpf || '',
         cobrador: (col as any)?.responsavel_cobranca || '',
+        networkId: partner?.network_id || '',
+        networkName: networksMap[partner?.network_id || ''] || '',
+        networkOverdueTotal: partner?.network_id ? netOverdue[partner.network_id] || 0 : 0,
+        networkRestrictedCount: partner?.network_id ? netRestricted[partner.network_id] || 0 : 0,
+        networkRegularCount: partner?.network_id ? netRegular[partner.network_id] || 0 : 0,
+        networkRestrictionStatus: partner?.network_restriction_source || '',
+        networkRestrictionOriginName: partner?.network_restriction_origin_name || '',
+        networkRestrictionOriginCnpj: partner?.network_restriction_origin_cnpj || '',
+        networkRestrictionOriginAmount: partner?.network_restriction_origin_amount || '',
+        networkRestrictionOriginDays: partner?.network_restriction_origin_days || '',
       }
     })
 
@@ -230,6 +271,7 @@ export function useCollectionCenter() {
     }
     if (filters.status)
       items = items.filter((i) => i.receivables.some((r) => r.status === filters.status))
+    if (filters.rede) items = items.filter((i) => i.networkId === filters.rede)
     if (filters.cardFilter) {
       const cf = filters.cardFilter
       if (cf === 'promessas_hoje')
@@ -309,7 +351,16 @@ export function useCollectionCenter() {
       }
     })
     return items
-  }, [receivables, collections, filters, sortBy, priorizacaoRules, partnersMap, vendedoresMap])
+  }, [
+    receivables,
+    collections,
+    filters,
+    sortBy,
+    priorizacaoRules,
+    partnersMap,
+    vendedoresMap,
+    networksMap,
+  ])
 
   const stats = useMemo<ExecutiveStats>(() => {
     const today = new Date().toISOString().split('T')[0]
@@ -357,7 +408,9 @@ export function useCollectionCenter() {
     const ufs = new Set<string>()
     const cobradores = new Set<string>()
     const statuses = new Set<string>()
+    const redes = new Map<string, string>()
     for (const item of queueItems) {
+      if (item.networkId && item.networkName) redes.set(item.networkId, item.networkName)
       if (item.vendedor) vendedores.add(item.vendedor)
       if (item.gerente) gerentes.add(item.gerente)
       if (item.supervisor) supervisores.add(item.supervisor)
@@ -378,6 +431,9 @@ export function useCollectionCenter() {
       ufs: [...ufs].sort(),
       cobradores: [...cobradores].sort(),
       statuses: [...statuses].sort(),
+      redes: [...redes.entries()]
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     }
   }, [queueItems])
 

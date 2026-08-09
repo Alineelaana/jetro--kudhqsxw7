@@ -13,7 +13,8 @@ import {
   formatCurrency,
   type QueueItem,
 } from '@/lib/collection-center-types'
-import { Info, Phone, Mail, User, Building2 } from 'lucide-react'
+import { Info, Phone, Mail, User, Building2, Network } from 'lucide-react'
+import { CollectionRestrictionCause } from './collection-restriction-cause'
 import { cn } from '@/lib/utils'
 
 export function CollectionClientPanel({
@@ -143,6 +144,16 @@ export function CollectionClientPanel({
             )}
         </CardContent>
       </Card>
+
+      {client.networkRestrictionStatus && (
+        <CollectionRestrictionCause
+          networkName={client.networkName}
+          originName={client.networkRestrictionOriginName}
+          originCnpj={client.networkRestrictionOriginCnpj}
+          overdueAmount={client.networkRestrictionOriginAmount}
+          overdueDays={client.networkRestrictionOriginDays}
+        />
+      )}
 
       <Card className="border-2 border-[#005B2E]/20 shadow-md overflow-hidden">
         <div className="bg-[#01361D] text-white px-3 py-2 text-xs font-bold">

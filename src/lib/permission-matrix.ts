@@ -100,6 +100,14 @@ import {
   canCancelDeliveries,
   canExportLogisticsInfo,
 } from '@/lib/logistics-permissions'
+import {
+  canViewNetworks,
+  canCreateNetwork,
+  canLinkClientNetwork,
+  canUnlinkClientNetwork,
+  canEditNetwork,
+  canManageNetworkCreditPolicy,
+} from '@/lib/network-permissions'
 export const PROFILES = ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'] as const
 
 export interface MatrixScreen {
@@ -785,6 +793,54 @@ export const MATRIX_SCREENS: MatrixScreen[] = [
     label: 'Industrial - Visão Executiva',
     category: 'Industrial',
     view: canViewExecutiveDashboard,
+    scope: 'EMPRESA',
+  },
+  {
+    key: 'network_view',
+    label: 'Redes - Visualizar',
+    category: 'Financeiro',
+    view: canViewNetworks,
+    scope: 'EMPRESA',
+  },
+  {
+    key: 'network_create',
+    label: 'Redes - Criar',
+    category: 'Financeiro',
+    view: canViewNetworks,
+    create: canCreateNetwork,
+    scope: 'EMPRESA',
+  },
+  {
+    key: 'network_link',
+    label: 'Redes - Vincular Cliente',
+    category: 'Financeiro',
+    view: canViewNetworks,
+    edit: canLinkClientNetwork,
+    scope: 'EMPRESA',
+  },
+  {
+    key: 'network_unlink',
+    label: 'Redes - Desvincular Cliente',
+    category: 'Financeiro',
+    view: canViewNetworks,
+    edit: canUnlinkClientNetwork,
+    scope: 'EMPRESA',
+  },
+  {
+    key: 'network_edit',
+    label: 'Redes - Alterar',
+    category: 'Financeiro',
+    view: canViewNetworks,
+    create: canCreateNetwork,
+    edit: canEditNetwork,
+    scope: 'EMPRESA',
+  },
+  {
+    key: 'network_credit_policy',
+    label: 'Redes - Administrar Política de Crédito',
+    category: 'Financeiro',
+    view: canViewNetworks,
+    edit: canManageNetworkCreditPolicy,
     scope: 'EMPRESA',
   },
 ]

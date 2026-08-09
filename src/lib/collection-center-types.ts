@@ -114,6 +114,16 @@ export interface QueueItem {
   supervisor: string
   cnpj_cpf: string
   cobrador: string
+  networkId: string
+  networkName: string
+  networkOverdueTotal: number
+  networkRestrictedCount: number
+  networkRegularCount: number
+  networkRestrictionStatus: string
+  networkRestrictionOriginName: string
+  networkRestrictionOriginCnpj: string
+  networkRestrictionOriginAmount: string
+  networkRestrictionOriginDays: string
 }
 
 export interface FilterOptions {
@@ -125,6 +135,7 @@ export interface FilterOptions {
   ufs: string[]
   cobradores: string[]
   statuses: string[]
+  redes: { value: string; label: string }[]
 }
 
 export interface AlcadaProfile {

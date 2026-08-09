@@ -15,7 +15,7 @@ import {
   formatCurrency,
   type QueueItem,
 } from '@/lib/collection-center-types'
-import { Search } from 'lucide-react'
+import { Search, Network } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function CollectionQueue({
@@ -148,6 +148,20 @@ export function CollectionQueue({
                   </Badge>
                 )}
               </div>
+              {item.networkName && (
+                <div className="flex items-center gap-1 mt-0.5 text-[10px]">
+                  <Network className="w-3 h-3 text-[#005B2E]" />
+                  <span className="text-[#005B2E] font-medium">{item.networkName}</span>
+                  {item.networkRestrictionStatus && (
+                    <span className="text-red-600 font-bold">
+                      • {item.networkRestrictionStatus}
+                    </span>
+                  )}
+                  <span className="text-muted-foreground">
+                    • Rede: {formatCurrency(item.networkOverdueTotal)}
+                  </span>
+                </div>
+              )}
             </div>
           ))
         )}
