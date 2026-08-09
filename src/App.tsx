@@ -41,6 +41,7 @@ import StockPage from './pages/StockPage'
 import WmsScreen from './pages/WmsScreen'
 import Layout from './components/Layout'
 import Logistics from './pages/Logistics'
+import Transporte from './pages/Transporte'
 import Financial from './pages/Financial'
 import RH from './pages/RH'
 import Conformidade from './pages/Conformidade'
@@ -161,7 +162,7 @@ const App = () => (
                         />
                         <Route
                           path="/admin/logistica/planejamento"
-                          element={<Logistics screen="route_planning" />}
+                          element={<Logistics screen="orchestration_planning" />}
                         />
                         <Route
                           path="/admin/logistica/indicadores"
@@ -178,6 +179,82 @@ const App = () => (
                         <Route
                           path="/admin/logistica/relatorios"
                           element={<Logistics screen="reports" />}
+                        />
+                        <Route
+                          path="/admin/logistica/transferencias"
+                          element={<Logistics screen="transfers" />}
+                        />
+                        <Route
+                          path="/admin/logistica/coletas"
+                          element={<Logistics screen="collections" />}
+                        />
+                        <Route
+                          path="/admin/logistica/excecoes"
+                          element={<Logistics screen="exceptions" />}
+                        />
+                        <Route
+                          path="/admin/transporte"
+                          element={<Transporte screen="dashboard" />}
+                        />
+                        <Route
+                          path="/admin/transporte/cargas"
+                          element={<Transporte screen="load_building" />}
+                        />
+                        <Route
+                          path="/admin/transporte/roteirizacao"
+                          element={<Transporte screen="routing" />}
+                        />
+                        <Route
+                          path="/admin/transporte/viagens"
+                          element={<Transporte screen="journeys" />}
+                        />
+                        <Route
+                          path="/admin/transporte/rotas"
+                          element={<Transporte screen="routes" />}
+                        />
+                        <Route
+                          path="/admin/transporte/entregas"
+                          element={<Transporte screen="deliveries" />}
+                        />
+                        <Route
+                          path="/admin/transporte/veiculos"
+                          element={<Transporte screen="vehicles" />}
+                        />
+                        <Route
+                          path="/admin/transporte/motoristas"
+                          element={<Transporte screen="drivers" />}
+                        />
+                        <Route
+                          path="/admin/transporte/fretes"
+                          element={<Transporte screen="freights" />}
+                        />
+                        <Route
+                          path="/admin/transporte/tabelas-frete"
+                          element={<Transporte screen="freight_tables" />}
+                        />
+                        <Route
+                          path="/admin/transporte/rastreamento"
+                          element={<Transporte screen="tracking" />}
+                        />
+                        <Route
+                          path="/admin/transporte/ocorrencias"
+                          element={<Transporte screen="occurrences" />}
+                        />
+                        <Route
+                          path="/admin/transporte/comprovantes"
+                          element={<Transporte screen="proof" />}
+                        />
+                        <Route
+                          path="/admin/transporte/custos"
+                          element={<Transporte screen="costs" />}
+                        />
+                        <Route
+                          path="/admin/transporte/app-motorista"
+                          element={<Transporte screen="driver_app" />}
+                        />
+                        <Route
+                          path="/admin/transporte/relatorios"
+                          element={<Transporte screen="reports" />}
                         />
                         <Route path="/admin/vendas" element={<SalesDashboardPage />} />
                         <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />

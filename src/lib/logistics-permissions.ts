@@ -69,3 +69,39 @@ export function canExportLogisticsInfo(role: string | undefined): boolean {
   if (!role) return false
   return LOG_EXPORT_ROLES.includes(role)
 }
+export function canPlanLogistics(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_OPS_ROLES.includes(role)
+}
+export function canPrioritizeLogistics(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_OPS_ROLES.includes(role)
+}
+export function canTrackLogistics(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_BASE_ROLES.includes(role)
+}
+export function canManageExceptions(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_ADMIN_ROLES.includes(role)
+}
+export function canManageTransfers(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_ADMIN_ROLES.includes(role)
+}
+export function canManageCollections(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_ADMIN_ROLES.includes(role)
+}
+export function canApproveReverse(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_ADMIN_ROLES.includes(role)
+}
+export function canViewConsolidatedCosts(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_COST_ROLES.includes(role)
+}
+export function canExportLogisticsData(role: string | undefined): boolean {
+  if (!role) return false
+  return LOG_EXPORT_ROLES.includes(role)
+}

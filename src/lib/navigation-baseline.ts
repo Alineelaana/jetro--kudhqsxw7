@@ -22,6 +22,7 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
   { route: '/admin/promocoes', label: 'Promoções', group: 'Comercial', classification: 'A' },
   { route: '/admin/financeiro', label: 'Financeiro', group: 'Financeiro', classification: 'A' },
   { route: '/admin/logistica', label: 'Logística', group: 'Operação', classification: 'A' },
+  { route: '/admin/transporte', label: 'Transporte', group: 'Operação', classification: 'A' },
   { route: '/admin/estoque', label: 'Estoque', group: 'Operação', classification: 'A' },
   { route: '/admin/industria', label: 'Indústria', group: 'Operação', classification: 'A' },
   { route: '/admin/fiscal', label: 'Fiscal', group: 'Fiscal & RH', classification: 'A' },

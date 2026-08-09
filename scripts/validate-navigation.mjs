@@ -18,6 +18,7 @@ const STABLE_ROUTES = [
   '/admin/promocoes',
   '/admin/financeiro',
   '/admin/logistica',
+  '/admin/transporte',
   '/admin/estoque',
   '/admin/industria',
   '/admin/fiscal',

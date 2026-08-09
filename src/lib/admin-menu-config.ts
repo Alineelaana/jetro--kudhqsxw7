@@ -28,6 +28,7 @@ import {
   Handshake,
   Megaphone,
   CalendarClock,
+  Container,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -47,6 +48,7 @@ import {
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
+import { canViewTransporte } from '@/lib/transporte-permissions'
 import { canViewIndustry } from '@/lib/industrial-permissions'
 import { canViewCRM } from '@/lib/crm-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
@@ -229,22 +231,38 @@ export const ADMIN_MENU: MenuGroup[] = [
         route: '/admin/logistica',
         perm: canViewLogistics,
         children: [
-          { label: 'Rotas', route: '/admin/logistica/rotas' },
-          { label: 'Entregas', route: '/admin/logistica/entregas' },
-          { label: 'Veículos', route: '/admin/logistica/veiculos' },
-          { label: 'Motoristas', route: '/admin/logistica/motoristas' },
+          { label: 'Planejamento Logístico', route: '/admin/logistica/planejamento' },
           { label: 'Romaneios', route: '/admin/logistica/romaneios' },
-          { label: 'Fretes', route: '/admin/logistica/fretes' },
-          { label: 'Tabelas de Frete', route: '/admin/logistica/tabelas-frete' },
-          { label: 'Rastreamento', route: '/admin/logistica/rastreamento' },
-          { label: 'Ocorrências', route: '/admin/logistica/ocorrencias' },
-          { label: 'Comprovantes', route: '/admin/logistica/comprovantes' },
-          { label: 'Custos', route: '/admin/logistica/custos' },
-          { label: 'Planejamento', route: '/admin/logistica/planejamento' },
+          { label: 'Transferências', route: '/admin/logistica/transferencias' },
+          { label: 'Coletas', route: '/admin/logistica/coletas' },
+          { label: 'Devoluções/Reversa', route: '/admin/logistica/reversa' },
+          { label: 'Central de Exceções', route: '/admin/logistica/excecoes' },
           { label: 'Indicadores', route: '/admin/logistica/indicadores' },
-          { label: 'Logística Reversa', route: '/admin/logistica/reversa' },
-          { label: 'App Motorista', route: '/admin/logistica/app-motorista' },
           { label: 'Relatórios', route: '/admin/logistica/relatorios' },
+        ],
+      },
+      {
+        label: 'Transporte',
+        icon: Container,
+        route: '/admin/transporte',
+        perm: canViewTransporte,
+        children: [
+          { label: 'Dashboard', route: '/admin/transporte' },
+          { label: 'Formação de Cargas', route: '/admin/transporte/cargas' },
+          { label: 'Roteirização', route: '/admin/transporte/roteirizacao' },
+          { label: 'Viagens', route: '/admin/transporte/viagens' },
+          { label: 'Rotas', route: '/admin/transporte/rotas' },
+          { label: 'Entregas', route: '/admin/transporte/entregas' },
+          { label: 'Veículos', route: '/admin/transporte/veiculos' },
+          { label: 'Motoristas', route: '/admin/transporte/motoristas' },
+          { label: 'Fretes', route: '/admin/transporte/fretes' },
+          { label: 'Tabelas de Frete', route: '/admin/transporte/tabelas-frete' },
+          { label: 'Rastreamento', route: '/admin/transporte/rastreamento' },
+          { label: 'Ocorrências', route: '/admin/transporte/ocorrencias' },
+          { label: 'Comprovantes', route: '/admin/transporte/comprovantes' },
+          { label: 'Custos', route: '/admin/transporte/custos' },
+          { label: 'App Motorista', route: '/admin/transporte/app-motorista' },
+          { label: 'Relatórios', route: '/admin/transporte/relatorios' },
         ],
       },
       {
