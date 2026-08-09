@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Package, Layers, Cog, Route, DollarSign, FileCheck } from 'lucide-react'
+import { Package, Layers, Cog, Route, DollarSign, FileCheck, Activity, Brain } from 'lucide-react'
+import { AnalyzeInBiButton } from '@/components/industry/analyze-in-bi-button'
 import {
   getIndustrialItems,
   getBomVersions,
@@ -68,6 +69,8 @@ export function IndustryDashboard() {
       icon: DollarSign,
       color: 'text-emerald-600',
     },
+    { label: 'Cockpit', value: 'Ver →', icon: Activity, color: 'text-amber-600' },
+    { label: 'Inteligência', value: 'Ver →', icon: Brain, color: 'text-purple-600' },
   ]
 
   if (loading) {
@@ -80,6 +83,9 @@ export function IndustryDashboard() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <AnalyzeInBiButton context={{ module: 'industrial' }} />
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {cards.map((c) => (
           <Card key={c.label} className="border-2 border-[#005B2E]/10">

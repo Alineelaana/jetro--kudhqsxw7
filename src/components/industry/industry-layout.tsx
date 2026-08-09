@@ -19,10 +19,15 @@ import {
   Brain,
   Activity,
   BarChart3,
+  SlidersHorizontal,
+} from 'lucide-react'
+=======
+  Brain,
+  Activity,
+  BarChart3,
+  SlidersHorizontal,
   Wrench,
-  ShieldCheck,
-  GitBranch,
-  ListOrdered,
+} from 'lucide-react'
   Crown,
   SlidersHorizontal,
 } from 'lucide-react'
@@ -84,16 +89,27 @@ const SECTIONS: NavSectionDef[] = [
     ],
   },
   {
-    title: 'Gestão & Indicadores',
+    title: 'Operação & Inteligência',
     items: [
+      {
+        to: '/admin/industria/cockpit',
+        label: 'Cockpit de Fábrica',
+        icon: Activity,
+      },
       { to: '/admin/industria/custos', label: 'Custos Industriais', icon: DollarSign },
       { to: '/admin/industria/kpis', label: 'Indicadores (KPIs)', icon: BarChart3 },
       { to: '/admin/industria/manutencao', label: 'Manutenção', icon: Wrench },
+      {
+        to: '/admin/industria/intelligence',
+        label: 'Inteligência Industrial',
+        icon: Brain,
+      },
       {
         to: '/admin/industria/calibracao',
         label: 'Calibração de Alertas',
         icon: SlidersHorizontal,
       },
+      { to: '/admin/industria/adapta', label: 'ADAPTA Industrial', icon: Brain },
       { to: '/admin/industria/executivo', label: 'Visão Executiva', icon: Crown },
     ],
   },

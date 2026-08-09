@@ -4,7 +4,12 @@ export interface ProductionOrder {
   id: string
   order_number: string
   status: string
+  order_type?: string
   product_id: string
+  justification?: string
+  transition_history?: unknown
+  demand_id?: string
+  production_scenario?: string
   bom_version_id: string
   route_id: string
   quantity: string

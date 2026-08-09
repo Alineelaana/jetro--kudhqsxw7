@@ -23,6 +23,9 @@ import { ProductionOrdersPanel } from '@/components/industry/production-orders-p
 import { ProductionPhasesPanel } from '@/components/industry/production-phases-panel'
 import { ExecutiveDashboard } from '@/components/industry/executive-dashboard'
 import { ThresholdCalibrationPanel } from '@/components/industry/threshold-calibration-panel'
+import { FactoryCockpit } from '@/components/industry/factory-cockpit'
+import { IntelligencePanel } from '@/components/industry/intelligence-panel'
+import { IndustrialAdaptaChat } from '@/components/industry/industrial-adapta-chat'
 
 interface Props {
   screen?: string
@@ -96,6 +99,12 @@ function IndustryContent({ screen }: { screen: string }) {
       return <MaintenancePanel />
     case 'calibracao':
       return <ThresholdCalibrationPanel />
+    case 'cockpit':
+      return <FactoryCockpit />
+    case 'intelligence':
+      return <IntelligencePanel />
+    case 'adapta':
+      return <IndustrialAdaptaChat />
     case 'executivo':
       return <ExecutiveDashboard />
     case 'especificacoes':
