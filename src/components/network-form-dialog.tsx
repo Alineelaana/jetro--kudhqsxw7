@@ -178,6 +178,16 @@ export function NetworkFormDialog({ open, onOpenChange, network, onSaved }: Prop
               className="focus-visible:ring-[#005B2E]"
             />
           </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs">Justificativa</Label>
+            <Textarea
+              value={form.justification || ''}
+              onChange={(e) => set('justification', e.target.value)}
+              rows={2}
+              placeholder="Motivo da criação/alteração..."
+              className="focus-visible:ring-[#005B2E]"
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

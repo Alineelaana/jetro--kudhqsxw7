@@ -14,6 +14,13 @@ onRecordUpdateRequest((e) => {
     return
   }
 
+  var justification = body.justification || ''
+  if (!justification.trim()) {
+    return e.badRequestError(
+      'Justificativa é obrigatória para vincular/desvincular cliente a uma Rede/Grupo Econômico',
+    )
+  }
+
   if (!e.auth) {
     return e.unauthorizedError('Autenticacao necessaria para alterar vinculo de rede')
   }
@@ -60,6 +67,9 @@ onRecordUpdateRequest((e) => {
     try {
       var auditCol = $app.findCollectionByNameOrId('audit_logs')
       var log = new Record(auditCol)
+      log.set('user_id', e.auth.id)
+      log.set('user_name', e.auth.getString('name') || e.auth.email || '')
+      log.set('user_role', role)
       log.set('action', 'network_link_blocked')
       log.set('module', 'Cadastros')
       log.set('target_collection', 'partners')
@@ -78,10 +88,8 @@ onRecordUpdateRequest((e) => {
         }),
       )
       log.set('criticidade', 'Alta')
-      log.set('origem', 'Area da Empresa')
-      log.set('user_id', e.auth.id)
-      log.set('user_name', e.auth.getString('name') || '')
-      log.set('user_role', role)
+      log.set('origem', 'Área da Empresa')
+      log.set('justification', justification.trim())
       log.set('is_suspicious', true)
       $app.save(log)
     } catch (_) {}

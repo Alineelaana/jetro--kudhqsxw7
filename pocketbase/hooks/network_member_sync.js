@@ -1,10 +1,24 @@
-onRecordAfterUpdateSuccess((e) => {
+onRecordUpdateRequest((e) => {
   var oldNetworkId = e.record.original().getString('network_id') || ''
   var newNetworkId = e.record.getString('network_id') || ''
-  if (oldNetworkId === newNetworkId) return e.next()
+
+  if (oldNetworkId === newNetworkId) {
+    e.next()
+    return
+  }
 
   var partnerName = e.record.getString('full_name') || e.record.getString('company_name') || ''
   var partnerId = e.record.id
+  var authUser = e.auth
+  var body = e.requestInfo().body || {}
+  var justification = body.justification || 'Vinculado via edição de parceiro'
+  var isUnlinking = newNetworkId === '' && oldNetworkId !== ''
+
+  if (isUnlinking) {
+    justification = body.justification || 'Desvinculado via edição de parceiro'
+  }
+
+  e.next()
 
   if (oldNetworkId) {
     try {
@@ -21,9 +35,9 @@ onRecordAfterUpdateSuccess((e) => {
         partner_id: partnerId,
         partner_name: partnerName,
         action: 'removed',
-        user: 'Sistema',
+        user: authUser ? authUser.getString('name') || authUser.email || '' : 'Sistema',
         date: new Date().toISOString(),
-        justification: 'Removido via edição de parceiro',
+        justification: justification,
       }
       oldNetwork.set('member_ids', newMembers)
       oldNetwork.set(
@@ -55,9 +69,9 @@ onRecordAfterUpdateSuccess((e) => {
         partner_id: partnerId,
         partner_name: partnerName,
         action: 'added',
-        user: 'Sistema',
+        user: authUser ? authUser.getString('name') || authUser.email || '' : 'Sistema',
         date: new Date().toISOString(),
-        justification: 'Vinculado via edição de parceiro',
+        justification: justification,
       }
       newNetwork.set('member_ids', members)
       newNetwork.set(
@@ -71,16 +85,20 @@ onRecordAfterUpdateSuccess((e) => {
   try {
     var auditCol = $app.findCollectionByNameOrId('audit_logs')
     var log = new Record(auditCol)
-    log.set('action', 'network_member_change')
+    log.set('user_id', authUser ? authUser.id : '')
+    log.set('user_name', authUser ? authUser.getString('name') || authUser.email || '' : '')
+    log.set('user_role', authUser ? authUser.getString('role') || '' : '')
+    log.set('action', isUnlinking ? 'network_member_unlinked' : 'network_member_change')
     log.set('module', 'Cadastros')
     log.set('target_collection', 'partners')
     log.set('target_id', partnerId)
     log.set('target_summary', partnerName)
     log.set('new_value', JSON.stringify({ old_network: oldNetworkId, new_network: newNetworkId }))
-    log.set('criticidade', 'Media')
-    log.set('origem', 'Area da Empresa')
+    log.set('criticidade', 'Média')
+    log.set('origem', 'Área da Empresa')
+    log.set('justification', justification)
     $app.save(log)
   } catch (_) {}
 
-  return e.next()
+  return
 }, 'partners')

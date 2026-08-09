@@ -1,7 +1,16 @@
-onRecordAfterCreateSuccess((e) => {
+onRecordCreateRequest((e) => {
+  var authUser = e.auth
+  var body = e.requestInfo().body || {}
+  var justification = body.justification || 'Criação de rede/grupo econômico'
+
+  e.next()
+
   try {
     var auditCol = $app.findCollectionByNameOrId('audit_logs')
     var log = new Record(auditCol)
+    log.set('user_id', authUser ? authUser.id : '')
+    log.set('user_name', authUser ? authUser.getString('name') || authUser.email || '' : '')
+    log.set('user_role', authUser ? authUser.getString('role') || '' : '')
     log.set('action', 'network_created')
     log.set('module', 'Cadastros')
     log.set('target_collection', 'client_networks')
@@ -16,10 +25,11 @@ onRecordAfterCreateSuccess((e) => {
         credit_limit: e.record.getString('credit_limit'),
       }),
     )
-    log.set('criticidade', 'Media')
-    log.set('origem', 'Area da Empresa')
+    log.set('criticidade', 'Média')
+    log.set('origem', 'Área da Empresa')
+    log.set('justification', justification)
     $app.save(log)
   } catch (_) {}
 
-  return e.next()
+  return
 }, 'client_networks')

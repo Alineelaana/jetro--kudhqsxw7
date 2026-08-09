@@ -1,11 +1,21 @@
-onRecordAfterUpdateSuccess((e) => {
+onRecordUpdateRequest((e) => {
   var oldStatus = e.record.original().getString('status') || ''
   var newStatus = e.record.getString('status') || ''
-  if (oldStatus === newStatus) return e.next()
-  if (newStatus !== 'Recebido' && newStatus !== 'Parcialmente Recebido') return e.next()
+  if (oldStatus === newStatus) {
+    e.next()
+    return
+  }
+  if (newStatus !== 'Recebido' && newStatus !== 'Parcialmente Recebido') {
+    e.next()
+    return
+  }
 
   var cliente = e.record.getString('cliente') || ''
-  if (!cliente) return e.next()
+  var authUser = e.auth
+
+  e.next()
+
+  if (!cliente) return
 
   var partner = null
   try {
@@ -14,11 +24,14 @@ onRecordAfterUpdateSuccess((e) => {
       'full_name ~ "' + cliente + '" || company_name ~ "' + cliente + '"',
     )
   } catch (_) {
-    return e.next()
+    return
   }
 
-  if (!partner.getBool('financial_restriction')) return e.next()
-  if (partner.getString('network_restriction_origin_partner_id')) return e.next()
+  if (!partner.getBool('financial_restriction')) return
+  if (partner.getString('network_restriction_origin_partner_id')) return
+
+  var networkId = partner.getString('network_id') || ''
+  var partnerId = partner.id
 
   var stillOverdue = false
   try {
@@ -42,6 +55,8 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (_) {}
 
   if (!stillOverdue) {
+    var autoJustification = 'dívida responsável regularizada — reavaliação automática da Rede'
+
     partner.set('financial_restriction', false)
     partner.set('restriction_reason', '')
     $app.saveNoValidate(partner)
@@ -49,20 +64,77 @@ onRecordAfterUpdateSuccess((e) => {
     try {
       var auditCol = $app.findCollectionByNameOrId('audit_logs')
       var log = new Record(auditCol)
+      log.set('user_id', authUser ? authUser.id : '')
+      log.set(
+        'user_name',
+        authUser ? authUser.getString('name') || authUser.email || '' : 'Automação',
+      )
+      log.set('user_role', authUser ? authUser.getString('role') || '' : '')
       log.set('action', 'network_restriction_auto_released')
       log.set('module', 'Financeiro')
       log.set('target_collection', 'partners')
-      log.set('target_id', partner.id)
+      log.set('target_id', partnerId)
       log.set('target_summary', cliente)
-      log.set(
-        'new_value',
-        JSON.stringify({ reason: 'Debt settled - no overdue receivables remaining' }),
-      )
-      log.set('criticidade', 'Media')
-      log.set('origem', 'Automação')
+      log.set('new_value', JSON.stringify({ reason: autoJustification }))
+      log.set('criticidade', 'Média')
+      log.set('origem', authUser ? 'Área da Empresa' : 'Automação')
+      log.set('justification', autoJustification)
       $app.save(log)
     } catch (_) {}
+
+    if (networkId) {
+      var restrictedMembers = []
+      try {
+        restrictedMembers = $app.findRecordsByFilter(
+          'partners',
+          'network_id = "' +
+            networkId +
+            '" && network_restriction_origin_partner_id = "' +
+            partnerId +
+            '"',
+          '',
+          500,
+          0,
+        )
+      } catch (_) {}
+
+      for (var rmi = 0; rmi < restrictedMembers.length; rmi++) {
+        var rm = restrictedMembers[rmi]
+        rm.set('financial_restriction', false)
+        rm.set('network_restriction_source', '')
+        rm.set('network_restriction_origin_partner_id', '')
+        rm.set('network_restriction_origin_name', '')
+        rm.set('network_restriction_origin_cnpj', '')
+        rm.set('network_restriction_origin_amount', '')
+        rm.set('network_restriction_origin_days', '')
+        $app.saveNoValidate(rm)
+
+        try {
+          var aCol = $app.findCollectionByNameOrId('audit_logs')
+          var aLog = new Record(aCol)
+          aLog.set('user_id', authUser ? authUser.id : '')
+          aLog.set(
+            'user_name',
+            authUser ? authUser.getString('name') || authUser.email || '' : 'Automação',
+          )
+          aLog.set('user_role', authUser ? authUser.getString('role') || '' : '')
+          aLog.set('action', 'network_restriction_released')
+          aLog.set('module', 'Financeiro')
+          aLog.set('target_collection', 'partners')
+          aLog.set('target_id', rm.id)
+          aLog.set(
+            'target_summary',
+            rm.getString('full_name') || rm.getString('company_name') || '',
+          )
+          aLog.set('new_value', JSON.stringify({ origin: cliente, network_id: networkId }))
+          aLog.set('criticidade', 'Média')
+          aLog.set('origem', authUser ? 'Área da Empresa' : 'Automação')
+          aLog.set('justification', autoJustification)
+          $app.save(aLog)
+        } catch (_) {}
+      }
+    }
   }
 
-  return e.next()
+  return
 }, 'financial_receivables')

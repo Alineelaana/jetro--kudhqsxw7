@@ -27,6 +27,8 @@ onRecordCreateRequest((e) => {
     } catch (_) {}
   }
 
+  var authUser = e.auth
+
   if (policy === 'block') {
     var originName = partner.getString('network_restriction_origin_name') || ''
     var originCnpj = partner.getString('network_restriction_origin_cnpj') || ''
@@ -45,6 +47,9 @@ onRecordCreateRequest((e) => {
   try {
     var auditCol = $app.findCollectionByNameOrId('audit_logs')
     var log = new Record(auditCol)
+    log.set('user_id', authUser ? authUser.id : '')
+    log.set('user_name', authUser ? authUser.getString('name') || authUser.email || '' : '')
+    log.set('user_role', authUser ? authUser.getString('role') || '' : '')
     log.set('action', 'order_restriction_check')
     log.set('module', 'Vendas')
     log.set('target_collection', 'sales_orders')
@@ -52,7 +57,8 @@ onRecordCreateRequest((e) => {
     log.set('target_summary', e.record.getString('client_name') || '')
     log.set('new_value', JSON.stringify({ policy: policy, restricted: true }))
     log.set('criticidade', 'Alta')
-    log.set('origem', 'Area da Empresa')
+    log.set('origem', 'Área da Empresa')
+    log.set('justification', 'Verificação de restrição ao criar pedido — Política: ' + policy)
     $app.save(log)
   } catch (_) {}
 

@@ -43,6 +43,27 @@ export async function loadNetworksMap(): Promise<Record<string, string>> {
   }
 }
 
+export async function linkPartnerToNetwork(
+  partnerId: string,
+  networkId: string,
+  justification: string,
+): Promise<void> {
+  await pb.collection('partners').update(partnerId, {
+    network_id: networkId,
+    justification,
+  })
+}
+
+export async function unlinkPartnerFromNetwork(
+  partnerId: string,
+  justification: string,
+): Promise<void> {
+  await pb.collection('partners').update(partnerId, {
+    network_id: '',
+    justification,
+  })
+}
+
 export async function getNetworkConsolidated(networkId: string): Promise<NetworkConsolidatedData> {
   const network = await getNetwork(networkId)
   const members = await getNetworkMembers(networkId)

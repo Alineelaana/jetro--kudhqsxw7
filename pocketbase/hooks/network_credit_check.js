@@ -13,6 +13,7 @@ routerAdd(
       return e.notFoundError('Partner not found')
     }
 
+    var authUser = e.auth
     var partnerName = partner.getString('full_name') || partner.getString('company_name') || ''
     var networkId = partner.getString('network_id') || ''
     var ownRestriction = partner.getBool('financial_restriction')
@@ -108,6 +109,38 @@ routerAdd(
       (hasOwnDelinquency || hasNetworkDelinquency || ownRestriction)
     ) {
       decision = 'requires_approval'
+    }
+
+    if (decision !== 'approved') {
+      try {
+        var auditCol = $app.findCollectionByNameOrId('audit_logs')
+        var log = new Record(auditCol)
+        log.set('user_id', authUser ? authUser.id : '')
+        log.set('user_name', authUser ? authUser.getString('name') || authUser.email || '' : '')
+        log.set('user_role', authUser ? authUser.getString('role') || '' : '')
+        log.set('action', 'network_credit_check')
+        log.set('module', 'Financeiro')
+        log.set('target_collection', 'partners')
+        log.set('target_id', partnerId)
+        log.set('target_summary', partnerName)
+        log.set(
+          'new_value',
+          JSON.stringify({
+            decision: decision,
+            own_overdue: ownOverdue,
+            network_overdue: networkOverdue,
+            policy: restrictionPolicy,
+            network_name: networkName,
+          }),
+        )
+        log.set('criticidade', decision === 'blocked' ? 'Alta' : 'Média')
+        log.set('origem', 'Área da Empresa')
+        log.set(
+          'justification',
+          'Verificação de crédito: ' + decision + ' — Política: ' + restrictionPolicy,
+        )
+        $app.save(log)
+      } catch (_) {}
     }
 
     return e.json(200, {
