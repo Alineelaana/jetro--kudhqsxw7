@@ -63,6 +63,7 @@ import AdaptaGovernance from './pages/AdaptaGovernance'
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
 import PlatformLayer from './pages/PlatformLayer'
+import Blueprint from './pages/Blueprint'
 import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
 import Performance from './pages/Performance'
@@ -691,6 +692,7 @@ const App = () => (
                         />
                         <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
                         <Route path="/admin/platform-layer" element={<PlatformLayer />} />
+                        <Route path="/admin/blueprint" element={<Blueprint />} />
                         <Route path="/admin/cadastro" element={<AdminRegister />} />
                         <Route path="/admin/recuperar-senha" element={<AdminPasswordRecovery />} />
                         <Route

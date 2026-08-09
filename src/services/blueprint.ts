@@ -129,6 +129,21 @@ export interface BlueprintDashboardStats {
   certifiedChapters: number
 }
 
+export async function publishChapter(id: string): Promise<BlueprintChapter> {
+  return pb.collection('blueprint_chapters').update(id, {
+    editorial_status: 'Publicado',
+    last_reviewed_at: new Date().toISOString(),
+  }) as Promise<BlueprintChapter>
+}
+
+export async function searchBlueprint(query: string, k?: number): Promise<unknown> {
+  return pb.send('/backend/v1/blueprint/search', {
+    method: 'POST',
+    body: JSON.stringify({ query, k }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
 export async function getDashboardStats(): Promise<BlueprintDashboardStats> {
   const [volumes, chapters, gaps, adrs, screenLinks] = await Promise.all([
     getVolumes(),
