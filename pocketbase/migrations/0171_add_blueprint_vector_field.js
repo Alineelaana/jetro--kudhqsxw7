@@ -8,10 +8,12 @@ migrate(
     console.log('BLUEPRINT-0171: vector field added to blueprint_chunks')
   },
   (app) => {
-    var col = app.findCollectionByNameOrId('blueprint_chunks')
-    if (col && col.fields.getByName('embedding')) {
-      col.fields.remove('embedding')
-      app.save(col)
-    }
+    try {
+      var col = app.findCollectionByNameOrId('blueprint_chunks')
+      if (col.fields.getByName('embedding')) {
+        col.fields.remove('embedding')
+        app.save(col)
+      }
+    } catch (e) {}
   },
 )

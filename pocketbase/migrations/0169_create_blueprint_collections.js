@@ -3,17 +3,22 @@ migrate(
     var R = "@request.auth.id != ''"
     var RS = "@request.auth.role = 'SUP'"
 
-    function AD() {
-      return [
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ]
-    }
+    var autoFields = [
+      { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+      { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+    ]
 
-    function mk(name, fields, indexes) {
+    var mk = function (name, fields, indexes) {
       try {
         return app.findCollectionByNameOrId(name)
-      } catch (_) {}
+      } catch (e) {}
+      var allFields = []
+      for (var i = 0; i < fields.length; i++) {
+        allFields.push(fields[i])
+      }
+      for (var j = 0; j < autoFields.length; j++) {
+        allFields.push(autoFields[j])
+      }
       var col = new Collection({
         name: name,
         type: 'base',
@@ -22,7 +27,7 @@ migrate(
         createRule: RS,
         updateRule: RS,
         deleteRule: RS,
-        fields: fields.concat(AD()),
+        fields: allFields,
         indexes: indexes || [],
       })
       app.save(col)
@@ -518,7 +523,7 @@ migrate(
     for (var i = 0; i < cols.length; i++) {
       try {
         app.delete(app.findCollectionByNameOrId(cols[i]))
-      } catch (_) {}
+      } catch (e) {}
     }
   },
 )
