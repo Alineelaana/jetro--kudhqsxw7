@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { getSalesOrders } from '@/services/sales'
-import { getVehicles, getRoutes, createJourney } from '@/services/transport-journeys'
-import { getRoutes as getLogisticsRoutes } from '@/services/logistics'
+import { createJourney } from '@/services/transport-journeys'
+import { getVehicles, getRoutes as getLogisticsRoutes } from '@/services/logistics'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'sonner'
