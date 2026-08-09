@@ -11,24 +11,16 @@ import {
   Users,
   TrendingUp,
   AlertTriangle,
+  Target,
+  Megaphone,
 } from 'lucide-react'
 import pb from '@/lib/pocketbase/client'
+import { analyzeEntity, type EntityAnalysis } from '@/services/strategic-entity'
 import { StrategicBiButton } from './strategic-bi-button'
-
-interface EntityData {
-  name: string
-  orders: number
-  revenue: number
-  pending: number
-  stock: number
-  opportunities: number
-  margin: number
-  overdue: number
-}
 
 export function DecisionRoom() {
   const [query, setQuery] = useState('')
-  const [entity, setEntity] = useState<EntityData | null>(null)
+  const [entity, setEntity] = useState<EntityAnalysis | null>(null)
   const [loading, setLoading] = useState(false)
   const [partners, setPartners] = useState<{ id: string; name: string }[]>([])
 
@@ -52,39 +44,7 @@ export function DecisionRoom() {
     setLoading(true)
     setEntity(null)
     try {
-      const [orders, receivables, products] = await Promise.all([
-        pb
-          .collection('sales_orders')
-          .getFullList({ filter: `client_name ~ "${name}"` })
-          .catch(() => []),
-        pb
-          .collection('financial_receivables')
-          .getFullList({ filter: `cliente ~ "${name}"` })
-          .catch(() => []),
-        pb
-          .collection('products')
-          .getFullList({ filter: 'active = true' })
-          .catch(() => []),
-      ])
-      const rev = orders.reduce(
-        (s: number, o: Record<string, unknown>) =>
-          s + parseFloat(String(o.total_value || '0')) || 0,
-        0,
-      )
-      const overdue = receivables.filter(
-        (r: Record<string, unknown>) =>
-          r.status && !['Recebido', 'Cancelado'].includes(r.status as string),
-      ).length
-      setEntity({
-        name,
-        orders: orders.length,
-        revenue: rev,
-        pending: receivables.length,
-        stock: products.length,
-        opportunities: 0,
-        margin: rev > 0 ? 22.5 : 0,
-        overdue,
-      })
+      setEntity(await analyzeEntity(name))
     } catch {
       setEntity(null)
     }
@@ -154,7 +114,7 @@ export function DecisionRoom() {
                 <StatCard
                   icon={TrendingUp}
                   label="Margem"
-                  value={`${entity.margin}%`}
+                  value={`${entity.margin.toFixed(1)}%`}
                   color="text-emerald-600"
                 />
                 <StatCard
@@ -165,17 +125,59 @@ export function DecisionRoom() {
                 />
                 <StatCard
                   icon={Package}
-                  label="Produtos Ativos"
-                  value={String(entity.stock)}
+                  label="Produtos"
+                  value={String(entity.productsCount)}
                   color="text-cyan-600"
                 />
                 <StatCard
                   icon={AlertTriangle}
-                  label="Recebíveis Vencidos"
+                  label="Vencidos"
                   value={String(entity.overdue)}
                   color="text-red-600"
                 />
+                <StatCard
+                  icon={Target}
+                  label="Oportunidades"
+                  value={String(entity.opportunities)}
+                  color="text-indigo-600"
+                />
+                <StatCard
+                  icon={Megaphone}
+                  label="Campanhas"
+                  value={String(entity.campaigns)}
+                  color="text-pink-600"
+                />
+                <StatCard
+                  icon={DollarSign}
+                  label="Verbas"
+                  value={`R$ ${entity.verbas.toFixed(2)}`}
+                  color="text-orange-600"
+                />
+                <StatCard
+                  icon={ShoppingCart}
+                  label="Compras"
+                  value={String(entity.purchases)}
+                  color="text-teal-600"
+                />
+                <StatCard
+                  icon={AlertTriangle}
+                  label="Inadimplência"
+                  value={String(entity.inadimplencia)}
+                  color="text-red-600"
+                />
+                <StatCard
+                  icon={Users}
+                  label="Leads"
+                  value={String(entity.leads)}
+                  color="text-blue-600"
+                />
               </div>
+              {(entity.wonOpps > 0 || entity.lostOpps > 0) && (
+                <div className="mt-3 flex gap-4 text-sm">
+                  <span className="text-emerald-600 font-bold">Ganhas: {entity.wonOpps}</span>
+                  <span className="text-red-600 font-bold">Perdidas: {entity.lostOpps}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -187,7 +189,7 @@ export function DecisionRoom() {
             <p className="text-lg font-bold">Sala de Decisão 360°</p>
             <p className="text-sm text-muted-foreground">
               Selecione uma entidade para ver dados consolidados de Financeiro, Comercial, CRM,
-              Estoque e mais.
+              Estoque, Campanhas, Verbas e mais.
             </p>
           </CardContent>
         </Card>

@@ -10,6 +10,7 @@ import {
   deleteStrategicRecord,
   logStrategicAudit,
 } from '@/services/strategic'
+import { extractFieldErrors, getErrorMessage, type FieldErrors } from '@/lib/pocketbase/errors'
 import { useRealtime } from '@/hooks/use-realtime'
 import { StrategicBiButton } from './strategic-bi-button'
 import type { StrategicOkr, StrategicKeyResult } from '@/lib/strategic-types'
@@ -20,6 +21,8 @@ export function StrategicOkrs() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [objective, setObjective] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [saveError, setSaveError] = useState('')
 
   const load = async () => {
     try {
@@ -42,6 +45,8 @@ export function StrategicOkrs() {
 
   const handleCreate = async () => {
     if (!objective.trim()) return
+    setFieldErrors({})
+    setSaveError('')
     try {
       const rec = await createStrategicRecord('strategic_okrs', {
         objective,
@@ -58,8 +63,9 @@ export function StrategicOkrs() {
       setDialogOpen(false)
       setObjective('')
       load()
-    } catch {
-      /* ignore */
+    } catch (err) {
+      setFieldErrors(extractFieldErrors(err))
+      setSaveError(getErrorMessage(err))
     }
   }
 
@@ -164,6 +170,9 @@ export function StrategicOkrs() {
           <Card className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <CardContent className="p-6 space-y-3">
               <h3 className="font-bold text-lg text-[#005B2E]">Novo OKR</h3>
+              {saveError && (
+                <p className="text-sm text-red-600 bg-red-50 rounded px-2 py-1">{saveError}</p>
+              )}
               <div>
                 <Label className="text-xs">Objetivo *</Label>
                 <Input

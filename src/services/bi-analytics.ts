@@ -19,6 +19,19 @@ function applyFilters(records: Rec[], filters: BIFilters, dateField = 'created')
   return records.filter((r) => {
     if (filters.empresa && r.company && r.company !== filters.empresa) return false
     if (filters.filial && r.branch && r.branch !== filters.filial) return false
+    const _entity = (filters as Record<string, unknown>).entity as string | undefined
+    if (_entity) {
+      const e = _entity.toLowerCase()
+      const fields = [
+        'client_name',
+        'name',
+        'cliente',
+        'supplier_name',
+        'full_name',
+        'company_name',
+      ]
+      if (!fields.some((f) => r[f] && String(r[f]).toLowerCase().includes(e))) return false
+    }
     if (
       filters.startDate &&
       r[dateField] &&

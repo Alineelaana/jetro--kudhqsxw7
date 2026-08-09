@@ -1,11 +1,14 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
-import { Filter } from 'lucide-react'
+import { Filter, X } from 'lucide-react'
 import type { BIFilters } from '@/lib/bi-types'
 
+type FullBIFilters = BIFilters & { entity?: string; area?: string }
+
 interface BIFilterContextType {
-  filters: BIFilters
-  setFilters: (f: BIFilters) => void
+  filters: FullBIFilters
+  setFilters: (f: FullBIFilters) => void
 }
 
 const BIFilterContext = createContext<BIFilterContextType | undefined>(undefined)
@@ -17,7 +20,15 @@ export const useBIFilters = () => {
 }
 
 export const BIFilterProvider = ({ children }: { children: ReactNode }) => {
-  const [filters, setFilters] = useState<BIFilters>({})
+  const [searchParams] = useSearchParams()
+  const entityFromUrl = searchParams.get('entity') || ''
+  const areaFromUrl = searchParams.get('area') || ''
+
+  const [filters, setFilters] = useState<FullBIFilters>({
+    entity: entityFromUrl || undefined,
+    area: areaFromUrl || undefined,
+  })
+
   return (
     <BIFilterContext.Provider value={{ filters, setFilters }}>{children}</BIFilterContext.Provider>
   )
@@ -54,6 +65,22 @@ export function BIFilterBar() {
         onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
         className="w-36 h-8 text-sm"
       />
+      {filters.entity && (
+        <div className="flex items-center gap-1 text-sm bg-[#005B2E]/10 text-[#005B2E] px-2 py-1 rounded font-bold">
+          <span>Entidade: {filters.entity}</span>
+          <button onClick={() => setFilters({ ...filters, entity: undefined })}>
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+      {filters.area && (
+        <div className="flex items-center gap-1 text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold">
+          <span>Área: {filters.area}</span>
+          <button onClick={() => setFilters({ ...filters, area: undefined })}>
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

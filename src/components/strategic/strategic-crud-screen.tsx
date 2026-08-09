@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, Search, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import { extractFieldErrors, getErrorMessage, type FieldErrors } from '@/lib/pocketbase/errors'
 import { useRealtime } from '@/hooks/use-realtime'
 import {
   getStrategicList,
@@ -32,6 +33,8 @@ export function StrategicCrudScreen({ config }: { config: StrategicCrudConfig })
   const [editing, setEditing] = useState<Record<string, unknown> | null>(null)
   const [form, setForm] = useState<Record<string, unknown>>({})
   const [search, setSearch] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [saveError, setSaveError] = useState('')
 
   const load = async () => {
     try {
@@ -58,6 +61,8 @@ export function StrategicCrudScreen({ config }: { config: StrategicCrudConfig })
   }
 
   const handleSave = async () => {
+    setFieldErrors({})
+    setSaveError('')
     const nameVal = (form[config.nameLabel] as string) || ''
     try {
       if (editing) {
@@ -77,8 +82,9 @@ export function StrategicCrudScreen({ config }: { config: StrategicCrudConfig })
       }
       setDialogOpen(false)
       load()
-    } catch {
-      /* ignore */
+    } catch (err) {
+      setFieldErrors(extractFieldErrors(err))
+      setSaveError(getErrorMessage(err))
     }
   }
 
@@ -196,6 +202,9 @@ export function StrategicCrudScreen({ config }: { config: StrategicCrudConfig })
               <h3 className="font-bold text-lg text-[#005B2E]">
                 {editing ? 'Editar' : 'Criar'} — {config.title}
               </h3>
+              {saveError && (
+                <p className="text-sm text-red-600 bg-red-50 rounded px-2 py-1">{saveError}</p>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 {config.fields.map((field) => (
                   <FieldInput
@@ -203,6 +212,7 @@ export function StrategicCrudScreen({ config }: { config: StrategicCrudConfig })
                     field={field}
                     value={form[field.name]}
                     onChange={(v) => setForm({ ...form, [field.name]: v })}
+                    error={fieldErrors[field.name]}
                   />
                 ))}
               </div>
@@ -226,10 +236,12 @@ function FieldInput({
   field,
   value,
   onChange,
+  error,
 }: {
   field: StrategicFieldDef
   value: unknown
   onChange: (v: string) => void
+  error?: string
 }) {
   const colSpan = field.span === 2 ? 'col-span-2' : ''
   return (
@@ -260,6 +272,7 @@ function FieldInput({
           onChange={(e) => onChange(e.target.value)}
         />
       )}
+      {error && <p className="text-xs text-red-600 mt-0.5">{error}</p>}
     </div>
   )
 }

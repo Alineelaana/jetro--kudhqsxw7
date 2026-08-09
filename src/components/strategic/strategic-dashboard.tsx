@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { getExecutiveAnalytics } from '@/services/bi-analytics-extended'
 import { getStrategicList } from '@/services/strategic'
+import { computeStrategicMetrics, type StrategicMetrics } from '@/services/strategic-metrics'
 import { useRealtime } from '@/hooks/use-realtime'
 import { StrategicBiButton } from './strategic-bi-button'
 
@@ -21,22 +22,26 @@ function fmt(v: number): string {
 
 export function StrategicDashboard() {
   const [data, setData] = useState<Record<string, number> | null>(null)
+  const [metrics, setMetrics] = useState<StrategicMetrics | null>(null)
   const [initiatives, setInitiatives] = useState<unknown[]>([])
   const [okrs, setOkrs] = useState<unknown[]>([])
   const [loading, setLoading] = useState(true)
 
   const load = async () => {
     try {
-      const [exec, inits, oks] = await Promise.all([
+      const [exec, mets, inits, oks] = await Promise.all([
         getExecutiveAnalytics({}),
+        computeStrategicMetrics(),
         getStrategicList('strategic_initiatives'),
         getStrategicList('strategic_okrs'),
       ])
       setData(exec as unknown as Record<string, number>)
+      setMetrics(mets)
       setInitiatives(inits)
       setOkrs(oks)
     } catch {
       setData(null)
+      setMetrics(null)
     }
     setLoading(false)
   }
@@ -45,6 +50,8 @@ export function StrategicDashboard() {
   }, [])
   useRealtime('sales_orders', () => load())
   useRealtime('strategic_initiatives', () => load())
+  useRealtime('crm_leads', () => load())
+  useRealtime('vr_campaigns', () => load())
 
   if (loading)
     return (
@@ -52,16 +59,9 @@ export function StrategicDashboard() {
         <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
       </div>
     )
-  if (!data)
+  if (!data || !metrics)
     return <p className="text-center py-6 text-muted-foreground">Erro ao carregar dados.</p>
 
-  const churn =
-    data.clientesAtivos > 0
-      ? ((data.clientesAtivos - data.novosClientes) / data.clientesAtivos) * 100
-      : 0
-  const cac = data.novosClientes > 0 ? 50000 / data.novosClientes : 0
-  const ltv = data.ticketMedio * (data.margem / 100) * 12
-  const campaignRoi = data.faturamento > 0 ? ((data.faturamento * 0.15 - 30000) / 30000) * 100 : 0
   const activeInitiatives = initiatives.filter(
     (i: Record<string, unknown>) => i.status === 'em_andamento',
   ).length
@@ -77,8 +77,8 @@ export function StrategicDashboard() {
           <CardContent className="py-3 flex items-center gap-2">
             <TrendingDown className="w-6 h-6 text-red-600" />
             <div>
-              <p className="text-lg font-black">{fmt(churn)}%</p>
-              <p className="text-xs text-muted-foreground">Churn</p>
+              <p className="text-lg font-black">{fmt(metrics.churn)}%</p>
+              <p className="text-xs text-muted-foreground">Churn ({metrics.churnCount} perdidos)</p>
             </div>
           </CardContent>
         </Card>
@@ -86,7 +86,7 @@ export function StrategicDashboard() {
           <CardContent className="py-3 flex items-center gap-2">
             <DollarSign className="w-6 h-6 text-blue-600" />
             <div>
-              <p className="text-lg font-black">R$ {fmt(cac)}</p>
+              <p className="text-lg font-black">R$ {fmt(metrics.cac)}</p>
               <p className="text-xs text-muted-foreground">CAC</p>
             </div>
           </CardContent>
@@ -95,7 +95,7 @@ export function StrategicDashboard() {
           <CardContent className="py-3 flex items-center gap-2">
             <Users className="w-6 h-6 text-emerald-600" />
             <div>
-              <p className="text-lg font-black">R$ {fmt(ltv)}</p>
+              <p className="text-lg font-black">R$ {fmt(metrics.ltv)}</p>
               <p className="text-xs text-muted-foreground">LTV</p>
             </div>
           </CardContent>
@@ -104,7 +104,7 @@ export function StrategicDashboard() {
           <CardContent className="py-3 flex items-center gap-2">
             <Megaphone className="w-6 h-6 text-purple-600" />
             <div>
-              <p className="text-lg font-black">{fmt(campaignRoi)}%</p>
+              <p className="text-lg font-black">{fmt(metrics.campaignRoi)}%</p>
               <p className="text-xs text-muted-foreground">ROI Campanhas</p>
             </div>
           </CardContent>
@@ -166,15 +166,29 @@ export function StrategicDashboard() {
             </div>
             <div>
               <p className="text-muted-foreground">Clientes Ativos</p>
-              <p className="font-bold text-lg">{data.clientesAtivos}</p>
+              <p className="font-bold text-lg">{metrics.activeClients}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Novos Clientes</p>
-              <p className="font-bold text-lg text-emerald-600">{data.novosClientes}</p>
+              <p className="font-bold text-lg text-emerald-600">{metrics.newClients}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Inadimplência</p>
               <p className="font-bold text-lg text-amber-600">{fmt(data.inadimplencia)}%</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Retenção</p>
+              <p className="font-bold text-lg text-[#005B2E]">
+                {fmt(metrics.retentionRate * 100)}%
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Campanhas Ativas</p>
+              <p className="font-bold text-lg">{metrics.activeCampaigns}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Custo Marketing</p>
+              <p className="font-bold text-lg">R$ {fmt(metrics.marketingCost)}</p>
             </div>
           </div>
         </CardContent>
