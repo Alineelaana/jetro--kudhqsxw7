@@ -323,7 +323,6 @@ migrate(
         { name: 'section_id', type: 'relation', collectionId: secId, maxSelect: 1 },
         { name: 'chunk_text', type: 'text' },
         { name: 'chunk_index', type: 'number' },
-        { name: 'embedding', type: 'vector', dimensions: 1536, distance: 'cosine' },
         { name: 'metadata', type: 'json' },
       ],
       [
