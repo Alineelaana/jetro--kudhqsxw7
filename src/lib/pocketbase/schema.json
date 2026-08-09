@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T04:07:18.755Z",
+  "generatedAt": "2026-08-09T04:25:40.614Z",
   "collections": [
     {
       "name": "users",
@@ -1739,6 +1739,37 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "triage_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "triage_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Novo", "Em análise", "Atribuído", "Resolvido", "Recorrente"]
+        },
+        {
+          "name": "triage_recurrence_count",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "triage_resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "triage_resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1754,7 +1785,8 @@
         "CREATE INDEX `idx_audit_logs_ip_address` ON `audit_logs` (ip_address)",
         "CREATE INDEX `idx_audit_logs_archived` ON `audit_logs` (archived)",
         "CREATE INDEX `idx_audit_logs_empresa` ON `audit_logs` (empresa)",
-        "CREATE INDEX `idx_audit_logs_filial` ON `audit_logs` (filial)"
+        "CREATE INDEX `idx_audit_logs_filial` ON `audit_logs` (filial)",
+        "CREATE INDEX `idx_audit_triage_status` ON `audit_logs` (triage_status)"
       ]
     },
     {
@@ -7243,11 +7275,43 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "triage_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "triage_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Novo", "Em análise", "Atribuído", "Resolvido", "Recorrente"]
+        },
+        {
+          "name": "triage_recurrence_count",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "triage_resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "triage_resolved_at",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_audit_alerts_alert_type ON audit_alerts (alert_type)",
-        "CREATE INDEX idx_audit_alerts_resolved ON audit_alerts (resolved)"
+        "CREATE INDEX idx_audit_alerts_resolved ON audit_alerts (resolved)",
+        "CREATE INDEX `idx_alerts_triage_status` ON `audit_alerts` (triage_status)"
       ]
     },
     {
