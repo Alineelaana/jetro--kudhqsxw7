@@ -28,7 +28,7 @@ export function LogisticsReverseOrchestration() {
   const { user } = useAuth()
   const role = user?.role as string
   const [records, setRecords] = useState<Record<string, unknown>[]>([])
-  const [salesReturns, setSalesReturns] = useState(Record<string, unknown>[]>([])
+  const [salesReturns, setSalesReturns] = useState<Record<string, unknown>[]>([])
   const [purchaseReturns, setPurchaseReturns] = useState(Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
