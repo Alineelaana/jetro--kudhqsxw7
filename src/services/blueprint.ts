@@ -105,14 +105,12 @@ export async function linkScreen(route: string, label: string, chapterId: string
       .collection('blueprint_screen_links')
       .update(existing.id, { chapter_id: chapterId, has_documentation: true })
   } catch {
-    await pb
-      .collection('blueprint_screen_links')
-      .create({
-        screen_route: route,
-        screen_label: label,
-        chapter_id: chapterId,
-        has_documentation: true,
-      })
+    await pb.collection('blueprint_screen_links').create({
+      screen_route: route,
+      screen_label: label,
+      chapter_id: chapterId,
+      has_documentation: true,
+    })
   }
 }
 
