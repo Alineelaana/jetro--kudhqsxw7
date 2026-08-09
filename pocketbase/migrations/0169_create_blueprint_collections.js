@@ -25,8 +25,13 @@ migrate(
         return app.findCollectionByNameOrId(name)
       } catch (e) {}
       var nonRel = []
+      var rels = []
       for (var i = 0; i < fields.length; i++) {
-        if (fields[i].type !== 'relation') nonRel.push(fields[i])
+        if (fields[i].type === 'relation') {
+          rels.push(fields[i])
+        } else {
+          nonRel.push(fields[i])
+        }
       }
       var col = new Collection({
         name: name,
@@ -36,36 +41,26 @@ migrate(
         createRule: RS,
         updateRule: RS,
         deleteRule: RS,
-        fields: fields.concat(AF),
+        fields: nonRel.concat(AF),
         indexes: indexes || [],
       })
-      try {
-        app.save(col)
-      } catch (e1) {
-        console.log('mk: save failed for ' + name + ', retrying without relations: ' + e1)
-        col = new Collection({
-          name: name,
-          type: 'base',
-          listRule: "@request.auth.id != ''",
-          viewRule: "@request.auth.id != ''",
-          createRule: RS,
-          updateRule: RS,
-          deleteRule: RS,
-          fields: nonRel.concat(AF),
-          indexes: [],
-        })
-        try {
-          app.save(col)
-        } catch (e2) {
-          console.log('mk: retry also failed for ' + name + ': ' + e2)
+      app.save(col)
+      col = app.findCollectionByNameOrId(name)
+      if (rels.length > 0) {
+        for (var j = 0; j < rels.length; j++) {
+          if (!col.fields.getByName(rels[j].name) && rels[j].collectionId) {
+            col.fields.add(
+              new RelationField({
+                name: rels[j].name,
+                collectionId: rels[j].collectionId,
+                maxSelect: rels[j].maxSelect || 1,
+              }),
+            )
+          }
         }
+        app.save(col)
       }
-      if (!col.id) {
-        try {
-          return app.findCollectionByNameOrId(name)
-        } catch (e3) {}
-      }
-      return col
+      return app.findCollectionByNameOrId(name)
     }
 
     // 1. blueprint_volumes
