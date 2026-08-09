@@ -131,6 +131,12 @@ export async function createMkAttribution(
   return pb.collection('mk_result_attributions').create(data) as Promise<MkResultAttribution>
 }
 
+export async function getMkList(
+  collection: string,
+  filter?: string,
+): Promise<Record<string, unknown>[]> {
+  return pb.collection(collection).getFullList({ sort: '-created', filter })
+}
 export async function getMkBriefingTemplates(): Promise<Record<string, unknown>[]> {
   return pb.collection('mk_briefing_templates').getFullList({ filter: 'active = true' })
 }
