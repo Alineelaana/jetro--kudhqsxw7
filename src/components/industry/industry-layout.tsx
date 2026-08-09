@@ -4,17 +4,6 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { useModuleSections } from '@/hooks/use-module-sections'
 import { ModuleNavSection } from '@/components/enterprise/module-nav-section'
-  Brain,
-  Activity,
-  BarChart3,
-  SlidersHorizontal,
-  Wrench,
-} from 'lucide-react'
-  Crown,
-  SlidersHorizontal,
-} from 'lucide-react'
-import { AdminBackButton } from '@/components/admin-back-button'
-=======
 import {
   Package,
   Layers,
@@ -36,17 +25,6 @@ import {
   ShieldCheck,
   ListOrdered,
   Crown,
-} from 'lucide-react'
-import { AdminBackButton } from '@/components/admin-back-button'
-=======
-  Brain,
-  Activity,
-  BarChart3,
-  SlidersHorizontal,
-  Wrench,
-} from 'lucide-react'
-  Crown,
-  SlidersHorizontal,
 } from 'lucide-react'
 import { AdminBackButton } from '@/components/admin-back-button'
 
