@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T23:34:22.465Z",
+  "generatedAt": "2026-08-09T02:13:13.224Z",
   "collections": [
     {
       "name": "users",
@@ -920,6 +920,49 @@
           "required": false,
           "system": false,
           "collectionRef": "users"
+        },
+        {
+          "name": "network_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "pbc_2568186236"
+        },
+        {
+          "name": "network_restriction_source",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "network_restriction_origin_partner_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "network_restriction_origin_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "network_restriction_origin_cnpj",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "network_restriction_origin_amount",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "network_restriction_origin_days",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -930,7 +973,8 @@
         "CREATE INDEX idx_partners_active ON partners (active)",
         "CREATE INDEX `idx_partners_rca` ON `partners` (rca_id)",
         "CREATE INDEX `idx_partners_televendas` ON `partners` (televendas_id)",
-        "CREATE INDEX `idx_partners_resp_digital` ON `partners` (responsavel_comercial_digital_id)"
+        "CREATE INDEX `idx_partners_resp_digital` ON `partners` (responsavel_comercial_digital_id)",
+        "CREATE INDEX `idx_partners_network` ON `partners` (network_id)"
       ]
     },
     {
