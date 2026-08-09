@@ -19,9 +19,8 @@ function applyFilters(records: Rec[], filters: BIFilters, dateField = 'created')
   return records.filter((r) => {
     if (filters.empresa && r.company && r.company !== filters.empresa) return false
     if (filters.filial && r.branch && r.branch !== filters.filial) return false
-    const _entity = (filters as Record<string, unknown>).entity as string | undefined
-    if (_entity) {
-      const e = _entity.toLowerCase()
+    if (filters.entity) {
+      const e = filters.entity.toLowerCase()
       const fields = [
         'client_name',
         'name',
@@ -29,8 +28,21 @@ function applyFilters(records: Rec[], filters: BIFilters, dateField = 'created')
         'supplier_name',
         'full_name',
         'company_name',
+        'seller_name',
+        'salesperson_name',
+        'description',
+        'title',
+        'product_name',
+        'produto_nome',
       ]
       if (!fields.some((f) => r[f] && String(r[f]).toLowerCase().includes(e))) return false
+    }
+    if (filters.area) {
+      const a = filters.area.toLowerCase()
+      const areaFields = ['area', 'module', 'category', 'department', 'type', 'sector']
+      const hasAreaField = areaFields.some((f) => r[f] !== undefined)
+      if (hasAreaField && !areaFields.some((f) => r[f] && String(r[f]).toLowerCase().includes(a)))
+        return false
     }
     if (
       filters.startDate &&

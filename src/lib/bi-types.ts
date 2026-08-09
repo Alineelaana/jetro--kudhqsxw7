@@ -3,6 +3,8 @@ export interface BIFilters {
   filial?: string
   startDate?: string
   endDate?: string
+  entity?: string
+  area?: string
 }
 
 export interface SalesAnalyticsData {

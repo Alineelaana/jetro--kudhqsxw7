@@ -82,11 +82,7 @@ export async function analyzeEntity(name: string): Promise<EntityAnalysis> {
   const wonOpps = opps.filter((o) => o.status === 'Ganha').length
   const lostOpps = opps.filter((o) => o.status === 'Perdida').length
 
-  let productsCount = productSet.size
-  if (productsCount === 0) {
-    const products = await safeFilter('products', 'active = true')
-    productsCount = products.length
-  }
+  const productsCount = productSet.size
 
   const verbas = apurations.reduce((s, a) => s + parseNum(a.commission_value), 0)
 

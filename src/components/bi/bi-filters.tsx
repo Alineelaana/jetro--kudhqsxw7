@@ -4,11 +4,9 @@ import { Input } from '@/components/ui/input'
 import { Filter, X } from 'lucide-react'
 import type { BIFilters } from '@/lib/bi-types'
 
-type FullBIFilters = BIFilters & { entity?: string; area?: string }
-
 interface BIFilterContextType {
-  filters: FullBIFilters
-  setFilters: (f: FullBIFilters) => void
+  filters: BIFilters
+  setFilters: (f: BIFilters) => void
 }
 
 const BIFilterContext = createContext<BIFilterContextType | undefined>(undefined)
@@ -24,7 +22,7 @@ export const BIFilterProvider = ({ children }: { children: ReactNode }) => {
   const entityFromUrl = searchParams.get('entity') || ''
   const areaFromUrl = searchParams.get('area') || ''
 
-  const [filters, setFilters] = useState<FullBIFilters>({
+  const [filters, setFilters] = useState<BIFilters>({
     entity: entityFromUrl || undefined,
     area: areaFromUrl || undefined,
   })
