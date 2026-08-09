@@ -42,7 +42,6 @@ migrate(
         updateRule: RS,
         deleteRule: RS,
         fields: nonRel.concat(AF),
-        indexes: indexes || [],
       })
       app.save(col)
       col = app.findCollectionByNameOrId(name)
@@ -57,6 +56,22 @@ migrate(
               }),
             )
           }
+        }
+        app.save(col)
+      }
+      if (indexes && indexes.length > 0) {
+        col = app.findCollectionByNameOrId(name)
+        for (var k = 0; k < indexes.length; k++) {
+          var sql = indexes[k]
+          var uMatch = sql.match(/CREATE\s+(UNIQUE\s+)?INDEX/i)
+          var isUnique = uMatch && uMatch[1] ? true : false
+          var nMatch = sql.match(/INDEX\s+(\S+)\s+ON/i)
+          var idxName = nMatch ? nMatch[1] : 'idx_' + name + '_' + k
+          var oMatch = sql.match(/ON\s+\w+\s+\(([^)]+)\)/i)
+          var idxCols = oMatch ? oMatch[1] : ''
+          var wMatch = sql.match(/WHERE\s+(.+)$/i)
+          var idxWhere = wMatch ? wMatch[1] : ''
+          col.addIndex(idxName, isUnique, idxCols, idxWhere)
         }
         app.save(col)
       }
