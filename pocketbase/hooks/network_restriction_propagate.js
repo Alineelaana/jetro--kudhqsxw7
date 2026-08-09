@@ -134,7 +134,6 @@ onRecordUpdateRequest((e) => {
       try {
         var aCol = $app.findCollectionByNameOrId('audit_logs')
         var aLog = new Record(aCol)
-        log.set('user_id', authUser ? authUser.id : '')
         aLog.set('user_id', authUser ? authUser.id : '')
         aLog.set('user_name', authUser ? authUser.getString('name') || authUser.email || '' : '')
         aLog.set('user_role', authUser ? authUser.getString('role') || '' : '')

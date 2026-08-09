@@ -66,15 +66,6 @@ import VariableRemuneration from './pages/VariableRemuneration'
 import BI from './pages/BI'
 import Performance from './pages/Performance'
 import ValidityAlerts from './pages/ValidityAlerts'
-import { IndustryLayout } from '@/components/industry/industry-layout'
-import { ProductionOrdersPanel } from '@/components/industry/production-orders-panel'
-import { CapacityPanel } from '@/components/industry/capacity-panel'
-import { PlanningPanel } from '@/components/industry/planning-panel'
-import { ExecutionPanel } from '@/components/industry/execution-panel'
-import { QualityExtendedPanel } from '@/components/industry/quality-extended-panel'
-import { TraceabilityPanel } from '@/components/industry/traceability-panel'
-import { KpisPanel } from '@/components/industry/kpis-panel'
-import { MaintenancePanel } from '@/components/industry/maintenance-panel'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -680,6 +671,18 @@ const App = () => (
                         <Route
                           path="/admin/industria/executivo"
                           element={<Industry screen="executivo" />}
+                        />
+                        <Route
+                          path="/admin/industria/cockpit"
+                          element={<Industry screen="cockpit" />}
+                        />
+                        <Route
+                          path="/admin/industria/intelligence"
+                          element={<Industry screen="intelligence" />}
+                        />
+                        <Route
+                          path="/admin/industria/adapta"
+                          element={<Industry screen="adapta" />}
                         />
                         <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
                         <Route path="/admin/platform-layer" element={<PlatformLayer />} />

@@ -11,7 +11,7 @@ routerAdd(
 
       var conversationId = body.conversation_id || null
 
-      var result = $ai.agent('logistics-agent').chat({
+      var result = $ai.agent('industrial-adapta').chat({
         user_id: userId,
         conversation_id: conversationId,
         message: message,

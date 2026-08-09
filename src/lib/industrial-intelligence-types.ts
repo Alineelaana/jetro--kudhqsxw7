@@ -126,6 +126,7 @@ export interface ExecutivePanelData {
     active: number
     idle: number
     overloaded: number
+    maintenance: number
     list: Array<{ name: string; status: string; load: number }>
   }
   centros_trabalho: Array<{ name: string; load: number; capacity: number; utilization: number }>

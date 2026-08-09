@@ -31,7 +31,7 @@ pocketbase/
 ### Migrações
 
 - **Formato:** `NNNN_description.js` — 4 dígitos sequenciais, começando em `0001`
-- **Próxima migração disponível:** `0160`
+- **Próxima migração disponível:** `0163`
 - **Regra:** Nunca reutilizar numeração existente
 - **Regra:** Migrações marcadas como `(applied)` são imutáveis — nunca modificar
 - **Regra:** Migrações marcadas como `(failed)` devem ser corrigidas no mesmo arquivo
@@ -117,6 +117,7 @@ Cada migração deve incluir:
 | 0128–0139 | Trade marketing, MK, verbas, corporate docs, business days                                             |
 | 0140–0149 | Commission rules, performance, validity alerts                                                         |
 | 0150–0159 | Financial extended, collection center, client networks, transport journeys, logistics agents, E2E seed |
+| 0160–0162 | Industrial ADAPTA agent, production order workflow, engineering collections                            |
 
 ## 7. Quando o GitHub Estiver Disponível
 
