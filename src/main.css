@@ -179,6 +179,29 @@
   .ken-burns {
     animation: none;
   }
+  .banner-motion {
+    animation: none;
+  }
+}
+
+@keyframes banner-motion {
+  0% {
+    transform: scale(1.08) translate(0%, 0%);
+  }
+  33% {
+    transform: scale(1.14) translate(-2%, -1%);
+  }
+  66% {
+    transform: scale(1.12) translate(2%, 1%);
+  }
+  100% {
+    transform: scale(1.08) translate(0%, 0%);
+  }
+}
+
+.banner-motion {
+  animation: banner-motion 25s ease-in-out infinite;
+  will-change: transform;
 }
 
 @media (max-width: 640px) {
