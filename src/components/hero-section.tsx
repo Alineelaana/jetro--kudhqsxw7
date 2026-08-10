@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Bot, ShieldCheck, Zap, Layers } from 'lucide-react'
 import heroBanner from '@/assets/whatsapp-image-2026-08-09-at-23.34.40-4795a.jpeg'
+import jetroRoboticHand from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-1-f45df.jpeg'
 
 export function HeroSection() {
   const scrollToSection = (id: string) => {
@@ -82,17 +83,17 @@ export function HeroSection() {
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto rounded-2xl overflow-hidden border-2 border-[#C89B3C]/60 shadow-2xl shadow-black/80 group hover:shadow-[#C89B3C]/20 transition-all duration-500">
               <img
-                src={heroBanner}
-                alt="Jetro - Gestão Inteligente com IA Nine"
+                src={jetroRoboticHand}
+                alt="Jetro - Nine IA & Jetro Platform"
                 className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#001D0F]/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#001D0F]/90 via-[#001D0F]/30 to-transparent pointer-events-none" />
               <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-transparent backdrop-blur-md border border-[#C89B3C]/40 text-xs text-gray-100 shadow-xl">
-                <p className="font-bold text-[#E5B85C] mb-1 flex items-center gap-1.5">
+                <p className="font-bold text-[#E5B85C] mb-1 flex items-center gap-1.5 bg-transparent drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                   <Zap className="h-3.5 w-3.5 text-[#C89B3C]" />
                   Nine IA &amp; Jetro Platform
                 </p>
-                <p className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                <p className="bg-transparent text-gray-100 font-medium leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                   Orquestração de operações e inteligência preditiva em tempo real.
                 </p>
               </div>
