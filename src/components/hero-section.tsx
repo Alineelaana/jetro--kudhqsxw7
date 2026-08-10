@@ -36,10 +36,6 @@ export function HeroSection() {
               desenvolvida para simplificar a gestão e impulsionar resultados.
             </p>
 
-            <p className="text-lg sm:text-xl font-bold text-[#E5B85C] flex items-center gap-2 bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              📞 31 9 9129-7619
-            </p>
-
             <div className="flex flex-col sm:flex-row gap-4 pt-2 bg-transparent">
               <Button
                 onClick={() => scrollToSection('orcamento')}
