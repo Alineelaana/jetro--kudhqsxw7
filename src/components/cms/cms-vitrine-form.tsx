@@ -8,6 +8,8 @@ import {
   VITRINE_TEXT_POSITIONS,
   type VitrineItem,
 } from '@/lib/vitrine-types'
+
+const FORM_STATUSES = VITRINE_STATUSES.filter((s) => s.id !== 'publicada')
 import { SERVICES } from '@/lib/constants'
 import {
   CmsCard,
@@ -119,7 +121,6 @@ export function CmsVitrineForm({
     setSaving(true)
     try {
       const saveData = { ...data }
-      if (saveData.status === 'publicada') saveData.has_publish_history = true
       if (itemId) {
         await updateVitrineItem(itemId, saveData)
         toast.success('Campanha atualizada!')
@@ -328,7 +329,7 @@ export function CmsVitrineForm({
           <Sel
             value={data.status || ''}
             onChange={(v) => update({ status: v as VitrineItem['status'] })}
-            options={VITRINE_STATUSES}
+            options={FORM_STATUSES}
           />
         </CmsField>
         <CmsToggle

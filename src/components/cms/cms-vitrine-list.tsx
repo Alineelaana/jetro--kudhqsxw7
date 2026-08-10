@@ -74,7 +74,7 @@ export function CmsVitrineList({
     try {
       await updateVitrineItem(item.id, {
         active: !item.active,
-        status: item.active ? 'inativa' : 'publicada',
+        status: item.active ? 'inativa' : 'rascunho',
       })
       toast.success(item.active ? 'Campanha inativada!' : 'Campanha ativada!')
     } catch {
@@ -220,6 +220,7 @@ export function CmsVitrineList({
                           size="icon"
                           className="h-8 w-8"
                           onClick={() => onPreview(item)}
+                          title="Visualizar"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -228,6 +229,7 @@ export function CmsVitrineList({
                           size="icon"
                           className="h-8 w-8"
                           onClick={() => onEdit(item.id)}
+                          title="Editar"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -236,6 +238,7 @@ export function CmsVitrineList({
                           size="icon"
                           className="h-8 w-8"
                           onClick={() => handleDuplicate(item.id)}
+                          title="Duplicar"
                         >
                           <Copy className="w-4 h-4" />
                         </Button>
@@ -244,6 +247,7 @@ export function CmsVitrineList({
                           size="icon"
                           className="h-8 w-8"
                           onClick={() => handleToggle(item)}
+                          title={item.active ? 'Inativar' : 'Ativar'}
                         >
                           <Power className="w-4 h-4" />
                         </Button>
@@ -252,6 +256,7 @@ export function CmsVitrineList({
                           size="icon"
                           className="h-8 w-8 text-red-500"
                           onClick={() => handleDelete(item)}
+                          title="Excluir"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

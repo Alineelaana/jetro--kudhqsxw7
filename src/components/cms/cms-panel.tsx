@@ -19,7 +19,6 @@ import {
   Search,
   Code,
   History,
-  Rocket,
   Megaphone,
 } from 'lucide-react'
 import { CmsOverview } from '@/components/cms/cms-overview'
@@ -35,7 +34,7 @@ import { CmsVisualIdentity } from '@/components/cms/cms-visual-identity'
 import { CmsNavigationMenu } from '@/components/cms/cms-navigation-menu'
 import { CmsFooterSettings } from '@/components/cms/cms-footer-settings'
 import { CmsSeoSettings, CmsScripts } from '@/components/cms/cms-seo-scripts'
-import { CmsChangeHistory, CmsPublication } from '@/components/cms/cms-workflow'
+import { CmsChangeHistory } from '@/components/cms/cms-workflow'
 import { CmsVitrine } from '@/components/cms/cms-vitrine'
 
 const CMS_TABS = [
@@ -56,7 +55,6 @@ const CMS_TABS = [
   { id: 'seo', label: 'SEO', icon: Search },
   { id: 'scripts', label: 'Scripts e Integrações', icon: Code },
   { id: 'history', label: 'Histórico de Alterações', icon: History },
-  { id: 'publish', label: 'Publicação', icon: Rocket },
 ] as const
 
 export function CmsPanel() {
@@ -143,7 +141,6 @@ export function CmsPanel() {
           {activeTab === 'seo' && <CmsSeoSettings />}
           {activeTab === 'scripts' && <CmsScripts />}
           {activeTab === 'history' && <CmsChangeHistory />}
-          {activeTab === 'publish' && <CmsPublication />}
         </div>
       </div>
     </div>
