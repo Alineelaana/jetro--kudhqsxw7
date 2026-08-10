@@ -54,7 +54,7 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
       <div className="relative z-10 container mx-auto px-4 sm:px-6 max-w-6xl text-center space-y-8">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-xs sm:text-sm font-extrabold uppercase tracking-wider backdrop-blur-sm">
           <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
-          <span>Plataforma Inteligente Jetro</span>
+          <span>Plataforma de Gestão Inteligente Jetro</span>
         </div>
 
         {/* Main Heading as per Acceptance Criteria */}
