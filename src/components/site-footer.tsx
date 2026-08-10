@@ -114,6 +114,11 @@ export function SiteFooter() {
                 <Link to="/central-de-privacidade" className="hover:text-white transition-colors">
                   Central de Privacidade
                 </Link>
+                <li>
+                  <Link to="/canal-de-privacidade" className="hover:text-white transition-colors">
+                    Canal de Privacidade (DPO)
+                  </Link>
+                </li>
               </li>
             </ul>
           </div>
