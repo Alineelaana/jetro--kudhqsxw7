@@ -26,6 +26,7 @@ import { canCreateAgents, canEditAgents, canActivateAgents } from '@/lib/ai-perm
 import { AGENT_TYPES, AGENT_STATUS, type AiAgent } from '@/lib/ai-types'
 import { Plus, Bot, Loader2, Power, Pause, Copy, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 
 const STATUS_COLORS: Record<string, string> = {
   Ativo: 'bg-green-100 text-green-700',
@@ -184,8 +185,12 @@ export function AiAgents() {
               <CardContent className="p-4 space-y-2">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-[#005B2E]/10 flex items-center justify-center">
-                      <Bot className="w-5 h-5 text-[#005B2E]" />
+                    <div className="w-10 h-10 rounded-full border-2 border-[#C89B3C] overflow-hidden shrink-0 shadow-sm">
+                      <img
+                        src={nineAvatar}
+                        alt="Srta. NINE - Inteligência Artificial Jetro"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div>
                       <p className="font-bold text-sm">{a.name}</p>

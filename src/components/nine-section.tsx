@@ -1,6 +1,6 @@
 import { Bot, Sparkles, MessageSquare, Database, Shield, Zap, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import nineAvatar from '@/assets/captura-de-tela-2026-08-01-as-10.38.48-65c70.png'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 
 interface NineSectionProps {
   onOpenChat?: () => void
@@ -27,7 +27,7 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
                 <div className="relative mx-auto w-40 h-40 rounded-full p-1.5 bg-gradient-to-tr from-emerald-400 via-teal-300 to-[#C89B3C] shadow-xl">
                   <img
                     src={nineAvatar}
-                    alt="Nine - Inteligência Artificial Jetro"
+                    alt="Srta. NINE - Inteligência Artificial Jetro"
                     className="w-full h-full object-cover rounded-full"
                   />
                   <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center">
@@ -37,7 +37,7 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
 
                 <div>
                   <h3 className="text-2xl font-black text-white flex items-center justify-center gap-2">
-                    Srta. Nine
+                    Srta. NINE
                     <Sparkles className="w-5 h-5 text-amber-400" />
                   </h3>
                   <p className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mt-0.5">

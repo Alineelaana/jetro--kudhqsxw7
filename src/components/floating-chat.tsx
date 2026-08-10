@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { MessageSquare, X, Send, Bot } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false)
@@ -43,10 +43,14 @@ export function FloatingChat() {
           aria-label="Fale com a Nine, nossa IA"
         >
           <div className="relative h-9 w-9 rounded-full overflow-hidden border border-[#C89B3C]">
-            <img src={nineAvatar} alt="Nine" className="h-full w-full object-cover" />
+            <img
+              src={nineAvatar}
+              alt="Srta. NINE - Inteligência Artificial Jetro"
+              className="h-full w-full object-cover"
+            />
           </div>
           <span className="hidden sm:inline-block font-bold text-sm pr-2">
-            Fale com a Nine, nossa IA
+            Fale com a Srta. NINE, nossa IA
           </span>
           <MessageSquare className="h-5 w-5 text-[#E5B85C]" />
         </button>
@@ -57,11 +61,15 @@ export function FloatingChat() {
           <div className="bg-gradient-to-r from-[#002817] via-[#005A36] to-[#002817] text-white p-4 flex items-center justify-between border-b border-[#C89B3C]">
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 rounded-full overflow-hidden border-2 border-[#C89B3C]">
-                <img src={nineAvatar} alt="Nine" className="h-full w-full object-cover" />
+                <img
+                  src={nineAvatar}
+                  alt="Srta. NINE - Inteligência Artificial Jetro"
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div>
                 <h4 className="text-sm font-bold flex items-center gap-1.5">
-                  Nine - IA Jetro
+                  Srta. NINE - IA Jetro
                   <Bot className="h-3.5 w-3.5 text-[#E5B85C]" />
                 </h4>
                 <span className="text-[10px] text-emerald-200">Assistente Inteligente Online</span>
@@ -79,8 +87,17 @@ export function FloatingChat() {
             {messages.map((m, idx) => (
               <div
                 key={idx}
-                className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex items-start gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
+                {m.sender === 'nine' && (
+                  <div className="h-7 w-7 rounded-full overflow-hidden border border-[#C89B3C] shrink-0 mt-0.5 shadow-sm">
+                    <img
+                      src={nineAvatar}
+                      alt="Srta. NINE - Inteligência Artificial Jetro"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
                 <div
                   className={`max-w-[82%] rounded-xl p-3 ${
                     m.sender === 'user'

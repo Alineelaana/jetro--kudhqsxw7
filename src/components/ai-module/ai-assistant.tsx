@@ -6,6 +6,7 @@ import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { SUGGESTED_QUESTIONS } from '@/lib/ai-types'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 
 interface ChatMsg {
   role: 'user' | 'assistant'
@@ -18,7 +19,7 @@ export function AiAssistant() {
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: 'assistant',
-      content: `Olá, ${user?.name || 'usuário'}! Sou a Srta. Velora, sua assistente de IA. Como posso ajudar você hoje?`,
+      content: `Olá, ${user?.name || 'usuário'}! Sou a Srta. NINE, sua assistente de IA da Jetro. Como posso ajudar você hoje?`,
     },
   ])
   const [input, setInput] = useState('')
@@ -69,11 +70,15 @@ export function AiAssistant() {
     <div className="space-y-4">
       <Card className="border-2 border-[#005B2E]/20 flex flex-col h-[70vh]">
         <div className="bg-[#005B2E] text-white px-4 py-3 flex items-center gap-3 rounded-t-xl">
-          <div className="w-10 h-10 rounded-full bg-[#C89B3C] flex items-center justify-center">
-            <Bot className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-full border-2 border-[#C89B3C] overflow-hidden flex-shrink-0 shadow-md">
+            <img
+              src={nineAvatar}
+              alt="Srta. NINE - Inteligência Artificial Jetro"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <p className="font-bold text-sm">Srta. Velora - Assistente IA</p>
+            <p className="font-bold text-sm">Srta. NINE - Assistente IA Jetro</p>
             <p className="text-xs text-white/80 flex items-center gap-1">
               <span className="w-2 h-2 bg-green-400 rounded-full" /> Online
             </p>
@@ -84,28 +89,52 @@ export function AiAssistant() {
             <div
               key={i}
               className={cn(
-                'max-w-[75%] rounded-2xl p-3 text-sm',
-                msg.role === 'user'
-                  ? 'ml-auto bg-[#005B2E] text-white rounded-tr-sm'
-                  : 'bg-white border border-border rounded-tl-sm',
+                'flex items-start gap-2.5 max-w-[80%]',
+                msg.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto',
               )}
             >
-              <div className="flex items-center gap-2 mb-1">
-                {msg.role === 'assistant' ? (
-                  <Bot className="w-3.5 h-3.5 text-[#C89B3C]" />
-                ) : (
-                  <User className="w-3.5 h-3.5 opacity-70" />
+              {msg.role === 'assistant' && (
+                <div className="w-8 h-8 rounded-full border border-[#C89B3C] overflow-hidden shrink-0 shadow-sm mt-0.5">
+                  <img
+                    src={nineAvatar}
+                    alt="Srta. NINE - Inteligência Artificial Jetro"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div
+                className={cn(
+                  'rounded-2xl p-3 text-sm',
+                  msg.role === 'user'
+                    ? 'bg-[#005B2E] text-white rounded-tr-sm'
+                    : 'bg-white border border-border rounded-tl-sm',
                 )}
-                <span className="text-xs font-bold opacity-70">
-                  {msg.role === 'assistant' ? 'Srta. Velora' : 'Você'}
-                </span>
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  {msg.role === 'assistant' ? (
+                    <span className="text-xs font-bold text-[#005B2E]">Srta. NINE</span>
+                  ) : (
+                    <>
+                      <User className="w-3.5 h-3.5 opacity-70" />
+                      <span className="text-xs font-bold opacity-70">Você</span>
+                    </>
+                  )}
+                </div>
+                <p className="whitespace-pre-wrap">{msg.content}</p>
               </div>
-              <p className="whitespace-pre-wrap">{msg.content}</p>
             </div>
           ))}
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" /> Srta. Velora está pensando...
+              <div className="w-6 h-6 rounded-full border border-[#C89B3C] overflow-hidden shrink-0">
+                <img
+                  src={nineAvatar}
+                  alt="Srta. NINE - Inteligência Artificial Jetro"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <Loader2 className="w-4 h-4 animate-spin text-[#005B2E]" />
+              <span>Srta. NINE está pensando...</span>
             </div>
           )}
           <div ref={endRef} />

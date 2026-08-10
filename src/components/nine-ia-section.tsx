@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Bot, Sparkles, MessageSquare, Brain, Lightbulb } from 'lucide-react'
-import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 
 export function NineIaSection() {
   const handleOpenNine = () => {
@@ -28,13 +28,13 @@ export function NineIaSection() {
               <div className="relative h-64 w-64 sm:h-80 sm:w-80 rounded-full overflow-hidden border-4 border-[#C89B3C] shadow-2xl mx-auto">
                 <img
                   src={nineAvatar}
-                  alt="Nine - Inteligência Artificial Jetro"
+                  alt="Srta. NINE - Inteligência Artificial Jetro"
                   className="h-full w-full object-cover"
                 />
               </div>
               <div className="absolute bottom-2 right-2 bg-[#005A36] text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-[#C89B3C] flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-[#E5B85C]" />
-                <span>Srta Nine</span>
+                <span>Srta. NINE</span>
               </div>
             </div>
           </div>

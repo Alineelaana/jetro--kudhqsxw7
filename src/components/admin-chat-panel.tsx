@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 import {
   Select,
   SelectContent,
@@ -187,7 +188,7 @@ export function AdminChatPanel() {
           <div>
             <p className="text-sm font-bold text-foreground">Exibir chat no site público</p>
             <p className="text-xs text-muted-foreground">
-              Controla se o chat da Srta. Velora aparece para os visitantes
+              Controla se o chat da Srta. NINE aparece para os visitantes
             </p>
           </div>
         </div>
@@ -211,7 +212,7 @@ export function AdminChatPanel() {
             <Bot className="w-5 h-5 text-[#C89B3C] flex-shrink-0" />
             <div>
               <p className="text-sm font-bold text-foreground">
-                Ativar Srta. Velora em tempo integral
+                Ativar Srta. NINE em tempo integral
               </p>
               <p className="text-xs text-muted-foreground">
                 A IA responderá automaticamente todas as mensagens do chat
@@ -239,9 +240,15 @@ export function AdminChatPanel() {
       )}
       {aiFulltimeActive && (
         <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#005B2E]/10 border border-[#005B2E]/20">
-          <Bot className="w-4 h-4 text-[#005B2E] flex-shrink-0" />
+          <div className="w-5 h-5 rounded-full border border-[#C89B3C] overflow-hidden flex-shrink-0">
+            <img
+              src={nineAvatar}
+              alt="Srta. NINE - Inteligência Artificial Jetro"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <span className="text-sm font-bold text-[#005B2E]">
-            Srta. Velora está atendendo em tempo integral no chat online.
+            Srta. NINE está atendendo em tempo integral no chat online.
           </span>
         </div>
       )}
@@ -323,25 +330,41 @@ export function AdminChatPanel() {
                   <div
                     key={msg.id}
                     className={cn(
-                      'max-w-[75%] rounded-2xl p-3 text-sm',
-                      msg.sender === 'client'
-                        ? 'bg-white border border-border rounded-tl-sm'
-                        : msg.sender === 'ai'
-                          ? 'bg-[#C89B3C]/15 border border-[#C89B3C]/30 rounded-tr-sm ml-auto'
-                          : 'bg-[#005B2E] text-white rounded-tr-sm ml-auto',
+                      'flex items-start gap-2 max-w-[80%]',
+                      msg.sender === 'client' ? 'mr-auto' : 'ml-auto flex-row-reverse',
                     )}
                   >
-                    <p className="text-xs font-bold mb-1 opacity-70">
-                      {msg.sender === 'client'
-                        ? msg.author_name || 'Cliente'
-                        : msg.sender === 'ai'
-                          ? 'Srta. Velora (IA)'
-                          : 'Srta. Velora'}
-                    </p>
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                    <p className="text-xs opacity-50 mt-1">
-                      {new Date(msg.created).toLocaleTimeString('pt-BR')}
-                    </p>
+                    {msg.sender === 'ai' && (
+                      <div className="w-7 h-7 rounded-full border border-[#C89B3C] overflow-hidden shrink-0 shadow-sm mt-0.5">
+                        <img
+                          src={nineAvatar}
+                          alt="Srta. NINE - Inteligência Artificial Jetro"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        'rounded-2xl p-3 text-sm',
+                        msg.sender === 'client'
+                          ? 'bg-white border border-border rounded-tl-sm'
+                          : msg.sender === 'ai'
+                            ? 'bg-[#C89B3C]/15 border border-[#C89B3C]/30 rounded-tr-sm'
+                            : 'bg-[#005B2E] text-white rounded-tr-sm',
+                      )}
+                    >
+                      <p className="text-xs font-bold mb-1 opacity-70">
+                        {msg.sender === 'client'
+                          ? msg.author_name || 'Cliente'
+                          : msg.sender === 'ai'
+                            ? 'Srta. NINE (IA)'
+                            : msg.author_name || 'Atendente'}
+                      </p>
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-xs opacity-50 mt-1">
+                        {new Date(msg.created).toLocaleTimeString('pt-BR')}
+                      </p>
+                    </div>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
