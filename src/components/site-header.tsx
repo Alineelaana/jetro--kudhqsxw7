@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Menu, X, ChevronRight } from 'lucide-react'
-import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-1-f45df.jpeg'
+import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-64131.jpeg'
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -35,10 +35,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#C89B3C]/30 bg-[#002817]">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="flex items-center group">
-          <div className="relative h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-md border-2 border-[#C89B3C] shadow-md group-hover:scale-105 transition-transform duration-300">
-            <img src={logoImg} alt="Jetro Logo" className="h-full w-full object-cover" />
-          </div>
+        <Link to="/" className="flex items-center group py-1">
+          <img
+            src={logoImg}
+            alt="Jetro Logo"
+            className="h-11 sm:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+          />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6">
