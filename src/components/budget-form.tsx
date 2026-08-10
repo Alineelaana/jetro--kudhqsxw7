@@ -97,7 +97,7 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-border shadow-xl p-6 sm:p-10 space-y-6">
+    <div className="space-y-6">
       <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-muted-foreground leading-relaxed">
         Conte um pouco sobre sua empresa e o que você procura. Nossa equipe entrará em contato para
         entender sua operação e apresentar como o Jetro pode ajudar.
