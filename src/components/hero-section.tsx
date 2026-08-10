@@ -59,10 +59,7 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
 
         {/* Main Heading as per Acceptance Criteria */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.1] drop-shadow-md">
-          Gestão inteligente para empresas que{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-200 to-[#E2B755]">
-            querem crescer
-          </span>
+          Gestão inteligente para empresas que <span className="text-white">querem crescer</span>
         </h1>
 
         <p className="text-slate-100 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed font-medium drop-shadow">
