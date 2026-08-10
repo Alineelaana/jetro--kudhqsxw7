@@ -72,7 +72,7 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
           <Button
             onClick={handlePrimaryClick}
             size="lg"
-            className="w-full sm:w-auto bg-white hover:bg-gray-100 text-[#005A36] font-extrabold text-base px-8 py-6 rounded-xl shadow-lg hover:shadow-white/25 transition-all group cursor-pointer"
+            className="w-full sm:w-auto bg-gold-metallic hover:bg-[#b88a2e] text-white font-extrabold text-base px-8 py-6 rounded-xl shadow-lg hover:shadow-yellow/25 transition-all group cursor-pointer"
           >
             <span>Solicitar Orçamento</span>
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -85,7 +85,7 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
             }}
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto bg-white hover:bg-gray-100 border-white text-[#005A36] font-bold text-base px-8 py-6 rounded-xl cursor-pointer"
+            className="w-full sm:w-auto bg-gold-metallic hover:bg-[#b88a2e] border-gold-metallic text-white font-bold text-base px-8 py-6 rounded-xl cursor-pointer"
           >
             Conhecer Soluções
           </Button>
