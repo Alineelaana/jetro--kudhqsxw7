@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { type FieldErrors } from '@/lib/pocketbase/errors'
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
+import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 export function AdminLogin() {
   const { login, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
@@ -59,11 +60,19 @@ export function AdminLogin() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
-        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg">
-          <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-6 h-6 text-[#E4C46A]" />
-            Área Restrita — Velora Log
+        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
+          <img
+            src={logoJetro}
+            alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
+            className="h-20 w-auto object-contain rounded-xl border border-[#C89B3C]/40 mb-3 shadow-lg"
+          />
+          <CardTitle className="text-lg sm:text-xl font-black text-center text-white flex items-center justify-center gap-2">
+            <Lock className="w-5 h-5 text-[#E4C46A]" />
+            Área Restrita — Jetro
           </CardTitle>
+          <p className="text-xs text-white/70 mt-1 font-medium">
+            Plataforma Inteligente de Gestão Empresarial
+          </p>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -6,7 +6,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import { Menu, MessageCircle } from 'lucide-react'
 import { GitHubConnectionButton } from '@/components/github-connection-button'
-import logoGreenBg from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-a43e3.png'
+import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 const NAV_LINKS = [
   { label: 'Início', to: '/' },
@@ -40,9 +40,9 @@ export function SiteHeader() {
         <div className="flex items-center justify-between h-24">
           <Link to="/" onClick={handleHomeClick} className="flex items-center gap-2 group">
             <img
-              src={logoGreenBg}
-              alt="Velora Log"
-              className="h-16 sm:h-20 w-auto object-contain transition-transform group-hover:scale-105 rounded-lg"
+              src={logoJetro}
+              alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
+              className="h-16 sm:h-20 w-auto object-contain transition-transform group-hover:scale-105 rounded-lg border border-[#C89B3C]/30 shadow-md"
             />
           </Link>
 
@@ -76,7 +76,7 @@ export function SiteHeader() {
               size="sm"
               className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-md rounded-lg"
             >
-              <Link to="/admin">Área da empresa</Link>
+              <Link to="/admin">Área da Empresa</Link>
             </Button>
             <Button
               asChild
@@ -86,7 +86,7 @@ export function SiteHeader() {
               <a
                 href={buildWhatsAppUrl(
                   safeWhatsapp,
-                  'Olá! Gostaria de informações sobre os serviços de armazenagem e transporte da Velora Log.',
+                  'Olá! Gostaria de informações sobre as soluções da Jetro - Plataforma Inteligente de Gestão Empresarial.',
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -107,9 +107,9 @@ export function SiteHeader() {
               <SheetTitle className="mb-6">
                 <Link to="/" onClick={handleHomeClick}>
                   <img
-                    src={logoGreenBg}
-                    alt="Velora Log"
-                    className="h-16 w-auto object-contain rounded-lg"
+                    src={logoJetro}
+                    alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
+                    className="h-16 w-auto object-contain rounded-lg border border-[#C89B3C]/30 shadow-md"
                   />
                 </Link>
               </SheetTitle>
@@ -142,7 +142,7 @@ export function SiteHeader() {
                   className="border-2 border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E] hover:text-white font-bold"
                 >
                   <Link to="/admin" onClick={() => setOpen(false)}>
-                    Área da empresa
+                    Área da Empresa
                   </Link>
                 </Button>
                 <Button
@@ -152,7 +152,7 @@ export function SiteHeader() {
                   <a
                     href={buildWhatsAppUrl(
                       safeWhatsapp,
-                      'Olá! Gostaria de informações sobre os serviços da Velora Log.',
+                      'Olá! Gostaria de informações sobre as soluções da Jetro.',
                     )}
                     target="_blank"
                     rel="noopener noreferrer"

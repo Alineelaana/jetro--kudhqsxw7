@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useClientAuth } from '@/hooks/use-client-auth'
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
+import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 export default function ClientLogin() {
   const navigate = useNavigate()
@@ -34,10 +35,18 @@ export default function ClientLogin() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
-        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg">
-          <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-6 h-6 text-[#E4C46A]" /> Área do Cliente
+        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
+          <img
+            src={logoJetro}
+            alt="Jetro - Área do Cliente"
+            className="h-20 w-auto object-contain rounded-xl border border-[#C89B3C]/40 mb-3 shadow-lg"
+          />
+          <CardTitle className="text-xl font-black text-center text-white flex items-center justify-center gap-2">
+            <Lock className="w-6 h-6 text-[#E4C46A]" /> Área do Cliente — Jetro
           </CardTitle>
+          <p className="text-xs text-white/70 mt-1 font-medium">
+            Plataforma Inteligente de Gestão Empresarial
+          </p>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">

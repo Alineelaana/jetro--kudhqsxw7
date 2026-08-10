@@ -9,6 +9,7 @@ import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { ADMIN_MENU, type MenuEntry } from '@/lib/admin-menu-config'
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
+import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 interface SearchResult {
   label: string
@@ -74,13 +75,18 @@ export function AdminSidebar() {
 
   if (collapsed) {
     return (
-      <div className="w-12 shrink-0 border-r border-gray-200 bg-white flex flex-col items-center py-3">
+      <div className="w-12 shrink-0 border-r border-gray-200 bg-[#01361D] flex flex-col items-center py-3 gap-3">
+        <img
+          src={logoJetro}
+          alt="Jetro"
+          className="h-8 w-auto object-contain rounded border border-[#C89B3C]/40 bg-black/20"
+        />
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded hover:bg-gray-100"
+          className="p-1.5 rounded hover:bg-white/10 text-white/80"
           title="Mostrar menu"
         >
-          <PanelLeftOpen className="w-4 h-4 text-gray-500" />
+          <PanelLeftOpen className="w-4 h-4 text-[#E4C46A]" />
         </button>
       </div>
     )
@@ -88,6 +94,27 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-60 shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+      <div className="p-2.5 border-b border-gray-100 shrink-0 bg-[#01361D] text-white flex items-center justify-between gap-2">
+        <Link to="/admin" className="flex items-center gap-2 overflow-hidden">
+          <img
+            src={logoJetro}
+            alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
+            className="h-9 w-auto object-contain rounded border border-[#C89B3C]/40 bg-black/20 shadow-sm"
+          />
+          <div className="flex flex-col min-w-0">
+            <span className="font-black text-xs text-[#E4C46A] tracking-wider truncate">JETRO</span>
+            <span className="text-[10px] text-white/80 truncate">Gestão Empresarial</span>
+          </div>
+        </Link>
+        <button
+          onClick={toggleSidebar}
+          className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          title="Esconder menu"
+        >
+          <PanelLeftClose className="w-4 h-4" />
+        </button>
+      </div>
+
       <div className="p-2 border-b border-gray-100 shrink-0 space-y-1">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
@@ -107,12 +134,6 @@ export function AdminSidebar() {
             </button>
           )}
         </div>
-        <button
-          onClick={toggleSidebar}
-          className="flex items-center gap-1.5 px-2 py-1 text-xs text-gray-500 hover:text-[#005B2E] hover:bg-gray-50 rounded w-full transition-colors"
-        >
-          <PanelLeftClose className="w-3.5 h-3.5" /> Esconder menu
-        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
