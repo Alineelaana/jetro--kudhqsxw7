@@ -1,5 +1,3 @@
-import { BUSINESS_SEGMENTS } from '@/lib/constants'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Briefcase,
   Truck,
@@ -7,70 +5,95 @@ import {
   Factory,
   ShoppingBag,
   Network,
-  TrendingUp,
-  CheckCircle2,
+  ArrowRight,
+  Check,
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { BUSINESS_SEGMENTS } from '@/lib/constants'
 
-const iconMap: Record<string, any> = {
+interface SegmentsSectionProps {
+  onSelectSegment?: (segmentTitle: string) => void
+}
+
+const ICON_MAP: Record<string, any> = {
   Briefcase,
   Truck,
   Building2,
   Factory,
   ShoppingBag,
   Network,
-  TrendingUp,
 }
 
-export function SegmentsSection() {
+export function SegmentsSection({ onSelectSegment }: SegmentsSectionProps) {
+  const segments = BUSINESS_SEGMENTS.filter(
+    (seg) => seg.id !== 'crescimento' && seg.title !== 'Empresas em Crescimento',
+  )
+
   return (
-    <section id="segmentos" className="py-16 sm:py-24 bg-slate-50 relative">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="bg-[#002817] text-white px-6 sm:px-10 py-10 sm:py-14 text-center space-y-3 rounded-t-2xl mb-0">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#C89B3C]/20 border border-[#C89B3C]/50 text-[#E5B85C] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
-            Versatilidade Empresarial
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-white">
-            Um sistema preparado para diferentes modelos de negócio
+    <section
+      id="segmentos"
+      className="py-20 bg-slate-50 dark:bg-slate-900/50 border-y border-border/50"
+    >
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+        <div className="text-center space-y-4 mb-14">
+          <Badge className="bg-[#C89B3C]/10 text-[#8F6A1E] dark:text-[#E2B755] border-[#C89B3C]/30 px-4 py-1.5 text-xs uppercase font-extrabold tracking-wider">
+            Segmentos Atendidos
+          </Badge>
+          <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight">
+            Tecnologia adaptada ao seu segmento
           </h2>
-          <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-            O Jetro adapta-se à dinâmica específica do seu segmento, unificando operações complexas
-            em fluxos inteligentes e produtivos.
+          <p className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto">
+            O Jetro adapta suas funcionalidades às especificidades de cada modelo de negócio,
+            garantindo a aderência operacional necessária para o sucesso da sua empresa.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {BUSINESS_SEGMENTS.map((segment) => {
-            const IconComponent = iconMap[segment.iconName] || Briefcase
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {segments.map((seg) => {
+            const IconComp = ICON_MAP[seg.iconName] || Briefcase
             return (
-              <Card
-                key={segment.id}
-                className="border border-border/80 hover:border-[#C89B3C] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white"
+              <div
+                key={seg.id}
+                className="flex flex-col justify-between p-8 rounded-2xl bg-background border border-border hover:border-emerald-500/50 shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
-                <CardContent className="p-6 space-y-4">
-                  <div className="h-12 w-12 rounded-xl bg-[#005A36]/10 text-[#005A36] flex items-center justify-center border border-[#005A36]/20">
-                    <IconComponent className="h-6 w-6" />
+                <div>
+                  <div className="p-3.5 w-fit rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-6">
+                    <IconComp className="w-6 h-6" />
                   </div>
 
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">{segment.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {segment.description}
-                    </p>
-                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-emerald-600 transition-colors">
+                    {seg.title}
+                  </h3>
 
-                  <div className="pt-3 border-t border-border/50 space-y-2">
-                    {segment.highlights.map((item) => (
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                    {seg.description}
+                  </p>
+
+                  <div className="space-y-2 pt-4 border-t border-border/60">
+                    {seg.highlights.map((item, idx) => (
                       <div
-                        key={item}
-                        className="flex items-center gap-2 text-xs font-semibold text-foreground/80"
+                        key={idx}
+                        className="flex items-center gap-2 text-xs text-muted-foreground"
                       >
-                        <CheckCircle2 className="h-4 w-4 text-[#C89B3C] shrink-0" />
+                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                         <span>{item}</span>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+
+                <div className="pt-6">
+                  <Button
+                    onClick={() => onSelectSegment && onSelectSegment(seg.title)}
+                    variant="outline"
+                    className="w-full justify-between border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-semibold"
+                  >
+                    <span>Solicitar demonstração</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             )
           })}
         </div>

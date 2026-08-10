@@ -1,4 +1,4 @@
-export const DEFAULT_WHATSAPP_NUMBER = '5527999999999'
+export const DEFAULT_WHATSAPP_NUMBER = '5531991297619'
 export const BRAND_NAME = 'Jetro'
 export const BRAND_SLOGAN = 'Plataforma Inteligente de Gestão Empresarial'
 
@@ -65,13 +65,5 @@ export const BUSINESS_SEGMENTS: SegmentItem[] = [
       'Gestão de empresas, filiais, unidades e operações com governança e visão consolidada.',
     iconName: 'Network',
     highlights: ['Consolidação de Filiais', 'Matriz de Permissões', 'DRE Unificada'],
-  },
-  {
-    id: 'crescimento',
-    title: 'Empresas em Crescimento',
-    description:
-      'Para negócios que precisam estruturar processos profissionais sem perder agilidade.',
-    iconName: 'TrendingUp',
-    highlights: ['Evolução Modular', 'Escalabilidade', 'Processos Padronizados'],
   },
 ]

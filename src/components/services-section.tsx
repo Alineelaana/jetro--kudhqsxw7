@@ -5,7 +5,6 @@ import {
   Factory,
   Store,
   Network,
-  TrendingUp,
   BarChart3,
   Brain,
   DollarSign,
@@ -110,20 +109,6 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
         'Trilhas de Auditoria e Governança',
       ],
     },
-    {
-      id: 'crescimento',
-      title: 'Empresas em Crescimento',
-      icon: TrendingUp,
-      badge: 'Escalabilidade',
-      description:
-        'Para negócios que precisam estruturar processos profissionais sem perder agilidade.',
-      features: [
-        'Workflows e Padronização de Processos',
-        'Relatórios Gerenciais Automáticos',
-        'Integração Completa de Áreas',
-        'Suporte de IA com a Srta. Nine',
-      ],
-    },
   ]
 
   const modulesGrid = [
@@ -179,7 +164,7 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
     },
     {
       name: 'Trade Marketing',
-      icon: TrendingUp,
+      icon: BarChart3,
       desc: 'Verbas de fornecedores, campanhas promocionais e acordos',
     },
     {
