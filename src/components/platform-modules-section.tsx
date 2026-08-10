@@ -71,19 +71,20 @@ export function PlatformModulesSection() {
 
   return (
     <section id="plataforma" className="bg-white relative">
-      <div id="solucoes" className="w-full bg-[#C89B3C] py-12 sm:py-16">
-        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl space-y-3">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#005A36] text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider">
-            Arquitetura de Soluções
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-[#005A36]">
-            Entregas e Pilares do Ecossistema Jetro
-          </h2>
-          <p className="text-white text-base sm:text-lg">
-            Um ecossistema completo e modular, projetado para oferecer visibilidade total,
-            eficiência operacional e previsibilidade financeira.
-          </p>
-        </div>
+      <div
+        id="solucoes"
+        className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center max-w-3xl space-y-3"
+      >
+        <span className="inline-block px-4 py-1.5 rounded-full bg-[#005A36]/10 text-[#005A36] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
+          Arquitetura de Soluções
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-black text-[#005A36]">
+          Entregas e Pilares do Ecossistema Jetro
+        </h2>
+        <p className="text-muted-foreground text-base sm:text-lg">
+          Um ecossistema completo e modular, projetado para oferecer visibilidade total, eficiência
+          operacional e previsibilidade financeira.
+        </p>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-24">
