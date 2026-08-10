@@ -1,8 +1,15 @@
 import { PolicyLayout } from '@/components/policy-layout'
+import commercialPolicyBanner from '@/assets/whatsapp-image-2026-08-09-at-23.34.40-b4928.jpeg'
 
 export default function PoliticaComercial() {
   return (
-    <PolicyLayout title="Política Comercial" lastUpdated="10 de agosto de 2026">
+    <PolicyLayout
+      title="Política Comercial"
+      lastUpdated="10 de agosto de 2026"
+      heroImage={commercialPolicyBanner}
+      heroBadge="Jetro — Plataforma Inteligente de Gestão Empresarial"
+      heroDescription="Diretrizes comerciais, modelo de licenciamento SaaS, condições de contratação e suporte para gestão inteligente e integrada."
+    >
       <p>
         Esta Política Comercial estabelece as diretrizes para contratação, utilização, renovação e
         relacionamento comercial entre o{' '}
