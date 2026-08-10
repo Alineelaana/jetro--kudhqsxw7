@@ -32,7 +32,7 @@ export const useAuth = () => {
   return context
 }
 
-const ADMIN_EMAIL = 'veloralog@veloralog.com'
+const ADMIN_EMAIL = 'jetrosup@jetro.com.br'
 
 function isTokenExpired(token: string | null | undefined): boolean {
   if (!token) return true
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const login = async (username: string, password: string) => {
-    const email = username.trim() === 'veloralog' ? ADMIN_EMAIL : username.trim()
+    const email = username.trim() === 'jetrosup' ? ADMIN_EMAIL : username.trim()
     try {
       const authData = await pb.collection('users').authWithPassword(email, password)
       const record = authData.record as Record<string, unknown> | null
