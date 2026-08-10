@@ -1,160 +1,258 @@
-import logoUrl from '@/assets/chatgpt-image-1-de-ago.de-2026-103549-f6f46.png'
-
-const PRESENTATION_MESSAGE =
-  'A VeloraLog agradece a oportunidade de apresentar esta proposta comercial. Nosso compromisso é oferecer soluções logísticas inteligentes, eficientes e personalizadas, agregando segurança, agilidade e redução de custos para sua operação.'
-
-const DIFFERENTIALS_TEXT =
-  'A VeloraLog oferece muito mais do que serviços logísticos: entregamos inteligência operacional. Atuamos com planejamento, tecnologia, segurança e eficiência para desenvolver soluções personalizadas que reduzem custos, aumentam a produtividade e garantem operações confiáveis do início ao fim.'
+import jetroLogoUrl from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-c8e57.jpeg'
 
 export interface BudgetPdfData {
-  budgetNumber: string
-  emissionDate: string
-  requestDate: string
-  clientName: string
-  clientEmail: string
-  clientPhone: string
-  clientCompany: string
-  service: string
-  origin: string
-  destination: string
-  merchandise: string
-  volume: string
-  operationType: string
-  periodicity: string
-  value: string
-  validUntil: string
-  responsible: string
-  responsibleEmail: string
-  responsiblePhone: string
-  observations: string
-  servicosInclusos: string[]
-  valorMercadoria: string
-  necessitaSeguro: string
-  necessitaPicking: string
-  necessitaCrossDocking: string
-  necessitaFracionamento: string
-  necessitaDistribuicao: string
-  prazoDesejado: string
-  quantidadeVolumes: string
-  peso: string
-  cubagem: string
-  tipoCarga: string
-  valorSeguro: string
-  formaPagamento: string
-  prazoComercial: string
-  userName?: string
+  id?: string
+  budget_number?: string
+  request_number?: number | string
+  client_name?: string
+  client_email?: string
+  client_phone?: string
+  service?: string
+  created?: string
+  status?: string
+  total_value?: string | number
+  quote_created_at?: string
+  responsible_email?: string
+  responsible_phone?: string
+  services?: Array<{
+    name?: string
+    servico?: string
+    description?: string
+    observacoes?: string
+    value?: string | number
+  }>
+  data?: Record<string, any>
+  status_history?: any[]
+  sending_history?: any[]
 }
 
-export function generateBudgetPdf(data: BudgetPdfData): void {
-  const fullLogoUrl = new URL(logoUrl, window.location.href).href
-  const servicesHtml = data.servicosInclusos
-    .map((s) => `<div class="service-item">✔ ${s}</div>`)
-    .join('')
-  const servicesSection = data.servicosInclusos.length
-    ? `<div class="section"><div class="section-title">Serviços Inclusos</div><div class="services-checklist">${servicesHtml}</div></div>`
-    : ''
-  const html = `<!DOCTYPE html>
-<html lang="pt-BR"><head><meta charset="UTF-8">
-<title>Orçamento ${data.budgetNumber}</title>
-<style>
-@page{size:A4;margin:0}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;width:210mm;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.stripe-top{background:linear-gradient(135deg,#005B2E 0%,#01361D 100%);height:14mm;width:100%;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.stripe-bottom{background:linear-gradient(135deg,#01361D 0%,#005B2E 100%);height:10mm;width:100%;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.content{padding:10mm 18mm}
-.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm}
-.header img{height:120px;width:auto}
-.header-right{text-align:right}
-.header-right h1{font-size:26px;color:#005B2E;letter-spacing:2px}
-.header-right .number{font-size:15px;color:#C89B3C;font-weight:bold;margin-top:4px}
-.header-right .date-line{font-size:11px;color:#666;margin-top:6px;line-height:1.6}
-.gold-divider{height:2px;background:linear-gradient(90deg,#C89B3C,transparent);margin:4mm 0}
-.presentation{background:#f0f7f3;border-left:4px solid #005B2E;border-radius:6px;padding:8px 14px;margin-bottom:4mm}
-.presentation p{font-size:11px;line-height:1.5;color:#333;font-style:italic}
-.section{margin-bottom:4mm}
-.section-title{font-size:12px;font-weight:bold;color:#005B2E;text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;border-bottom:2px solid #C89B3C;margin-bottom:6px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
-.info-item{font-size:11.5px;line-height:1.45}
-.info-item strong{color:#005B2E}
-.services-checklist{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px}
-.service-item{font-size:11.5px;color:#005B2E;font-weight:600;padding:2px 0}
-.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
-.budget-item{font-size:12.5px;padding:8px;background:#f7f7f5;border-radius:6px;border-left:3px solid #005B2E}
-.budget-item strong{color:#005B2E;display:block;font-size:10px;text-transform:uppercase;margin-bottom:3px;letter-spacing:.5px}
-.responsible-box{margin-top:6px;padding:8px;background:#f0f7f3;border-radius:6px;border:1px solid rgba(0,91,46,0.12)}
-.responsible-box .title{font-size:10px;text-transform:uppercase;color:#005B2E;font-weight:bold;margin-bottom:4px;letter-spacing:.5px}
-.responsible-box .info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;font-size:11.5px}
-.responsible-box .info strong{color:#005B2E}
-.observations{font-size:11.5px;padding:8px;background:#f7f7f5;border-radius:6px;border-left:3px solid #C89B3C;min-height:30px;white-space:pre-wrap;margin-top:5px;line-height:1.45}
-.brand-section{background:linear-gradient(135deg,#f0f7f3 0%,#faf5e8 100%);border-radius:8px;padding:10px 14px;margin-top:3mm;border:1px solid rgba(200,155,60,0.25)}
-.brand-section .title{font-size:11px;text-transform:uppercase;color:#005B2E;font-weight:bold;margin-bottom:4px;letter-spacing:.5px}
-.brand-section p{font-size:11px;line-height:1.5;color:#333}
-.footer-text{font-size:10px;color:#C89B3C;font-weight:bold}
-@media print{body{width:210mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}.stripe-top,.stripe-bottom{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style></head><body>
-<div class="stripe-top"></div>
-<div class="content">
-<div class="header"><img src="${fullLogoUrl}" alt="Velora Log" />
-<div class="header-right"><h1>ORÇAMENTO</h1>
-<div class="number">Nº ${data.budgetNumber}</div>
-<div class="date-line">Solicitação recebida em: ${data.requestDate}<br/>Gerado em: ${data.emissionDate}</div></div></div>
-<div class="gold-divider"></div>
-<div class="presentation"><p>${PRESENTATION_MESSAGE}</p></div>
-<div class="section"><div class="section-title">Dados do Cliente</div>
-<div class="info-grid">
-<div class="info-item"><strong>Nome:</strong> ${data.clientName || '—'}</div>
-<div class="info-item"><strong>Empresa:</strong> ${data.clientCompany || '—'}</div>
-<div class="info-item"><strong>E-mail:</strong> ${data.clientEmail || '—'}</div>
-<div class="info-item"><strong>Telefone:</strong> ${data.clientPhone || '—'}</div>
-<div class="info-item"><strong>Serviço:</strong> ${data.service || '—'}</div>
-<div class="info-item"><strong>Tipo de Operação:</strong> ${data.operationType || '—'}</div>
-<div class="info-item"><strong>Origem:</strong> ${data.origin || '—'}</div>
-<div class="info-item"><strong>Destino:</strong> ${data.destination || '—'}</div>
-<div class="info-item"><strong>Mercadoria:</strong> ${data.merchandise || '—'}</div>
-<div class="info-item"><strong>Volume:</strong> ${data.volume || '—'}</div>
-<div class="info-item"><strong>Periodicidade:</strong> ${data.periodicity || '—'}</div>
-<div class="info-item"><strong>Tipo de Carga:</strong> ${data.tipoCarga || '—'}</div>
-<div class="info-item"><strong>Valor da Mercadoria:</strong> ${data.valorMercadoria ? 'R$ ' + data.valorMercadoria : '—'}</div>
-<div class="info-item"><strong>Prazo Desejado:</strong> ${data.prazoDesejado || '—'}</div>
-<div class="info-item"><strong>Qtd. Volumes:</strong> ${data.quantidadeVolumes || '—'}</div>
-<div class="info-item"><strong>Peso:</strong> ${data.peso ? data.peso + ' kg' : '—'}</div>
-<div class="info-item"><strong>Cubagem:</strong> ${data.cubagem ? data.cubagem + ' m³' : '—'}</div>
-<div class="info-item"><strong>Necessita Seguro:</strong> ${data.necessitaSeguro || '—'}</div>
-<div class="info-item"><strong>Necessita Picking:</strong> ${data.necessitaPicking || '—'}</div>
-<div class="info-item"><strong>Necessita Cross Docking:</strong> ${data.necessitaCrossDocking || '—'}</div>
-<div class="info-item"><strong>Necessita Fracionamento:</strong> ${data.necessitaFracionamento || '—'}</div>
-<div class="info-item"><strong>Necessita Distribuição:</strong> ${data.necessitaDistribuicao || '—'}</div>
-</div></div>
-${servicesSection}
-<div class="section"><div class="section-title">Proposta Comercial</div>
-<div class="budget-grid">
-<div class="budget-item"><strong>Valor</strong>R$ ${data.value || '—'}</div>
-<div class="budget-item"><strong>Validade do Orçamento</strong>${data.validUntil || '—'}</div>
-<div class="budget-item"><strong>Valor do Seguro</strong>R$ ${data.valorSeguro || '—'}</div>
-<div class="budget-item"><strong>Forma de Pagamento</strong>${data.formaPagamento || '—'}</div>
-<div class="budget-item"><strong>Prazo</strong>${data.prazoComercial || '—'}</div>
-</div>
-<div class="responsible-box">
-<div class="title">Responsável pelo Atendimento</div>
-<div class="info">
-<div><strong>Nome:</strong> ${data.responsible || '—'}</div>
-<div><strong>E-mail:</strong> ${data.responsibleEmail || '—'}</div>
-<div><strong>Telefone:</strong> ${data.responsiblePhone || '—'}</div>
-</div></div>
-<div style="margin-top:6px;"><div class="section-title" style="font-size:11px;">Observações</div>
-<div class="observations">${data.observations || '—'}</div></div></div>
-<div class="brand-section">
-<div class="title">Nossos Diferenciais</div>
-<p>${DIFFERENTIALS_TEXT}</p>
-</div>
-</div>
-<div class="stripe-bottom"><span class="footer-text">Velora Log — Operações Logísticas de Excelência${data.userName ? ' | Gerado por: ' + data.userName : ''}</span></div>
-<script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>
-</body></html>`
-
-  const win = window.open('', '_blank')
-  if (!win) throw new Error('Pop-up bloqueado. Permita pop-ups para gerar o PDF.')
-  win.document.write(html)
-  win.document.close()
+export function getJetroLogoUrl(): string {
+  return jetroLogoUrl
 }
+
+export function generateBudgetPdfHtml(request: BudgetPdfData): string {
+  const budgetNum =
+    request.budget_number ||
+    (request.request_number ? `ORC-${String(request.request_number).padStart(4, '0')}` : 'ORC-0001')
+  const clientName =
+    request.client_name || request.data?.nome || request.data?.client_name || 'Cliente'
+  const clientEmail = request.client_email || request.data?.email || '-'
+  const clientPhone = request.client_phone || request.data?.telefone || '-'
+  const service = request.service || request.data?.servico || 'Operações Logísticas'
+  const dateStr = request.created
+    ? new Date(request.created).toLocaleDateString('pt-BR')
+    : new Date().toLocaleDateString('pt-BR')
+  const totalVal = request.total_value
+    ? `R$ ${Number(request.total_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+    : 'Sob Consulta'
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Solicitação de Orçamento - Jetro #${budgetNum}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #1e293b; margin: 0; padding: 24px; background: #ffffff; line-height: 1.5; }
+    .header-container { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 16px; margin-bottom: 24px; }
+    .logo-img { height: 68px; max-width: 260px; object-fit: contain; }
+    .company-details { text-align: right; }
+    .company-name { font-size: 22px; font-weight: 800; color: #047857; margin: 0; letter-spacing: 0.5px; text-transform: uppercase; }
+    .company-slogan { font-size: 11px; color: #059669; font-weight: 600; margin-top: 2px; }
+    .company-info { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.3; }
+    .document-banner { background: linear-gradient(135deg, #065f46 0%, #047857 100%); color: #ffffff; padding: 14px 20px; border-radius: 8px; text-align: center; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .document-title { font-size: 18px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
+    .document-subtitle { font-size: 12px; color: #a7f3d0; margin-top: 4px; }
+    .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .info-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; }
+    .card-heading { font-size: 12px; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+    .info-row { font-size: 12px; margin-bottom: 6px; display: flex; }
+    .info-label { font-weight: 600; color: #475569; width: 100px; flex-shrink: 0; }
+    .info-value { color: #0f172a; flex-grow: 1; }
+    .status-badge { display: inline-block; background: #d1fae5; color: #065f46; font-weight: 700; font-size: 11px; padding: 2px 10px; border-radius: 12px; text-transform: uppercase; }
+    .table-container { margin-bottom: 24px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #047857; color: #ffffff; font-weight: 700; text-align: left; padding: 10px 14px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    tr:nth-child(even) td { background-color: #f8fafc; }
+    tr:last-child td { border-bottom: none; }
+    .notes-box { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
+    .notes-heading { font-size: 12px; font-weight: 700; color: #b45309; text-transform: uppercase; margin-bottom: 6px; }
+    .notes-content { font-size: 12px; color: #78350f; line-height: 1.5; }
+    .footer { text-align: center; border-top: 1px solid #e2e8f0; padding-top: 18px; margin-top: 32px; font-size: 11px; color: #64748b; }
+    .footer-brand { font-weight: 700; color: #047857; margin-bottom: 4px; }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <img src="${jetroLogoUrl}" alt="Jetro Logo" class="logo-img" />
+    <div class="company-details">
+      <div class="company-name">Jetro</div>
+      <div class="company-slogan">Inteligência que Conecta. Tecnologia que Evolui.</div>
+      <div class="company-info">
+        Operações Logísticas Premium - Espírito Santo<br/>
+        Atendimento: contato@jetrolog.com.br
+      </div>
+    </div>
+  </div>
+
+  <div class="document-banner">
+    <h1 class="document-title">Solicitação de Orçamento</h1>
+    <div class="document-subtitle">Documento Oficial de Cotação de Serviços Nº ${budgetNum}</div>
+  </div>
+
+  <div class="section-grid">
+    <div class="info-card">
+      <div class="card-heading">Dados do Cliente</div>
+      <div class="info-row">
+        <span class="info-label">Nome:</span>
+        <span class="info-value">${clientName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">E-mail:</span>
+        <span class="info-value">${clientEmail}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Telefone:</span>
+        <span class="info-value">${clientPhone}</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-heading">Resumo da Cotação</div>
+      <div class="info-row">
+        <span class="info-label">Nº Registro:</span>
+        <span class="info-value"><strong>${budgetNum}</strong></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Data Emissão:</span>
+        <span class="info-value">${dateStr}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Serviço:</span>
+        <span class="info-value">${service}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status:</span>
+        <span class="info-value"><span class="status-badge">${request.status || 'Em Análise'}</span></span>
+      </div>
+    </div>
+  </div>
+
+  ${
+    request.services && request.services.length > 0
+      ? `
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 30%;">Serviço / Módulo</th>
+            <th style="width: 50%;">Descrição Detalhada</th>
+            <th style="width: 20%; text-align: right;">Valor Estimado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${request.services
+            .map(
+              (s) => `
+            <tr>
+              <td><strong>${s.name || s.servico || service}</strong></td>
+              <td>${s.description || s.observacoes || 'Serviço operacional contratado via plataforma Jetro.'}</td>
+              <td style="text-align: right; font-weight: 600;">${
+                s.value
+                  ? `R$ ${Number(s.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                  : totalVal
+              }</td>
+            </tr>
+          `,
+            )
+            .join('')}
+        </tbody>
+      </table>
+    </div>
+  `
+      : `
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Serviço Solicitado</th>
+            <th>Descrição</th>
+            <th style="text-align: right;">Estimativa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>${service}</strong></td>
+            <td>Solicitação de cotação para operações logísticas efetuada via portal Jetro.</td>
+            <td style="text-align: right; font-weight: 600;">${totalVal}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `
+  }
+
+  ${
+    request.data && Object.keys(request.data).length > 0
+      ? `
+    <div class="notes-box">
+      <div class="notes-heading">Informações Complementares da Solicitação</div>
+      <div class="notes-content">
+        ${Object.entries(request.data)
+          .filter(
+            ([k]) =>
+              ![
+                'nome',
+                'email',
+                'telefone',
+                'servico',
+                'client_name',
+                'client_email',
+                'client_phone',
+              ].includes(k.toLowerCase()),
+          )
+          .map(
+            ([key, val]) => `
+            <div style="margin-bottom: 4px;">
+              <strong style="text-transform: capitalize;">${key.replace(/_/g, ' ')}:</strong> ${
+                typeof val === 'object' ? JSON.stringify(val) : String(val)
+              }
+            </div>
+          `,
+          )
+          .join('')}
+      </div>
+    </div>
+  `
+      : ''
+  }
+
+  <div class="footer">
+    <div class="footer-brand">Jetro - Operações Logísticas e Plataforma de Gestão</div>
+    <div>Inteligência que Conecta. Tecnologia que Evolui. Resultados que Transformam.</div>
+    <div style="margin-top: 6px; font-size: 10px; color: #94a3b8;">Documento gerado eletronicamente em ${new Date().toLocaleString('pt-BR')}. Válido sem assinatura por 30 dias.</div>
+  </div>
+</body>
+</html>`
+}
+
+export function downloadBudgetPdf(request: BudgetPdfData): void {
+  const html = generateBudgetPdfHtml(request)
+  const printWindow = window.open('', '_blank')
+  if (printWindow) {
+    printWindow.document.write(html)
+    printWindow.document.close()
+    printWindow.focus()
+    setTimeout(() => {
+      printWindow.print()
+    }, 400)
+  }
+}
+
+export const generateBudgetPdf = downloadBudgetPdf
+export const exportBudgetPdf = downloadBudgetPdf
