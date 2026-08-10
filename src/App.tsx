@@ -29,6 +29,7 @@ import PoliticaSeguranca from './pages/PoliticaSeguranca'
 import CentralDePrivacidade from './pages/CentralDePrivacidade'
 import PoliticaLicenciamento from './pages/PoliticaLicenciamento'
 import PoliticaSla from './pages/PoliticaSla'
+import PoliticaBackupContinuidade from './pages/PoliticaBackupContinuidade'
 import Products from './pages/Products'
 import Cadastros from './pages/Cadastros'
 import PriceTablesPage from './pages/PriceTablesPage'
@@ -1318,6 +1319,10 @@ const App = () => (
                           element={<PoliticaLicenciamento />}
                         />
                         <Route path="/politica-de-sla" element={<PoliticaSla />} />
+                        <Route
+                          path="/politica-de-backup-continuidade"
+                          element={<PoliticaBackupContinuidade />}
+                        />
                         <Route path="*" element={<NotFound />} />
                       </Route>
                     </Routes>

@@ -90,6 +90,14 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link
+                  to="/politica-de-backup-continuidade"
+                  className="hover:text-white transition-colors"
+                >
+                  Backup e Continuidade
+                </Link>
+              </li>
+              <li>
                 <Link to="/politica-comercial" className="hover:text-white transition-colors">
                   Política Comercial
                 </Link>
