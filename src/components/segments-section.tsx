@@ -25,14 +25,14 @@ export function SegmentsSection() {
   return (
     <section id="segmentos" className="py-16 sm:py-24 bg-slate-50 relative">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#005A36]/10 text-[#005A36] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
+        <div className="bg-[#005A36] text-white px-6 sm:px-10 py-10 sm:py-14 text-center space-y-3 rounded-t-2xl max-w-5xl mx-auto mb-0">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#C89B3C]/20 border border-[#C89B3C]/50 text-[#E5B85C] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
             Versatilidade Empresarial
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-foreground">
+          <h2 className="text-3xl sm:text-4xl font-black text-white">
             Um sistema preparado para diferentes modelos de negócio
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
             O Jetro adapta-se à dinâmica específica do seu segmento, unificando operações complexas
             em fluxos inteligentes e produtivos.
           </p>
