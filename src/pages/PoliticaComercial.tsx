@@ -2,113 +2,125 @@ import { PolicyLayout } from '@/components/policy-layout'
 
 export default function PoliticaComercial() {
   return (
-    <PolicyLayout title="Política Comercial" lastUpdated="01 de agosto de 2026">
+    <PolicyLayout title="Política Comercial" lastUpdated="10 de agosto de 2026">
       <p>
-        Esta Política Comercial estabelece as condições, prazos e diretrizes para a contratação dos
-        serviços de operações logísticas prestados pela{' '}
-        <strong className="text-[#005B2E]">Velora Log Operações Logísticas</strong>, incluindo
-        armazenagem de produtos (WMS), picking & packing, transporte de cargas, distribuição urbana,
-        logística portuária, cross docking e gestão de frota.
+        Esta Política Comercial estabelece as diretrizes para contratação, utilização, renovação e
+        relacionamento comercial entre o{' '}
+        <strong className="text-[#005B2E]">
+          Jetro — Plataforma Inteligente de Gestão Empresarial
+        </strong>{' '}
+        e seus clientes.
       </p>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">1. Escopo dos Serviços</h2>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">1. Objetivo</h2>
       <p>
-        A Velora Log oferece soluções logísticas completas. Atendemos em todo o estado do Espírito
-        Santo, compreendendo:
+        Esta Política Comercial estabelece as diretrizes para contratação, utilização, renovação e
+        relacionamento comercial entre o Jetro e seus clientes.
       </p>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">2. Modelo de Contratação</h2>
+      <p>O Jetro é disponibilizado no modelo Software como Serviço (SaaS), mediante assinatura.</p>
+      <p>A contratação poderá variar conforme:</p>
       <ul className="list-disc pl-6 space-y-1">
-        <li>Armazenagem de produtos com gestão WMS, controle de lotes e validade;</li>
-        <li>Picking & packing com inventário contínuo e máxima acuracidade;</li>
-        <li>Transporte rodoviário de cargas fracionadas e dedicadas, com seguro e rastreamento;</li>
-        <li>Distribuição urbana e Last Mile com roteirização inteligente;</li>
-        <li>Logística portuária com conexão aos principais portos do ES;</li>
-        <li>Cross docking e triagem ágil de mercadorias;</li>
-        <li>Gestão de frota com telemetria e gerenciamento de risco.</li>
+        <li>Plano escolhido;</li>
+        <li>Quantidade de usuários;</li>
+        <li>Módulos contratados;</li>
+        <li>Recursos adicionais;</li>
+        <li>Necessidades específicas da empresa.</li>
       </ul>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">
-        2. Fluxo de Solicitação de Orçamento
-      </h2>
-      <p>O processo de cotação funciona da seguinte forma:</p>
-      <ol className="list-decimal pl-6 space-y-1">
-        <li>
-          O cliente preenche o formulário de orçamento disponível neste site, informando os dados da
-          operação (tipo de serviço, origem, destino, mercadoria, volume e periodicidade);
-        </li>
-        <li>
-          A equipe comercial da Velora Log analisa a solicitação e responde com uma cotação
-          detalhada por meio do canal de contato fornecido (WhatsApp{' '}
-          <strong className="text-[#005B2E]">(31) 99129-7619</strong>);
-        </li>
-        <li>
-          A cotação inclui escopo, prazos estimados, condições comerciais e validade da proposta;
-        </li>
-        <li>
-          Após a aprovação do cliente, a operação é formalizada conforme as condições descritas na
-          proposta.
-        </li>
-      </ol>
-
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">
-        3. Prazo de Resposta e Validade da Cotação
-      </h2>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">3. Demonstração da Plataforma</h2>
       <p>
-        O prazo médio de resposta para solicitações de orçamento é de até{' '}
-        <strong className="text-[#005B2E]">48 horas úteis</strong>, podendo variar conforme a
-        complexidade da operação. As cotações enviadas pela Velora Log têm validade de{' '}
-        <strong className="text-[#005B2E]">15 (quinze) dias corridos</strong> a partir da data de
-        envio, exceto quando indicado de outra forma na proposta.
+        A demonstração tem caráter exclusivamente comercial e pode não contemplar todas as
+        funcionalidades ou personalizações disponíveis na versão contratada.
       </p>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">4. Condições de Pagamento</h2>
-      <p>
-        As condições de pagamento são definidas caso a caso, conforme o escopo e a duração da
-        operação. Em geral, aplicam-se as seguintes diretrizes:
-      </p>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">4. Propostas Comerciais</h2>
+      <p>As propostas emitidas possuem prazo de validade informado no documento.</p>
+      <p>Após esse período, valores e condições poderão ser revistos.</p>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">5. Implantação</h2>
+      <p>Quando contratada, a implantação poderá incluir:</p>
       <ul className="list-disc pl-6 space-y-1">
-        <li>Operações pontuais: pagamento antecipado ou à vista, conforme acordado na proposta;</li>
-        <li>Contratos recorrentes: faturamento mensal com vencimento definido em contrato;</li>
-        <li>Possibilidade de condições especiais para projetos de longo prazo.</li>
+        <li>parametrização inicial;</li>
+        <li>treinamento;</li>
+        <li>migração de dados (quando prevista em contrato);</li>
+        <li>acompanhamento da entrada em operação.</li>
+      </ul>
+      <p>Os serviços efetivamente contratados serão definidos na proposta comercial.</p>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">6. Licenciamento</h2>
+      <p>
+        A licença concede direito de uso da plataforma, não transferência de propriedade
+        intelectual.
+      </p>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">7. Cobrança</h2>
+      <p>As condições de cobrança serão definidas em contrato ou proposta comercial.</p>
+      <p>Podem incluir:</p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>mensalidade;</li>
+        <li>implantação;</li>
+        <li>treinamentos;</li>
+        <li>serviços adicionais;</li>
+        <li>módulos opcionais.</li>
       </ul>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">5. Contratação</h2>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">8. Reajustes</h2>
       <p>
-        A aceitação da cotação pelo cliente formaliza o interesse na contratação. Operações
-        específicas podem ser formalizadas por meio de contrato escrito, que detalhará escopo,
-        prazos, valores, responsabilidades e demais condições acordadas entre as partes.
+        Os valores poderão ser reajustados conforme previsto em contrato, observando os índices
+        definidos entre as partes.
       </p>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">6. Cancelamento e Reagendamento</h2>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">9. Cancelamento</h2>
       <p>
-        Cancelamentos e reagendamentos de operações devem ser comunicados à Velora Log com
-        antecedência mínima de <strong className="text-[#005B2E]">24 horas</strong>. Operações
-        canceladas em prazo inferior podem estar sujeitas a cobranças proporcionais aos custos já
-        incorridos. Reagendamentos estão sujeitos à disponibilidade de agenda e capacidade
-        operacional.
+        As condições para cancelamento, aviso prévio e encerramento da assinatura seguirão o
+        contrato firmado.
       </p>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">
-        7. Responsabilidade e Níveis de Serviço
-      </h2>
-      <p>
-        A Velora Log compromete-se a executar os serviços com padrões de qualidade e pontualidade
-        adequados. Os níveis de serviço (SLAs) específicos — incluindo prazos de entrega,
-        acuracidade de inventário e disponibilidade — são definidos na proposta comercial ou
-        contrato. A responsabilidade da Velora Log limita-se ao valor dos serviços contratados,
-        salvo nos casos de dolo ou culpa grave devidamente comprovados.
-      </p>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">10. Suporte</h2>
+      <p>O atendimento seguirá o SLA vigente da plataforma.</p>
+      <p>Demandas podem ser classificadas por prioridade.</p>
 
-      <h2 className="text-xl font-bold text-[#005B2E] pt-4">8. Disposições Gerais</h2>
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">11. Customizações</h2>
+      <p>Desenvolvimentos específicos poderão ser analisados separadamente.</p>
+      <p>A aprovação dependerá de viabilidade técnica, cronograma e orçamento.</p>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">12. Integrações</h2>
+      <p>Integrações com sistemas de terceiros poderão exigir:</p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>APIs disponíveis;</li>
+        <li>contratação adicional;</li>
+        <li>desenvolvimento específico.</li>
+      </ul>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">13. Responsabilidades do Cliente</h2>
+      <p>O cliente compromete-se a:</p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>fornecer informações corretas;</li>
+        <li>manter usuários autorizados;</li>
+        <li>cumprir obrigações contratuais;</li>
+        <li>utilizar a plataforma de forma adequada.</li>
+      </ul>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">14. Responsabilidades do Jetro</h2>
+      <p>Comprometemo-nos a:</p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>disponibilizar a plataforma conforme contratado;</li>
+        <li>manter padrões de segurança;</li>
+        <li>prestar suporte conforme SLA;</li>
+        <li>buscar evolução contínua do produto.</li>
+      </ul>
+
+      <h2 className="text-xl font-bold text-[#005B2E] pt-4">15. Alterações desta Política</h2>
       <p>
-        As condições comerciais descritas nesta política aplicam-se aos serviços apresentados neste
-        site. Contratações específicas podem ter condições diferenciadas, que prevalecerão sobre os
-        termos gerais aqui descritos quando formalizadas em contrato escrito. Em caso de dúvidas,
-        entre em contato pelo WhatsApp (31) 99129-7619.
+        Esta Política Comercial poderá ser atualizada para refletir melhorias nos serviços ou
+        mudanças nas condições comerciais.
       </p>
 
       <div className="border-t border-[#C89B3C]/30 pt-6 mt-8">
         <p className="text-sm text-muted-foreground">
-          Velora Log Operações Logísticas — Excelência em soluções logísticas no Espírito Santo.
+          Jetro — Plataforma Inteligente de Gestão Empresarial.
         </p>
       </div>
     </PolicyLayout>
