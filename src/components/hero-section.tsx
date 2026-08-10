@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Bot, ShieldCheck, Zap, Layers } from 'lucide-react'
-import heroBanner from '@/assets/whatsapp-image-2026-08-09-at-23.43.49-566dc.jpeg'
+import heroBanner from '@/assets/whatsapp-image-2026-08-09-at-23.34.40-00920.jpeg'
 import jetroRoboticHand from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-1-f45df.jpeg'
 
 export function HeroSection() {
@@ -28,13 +28,12 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-              Transforme a forma como sua empresa é gerenciada
+              Transforme sua operação logística com a Jetro
             </h1>
 
             <p className="text-base sm:text-xl text-gray-200 leading-relaxed font-normal max-w-2xl bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              O Jetro é uma plataforma inteligente que conecta pessoas, processos e informações em
-              um único ambiente, oferecendo mais controle, produtividade e inteligência para
-              empresas de todos os portes.
+              Solicite uma apresentação comercial e descubra como nossa arquitetura pode elevar a
+              eficiência da sua empresa no Espírito Santo.
             </p>
 
             <p className="text-lg sm:text-xl font-bold text-[#E5B85C] flex items-center gap-2 bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
@@ -43,11 +42,11 @@ export function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2 bg-transparent">
               <Button
-                onClick={() => scrollToSection('contato')}
+                onClick={() => scrollToSection('orcamento')}
                 size="lg"
                 className="bg-[#005A36]/90 hover:bg-[#007343] text-white font-bold px-8 py-6 text-base rounded-lg shadow-xl shadow-[#005A36]/40 border border-[#008A4D] hover:scale-105 transition-all duration-300 active:scale-95"
               >
-                Agendar uma Demonstração
+                Solicitar Orçamento
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
 
