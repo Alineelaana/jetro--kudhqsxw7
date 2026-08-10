@@ -14,10 +14,13 @@ export function FinalCTA() {
   return (
     <section
       id="sobre"
-      className="py-16 sm:py-24 text-white relative overflow-hidden border-t border-[#C89B3C]/30 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${ctaBgImage})` }}
+      className="py-16 sm:py-24 text-white relative overflow-hidden border-t border-[#C89B3C]/30"
     >
-      {/* Light gradient overlay for contrast while preserving background visibility */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat screen-press-animate"
+        style={{ backgroundImage: `url(${ctaBgImage})` }}
+      />
+
       <div className="absolute inset-0 bg-gradient-to-b from-[#001D0F]/85 via-black/60 to-[#001D0F]/85 pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10 text-center max-w-4xl space-y-6 bg-transparent">
