@@ -28,7 +28,7 @@ const ICON_MAP: Record<string, any> = {
 }
 
 export function SegmentsSection({ onSelectSegment }: SegmentsSectionProps) {
-  const segments = BUSINESS_SEGMENTS
+  const segments = BUSINESS_SEGMENTS.filter((seg) => seg.title !== 'Empresas em Crescimento')
 
   return (
     <section
