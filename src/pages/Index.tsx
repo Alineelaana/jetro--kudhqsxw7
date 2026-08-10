@@ -42,7 +42,12 @@ export default function Index() {
         </div>
       </section>
 
-      <FinalCTA />
+      <FinalCTA
+        onOpenBudget={() => {
+          const el = document.getElementById('contato') || document.getElementById('orcamento')
+          el?.scrollIntoView({ behavior: 'smooth' })
+        }}
+      />
     </main>
   )
 }
