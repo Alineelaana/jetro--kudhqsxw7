@@ -80,6 +80,11 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link to="/politica-de-cookies" className="hover:text-white transition-colors">
+                  Cookies
+                </Link>
+              </li>
+              <li>
                 <Link to="/politica-comercial" className="hover:text-white transition-colors">
                   Política Comercial
                 </Link>
