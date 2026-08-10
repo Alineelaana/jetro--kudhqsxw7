@@ -2,6 +2,14 @@ export const DEFAULT_WHATSAPP_NUMBER = '5527999999999'
 export const BRAND_NAME = 'Jetro'
 export const BRAND_SLOGAN = 'Plataforma Inteligente de Gestão Empresarial'
 
+export const SERVICE_OPTIONS: string[] = [
+  'Armazenagem',
+  'Transporte',
+  'Distribuição',
+  'Logística Integrada',
+  'Outros',
+]
+
 export interface SegmentItem {
   id: string
   title: string
