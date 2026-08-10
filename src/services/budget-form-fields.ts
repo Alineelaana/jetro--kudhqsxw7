@@ -1,5 +1,5 @@
 import pb from '@/lib/pocketbase/client'
-import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/constants'
+import { DEFAULT_FORM_FIELDS, type DefaultFormField } from '@/lib/budget-constants'
 
 export async function getFormFields(): Promise<DefaultFormField[]> {
   try {

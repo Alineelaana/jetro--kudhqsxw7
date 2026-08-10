@@ -31,7 +31,7 @@ import {
 import { getNextBudgetNumber, saveQuoteData } from '@/services/budget-requests'
 import { generateBudgetPdf } from '@/lib/pdf-generator'
 import { type BudgetRecord } from '@/lib/types'
-import { CARGO_TYPE_OPTIONS, PAYMENT_OPTIONS, DEADLINE_OPTIONS } from '@/lib/constants'
+import { CARGO_TYPE_OPTIONS, PAYMENT_OPTIONS, DEADLINE_OPTIONS } from '@/lib/budget-constants'
 import { getServiceAreas } from '@/services/service-areas'
 import { BudgetServicePicker } from '@/components/budget-service-picker'
 import type { BudgetServiceItem } from '@/lib/types'
