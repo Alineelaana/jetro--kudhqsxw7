@@ -89,6 +89,11 @@ export function SiteFooter() {
                   Política Comercial
                 </Link>
               </li>
+              <li>
+                <Link to="/central-de-privacidade" className="hover:text-white transition-colors">
+                  Central de Privacidade
+                </Link>
+              </li>
             </ul>
           </div>
 
