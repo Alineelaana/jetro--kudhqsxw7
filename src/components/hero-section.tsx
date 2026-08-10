@@ -1,5 +1,5 @@
 import { useState, MouseEvent } from 'react'
-import { ArrowRight, Sparkles, CheckCircle, ShieldCheck, Zap, Phone, Building2 } from 'lucide-react'
+import { ArrowRight, Sparkles, CheckCircle, ShieldCheck, Zap, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import heroBgImage from '@/assets/whatsapp-image-2026-08-09-at-23.34.40-78c1f.jpeg'
 
@@ -66,14 +66,6 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
           O Jetro reúne operações, finanças, vendas, pessoas e indicadores em uma plataforma
           desenvolvida para simplificar a gestão e impulsionar resultados.
         </p>
-
-        {/* Contact Information */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-transparent border border-[#C89B3C]/70 text-[#E5B85C] text-lg sm:text-xl font-bold shadow-sm">
-            <Phone className="w-5 h-5 text-[#E5B85C]" />
-            <span>31 9 9129-7619</span>
-          </div>
-        </div>
 
         {/* Call to Action */}
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
