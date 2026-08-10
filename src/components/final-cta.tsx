@@ -31,12 +31,17 @@ export function FinalCTA({ onOpenBudget }: FinalCTAProps) {
         </div>
 
         <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
-          Transforme sua operação logística com a Jetro
+          Sua empresa merece uma gestão mais inteligente
         </h2>
 
         <p className="text-slate-300 text-base sm:text-xl max-w-3xl mx-auto font-normal leading-relaxed">
+          O Jetro reúne pessoas, processos e informações em uma plataforma completa para empresas
+          que desejam crescer com organização, tecnologia e inteligência.
+        </p>
+
+        <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto font-normal leading-relaxed">
           Solicite uma apresentação comercial e descubra como nossa arquitetura pode elevar a
-          eficiência da sua empresa no Espírito Santo.
+          eficiência da sua empresa.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -51,7 +56,7 @@ export function FinalCTA({ onOpenBudget }: FinalCTAProps) {
             size="lg"
             className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white font-extrabold text-base px-8 py-6 rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all group"
           >
-            <span>Solicitar Orçamento</span>
+            <span>Solicitar contato</span>
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
