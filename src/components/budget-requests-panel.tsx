@@ -104,6 +104,7 @@ export function BudgetRequestsPanel() {
         r?.client_email?.toLowerCase()?.includes(term) ||
         r?.service?.toLowerCase()?.includes(term) ||
         r?.budget_number?.toLowerCase()?.includes(term) ||
+        r?.sales_channel?.toLowerCase()?.includes(term) ||
         String(r?.request_number || '').includes(term) ||
         `#${r?.request_number || ''}`.toLowerCase().includes(term)
       const matchDate = (() => {
@@ -309,7 +310,7 @@ export function BudgetRequestsPanel() {
         <Card className="border-2 border-dashed border-border">
           <CardContent className="py-16 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-bold mb-1">Nenhuma solicitação encontrada.</p>
+            <p className="text-lg font-bold mb-1">Nenhuma solicitação de orçamento encontrada.</p>
           </CardContent>
         </Card>
       ) : (
@@ -320,9 +321,12 @@ export function BudgetRequestsPanel() {
                 <tr className="bg-[#01361D] text-white">
                   <th className="text-left px-3 py-3 font-bold">Cliente</th>
                   <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Nº</th>
+                  <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Orç.</th>
                   <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Telefone</th>
+                  <th className="text-left px-3 py-3 font-bold hidden xl:table-cell">Email</th>
                   <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Serviço</th>
-                  <th className="text-left px-3 py-3 font-bold">Tempo</th>
+                  <th className="text-left px-3 py-3 font-bold hidden xl:table-cell">Canal</th>
+                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Tempo</th>
                   <th className="text-left px-3 py-3 font-bold">Data</th>
                   <th className="text-left px-3 py-3 font-bold">Status</th>
                   <th className="text-left px-3 py-3 font-bold whitespace-nowrap">Ações</th>

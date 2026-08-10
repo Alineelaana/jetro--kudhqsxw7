@@ -81,6 +81,7 @@ import {
   NOTIFICATION_CONFIG,
   NUMERATION_CONFIG,
 } from '@/lib/configuracoes-config'
+import { BudgetRequestsPanel } from '@/components/budget-requests-panel'
 import Atendimento from './pages/Atendimento'
 import DP from './pages/DP'
 import SST from './pages/SST'
@@ -112,6 +113,7 @@ const App = () => (
                       <Route element={<Layout />}>
                         <Route path="/" element={<Index />} />
                         <Route path="/admin" element={<Admin />} />
+                        <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
 
                         <Route path="/admin/produtos" element={<Products />} />
                         <Route path="/admin/cadastros" element={<Cadastros />} />

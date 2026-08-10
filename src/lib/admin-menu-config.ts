@@ -29,6 +29,7 @@ import {
   Megaphone,
   CalendarClock,
   Container,
+  ClipboardList,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -89,6 +90,7 @@ export const ADMIN_MENU: MenuGroup[] = [
         route: '/admin/atendimento',
         perm: canViewAtendimentoModule,
       },
+      { label: 'Solicitações de Orçamento', icon: ClipboardList, route: '/admin/orcamentos' },
     ],
   },
   {

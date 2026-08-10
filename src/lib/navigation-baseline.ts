@@ -9,6 +9,12 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
   { route: '/admin', label: 'Dashboard', group: 'Principal', classification: 'A' },
   { route: '/admin/notificacoes', label: 'Notificações', group: 'Principal', classification: 'A' },
   { route: '/admin/atendimento', label: 'Atendimento', group: 'Principal', classification: 'A' },
+  {
+    route: '/admin/orcamentos',
+    label: 'Solicitações de Orçamento',
+    group: 'Principal',
+    classification: 'A',
+  },
   { route: '/admin/vendas', label: 'Vendas', group: 'Comercial', classification: 'A' },
   { route: '/admin/produtos', label: 'Produtos', group: 'Comercial', classification: 'A' },
   { route: '/admin/cadastros', label: 'Cadastros', group: 'Comercial', classification: 'A' },

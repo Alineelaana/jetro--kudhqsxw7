@@ -1,4 +1,4 @@
-import { Clock, Receipt, Mail, Phone } from 'lucide-react'
+import { Clock, Receipt, Mail, Phone, Tag } from 'lucide-react'
 import { type BudgetRecord } from '@/lib/types'
 import { getResponseTime } from '@/lib/response-time'
 
@@ -76,6 +76,11 @@ export function AdminRequestDetails({ data, labelMap, record }: AdminRequestDeta
             {record.responsible_phone && (
               <span className="flex items-center gap-1">
                 <Phone className="w-3 h-3" /> {record.responsible_phone}
+              </span>
+            )}
+            {record.sales_channel && (
+              <span className="flex items-center gap-1">
+                <Tag className="w-3 h-3" /> {record.sales_channel}
               </span>
             )}
           </div>

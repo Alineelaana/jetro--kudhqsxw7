@@ -91,16 +91,37 @@ export function AdminRequestRow({
           {record.request_number ? `#${record.request_number}` : '—'}
         </td>
         <td
+          className={cn(
+            cellPad,
+            'font-semibold text-[#C89B3C] hidden lg:table-cell whitespace-nowrap',
+          )}
+          title={record.budget_number || ''}
+        >
+          {record.budget_number || '—'}
+        </td>
+        <td
           className={cn(cellPad, 'text-muted-foreground truncate hidden lg:table-cell')}
           title={record.client_phone || ''}
         >
           {record.client_phone || '—'}
         </td>
         <td
+          className={cn(cellPad, 'text-muted-foreground truncate hidden xl:table-cell')}
+          title={record.client_email || ''}
+        >
+          {record.client_email || '—'}
+        </td>
+        <td
           className={cn(cellPad, 'text-muted-foreground truncate hidden sm:table-cell')}
           title={record.service || ''}
         >
           {record.service || '—'}
+        </td>
+        <td
+          className={cn(cellPad, 'text-muted-foreground truncate hidden xl:table-cell')}
+          title={record.sales_channel || ''}
+        >
+          {record.sales_channel || '—'}
         </td>
         <td
           className={cn(
@@ -258,7 +279,7 @@ export function AdminRequestRow({
       </tr>
       {isExpanded && (
         <tr className="bg-muted/30">
-          <td colSpan={8} className="px-4 py-4">
+          <td colSpan={11} className="px-4 py-4">
             <AdminRequestDetails data={record.data} labelMap={labelMap} record={record} />
             {onRespond && onReprint && onSave && (
               <div className="mt-4 pt-4 border-t border-border">
