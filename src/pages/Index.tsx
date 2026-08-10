@@ -34,6 +34,7 @@ export default function Index() {
               Preencha os dados da sua empresa para que nossa equipe apresente a arquitetura Jetro
               ideal para a sua operação.
             </p>
+            <p className="text-[#E5B85C] text-lg sm:text-xl font-bold pt-2">31 9 9129-7619</p>
           </div>
           <div className="bg-white px-6 sm:px-10 pb-10 pt-8 rounded-b-2xl border border-border shadow-xl">
             <BudgetForm whatsappNumber={safeWhatsapp} selectedService={selectedService} />
