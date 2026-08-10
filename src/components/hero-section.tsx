@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles, CheckCircle, ShieldCheck, Zap } from 'lucide-react'
+import { ArrowRight, Sparkles, CheckCircle, ShieldCheck, Zap, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface HeroSectionProps {
@@ -18,8 +18,7 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
   }
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
-      {/* Background glow & accents */}
+    <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28 bg-gradient-to-b from-[#002817] via-[#003524] to-[#002817] text-white">
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-1/3 right-10 w-[300px] h-[200px] bg-[#C89B3C]/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -42,6 +41,11 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
           impulsionar resultados.
         </p>
 
+        <div className="flex items-center justify-center gap-2 text-[#E5B85C] text-lg sm:text-xl font-bold">
+          <Phone className="w-5 h-5" />
+          <span>31 9 9129-7619</span>
+        </div>
+
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button
             onClick={handlePrimaryClick}
@@ -59,14 +63,14 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
             }}
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto border-slate-700 hover:bg-slate-800/60 text-slate-200 font-bold text-base px-8 py-6 rounded-xl"
+            className="w-full sm:w-auto border-emerald-800 hover:bg-emerald-900/40 text-emerald-200 font-bold text-base px-8 py-6 rounded-xl"
           >
             Conhecer Soluções
           </Button>
         </div>
 
         <div className="pt-8 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+          <div className="p-4 rounded-2xl bg-[#003524]/60 border border-[#004d33]/80 backdrop-blur-sm">
             <div className="text-emerald-400 font-bold text-sm mb-1 flex items-center gap-1.5">
               <Zap className="w-4 h-4" /> 100% Integrado
             </div>
@@ -74,19 +78,19 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
               Operação, vendas e financeiro em tempo real
             </div>
           </div>
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+          <div className="p-4 rounded-2xl bg-[#003524]/60 border border-[#004d33]/80 backdrop-blur-sm">
             <div className="text-emerald-400 font-bold text-sm mb-1 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4" /> Governança
             </div>
             <div className="text-slate-400 text-xs">Alçadas, trilha de auditoria e segurança</div>
           </div>
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+          <div className="p-4 rounded-2xl bg-[#003524]/60 border border-[#004d33]/80 backdrop-blur-sm">
             <div className="text-emerald-400 font-bold text-sm mb-1 flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4" /> Inteligência IA
             </div>
             <div className="text-slate-400 text-xs">Suporte preditivo e análises ágeis</div>
           </div>
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+          <div className="p-4 rounded-2xl bg-[#003524]/60 border border-[#004d33]/80 backdrop-blur-sm">
             <div className="text-emerald-400 font-bold text-sm mb-1 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4" /> Módulos Flexíveis
             </div>

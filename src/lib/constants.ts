@@ -66,4 +66,12 @@ export const BUSINESS_SEGMENTS: SegmentItem[] = [
     iconName: 'Network',
     highlights: ['Consolidação de Filiais', 'Matriz de Permissões', 'DRE Unificada'],
   },
+  {
+    id: 'crescimento',
+    title: 'Empresas em Crescimento',
+    description:
+      'Para negócios que precisam estruturar processos profissionais sem perder agilidade.',
+    iconName: 'TrendingUp',
+    highlights: ['Processos Profissionais', 'Gestão Estruturada', 'Agilidade Operacional'],
+  },
 ]

@@ -5,6 +5,7 @@ import {
   Factory,
   ShoppingBag,
   Network,
+  TrendingUp,
   ArrowRight,
   Check,
 } from 'lucide-react'
@@ -23,12 +24,11 @@ const ICON_MAP: Record<string, any> = {
   Factory,
   ShoppingBag,
   Network,
+  TrendingUp,
 }
 
 export function SegmentsSection({ onSelectSegment }: SegmentsSectionProps) {
-  const segments = BUSINESS_SEGMENTS.filter(
-    (seg) => seg.id !== 'crescimento' && seg.title !== 'Empresas em Crescimento',
-  )
+  const segments = BUSINESS_SEGMENTS
 
   return (
     <section
