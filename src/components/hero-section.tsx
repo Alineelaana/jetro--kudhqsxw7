@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Bot, ShieldCheck, Zap, Layers } from 'lucide-react'
-import heroBanner from '@/assets/whatsapp-image-2026-08-09-at-23.34.40-4795a.jpeg'
+import heroBanner from '@/assets/whatsapp-image-2026-08-09-at-23.43.49-566dc.jpeg'
 import jetroRoboticHand from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-1-f45df.jpeg'
 
 export function HeroSection() {
@@ -12,12 +12,12 @@ export function HeroSection() {
   }
 
   return (
-    <section className="relative bg-[#001D0F] text-white overflow-hidden py-16 lg:py-24 min-h-[85vh] flex items-center">
+    <section className="relative bg-[#002817] text-white overflow-hidden py-16 lg:py-24 min-h-[85vh] flex items-center">
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60 sm:opacity-75 scale-100 transition-transform duration-1000 ease-out pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60 sm:opacity-75 scale-100 pointer-events-none ken-burns"
         style={{ backgroundImage: `url(${heroBanner})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#001D0F]/90 via-[#001D0F]/50 to-transparent sm:bg-gradient-to-b sm:from-[#001D0F]/70 sm:via-transparent sm:to-[#001D0F]/90 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#002817]/90 via-[#002817]/50 to-transparent sm:bg-gradient-to-b sm:from-[#002817]/70 sm:via-transparent sm:to-[#002817]/90 pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -28,22 +28,26 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-              Gestão inteligente para empresas que querem crescer com controle.
+              Transforme a forma como sua empresa é gerenciada
             </h1>
 
             <p className="text-base sm:text-xl text-gray-200 leading-relaxed font-normal max-w-2xl bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              O Jetro conecta áreas, processos, pessoas e informações em uma única plataforma,
-              ajudando sua empresa a tomar decisões melhores, operar com eficiência e crescer com
-              segurança.
+              O Jetro é uma plataforma inteligente que conecta pessoas, processos e informações em
+              um único ambiente, oferecendo mais controle, produtividade e inteligência para
+              empresas de todos os portes.
+            </p>
+
+            <p className="text-lg sm:text-xl font-bold text-[#E5B85C] flex items-center gap-2 bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+              📞 31 9 9129-7619
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2 bg-transparent">
               <Button
-                onClick={() => scrollToSection('plataforma')}
+                onClick={() => scrollToSection('contato')}
                 size="lg"
                 className="bg-[#005A36]/90 hover:bg-[#007343] text-white font-bold px-8 py-6 text-base rounded-lg shadow-xl shadow-[#005A36]/40 border border-[#008A4D] hover:scale-105 transition-all duration-300 active:scale-95"
               >
-                Conheça o Jetro
+                Agendar uma Demonstração
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
 
@@ -87,7 +91,7 @@ export function HeroSection() {
                 alt="Jetro - Nine IA & Jetro Platform"
                 className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#001D0F]/90 via-[#001D0F]/30 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#002817]/90 via-[#002817]/30 to-transparent pointer-events-none" />
               <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-transparent backdrop-blur-md border border-[#C89B3C]/40 text-xs text-gray-100 shadow-xl">
                 <p className="font-bold text-[#E5B85C] mb-1 flex items-center gap-1.5 bg-transparent drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                   <Zap className="h-3.5 w-3.5 text-[#C89B3C]" />

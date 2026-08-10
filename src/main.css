@@ -176,4 +176,13 @@
   .screen-press-animate {
     animation: none;
   }
+  .ken-burns {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .ken-burns {
+    animation: none;
+  }
 }
