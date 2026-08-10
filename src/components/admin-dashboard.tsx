@@ -1,3 +1,4 @@
+import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { NotificationBell } from '@/components/notification-bell'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
