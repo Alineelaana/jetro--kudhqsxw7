@@ -25,7 +25,7 @@ export function SegmentsSection() {
   return (
     <section id="segmentos" className="py-16 sm:py-24 bg-slate-50 relative">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="bg-[#005A36] text-white px-6 sm:px-10 py-10 sm:py-14 text-center space-y-3 rounded-t-2xl max-w-5xl mx-auto mb-0">
+        <div className="bg-[#002817] text-white px-6 sm:px-10 py-10 sm:py-14 text-center space-y-3 rounded-t-2xl mb-0">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#C89B3C]/20 border border-[#C89B3C]/50 text-[#E5B85C] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
             Versatilidade Empresarial
           </span>

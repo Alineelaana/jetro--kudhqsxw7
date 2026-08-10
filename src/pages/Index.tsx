@@ -23,7 +23,7 @@ export default function Index() {
 
       <section id="contato" className="bg-white relative">
         <div id="orcamento" className="max-w-4xl mx-auto px-0">
-          <div className="bg-[#005A36] text-white px-6 sm:px-10 py-10 sm:py-14 text-center space-y-3 rounded-t-2xl">
+          <div className="bg-[#002817] text-white px-6 sm:px-10 py-10 sm:py-14 text-center space-y-3 rounded-t-2xl">
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#C89B3C]/20 border border-[#C89B3C]/50 text-[#E5B85C] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
               Solicitação de Apresentação Comercial
             </span>
