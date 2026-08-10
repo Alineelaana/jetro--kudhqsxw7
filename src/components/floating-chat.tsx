@@ -1,299 +1,116 @@
-import { useState, useEffect, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
-import { X, Send, Star, EyeOff } from 'lucide-react'
-import {
-  sendChatMessage,
-  getChatMessages,
-  getConversationStatus,
-  type ChatMessage,
-} from '@/services/chat'
-import { submitRating } from '@/services/chat-ratings'
-import { getChatVisibility } from '@/services/chat-visibility'
-import { cn } from '@/lib/utils'
-import veloraAvatar from '@/assets/chatgpt-image-1-de-ago.de-2026-150848-e934f.png'
+import { useState } from 'react'
+import { MessageSquare, X, Send, Bot } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 export function FloatingChat() {
-  const { pathname } = useLocation()
-  const [chatEnabled, setChatEnabled] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [conversationId, setConversationId] = useState<string | null>(() =>
-    localStorage.getItem('velora_chat_conv_id'),
-  )
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<Array<{ sender: 'nine' | 'user'; text: string }>>([
+    {
+      sender: 'nine',
+      text: 'Olá! Sou a Nine, sua assistente inteligente da plataforma Jetro. Como posso ajudar sua empresa hoje?',
+    },
+  ])
   const [input, setInput] = useState('')
-  const [name, setName] = useState('')
-  const [contact, setContact] = useState('')
-  const [step, setStep] = useState<'info' | 'chat'>(conversationId ? 'chat' : 'info')
-  const [sending, setSending] = useState(false)
-  const [showRating, setShowRating] = useState(false)
-  const [hasRated, setHasRated] = useState(false)
-  const [ratingValue, setRatingValue] = useState(0)
-  const [hoverRating, setHoverRating] = useState(0)
-  const [ratingComment, setRatingComment] = useState('')
-  const [submittingRating, setSubmittingRating] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (pathname.startsWith('/admin') || pathname.startsWith('/cliente')) {
-      setChatEnabled(false)
-      return
-    }
-    getChatVisibility()
-      .then(setChatEnabled)
-      .catch(() => setChatEnabled(true))
-  }, [pathname])
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim()) return
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    const userMsg = input.trim()
+    setMessages((prev) => [...prev, { sender: 'user', text: userMsg }])
+    setInput('')
 
-  useEffect(() => {
-    if (!isOpen || !conversationId) return
-    let active = true
-    const poll = async () => {
-      try {
-        const msgs = await getChatMessages(conversationId)
-        if (!active) return
-        if (Array.isArray(msgs) && msgs.length > 0) {
-          setMessages(msgs)
-          setStep('chat')
-        }
-        if (!hasRated) {
-          const st = await getConversationStatus(conversationId)
-          if (!active) return
-          if (st && st.closed) setShowRating(true)
-        }
-      } catch {
-        if (!active) return
-        localStorage.removeItem('velora_chat_conv_id')
-        setConversationId(null)
-        setStep('info')
-      }
-    }
-    poll()
-    const interval = setInterval(poll, 3000)
-    return () => {
-      active = false
-      clearInterval(interval)
-    }
-  }, [isOpen, conversationId, hasRated])
-
-  const handleSend = async () => {
-    if (!input.trim() || sending) return
-    setSending(true)
-    try {
-      const result = await sendChatMessage({
-        conversation_id: conversationId || undefined,
-        client_name: name || 'Visitante',
-        client_email: '',
-        client_phone: contact || '',
-        message: input.trim(),
-      })
-      if (!conversationId && result?.conversation_id) {
-        setConversationId(result.conversation_id)
-        localStorage.setItem('velora_chat_conv_id', result.conversation_id)
-      }
-      setInput('')
-      if (result?.conversation_id) {
-        const msgs = await getChatMessages(result.conversation_id)
-        if (Array.isArray(msgs)) setMessages(msgs)
-      }
-      setStep('chat')
-    } catch {
-      /* intentionally ignored */
-    }
-    setSending(false)
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: 'nine',
+          text: 'Obrigado pelo contato! Para conhecer como o Jetro atende suas necessidades operacionais, preencha o formulário de apresentação comercial em nossa página ou solicite um contato de nossos consultores.',
+        },
+      ])
+    }, 800)
   }
-
-  const handleStart = () => {
-    if (!name.trim()) return
-    setStep('chat')
-  }
-
-  const handleSubmitRating = async () => {
-    if (ratingValue < 1 || submittingRating || !conversationId) return
-    setSubmittingRating(true)
-    try {
-      await submitRating(conversationId, ratingValue, ratingComment || '')
-      setHasRated(true)
-      setShowRating(false)
-      const msgs = await getChatMessages(conversationId)
-      if (Array.isArray(msgs)) setMessages(msgs)
-    } catch {
-      /* intentionally ignored */
-    }
-    setSubmittingRating(false)
-  }
-
-  if (!chatEnabled) return null
 
   return (
-    <>
+    <div className="fixed bottom-6 right-6 z-50">
       {!isOpen && (
         <button
+          id="floating-chat-trigger"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#005B2E] hover:bg-[#01361D] text-white pl-2 pr-4 py-2 rounded-full shadow-2xl transition-all duration-300 hover:scale-105"
-          aria-label="Abrir chat"
+          className="group flex items-center gap-3 bg-[#005A36] hover:bg-[#004225] text-white p-3.5 rounded-full shadow-2xl border-2 border-[#C89B3C] transition-all duration-300 hover:scale-105"
+          aria-label="Fale com a Nine, nossa IA"
         >
-          <img
-            src={veloraAvatar}
-            alt="Srta. Velora"
-            className="w-10 h-10 rounded-full border-2 border-[#C89B3C] object-cover"
-          />
-          <span className="text-sm font-bold hidden sm:inline">Fale com a Srta. Velora</span>
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse" />
+          <div className="relative h-9 w-9 rounded-full overflow-hidden border border-[#C89B3C]">
+            <img src={nineAvatar} alt="Nine" className="h-full w-full object-cover" />
+          </div>
+          <span className="hidden sm:inline-block font-bold text-sm pr-2">
+            Fale com a Nine, nossa IA
+          </span>
+          <MessageSquare className="h-5 w-5 text-[#E5B85C]" />
         </button>
       )}
+
       {isOpen && (
-        <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-96 h-[100dvh] sm:h-[32rem] bg-white rounded-none sm:rounded-2xl shadow-2xl flex flex-col border-2 border-[#005B2E]/20 overflow-hidden animate-fade-in-up">
-          <div className="bg-[#005B2E] text-white px-4 py-3 flex items-center gap-3 flex-shrink-0">
-            <img
-              src={veloraAvatar}
-              alt="Srta. Velora"
-              className="w-10 h-10 rounded-full border-2 border-[#C89B3C] object-cover"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm truncate">Srta. Velora</p>
-              <p className="text-xs text-white/80 flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0" /> Atendente
-                Online
-              </p>
+        <div className="w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-2xl border-2 border-[#005A36] overflow-hidden flex flex-col h-[460px] animate-fade-in-up">
+          <div className="bg-gradient-to-r from-[#002817] via-[#005A36] to-[#002817] text-white p-4 flex items-center justify-between border-b border-[#C89B3C]">
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 rounded-full overflow-hidden border-2 border-[#C89B3C]">
+                <img src={nineAvatar} alt="Nine" className="h-full w-full object-cover" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold flex items-center gap-1.5">
+                  Nine - IA Jetro
+                  <Bot className="h-3.5 w-3.5 text-[#E5B85C]" />
+                </h4>
+                <span className="text-[10px] text-emerald-200">Assistente Inteligente Online</span>
+              </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white/80 hover:text-white p-1"
-              aria-label="Fechar chat"
+              className="text-white/80 hover:text-white p-1 rounded hover:bg-white/10"
             >
-              <EyeOff className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-white/80 hover:text-white p-1"
-              aria-label="Minimizar"
-            >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-            {step === 'info' ? (
-              <div className="space-y-4">
-                <div className="bg-[#005B2E]/10 rounded-2xl rounded-tl-sm p-3 text-sm text-foreground">
-                  Olá! Seja bem-vindo à VeloraLog. 😊<br />
-                  Como podemos te ajudar hoje?
-                </div>
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Seu nome"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus-visible:ring-[#005B2E]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Telefone ou e-mail (opcional)"
-                    value={contact}
-                    onChange={(e) => setContact(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus-visible:ring-[#005B2E]"
-                  />
-                  <button
-                    onClick={handleStart}
-                    disabled={!name.trim()}
-                    className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-bold py-2 rounded-lg text-sm disabled:opacity-50"
-                  >
-                    Iniciar Conversa
-                  </button>
+
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
+            {messages.map((m, idx) => (
+              <div
+                key={idx}
+                className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[82%] rounded-xl p-3 ${
+                    m.sender === 'user'
+                      ? 'bg-[#005A36] text-white font-medium'
+                      : 'bg-white border border-border text-foreground shadow-sm'
+                  }`}
+                >
+                  {m.text}
                 </div>
               </div>
-            ) : (
-              <>
-                {(Array.isArray(messages) ? messages : [])
-                  .filter(Boolean)
-                  .filter((m) => m && typeof m === 'object' && m.id)
-                  .map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={cn(
-                        'max-w-[80%] rounded-2xl p-3 text-sm',
-                        msg.sender === 'client'
-                          ? 'ml-auto bg-[#005B2E] text-white rounded-tr-sm'
-                          : 'bg-[#C89B3C]/15 text-foreground rounded-tl-sm border border-[#C89B3C]/30',
-                      )}
-                    >
-                      {msg.sender !== 'client' && (
-                        <p className="text-xs font-bold mb-1 opacity-70">
-                          {msg.sender === 'ai' ? 'Srta. Velora (IA)' : 'Srta. Velora'}
-                        </p>
-                      )}
-                      <p className="whitespace-pre-wrap break-words">{msg.content || ''}</p>
-                    </div>
-                  ))}
-                {showRating && !hasRated && (
-                  <div className="bg-white border-2 border-[#C89B3C]/40 rounded-2xl p-4 space-y-3">
-                    <p className="text-sm font-bold text-foreground text-center">
-                      Avalie o atendimento
-                    </p>
-                    <div className="flex justify-center gap-2">
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <button
-                          key={n}
-                          onClick={() => setRatingValue(n)}
-                          onMouseEnter={() => setHoverRating(n)}
-                          onMouseLeave={() => setHoverRating(0)}
-                        >
-                          <Star
-                            className={cn(
-                              'w-8 h-8 transition-colors',
-                              n <= (hoverRating || ratingValue)
-                                ? 'fill-[#C89B3C] text-[#C89B3C]'
-                                : 'text-muted-foreground',
-                            )}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                    <textarea
-                      placeholder="Observação ou sugestão (opcional)"
-                      value={ratingComment}
-                      onChange={(e) => setRatingComment(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border text-sm focus-visible:ring-[#005B2E] resize-none"
-                      rows={2}
-                    />
-                    <button
-                      onClick={handleSubmitRating}
-                      disabled={ratingValue < 1 || submittingRating}
-                      className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-bold py-2 rounded-lg text-sm disabled:opacity-50"
-                    >
-                      {submittingRating ? 'Enviando...' : 'Enviar Avaliação'}
-                    </button>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </>
-            )}
+            ))}
           </div>
-          {step === 'chat' && !showRating && !hasRated && (
-            <div className="p-3 border-t border-border flex items-center gap-2 bg-white flex-shrink-0">
-              <input
-                type="text"
-                placeholder="Digite sua mensagem..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                disabled={sending}
-                className="flex-1 min-w-0 px-3 py-2 rounded-full border border-border text-sm focus-visible:ring-[#005B2E]"
-              />
-              <button
-                onClick={handleSend}
-                disabled={sending || !input.trim()}
-                className="w-10 h-10 rounded-full bg-[#005B2E] hover:bg-[#01361D] text-white flex items-center justify-center disabled:opacity-50 flex-shrink-0"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          )}
+
+          <form onSubmit={handleSend} className="p-3 bg-white border-t border-border flex gap-2">
+            <Input
+              placeholder="Digite sua dúvida sobre o Jetro..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="h-10 text-xs"
+            />
+            <Button
+              type="submit"
+              size="icon"
+              className="bg-[#005A36] hover:bg-[#004225] text-white h-10 w-10 shrink-0"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
       )}
-    </>
+    </div>
   )
 }

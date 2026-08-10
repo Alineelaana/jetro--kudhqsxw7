@@ -1,204 +1,69 @@
-export const DEFAULT_WHATSAPP_NUMBER = '5531991297619'
-export const BRAND_NAME = 'Velora Log'
-export const BRAND_SLOGAN = 'Operações Logísticas de Excelência'
+export const DEFAULT_WHATSAPP_NUMBER = '5527999999999'
+export const BRAND_NAME = 'Jetro'
+export const BRAND_SLOGAN = 'Plataforma Inteligente de Gestão Empresarial'
 
-export interface ServiceItem {
+export interface SegmentItem {
   id: string
   title: string
-  shortTitle: string
   description: string
-  icon: string
-  tags: string[]
-  highlight?: boolean
+  iconName: string
+  highlights: string[]
 }
 
-export const SERVICES: ServiceItem[] = [
+export const BUSINESS_SEGMENTS: SegmentItem[] = [
   {
-    id: 'armazenagem-estoque',
-    title: 'Armazenagem de Produtos em Estoque',
-    shortTitle: 'Armazenagem de Estoque',
+    id: 'servicos',
+    title: 'Prestadoras de Serviços',
     description:
-      'Gestão WMS avançada, inventário contínuo, picking & packing ágil e controle total de lotes e validade com máxima acuracidade para sua empresa.',
-    icon: 'Warehouse',
-    tags: ['Gestão WMS', 'Picking & Packing', 'Controle de Lotes/Validade', 'Inventário'],
-    highlight: true,
+      'Gestão comercial, contratos, equipes, financeiro, atendimento, indicadores e performance.',
+    iconName: 'Briefcase',
+    highlights: ['Contratos e Faturamento', 'Gestão de Equipes', 'Performance de Serviços'],
   },
   {
-    id: 'transporte-cargas',
-    title: 'Transporte de Cargas',
-    shortTitle: 'Transporte de Cargas',
+    id: 'distribuidoras',
+    title: 'Distribuidoras',
     description:
-      'Transporte rodoviário de cargas fracionadas e dedicadas com monitoramento em tempo real. Atendemos em todo o estado do Espírito Santo.',
-    icon: 'Truck',
-    tags: ['Carga Lotação', 'Carga Fracionada', 'Sistema de Rastreamento'],
+      'Compras, vendas, estoque, fornecedores, verbas, crédito, cobrança, logística, financeiro e inteligência comercial.',
+    iconName: 'Truck',
+    highlights: ['Verbas de Fornecedor', 'Crédito e Cobrança', 'Inteligência Logística'],
   },
   {
-    id: 'distribuicao-urbana',
-    title: 'Distribuição Urbana e Delivery',
-    shortTitle: 'Distribuição e Last Mile',
+    id: 'atacadistas',
+    title: 'Atacadistas',
     description:
-      'Soluções de última milha (Last Mile) com roteirização inteligente e pontualidade na entrega final nos grandes centros urbanos do Espírito Santo.',
-    icon: 'MapPinned',
-    tags: ['Last Mile', 'Entregas Rápidas', 'Roteirização Inteligente'],
+      'Gestão de clientes, preços, margens, estoque, compras, vendas, crédito e rentabilidade.',
+    iconName: 'Building2',
+    highlights: ['Tabelas de Preços', 'Análise de Margem', 'Gestão de Atacado'],
   },
   {
-    id: 'armazenagem-cd',
-    title: 'Armazenagem e Centro de Distribuição',
-    shortTitle: 'Centro de Distribuição',
+    id: 'industrias',
+    title: 'Indústrias',
     description:
-      'Infraestrutura moderna e segura para estocagem e movimentação de mercadorias em localização estratégica nos eixos rodoviários capixabas.',
-    icon: 'Layers',
-    tags: ['CD Estratégico', 'Segurança 24/7', 'Estrutura Modular'],
+      'Planejamento, produção, custos, estoque, compras, qualidade, manutenção, vendas e indicadores.',
+    iconName: 'Factory',
+    highlights: ['PCP e Engenharia', 'Controle de Qualidade', 'Custos Industriais'],
   },
   {
-    id: 'logistica-portuaria',
-    title: 'Logística Portuária',
-    shortTitle: 'Logística Portuária',
+    id: 'comerciais',
+    title: 'Empresas Comerciais',
+    description: 'CRM, vendas, metas, clientes, propostas, faturamento, financeiro e performance.',
+    iconName: 'ShoppingBag',
+    highlights: ['Funil de Vendas', 'Metas e Comissões', 'Controle Financeiro'],
+  },
+  {
+    id: 'multicompanhia',
+    title: 'Operações Multicompanhia',
     description:
-      'Conexão direta com os principais portos e terminais do Espírito Santo para recepção, transporte e movimentação de contêineres.',
-    icon: 'Ship',
-    tags: ['Portos do ES', 'Contêineres', 'Agilidade Operacional'],
+      'Gestão de empresas, filiais, unidades e operações com governança e visão consolidada.',
+    iconName: 'Network',
+    highlights: ['Consolidação de Filiais', 'Matriz de Permissões', 'DRE Unificada'],
   },
   {
-    id: 'cross-docking',
-    title: 'Cross Docking',
-    shortTitle: 'Cross Docking',
+    id: 'crescimento',
+    title: 'Empresas em Crescimento',
     description:
-      'Triagem e redistribuição imediata de produtos com agilidade na transferência de mercadorias entre modais, reduzindo lead time.',
-    icon: 'ArrowLeftRight',
-    tags: [
-      'Triagem Rápida',
-      'Agilidade na transferência de mercadorias entre modais',
-      'Redução de Lead Time',
-    ],
+      'Para negócios que precisam estruturar processos profissionais sem perder agilidade.',
+    iconName: 'TrendingUp',
+    highlights: ['Evolução Modular', 'Escalabilidade', 'Processos Padronizados'],
   },
-  {
-    id: 'gestao-frota',
-    title: 'Gestão de Frota e Rastreamento',
-    shortTitle: 'Gestão de Frota',
-    description:
-      'Telemetria avançada, gerenciamento de risco e condutores qualificados para garantir a segurança integral do seu patrimônio.',
-    icon: 'Bus',
-    tags: ['Telemetria', 'Gerenciamento de Risco', 'Frota Rastreada'],
-  },
-]
-
-export const SERVICE_OPTIONS = SERVICES.map((s) => s.title)
-
-export interface DefaultFormField {
-  name: string
-  label: string
-  type: 'text' | 'email' | 'tel' | 'textarea' | 'select'
-  required: boolean
-  order: number
-  options?: string[] | null
-}
-
-export const DEFAULT_FORM_FIELDS: DefaultFormField[] = [
-  { name: 'nome_completo', label: 'Nome Completo', type: 'text', required: true, order: 1 },
-  { name: 'empresa', label: 'Empresa', type: 'text', required: true, order: 2 },
-  { name: 'email', label: 'E-mail Corporativo', type: 'email', required: true, order: 3 },
-  { name: 'telefone', label: 'Telefone / WhatsApp', type: 'tel', required: true, order: 4 },
-  {
-    name: 'servico_interesse',
-    label: 'Serviço de Interesse',
-    type: 'select',
-    required: true,
-    order: 5,
-    options: SERVICE_OPTIONS,
-  },
-  {
-    name: 'tipo_operacao',
-    label: 'Tipo de Operação',
-    type: 'select',
-    required: true,
-    order: 6,
-    options: [
-      'Armazenagem de Produtos em Estoque',
-      'Transporte de Cargas',
-      'Distribuição Urbana e Last Mile',
-      'Logística Portuária',
-      'Cross Docking',
-      'Gestão de Frota',
-      'Operação Logística Completa',
-    ],
-  },
-  { name: 'cidade_origem', label: 'Cidade de Origem', type: 'text', required: true, order: 7 },
-  { name: 'cidade_destino', label: 'Cidade de Destino', type: 'text', required: true, order: 8 },
-  {
-    name: 'tipo_mercadoria',
-    label: 'Tipo de Mercadoria / Produto',
-    type: 'text',
-    required: true,
-    order: 9,
-  },
-  {
-    name: 'volume_estimado',
-    label: 'Volume Estimado (Paletes, peso, caixas)',
-    type: 'text',
-    required: true,
-    order: 10,
-  },
-  {
-    name: 'periodicidade',
-    label: 'Periodicidade da Operação',
-    type: 'select',
-    required: true,
-    order: 11,
-    options: ['Operação Única / Pontual', 'Contrato Recorrente', 'Projeto Urgente'],
-  },
-  {
-    name: 'mensagem',
-    label: 'Conte-nos um pouco sobre sua empresa / Operação',
-    type: 'textarea',
-    required: true,
-    order: 12,
-  },
-]
-
-export const SERVICE_CHECKLIST_OPTIONS = [
-  'Recebimento',
-  'Conferência',
-  'Armazenagem',
-  'Separação',
-  'Embalagem',
-  'Expedição',
-  'Transporte',
-  'Monitoramento',
-  'Entrega',
-]
-
-export const CARGO_TYPE_OPTIONS = [
-  'Carga Geral',
-  'Carga Fracionada',
-  'Carga Lotação',
-  'Carga Perecível',
-  'Carga Perigosa (NR-20)',
-  'Carga Refrigerada',
-  'Contêiner',
-  'Granel',
-  'Outros',
-]
-
-export const PAYMENT_OPTIONS = [
-  'À Vista',
-  'Boleto Bancário',
-  'PIX',
-  'Transferência Bancária',
-  'Cartão de Crédito',
-  '30 Dias',
-  '30/60 Dias',
-  '30/60/90 Dias',
-  'A Combinar',
-]
-
-export const DEADLINE_OPTIONS = [
-  'Imediato',
-  '24 horas',
-  '48 horas',
-  '72 horas',
-  '1 semana',
-  '2 semanas',
-  '30 dias',
-  'A Combinar',
 ]

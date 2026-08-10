@@ -1,138 +1,88 @@
 import { Button } from '@/components/ui/button'
-import { useSettings } from '@/hooks/use-settings'
-import { useResponseTime } from '@/hooks/use-response-time'
-import { buildWhatsAppUrl } from '@/lib/utils'
-import logoDark from '@/assets/chatgpt-image-1-de-ago.de-2026-103411-29182.png'
-import warehouseBg from '@/assets/chatgpt-image-1-de-ago.de-2026-122134-e02ba.png'
-import {
-  MessageCircle,
-  FileText,
-  ShieldCheck,
-  Clock,
-  Warehouse,
-  Boxes,
-  CheckCircle,
-} from 'lucide-react'
-
-const DIFFERENTIALS = [
-  { icon: ShieldCheck, label: 'Sistema de força de vendas para que você use em sua operação' },
-  { icon: Warehouse, label: 'Armazenagem WMS em Espaço Próprio' },
-  { icon: Clock, label: 'SLA de Expedição 99.8%' },
-  { icon: Boxes, label: '+15.000 Pos. Paletes no ES' },
-]
+import { ArrowRight, Bot, ShieldCheck, Zap, Layers } from 'lucide-react'
+import heroBanner from '@/assets/chatgpt-image-1-de-ago.de-2026-123806-850fe.png'
 
 export function HeroSection() {
-  const { whatsappNumber } = useSettings()
-  const safeWhatsapp = whatsappNumber || ''
-  const responseTime = useResponseTime()
-  const responseTimeFormatted = responseTime?.formatted ?? ''
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   return (
-    <section
-      id="inicio"
-      className="relative overflow-hidden bg-black text-white pt-10 pb-20 border-b border-[#C89B3C]/30 min-h-[90vh] flex flex-col justify-center"
-    >
-      {/* Background Warehouse Image — maximally visible with minimal neutral gradient for text legibility */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <img
-          src={warehouseBg}
-          alt="Operação de Armazenagem Velora Log Espírito Santo"
-          className="w-full h-full object-cover object-center opacity-100 brightness-110 transition-all duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/25" />
-      </div>
+    <section className="relative bg-gradient-to-b from-[#001D0F] via-[#002E1B] to-[#001D0F] text-white overflow-hidden py-16 lg:py-24">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#005A36]/30 via-transparent to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-4 relative z-10 pt-4">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          {/* Main Logo Header */}
-          <div className="flex justify-center mb-2 animate-fade-in-down">
-            <img
-              src={logoDark}
-              alt="Velora Log Operações Logísticas"
-              className="h-28 sm:h-36 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
-            />
-          </div>
-
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/50 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
-            <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
-            <span>Infraestrutura Própria, Operação Segura e Otimizada</span>
-          </div>
-
-          {responseTimeFormatted && (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#005B2E]/80 border border-[#C89B3C]/60 text-[#E4C46A] text-xs sm:text-sm font-bold shadow-lg backdrop-blur animate-fade-in-up">
-              <Clock className="w-4 h-4" />
-              Resposta em média de {responseTimeFormatted}
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7 space-y-6 text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C89B3C]/10 border border-[#C89B3C]/40 text-[#E5B85C] text-xs sm:text-sm font-semibold tracking-wide">
+              <Zap className="h-4 w-4 text-[#C89B3C]" />
+              <span>Plataforma Inteligente de Gestão Empresarial</span>
             </div>
-          )}
 
-          {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.9)] [text-shadow:0_2px_6px_rgba(0,0,0,0.95),0_0_2px_rgba(0,0,0,1)]">
-            Sua Operação Logística Integrada com Precisão, Agilidade e{' '}
-            <span className="text-[#E4C46A]">Segurança</span>
-          </h1>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] text-white">
+              Gestão inteligente para empresas que querem crescer com controle.
+            </h1>
 
-          <p className="text-base sm:text-lg text-white/95 max-w-2xl mx-auto leading-relaxed font-normal [text-shadow:0_2px_6px_rgba(0,0,0,0.9),0_0_1px_rgba(0,0,0,1)]">
-            Especialistas em armazenagem de alta capacidade com tecnologia WMS, movimentação de
-            cargas, picking & packing, logística portuária e distribuição. Atendemos em todo o
-            estado do Espírito Santo.
-          </p>
+            <p className="text-base sm:text-xl text-gray-300 leading-relaxed font-normal max-w-2xl">
+              O Jetro conecta áreas, processos, pessoas e informações em uma única plataforma,
+              ajudando sua empresa a tomar decisões melhores, operar com eficiência e crescer com
+              segurança.
+            </p>
 
-          {/* Call to Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button
-              asChild
-              size="lg"
-              className="bg-[#25D366] hover:bg-[#1da851] text-white text-base font-extrabold shadow-2xl px-8 h-14 rounded-xl border border-white/20 transition-all hover:scale-105"
-            >
-              <a
-                href={buildWhatsAppUrl(
-                  safeWhatsapp,
-                  'Olá! Gostaria de falar com um especialista da Velora Log sobre as operações de armazenagem e transporte.',
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <Button
+                onClick={() => scrollToSection('plataforma')}
+                size="lg"
+                className="bg-[#005A36] hover:bg-[#007343] text-white font-bold px-8 py-6 text-base rounded-lg shadow-xl shadow-[#005A36]/30 border border-[#008A4D]"
               >
-                <MessageCircle className="w-6 h-6 mr-2 shrink-0" />
-                Falar com Especialista no WhatsApp
-              </a>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="text-base font-bold border-2 border-[#C89B3C] text-[#E4C46A] hover:bg-[#C89B3C] hover:text-[#01361D] bg-[#01361D]/80 backdrop-blur h-14 rounded-xl shadow-lg transition-all"
-            >
-              <a href="#orcamento">
-                <FileText className="w-5 h-5 mr-2" />
-                Solicitar Cotação Rápida
-              </a>
-            </Button>
-          </div>
-        </div>
+                Conheça o Jetro
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
 
-        {/* Differentials */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mt-14 pt-8 border-t border-[#C89B3C]/30 max-w-5xl mx-auto">
-          {(Array.isArray(DIFFERENTIALS) ? DIFFERENTIALS : [])
-            .filter(Boolean)
-            .filter((d) => d && typeof d === 'object' && d.icon && d.label)
-            .map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-3 bg-black/40 p-4 rounded-xl border border-[#C89B3C]/30 backdrop-blur hover:border-[#C89B3C] hover:bg-black/60 transition-all shadow-md group"
+              <Button
+                onClick={() => scrollToSection('nine-ia')}
+                size="lg"
+                variant="outline"
+                className="border-[#C89B3C]/60 text-[#E5B85C] hover:bg-[#C89B3C]/10 hover:text-white font-bold px-8 py-6 text-base rounded-lg bg-black/20 backdrop-blur"
               >
-                <div className="w-10 h-10 rounded-lg bg-[#005B2E] border border-[#C89B3C]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  <item.icon className="w-5 h-5 text-[#E4C46A]" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs sm:text-sm font-bold text-white leading-snug">
-                    {item.label}
-                  </span>
-                  <span className="text-[10px] text-[#E4C46A] flex items-center gap-1 font-semibold mt-0.5">
-                    <CheckCircle className="w-3 h-3 text-[#25D366]" /> Velora Log ES
-                  </span>
-                </div>
+                <Bot className="mr-2 h-5 w-5 text-[#C89B3C]" />
+                Fale com a Nine
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/10 max-w-lg">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-[#C89B3C] shrink-0" />
+                <span className="text-xs text-gray-300 font-medium">Governança Total</span>
               </div>
-            ))}
+              <div className="flex items-center gap-2">
+                <Layers className="h-5 w-5 text-[#C89B3C] shrink-0" />
+                <span className="text-xs text-gray-300 font-medium">Arquitetura Modular</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Bot className="h-5 w-5 text-[#C89B3C] shrink-0" />
+                <span className="text-xs text-gray-300 font-medium">IA Integrada</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 relative">
+            <div className="relative mx-auto rounded-2xl overflow-hidden border-2 border-[#C89B3C]/40 shadow-2xl shadow-black/60 group">
+              <img
+                src={heroBanner}
+                alt="Jetro - Gestão Inteligente"
+                className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#001D0F]/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-black/60 backdrop-blur border border-white/10 text-xs text-gray-200">
+                <p className="font-bold text-[#E5B85C] mb-1">Tecnologia que Transforma</p>
+                <p>Integração de setores em tempo real com controle executivo e visão 360°.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
