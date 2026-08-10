@@ -126,9 +126,8 @@ export function SiteFooter() {
               Contato
             </h4>
             <div className="space-y-3 text-sm text-gray-300">
-              <p>Espírito Santo / Atendimento Nacional</p>
-              <p>E-mail: contato@jetro.com.br</p>
-              <p>Comercial: +55 (27) 99999-9999</p>
+              <p>Atendimento em todo território Nacional</p>
+              <p>Comercial: +55 (31) 9 9129-7619</p>
               <div className="pt-2">
                 <span className="inline-block px-3 py-1 rounded bg-[#005A36] text-xs font-semibold text-white">
                   Suporte & Atendimento Especializado
