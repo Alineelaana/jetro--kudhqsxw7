@@ -27,6 +27,7 @@ import TermosDeUso from './pages/TermosDeUso'
 import PoliticaCookies from './pages/PoliticaCookies'
 import PoliticaSeguranca from './pages/PoliticaSeguranca'
 import CentralDePrivacidade from './pages/CentralDePrivacidade'
+import PoliticaLicenciamento from './pages/PoliticaLicenciamento'
 import Products from './pages/Products'
 import Cadastros from './pages/Cadastros'
 import PriceTablesPage from './pages/PriceTablesPage'
@@ -1311,6 +1312,10 @@ const App = () => (
                         <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
                         <Route path="/politica-de-seguranca" element={<PoliticaSeguranca />} />
                         <Route path="/central-de-privacidade" element={<CentralDePrivacidade />} />
+                        <Route
+                          path="/politica-de-licenciamento"
+                          element={<PoliticaLicenciamento />}
+                        />
                         <Route path="*" element={<NotFound />} />
                       </Route>
                     </Routes>

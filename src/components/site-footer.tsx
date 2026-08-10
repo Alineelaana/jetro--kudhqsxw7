@@ -90,6 +90,14 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link
+                  to="/politica-de-licenciamento"
+                  className="hover:text-white transition-colors"
+                >
+                  Licenciamento
+                </Link>
+              </li>
+              <li>
                 <Link to="/central-de-privacidade" className="hover:text-white transition-colors">
                   Central de Privacidade
                 </Link>
