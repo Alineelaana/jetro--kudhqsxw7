@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Bot, ShieldCheck, Zap, Layers } from 'lucide-react'
-import heroBanner from '@/assets/chatgpt-image-1-de-ago.de-2026-123806-850fe.png'
+import heroBanner from '@/assets/whatsapp-image-2026-08-09-at-23.34.40-93309.jpeg'
 
 export function HeroSection() {
   const scrollToSection = (id: string) => {
@@ -12,7 +12,11 @@ export function HeroSection() {
 
   return (
     <section className="relative bg-gradient-to-b from-[#001D0F] via-[#002E1B] to-[#001D0F] text-white overflow-hidden py-16 lg:py-24">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#005A36]/30 via-transparent to-transparent pointer-events-none" />
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity pointer-events-none filter blur-sm scale-105"
+        style={{ backgroundImage: `url(${heroBanner})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#001D0F]/90 via-[#002E1B]/85 to-[#001D0F] pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -70,16 +74,19 @@ export function HeroSection() {
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto rounded-2xl overflow-hidden border-2 border-[#C89B3C]/40 shadow-2xl shadow-black/60 group">
+            <div className="relative mx-auto rounded-2xl overflow-hidden border-2 border-[#C89B3C]/50 shadow-2xl shadow-black/80 group">
               <img
                 src={heroBanner}
-                alt="Jetro - Gestão Inteligente"
+                alt="Jetro - Gestão Inteligente com IA Nine"
                 className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#001D0F]/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-black/60 backdrop-blur border border-white/10 text-xs text-gray-200">
-                <p className="font-bold text-[#E5B85C] mb-1">Tecnologia que Transforma</p>
-                <p>Integração de setores em tempo real com controle executivo e visão 360°.</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#001D0F]/90 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-black/70 backdrop-blur border border-[#C89B3C]/30 text-xs text-gray-200">
+                <p className="font-bold text-[#E5B85C] mb-1 flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-[#C89B3C]" />
+                  Nine IA &amp; Jetro Platform
+                </p>
+                <p>Orquestração de operações e inteligência preditiva em tempo real.</p>
               </div>
             </div>
           </div>
