@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Menu, X, ChevronRight } from 'lucide-react'
-import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-1-f45df.jpeg'
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -33,18 +33,18 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 w-full border-b border-[#C89B3C]/30 bg-[#002817]">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-[#C89B3C] shadow-md group-hover:scale-105 transition-transform duration-300">
+          <div className="relative h-12 w-12 overflow-hidden rounded-md border-2 border-[#C89B3C] shadow-md group-hover:scale-105 transition-transform duration-300">
             <img src={logoImg} alt="Jetro Logo" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-black tracking-tight text-foreground flex items-center gap-1">
+            <span className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
               JETRO
               <span className="inline-block h-2 w-2 rounded-full bg-[#C89B3C]" />
             </span>
-            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-[10px] font-semibold tracking-wider text-gray-300 uppercase">
               Plataforma Inteligente
             </span>
           </div>
@@ -59,7 +59,7 @@ export function SiteHeader() {
                 e.preventDefault()
                 handleNavClick(link.href)
               }}
-              className="text-sm font-medium text-foreground/80 hover:text-foreground hover:text-[#005A36] transition-colors"
+              className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
             >
               {link.label}
             </a>
@@ -80,7 +80,7 @@ export function SiteHeader() {
 
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 text-foreground hover:text-[#005A36] transition-colors"
+          className="lg:hidden p-2 text-white hover:text-[#C89B3C] transition-colors"
           aria-label="Alternar Menu"
         >
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -88,7 +88,7 @@ export function SiteHeader() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden border-b border-border bg-background px-4 py-6 space-y-4 animate-fade-in">
+        <div className="lg:hidden border-b border-[#C89B3C]/30 bg-[#002817] px-4 py-6 space-y-4 animate-fade-in">
           <nav className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <a
@@ -98,7 +98,7 @@ export function SiteHeader() {
                   e.preventDefault()
                   handleNavClick(link.href)
                 }}
-                className="text-base font-medium text-foreground py-2 border-b border-border/50 hover:text-[#005A36]"
+                className="text-base font-medium text-gray-300 py-2 border-b border-white/10 hover:text-white"
               >
                 {link.label}
               </a>

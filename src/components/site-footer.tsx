@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-1-f45df.jpeg'
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear()
@@ -10,7 +10,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 overflow-hidden rounded-full border border-[#C89B3C]">
+              <div className="h-12 w-12 overflow-hidden rounded-md border border-[#C89B3C]">
                 <img src={logoImg} alt="Jetro" className="h-full w-full object-cover" />
               </div>
               <span className="text-2xl font-black text-white tracking-tight">JETRO</span>
