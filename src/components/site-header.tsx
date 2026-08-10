@@ -35,18 +35,9 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#C89B3C]/30 bg-[#002817]">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-12 w-12 overflow-hidden rounded-md border-2 border-[#C89B3C] shadow-md group-hover:scale-105 transition-transform duration-300">
+        <Link to="/" className="flex items-center group">
+          <div className="relative h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-md border-2 border-[#C89B3C] shadow-md group-hover:scale-105 transition-transform duration-300">
             <img src={logoImg} alt="Jetro Logo" className="h-full w-full object-cover" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
-              JETRO
-              <span className="inline-block h-2 w-2 rounded-full bg-[#C89B3C]" />
-            </span>
-            <span className="text-[10px] font-semibold tracking-wider text-gray-300 uppercase">
-              Plataforma Inteligente
-            </span>
           </div>
         </Link>
 
