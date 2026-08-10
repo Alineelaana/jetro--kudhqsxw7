@@ -70,21 +70,23 @@ export function PlatformModulesSection() {
   ]
 
   return (
-    <section id="plataforma" className="py-16 sm:py-24 bg-white relative">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div id="solucoes" className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#C89B3C]/10 text-[#8F6A1E] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
+    <section id="plataforma" className="bg-white relative">
+      <div id="solucoes" className="w-full bg-[#C89B3C] py-12 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl space-y-3">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#005A36] text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider">
             Arquitetura de Soluções
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-foreground">
+          <h2 className="text-3xl sm:text-4xl font-black text-[#005A36]">
             Entregas e Pilares do Ecossistema Jetro
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <p className="text-white text-base sm:text-lg">
             Um ecossistema completo e modular, projetado para oferecer visibilidade total,
             eficiência operacional e previsibilidade financeira.
           </p>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-24">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {pillars.map((p) => (
             <div
