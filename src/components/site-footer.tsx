@@ -85,6 +85,11 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link to="/politica-de-sla" className="hover:text-white transition-colors">
+                  SLA
+                </Link>
+              </li>
+              <li>
                 <Link to="/politica-comercial" className="hover:text-white transition-colors">
                   Política Comercial
                 </Link>

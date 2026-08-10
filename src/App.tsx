@@ -28,6 +28,7 @@ import PoliticaCookies from './pages/PoliticaCookies'
 import PoliticaSeguranca from './pages/PoliticaSeguranca'
 import CentralDePrivacidade from './pages/CentralDePrivacidade'
 import PoliticaLicenciamento from './pages/PoliticaLicenciamento'
+import PoliticaSla from './pages/PoliticaSla'
 import Products from './pages/Products'
 import Cadastros from './pages/Cadastros'
 import PriceTablesPage from './pages/PriceTablesPage'
@@ -1316,6 +1317,7 @@ const App = () => (
                           path="/politica-de-licenciamento"
                           element={<PoliticaLicenciamento />}
                         />
+                        <Route path="/politica-de-sla" element={<PoliticaSla />} />
                         <Route path="*" element={<NotFound />} />
                       </Route>
                     </Routes>
