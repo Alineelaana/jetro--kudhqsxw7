@@ -28,12 +28,12 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-              Transforme sua operação logística com a Jetro
+              Gestão inteligente para empresas que querem crescer.
             </h1>
 
             <p className="text-base sm:text-xl text-gray-200 leading-relaxed font-normal max-w-2xl bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              Solicite uma apresentação comercial e descubra como nossa arquitetura pode elevar a
-              eficiência da sua empresa no Espírito Santo.
+              O Jetro reúne operações, finanças, vendas, pessoas e indicadores em uma plataforma
+              desenvolvida para simplificar a gestão e impulsionar resultados.
             </p>
 
             <p className="text-lg sm:text-xl font-bold text-[#E5B85C] flex items-center gap-2 bg-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
