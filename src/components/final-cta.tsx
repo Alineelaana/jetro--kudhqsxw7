@@ -67,37 +67,33 @@ export function FinalCTA({ onOpenBudget }: FinalCTAProps) {
         }}
       />
 
-      {/* Semi-transparent Overlay preserving background artwork visibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/75 pointer-events-none" />
-      <div className="absolute inset-0 bg-emerald-950/15 backdrop-brightness-[0.9] pointer-events-none" />
-
-      {/* Glow highlight */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[380px] bg-emerald-500/15 rounded-full blur-[150px] pointer-events-none" />
+      {/* Subtle gradient for text legibility — no solid/opaque layer */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20 pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 max-w-5xl">
-        {/* Semi-transparent High-Legibility Text Container */}
-        <div className="bg-black/50 backdrop-blur-md border border-white/15 rounded-3xl p-8 sm:p-12 lg:p-14 text-center space-y-6 sm:space-y-8 shadow-2xl transition-all duration-300 hover:border-emerald-500/30 hover:bg-black/55">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-md">
+        {/* Transparent text container — image fully visible behind text */}
+        <div className="text-center space-y-6 sm:space-y-8 py-8 sm:py-12 lg:py-14">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-md [text-shadow:0_2px_6px_rgba(0,0,0,0.6)]">
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
             <span>Apresentação Comercial</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-md">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
             Sua empresa merece uma gestão mais inteligente
           </h2>
 
-          <p className="text-white text-base sm:text-xl max-w-3xl mx-auto font-normal leading-relaxed drop-shadow">
+          <p className="text-white text-base sm:text-xl max-w-3xl mx-auto font-normal leading-relaxed [text-shadow:0_2px_8px_rgba(0,0,0,0.7)]">
             O Jetro reúne pessoas, processos e informações em uma plataforma completa para empresas
             que desejam crescer com organização, tecnologia e inteligência.
           </p>
 
-          <p className="text-white text-sm sm:text-base max-w-2xl mx-auto font-normal leading-relaxed drop-shadow-sm">
+          <p className="text-white text-sm sm:text-base max-w-2xl mx-auto font-normal leading-relaxed [text-shadow:0_2px_8px_rgba(0,0,0,0.7)]">
             Solicite uma apresentação comercial e descubra como nossa arquitetura pode elevar a
             eficiência da sua empresa.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <div className="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-extrabold text-lg shadow-xl tracking-wide">
+            <div className="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-extrabold text-lg shadow-xl tracking-wide [text-shadow:0_2px_6px_rgba(0,0,0,0.6)]">
               <PhoneCall className="w-5 h-5 text-amber-400" />
               <span>31 9 9129-7619</span>
             </div>
