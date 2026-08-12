@@ -27,7 +27,7 @@ export default function Layout() {
 
   if (showSidebar) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-screen flex-col overflow-hidden">
         <SiteHeader />
         <div className="flex flex-1 overflow-hidden">
           <AdminSidebar />

@@ -75,7 +75,7 @@ export function AdminSidebar() {
 
   if (collapsed) {
     return (
-      <div className="w-12 shrink-0 border-r border-gray-200 bg-[#01361D] flex flex-col items-center py-3 gap-3">
+      <div className="w-12 h-full shrink-0 border-r border-gray-200 bg-[#01361D] flex flex-col items-center py-3 gap-3 overflow-y-auto">
         <img
           src={logoJetro}
           alt="Jetro"
@@ -93,7 +93,7 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="w-60 shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+    <aside className="w-60 h-full shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
       <div className="p-2.5 border-b border-gray-100 shrink-0 bg-[#01361D] text-white flex items-center justify-between gap-2">
         <Link to="/admin" className="flex items-center gap-2 overflow-hidden">
           <img
