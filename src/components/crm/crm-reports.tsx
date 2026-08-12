@@ -13,13 +13,23 @@ import {
   Pie,
   Cell,
 } from 'recharts'
-import { getCrmReportData } from '@/services/crm'
+import { getCrmReportData, callCrmAI } from '@/services/crm'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useAuth } from '@/hooks/use-auth'
 import { CRM_REPORT_TYPES } from '@/lib/crm-types'
-import { Loader2, FileText, FileSpreadsheet, Sparkles } from 'lucide-react'
+import {
+  Loader2,
+  FileText,
+  FileSpreadsheet,
+  Sparkles,
+  Users,
+  Briefcase,
+  Trophy,
+  Percent,
+} from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { exportCsv } from '@/lib/csv-export'
-import { callCrmAI } from '@/services/crm'
+import { generateCrmReportPdf } from '@/lib/crm-report-pdf'
 
 const COLORS = [
   '#005B2E',
@@ -32,10 +42,20 @@ const COLORS = [
   '#ef4444',
 ]
 
+const ROLE_LABELS: Record<string, string> = {
+  SUP: 'Super Admin',
+  PADRAO: 'Padrão',
+  SDR: 'SDR',
+  Vendedor: 'Vendedor',
+  FINANCEIRO: 'Financeiro',
+  COMERCIAL: 'Comercial',
+}
+
 export function CrmReports() {
   const [data, setData] = useState<Record<string, unknown> | null>(null)
   const [selected, setSelected] = useState(CRM_REPORT_TYPES[0])
   const [aiLoading, setAiLoading] = useState(false)
+  const { user, userRole } = useAuth()
 
   const load = async () => setData(await getCrmReportData())
   useEffect(() => {
@@ -44,6 +64,9 @@ export function CrmReports() {
   useRealtime('crm_leads', () => load())
   useRealtime('crm_opportunities', () => load())
   useRealtime('crm_proposals', () => load())
+
+  const userName = (user?.name as string) || 'Usuário'
+  const roleLabel = ROLE_LABELS[userRole] || userRole
 
   if (!data)
     return (
@@ -59,18 +82,37 @@ export function CrmReports() {
   const lostOpps = (data.lostOpps as Array<Record<string, unknown>>) || []
   const totalLeads = (data.leads as Array<Record<string, unknown>>)?.length || 0
   const conversionRate = totalLeads > 0 ? ((wonOpps.length / totalLeads) * 100).toFixed(1) : '0'
+  const proposalsCount = (data.proposals as Array<Record<string, unknown>>)?.length || 0
+  const activitiesCount = (data.activities as Array<Record<string, unknown>>)?.length || 0
+  const funnelValue = Number(data.funnelValue || 0)
+
+  const summaryCards = [
+    { label: 'Total de Leads', value: totalLeads, icon: Users, color: '#005B2E' },
+    { label: 'Oportunidades', value: opps.length, icon: Briefcase, color: '#3b82f6' },
+    { label: 'Ganhas', value: wonOpps.length, icon: Trophy, color: '#10b981' },
+    { label: 'Conversão', value: `${conversionRate}%`, icon: Percent, color: '#C89B3C' },
+  ]
 
   const handleExportPdf = () => {
-    const win = window.open('', '_blank')
-    if (!win) {
+    try {
+      generateCrmReportPdf({
+        reportType: selected,
+        totalLeads,
+        totalOpps: opps.length,
+        wonOpps: wonOpps.length,
+        conversionRate,
+        funnelValue,
+        leadsBySource: leadsBySource.map((r) => ({ name: String(r.name), count: Number(r.count) })),
+        leadsByStatus: leadsByStatus.map((r) => ({ name: String(r.name), count: Number(r.count) })),
+        lostOpps: lostOpps.length,
+        proposalsCount,
+        activitiesCount,
+        userName,
+        userRole: roleLabel,
+      })
+    } catch {
       toast({ title: 'Pop-up bloqueado', variant: 'destructive' })
-      return
     }
-    win.document.write(
-      `<html><head><title>Relatório CRM - ${selected}</title></head><body><h1>Relatório: ${selected}</h1><p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p><p>Total de Leads: ${totalLeads}<br>Oportunidades Ganhas: ${wonOpps.length}<br>Taxa de Conversão: ${conversionRate}%<br>Valor do Funil: R$ ${Number(data.funnelValue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p></body></html>`,
-    )
-    win.document.close()
-    setTimeout(() => win.print(), 500)
   }
 
   const handleExportExcel = () => {
@@ -97,86 +139,111 @@ export function CrmReports() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <select
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
-          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm focus-visible:ring-[#005B2E]"
-        >
-          {CRM_REPORT_TYPES.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExportPdf}
-          className="border-[#005B2E] text-[#005B2E]"
-        >
-          <FileText className="w-4 h-4 mr-2" /> PDF
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExportExcel}
-          className="border-[#005B2E] text-[#005B2E]"
-        >
-          <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleAI}
-          disabled={aiLoading}
-          className="border-purple-500 text-purple-600"
-        >
-          {aiLoading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Sparkles className="w-4 h-4 mr-2" />
-          )}{' '}
-          Análise IA
-        </Button>
+    <div className="space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm focus-visible:ring-[#005B2E]"
+          >
+            {CRM_REPORT_TYPES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportPdf}
+            className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/5"
+          >
+            <FileText className="w-4 h-4 mr-2" /> PDF
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportExcel}
+            className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/5"
+          >
+            <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleAI}
+            disabled={aiLoading}
+            className="border-purple-500 text-purple-600 hover:bg-purple-50"
+          >
+            {aiLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4 mr-2" />
+            )}{' '}
+            Análise IA
+          </Button>
+        </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: 'Total Leads', value: totalLeads },
-          { label: 'Oportunidades', value: opps.length },
-          { label: 'Ganhas', value: wonOpps.length },
-          { label: 'Conversão', value: `${conversionRate}%` },
-        ].map((c) => (
-          <Card key={c.label} className="border-2 border-[#005B2E]/20">
-            <CardContent className="py-3 px-4">
-              <p className="text-2xl font-black">{c.value}</p>
-              <p className="text-xs text-muted-foreground">{c.label}</p>
-            </CardContent>
-          </Card>
-        ))}
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {summaryCards.map((c) => {
+          const Icon = c.icon
+          return (
+            <Card
+              key={c.label}
+              className="border-t-2 border-t-[#005B2E]/30 shadow-sm transition-shadow hover:shadow-md"
+              style={{ borderTopColor: c.color }}
+            >
+              <CardContent className="py-4 px-4 flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-10 h-10 rounded-lg shrink-0"
+                  style={{ backgroundColor: `${c.color}15` }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: c.color }} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-2xl font-black leading-none">{c.value}</p>
+                  <p className="text-xs text-muted-foreground mt-1 truncate">{c.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardHeader>
-            <CardTitle className="text-base">Leads por Origem</CardTitle>
+        <Card className="border-2 border-[#005B2E]/10 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold text-[#005B2E]">Leads por Origem</CardTitle>
           </CardHeader>
           <CardContent>
             {leadsBySource.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">Sem dados.</p>
+              <p className="text-center text-muted-foreground py-12 text-sm">Sem dados.</p>
             ) : (
-              <ChartContainer config={{}} className="h-[250px]">
+              <ChartContainer config={{}} className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={leadsBySource}>
+                  <BarChart
+                    data={leadsBySource}
+                    margin={{ top: 8, right: 8, bottom: 8, left: -12 }}
+                  >
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 9 }}
+                      tick={{ fontSize: 9, fill: '#666' }}
                       angle={-20}
                       textAnchor="end"
-                      height={50}
+                      height={55}
                     />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
+                    <YAxis tick={{ fontSize: 10, fill: '#666' }} />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: 8,
+                        border: '1px solid #e0e0e0',
+                        fontSize: 12,
+                      }}
+                    />
                     <Bar dataKey="count" fill="#005B2E" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -184,15 +251,17 @@ export function CrmReports() {
             )}
           </CardContent>
         </Card>
-        <Card className="border-2 border-[#005B2E]/20">
-          <CardHeader>
-            <CardTitle className="text-base">Leads por Situação</CardTitle>
+        <Card className="border-2 border-[#005B2E]/10 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold text-[#005B2E]">
+              Leads por Situação
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {leadsByStatus.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">Sem dados.</p>
+              <p className="text-center text-muted-foreground py-12 text-sm">Sem dados.</p>
             ) : (
-              <ChartContainer config={{}} className="h-[250px]">
+              <ChartContainer config={{}} className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -202,13 +271,20 @@ export function CrmReports() {
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
-                      label
+                      innerRadius={30}
+                      label={{ fontSize: 10 }}
                     >
                       {leadsByStatus.map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: 8,
+                        border: '1px solid #e0e0e0',
+                        fontSize: 12,
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </ChartContainer>
@@ -216,36 +292,36 @@ export function CrmReports() {
           </CardContent>
         </Card>
       </div>
-      <Card className="border-2 border-[#005B2E]/20">
-        <CardHeader>
-          <CardTitle className="text-base">Resumo do Funil</CardTitle>
+
+      <Card className="border-2 border-[#005B2E]/10 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold text-[#005B2E]">Resumo do Funil</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <div>
-              <p className="text-muted-foreground">Valor do Funil</p>
-              <p className="font-bold text-[#005B2E]">
-                R${' '}
-                {Number(data.funnelValue || 0).toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                })}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                Valor do Funil
+              </p>
+              <p className="text-lg font-bold text-[#005B2E]">
+                R$ {funnelValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
-            <div>
-              <p className="text-muted-foreground">Oportunidades Perdidas</p>
-              <p className="font-bold text-red-600">{lostOpps.length}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Propostas Enviadas</p>
-              <p className="font-bold">
-                {(data.proposals as Array<Record<string, unknown>>)?.length || 0}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                Oportunidades Perdidas
               </p>
+              <p className="text-lg font-bold text-red-600">{lostOpps.length}</p>
             </div>
-            <div>
-              <p className="text-muted-foreground">Atividades</p>
-              <p className="font-bold">
-                {(data.activities as Array<Record<string, unknown>>)?.length || 0}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                Propostas Enviadas
               </p>
+              <p className="text-lg font-bold text-blue-600">{proposalsCount}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">Atividades</p>
+              <p className="text-lg font-bold text-[#C89B3C]">{activitiesCount}</p>
             </div>
           </div>
         </CardContent>
