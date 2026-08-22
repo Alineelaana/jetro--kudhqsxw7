@@ -12,6 +12,7 @@ export interface ValidityRule {
   recurrence_days: number
   channels: string[]
   active: boolean
+  attachments: string[]
   company: string
   branch: string
   created: string

@@ -11,11 +11,22 @@ export async function createValidityRule(data: Partial<ValidityRule>): Promise<V
   return pb.collection('validity_rules').create(data) as Promise<ValidityRule>
 }
 
+export async function createValidityRuleFormData(formData: FormData): Promise<ValidityRule> {
+  return pb.collection('validity_rules').create(formData) as Promise<ValidityRule>
+}
+
 export async function updateValidityRule(
   id: string,
   data: Partial<ValidityRule>,
 ): Promise<ValidityRule> {
   return pb.collection('validity_rules').update(id, data) as Promise<ValidityRule>
+}
+
+export async function updateValidityRuleFormData(
+  id: string,
+  formData: FormData,
+): Promise<ValidityRule> {
+  return pb.collection('validity_rules').update(id, formData) as Promise<ValidityRule>
 }
 
 export async function deleteValidityRule(id: string): Promise<void> {
