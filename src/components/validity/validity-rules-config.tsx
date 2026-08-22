@@ -305,7 +305,8 @@ export function ValidityRulesConfig() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleToggle(r)}
-                    className="text-orange-600"
+                    className={r.active ? 'text-[#005B2E]' : 'text-red-600'}
+                    title={r.active ? 'Inativar registro' : 'Ativar registro'}
                   >
                     <Power className="w-3.5 h-3.5" />
                   </Button>
@@ -436,7 +437,7 @@ export function ValidityRulesConfig() {
               <Switch
                 checked={form.active === 'true'}
                 onCheckedChange={(v) => setForm((p) => ({ ...p, active: v ? 'true' : 'false' }))}
-                className="data-[state=checked]:bg-[#005B2E]"
+                className="data-[state=checked]:bg-[#005B2E] data-[state=unchecked]:bg-red-600"
               />
               <Label>{form.active === 'true' ? 'Ativo' : 'Inativo'}</Label>
             </div>
