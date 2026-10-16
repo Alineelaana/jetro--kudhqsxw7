@@ -114,13 +114,22 @@ export default function ClientLogin() {
             >
               Esqueci minha senha
             </Link>
-            <div className="border-t border-border pt-4 mt-4">
+            <div className="border-t border-border pt-4 mt-4 space-y-3">
               <p className="text-center text-sm text-muted-foreground">
                 Ainda não tem cadastro?{' '}
                 <Link to="/cliente/cadastro" className="text-[#005B2E] hover:underline font-bold">
                   Clique aqui para fazer um pré-cadastro
                 </Link>
               </p>
+              <div className="pt-2 text-center">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full border-[#C89B3C]/70 hover:bg-[#C89B3C]/10 text-[#002817] font-bold text-sm rounded-xl"
+                >
+                  <Link to="/site">Acesse o site do Jetro</Link>
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

@@ -35,7 +35,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#C89B3C]/30 bg-[#002817]">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="flex items-center group py-1">
+        <Link to="/site" className="flex items-center group py-1">
           <img
             src={logoImg}
             alt="Jetro Logo"
@@ -62,10 +62,10 @@ export function SiteHeader() {
         <div className="hidden lg:flex items-center gap-3">
           <Button
             asChild
-            className="bg-[#005A36] hover:bg-[#004225] text-white font-semibold px-6 shadow-md shadow-[#005A36]/20 transition-all hover:shadow-lg"
+            className="bg-[#005A36] hover:bg-[#004225] border border-[#C89B3C]/50 text-white font-semibold px-6 shadow-md shadow-[#005A36]/20 transition-all hover:shadow-lg"
           >
-            <Link to="/admin" className="flex items-center gap-2">
-              Acessar Jetro
+            <Link to="/" className="flex items-center gap-2">
+              Acessar o sistema
               <ChevronRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -100,10 +100,10 @@ export function SiteHeader() {
           <div className="pt-2">
             <Button
               asChild
-              className="w-full bg-[#005A36] hover:bg-[#004225] text-white font-semibold py-3"
+              className="w-full bg-[#005A36] hover:bg-[#004225] border border-[#C89B3C]/50 text-white font-semibold py-3"
             >
-              <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-                Acessar Jetro
+              <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+                Acessar o sistema
               </Link>
             </Button>
           </div>

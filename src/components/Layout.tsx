@@ -8,6 +8,7 @@ import { AdminSidebar } from '@/components/admin-sidebar'
 import { useAuth } from '@/hooks/use-auth'
 
 function isInternalPath(pathname: string): boolean {
+  if (pathname === '/') return true
   if (pathname.startsWith('/admin')) return true
   if (pathname.startsWith('/cliente')) return true
   if (pathname.startsWith('/_')) return true
@@ -45,14 +46,16 @@ export default function Layout() {
     )
   }
 
+  const isRootLogin = pathname === '/'
+
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+      {!isRootLogin && <SiteHeader />}
       <main className="flex-1">
         <Outlet />
       </main>
       {showFooter && <SiteFooter />}
-      <FloatingChat />
+      {!isRootLogin && <FloatingChat />}
     </div>
   )
 }

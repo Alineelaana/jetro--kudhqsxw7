@@ -14,9 +14,14 @@ export default function NotFound() {
         <h1 className="text-6xl font-bold text-primary">404</h1>
         <h2 className="text-2xl font-bold text-foreground">Página não encontrada</h2>
         <p className="text-muted-foreground">A página que você procura não existe ou foi movida.</p>
-        <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-          <Link to="/">Voltar ao início</Link>
-        </Button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+            <Link to="/">Acessar o sistema</Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link to="/site">Acessar o site</Link>
+          </Button>
+        </div>
       </div>
     </div>
   )

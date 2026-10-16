@@ -58,6 +58,11 @@ export function SiteFooter() {
             </h4>
             <ul className="space-y-2.5 text-sm text-gray-300">
               <li>
+                <Link to="/" className="hover:text-white transition-colors">
+                  Acessar o Sistema
+                </Link>
+              </li>
+              <li>
                 <Link to="/admin" className="hover:text-white transition-colors">
                   Portal Administrativo
                 </Link>

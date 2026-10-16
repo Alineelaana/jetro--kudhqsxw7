@@ -58,7 +58,7 @@ export function AdminLogin() {
   }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 space-y-4">
       <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
         <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
           <img
@@ -154,6 +154,17 @@ export function AdminLogin() {
             >
               Cadastre-se
             </Link>
+            <div className="pt-3 border-t border-border mt-3">
+              <Button
+                asChild
+                variant="outline"
+                className="w-full border-[#C89B3C]/70 hover:bg-[#C89B3C]/10 text-[#002817] font-bold text-sm rounded-xl"
+              >
+                <Link to="/site" className="flex items-center justify-center gap-2">
+                  Acesse o site do Jetro
+                </Link>
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

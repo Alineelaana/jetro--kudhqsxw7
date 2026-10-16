@@ -10,6 +10,7 @@ import { AuthorizationProvider } from '@/hooks/use-authorization'
 import { ClientAuthProvider } from '@/hooks/use-client-auth'
 import { CmsContentProvider } from '@/hooks/use-cms-content'
 import Index from './pages/Index'
+import LoginPage from './pages/Login'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
 import AdminRegister from './pages/AdminRegister'
@@ -111,7 +112,8 @@ const App = () => (
                     <Sonner />
                     <Routes>
                       <Route element={<Layout />}>
-                        <Route path="/" element={<Index />} />
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/site" element={<Index />} />
                         <Route path="/admin" element={<Admin />} />
                         <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
 
