@@ -9,10 +9,18 @@ export function SiteFooter() {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <img src={logoImg} alt="Jetro" className="h-12 w-auto object-contain" />
+            <Link
+              to="/"
+              className="inline-flex items-center gap-3 group transition-opacity hover:opacity-90"
+              title="Retornar para a tela inicial / login"
+            >
+              <img
+                src={logoImg}
+                alt="Jetro"
+                className="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
               <span className="text-2xl font-black text-white tracking-tight">JETRO</span>
-            </div>
+            </Link>
             <p className="text-sm text-gray-300 leading-relaxed">
               Plataforma Inteligente de Gestão Empresarial. Conectamos áreas, processos, pessoas e
               informações em um ecossistema seguro e escalável.

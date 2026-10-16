@@ -35,7 +35,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#C89B3C]/30 bg-[#002817]">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
-        <Link to="/site" className="flex items-center group py-1">
+        <Link
+          to="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center group py-1"
+          title="Retornar para a tela inicial / login"
+        >
           <img
             src={logoImg}
             alt="Jetro Logo"
