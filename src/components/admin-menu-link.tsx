@@ -53,7 +53,7 @@ export function MenuLink({
             <span className="truncate flex-1">{entry.label}</span>
             <ChevronDown
               className={cn(
-                'w-3.5 h-3.5 transition-transform shrink-0',
+                'w-3.5 h-3.5 transition-transform duration-150 shrink-0',
                 isActive || isChildActive ? 'text-white/80' : 'text-gray-400',
                 isExpanded && 'rotate-180',
               )}
@@ -77,7 +77,7 @@ export function MenuLink({
           </button>
         </div>
         {isExpanded && (
-          <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5">
+          <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5 animate-in fade-in-50 duration-150">
             {entry.children!.map((child) => {
               if (child.perm && !child.perm(userRole)) return null
               const ChildIcon = child.icon as ComponentType<{ className?: string }> | undefined

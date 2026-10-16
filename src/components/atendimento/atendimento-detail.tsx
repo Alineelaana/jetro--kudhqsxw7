@@ -24,7 +24,6 @@ import { useRealtime } from '@/hooks/use-realtime'
 import {
   ATENDIMENTO_STATUS,
   STATUS_BADGE_COLORS,
-  STAGE_STATUS,
   type AtendimentoRecord,
   type HistoricoRecord,
   type StageStatusRecord,

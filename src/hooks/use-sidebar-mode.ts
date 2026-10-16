@@ -4,17 +4,23 @@ function getStorageKey(userId?: string): string {
   return `veloralog:sidebar-mode:${userId || 'anonymous'}`
 }
 
+export type SidebarMode = 'expanded' | 'rail'
+
 export function useSidebarMode(userId?: string) {
-  const [collapsed, setCollapsed] = useState(false)
+  const [mode, setMode] = useState<SidebarMode>('expanded')
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     setLoaded(false)
     try {
       const raw = localStorage.getItem(getStorageKey(userId))
-      setCollapsed(raw === 'collapsed')
+      if (raw === 'collapsed' || raw === 'rail') {
+        setMode('rail')
+      } else {
+        setMode('expanded')
+      }
     } catch {
-      setCollapsed(false)
+      setMode('expanded')
     }
     setLoaded(true)
   }, [userId])
@@ -22,15 +28,27 @@ export function useSidebarMode(userId?: string) {
   useEffect(() => {
     if (!loaded) return
     try {
-      localStorage.setItem(getStorageKey(userId), collapsed ? 'collapsed' : 'expanded')
+      localStorage.setItem(getStorageKey(userId), mode)
     } catch {
       // ignore
     }
-  }, [collapsed, userId, loaded])
+  }, [mode, userId, loaded])
 
   const toggle = useCallback(() => {
-    setCollapsed((prev) => !prev)
+    setMode((prev) => (prev === 'rail' ? 'expanded' : 'rail'))
   }, [])
 
-  return { collapsed, setCollapsed, toggle }
+  const setRail = useCallback(() => setMode('rail'), [])
+  const setExpanded = useCallback(() => setMode('expanded'), [])
+
+  return {
+    mode,
+    setMode,
+    isRail: mode === 'rail',
+    collapsed: mode === 'rail', // backward compatibility
+    setCollapsed: (val: boolean) => setMode(val ? 'rail' : 'expanded'),
+    toggle,
+    setRail,
+    setExpanded,
+  }
 }
