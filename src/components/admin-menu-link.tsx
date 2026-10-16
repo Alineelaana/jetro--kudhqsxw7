@@ -43,22 +43,30 @@ export function MenuLink({
   if (hasChildren) {
     return (
       <div>
-        <div className="flex items-center">
-          <Link to={entry.route} className={linkClass}>
+        <div className="flex items-center gap-0.5">
+          <button
+            type="button"
+            onClick={() => onToggleExpand(favKey)}
+            className={cn(linkClass, 'text-left w-full cursor-pointer select-none')}
+          >
             <Icon className="w-4 h-4 shrink-0" />
-            <span className="truncate">{entry.label}</span>
-          </Link>
-          <button onClick={() => onToggleExpand(favKey)} className="p-1 rounded hover:bg-gray-100">
+            <span className="truncate flex-1">{entry.label}</span>
             <ChevronDown
               className={cn(
-                'w-3.5 h-3.5 transition-transform text-gray-400',
+                'w-3.5 h-3.5 transition-transform shrink-0',
+                isActive || isChildActive ? 'text-white/80' : 'text-gray-400',
                 isExpanded && 'rotate-180',
               )}
             />
           </button>
           <button
-            onClick={() => onToggleFavorite(favKey)}
-            className="p-1 rounded hover:bg-gray-100"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleFavorite(favKey)
+            }}
+            className="p-1 rounded hover:bg-gray-100 shrink-0"
+            title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           >
             <Star
               className={cn(
@@ -97,12 +105,17 @@ export function MenuLink({
   }
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-0.5">
       <Link to={entry.route} className={linkClass}>
         <Icon className="w-4 h-4 shrink-0" />
-        <span className="truncate">{entry.label}</span>
+        <span className="truncate flex-1">{entry.label}</span>
       </Link>
-      <button onClick={() => onToggleFavorite(favKey)} className="p-1 rounded hover:bg-gray-100">
+      <button
+        type="button"
+        onClick={() => onToggleFavorite(favKey)}
+        className="p-1 rounded hover:bg-gray-100 shrink-0"
+        title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+      >
         <Star
           className={cn('w-3 h-3', isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300')}
         />

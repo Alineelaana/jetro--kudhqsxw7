@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom'
 import { ChevronDown, Search, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
-import { useModuleSections } from '@/hooks/use-module-sections'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { ADMIN_MENU, type MenuEntry } from '@/lib/admin-menu-config'
@@ -20,15 +19,15 @@ interface SearchResult {
 export function AdminSidebar() {
   const { pathname } = useLocation()
   const { user, userRole } = useAuth()
-  const { isExpanded, toggle } = useModuleSections('admin-sidebar', user?.id as string)
-  const { isExpanded: isItemExpanded, toggle: toggleItem } = useModuleSections(
-    'admin-sidebar-items',
-    user?.id as string,
-  )
+  const [activeArea, setActiveArea] = useState<string | null>(null)
   const { isFavorite, toggleFavorite } = useMenuFavorites(user?.id as string)
   const { collapsed, toggle: toggleSidebar } = useSidebarMode(user?.id as string)
   const [searchQuery, setSearchQuery] = useState('')
   const isSearching = searchQuery.trim().length > 0
+
+  const toggleArea = (key: string) => {
+    setActiveArea((prev) => (prev === key ? null : key))
+  }
 
   const searchResults = useMemo<SearchResult[]>(() => {
     if (!isSearching) return []
@@ -57,6 +56,7 @@ export function AdminSidebar() {
       ? item.children.some((c) => pathname === c.route || pathname.startsWith(c.route + '/'))
       : false
     const isActive = !item.children && pathname === item.route
+    const isExpanded = activeArea === item.route
     return (
       <MenuLink
         key={item.route}
@@ -67,8 +67,8 @@ export function AdminSidebar() {
         isActive={isActive}
         isChildActive={isChildActive}
         currentPathname={pathname}
-        isExpanded={isItemExpanded(item.route) || isChildActive}
-        onToggleExpand={toggleItem}
+        isExpanded={isExpanded}
+        onToggleExpand={toggleArea}
       />
     )
   }
@@ -172,6 +172,7 @@ export function AdminSidebar() {
                 {favItems.map((item) => {
                   const childActive =
                     pathname.startsWith(item.route + '/') || pathname === item.route
+                  const isExpanded = activeArea === item.route
                   return (
                     <MenuLink
                       key={`fav-${item.route}`}
@@ -182,38 +183,20 @@ export function AdminSidebar() {
                       isActive={pathname === item.route}
                       isChildActive={childActive}
                       currentPathname={pathname}
-                      isExpanded={isItemExpanded(item.route) || childActive}
-                      onToggleExpand={toggleItem}
+                      isExpanded={isExpanded}
+                      onToggleExpand={toggleArea}
                     />
                   )
                 })}
               </div>
             )}
             {ADMIN_MENU.map((group) => {
-              const expanded =
-                isExpanded(group.title) ||
-                group.items.some((item) => {
-                  if (item.children) {
-                    return item.children.some(
-                      (c) => pathname === c.route || pathname.startsWith(c.route + '/'),
-                    )
-                  }
-                  return pathname === item.route || pathname.startsWith(item.route + '/')
-                })
               return (
-                <div key={group.title} className="border-b border-gray-100 last:border-b-0">
-                  <button
-                    onClick={() => toggle(group.title)}
-                    className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide hover:text-gray-600"
-                  >
+                <div key={group.title} className="border-b border-gray-100 last:border-b-0 py-1">
+                  <div className="px-3 py-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
                     {group.title}
-                    <ChevronDown
-                      className={cn('w-3.5 h-3.5 transition-transform', expanded && 'rotate-180')}
-                    />
-                  </button>
-                  {expanded && (
-                    <div className="flex flex-col gap-0.5 pb-2">{group.items.map(renderItem)}</div>
-                  )}
+                  </div>
+                  <div className="flex flex-col gap-0.5 pb-1">{group.items.map(renderItem)}</div>
                 </div>
               )
             })}

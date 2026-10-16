@@ -85,7 +85,7 @@ export const ADMIN_MENU: MenuGroup[] = [
     title: 'Principal',
     items: [
       {
-        label: 'Área Principal',
+        label: 'Principal',
         icon: LayoutDashboard,
         route: '/admin',
         children: [
