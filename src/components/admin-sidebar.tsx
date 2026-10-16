@@ -53,10 +53,10 @@ export function AdminSidebar() {
   const favItems = ADMIN_MENU.flatMap((g) => g.items).filter((item) => isFavorite(item.route))
 
   const renderItem = (item: MenuEntry) => {
-    const isActive = pathname === item.route
     const isChildActive = item.children
-      ? pathname.startsWith(item.route + '/') || pathname === item.route
+      ? item.children.some((c) => pathname === c.route || pathname.startsWith(c.route + '/'))
       : false
+    const isActive = !item.children && pathname === item.route
     return (
       <MenuLink
         key={item.route}
@@ -192,7 +192,14 @@ export function AdminSidebar() {
             {ADMIN_MENU.map((group) => {
               const expanded =
                 isExpanded(group.title) ||
-                group.items.some((item) => pathname.startsWith(item.route))
+                group.items.some((item) => {
+                  if (item.children) {
+                    return item.children.some(
+                      (c) => pathname === c.route || pathname.startsWith(c.route + '/'),
+                    )
+                  }
+                  return pathname === item.route || pathname.startsWith(item.route + '/')
+                })
               return (
                 <div key={group.title} className="border-b border-gray-100 last:border-b-0">
                   <button

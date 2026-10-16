@@ -64,4 +64,5 @@ export interface BudgetRecord {
   quote_created_at?: string
   budget_number?: string
   request_number?: number
+  sales_channel?: string
 }

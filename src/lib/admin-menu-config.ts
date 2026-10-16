@@ -65,6 +65,8 @@ import { canViewValidityAlerts } from '@/lib/validity-permissions'
 export interface MenuChild {
   label: string
   route: string
+  icon?: LucideIcon
+  perm?: (r: string | undefined) => boolean
 }
 export interface MenuEntry {
   label: string
@@ -82,15 +84,26 @@ export const ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Principal',
     items: [
-      { label: 'Dashboard', icon: LayoutDashboard, route: '/admin' },
-      { label: 'Notificações', icon: Bell, route: '/admin/notificacoes' },
       {
-        label: 'Atendimento',
-        icon: Headset,
-        route: '/admin/atendimento',
-        perm: canViewAtendimentoModule,
+        label: 'Área Principal',
+        icon: LayoutDashboard,
+        route: '/admin',
+        children: [
+          { label: 'Dashboard', icon: LayoutDashboard, route: '/admin' },
+          { label: 'Notificações', icon: Bell, route: '/admin/notificacoes' },
+          {
+            label: 'Atendimento',
+            icon: Headset,
+            route: '/admin/atendimento',
+            perm: canViewAtendimentoModule,
+          },
+          {
+            label: 'Solicitações de Orçamento',
+            icon: ClipboardList,
+            route: '/admin/orcamentos',
+          },
+        ],
       },
-      { label: 'Solicitações de Orçamento', icon: ClipboardList, route: '/admin/orcamentos' },
     ],
   },
   {

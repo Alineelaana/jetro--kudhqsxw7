@@ -10,15 +10,30 @@ export interface FlatMenuItem {
 }
 
 export function flattenMenu(menu: MenuGroup[]): FlatMenuItem[] {
-  return menu.flatMap((group) =>
-    group.items.map((item: MenuEntry) => ({
-      label: item.label,
-      route: item.route,
-      group: group.title,
-      hasChildren: !!item.children?.length,
-      childRoutes: item.children?.map((c) => c.route) ?? [],
-    })),
-  )
+  const result: FlatMenuItem[] = []
+  for (const group of menu) {
+    for (const item of group.items) {
+      result.push({
+        label: item.label,
+        route: item.route,
+        group: group.title,
+        hasChildren: !!item.children?.length,
+        childRoutes: item.children?.map((c) => c.route) ?? [],
+      })
+      if (item.children) {
+        for (const child of item.children) {
+          result.push({
+            label: child.label,
+            route: child.route,
+            group: group.title,
+            hasChildren: false,
+            childRoutes: [],
+          })
+        }
+      }
+    }
+  }
+  return result
 }
 
 export function validateAgainstBaseline(): {

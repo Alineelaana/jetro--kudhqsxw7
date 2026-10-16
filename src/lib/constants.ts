@@ -10,6 +10,51 @@ export const SERVICE_OPTIONS: string[] = [
   'Outros',
 ]
 
+export const SERVICES = SERVICE_OPTIONS
+
+export const SERVICE_CHECKLIST_OPTIONS: string[] = [
+  'Armazenagem',
+  'Transporte',
+  'Distribuição',
+  'Cross Docking',
+  'Picking',
+  'Logística Reversa',
+]
+
+export const CARGO_TYPE_OPTIONS: string[] = [
+  'Carga Geral',
+  'Carga Seca',
+  'Fracionada',
+  'Lotação',
+  'Refrigerada',
+  'Perigosa',
+  'Outros',
+]
+
+export const PAYMENT_OPTIONS: string[] = [
+  'Boleto Bancário',
+  'Transferência / PIX',
+  'Cartão de Crédito',
+  'A Prazo (Faturado)',
+  'A Vista',
+]
+
+export const DEADLINE_OPTIONS: string[] = [
+  'Imediato (Urgente)',
+  'Até 24 horas',
+  'Até 48 horas',
+  'Até 5 dias úteis',
+  'A Combinar',
+]
+
+export interface DefaultFormField {
+  id: string
+  label: string
+  type: string
+  required?: boolean
+  options?: string[]
+}
+
 export interface SegmentItem {
   id: string
   title: string

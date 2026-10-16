@@ -70,20 +70,26 @@ export function MenuLink({
         </div>
         {isExpanded && (
           <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5">
-            {entry.children!.map((child) => (
-              <Link
-                key={child.route}
-                to={child.route}
-                className={cn(
-                  'block px-2 py-1 rounded text-xs transition-colors',
-                  currentPathname === child.route
-                    ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
-                    : 'text-gray-500 hover:text-[#005B2E] hover:bg-gray-50',
-                )}
-              >
-                {child.label}
-              </Link>
-            ))}
+            {entry.children!.map((child) => {
+              if (child.perm && !child.perm(userRole)) return null
+              const ChildIcon = child.icon as ComponentType<{ className?: string }> | undefined
+              const isChildItemActive = currentPathname === child.route
+              return (
+                <Link
+                  key={child.route}
+                  to={child.route}
+                  className={cn(
+                    'flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors',
+                    isChildItemActive
+                      ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
+                      : 'text-gray-500 hover:text-[#005B2E] hover:bg-gray-50',
+                  )}
+                >
+                  {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0" />}
+                  <span className="truncate">{child.label}</span>
+                </Link>
+              )
+            })}
           </div>
         )}
       </div>

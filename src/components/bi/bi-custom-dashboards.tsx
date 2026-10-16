@@ -128,60 +128,64 @@ export function BiCustomDashboards() {
     <div className="space-y-4">
       <div className="flex justify-end">
         {canManageCustomDashboards(userRole) && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#005B2E] hover:bg-[#01361D]">
-                <Plus className="w-4 h-4 mr-1" /> Novo Dashboard
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Criar Dashboard Personalizado</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-3 py-2">
-                <div>
-                  <Label>Nome</Label>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Nome do dashboard"
-                  />
+          <>
+            <Button
+              size="sm"
+              className="bg-[#005B2E] hover:bg-[#01361D]"
+              onClick={() => setOpen(true)}
+            >
+              <Plus className="w-4 h-4 mr-1" /> Novo Dashboard
+            </Button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Criar Dashboard Personalizado</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 py-2">
+                  <div>
+                    <Label>Nome</Label>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Nome do dashboard"
+                    />
+                  </div>
+                  <div>
+                    <Label>Descrição</Label>
+                    <Input
+                      value={desc}
+                      onChange={(e) => setDesc(e.target.value)}
+                      placeholder="Descrição opcional"
+                    />
+                  </div>
+                  <div>
+                    <Label>Centro de Inteligência</Label>
+                    <Select value={center} onValueChange={setCenter}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CENTERS.map((c) => (
+                          <SelectItem key={c.value} value={c.value}>
+                            {c.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch checked={isShared} onCheckedChange={setIsShared} />
+                    <Label>Compartilhado com outros usuários</Label>
+                  </div>
                 </div>
-                <div>
-                  <Label>Descrição</Label>
-                  <Input
-                    value={desc}
-                    onChange={(e) => setDesc(e.target.value)}
-                    placeholder="Descrição opcional"
-                  />
-                </div>
-                <div>
-                  <Label>Centro de Inteligência</Label>
-                  <Select value={center} onValueChange={setCenter}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CENTERS.map((c) => (
-                        <SelectItem key={c.value} value={c.value}>
-                          {c.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={isShared} onCheckedChange={setIsShared} />
-                  <Label>Compartilhado com outros usuários</Label>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleCreate} className="bg-[#005B2E] hover:bg-[#01361D]">
-                  Criar
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button onClick={handleCreate} className="bg-[#005B2E] hover:bg-[#01361D]">
+                    Criar
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </div>
       <Card className="border-2 border-[#005B2E]/20">
