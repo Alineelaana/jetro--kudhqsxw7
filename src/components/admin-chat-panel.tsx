@@ -188,7 +188,7 @@ export function AdminChatPanel() {
           <div>
             <p className="text-sm font-bold text-foreground">Exibir chat no site público</p>
             <p className="text-xs text-muted-foreground">
-              Controla se o chat da Srta. NINE aparece para os visitantes
+              Controla se o chat da Jeh aparece para os visitantes
             </p>
           </div>
         </div>
@@ -211,9 +211,7 @@ export function AdminChatPanel() {
           <div className="flex items-center gap-3">
             <Bot className="w-5 h-5 text-[#C89B3C] flex-shrink-0" />
             <div>
-              <p className="text-sm font-bold text-foreground">
-                Ativar Srta. NINE em tempo integral
-              </p>
+              <p className="text-sm font-bold text-foreground">Ativar Jeh em tempo integral</p>
               <p className="text-xs text-muted-foreground">
                 A IA responderá automaticamente todas as mensagens do chat
               </p>
@@ -243,12 +241,12 @@ export function AdminChatPanel() {
           <div className="w-5 h-5 rounded-full border border-[#C89B3C] overflow-hidden flex-shrink-0">
             <img
               src={nineAvatar}
-              alt="Srta. NINE - Inteligência Artificial Jetro"
+              alt="Jeh - Inteligência Artificial Jetro"
               className="w-full h-full object-cover"
             />
           </div>
           <span className="text-sm font-bold text-[#005B2E]">
-            Srta. NINE está atendendo em tempo integral no chat online.
+            Jeh está atendendo em tempo integral no chat online.
           </span>
         </div>
       )}
@@ -338,7 +336,7 @@ export function AdminChatPanel() {
                       <div className="w-7 h-7 rounded-full border border-[#C89B3C] overflow-hidden shrink-0 shadow-sm mt-0.5">
                         <img
                           src={nineAvatar}
-                          alt="Srta. NINE - Inteligência Artificial Jetro"
+                          alt="Jeh - Inteligência Artificial Jetro"
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -357,7 +355,7 @@ export function AdminChatPanel() {
                         {msg.sender === 'client'
                           ? msg.author_name || 'Cliente'
                           : msg.sender === 'ai'
-                            ? 'Srta. NINE (IA)'
+                            ? 'Jeh (IA)'
                             : msg.author_name || 'Atendente'}
                       </p>
                       <p className="whitespace-pre-wrap">{msg.content}</p>

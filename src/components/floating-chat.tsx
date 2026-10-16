@@ -9,7 +9,7 @@ export function FloatingChat() {
   const [messages, setMessages] = useState<Array<{ sender: 'nine' | 'user'; text: string }>>([
     {
       sender: 'nine',
-      text: 'Olá! Sou a Nine, sua assistente inteligente da plataforma Jetro. Como posso ajudar sua empresa hoje?',
+      text: 'Olá! Sou a Jeh, sua assistente inteligente da plataforma Jetro. Como posso ajudar sua empresa hoje?',
     },
   ])
   const [input, setInput] = useState('')
@@ -40,18 +40,16 @@ export function FloatingChat() {
           id="floating-chat-trigger"
           onClick={() => setIsOpen(true)}
           className="group flex items-center gap-3 bg-[#005A36] hover:bg-[#004225] text-white p-3.5 rounded-full shadow-2xl border-2 border-[#C89B3C] transition-all duration-300 hover:scale-105"
-          aria-label="Fale com a Nine, nossa IA"
+          aria-label="Fale com a Jeh, nossa assistente virtual"
         >
           <div className="relative h-9 w-9 rounded-full overflow-hidden border border-[#C89B3C]">
             <img
               src={nineAvatar}
-              alt="Srta. NINE - Inteligência Artificial Jetro"
+              alt="Jeh - Inteligência Artificial Jetro"
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="hidden sm:inline-block font-bold text-sm pr-2">
-            Fale com a Srta. NINE, nossa IA
-          </span>
+          <span className="hidden sm:inline-block font-bold text-sm pr-2">Fale com a Jeh</span>
           <MessageSquare className="h-5 w-5 text-[#E5B85C]" />
         </button>
       )}
@@ -63,13 +61,13 @@ export function FloatingChat() {
               <div className="relative h-10 w-10 rounded-full overflow-hidden border-2 border-[#C89B3C]">
                 <img
                   src={nineAvatar}
-                  alt="Srta. NINE - Inteligência Artificial Jetro"
+                  alt="Jeh - Inteligência Artificial Jetro"
                   className="h-full w-full object-cover"
                 />
               </div>
               <div>
                 <h4 className="text-sm font-bold flex items-center gap-1.5">
-                  Srta. NINE - IA Jetro
+                  Jeh - IA Jetro
                   <Bot className="h-3.5 w-3.5 text-[#E5B85C]" />
                 </h4>
                 <span className="text-[10px] text-emerald-200">Assistente Inteligente Online</span>
@@ -93,7 +91,7 @@ export function FloatingChat() {
                   <div className="h-7 w-7 rounded-full overflow-hidden border border-[#C89B3C] shrink-0 mt-0.5 shadow-sm">
                     <img
                       src={nineAvatar}
-                      alt="Srta. NINE - Inteligência Artificial Jetro"
+                      alt="Jeh - Inteligência Artificial Jetro"
                       className="h-full w-full object-cover"
                     />
                   </div>

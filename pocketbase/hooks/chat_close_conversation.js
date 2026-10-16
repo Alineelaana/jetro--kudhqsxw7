@@ -29,7 +29,7 @@ routerAdd(
         'content',
         'Olá! Seu atendimento foi encerrado. Para que possamos melhorar continuamente, avalie o atendimento de 1 a 5 e, se desejar, deixe uma observação ou sugestão. Obrigado!',
       )
-      ratingMsg.set('author_name', 'Srta. Velora (IA)')
+      ratingMsg.set('author_name', 'Jeh (IA)')
       $app.save(ratingMsg)
 
       return e.json(200, { success: true })

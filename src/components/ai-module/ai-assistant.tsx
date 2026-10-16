@@ -19,7 +19,7 @@ export function AiAssistant() {
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: 'assistant',
-      content: `Olá, ${user?.name || 'usuário'}! Sou a Srta. NINE, sua assistente de IA da Jetro. Como posso ajudar você hoje?`,
+      content: `Olá, ${user?.name || 'usuário'}! Sou a Jeh, sua assistente de IA da Jetro. Como posso ajudar você hoje?`,
     },
   ])
   const [input, setInput] = useState('')
@@ -73,12 +73,12 @@ export function AiAssistant() {
           <div className="w-10 h-10 rounded-full border-2 border-[#C89B3C] overflow-hidden flex-shrink-0 shadow-md">
             <img
               src={nineAvatar}
-              alt="Srta. NINE - Inteligência Artificial Jetro"
+              alt="Jeh - Inteligência Artificial Jetro"
               className="w-full h-full object-cover"
             />
           </div>
           <div>
-            <p className="font-bold text-sm">Srta. NINE - Assistente IA Jetro</p>
+            <p className="font-bold text-sm">Jeh - Assistente IA Jetro</p>
             <p className="text-xs text-white/80 flex items-center gap-1">
               <span className="w-2 h-2 bg-green-400 rounded-full" /> Online
             </p>
@@ -97,7 +97,7 @@ export function AiAssistant() {
                 <div className="w-8 h-8 rounded-full border border-[#C89B3C] overflow-hidden shrink-0 shadow-sm mt-0.5">
                   <img
                     src={nineAvatar}
-                    alt="Srta. NINE - Inteligência Artificial Jetro"
+                    alt="Jeh - Inteligência Artificial Jetro"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -112,7 +112,7 @@ export function AiAssistant() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   {msg.role === 'assistant' ? (
-                    <span className="text-xs font-bold text-[#005B2E]">Srta. NINE</span>
+                    <span className="text-xs font-bold text-[#005B2E]">Jeh</span>
                   ) : (
                     <>
                       <User className="w-3.5 h-3.5 opacity-70" />
@@ -129,12 +129,12 @@ export function AiAssistant() {
               <div className="w-6 h-6 rounded-full border border-[#C89B3C] overflow-hidden shrink-0">
                 <img
                   src={nineAvatar}
-                  alt="Srta. NINE - Inteligência Artificial Jetro"
+                  alt="Jeh - Inteligência Artificial Jetro"
                   className="w-full h-full object-cover"
                 />
               </div>
               <Loader2 className="w-4 h-4 animate-spin text-[#005B2E]" />
-              <span>Srta. NINE está pensando...</span>
+              <span>Jeh está pensando...</span>
             </div>
           )}
           <div ref={endRef} />

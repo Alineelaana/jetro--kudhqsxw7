@@ -27,7 +27,7 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
                 <div className="relative mx-auto w-40 h-40 rounded-full p-1.5 bg-gradient-to-tr from-emerald-400 via-teal-300 to-[#C89B3C] shadow-xl">
                   <img
                     src={nineAvatar}
-                    alt="Srta. NINE - Inteligência Artificial Jetro"
+                    alt="Jeh - Inteligência Artificial Jetro"
                     className="w-full h-full object-cover rounded-full"
                   />
                   <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center">
@@ -37,7 +37,7 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
 
                 <div>
                   <h3 className="text-2xl font-black text-white flex items-center justify-center gap-2">
-                    Srta. NINE
+                    Jeh
                     <Sparkles className="w-5 h-5 text-amber-400" />
                   </h3>
                   <p className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mt-0.5">
@@ -48,7 +48,7 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
                 <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-left text-xs text-slate-300 space-y-1.5">
                   <p className="font-semibold text-white flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    Superpoderes da Nine:
+                    Superpoderes da Jeh:
                   </p>
                   <ul className="space-y-1 text-slate-400 pl-4 list-disc">
                     <li>Análise de indicadores do ERP em tempo real</li>
@@ -62,7 +62,7 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
                   className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-5 rounded-xl shadow-lg flex items-center justify-center gap-2"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Fale com a Nine, nossa IA</span>
+                  <span>Fale com a Jeh, nossa assistente virtual</span>
                 </Button>
               </div>
             </div>
@@ -74,17 +74,14 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
               <Bot className="w-4 h-4" />
               <span>Inteligência Artificial Nativa</span>
             </div>
-
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-              Conheça a Nine
+              Conheça a Jeh
             </h2>
-
             <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-              A Nine é a inteligência artificial integrada ao ecossistema Jetro. Ela ajuda usuários
-              a encontrar informações, compreender processos, analisar dados e navegar pela
-              plataforma de maneira mais inteligente.
+              A Jeh é a inteligência artificial integrada ao ecossistema Jetro. Ela ajuda usuários a
+              encontrar informações, compreender processos, analisar dados e navegar pela plataforma
+              de maneira mais inteligente.
             </p>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
               <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
                 <div className="p-2 w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
@@ -108,17 +105,16 @@ export function NineSection({ onOpenChat }: NineSectionProps) {
                 </p>
               </div>
             </div>
-
             <div className="pt-2">
               <Button
                 onClick={onOpenChat}
                 variant="outline"
                 className="border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/20 font-semibold"
               >
-                <span>Iniciar conversa com a Nine</span>
+                <span>Iniciar conversa com a Jeh</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </div>
+            </div>{' '}
           </div>
         </div>
       </div>

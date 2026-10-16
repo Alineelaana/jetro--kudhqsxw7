@@ -23,7 +23,7 @@ routerAdd(
       msg.set('conversation_id', conversationId)
       msg.set('sender', 'attendant')
       msg.set('content', content)
-      msg.set('author_name', 'Srta. Velora')
+      msg.set('author_name', 'Jeh')
       $app.save(msg)
 
       conv.set('last_message_at', new Date().toISOString())

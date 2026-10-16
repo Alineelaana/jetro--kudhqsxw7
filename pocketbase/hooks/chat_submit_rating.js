@@ -40,7 +40,7 @@ routerAdd('POST', '/backend/v1/chat/rate', (e) => {
       'content',
       'Muito obrigado pela sua avaliação! Seu feedback é muito importante para nós. \u2764\ufe0f',
     )
-    thankMsg.set('author_name', 'Srta. Velora (IA)')
+    thankMsg.set('author_name', 'Jeh (IA)')
     $app.save(thankMsg)
 
     conv.set('last_message_at', new Date().toISOString())

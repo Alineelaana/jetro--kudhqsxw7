@@ -101,7 +101,7 @@ export function AiTrainingPanel() {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-base flex items-center gap-2">
           <GraduationCap className="w-5 h-5 text-[#C89B3C]" />
-          Treinamento da Srta. Velora
+          Treinamento da Jeh
         </CardTitle>
         {!showForm && (
           <Button
@@ -173,7 +173,7 @@ export function AiTrainingPanel() {
           </div>
         ) : items.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-8">
-            Nenhum treinamento cadastrado. Adicione instruções para a Srta. Velora.
+            Nenhum treinamento cadastrado. Adicione instruções para a Jeh.
           </p>
         ) : (
           <div className="space-y-3">

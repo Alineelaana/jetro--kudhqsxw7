@@ -178,7 +178,7 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
       desc: 'Dashboards executivos, visões cruzadas e projeções',
     },
     {
-      name: 'Inteligência Artificial (Nine)',
+      name: 'Inteligência Artificial (Jeh)',
       icon: Brain,
       desc: 'Assistente inteligente para dados, consultas e suporte',
     },

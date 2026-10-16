@@ -41,7 +41,7 @@ export function SiteFooter() {
               </li>
               <li>
                 <a href="#nine-ia" className="hover:text-white transition-colors">
-                  Inteligência Artificial (Nine)
+                  Inteligência Artificial (Jeh)
                 </a>
               </li>
               <li>

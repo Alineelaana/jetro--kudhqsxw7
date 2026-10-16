@@ -66,7 +66,7 @@ export function PlatformModulesSection() {
     { name: 'Trade Marketing', icon: Store },
     { name: 'Atendimento', icon: Headphones },
     { name: 'BI Executive', icon: LineChart },
-    { name: 'IA Nine', icon: Bot },
+    { name: 'IA Jeh', icon: Bot },
   ]
 
   return (

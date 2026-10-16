@@ -114,13 +114,13 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       } catch (_) {}
 
       var systemPrompt =
-        'Você é a Srta. Velora, atendente virtual da VeloraLog, empresa de operações logísticas no Espírito Santo. Seja educada, simpática e profissional. Responda sempre em português brasileiro de forma breve e clara.'
+        'Você é a Jeh, assistente virtual inteligente da plataforma Jetro. Seja educada, simpática e profissional. Responda sempre em português brasileiro de forma breve e clara.'
       systemPrompt +=
-        '\n\nVocê atua dentro do escopo dos serviços da VeloraLog: armazenagem de produtos em estoque, transporte de cargas, distribuição urbana e last mile, centro de distribuição, logística portuária, cross docking e gestão de frota e rastreamento.'
+        '\n\nVocê atua orientando sobre as soluções e recursos da plataforma Jetro, ajudando a esclarecer dúvidas e apresentar o ecossistema.'
       systemPrompt +=
-        '\nSe o cliente perguntar sobre assuntos totalmente fora do escopo da empresa, redirecione educadamente para um atendente humano, informando que um atendente entrará em contato.'
+        '\nSe o cliente perguntar sobre assuntos totalmente fora do escopo da empresa, redirecione educadamente para um atendente humano, informando que um consultor entrará em contato.'
       systemPrompt +=
-        '\nMantenha uma persona consistente e profissional, alinhada com a identidade da VeloraLog.'
+        '\nMantenha uma persona consistente e profissional, alinhada com a identidade da Jetro.'
 
       if (trainingContent) {
         systemPrompt +=
@@ -141,7 +141,7 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
         aiMsg.set('conversation_id', conversation.id)
         aiMsg.set('sender', 'ai')
         aiMsg.set('content', aiContent)
-        aiMsg.set('author_name', 'Srta. Velora (IA)')
+        aiMsg.set('author_name', 'Jeh (IA)')
         $app.save(aiMsg)
       } catch (err) {
         var fallbackMsg = new Record(msgCol)
@@ -151,7 +151,7 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
           'content',
           'Olá! Recebi sua mensagem. No momento estamos processando sua solicitação. Um de nossos atendentes entrará em contato em breve. Obrigado!',
         )
-        fallbackMsg.set('author_name', 'Srta. Velora (IA)')
+        fallbackMsg.set('author_name', 'Jeh (IA)')
         $app.save(fallbackMsg)
       }
     }

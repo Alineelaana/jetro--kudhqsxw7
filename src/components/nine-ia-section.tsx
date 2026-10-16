@@ -28,13 +28,13 @@ export function NineIaSection() {
               <div className="relative h-64 w-64 sm:h-80 sm:w-80 rounded-full overflow-hidden border-4 border-[#C89B3C] shadow-2xl mx-auto">
                 <img
                   src={nineAvatar}
-                  alt="Srta. NINE - Inteligência Artificial Jetro"
+                  alt="Jeh - Inteligência Artificial Jetro"
                   className="h-full w-full object-cover"
                 />
               </div>
               <div className="absolute bottom-2 right-2 bg-[#005A36] text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-[#C89B3C] flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-[#E5B85C]" />
-                <span>Srta. NINE</span>
+                <span>Jeh</span>
               </div>
             </div>
           </div>
@@ -46,13 +46,13 @@ export function NineIaSection() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-              Conheça a Nine
+              Conheça a Jeh
             </h2>
 
             <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-              A Nine é a inteligência artificial integrada ao ecossistema Jetro. Ela ajuda usuários
-              a encontrar informações, compreender processos, analisar dados e navegar pela
-              plataforma de maneira mais inteligente.
+              A Jeh é a inteligência artificial integrada ao ecossistema Jetro. Ela ajuda usuários a
+              encontrar informações, compreender processos, analisar dados e navegar pela plataforma
+              de maneira mais inteligente.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -84,7 +84,7 @@ export function NineIaSection() {
                 className="bg-[#005A36] hover:bg-[#004225] text-white font-bold px-8 py-6 text-base rounded-lg shadow-lg shadow-[#005A36]/20"
               >
                 <MessageSquare className="mr-2 h-5 w-5 text-[#E5B85C]" />
-                Fale com a Nine, nossa IA
+                Fale com a Jeh, nossa assistente virtual
               </Button>
             </div>
           </div>
