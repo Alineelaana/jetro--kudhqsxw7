@@ -6,7 +6,17 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { type FieldErrors } from '@/lib/pocketbase/errors'
-import { Lock, User, AlertCircle, Loader2, Globe, ShieldCheck, ChevronRight } from 'lucide-react'
+import {
+  Lock,
+  User,
+  AlertCircle,
+  Loader2,
+  Globe,
+  ShieldCheck,
+  ChevronRight,
+  Eye,
+  EyeOff,
+} from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
@@ -15,6 +25,7 @@ export default function LoginPage() {
   const { login, isAuthenticated, loading, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [submitting, setSubmitting] = useState(false)
@@ -170,13 +181,21 @@ export default function LoginPage() {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="system-password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Digite sua senha"
-                    className="pl-10 h-11 border-border focus-visible:ring-[#005B2E]"
+                    className="pl-10 pr-10 h-11 border-border focus-visible:ring-[#005B2E]"
                     autoComplete="current-password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded focus:outline-none focus-visible:ring-1 focus-visible:ring-[#005B2E] transition-colors"
+                    aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
                 {fieldErrors.password && (
                   <p className="text-xs text-destructive font-medium">{fieldErrors.password}</p>
@@ -216,20 +235,8 @@ export default function LoginPage() {
                 <span>Ambiente Seguro com Criptografia de Ponta</span>
               </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-                <Link to="/admin/cadastro" className="text-[#005B2E] hover:underline font-bold">
-                  Solicitar novo cadastro
-                </Link>
-                <Link
-                  to="/cliente/login"
-                  className="text-muted-foreground hover:text-[#005B2E] font-medium transition-colors"
-                >
-                  Portal do Cliente
-                </Link>
-              </div>
-
               {/* Botão em destaque no card também para fácil acesso */}
-              <div className="pt-3">
+              <div className="pt-2">
                 <Button
                   asChild
                   variant="outline"
