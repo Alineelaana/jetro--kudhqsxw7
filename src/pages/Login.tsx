@@ -287,9 +287,7 @@ export default function LoginPage() {
           © {new Date().getFullYear()} Jetro — Plataforma Inteligente de Gestão Empresarial. Todos
           os direitos reservados.
         </p>
-        <p className="text-[11px] text-white/70">
-          Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
-        </p>
+        <AttributionFooter variant="inline" className="text-white/70" />
       </footer>
     </div>
   )

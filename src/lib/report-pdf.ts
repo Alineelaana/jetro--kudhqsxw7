@@ -68,7 +68,7 @@ tr{page-break-inside:avoid}
 <div class="stripe-top"></div>
 <div class="content">
 <div class="header">
-<img src="${fullLogoUrl}" alt="Velora Log" />
+<img src="${fullLogoUrl}" alt="Jetro" />
 <h1>Relatório de Solicitações</h1>
 <div class="meta">Total: ${records.length} registro(s)</div>
 </div>

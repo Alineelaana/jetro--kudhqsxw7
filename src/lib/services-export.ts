@@ -57,7 +57,7 @@ export function exportServicesExcel(services: ServiceOffered[], userName: string
 
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>
 <table border="1">
-<tr><td colspan="11"><strong>Relatório de Serviços — Velora Log</strong></td></tr>
+<tr><td colspan="11"><strong>Relatório de Serviços — Jetro</strong></td></tr>
 <tr><td colspan="11">Gerado em: ${escapeHtml(genDateTime)}</td></tr>
 <tr><td colspan="11">Gerado por: ${escapeHtml(userName)}</td></tr>
 <tr><td colspan="11"></td></tr>

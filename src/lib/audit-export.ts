@@ -47,7 +47,7 @@ export function exportAuditExcel(
     .join('')
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>
 <table border="1">
-<tr><td colspan="10"><strong>Relatório de Auditoria — Velora Log</strong></td></tr>
+<tr><td colspan="10"><strong>Relatório de Auditoria — Jetro</strong></td></tr>
 <tr><td colspan="10">Gerado em: ${escapeHtml(genDateTime)}</td></tr>
 <tr><td colspan="10">Gerado por: ${escapeHtml(userName)}</td></tr>
 <tr><td colspan="10">Total de registros: ${logs.length}</td></tr>

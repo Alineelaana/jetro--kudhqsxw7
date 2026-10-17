@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-64131.jpeg'
 import { useAuth } from '@/hooks/use-auth'
+import { AttributionFooter } from '@/components/attribution-footer'
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear()
@@ -165,9 +166,7 @@ export function SiteFooter() {
           </p>
         </div>
         <div className="mt-6 pt-4 border-t border-white/5 text-center">
-          <p className="text-[11px] sm:text-xs text-gray-400/80">
-            Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
-          </p>
+          <AttributionFooter variant="inline" className="text-gray-400/80" />
         </div>
       </div>
     </footer>

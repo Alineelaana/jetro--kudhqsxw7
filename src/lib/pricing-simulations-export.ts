@@ -141,7 +141,7 @@ tr{page-break-inside:avoid}
 <div class="stripe-top"></div>
 <div class="content">
 <div class="header">
-<img src="${fullLogoUrl}" alt="Velora Log" />
+<img src="${fullLogoUrl}" alt="Jetro" />
 <h1>Simulações de Preços</h1>
 <div class="meta">Total: ${simulations.length} registro(s)<br>Gerado em: ${genDate}<br>Por: ${escapeHtml(userName)}</div>
 </div>
@@ -149,7 +149,7 @@ tr{page-break-inside:avoid}
 <table><thead><tr>${headerHtml}</tr></thead><tbody>${rowsHtml}</tbody></table>
 </div>
 <div class="footer">
-<span>Velora Log — Operações Logísticas de Excelência</span>
+<span>Jetro — Operações Logísticas de Excelência</span>
 <span>Gerado por: ${escapeHtml(userName)}</span>
 </div>
 <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>

@@ -27,6 +27,6 @@ export function buildBudgetWhatsAppUrl(
   service: string,
 ): string {
   const normalized = normalizePhone(phone)
-  const message = `Olá ${clientName}!\n\nSeu orçamento ${budgetNumber ? '#' + budgetNumber : ''} da Velora Log está pronto.\n\nServiço: ${service}\n\nPara mais detalhes, entre em contato conosco.\n\nAtenciosamente,\nEquipe Velora Log`
+  const message = `Olá ${clientName}!\n\nSeu orçamento ${budgetNumber ? '#' + budgetNumber : ''} da Jetro está pronto.\n\nServiço: ${service}\n\nPara mais detalhes, entre em contato conosco.\n\nAtenciosamente,\nEquipe Jetro`
   return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`
 }

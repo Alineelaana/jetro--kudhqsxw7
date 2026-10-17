@@ -32,10 +32,10 @@ table{width:100%;border-collapse:collapse;font-size:10px;margin-top:3mm}
 th{background:#005B2E;color:#fff;padding:6px;text-align:left}td{padding:5px;border-bottom:1px solid #e0e0e0}
 tr.alt{background:#f7f7f5}.footer{margin-top:5mm;font-size:9px;color:#666;border-top:1px solid #ddd;padding-top:3mm}
 </style></head><body><div class="stripe"></div><div class="content">
-<div class="header"><img src="${fullLogoUrl}" alt="Velora Log" /><h1>${escapeHtml(title)}</h1>
+<div class="header"><img src="${fullLogoUrl}" alt="Jetro" /><h1>${escapeHtml(title)}</h1>
 <div class="meta">Gerado em: ${genDate}<br>Por: ${escapeHtml(userName)}<br>Registros: ${rows.length}</div></div>
 <table><thead><tr>${headerHtml}</tr></thead><tbody>${rowsHtml}</tbody></table>
-<div class="footer">Velora Log — Operações Logísticas de Excelência</div></div>
+<div class="footer">Jetro — Operações Logísticas de Excelência</div></div>
 <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script></body></html>`
   const win = window.open('', '_blank')
   if (!win) return
@@ -55,7 +55,7 @@ export function exportPurchasingXls(
     .map((r) => `<tr>${r.map((c) => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`)
     .join('')
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>
-<table border="1"><tr><td colspan="${headers.length}" style="background:#005B2E;color:#fff;font-weight:bold">${escapeHtml(title)} — Velora Log</td></tr>
+<table border="1"><tr><td colspan="${headers.length}" style="background:#005B2E;color:#fff;font-weight:bold">${escapeHtml(title)} — Jetro</td></tr>
 <tr><td colspan="${headers.length}">Gerado em: ${escapeHtml(genDate)} | Por: ${escapeHtml(userName)}</td></tr>
 <tr style="background:#005B2E;color:#fff;font-weight:bold">${headerHtml}</tr>${rowsHtml}</table></body></html>`
   const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' })

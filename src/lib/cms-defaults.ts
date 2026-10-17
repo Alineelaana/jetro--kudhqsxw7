@@ -1,6 +1,6 @@
 export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
   header: {
-    logoText: 'Velora Log',
+    logoText: 'Jetro',
     logoSize: 'h-16 sm:h-20',
     logoPosition: 'left',
     fixed: true,
@@ -52,7 +52,7 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
       {
         id: 'b1',
         name: 'Banner Principal',
-        title: 'Velora Log — Excelência Logística',
+        title: 'Jetro — Gestão & Operações Logísticas',
         subtitle: 'Operações Logísticas de Excelência no Espírito Santo',
         text: '',
         buttonText: 'Solicitar Orçamento',
@@ -108,13 +108,13 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     ],
   },
   institutional: {
-    aboutTitle: 'Sobre a Velora Log',
+    aboutTitle: 'Sobre a Jetro',
     aboutText:
-      'A Velora Log é uma empresa especializada em operações logísticas no Espírito Santo.',
+      'A Jetro é uma empresa especializada em operações logísticas e soluções de gestão empresarial integrada.',
     mission:
-      'Providenciar soluções logísticas de excelência que impulsionam o crescimento dos nossos clientes.',
+      'Providenciar soluções logísticas e de gestão de excelência que impulsionam o crescimento dos nossos clientes.',
     vision:
-      'Ser referência em operações logísticas no Espírito Santo, reconhecida pela qualidade e inovação.',
+      'Ser referência em operações logísticas e gestão integrada no Brasil, reconhecida pela qualidade e inovação.',
     values: 'Segurança, Eficiência, Inovação, Compromisso, Transparência',
     history: '',
     team: '',
@@ -217,7 +217,7 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     email: '',
     website: '',
     address: 'Atendemos em todo o estado do Espírito Santo',
-    copyrightText: 'Velora Log Operações Logísticas. Todos os direitos reservados.',
+    copyrightText: 'Jetro. Todos os direitos reservados.',
     socialLinks: {},
     backgroundColor: '#01361D',
     textColor: '#FFFFFF',
@@ -234,20 +234,21 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     ],
   },
   seo: {
-    title: 'Velora Log - Operações Logísticas de Excelência no Espírito Santo',
+    title: 'Jetro - Gestão Empresarial Inteligente & Operações Logísticas',
     description:
-      'Soluções completas em armazenagem, transporte de cargas, logística portuária e distribuição. Atendemos em todo o estado do Espírito Santo.',
-    keywords: 'logística, armazenagem, transporte, cargas, Espírito Santo, WMS, distribuição',
+      'Soluções completas em gestão empresarial inteligente, armazenagem, transporte de cargas e distribuição.',
+    keywords:
+      'jetro, gestão empresarial, erp, logística, armazenagem, transporte, cargas, WMS, distribuição',
     canonicalUrl: '',
-    ogTitle: 'Velora Log - Operações Logísticas',
-    ogDescription: 'Excelência em soluções logísticas no ES',
+    ogTitle: 'Jetro - Gestão Empresarial e Logística Integrada',
+    ogDescription: 'Excelência em gestão inteligente e soluções logísticas',
     indexNoIndex: 'index',
     friendlyUrl: '',
-    defaultTitle: 'Velora Log - Operações Logísticas de Excelência no Espírito Santo',
+    defaultTitle: 'Jetro - Gestão Empresarial Inteligente & Operações Logísticas',
     defaultDescription:
-      'Soluções completas em armazenagem, transporte de cargas, logística portuária e distribuição.',
+      'Soluções completas em gestão empresarial inteligente, armazenagem, transporte de cargas e distribuição.',
     defaultKeywords:
-      'logística, armazenagem, transporte, cargas, Espírito Santo, WMS, distribuição',
+      'jetro, gestão empresarial, erp, logística, armazenagem, transporte, cargas, WMS, distribuição',
     favicon: '',
     searchLogo: '',
     pages: [

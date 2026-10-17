@@ -42,7 +42,7 @@ export function exportProductsExcel(products: Product[]): void {
 
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>
 <table border="1">
-<tr><td colspan="11"><strong>Relatório de Produtos — Velora Log</strong></td></tr>
+<tr><td colspan="11"><strong>Relatório de Produtos — Jetro</strong></td></tr>
 <tr><td colspan="11">Gerado em: ${escapeHtml(genDateTime)}</td></tr>
 <tr><td colspan="11"></td></tr>
 <tr style="background:#005B2E;color:#fff;font-weight:bold">
@@ -112,7 +112,7 @@ tr{page-break-inside:avoid}
 </div>
 <div class="footer">
 <span>Gerado em: ${escapeHtml(genDateTime)}</span>
-<span>Velora Log</span>
+<span>Jetro</span>
 </div>
 <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>
 </body></html>`

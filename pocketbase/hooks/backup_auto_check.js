@@ -19,11 +19,7 @@ routerAdd(
       var initBackup = null
       try {
         initBackup = $app.findFirstRecordByData('backups', 'version_name', 'Jetro v1.0')
-      } catch (_) {
-        try {
-          initBackup = $app.findFirstRecordByData('backups', 'version_name', 'VeloraLog v1.0')
-        } catch (_) {}
-      }
+      } catch (_) {}
       if (initBackup && initBackup.getString('status') === 'pending') {
         var initData = {
           version: 'Jetro v1.0',
