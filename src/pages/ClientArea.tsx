@@ -195,11 +195,11 @@ export default function ClientArea() {
           </Link>
           <span className="text-muted-foreground">•</span>
           <Link
-            to="/"
+            to={client ? '/cliente' : '/cliente/login'}
             className="text-sm text-muted-foreground hover:text-[#005B2E] hover:underline"
           >
-            Acessar o sistema
-          </Link>
+            Área do cliente
+          </Link>{' '}
         </div>
       </main>
     </div>

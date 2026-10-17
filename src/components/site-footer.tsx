@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-64131.jpeg'
+import { useAuth } from '@/hooks/use-auth'
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear()
+  const { isAuthenticated } = useAuth()
 
   return (
     <footer className="bg-[#002817] text-white border-t border-[#C89B3C]/30 pt-16 pb-12">
@@ -10,9 +12,13 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div className="space-y-4">
             <Link
-              to="/"
+              to={isAuthenticated ? '/admin' : '/'}
               className="inline-flex items-center gap-3 group transition-opacity hover:opacity-90"
-              title="Retornar para a tela inicial / login"
+              title={
+                isAuthenticated
+                  ? 'Página principal interna (Dashboard)'
+                  : 'Retornar para a tela inicial / login'
+              }
             >
               <img
                 src={logoImg}
@@ -65,14 +71,16 @@ export function SiteFooter() {
               Portal & Institucional
             </h4>
             <ul className="space-y-2.5 text-sm text-gray-300">
-              <li>
-                <Link to="/" className="hover:text-white transition-colors">
-                  Acessar o Sistema
-                </Link>
-              </li>
+              {!isAuthenticated && (
+                <li>
+                  <Link to="/" className="hover:text-white transition-colors">
+                    Acessar o Sistema
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link to="/admin" className="hover:text-white transition-colors">
-                  Portal Administrativo
+                  {isAuthenticated ? 'Painel / Dashboard' : 'Portal Administrativo'}
                 </Link>
               </li>
               <li>
