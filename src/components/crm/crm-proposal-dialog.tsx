@@ -70,7 +70,7 @@ export function CrmProposalDialog({
           validity_date: proposal.validity_date || '',
           status: proposal.status || 'Em Elaboração',
           observations: proposal.rejected_reason || '',
-          company: proposal.company || 'Velora Log',
+          company: proposal.company || 'Jetro',
           filial: proposal.filial || 'Matriz',
         })
         const rawItems = Array.isArray(proposal.items) ? proposal.items : []
@@ -99,7 +99,7 @@ export function CrmProposalDialog({
         setForm({
           status: 'Em Elaboração',
           responsible_name: user?.name || '',
-          company: 'Velora Log',
+          company: 'Jetro',
           filial: 'Matriz',
           validity_date: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
         })

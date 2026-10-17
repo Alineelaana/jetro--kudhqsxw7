@@ -657,7 +657,7 @@ export function BudgetCreateDialog({
                   type="email"
                   value={responsibleEmail}
                   onChange={(e) => setResponsibleEmail(e.target.value)}
-                  placeholder="responsavel@veloralog.com.br"
+                  placeholder="responsavel@jetro.com.br"
                   className="h-9 focus-visible:ring-[#005B2E]"
                 />
               </div>

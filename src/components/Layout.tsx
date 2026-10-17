@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { canViewScreenDocs } from '@/lib/permissions'
 import { ScreenLogicDrawer } from '@/components/screen-docs/screen-logic-drawer'
 import { InactivityTracker } from '@/components/inactivity-tracker'
+import { AttributionFooter } from '@/components/attribution-footer'
 import { Button } from '@/components/ui/button'
 import { FileCode2 } from 'lucide-react'
 
@@ -72,9 +73,12 @@ export default function Layout() {
             </div>
             <main
               id="admin-main-content"
-              className="flex-1 min-w-0 overflow-y-auto overscroll-contain"
+              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between"
             >
-              <Outlet />
+              <div className="flex-1">
+                <Outlet />
+              </div>
+              <AttributionFooter variant="muted" />
             </main>
           </div>
         </div>
@@ -97,8 +101,11 @@ export default function Layout() {
     <div className="flex min-h-screen flex-col">
       <InactivityTracker />
       {!isRootLogin && <SiteHeader />}
-      <main className="flex-1">
-        <Outlet />
+      <main className="flex-1 flex flex-col justify-between">
+        <div className="flex-1">
+          <Outlet />
+        </div>
+        {!showFooter && !isRootLogin && <AttributionFooter variant="muted" />}
       </main>
       {showFooter && <SiteFooter />}
       {!isRootLogin && <FloatingChat />}

@@ -57,7 +57,7 @@ routerAdd(
           encodeURIComponent(origin) +
           '&format=json&limit=1',
         method: 'GET',
-        headers: { 'User-Agent': 'VeloraLog/1.0' },
+        headers: { 'User-Agent': 'Jetro/1.0' },
         timeout: 10,
       })
       var geoDest = $http.send({
@@ -66,7 +66,7 @@ routerAdd(
           encodeURIComponent(destination) +
           '&format=json&limit=1',
         method: 'GET',
-        headers: { 'User-Agent': 'VeloraLog/1.0' },
+        headers: { 'User-Agent': 'Jetro/1.0' },
         timeout: 10,
       })
 

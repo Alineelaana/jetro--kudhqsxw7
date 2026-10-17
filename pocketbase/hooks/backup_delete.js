@@ -9,8 +9,9 @@ routerAdd(
 
     var record = $app.findRecordById('backups', id)
 
-    if (record.getString('version_name') === 'VeloraLog v1.0') {
-      return e.badRequestError('O backup inicial VeloraLog v1.0 nao pode ser excluido.')
+    var vName = record.getString('version_name')
+    if (vName === 'Jetro v1.0' || vName === 'VeloraLog v1.0') {
+      return e.badRequestError('O backup inicial Jetro v1.0 nao pode ser excluido.')
     }
 
     var ip = '',

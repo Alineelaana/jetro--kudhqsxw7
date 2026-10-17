@@ -19,6 +19,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
+import { AttributionFooter } from '@/components/attribution-footer'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 export default function LoginPage() {
@@ -270,16 +271,24 @@ export default function LoginPage() {
                   </Link>
                 </Button>
               </div>
+
+              {/* Mensagem de atribuição abaixo do formulário de login */}
+              <div className="pt-2 text-center">
+                <AttributionFooter variant="inline" className="text-[11px] text-muted-foreground" />
+              </div>
             </div>
           </CardContent>
         </Card>
       </main>
 
       {/* Rodapé discreto da tela de login */}
-      <footer className="relative z-10 w-full px-4 py-4 text-center text-xs text-white/60 border-t border-white/10 bg-[#001c10]/70 backdrop-blur-sm">
+      <footer className="relative z-10 w-full px-4 py-4 text-center text-xs text-white/60 border-t border-white/10 bg-[#001c10]/70 backdrop-blur-sm space-y-1.5">
         <p>
           © {new Date().getFullYear()} Jetro — Plataforma Inteligente de Gestão Empresarial. Todos
           os direitos reservados.
+        </p>
+        <p className="text-[11px] text-white/70">
+          Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
         </p>
       </footer>
     </div>

@@ -16,10 +16,17 @@ routerAdd(
 
     var createdInitial = false
     try {
-      var initBackup = $app.findFirstRecordByData('backups', 'version_name', 'VeloraLog v1.0')
-      if (initBackup.getString('status') === 'pending') {
+      var initBackup = null
+      try {
+        initBackup = $app.findFirstRecordByData('backups', 'version_name', 'Jetro v1.0')
+      } catch (_) {
+        try {
+          initBackup = $app.findFirstRecordByData('backups', 'version_name', 'VeloraLog v1.0')
+        } catch (_) {}
+      }
+      if (initBackup && initBackup.getString('status') === 'pending') {
         var initData = {
-          version: 'VeloraLog v1.0',
+          version: 'Jetro v1.0',
           type: 'full',
           timestamp: new Date().toISOString(),
           created_by: 'Sistema',
@@ -29,8 +36,9 @@ routerAdd(
         var initJson = JSON.stringify(initData)
         var initFile = $filesystem.fileFromBytes(
           initJson,
-          'backup_VeloraLog_v1.0_' + Date.now() + '.json',
+          'backup_Jetro_v1.0_' + Date.now() + '.json',
         )
+        initBackup.set('version_name', 'Jetro v1.0')
         initBackup.set('backup_data', initJson)
         initBackup.set('file', initFile)
         initBackup.set('file_size', initJson.length)

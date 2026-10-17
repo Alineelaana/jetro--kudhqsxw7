@@ -95,7 +95,7 @@ export function CrmLeadDialog({
           next_action: lead.next_action || '',
           observations: lead.observations || '',
           status: lead.status || 'Novo',
-          company: lead.company || 'Velora Log',
+          company: lead.company || 'Jetro',
           filial: lead.filial || 'Matriz',
         })
         const qd = lead.qualification_data || {}
@@ -119,7 +119,7 @@ export function CrmLeadDialog({
           lead_source: 'Site',
           status: 'Novo',
           entry_date: new Date().toISOString().split('T')[0],
-          company: 'Velora Log',
+          company: 'Jetro',
           filial: 'Matriz',
         })
         setQualif({ temperature: 'Frio' })

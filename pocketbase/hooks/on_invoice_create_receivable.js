@@ -5,7 +5,7 @@ onRecordAfterCreateSuccess((e) => {
   const clientName = invoice.getString('client_name') || ''
   const clientId = invoice.getString('client_id') || ''
   const totalValue = invoice.getString('total_value') || '0'
-  const company = invoice.getString('company') || 'Velora Log'
+  const company = invoice.getString('company') || 'Jetro'
   const branch = invoice.getString('branch') || 'Matriz'
 
   try {

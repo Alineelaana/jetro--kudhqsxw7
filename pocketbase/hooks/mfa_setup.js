@@ -31,13 +31,13 @@ routerAdd(
     }
 
     var email = authUser.email || ''
-    var label = 'VeloraLog:' + email
+    var label = 'Jetro:' + email
     var otpauthUrl =
       'otpauth://totp/' +
       encodeURIComponent(label) +
       '?secret=' +
       secretBase32 +
-      '&issuer=VeloraLog&algorithm=SHA256&digits=6&period=30'
+      '&issuer=Jetro&algorithm=SHA256&digits=6&period=30'
 
     var record = $app.findRecordById('users', authUser.id)
     record.set('mfa_secret', secretHex)

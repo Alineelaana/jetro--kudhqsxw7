@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { type FieldErrors } from '@/lib/pocketbase/errors'
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
+import { AttributionFooter } from '@/components/attribution-footer'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 export function AdminLogin() {
@@ -165,9 +166,13 @@ export function AdminLogin() {
                 </Link>
               </Button>
             </div>
+            <div className="pt-2 text-center">
+              <AttributionFooter variant="inline" className="text-[11px] text-muted-foreground" />
+            </div>
           </form>
         </CardContent>
       </Card>
+      <AttributionFooter variant="inline" className="text-[11px] text-muted-foreground/70" />
     </div>
   )
 }

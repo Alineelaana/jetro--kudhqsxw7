@@ -427,7 +427,7 @@ export function SendCollectionDialog({
 }) {
   const [channel, setChannel] = useState('WhatsApp')
   const [saving, setSaving] = useState(false)
-  const message = `Olá! Identificamos títulos vencidos em nome de ${cliente} no valor de R$ ${totalVencido.toFixed(2)}. Por favor, entre em contato para regularização. - VeloraLog`
+  const message = `Olá! Identificamos títulos vencidos em nome de ${cliente} no valor de R$ ${totalVencido.toFixed(2)}. Por favor, entre em contato para regularização. - Jetro`
   const handleSend = async () => {
     setSaving(true)
     try {

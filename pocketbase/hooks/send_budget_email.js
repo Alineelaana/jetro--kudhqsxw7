@@ -5,7 +5,7 @@ routerAdd(
     const body = e.requestInfo().body || {}
     const requestId = body.request_id
     const recipientEmail = body.recipient_email
-    const subject = body.subject || 'Orçamento Velora Log'
+    const subject = body.subject || 'Orçamento Jetro'
     const authorName = body.author_name || 'Atendente'
 
     if (!requestId || !recipientEmail) {
@@ -18,8 +18,8 @@ routerAdd(
     const signatureHtml = `
       <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; font-family: sans-serif;">
         <p style="margin: 0 0 8px 0; color: #374151; font-size: 14px;">Atenciosamente,</p>
-        <p style="margin: 0 0 12px 0; color: #005B2E; font-weight: bold; font-size: 15px;">${authorName} — Velora Log Operações Logísticas</p>
-        <img src="${signatureImageUrl}" alt="Assinatura Velora Log" style="max-width: 580px; width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
+        <p style="margin: 0 0 12px 0; color: #005B2E; font-weight: bold; font-size: 15px;">${authorName} — Jetro</p>
+        <img src="${signatureImageUrl}" alt="Assinatura Jetro" style="max-width: 580px; width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
       </div>
     `
 

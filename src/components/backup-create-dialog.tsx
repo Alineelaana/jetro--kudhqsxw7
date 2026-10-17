@@ -70,7 +70,7 @@ export function BackupCreateDialog({ open, onOpenChange, onCreated, onError }: P
               id="backup-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Cópia VeloraLog"
+              placeholder="Ex: Cópia Jetro"
               disabled={creating}
             />
             {fieldErrors.version_name && (

@@ -61,7 +61,7 @@ export function CrmActivityDialog({
           result: activity.result || '',
           follow_up_date: activity.follow_up_date || '',
           description: activity.description || '',
-          company: activity.company || 'Velora Log',
+          company: activity.company || 'Jetro',
           filial: activity.filial || 'Matriz',
         })
       } else {
@@ -73,7 +73,7 @@ export function CrmActivityDialog({
           scheduled_time: '09:00',
           duration_minutes: '30',
           responsible_name: user?.name || '',
-          company: 'Velora Log',
+          company: 'Jetro',
           filial: 'Matriz',
         })
       }

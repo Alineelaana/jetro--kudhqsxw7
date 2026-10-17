@@ -64,7 +64,7 @@ export function CrmOpportunityDialog({
           next_action: opportunity.next_action || '',
           observations: opportunity.observations || '',
           responsible_name: opportunity.responsible_name || user?.name || '',
-          company: opportunity.company || 'Velora Log',
+          company: opportunity.company || 'Jetro',
           filial: opportunity.filial || 'Matriz',
         })
       } else {
@@ -73,7 +73,7 @@ export function CrmOpportunityDialog({
           open_date: new Date().toISOString().split('T')[0],
           probability: '0',
           estimated_value: '0',
-          company: 'Velora Log',
+          company: 'Jetro',
           filial: 'Matriz',
           responsible_name: user?.name || '',
         })

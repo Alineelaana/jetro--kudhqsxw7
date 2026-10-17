@@ -56,7 +56,7 @@ export function exportCadastrosXls(collection: string, records: CadastroRecord[]
         `<tr><td>${escapeHtml(r.code || '—')}</td><td>${escapeHtml(r.name || '—')}</td><td>${r.active !== false ? 'Ativo' : 'Inativo'}</td><td>${escapeHtml(r.responsible_user || '—')}</td><td>${escapeHtml(r.created || '—')}</td></tr>`,
     )
     .join('')
-  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1"><tr><td colspan="5"><strong>${collection} — Velora Log</strong></td></tr><tr><td colspan="5">Gerado em: ${escapeHtml(dt)}</td></tr><tr style="background:#005B2E;color:#fff;font-weight:bold"><th>Código</th><th>Nome</th><th>Situação</th><th>Responsável</th><th>Data Cadastro</th></tr>${rows}</table></body></html>`
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1"><tr><td colspan="5"><strong>${collection} — Jetro</strong></td></tr><tr><td colspan="5">Gerado em: ${escapeHtml(dt)}</td></tr><tr style="background:#005B2E;color:#fff;font-weight:bold"><th>Código</th><th>Nome</th><th>Situação</th><th>Responsável</th><th>Data Cadastro</th></tr>${rows}</table></body></html>`
   const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

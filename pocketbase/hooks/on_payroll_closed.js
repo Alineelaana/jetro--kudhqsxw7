@@ -6,7 +6,7 @@ onRecordAfterUpdateSuccess((e) => {
   if (newStatus !== 'Fechada') return e.next()
 
   const competencia = e.record.getString('competencia') || ''
-  const empresa = e.record.getString('empresa') || 'Velora Log'
+  const empresa = e.record.getString('empresa') || 'Jetro'
   const filial = e.record.getString('filial') || 'Matriz'
   const centroCusto = e.record.getString('centro_custo') || 'Folha'
   const docOrigem = 'Folha de Pagamento - ' + competencia

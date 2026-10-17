@@ -164,6 +164,11 @@ export function SiteFooter() {
             Tecnologia de Alta Performance & Governança Corporativa
           </p>
         </div>
+        <div className="mt-6 pt-4 border-t border-white/5 text-center">
+          <p className="text-[11px] sm:text-xs text-gray-400/80">
+            Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
+          </p>
+        </div>
       </div>
     </footer>
   )
