@@ -157,10 +157,22 @@ export async function getNetworkConsolidated(networkId: string): Promise<Network
   }
 }
 
-export async function creditCheck(partnerId: string) {
+export interface CreditCheckResult {
+  decision: 'blocked' | 'requires_approval' | 'approved'
+  own_delinquency?: boolean
+  network_delinquency?: boolean
+  own_overdue_amount: number
+  network_overdue_amount: number
+  network_limit: number
+  restriction_policy: string
+  members_count: number
+  network_name?: string
+}
+
+export async function creditCheck(partnerId: string): Promise<CreditCheckResult> {
   return pb.send('/backend/v1/networks/credit-check', {
     method: 'POST',
     body: JSON.stringify({ partner_id: partnerId }),
     headers: { 'Content-Type': 'application/json' },
-  })
+  }) as Promise<CreditCheckResult>
 }

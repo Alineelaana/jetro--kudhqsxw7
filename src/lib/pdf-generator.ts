@@ -3,10 +3,15 @@ import jetroLogoUrl from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-c8e57.j
 export interface BudgetPdfData {
   id?: string
   budget_number?: string
+  budgetNumber?: string
   request_number?: number | string
   client_name?: string
+  clientName?: string
   client_email?: string
+  clientEmail?: string
   client_phone?: string
+  clientPhone?: string
+  clientCompany?: string
   service?: string
   created?: string
   status?: string
@@ -14,6 +19,36 @@ export interface BudgetPdfData {
   quote_created_at?: string
   responsible_email?: string
   responsible_phone?: string
+  responsible?: string
+  responsibleEmail?: string
+  responsiblePhone?: string
+  emissionDate?: string
+  requestDate?: string
+  origin?: string
+  destination?: string
+  merchandise?: string
+  volume?: string
+  operationType?: string
+  periodicity?: string
+  value?: string | number
+  validUntil?: string
+  observations?: string
+  servicosInclusos?: string[]
+  valorMercadoria?: string
+  necessitaSeguro?: string
+  necessitaPicking?: string
+  necessitaCrossDocking?: string
+  necessitaFracionamento?: string
+  necessitaDistribuicao?: string
+  prazoDesejado?: string
+  quantidadeVolumes?: string
+  peso?: string
+  cubagem?: string
+  tipoCarga?: string
+  valorSeguro?: string
+  formaPagamento?: string
+  prazoComercial?: string
+  userName?: string
   services?: Array<{
     name?: string
     servico?: string

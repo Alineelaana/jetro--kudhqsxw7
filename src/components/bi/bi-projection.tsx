@@ -99,15 +99,6 @@ export function BiProjection() {
         documentType: 'projection',
         format,
         sections,
-        stamp: {
-          empresa: filters.empresa,
-          filial: filters.filial,
-          userName: (user?.name as string) || 'Usuário',
-          userRole: (user?.role as string) || 'PADRAO',
-          module: 'bi',
-          documentType: 'projection',
-          filters: { competencia: filters.competencia },
-        },
         recordCount: currentRows.length,
         filters: { competencia: filters.competencia },
       })

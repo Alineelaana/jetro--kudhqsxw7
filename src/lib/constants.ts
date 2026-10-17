@@ -49,6 +49,7 @@ export const DEADLINE_OPTIONS: string[] = [
 
 export interface DefaultFormField {
   id: string
+  name?: string
   label: string
   type: string
   required?: boolean

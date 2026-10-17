@@ -87,12 +87,21 @@ export function CmsTextArea({
   value,
   onChange,
   rows = 4,
+  placeholder,
 }: {
   value: string
   onChange: (v: string) => void
   rows?: number
+  placeholder?: string
 }) {
-  return <Textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={rows} />
+  return (
+    <Textarea
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      rows={rows}
+      placeholder={placeholder}
+    />
+  )
 }
 
 export function CmsColorInput({

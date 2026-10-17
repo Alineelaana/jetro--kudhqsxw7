@@ -26,7 +26,7 @@ export function ProjectionKPIs({ kpis }: Props) {
     },
     {
       label: 'Restante p/ Meta',
-      value: kpis.meta > 0 ? fmtCurrency(kpis.restantante) : '—',
+      value: kpis.meta > 0 ? fmtCurrency(kpis.restante) : '—',
       color: 'text-amber-600',
     },
     { label: 'Média/Dia Útil', value: fmtCurrency(kpis.media_dia), color: 'text-purple-600' },

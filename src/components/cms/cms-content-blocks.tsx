@@ -48,17 +48,17 @@ export function CmsServicesSettings() {
       </CmsCard>
       <CmsCard title="Visibilidade e Ordem dos Serviços">
         <div className="space-y-2">
-          {SERVICES.map((service, idx) => (
+          {SERVICES.map((serviceName, idx) => (
             <div
-              key={service.id}
+              key={serviceName}
               className="flex items-center justify-between p-3 rounded-lg border border-border bg-white"
             >
               <div className="flex items-center gap-3">
                 <CmsToggle
-                  checked={visible.includes(service.id)}
-                  onChange={() => toggleService(service.id)}
+                  checked={visible.includes(serviceName)}
+                  onChange={() => toggleService(serviceName)}
                 />
-                <span className="text-sm font-medium">{service.title}</span>
+                <span className="text-sm font-medium">{serviceName}</span>
               </div>
               <ListActions
                 onUp={
@@ -66,7 +66,7 @@ export function CmsServicesSettings() {
                     ? () => {
                         const arr = [...SERVICES]
                         ;[arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]
-                        update({ serviceOrder: arr.map((s) => s.id) })
+                        update({ serviceOrder: arr })
                       }
                     : undefined
                 }
@@ -75,7 +75,7 @@ export function CmsServicesSettings() {
                     ? () => {
                         const arr = [...SERVICES]
                         ;[arr[idx + 1], arr[idx]] = [arr[idx], arr[idx + 1]]
-                        update({ serviceOrder: arr.map((s) => s.id) })
+                        update({ serviceOrder: arr })
                       }
                     : undefined
                 }

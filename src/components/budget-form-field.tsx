@@ -19,18 +19,19 @@ interface BudgetFormFieldProps {
 }
 
 export function BudgetFormField({ field, value, onChange, error }: BudgetFormFieldProps) {
+  const fieldName = field.name || field.id
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={field.name} className="text-xs sm:text-sm font-semibold text-foreground">
+      <Label htmlFor={fieldName} className="text-xs sm:text-sm font-semibold text-foreground">
         {field.label}
         {field.required && <span className="text-destructive ml-1">*</span>}
       </Label>
 
       {field.type === 'textarea' ? (
         <Textarea
-          id={field.name}
+          id={fieldName}
           value={value}
-          onChange={(e) => onChange(field.name, e.target.value)}
+          onChange={(e) => onChange(fieldName, e.target.value)}
           placeholder="Descreva detalhes como dimensões, peso, janela de entrega ou requisitos especiais..."
           className={cn(
             'focus-visible:ring-[#005B2E] border-border',
@@ -39,7 +40,7 @@ export function BudgetFormField({ field, value, onChange, error }: BudgetFormFie
           rows={3}
         />
       ) : field.type === 'select' ? (
-        <Select value={value} onValueChange={(v) => onChange(field.name, v)}>
+        <Select value={value} onValueChange={(v) => onChange(fieldName, v)}>
           <SelectTrigger
             className={cn(
               'focus:ring-[#005B2E] border-border bg-white',
@@ -58,10 +59,10 @@ export function BudgetFormField({ field, value, onChange, error }: BudgetFormFie
         </Select>
       ) : (
         <Input
-          id={field.name}
+          id={fieldName}
           type={field.type}
           value={value}
-          onChange={(e) => onChange(field.name, e.target.value)}
+          onChange={(e) => onChange(fieldName, e.target.value)}
           placeholder={
             field.type === 'email'
               ? 'nome@empresa.com.br'

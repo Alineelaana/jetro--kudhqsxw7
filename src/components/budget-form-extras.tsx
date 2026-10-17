@@ -34,7 +34,7 @@ export function BudgetFormExtras({ values, onChange }: BudgetFormExtrasProps) {
     ? values.servicos_inclusos.split(',').filter(Boolean)
     : []
 
-  const toggleService = (service: string) => {
+  const toggleService = (service: string, _checked?: boolean) => {
     const current = values.servicos_inclusos
       ? values.servicos_inclusos.split(',').filter(Boolean)
       : []

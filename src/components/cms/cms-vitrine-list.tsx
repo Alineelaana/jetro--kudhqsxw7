@@ -101,7 +101,7 @@ export function CmsVitrineList({
     VITRINE_STATUSES.find((v) => v.id === s) || { label: s, color: 'bg-gray-100 text-gray-700' }
   const getServiceNames = (ids: string[]) =>
     (ids || [])
-      .map((id) => SERVICES.find((s: { id: string; title: string }) => s.id === id)?.title)
+      .map((id) => SERVICES.find((s) => s === id))
       .filter(Boolean)
       .join(', ')
   const selClass = 'border border-border rounded-md px-3 py-1.5 text-sm bg-white'
@@ -157,9 +157,9 @@ export function CmsVitrineList({
           className={selClass}
         >
           <option value="">Todos os serviços</option>
-          {SERVICES.map((s: { id: string; title: string }) => (
-            <option key={s.id} value={s.id}>
-              {s.title}
+          {SERVICES.map((s) => (
+            <option key={s} value={s}>
+              {s}
             </option>
           ))}
         </select>

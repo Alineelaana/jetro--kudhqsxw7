@@ -158,7 +158,7 @@ export function CadastroFormDialog({
       const code =
         form.code ||
         `${config.collection.slice(0, 3).toUpperCase()}-${Date.now().toString(36).toUpperCase().slice(-6)}`
-      fd.append('code', code)
+      fd.append('code', String(code))
       fd.append('name', String(form.name || '').trim())
       fd.append('active', String(form.active ?? true))
       if (!record) fd.append('responsible_user', userName)

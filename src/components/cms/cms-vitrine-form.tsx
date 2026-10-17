@@ -29,7 +29,7 @@ import { toast } from 'sonner'
 type SelOption = { id: string; label: string }
 const EMPTY: Partial<VitrineItem> = {
   name: '',
-  type: '',
+  type: 'banner_full',
   title: '',
   subtitle: '',
   description: '',
@@ -340,18 +340,18 @@ export function CmsVitrineForm({
       </CmsCard>
       <CmsCard title="Vincular a Serviços">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {SERVICES.map((s: { id: string; title: string }) => (
+          {SERVICES.map((serviceName) => (
             <label
-              key={s.id}
+              key={serviceName}
               className="flex items-center gap-2 p-2 rounded border border-border cursor-pointer hover:bg-muted/30"
             >
               <input
                 type="checkbox"
-                checked={(data.linked_services || []).includes(s.id)}
-                onChange={() => toggleService(s.id)}
+                checked={(data.linked_services || []).includes(serviceName)}
+                onChange={() => toggleService(serviceName)}
                 className="accent-[#005B2E]"
               />
-              <span className="text-sm">{s.title}</span>
+              <span className="text-sm">{serviceName}</span>
             </label>
           ))}
         </div>

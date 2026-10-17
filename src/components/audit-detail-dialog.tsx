@@ -59,7 +59,7 @@ export function AuditDetailDialog({ open, onOpenChange, log }: Props) {
   useEffect(() => {
     if (log?.session_id) {
       getSessionBySessionId(log.session_id)
-        .then(setSession)
+        .then((res) => setSession(res as unknown as AuditSession))
         .catch(() => setSession(null))
     } else {
       setSession(null)
