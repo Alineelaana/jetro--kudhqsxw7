@@ -2,6 +2,7 @@ import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { NotificationBell } from '@/components/notification-bell'
 import { DashboardsPanel } from '@/components/dashboards/dashboards-panel'
+import { JetroOnlineChat } from '@/components/jetro-online/jetro-online-chat'
 
 export function AdminDashboard() {
   const { signOut } = useAuth()
@@ -17,7 +18,13 @@ export function AdminDashboard() {
           </button>
         </div>
       </div>
-      <DashboardsPanel />
+      <div className="space-y-8">
+        <JetroOnlineChat />
+        <div>
+          <h3 className="text-base font-bold text-gray-800 mb-3">Indicadores Operacionais</h3>
+          <DashboardsPanel />
+        </div>
+      </div>
     </div>
   )
 }
