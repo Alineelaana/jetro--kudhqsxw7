@@ -51,7 +51,7 @@ import {
   DynamicDateRangeKey,
   ReportFilterFieldDef,
 } from '@/lib/report-schedule-registry'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { useToast } from '@/hooks/use-toast'
 
 export interface ReportScheduleFormData {

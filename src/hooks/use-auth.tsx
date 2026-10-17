@@ -137,7 +137,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const login = async (username: string, password: string) => {
-    const email = username.trim() === 'jetrosup' ? ADMIN_EMAIL : username.trim()
+    const trimmed = username.trim()
+    const email = trimmed === 'Alineelaana' || trimmed === 'jetrosup' ? ADMIN_EMAIL : trimmed
     try {
       const authData = await pb.collection('users').authWithPassword(email, password)
       const record = authData.record as Record<string, unknown> | null

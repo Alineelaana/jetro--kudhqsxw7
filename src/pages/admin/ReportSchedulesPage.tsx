@@ -57,7 +57,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { useToast } from '@/hooks/use-toast'
 import { ReportScheduleDialog, ReportScheduleFormData } from './report-schedule-dialog'
 import { ExecutionHistoryDialog } from './report-schedule-history-dialog'

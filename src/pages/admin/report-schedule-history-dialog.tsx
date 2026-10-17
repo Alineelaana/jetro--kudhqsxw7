@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { History, CheckCircle2, XCircle, Clock, RefreshCw, AlertCircle } from 'lucide-react'
 
 interface ExecutionHistoryDialogProps {
