@@ -95,6 +95,7 @@ import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
 import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
 import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
 import ComparativoMargensGrPage from './pages/admin/ComparativoMargensGrPage'
+import TabelaMaeGrPage from './pages/admin/TabelaMaeGrPage'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
 import TradeMarketing from './pages/TradeMarketing'
@@ -1176,6 +1177,10 @@ const App = () => (
                         <Route
                           path="/admin/planilhas/convertidas/comparativo-margens-gr"
                           element={<ComparativoMargensGrPage />}
+                        />
+                        <Route
+                          path="/admin/planilhas/convertidas/tabela-mae-gr"
+                          element={<TabelaMaeGrPage />}
                         />
                         <Route path="/admin/auditoria" element={<Auditoria />} />
                         <Route

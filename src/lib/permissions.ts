@@ -314,3 +314,19 @@ export function canViewPlanilhasConvertidas(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
+
+/**
+ * Permissão específica para a tela Tabela Mãe GR
+ */
+export function canViewPlanilhasTabelaMaeGr(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+/**
+ * Permissão para editar células e fórmulas nas Planilhas Convertidas
+ */
+export function canEditPlanilhasConvertidas(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}

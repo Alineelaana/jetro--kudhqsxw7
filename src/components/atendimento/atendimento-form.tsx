@@ -165,8 +165,10 @@ export function AtendimentoForm() {
                   onClick={() => selectCustomer(c)}
                   className="w-full text-left p-2 hover:bg-[#005B2E]/5 border-b border-border"
                 >
-                  <span className="font-medium">{c.full_name || c.company_name}</span>
-                  <span className="text-xs text-muted-foreground ml-2">{c.email}</span>
+                  <span className="font-medium">{String(c.full_name || c.company_name || '')}</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    {String(c.email || '')}
+                  </span>
                 </button>
               ))}
             </div>
@@ -176,10 +178,10 @@ export function AtendimentoForm() {
               <User className="w-5 h-5 text-[#005B2E]" />
               <div>
                 <p className="font-bold text-sm">
-                  {selectedCustomer.full_name || selectedCustomer.company_name}
+                  {String(selectedCustomer.full_name || selectedCustomer.company_name || '')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {selectedCustomer.email} • {selectedCustomer.phone}
+                  {String(selectedCustomer.email || '')} • {String(selectedCustomer.phone || '')}
                 </p>
               </div>
             </div>

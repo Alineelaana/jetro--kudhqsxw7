@@ -50,6 +50,7 @@ import {
   canViewScreenDocs,
   canViewSegundoCerebro,
   canViewPlanilhasConvertidas,
+  canViewPlanilhasTabelaMaeGr,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -697,6 +698,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/planilhas/convertidas/comparativo-margens-gr',
             icon: FileSpreadsheet,
             perm: canViewPlanilhasConvertidas,
+          },
+          {
+            label: 'Tabela Mãe GR',
+            route: '/admin/planilhas/convertidas/tabela-mae-gr',
+            icon: FileSpreadsheet,
+            perm: canViewPlanilhasTabelaMaeGr,
           },
         ],
       },

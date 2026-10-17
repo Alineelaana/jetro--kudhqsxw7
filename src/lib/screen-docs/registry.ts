@@ -1579,6 +1579,120 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
       content: 'Pendente de validação técnica',
     },
   },
+
+  // -------------------------------------------------------------
+  // 29. PLANILHAS CONVERTIDAS — COMPARATIVO MARGENS GR
+  // -------------------------------------------------------------
+  '/admin/planilhas/convertidas/comparativo-margens-gr': {
+    route: '/admin/planilhas/convertidas/comparativo-margens-gr',
+    title: 'Comparativo de Margens GR — Planilha Interativa',
+    moduleGroup: 'Planilhas Convertidas',
+    docVersion: '2.0.0',
+    lastUpdated: '2026-03-30',
+    author: 'Engenharia de Software Jetro',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Ambiente de planilha editável tipo Excel/Google Sheets para análise detalhada de margens de venda da linha Gran Romano ao preço Rivoli, com recálculo instantâneo de fórmulas em grade, abas múltiplas (Comparativo e Premissas & Parâmetros), histórico de versões e persistência em banco.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Grade 100% editável com duplo clique ou digitação direta, atalhos de teclado (setas, Tab, Enter, Ctrl+Z, Ctrl+Y, Ctrl+C, Ctrl+V, Ctrl+S).\n- Fórmulas ativas entre células e entre abas (SOMA, MÉDIA, CONT.SE, SE, ARRED e operações aritméticas puras).\n- Barra de fórmulas no topo com identificador de coordenadas da célula.\n- Barra inferior de abas dinâmicas com alternância sem perda de dados.\n- Toolbar compacta: Salvar, Desfazer/Refazer, Formatação Moeda (R$) e Percentual (%), Negrito, Alinhamento, Inserir/Excluir Linhas e Colunas, Exportar e Importar Excel (.xlsx) e Histórico de Versões com restauração.\n- Modo alternável para Visão Analítica (cards executivos de resumo e tabela gerencial).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Comissão (3%) e Frete (3%) são calculados diretamente sobre o Preço Rivoli (preço de venda).\n- Tributos diretos sobre Preço Rivoli somam 9,33% (ICMS 1,20% + PIS 1,45% + COFINS 6,68%).\n- Preço Mínimo com Tributos considera exclusivamente CMV + ICMS + PIS + COFINS.\n- Margem Final R$ = Preço Rivoli − CMV − Deduções Totais (15,33% sobre Rivoli).\n- Margem Final % = Margem R$ ÷ Preço Rivoli.\n- Não embutir dados de linhas no código (compliance de dados sob importação via runtime).',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário autorizado acessa a tela de Comparativo de Margens GR.\n2. O sistema carrega os dados persistidos na coleção `margens_comparativo_gr` e o snapshot na coleção `planilhas_workbooks`.\n3. O usuário edita preços ou premissas na planilha; o motor recalcula dependentes e totalizadores em tempo real.\n4. O usuário clica em Salvar ou aciona Ctrl+S para gravar a nova versão no histórico `planilhas_versoes`.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `planilhas_workbooks`, `planilhas_versoes`, `margens_comparativo_gr`, `margens_parametros_gr`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Importador nativo de arquivos .xlsx e .csv via navegador com descompressão de stream ZIP.\n- Exportador nativo de .xlsx compatível com Microsoft Excel preservando tags de fórmulas <f> e valores <v>.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização: `canViewPlanilhasConvertidas(role)` (SUP, PADRAO, FINANCEIRO, COMERCIAL).\n- Edição de células e fórmulas: `canEditPlanilhasConvertidas(role)` (SUP, FINANCEIRO, COMERCIAL).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `JetroSpreadsheet`, `JetroSpreadsheetToolbar`, `JetroSpreadsheetFormulaBar`, `JetroSpreadsheetTabBar`, `JetroSpreadsheetHistoryDialog`.\n- Motor de Fórmulas: `SpreadsheetFormulaEngine`.\n- Serviços: `spreadsheet-storage.ts`, `spreadsheet-file-utils.ts`, `comparativo-workbook-adapter.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Tratamento de divisão por zero (#DIV/0!), referências quebradas (#REF!) e valores inválidos (#VALOR!).\n- Detecção de conflitos de concorrência com alerta antes de sobrescrever alterações simultâneas.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 30. PLANILHAS CONVERTIDAS — TABELA MÃE GR
+  // -------------------------------------------------------------
+  '/admin/planilhas/convertidas/tabela-mae-gr': {
+    route: '/admin/planilhas/convertidas/tabela-mae-gr',
+    title: 'Tabela Mãe GR — Planilha Mestre Interativa',
+    moduleGroup: 'Planilhas Convertidas',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-03-30',
+    author: 'Engenharia de Software Jetro',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Disponibilizar uma planilha genérica de edição livre no formato Excel/Google Sheets dentro do ERP Jetro, permitindo ao usuário importar a Tabela Mãe Gran Romano, editar qualquer célula ou fórmula, criar novas abas, salvar com versionamento e exportar com compatibilidade total.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Grade bidirecional interativa com suporte a milhares de células e colunas alfabéticas.\n- Edição completa com barra de fórmulas e atalhos universais de teclado.\n- Gerenciamento de abas (adicionar, renomear e excluir abas).\n- Importador drag & drop de arquivos Excel (.xlsx) mantendo todas as abas originais do arquivo importado.\n- Persistência com autosave em segundo plano e salvamento manual com histórico auditado de versões.\n- Exportação de arquivo Excel (.xlsx) contendo abas e fórmulas preservadas.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- A coleção nasce 100% vazia (nenhuma linha de produto hardcoded no sistema).\n- Dados entram exclusivamente via upload do arquivo pelo usuário em runtime.\n- Edições respeitam travas de proteção quando a planilha estiver bloqueada.\n- Alterações geram registros de autoria e carimbo de data/hora.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário acessa Planilhas Convertidas > Tabela Mãe GR.\n2. Caso não existam dados, a grade inicial é apresentada com estrutura aberta.\n3. O usuário importa seu arquivo Excel ou digita dados nas células.\n4. O motor avalia fórmulas locais ou referências entre abas e o estado é persistido no banco.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `tabela_mae_gr`, `planilhas_workbooks`, `planilhas_versoes`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Processamento assíncrono de XML/ZIP para leitura e geração de workbooks SpreadsheetML (.xlsx).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso: `canViewPlanilhasTabelaMaeGr(role)` (SUP, PADRAO, FINANCEIRO, COMERCIAL).\n- Edição: `canEditPlanilhasConvertidas(role)` (SUP, FINANCEIRO, COMERCIAL).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `JetroSpreadsheet`, `TabelaMaeGrPage`.\n- Serviços: `spreadsheet-storage.ts`, `spreadsheet-file-utils.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Alerta amigável em caso de arquivo corrompido ou formato incompatível.\n- Fallback resiliente caso haja perda de conexão durante a gravação.',
+    },
+  },
 }
 
 /**
