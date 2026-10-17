@@ -1,15 +1,26 @@
 import { cn } from '@/lib/utils'
 
-interface AttributionFooterProps {
+export interface AttributionFooterProps {
   className?: string
   variant?: 'light' | 'dark' | 'muted' | 'inline'
+  context?: 'site' | 'sistema' | 'system'
 }
 
 /**
  * Rodapé obrigatório de atribuição institucional:
- * "Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00"
+ * - Site institucional / páginas públicas / login:
+ *   "Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00"
+ * - Sistema (área logada /admin):
+ *   "Sistema criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00"
  */
-export function AttributionFooter({ className, variant = 'muted' }: AttributionFooterProps) {
+export function AttributionFooter({
+  className,
+  variant = 'muted',
+  context = 'site',
+}: AttributionFooterProps) {
+  const isSystem = context === 'sistema' || context === 'system'
+  const prefix = isSystem ? 'Sistema' : 'Site'
+
   const linkColor =
     variant === 'dark'
       ? 'text-white/70 hover:text-[#E4C46A] underline decoration-white/20 hover:decoration-[#E4C46A] underline-offset-2'
@@ -32,7 +43,7 @@ export function AttributionFooter({ className, variant = 'muted' }: AttributionF
       className={cn('inline-block transition-colors cursor-pointer select-text', linkColor)}
       title="Falar no WhatsApp: (31) 99129-7619"
     >
-      Site criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
+      {prefix} criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
     </a>
   )
 

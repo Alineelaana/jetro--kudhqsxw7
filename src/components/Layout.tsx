@@ -78,7 +78,7 @@ export default function Layout() {
               <div className="flex-1">
                 <Outlet />
               </div>
-              <AttributionFooter variant="muted" />
+              <AttributionFooter variant="muted" context="sistema" />
             </main>
           </div>
         </div>
@@ -105,7 +105,12 @@ export default function Layout() {
         <div className="flex-1">
           <Outlet />
         </div>
-        {!showFooter && !isRootLogin && <AttributionFooter variant="muted" />}
+        {!showFooter && !isRootLogin && (
+          <AttributionFooter
+            variant="muted"
+            context={isAdmin && isAuthenticated ? 'sistema' : 'site'}
+          />
+        )}
       </main>
       {showFooter && <SiteFooter />}
       {!isRootLogin && <FloatingChat />}
