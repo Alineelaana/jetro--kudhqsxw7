@@ -43,10 +43,15 @@ export function AdminSidebar() {
   const [searchQuery, setSearchQuery] = useState('')
   const isSearching = searchQuery.trim().length > 0
 
-  // Fechar flyout do rail ao navegar
+  // No rail, não resetamos railFlyoutArea se o pathname ainda pertencer à mesma área de menu
   useEffect(() => {
-    setRailFlyoutArea(null)
-  }, [pathname])
+    if (railFlyoutArea) {
+      const isStillInArea = pathname === railFlyoutArea || pathname.startsWith(railFlyoutArea + '/')
+      if (!isStillInArea) {
+        setRailFlyoutArea(null)
+      }
+    }
+  }, [pathname, railFlyoutArea])
 
   // Fechar flyout ao clicar fora
   useEffect(() => {
@@ -95,6 +100,66 @@ export function AdminSidebar() {
   }, [searchQuery, isSearching, userRole])
 
   const favItems = ADMIN_MENU.flatMap((g) => g.items).filter((item) => isFavorite(item.route))
+
+  // Referências para os containers de scroll do sidebar
+  const expandedNavRef = useRef<HTMLElement>(null)
+  const railNavRef = useRef<HTMLElement>(null)
+  const flyoutNavRef = useRef<HTMLDivElement>(null)
+
+  // Guardar posição de scroll do sidebar entre renderizações e navegações
+  const savedScrollRef = useRef<{
+    expanded: number
+    rail: number
+    flyouts: Record<string, number>
+  }>({
+    expanded: 0,
+    rail: 0,
+    flyouts: {},
+  })
+
+  // Quando o usuário rola o menu expandido, armazenamos a posição
+  const handleExpandedScroll = () => {
+    if (expandedNavRef.current) {
+      savedScrollRef.current.expanded = expandedNavRef.current.scrollTop
+    }
+  }
+
+  // Quando o usuário rola a barra rail, armazenamos a posição
+  const handleRailScroll = () => {
+    if (railNavRef.current) {
+      savedScrollRef.current.rail = railNavRef.current.scrollTop
+    }
+  }
+
+  // Quando o usuário rola o flyout, armazenamos a posição da respectiva área
+  const handleFlyoutScroll = () => {
+    if (flyoutNavRef.current && railFlyoutArea) {
+      savedScrollRef.current.flyouts[railFlyoutArea] = flyoutNavRef.current.scrollTop
+    }
+  }
+
+  // Preservar e restaurar posição de scroll entre renderizações e trocas de rota
+  useEffect(() => {
+    const restoreScrolls = () => {
+      if (!isSearching && expandedNavRef.current && savedScrollRef.current.expanded > 0) {
+        expandedNavRef.current.scrollTop = savedScrollRef.current.expanded
+      }
+      if (railNavRef.current && savedScrollRef.current.rail > 0) {
+        railNavRef.current.scrollTop = savedScrollRef.current.rail
+      }
+      if (
+        railFlyoutArea &&
+        flyoutNavRef.current &&
+        savedScrollRef.current.flyouts[railFlyoutArea]
+      ) {
+        flyoutNavRef.current.scrollTop = savedScrollRef.current.flyouts[railFlyoutArea]
+      }
+    }
+
+    restoreScrolls()
+    const timer = setTimeout(restoreScrolls, 0)
+    return () => clearTimeout(timer)
+  }, [pathname, isSearching, railFlyoutArea])
 
   // Objeto do item atualmente aberto no flyout (rail)
   const flyoutItem = useMemo<MenuEntry | null>(() => {
@@ -208,7 +273,11 @@ export function AdminSidebar() {
 
         {/* MODO RAIL (ÍCONES COMPACTOS) */}
         {effectiveRail ? (
-          <nav className="flex-1 overflow-y-auto py-2 px-1 flex flex-col items-center gap-1">
+          <nav
+            ref={railNavRef}
+            onScroll={handleRailScroll}
+            className="flex-1 overflow-y-auto overscroll-contain py-2 px-1 flex flex-col items-center gap-1"
+          >
             {ADMIN_MENU.map((group, groupIdx) => {
               const visibleItems = group.items.filter((item) => !item.perm || item.perm(userRole))
               if (visibleItems.length === 0) return null
@@ -319,7 +388,11 @@ export function AdminSidebar() {
               </div>
             </div>
 
-            <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+            <nav
+              ref={expandedNavRef}
+              onScroll={handleExpandedScroll}
+              className="flex-1 overflow-y-auto overscroll-contain p-2 space-y-1"
+            >
               {isSearching ? (
                 <div className="space-y-0.5">
                   {searchResults.length === 0 ? (
@@ -426,7 +499,6 @@ export function AdminSidebar() {
           <div className="p-2 border-b border-gray-100 bg-white">
             <Link
               to={flyoutItem.route}
-              onClick={() => setRailFlyoutArea(null)}
               className={cn(
                 'flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                 pathname === flyoutItem.route
@@ -440,7 +512,11 @@ export function AdminSidebar() {
           </div>
 
           {/* Lista de submenus com scroll interno independente */}
-          <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+          <div
+            ref={flyoutNavRef}
+            onScroll={handleFlyoutScroll}
+            className="flex-1 overflow-y-auto overscroll-contain p-2 space-y-0.5"
+          >
             {flyoutItem.children.map((child: MenuChild) => {
               if (child.perm && !child.perm(userRole)) return null
               const ChildIcon = child.icon
@@ -449,7 +525,6 @@ export function AdminSidebar() {
                 <Link
                   key={child.route}
                   to={child.route}
-                  onClick={() => setRailFlyoutArea(null)}
                   className={cn(
                     'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-colors',
                     isChildActive
