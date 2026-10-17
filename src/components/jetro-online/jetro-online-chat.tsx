@@ -678,14 +678,14 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
         className,
       )}
     >
-      {/* Top Header Corporativo da IA Jetro On-line — Claro, Elegante e com Alto Contraste */}
-      <div className="relative px-5 sm:px-6 py-4 bg-white border-b border-gray-200/90 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      {/* Top Header Corporativo da IA Jetro On-line — Claro, Elegante, Centralizado e com Alto Contraste */}
+      <div className="relative px-5 sm:px-6 py-4 bg-white border-b border-gray-200/90 flex flex-col md:flex-row items-center justify-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center text-center gap-3 max-w-2xl mx-auto">
           <div className="w-10 h-10 rounded-xl bg-[#005B2E]/10 border border-[#005B2E]/20 text-[#005B2E] flex items-center justify-center shrink-0 shadow-2xs">
             <Bot className="w-5 h-5 text-[#005B2E]" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <span className="font-bold text-base sm:text-lg tracking-tight text-gray-900">
                 Jetro On-line
               </span>
@@ -695,42 +695,44 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
               </span>
               <Badge
                 variant="outline"
-                className="hidden sm:inline-flex border-[#C9A227]/40 text-[#9A7B1C] bg-amber-50/50 text-[10px] font-bold uppercase tracking-wider"
+                className="inline-flex border-[#C9A227]/40 text-[#9A7B1C] bg-amber-50/50 text-[10px] font-bold uppercase tracking-wider"
               >
                 IA Nativa ERP
               </Badge>
             </div>
-            <p className="text-xs text-gray-600 font-medium mt-0.5">
+            <p className="text-xs text-gray-600 font-medium mt-0.5 text-center">
               Consultas corporativas com critérios comerciais reais, dados auditados e gráficos
               executivos
             </p>
           </div>
         </div>
 
-        {/* Ações superiores: Nova consulta e Histórico */}
-        <div className="flex items-center gap-2">
-          {conversations.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-              className="border-gray-200 hover:border-[#005B2E] bg-white hover:bg-gray-50 text-gray-700 text-xs h-8 px-3 transition-colors"
-            >
-              <MessageSquare className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
-              Histórico ({conversations.length})
-            </Button>
-          )}
-          {hasMessages && (
-            <Button
-              size="sm"
-              onClick={newConversation}
-              className="bg-[#005B2E] hover:bg-[#01361D] text-white font-semibold text-xs h-8 px-3 shadow-xs transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5 mr-1" />
-              Nova Consulta
-            </Button>
-          )}
-        </div>
+        {/* Ações superiores: Nova consulta e Histórico posicionadas nas extremidades sem quebrar a centralização */}
+        {(conversations.length > 0 || hasMessages) && (
+          <div className="flex items-center gap-2 md:absolute md:right-5 md:top-1/2 md:-translate-y-1/2">
+            {conversations.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowHistorySidebar(!showHistorySidebar)}
+                className="border-gray-200 hover:border-[#005B2E] bg-white hover:bg-gray-50 text-gray-700 text-xs h-8 px-3 transition-colors"
+              >
+                <MessageSquare className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
+                Histórico ({conversations.length})
+              </Button>
+            )}
+            {hasMessages && (
+              <Button
+                size="sm"
+                onClick={newConversation}
+                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-semibold text-xs h-8 px-3 shadow-xs transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Nova Consulta
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Corpo principal do assistente */}
@@ -785,32 +787,32 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
           <ScrollArea className="flex-1 p-5 sm:p-6 bg-slate-50/30">
             {!hasMessages ? (
               <div className="max-w-3xl mx-auto py-2 sm:py-4 space-y-5">
-                {/* 1. Título e Saudação com Efeito de Digitação — Visual Limpo e Elegante */}
-                <div className="space-y-2 text-center sm:text-left">
+                {/* 1. Título e Saudação com Efeito de Digitação — Visual Limpo, Centralizado e Elegante */}
+                <div className="space-y-2 text-center flex flex-col items-center">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#005B2E]/10 text-[#005B2E] text-xs font-semibold">
                     <Sparkles className="w-3.5 h-3.5 text-[#9A7B1C]" />
                     <span>Assistente ERP com critérios comerciais e fiscais auditados</span>
                   </div>
 
                   {/* Frases animadas em ciclo */}
-                  <div className="min-h-[44px] flex items-center justify-center sm:justify-start">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center">
+                  <div className="min-h-[44px] flex items-center justify-center">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center justify-center text-center">
                       <span>{displayedText}</span>
                       <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 bg-[#005B2E] animate-pulse" />
                     </h1>
                   </div>
 
                   {/* Texto de orientação discreto */}
-                  <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed max-w-2xl">
+                  <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed max-w-2xl text-center mx-auto">
                     Pergunte sobre produtos mais vendidos, faturamento por período, clientes
                     inativos, situação fiscal ou consulte dados operacionais com tabelas e gráficos
                     automáticos.
                   </p>
                 </div>
 
-                {/* Badge de Governança e Contexto do Usuário — discreto e neutro */}
-                <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 shadow-2xs">
-                  <div className="flex items-center gap-2">
+                {/* Badge de Governança e Contexto do Usuário — discreto, neutro e centralizado */}
+                <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 shadow-2xs max-w-2xl mx-auto w-full">
+                  <div className="flex items-center justify-center gap-2 mx-auto sm:mx-0 text-center">
                     <ShieldCheck className="w-4 h-4 text-[#005B2E] shrink-0" />
                     <span className="text-gray-700">
                       Usuário:{' '}

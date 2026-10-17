@@ -9,10 +9,10 @@ export function IntelligentHomeScreen() {
 
   return (
     <div className="flex flex-col min-h-full p-4 sm:p-6 max-w-7xl mx-auto w-full pb-12 space-y-6">
-      {/* Barra de identificação superior discreta e profissional */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-0.5">
-        <div>
-          <div className="flex items-center gap-2">
+      {/* Barra de identificação superior discreta e profissional com textos centralizados */}
+      <div className="relative flex flex-col items-center justify-center text-center px-0.5 pt-1 pb-2">
+        <div className="flex flex-col items-center justify-center max-w-2xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold text-gray-950 tracking-tight">
               Tela Inicial Inteligente
             </h1>
@@ -21,13 +21,13 @@ export function IntelligentHomeScreen() {
               ERP Jetro
             </span>
           </div>
-          <p className="text-xs text-gray-600 mt-1 font-medium">
+          <p className="text-xs sm:text-sm text-gray-600 mt-1 font-medium text-center">
             Assistente executivo com consultas em tempo real, inteligência de dados e agenda
             integrada
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="mt-3 sm:mt-0 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 flex items-center gap-2.5">
           <NotificationBell />
           <button
             onClick={signOut}
