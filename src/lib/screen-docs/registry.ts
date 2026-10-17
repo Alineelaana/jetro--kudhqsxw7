@@ -191,6 +191,63 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
+  // SEGUNDO CÉREBRO DA EMPRESA (CENTRAL DE INTELIGÊNCIA & MEMÓRIA)
+  // -------------------------------------------------------------
+  '/admin/segundo-cerebro': {
+    route: '/admin/segundo-cerebro',
+    title: 'Segundo Cérebro da Empresa — Central de Inteligência e Memória Corporativa',
+    moduleGroup: 'Inteligência',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-03-29',
+    author: 'Engenharia de Software Jetro',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Conectar e estruturar todo o conhecimento organizacional da empresa (reuniões, projetos, processos, diretrizes, decisões e notas Obsidian importadas) correlacionado a dados autorizados do ERP (pedidos de venda, títulos financeiros, clientes, produtos), provendo assistência executiva em linguagem natural, conselheiro estratégico, memória documental de projetos e decisões, radar de oportunidades e mapa de conexões, estritamente em modo de leitura e com auditoria completa de consultas.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- 7 Indicadores no Topo em tempo real (Docs indexados, Áreas, Projetos, Decisões, Oportunidades, Pendentes de revisão, Última sincronização Obsidian).\n- Assistente IA Central nativo do Skip Cloud com citações documentais obrigatórias e rotulagem tripla ([DADO OPERACIONAL DO ERP], [INFORMAÇÃO DOCUMENTADA], [INTERPRETAÇÃO DA IA]).\n- Biblioteca de Conhecimento com 13 áreas corporativas, busca de texto/tags e visualização completa de notas.\n- Conselheiro Estratégico com avaliação estruturada em 8 dimensões executivas.\n- Memória de Projetos com consolidação baseada 100% em documentos indexados.\n- Memória de Decisões com status de deliberação e identificação de divergências documentais.\n- Radar de Oportunidades com varredura no servidor (cron periódico a cada 6h e botão manual) para detecção de automações, inconsistências e reduções de custo, com avaliação e aprovação exclusivamente humana.\n- Mapa de Conhecimento interativo em SVG mapeando wikilinks [[links]] e áreas de conhecimento.\n- Central de Insights Estratégicos & Análise de Processos por departamento.\n- Histórico Privado de Consultas e Conversas por usuário com favoritar respostas.\n- Conectar Obsidian via ingestão de notas Markdown (.md) com extração de hash md5, wikilinks e controle de versão unidirecional (Obsidian -> Jetro).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- A IA opera estritamente em MODO LEITURA — nunca cria, altera ou exclui dados de ERP ou documentos originais.\n- Toda resposta afirmativa deve citar a fonte documental correspondente com título e caminho.\n- Informações inexistentes na base autorizada devem ser categoricamente declaradas como não localizadas, sendo proibido inventar documentos ou decisões.\n- Respeito irrestrito à governança de acesso (RBAC): documentos Confidenciais e Estratégicos são filtrados tanto no backend quanto no frontend.\n- A sincronização automática contínua do Obsidian é sinalizada na interface como "Indisponível — aguardando caminho de integração" (nunca simulada).\n- O Radar de Oportunidades apenas sugere ações: nenhuma aprovação ou execução ocorre de forma automática sem intervenção humana.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário autorizado acessa Inteligência > Segundo Cérebro da Empresa (rota /admin/segundo-cerebro).\n2. O backend autentica o usuário e injeta as permissões (SUP, Comercial, Financeiro) no contexto de segurança.\n3. O usuário realiza perguntas no Assistente IA ou navega pelas abas da Biblioteca, Conselheiro, Decisões ou Radar.\n4. As consultas ao agente acionam o endpoint `/backend/v1/segundo-cerebro/chat`, que executa o agente nativo `segundo-cerebro`, cruza com os documentos autorizados, anexa citações e registra log na coleção `audit_logs`.\n5. O usuário com permissão de administração pode enviar notas .md via aba Configurações, disparando o endpoint `/backend/v1/segundo-cerebro/sync-obsidian` para indexação imediata.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase dedicadas: `segundo_cerebro_docs`, `segundo_cerebro_decisions`, `segundo_cerebro_opportunities`, `segundo_cerebro_insights`, `segundo_cerebro_sync_logs`, `segundo_cerebro_chats`, `segundo_cerebro_messages`.\n- Coleções operacionais do ERP correlacionadas para leitura: `sales_orders`, `financial_receivables`, `partners`, `products`, `empresas`.\n- Coleção de auditoria: `audit_logs`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Agente nativo de IA do Skip Cloud (`segundo-cerebro`) configurado via migration 0189.\n- Endpoints de backend em pb_hooks: `/backend/v1/segundo-cerebro/chat`, `/backend/v1/segundo-cerebro/sync-obsidian`, `/backend/v1/segundo-cerebro/scan-radar`, `/backend/v1/segundo-cerebro/conversations`.\n- Scheduled Job: `segundo_cerebro_radar_scan` (execução periódica a cada 6h).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso ao módulo: `canViewSegundoCerebro(role)` (SUP, FINANCEIRO, COMERCIAL, PADRAO).\n- Consultar base documental: `canConsultSegundoCerebroDocs(role)`.\n- Interagir com assistente de IA: `canUseSegundoCerebroAI(role)`.\n- Informações estratégicas (Conselheiro, Radar, Insights): `canViewStrategicIntelligence(role)` (SUP, FINANCEIRO, COMERCIAL).\n- Documentos confidenciais: `canViewConfidentialDocs(role)` (apenas SUP).\n- Administrar integrações e upload Obsidian: `canAdminSegundoCerebroIntegrations(role)` (SUP, COMERCIAL, FINANCEIRO).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `SegundoCerebroScreen`, `SegundoCerebroHeader`, `SegundoCerebroAssistant`, `SegundoCerebroLibrary`, `SegundoCerebroAdvisor`, `SegundoCerebroProjects`, `SegundoCerebroDecisions`, `SegundoCerebroRadar`, `SegundoCerebroKnowledgeMap`, `SegundoCerebroInsights`, `SegundoCerebroHistory`, `SegundoCerebroSettings`.\n- Serviços e Tipos: `src/services/segundo-cerebro.ts`, `src/types/segundo-cerebro.ts`, `src/lib/permissions.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Bloqueio de rota direta com redirecionamento para `/admin` caso o usuário não possua permissão.\n- Tratamento resiliente de falhas de IA (`SkipAiConfigError`, `SkipAiAgentsError`, `SkipAiError`) com feedback explicativo via toast.\n- Relatório de erros pontuais na sincronização de notas sem interromper a ingestão dos arquivos íntegros.\n- Pendente de validação técnica: busca semântica completa por embeddings vetoriais assíncronos (atualmente operando por busca léxica, chunks e metadados com sinalização explícita na interface).',
+    },
+  },
+
+  // -------------------------------------------------------------
   // 4. CENTRAL DE DOCUMENTAÇÃO TÉCNICA (ESTA PRÓPRIA FERRAMENTA)
   // -------------------------------------------------------------
   '/admin/central-documentacao': {

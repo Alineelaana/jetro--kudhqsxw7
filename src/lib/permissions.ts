@@ -249,6 +249,55 @@ export function canViewConformidade(role: string | undefined): boolean {
 }
 
 /**
+ * Permissão para acessar o módulo "Segundo Cérebro da Empresa".
+ * Acesso geral ao módulo: Gestão, Diretoria, Comercial e Financeiro.
+ */
+export function canViewSegundoCerebro(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+/**
+ * Permissão para consultar documentos gerais e base de conhecimento.
+ */
+export function canConsultSegundoCerebroDocs(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+/**
+ * Permissão para interagir com o Assistente de IA do Segundo Cérebro.
+ */
+export function canUseSegundoCerebroAI(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+/**
+ * Permissão para visualizar informações estratégicas (Conselheiro, Radar e Insights).
+ */
+export function canViewStrategicIntelligence(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
+
+/**
+ * Permissão para acessar documentos confidenciais no Segundo Cérebro.
+ */
+export function canViewConfidentialDocs(role: string | undefined): boolean {
+  if (!role) return false
+  return role === 'SUP'
+}
+
+/**
+ * Permissão para administrar integrações (conectar Obsidian, upload de cofres).
+ */
+export function canAdminSegundoCerebroIntegrations(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+}
+
+/**
  * Permissão para acessar a Central de Documentação Técnica e o Drawer de Lógica da Tela.
  * Exclusivo para usuários autorizados: perfil SUP (Superusuário / Administrador / TI).
  */

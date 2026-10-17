@@ -93,6 +93,7 @@ import Precificacao from './pages/Precificacao'
 import Auditoria from './pages/Auditoria'
 import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
 import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
+import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
 import TradeMarketing from './pages/TradeMarketing'
@@ -1170,6 +1171,7 @@ const App = () => (
                           path="/admin/central-documentacao"
                           element={<CentralDocumentacaoPage />}
                         />
+                        <Route path="/admin/segundo-cerebro" element={<SegundoCerebroPage />} />
                         <Route path="/admin/auditoria" element={<Auditoria />} />
                         <Route
                           path="/admin/controladoria"

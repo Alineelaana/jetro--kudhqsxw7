@@ -47,6 +47,7 @@ import {
   canConsultCosts,
   canViewConformidade,
   canViewScreenDocs,
+  canViewSegundoCerebro,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -566,6 +567,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Regras', route: '/admin/remuneracao/regras' },
           { label: 'Simulador', route: '/admin/remuneracao/simulador' },
         ],
+      },
+      {
+        label: 'Segundo Cérebro da Empresa',
+        icon: Bot,
+        route: '/admin/segundo-cerebro',
+        perm: canViewSegundoCerebro,
       },
     ],
   },
