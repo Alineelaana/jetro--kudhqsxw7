@@ -233,6 +233,11 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewSales,
         children: [
           { label: 'Contratos', route: '/admin/vendas/contratos' },
+          {
+            label: 'Consulta de Pedidos',
+            route: '/admin/vendas/consulta-pedidos',
+            perm: canViewSales,
+          },
           { label: 'Devoluções', route: '/admin/vendas/devolucoes' },
           { label: 'Faturamento', route: '/admin/vendas/faturamento' },
           { label: 'Histórico', route: '/admin/vendas/historico' },

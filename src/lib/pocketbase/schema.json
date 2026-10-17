@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T00:47:20.586Z",
+  "generatedAt": "2026-10-17T01:22:38.329Z",
   "collections": [
     {
       "name": "users",
@@ -960,6 +960,18 @@
         },
         {
           "name": "network_restriction_origin_days",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cnae",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "team",
           "type": "text",
           "required": false,
           "system": false
@@ -6045,12 +6057,142 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "integration_order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operation_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cfop",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "top_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_balance",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "generated_balance",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "original_order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "original_order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "balance_order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "balance_order_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cut_items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "team",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rca_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rca_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "customer_group",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "customer_cnpj",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "customer_city",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "customer_district",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "customer_address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_invoiced",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoiced_at",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_sales_orders_status ON sales_orders (status)",
         "CREATE INDEX idx_sales_orders_created ON sales_orders (created DESC)",
-        "CREATE INDEX idx_sales_orders_client ON sales_orders (client_name)"
+        "CREATE INDEX idx_sales_orders_client ON sales_orders (client_name)",
+        "CREATE INDEX `idx_sales_orders_is_balance` ON `sales_orders` (is_balance)",
+        "CREATE INDEX `idx_sales_orders_gen_balance` ON `sales_orders` (generated_balance)",
+        "CREATE INDEX `idx_sales_orders_integ` ON `sales_orders` (integration_order_number)",
+        "CREATE INDEX `idx_sales_orders_op_type` ON `sales_orders` (operation_type)"
       ]
     },
     {

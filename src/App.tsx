@@ -38,6 +38,7 @@ import PriceTablesPage from './pages/PriceTablesPage'
 import CommissionRules from './pages/CommissionRules'
 import SalesDashboardPage from './pages/sales/SalesDashboardPage'
 import SalesOrdersPage from './pages/sales/SalesOrdersPage'
+import SalesOrdersQueryPage from './pages/sales/SalesOrdersQueryPage'
 import InvoicingPage from './pages/sales/InvoicingPage'
 import NfePage from './pages/sales/NfePage'
 import NfcePage from './pages/sales/NfcePage'
@@ -264,6 +265,10 @@ const App = () => (
                         />
                         <Route path="/admin/vendas" element={<SalesDashboardPage />} />
                         <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                        <Route
+                          path="/admin/vendas/consulta-pedidos"
+                          element={<SalesOrdersQueryPage />}
+                        />
                         <Route path="/admin/vendas/faturamento" element={<InvoicingPage />} />
                         <Route path="/admin/vendas/nfe" element={<NfePage />} />
                         <Route path="/admin/vendas/nfce" element={<NfcePage />} />
