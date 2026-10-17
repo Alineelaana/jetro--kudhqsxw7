@@ -359,17 +359,27 @@ export function ReportScheduleManagerModal({
               </TabsList>
 
               {activeTab === 'list' && (
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    resetForm()
-                    setActiveTab('form')
-                  }}
-                  className="bg-[#005B2E] text-white hover:bg-[#00401f]"
-                >
-                  <Plus className="mr-1 h-4 w-4" />
-                  Novo Agendamento
-                </Button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/admin/agendamento-relatorios"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-[#005B2E] hover:underline flex items-center gap-1 font-semibold"
+                  >
+                    Abrir Central de Agendamentos &nearr;
+                  </a>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      resetForm()
+                      setActiveTab('form')
+                    }}
+                    className="bg-[#005B2E] text-white hover:bg-[#00401f]"
+                  >
+                    <Plus className="mr-1 h-4 w-4" />
+                    Novo Agendamento
+                  </Button>
+                </div>
               )}
             </div>
 

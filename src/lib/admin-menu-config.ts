@@ -120,6 +120,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Administração',
     items: [
+      {
+        label: 'Agendamento de Relatórios',
+        icon: CalendarClock,
+        route: '/admin/agendamento-relatorios',
+        perm: canViewConfiguracoes,
+      },
       { label: 'Auditoria', icon: FileSearch, route: '/admin/auditoria', perm: canViewAuditLogs },
       {
         label: 'Configurações',

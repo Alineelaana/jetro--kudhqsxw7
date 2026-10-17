@@ -1,0 +1,1147 @@
+// ============================================================================
+// Endpoint Manual / Teste / Prévia para Agendamentos de Relatórios do Jetro ERP
+// POST /api/report-schedules/trigger
+// Body: { schedule_id: string } OU { test_config: { ... } }
+// ============================================================================
+
+routerAdd('POST', '/backend/v1/report-schedules/trigger', (e) => {
+  var authUser = e.auth
+  if (!authUser) {
+    return e.json(401, { error: 'Usuário não autenticado' })
+  }
+
+  function parseJSON(str, fallback) {
+    if (!str) return fallback
+    if (typeof str === 'object') return str
+    try {
+      return JSON.parse(str)
+    } catch (_) {
+      return fallback
+    }
+  }
+
+  function xmlEscape(s) {
+    if (!s) return ''
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+  }
+
+  function columnLetter(n) {
+    var s = ''
+    while (n >= 0) {
+      s = String.fromCharCode((n % 26) + 65) + s
+      n = Math.floor(n / 26) - 1
+    }
+    return s
+  }
+
+  function crc32Table() {
+    var table = []
+    for (var n = 0; n < 256; n++) {
+      var c = n
+      for (var k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+      table[n] = c
+    }
+    return table
+  }
+  var CRC_TABLE = crc32Table()
+
+  function crc32(bytes) {
+    var crc = 0 ^ -1
+    for (var i = 0; i < bytes.length; i++) {
+      crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ bytes[i]) & 0xff]
+    }
+    return (crc ^ -1) >>> 0
+  }
+
+  function stringToBytes(str) {
+    var bytes = []
+    for (var i = 0; i < str.length; i++) {
+      var code = str.charCodeAt(i)
+      if (code < 0x80) {
+        bytes.push(code)
+      } else if (code < 0x800) {
+        bytes.push(0xc0 | (code >> 6), 0x80 | (code & 0x3f))
+      } else if (code < 0xd800 || code >= 0xe000) {
+        bytes.push(0xe0 | (code >> 12), 0x80 | ((code >> 6) & 0x3f), 0x80 | (code & 0x3f))
+      } else {
+        i++
+        var code2 = 0x10000 + (((code & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff))
+        bytes.push(
+          0xf0 | (code2 >> 18),
+          0x80 | ((code2 >> 12) & 0x3f),
+          0x80 | ((code2 >> 6) & 0x3f),
+          0x80 | (code2 & 0x3f),
+        )
+      }
+    }
+    return bytes
+  }
+
+  function buildZip(entries) {
+    var chunks = []
+    var central = []
+    var offset = 0
+
+    for (var eIdx = 0; eIdx < entries.length; eIdx++) {
+      var entry = entries[eIdx]
+      var nameBytes = stringToBytes(entry.name)
+      var dataBytes = entry.data
+      var crc = crc32(dataBytes)
+      var size = dataBytes.length
+
+      var localHeader = [
+        0x50,
+        0x4b,
+        0x03,
+        0x04,
+        20,
+        0,
+        0,
+        8,
+        0,
+        0,
+        0,
+        0,
+        crc & 0xff,
+        (crc >> 8) & 0xff,
+        (crc >> 16) & 0xff,
+        (crc >>> 24) & 0xff,
+        size & 0xff,
+        (size >> 8) & 0xff,
+        (size >> 16) & 0xff,
+        (size >>> 24) & 0xff,
+        size & 0xff,
+        (size >> 8) & 0xff,
+        (size >> 16) & 0xff,
+        (size >>> 24) & 0xff,
+        nameBytes.length & 0xff,
+        (nameBytes.length >> 8) & 0xff,
+        0,
+        0,
+      ]
+      for (var ni = 0; ni < nameBytes.length; ni++) localHeader.push(nameBytes[ni])
+      for (var di = 0; di < dataBytes.length; di++) localHeader.push(dataBytes[di])
+      chunks.push(localHeader)
+
+      var centralRecord = [
+        0x50,
+        0x4b,
+        0x01,
+        0x02,
+        20,
+        0,
+        20,
+        0,
+        0,
+        8,
+        0,
+        0,
+        0,
+        0,
+        crc & 0xff,
+        (crc >> 8) & 0xff,
+        (crc >> 16) & 0xff,
+        (crc >>> 24) & 0xff,
+        size & 0xff,
+        (size >> 8) & 0xff,
+        (size >> 16) & 0xff,
+        (size >>> 24) & 0xff,
+        size & 0xff,
+        (size >> 8) & 0xff,
+        (size >> 16) & 0xff,
+        (size >>> 24) & 0xff,
+        nameBytes.length & 0xff,
+        (nameBytes.length >> 8) & 0xff,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        offset & 0xff,
+        (offset >> 8) & 0xff,
+        (offset >> 16) & 0xff,
+        (offset >>> 24) & 0xff,
+      ]
+      for (var nci = 0; nci < nameBytes.length; nci++) centralRecord.push(nameBytes[nci])
+      central.push(centralRecord)
+      offset += localHeader.length
+    }
+
+    var centralLength = 0
+    for (var c = 0; c < central.length; c++) centralLength += central[c].length
+
+    var endRecord = [
+      0x50,
+      0x4b,
+      0x05,
+      0x06,
+      0,
+      0,
+      0,
+      0,
+      entries.length & 0xff,
+      (entries.length >> 8) & 0xff,
+      entries.length & 0xff,
+      (entries.length >> 8) & 0xff,
+      centralLength & 0xff,
+      (centralLength >> 8) & 0xff,
+      (centralLength >> 16) & 0xff,
+      (centralLength >>> 24) & 0xff,
+      offset & 0xff,
+      (offset >> 8) & 0xff,
+      (offset >> 16) & 0xff,
+      (offset >>> 24) & 0xff,
+      0,
+      0,
+    ]
+
+    var out = []
+    for (var ch = 0; ch < chunks.length; ch++) {
+      for (var k = 0; k < chunks[ch].length; k++) out.push(chunks[ch][k])
+    }
+    for (var ce = 0; ce < central.length; ce++) {
+      for (var m = 0; m < central[ce].length; m++) out.push(central[ce][m])
+    }
+    for (var ed = 0; ed < endRecord.length; ed++) out.push(endRecord[ed])
+
+    return out
+  }
+
+  var XLSX_STYLES =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<fonts count="3">' +
+    '<font><sz val="10"/><name val="Calibri"/></font>' +
+    '<font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Calibri"/></font>' +
+    '<font><b/><sz val="10"/><name val="Calibri"/></font>' +
+    '</fonts>' +
+    '<fills count="3">' +
+    '<fill><patternFill patternType="none"/></fill>' +
+    '<fill><patternFill patternType="gray125"/></fill>' +
+    '<fill><patternFill patternType="solid"><fgColor rgb="FF005B2E"/><bgColor indexed="64"/></patternFill></fill>' +
+    '</fills>' +
+    '<borders count="2">' +
+    '<border><left/><right/><top/><bottom/><diagonal/></border>' +
+    '<border>' +
+    '<left style="thin"><color rgb="FFD0D0D0"/></left><right style="thin"><color rgb="FFD0D0D0"/></right>' +
+    '<top style="thin"><color rgb="FFD0D0D0"/></top><bottom style="thin"><color rgb="FFD0D0D0"/></bottom><diagonal/>' +
+    '</border>' +
+    '</borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    '<cellXfs count="4">' +
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+    '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>' +
+    '<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/>' +
+    '<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>' +
+    '</cellXfs>' +
+    '</styleSheet>'
+
+  function formatCurrencyBR(num) {
+    if (num === null || num === undefined || isNaN(num)) return 'R$ 0,00'
+    var fixed = num.toFixed(2).split('.')
+    var intPart = fixed[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    var decPart = fixed[1]
+    return 'R$ ' + intPart + ',' + decPart
+  }
+
+  function formatDateBR(isoStr) {
+    if (!isoStr) return ''
+    return String(isoStr).substring(0, 19).replace('T', ' ')
+  }
+
+  function parseRecipientEmails(recipientsStr) {
+    if (!recipientsStr) return []
+    return recipientsStr
+      .split(',')
+      .map(function (s) {
+        return s.trim()
+      })
+      .filter(function (s) {
+        return s.indexOf('@') > 0
+      })
+  }
+
+  function resolveDynamicDateRangeServer(range, dateFromFixed, dateToFixed, nowDate) {
+    var spOffsetMs = -3 * 60 * 60 * 1000
+    var spDate = new Date(nowDate.getTime() + spOffsetMs)
+    var year = spDate.getUTCFullYear()
+    var month = spDate.getUTCMonth()
+    var day = spDate.getUTCDate()
+
+    var pad = function (n) {
+      return n < 10 ? '0' + n : String(n)
+    }
+    var formatYMD = function (d) {
+      return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate())
+    }
+
+    if (range === 'today') {
+      var todayStr = year + '-' + pad(month + 1) + '-' + pad(day)
+      return {
+        dateFrom: todayStr + ' 00:00:00',
+        dateTo: todayStr + ' 23:59:59',
+        label: 'Hoje',
+      }
+    }
+    if (range === 'yesterday') {
+      var yDate = new Date(spDate.getTime() - 24 * 60 * 60 * 1000)
+      var yStr = formatYMD(yDate)
+      return {
+        dateFrom: yStr + ' 00:00:00',
+        dateTo: yStr + ' 23:59:59',
+        label: 'Ontem',
+      }
+    }
+    if (range === 'last_7_days') {
+      var from7 = new Date(spDate.getTime() - 7 * 24 * 60 * 60 * 1000)
+      return {
+        dateFrom: formatYMD(from7) + ' 00:00:00',
+        dateTo: formatYMD(spDate) + ' 23:59:59',
+        label: 'Últimos 7 dias',
+      }
+    }
+    if (range === 'last_week') {
+      var currentDayOfWeek = spDate.getUTCDay()
+      var daysSinceLastSunday = currentDayOfWeek === 0 ? 7 : currentDayOfWeek
+      var lastSunday = new Date(spDate.getTime() - daysSinceLastSunday * 24 * 60 * 60 * 1000)
+      var lastMonday = new Date(lastSunday.getTime() - 6 * 24 * 60 * 60 * 1000)
+      return {
+        dateFrom: formatYMD(lastMonday) + ' 00:00:00',
+        dateTo: formatYMD(lastSunday) + ' 23:59:59',
+        label: 'Semana anterior',
+      }
+    }
+    if (range === 'last_fortnight') {
+      if (day > 15) {
+        return {
+          dateFrom: year + '-' + pad(month + 1) + '-01 00:00:00',
+          dateTo: year + '-' + pad(month + 1) + '-15 23:59:59',
+          label: '1ª Quinzena deste mês',
+        }
+      } else {
+        var prevM = month === 0 ? 12 : month
+        var prevY = month === 0 ? year - 1 : year
+        var lastDayPrev = new Date(Date.UTC(prevY, prevM, 0)).getUTCDate()
+        return {
+          dateFrom: prevY + '-' + pad(prevM) + '-16 00:00:00',
+          dateTo: prevY + '-' + pad(prevM) + '-' + pad(lastDayPrev) + ' 23:59:59',
+          label: '2ª Quinzena do mês anterior',
+        }
+      }
+    }
+    if (range === 'last_month') {
+      var pmYear = month === 0 ? year - 1 : year
+      var pmMonth = month === 0 ? 12 : month
+      var lastDayOfMonth = new Date(Date.UTC(pmYear, pmMonth, 0)).getUTCDate()
+      return {
+        dateFrom: pmYear + '-' + pad(pmMonth) + '-01 00:00:00',
+        dateTo: pmYear + '-' + pad(pmMonth) + '-' + pad(lastDayOfMonth) + ' 23:59:59',
+        label: 'Mês anterior',
+      }
+    }
+    if (range === 'current_month') {
+      return {
+        dateFrom: year + '-' + pad(month + 1) + '-01 00:00:00',
+        dateTo: formatYMD(spDate) + ' 23:59:59',
+        label: 'Mês atual',
+      }
+    }
+    return {
+      dateFrom: dateFromFixed || '',
+      dateTo: dateToFixed || '',
+      label: 'Período Fixo',
+    }
+  }
+
+  function getReportMeta(reportId) {
+    if (reportId === 'comercial-relatorio-vendas') {
+      return {
+        collection: 'sales_orders',
+        dateField: 'created',
+        amountField: 'total_value',
+        title: 'Relatório de Vendas',
+        columns: [
+          { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+          { key: 'client_name', label: 'Cliente', width: 32, type: 'text' },
+          { key: 'team', label: 'Equipe', width: 14, type: 'text' },
+          { key: 'rca_name', label: 'RCA / Vendedor', width: 18, type: 'text' },
+          { key: 'created', label: 'Data', width: 18, type: 'date' },
+          { key: 'sales_channel', label: 'Canal', width: 14, type: 'text' },
+          { key: 'total_value', label: 'Valor da Venda', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'comercial-desempenho-rcas') {
+      return {
+        collection: 'sales_orders',
+        dateField: 'created',
+        amountField: 'total_value',
+        title: 'Desempenho Comercial',
+        columns: [
+          { key: 'rca_name', label: 'RCA / Vendedor', width: 22, type: 'text' },
+          { key: 'team', label: 'Equipe', width: 16, type: 'text' },
+          { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+          { key: 'client_name', label: 'Cliente', width: 30, type: 'text' },
+          { key: 'created', label: 'Data', width: 18, type: 'date' },
+          { key: 'total_value', label: 'Valor Faturado', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'financeiro-contas-receber') {
+      return {
+        collection: 'financial_receivables',
+        dateField: 'data_vencimento',
+        amountField: 'valor_atualizado',
+        title: 'Contas a Receber',
+        columns: [
+          { key: 'numero_titulo', label: 'Nº Título', width: 14, type: 'text' },
+          { key: 'cliente', label: 'Cliente', width: 32, type: 'text' },
+          { key: 'data_emissao', label: 'Emissão', width: 14, type: 'date' },
+          { key: 'data_vencimento', label: 'Vencimento', width: 14, type: 'date' },
+          { key: 'valor_original', label: 'Valor Original', width: 14, type: 'currency' },
+          { key: 'valor_atualizado', label: 'Valor Atualizado', width: 14, type: 'currency' },
+          { key: 'forma_recebimento', label: 'Forma', width: 14, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'financeiro-contas-pagar') {
+      return {
+        collection: 'financial_payables',
+        dateField: 'data_vencimento',
+        amountField: 'valor_atualizado',
+        title: 'Contas a Pagar',
+        columns: [
+          { key: 'numero_titulo', label: 'Nº Título', width: 14, type: 'text' },
+          { key: 'fornecedor', label: 'Fornecedor', width: 32, type: 'text' },
+          { key: 'data_vencimento', label: 'Vencimento', width: 14, type: 'date' },
+          { key: 'valor_original', label: 'Valor Original', width: 14, type: 'currency' },
+          { key: 'valor_atualizado', label: 'Valor Atualizado', width: 14, type: 'currency' },
+          { key: 'forma_pagamento', label: 'Forma Pgto', width: 14, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'logistica-entregas') {
+      return {
+        collection: 'logistics_deliveries',
+        dateField: 'created',
+        amountField: 'valor_mercadoria',
+        title: 'Relatório de Entregas',
+        columns: [
+          { key: 'numero_entrega', label: 'Nº Entrega', width: 14, type: 'text' },
+          { key: 'pedido', label: 'Pedido', width: 14, type: 'text' },
+          { key: 'cliente', label: 'Cliente', width: 30, type: 'text' },
+          { key: 'cidade', label: 'Cidade', width: 18, type: 'text' },
+          { key: 'rota', label: 'Rota', width: 16, type: 'text' },
+          { key: 'transportadora', label: 'Transportadora', width: 18, type: 'text' },
+          { key: 'data_prevista', label: 'Previsão', width: 16, type: 'date' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    // Default: Consulta de Pedidos
+    return {
+      collection: 'sales_orders',
+      dateField: 'created',
+      amountField: 'total_value',
+      title: 'Consulta de Pedidos',
+      columns: [
+        { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+        { key: 'integration_order_number', label: 'Nº Integração', width: 16, type: 'text' },
+        { key: 'client_name', label: 'Cliente', width: 34, type: 'text' },
+        { key: 'customer_cnpj', label: 'CNPJ', width: 18, type: 'text' },
+        { key: 'team', label: 'Equipe', width: 14, type: 'text' },
+        { key: 'rca_name', label: 'RCA', width: 16, type: 'text' },
+        { key: 'created', label: 'Data', width: 18, type: 'date' },
+        { key: 'operation_type', label: 'Operação', width: 16, type: 'text' },
+        { key: 'sales_channel', label: 'Canal', width: 14, type: 'text' },
+        { key: 'total_value', label: 'Valor', width: 14, type: 'currency' },
+        { key: 'status', label: 'Status', width: 16, type: 'text' },
+        { key: 'is_balance', label: 'É Saldo', width: 10, type: 'boolean' },
+        { key: 'is_invoiced', label: 'Faturado', width: 10, type: 'boolean' },
+      ],
+    }
+  }
+
+  function buildFilterQueryForSchedule(reportId, f, userRec, dateRange) {
+    var parts = []
+
+    if (reportId === 'financeiro-contas-receber') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.cliente && f.cliente !== 'all') parts.push('cliente ~ "' + f.cliente + '"')
+      if (dateRange.dateFrom)
+        parts.push('data_vencimento >= "' + dateRange.dateFrom.substring(0, 10) + '"')
+      if (dateRange.dateTo)
+        parts.push('data_vencimento <= "' + dateRange.dateTo.substring(0, 10) + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'financeiro-contas-pagar') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.fornecedor && f.fornecedor !== 'all') parts.push('fornecedor ~ "' + f.fornecedor + '"')
+      if (dateRange.dateFrom)
+        parts.push('data_vencimento >= "' + dateRange.dateFrom.substring(0, 10) + '"')
+      if (dateRange.dateTo)
+        parts.push('data_vencimento <= "' + dateRange.dateTo.substring(0, 10) + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'logistica-entregas') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.rota && f.rota !== 'all') parts.push('rota ~ "' + f.rota + '"')
+      if (f.transportadora && f.transportadora !== 'all')
+        parts.push('transportadora ~ "' + f.transportadora + '"')
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (f.operation_type && f.operation_type !== 'all')
+      parts.push('operation_type = "' + f.operation_type + '"')
+    if (f.client && f.client !== 'all') parts.push('client_name ~ "' + f.client + '"')
+    if (f.team && f.team !== 'all') parts.push('team = "' + f.team + '"')
+    if (f.rca && f.rca !== 'all') parts.push('rca_name ~ "' + f.rca + '"')
+    if (f.channel && f.channel !== 'all') parts.push('sales_channel = "' + f.channel + '"')
+    if (f.is_balance && f.is_balance !== 'all')
+      parts.push('is_balance = ' + (f.is_balance === 'yes'))
+    if (f.only_invoiced) parts.push('is_invoiced = true')
+    if (f.statuses && Array.isArray(f.statuses) && f.statuses.length > 0) {
+      var sParts = f.statuses.map(function (s) {
+        return 'status = "' + s + '"'
+      })
+      parts.push('(' + sParts.join(' || ') + ')')
+    }
+    if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+    if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+
+    if (
+      userRec &&
+      (userRec.getString('role') === 'RCA' || userRec.getString('role') === 'Vendedor')
+    ) {
+      parts.push('rca_id = "' + userRec.id + '"')
+    }
+
+    return parts.join(' && ')
+  }
+
+  function fetchRecords(collectionName, filter) {
+    var all = []
+    var pageSize = 200
+    var maxLimit = 10000
+    var page = 1
+
+    while (all.length < maxLimit) {
+      var list = []
+      try {
+        list = $app.findRecordsByFilter(
+          collectionName,
+          filter,
+          '-created',
+          pageSize,
+          (page - 1) * pageSize,
+        )
+      } catch (_) {
+        break
+      }
+      if (!list || list.length === 0) break
+      for (var i = 0; i < list.length; i++) {
+        all.push(list[i])
+        if (all.length >= maxLimit) break
+      }
+      if (list.length < pageSize) break
+      page++
+    }
+    return all
+  }
+
+  function buildGenericXlsxBytes(sheetName, columns, records) {
+    var colsXml = columns
+      .map(function (c, i) {
+        var w = c.width || 18
+        return (
+          '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'
+        )
+      })
+      .join('')
+
+    var headerCells = columns
+      .map(function (c, cIdx) {
+        var ref = columnLetter(cIdx) + '1'
+        return (
+          '<c r="' +
+          ref +
+          '" t="inlineStr" s="1"><is><t xml:space="preserve">' +
+          xmlEscape(c.label) +
+          '</t></is></c>'
+        )
+      })
+      .join('')
+
+    var rowsXml = ['<row r="1">' + headerCells + '</row>']
+
+    for (var rIdx = 0; rIdx < records.length; rIdx++) {
+      var rec = records[rIdx]
+      var rowNum = rIdx + 2
+      var cellsXml = columns
+        .map(function (c, cIdx) {
+          var ref = columnLetter(cIdx) + rowNum
+          var rawVal = rec.getString(c.key)
+          if (c.type === 'currency' || c.type === 'number') {
+            var numVal = parseFloat(rawVal || '0') || 0
+            return '<c r="' + ref + '" t="n" s="3"><v>' + numVal + '</v></c>'
+          }
+          if (c.type === 'boolean') {
+            var boolVal = rec.getBool(c.key) ? 'Sim' : 'Não'
+            return (
+              '<c r="' +
+              ref +
+              '" t="inlineStr" s="2"><is><t xml:space="preserve">' +
+              boolVal +
+              '</t></is></c>'
+            )
+          }
+          if (c.type === 'date') {
+            return (
+              '<c r="' +
+              ref +
+              '" t="inlineStr" s="2"><is><t xml:space="preserve">' +
+              xmlEscape(formatDateBR(rawVal)) +
+              '</t></is></c>'
+            )
+          }
+          return (
+            '<c r="' +
+            ref +
+            '" t="inlineStr" s="2"><is><t xml:space="preserve">' +
+            xmlEscape(rawVal || '—') +
+            '</t></is></c>'
+          )
+        })
+        .join('')
+      rowsXml.push('<row r="' + rowNum + '">' + cellsXml + '</row>')
+    }
+
+    var cleanSheetName = (sheetName || 'Relatorio').substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, '')
+    var sheetXml =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<cols>' +
+      colsXml +
+      '</cols>' +
+      '<sheetData>' +
+      rowsXml.join('') +
+      '</sheetData>' +
+      '</worksheet>'
+
+    var workbookXml =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="' +
+      xmlEscape(cleanSheetName) +
+      '" sheetId="1" r:id="rId1"/></sheets></workbook>'
+
+    var rels =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'
+
+    var contentTypes =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'
+
+    var rootRels =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'
+
+    return buildZip([
+      { name: '[Content_Types].xml', data: stringToBytes(contentTypes) },
+      { name: '_rels/.rels', data: stringToBytes(rootRels) },
+      { name: 'xl/workbook.xml', data: stringToBytes(workbookXml) },
+      { name: 'xl/_rels/workbook.xml.rels', data: stringToBytes(rels) },
+      { name: 'xl/styles.xml', data: stringToBytes(XLSX_STYLES) },
+      { name: 'xl/worksheets/sheet1.xml', data: stringToBytes(sheetXml) },
+    ])
+  }
+
+  function buildMasterEmailHtml(
+    schedName,
+    moduleName,
+    customMessage,
+    meta,
+    records,
+    filterLabels,
+    hasPdf,
+    hasAttachment,
+    isTooLarge,
+    dateRangeLabel,
+  ) {
+    var totalCount = records.length
+    var totalSum = 0
+
+    if (meta.amountField) {
+      for (var i = 0; i < records.length; i++) {
+        totalSum += parseFloat(records[i].getString(meta.amountField) || '0') || 0
+      }
+    }
+
+    var filterEntries = Object.entries(filterLabels || {}).filter(function (pair) {
+      return pair[1] && pair[1] !== ''
+    })
+    var filterListHtml =
+      filterEntries.length > 0
+        ? filterEntries
+            .map(function (p) {
+              return (
+                '<li style="margin-bottom: 4px;"><strong>' +
+                xmlEscape(p[0]) +
+                ':</strong> ' +
+                xmlEscape(p[1]) +
+                '</li>'
+              )
+            })
+            .join('')
+        : '<li style="color: #6b7280;">Nenhum filtro específico aplicado (todos os registros visíveis).</li>'
+
+    var tablePreviewHtml = ''
+    if (totalCount > 0) {
+      var previewRows = records.slice(0, 15)
+      var colsToPreview = meta.columns.slice(0, 5)
+
+      var ths = colsToPreview
+        .map(function (c) {
+          var align = c.align === 'right' ? 'right' : 'left'
+          return (
+            '<th style="padding: 8px 10px; text-align: ' +
+            align +
+            ';">' +
+            xmlEscape(c.label) +
+            '</th>'
+          )
+        })
+        .join('')
+
+      var trs = previewRows
+        .map(function (rec, idx) {
+          var bg = idx % 2 === 0 ? '#ffffff' : '#f9fafb'
+          var tds = colsToPreview
+            .map(function (c) {
+              var align = c.align === 'right' ? 'right' : 'left'
+              var val = rec.getString(c.key)
+              if (c.type === 'currency') {
+                val = formatCurrencyBR(parseFloat(val || '0') || 0)
+              } else if (c.type === 'date') {
+                val = formatDateBR(val)
+              } else if (c.type === 'boolean') {
+                val = rec.getBool(c.key) ? 'Sim' : 'Não'
+              }
+              return (
+                '<td style="padding: 6px 10px; text-align: ' +
+                align +
+                '; color: #374151;">' +
+                xmlEscape(val || '—') +
+                '</td>'
+              )
+            })
+            .join('')
+          return (
+            '<tr style="background: ' + bg + '; border-bottom: 1px solid #e5e7eb;">' + tds + '</tr>'
+          )
+        })
+        .join('')
+
+      tablePreviewHtml =
+        '<div style="margin-top: 20px;">' +
+        '<h3 style="font-size: 13px; color: #005B2E; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Prévia dos dados atualizados (' +
+        previewRows.length +
+        ' de ' +
+        totalCount +
+        '):</h3>' +
+        '<table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #e5e7eb;">' +
+        '<thead><tr style="background: #005B2E; color: #ffffff;">' +
+        ths +
+        '</tr></thead>' +
+        '<tbody>' +
+        trs +
+        '</tbody></table>' +
+        (totalCount > 15
+          ? '<p style="font-size: 11px; color: #6b7280; margin-top: 6px;">Consulte o arquivo completo em anexo para conferir todos os ' +
+            totalCount +
+            ' registros.</p>'
+          : '') +
+        '</div>'
+    }
+
+    var warningBox = ''
+    if (hasPdf) {
+      warningBox +=
+        '<div style="margin-top: 14px; padding: 10px 14px; background: #fffbeb; border-left: 4px solid #C9A227; font-size: 12px; color: #92400e;">' +
+        '<strong>Nota sobre formato PDF:</strong> A tabela executiva com os dados consolidados foi incluída no corpo deste e-mail. Para dados tabulares e análises detalhadas, utilize o anexo Excel (.xlsx).' +
+        '</div>'
+    }
+    if (isTooLarge) {
+      warningBox +=
+        '<div style="margin-top: 14px; padding: 10px 14px; background: #fef2f2; border-left: 4px solid #dc2626; font-size: 12px; color: #991b1b;">' +
+        '<strong>Aviso de tamanho:</strong> O arquivo ultrapassou o limite seguro de envio por e-mail (10 MB). Acesse o painel do Jetro para exportação direta.' +
+        '</div>'
+    }
+
+    var customMsgHtml = customMessage
+      ? '<div style="margin-bottom: 16px; padding: 12px 14px; background: #f0fdf4; border-left: 4px solid #005B2E; font-size: 13px; color: #166534;">' +
+        xmlEscape(customMessage).replace(/\n/g, '<br/>') +
+        '</div>'
+      : ''
+
+    var emptyNotice =
+      totalCount === 0
+        ? '<div style="margin-top: 14px; padding: 12px 16px; background: #f3f4f6; border-left: 4px solid #6b7280; font-size: 13px; color: #374151;">Nenhum registro encontrado no período com os filtros aplicados.</div>'
+        : ''
+
+    return (
+      '<!DOCTYPE html>' +
+      '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
+      '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f9fafb; margin: 0; padding: 24px; color: #1f2937;">' +
+      '<div style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden;">' +
+      '<div style="background: #005B2E; padding: 20px 24px; border-bottom: 4px solid #C9A227;">' +
+      '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">JETRO<span style="color: #C9A227;">.</span></div>' +
+      '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Integrado ERP — ' +
+      xmlEscape(moduleName) +
+      ' / ' +
+      xmlEscape(meta.title) +
+      ' (Disparo Manual / Teste)</div>' +
+      '</div>' +
+      '<div style="padding: 24px;">' +
+      customMsgHtml +
+      '<h2 style="font-size: 18px; color: #005B2E; margin: 0 0 6px 0;">' +
+      xmlEscape(schedName) +
+      '</h2>' +
+      '<p style="font-size: 12px; color: #6b7280; margin: 0 0 16px 0;">Envio disparado manualmente em ' +
+      formatDateBR(new Date().toISOString()) +
+      ' (Período: ' +
+      xmlEscape(dateRangeLabel) +
+      ').</p>' +
+      '<div style="display: table; width: 100%; margin: 16px 0; background: #f4faf6; border-radius: 6px; border: 1px solid #d1fae5;">' +
+      '<div style="display: table-cell; padding: 14px 18px; width: 50%; border-right: 1px solid #d1fae5;">' +
+      '<div style="font-size: 11px; text-transform: uppercase; color: #065f46; font-weight: 600;">Total de Registros</div>' +
+      '<div style="font-size: 24px; font-weight: bold; color: #005B2E; margin-top: 4px;">' +
+      totalCount +
+      '</div>' +
+      '</div>' +
+      (meta.amountField
+        ? '<div style="display: table-cell; padding: 14px 18px; width: 50%;">' +
+          '<div style="font-size: 11px; text-transform: uppercase; color: #065f46; font-weight: 600;">Valor Total</div>' +
+          '<div style="font-size: 24px; font-weight: bold; color: #005B2E; margin-top: 4px;">' +
+          formatCurrencyBR(totalSum) +
+          '</div>' +
+          '</div>'
+        : '') +
+      '</div>' +
+      emptyNotice +
+      '<div style="margin-top: 18px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 18px;">' +
+      '<h4 style="font-size: 12px; text-transform: uppercase; color: #005B2E; margin: 0 0 8px 0;">Filtros Configurados:</h4>' +
+      '<ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #374151; line-height: 1.5;">' +
+      filterListHtml +
+      '</ul></div>' +
+      tablePreviewHtml +
+      warningBox +
+      '<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">' +
+      'E-mail gerado pelo Jetro ERP a pedido de ' +
+      xmlEscape(authUser.getString('name') || authUser.getString('email')) +
+      '.<br/>Gerencie seus agendamentos no menu <strong>Administração &gt; Agendamento de Relatórios</strong>.' +
+      '</div></div></div></body></html>'
+    )
+  }
+
+  function logExecution(
+    scheduleId,
+    schedName,
+    reportId,
+    triggeredBy,
+    userEmail,
+    status,
+    count,
+    totalVal,
+    recipients,
+    recipientsCc,
+    errMsg,
+    durationMs,
+  ) {
+    try {
+      var execCol = $app.findCollectionByNameOrId('report_schedule_executions')
+      var rec = new Record(execCol, {
+        schedule_id: scheduleId,
+        schedule_name: schedName,
+        report_id: reportId,
+        triggered_by: triggeredBy,
+        user_email: userEmail,
+        executed_at: new Date().toISOString(),
+        status: status,
+        record_count: count,
+        total_value: totalVal,
+        recipients: recipients,
+        recipients_cc: recipientsCc,
+        error_message: errMsg || '',
+        execution_duration_ms: durationMs || 0,
+      })
+      $app.save(rec)
+    } catch (_) {}
+  }
+
+  var body = parseJSON(e.request.body, {})
+  var scheduleId = body.schedule_id
+  var testConfig = body.test_config // se for disparo de teste de formulário antes de salvar
+  var isPreviewOnly = body.preview_only === true
+
+  var startTime = Date.now()
+  var schedRecord = null
+  var schedName = ''
+  var reportId = ''
+  var moduleName = ''
+  var recipientsStr = ''
+  var recipientsCcStr = ''
+  var customSubject = ''
+  var customMessage = ''
+  var formats = ['xlsx']
+  var filters = {}
+  var filterLabels = {}
+  var dynamicRange = 'today'
+  var skipIfEmpty = false
+
+  if (scheduleId) {
+    try {
+      schedRecord = $app.findRecordById('report_schedules', scheduleId)
+    } catch (_) {
+      return e.json(404, { error: 'Agendamento não encontrado' })
+    }
+    schedName = schedRecord.getString('name')
+    reportId = schedRecord.getString('report_id') || 'comercial-consulta-pedidos'
+    moduleName = schedRecord.getString('module') || 'Comercial'
+    recipientsStr = schedRecord.getString('recipients')
+    recipientsCcStr = schedRecord.getString('recipients_cc')
+    customSubject = schedRecord.getString('email_subject')
+    customMessage = schedRecord.getString('email_message')
+    formats = parseJSON(schedRecord.getString('formats'), ['xlsx'])
+    filters = parseJSON(schedRecord.getString('filters'), {})
+    filterLabels = parseJSON(schedRecord.getString('filter_labels'), {})
+    dynamicRange = schedRecord.getString('dynamic_date_range') || 'today'
+    skipIfEmpty = schedRecord.getBool('skip_if_empty')
+  } else if (testConfig) {
+    schedName = testConfig.name || 'Teste de Agendamento'
+    reportId = testConfig.report_id || 'comercial-consulta-pedidos'
+    moduleName = testConfig.module || 'Comercial'
+    recipientsStr = testConfig.recipients || authUser.getString('email')
+    recipientsCcStr = testConfig.recipients_cc || ''
+    customSubject = testConfig.email_subject || ''
+    customMessage = testConfig.email_message || ''
+    formats = testConfig.formats || ['xlsx']
+    filters = testConfig.filters || {}
+    filterLabels = testConfig.filter_labels || {}
+    dynamicRange = testConfig.dynamic_date_range || 'today'
+    skipIfEmpty = testConfig.skip_if_empty === true
+  } else {
+    return e.json(400, { error: 'schedule_id ou test_config obrigatório' })
+  }
+
+  var meta = getReportMeta(reportId)
+  var dateRange = resolveDynamicDateRangeServer(
+    dynamicRange,
+    filters.date_from,
+    filters.date_to,
+    new Date(),
+  )
+  var queryFilter = buildFilterQueryForSchedule(reportId, filters, authUser, dateRange)
+
+  var records = []
+  try {
+    records = fetchRecords(meta.collection, queryFilter)
+  } catch (errQuery) {
+    return e.json(500, {
+      error: 'Falha ao consultar dados: ' + String(errQuery),
+      queryFilter: queryFilter,
+    })
+  }
+
+  var totalSum = 0
+  if (meta.amountField) {
+    for (var k = 0; k < records.length; k++) {
+      totalSum += parseFloat(records[k].getString(meta.amountField) || '0') || 0
+    }
+  }
+
+  // Se for apenas prévia, retorna os dados resumidos sem enviar e-mail
+  if (isPreviewOnly) {
+    var previewRows = records.slice(0, 20).map(function (r) {
+      var obj = { id: r.id }
+      for (var ci = 0; ci < meta.columns.length; ci++) {
+        var col = meta.columns[ci]
+        obj[col.key] = r.getString(col.key)
+      }
+      return obj
+    })
+    return e.json(200, {
+      preview: true,
+      report_id: reportId,
+      title: meta.title,
+      total_count: records.length,
+      total_sum: formatCurrencyBR(totalSum),
+      date_range: dateRange,
+      filter_query: queryFilter,
+      columns: meta.columns,
+      sample_records: previewRows,
+    })
+  }
+
+  var recipients = parseRecipientEmails(recipientsStr)
+  var recipientsCc = parseRecipientEmails(recipientsCcStr)
+
+  if (recipients.length === 0) {
+    return e.json(400, { error: 'Nenhum destinatário de e-mail válido informado' })
+  }
+
+  var hasXlsx = formats.indexOf('xlsx') !== -1
+  var hasPdf = formats.indexOf('pdf') !== -1
+
+  var xlsxFile = null
+  var isTooLarge = false
+  var filename =
+    'jetro_' +
+    reportId.replace(/[^a-z0-9]/g, '_') +
+    '_' +
+    new Date().toISOString().substring(0, 10) +
+    '.xlsx'
+
+  if (hasXlsx && records.length > 0) {
+    try {
+      var bytes = buildGenericXlsxBytes(meta.title, meta.columns, records)
+      if (bytes.length > 10485760) {
+        isTooLarge = true
+      } else {
+        xlsxFile = $filesystem.fileFromBytes(bytes, filename)
+      }
+    } catch (eZip) {
+      $app.logger().error('Falha ao gerar planilha Excel de teste', 'error', String(eZip))
+    }
+  }
+
+  var htmlBody = buildMasterEmailHtml(
+    schedName,
+    moduleName,
+    customMessage,
+    meta,
+    records,
+    filterLabels,
+    hasPdf,
+    !!xlsxFile,
+    isTooLarge,
+    dateRange.label,
+  )
+
+  var defaultSubject =
+    'Jetro — ' + meta.title + ': ' + schedName + ' (' + records.length + ' registros)'
+  var finalSubject =
+    customSubject && customSubject.trim().length > 0 ? customSubject : defaultSubject
+
+  var reader = null
+  try {
+    var toList = recipients.map(function (email) {
+      return { address: email }
+    })
+    var ccList = recipientsCc.map(function (email) {
+      return { address: email }
+    })
+
+    var mailOptions = {
+      from: {
+        address: $app.settings().meta.senderAddress || 'no-reply@jetro.com.br',
+        name: $app.settings().meta.senderName || 'Jetro ERP',
+      },
+      to: toList,
+      cc: ccList,
+      subject: finalSubject,
+      html: htmlBody,
+    }
+
+    if (xlsxFile && !isTooLarge) {
+      reader = xlsxFile.reader.open()
+      var attachMap = {}
+      attachMap[filename] = reader
+      mailOptions.attachments = attachMap
+    }
+
+    var message = new MailerMessage(mailOptions)
+    $app.newMailClient().send(message)
+
+    if (schedRecord) {
+      schedRecord.set('last_run_at', new Date().toISOString())
+      schedRecord.set('last_run_status', 'success')
+      schedRecord.set('last_run_error', '')
+      schedRecord.set('last_run_count', records.length)
+      schedRecord.set('last_run_total', formatCurrencyBR(totalSum))
+      schedRecord.set('execution_count', (schedRecord.getInt('execution_count') || 0) + 1)
+      schedRecord.set('retry_count', 0)
+      $app.save(schedRecord)
+
+      logExecution(
+        schedRecord.id,
+        schedName,
+        reportId,
+        'manual',
+        authUser.getString('email'),
+        'success',
+        records.length,
+        formatCurrencyBR(totalSum),
+        recipients.join(', '),
+        recipientsCc.join(', '),
+        '',
+        Date.now() - startTime,
+      )
+    }
+
+    return e.json(200, {
+      success: true,
+      message: 'Relatório disparado com sucesso para ' + recipients.length + ' destinatário(s)',
+      record_count: records.length,
+      total_value: formatCurrencyBR(totalSum),
+      recipients: recipients,
+      recipients_cc: recipientsCc,
+      has_attachment: !!xlsxFile,
+    })
+  } catch (errSend) {
+    if (schedRecord) {
+      schedRecord.set('last_run_at', new Date().toISOString())
+      schedRecord.set('last_run_status', 'error')
+      schedRecord.set('last_run_error', String(errSend))
+      $app.save(schedRecord)
+
+      logExecution(
+        schedRecord.id,
+        schedName,
+        reportId,
+        'manual',
+        authUser.getString('email'),
+        'error',
+        records.length,
+        formatCurrencyBR(totalSum),
+        recipients.join(', '),
+        recipientsCc.join(', '),
+        String(errSend),
+        Date.now() - startTime,
+      )
+    }
+    return e.json(500, { error: 'Falha ao enviar e-mail: ' + String(errSend) })
+  } finally {
+    if (reader && typeof reader.close === 'function') {
+      try {
+        reader.close()
+      } catch (_) {}
+    }
+  }
+})
