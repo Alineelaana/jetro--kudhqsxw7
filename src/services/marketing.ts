@@ -196,23 +196,29 @@ export async function getMkCockpitData() {
       new Date(j.deadline) < new Date() &&
       !['encerrado', 'cancelado'].includes(j.status),
   )
-  const totalInvestment = media.reduce((s, m) => s + (parseFloat(m.investment) || 0), 0)
-  const totalRevenue = attributions.reduce((s, a) => s + (parseFloat(a.revenue) || 0), 0)
-  const totalLeads = media.reduce((s, m) => s + (m.leads || 0), 0)
-  const totalConversions = media.reduce((s, m) => s + (m.conversions || 0), 0)
+  const totalInvestment = (media as any[]).reduce(
+    (s: number, m: any) => s + (parseFloat(m.investment) || 0),
+    0,
+  )
+  const totalRevenue = (attributions as any[]).reduce(
+    (s: number, a: any) => s + (parseFloat(a.revenue) || 0),
+    0,
+  )
+  const totalLeads = (media as any[]).reduce((s: number, m: any) => s + (m.leads || 0), 0)
+  const totalConversions = (media as any[]).reduce(
+    (s: number, m: any) => s + (m.conversions || 0),
+    0,
+  )
   const roi = totalInvestment > 0 ? ((totalRevenue - totalInvestment) / totalInvestment) * 100 : 0
   const cpl = totalLeads > 0 ? totalInvestment / totalLeads : 0
   const cac = totalConversions > 0 ? totalInvestment / totalConversions : 0
   const byChannel = Object.entries(
-    media.reduce(
-      (acc, m) => {
-        const k = m.channel || '—'
-        acc[k] = (acc[k] || 0) + (parseFloat(m.investment) || 0)
-        return acc
-      },
-      {} as Record<string, number>,
-    ),
-  ).sort((a, b) => b[1] - a[1])
+    (media as any[]).reduce((acc: Record<string, number>, m: any) => {
+      const k = m.channel || '—'
+      acc[k] = (acc[k] || 0) + (parseFloat(m.investment) || 0)
+      return acc
+    }, {}),
+  ).sort((a, b) => Number(b[1]) - Number(a[1]))
   return {
     totalRequests: requests.length,
     pendingApproval: pendingApproval.length,

@@ -164,10 +164,12 @@ export default function ClientTracking() {
                   {timeline.map((t, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 rounded-full bg-[#005B2E]" />
-                      <span className="flex-1">{t?.evento || t?.status || t?.acao || '—'}</span>
-                      {t?.data && (
+                      <span className="flex-1">
+                        {String(t?.evento || t?.status || t?.acao || '—')}
+                      </span>
+                      {Boolean(t?.data) && (
                         <span className="text-xs text-muted-foreground">
-                          {new Date(t.data).toLocaleString('pt-BR')}
+                          {new Date(String(t?.data)).toLocaleString('pt-BR')}
                         </span>
                       )}
                     </div>
@@ -185,8 +187,8 @@ export default function ClientTracking() {
                 </h3>
                 {deliveryOccs.map((o, i) => (
                   <div key={i} className="text-sm py-1 border-b border-border last:border-0">
-                    <span className="font-medium">{o.tipo_ocorrencia || '—'}</span>
-                    <p className="text-xs text-muted-foreground">{o.descricao || ''}</p>
+                    <span className="font-medium">{String(o.tipo_ocorrencia || '—')}</span>
+                    <p className="text-xs text-muted-foreground">{String(o.descricao || '')}</p>
                   </div>
                 ))}
               </CardContent>
@@ -203,7 +205,7 @@ export default function ClientTracking() {
                   <div key={i} className="text-sm space-y-1">
                     <p>
                       <FileCheck className="w-3 h-3 inline mr-1" />
-                      Recebedor: {p.recebedor_nome || '—'}
+                      Recebedor: {String(p.recebedor_nome || '—')}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Data:{' '}

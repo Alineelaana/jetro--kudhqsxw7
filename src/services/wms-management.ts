@@ -7,8 +7,9 @@ export const createWmsPallet = (data: Record<string, unknown>): Promise<WmsPalle
   pb.collection('wms_pallets').create(data)
 export const updateWmsPallet = (id: string, data: Record<string, unknown>): Promise<WmsPallet> =>
   pb.collection('wms_pallets').update(id, data)
-export const deleteWmsPallet = (id: string): Promise<void> =>
-  pb.collection('wms_pallets').delete(id)
+export const deleteWmsPallet = async (id: string): Promise<void> => {
+  await pb.collection('wms_pallets').delete(id)
+}
 
 export const getWmsVolumes = (): Promise<WmsVolume[]> =>
   pb.collection('wms_volumes').getFullList({ sort: '-created' })
@@ -16,8 +17,9 @@ export const createWmsVolume = (data: Record<string, unknown>): Promise<WmsVolum
   pb.collection('wms_volumes').create(data)
 export const updateWmsVolume = (id: string, data: Record<string, unknown>): Promise<WmsVolume> =>
   pb.collection('wms_volumes').update(id, data)
-export const deleteWmsVolume = (id: string): Promise<void> =>
-  pb.collection('wms_volumes').delete(id)
+export const deleteWmsVolume = async (id: string): Promise<void> => {
+  await pb.collection('wms_volumes').delete(id)
+}
 
 export const getWmsCollectors = (): Promise<WmsCollector[]> =>
   pb.collection('wms_collectors').getFullList({ sort: '-created' })
@@ -27,8 +29,9 @@ export const updateWmsCollector = (
   id: string,
   data: Record<string, unknown>,
 ): Promise<WmsCollector> => pb.collection('wms_collectors').update(id, data)
-export const deleteWmsCollector = (id: string): Promise<void> =>
-  pb.collection('wms_collectors').delete(id)
+export const deleteWmsCollector = async (id: string): Promise<void> => {
+  await pb.collection('wms_collectors').delete(id)
+}
 
 export const getWmsOperators = (): Promise<WmsOperator[]> =>
   pb.collection('wms_operators').getFullList({ sort: '-created' })
@@ -38,5 +41,6 @@ export const updateWmsOperator = (
   id: string,
   data: Record<string, unknown>,
 ): Promise<WmsOperator> => pb.collection('wms_operators').update(id, data)
-export const deleteWmsOperator = (id: string): Promise<void> =>
-  pb.collection('wms_operators').delete(id)
+export const deleteWmsOperator = async (id: string): Promise<void> => {
+  await pb.collection('wms_operators').delete(id)
+}

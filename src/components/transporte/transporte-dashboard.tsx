@@ -74,13 +74,15 @@ export function TransporteDashboard() {
         vehiclesInOp: vehicles.filter((v) => v.situacao === 'Em Rota').length,
         vehiclesAvailable: vehicles.filter((v) => v.situacao === 'Disponível').length,
         driversOnRoute: drivers.filter((d) => d.situacao === 'Em Rota').length,
-        totalFreightCost: freights.reduce<number>(
-          (sum, f) => sum + (parseFloat(f.valor_total || '0') || 0),
+        totalFreightCost: (freights as any[]).reduce(
+          (sum: number, f: any) => sum + (parseFloat(f.valor_total || '0') || 0),
           0,
         ),
         avgCostPerDelivery:
-          freights.reduce<number>((sum, f) => sum + (parseFloat(f.valor_total || '0') || 0), 0) /
-          Math.max(deliveries.length, 1),
+          (freights as any[]).reduce(
+            (sum: number, f: any) => sum + (parseFloat(f.valor_total || '0') || 0),
+            0,
+          ) / Math.max(deliveries.length, 1),
         routesActive: 0,
         onTimeRate:
           deliveries.length > 0

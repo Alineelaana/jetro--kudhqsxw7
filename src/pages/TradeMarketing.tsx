@@ -41,7 +41,7 @@ export default function TradeMarketing({ screen = 'dashboard' }: TradeMarketingP
   const reloadActions = () => {
     pb.collection('trade_marketing_actions')
       .getFullList({ sort: '-created' })
-      .then((data) => setActions(data as TradeMarketingAction[]))
+      .then((data) => setActions(data as unknown as TradeMarketingAction[]))
       .catch((err) => {
         setActions([])
         toast.error(getErrorMessage(err))

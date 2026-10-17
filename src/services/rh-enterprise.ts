@@ -96,8 +96,12 @@ export async function getTalentReview(filters?: {
     getSuccession().catch(() => []),
     getPdi().catch(() => []),
   ])
-  const succMap = new Map(succession.map((s: any) => [s.employee_name, s]))
-  const pdiMap = new Map(pdi.map((p: any) => [p.employee_name, p]))
+  const succMap = new Map<string, any>(
+    (succession as any[]).map((s: any) => [s.employee_name as string, s] as [string, any]),
+  )
+  const pdiMap = new Map<string, any>(
+    (pdi as any[]).map((p: any) => [p.employee_name as string, p] as [string, any]),
+  )
   let results = evals.map((e: any) => ({
     ...e,
     succession: succMap.get(e.employee_name),

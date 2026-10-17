@@ -323,14 +323,14 @@ export async function getCrmReportData() {
     getLossReasons().catch(() => []),
   ])
   const leadsBySource = Object.entries(
-    leads.reduce<Record<string, number>>((acc, l) => {
+    (leads as CrmLead[]).reduce((acc: Record<string, number>, l: CrmLead) => {
       const k = l.lead_source || '—'
       acc[k] = (acc[k] || 0) + 1
       return acc
     }, {}),
   ).map(([name, count]) => ({ name, count }))
   const leadsByStatus = Object.entries(
-    leads.reduce<Record<string, number>>((acc, l) => {
+    (leads as CrmLead[]).reduce((acc: Record<string, number>, l: CrmLead) => {
       const k = l.status || '—'
       acc[k] = (acc[k] || 0) + 1
       return acc
