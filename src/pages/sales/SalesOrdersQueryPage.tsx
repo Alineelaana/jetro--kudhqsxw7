@@ -9,7 +9,9 @@ import {
   FileSpreadsheet,
   FileText,
   Loader2,
+  CalendarClock,
 } from 'lucide-react'
+import { ReportScheduleManagerModal } from './sales-orders-report-schedule-modal'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -277,6 +279,7 @@ export default function SalesOrdersQueryPage() {
   const [detail, setDetail] = useState<SalesOrderRow | null>(null)
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [exporting, setExporting] = useState<'excel' | 'pdf' | null>(null)
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
 
   const [operationTypes, setOperationTypes] = useState<FilterOption[]>([])
   const [teams, setTeams] = useState<FilterOption[]>([])
@@ -626,6 +629,13 @@ export default function SalesOrdersQueryPage() {
               )}
               Exportar PDF
             </Button>
+            <Button
+              onClick={() => setShowScheduleModal(true)}
+              className="h-10 border border-emerald-800 bg-[#005B2E] px-5 font-semibold text-white shadow-xs hover:bg-[#004222]"
+            >
+              <CalendarClock className="mr-2 h-4 w-4 text-[#C9A227]" />
+              Agendar Relatório
+            </Button>
           </div>
         </div>
       </div>
@@ -912,6 +922,14 @@ export default function SalesOrdersQueryPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de gerenciamento e criação de agendamentos */}
+      <ReportScheduleManagerModal
+        open={showScheduleModal}
+        onOpenChange={setShowScheduleModal}
+        currentFilters={filters}
+        filterLabels={describeFilters(filters)}
+      />
 
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
