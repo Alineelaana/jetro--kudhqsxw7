@@ -1,5 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Filter, Eraser, Eye, ChevronLeft, ChevronRight, Link2 } from 'lucide-react'
+import {
+  Filter,
+  Eraser,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Link2,
+  FileSpreadsheet,
+  FileText,
+  Loader2,
+} from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +27,12 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import pb from '@/lib/pocketbase/client'
 import { cn } from '@/lib/utils'
+import {
+  EXPORT_LIMIT,
+  exportOrdersToExcel,
+  exportOrdersToPdf,
+  fetchAllForExport,
+} from './sales-orders-query-export'
 
 // Cores de status mapeadas a partir da collection order_statuses (parametrizável)
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -259,6 +276,7 @@ export default function SalesOrdersQueryPage() {
   const [rows, setRows] = useState<SalesOrderRow[]>([])
   const [detail, setDetail] = useState<SalesOrderRow | null>(null)
   const [loadingDetail, setLoadingDetail] = useState(false)
+  const [exporting, setExporting] = useState<'excel' | 'pdf' | null>(null)
 
   const [operationTypes, setOperationTypes] = useState<FilterOption[]>([])
   const [teams, setTeams] = useState<FilterOption[]>([])
@@ -442,6 +460,91 @@ export default function SalesOrdersQueryPage() {
 
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage))
 
+  // Rótulo legível de cada filtro ativo (auditoria no PDF e aviso no toast)
+  const describeFilters = useCallback(
+    (f: typeof emptyFilters): Record<string, string> => {
+      const d: Record<string, string> = {}
+      if (f.operation_type !== 'all')
+        d['Origem'] =
+          operationTypes.find((o) => o.value === f.operation_type)?.label || f.operation_type
+      if (f.client !== 'all') d['Cliente (Razão/CNPJ)'] = f.client
+      if (f.team !== 'all') d['Equipe'] = teams.find((o) => o.value === f.team)?.label || f.team
+      if (f.rca !== 'all') d['RCA'] = rcas.find((o) => o.value === f.rca)?.label || f.rca
+      if (f.customer_group !== 'all')
+        d['Grupo de clientes'] =
+          clientGroups.find((o) => o.value === f.customer_group)?.label || f.customer_group
+      if (f.city !== 'all') d['Cidade'] = f.city
+      if (f.district) d['Bairro'] = f.district
+      if (f.address) d['Endereço'] = f.address
+      if (f.price_table !== 'all')
+        d['Tabela'] = priceTables.find((o) => o.value === f.price_table)?.label || f.price_table
+      if (f.order_number) d['Nº do pedido'] = f.order_number
+      if (f.integration_number) d['Nº do pedido integração'] = f.integration_number
+      if (f.date_from) d['Da data'] = formatDateTime(f.date_from)
+      if (f.date_to) d['Até a data'] = formatDateTime(f.date_to)
+      if (f.statuses.length > 0) d['Status'] = f.statuses.join(', ')
+      if (f.is_balance !== 'all') d['É saldo'] = f.is_balance === 'yes' ? 'Sim' : 'Não'
+      if (f.generated_balance !== 'all')
+        d['Pedido gerou saldo'] = f.generated_balance === 'yes' ? 'Sim' : 'Não'
+      if (f.channel !== 'all')
+        d['Origem do pedido (canal)'] =
+          channels.find((o) => o.value === f.channel)?.label || f.channel
+      if (f.only_invoiced) d['Somente faturados'] = 'Sim'
+      return d
+    },
+    [operationTypes, teams, rcas, clientGroups, priceTables, channels],
+  )
+
+  const runExport = useCallback(
+    async (kind: 'excel' | 'pdf') => {
+      if (exporting) return
+      setExporting(kind)
+      try {
+        const filter = buildFilter(appliedFilters)
+        const data = await fetchAllForExport(filter)
+        if (data.length === 0) {
+          toast.info('Nenhum pedido encontrado com os filtros aplicados.')
+          return
+        }
+        if (data.length >= EXPORT_LIMIT) {
+          toast.warning(
+            `A consulta retornou mais de ${EXPORT_LIMIT.toLocaleString('pt-BR')} pedidos. O arquivo gerado contém apenas os ${EXPORT_LIMIT.toLocaleString('pt-BR')} mais recentes.`,
+          )
+        }
+
+        const now = new Date()
+        const pad = (n: number) => String(n).padStart(2, '0')
+        const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`
+        const labels = describeFilters(appliedFilters)
+
+        if (kind === 'excel') {
+          exportOrdersToExcel(data, appliedFilters, `consulta-pedidos_${stamp}.xlsx`)
+          toast.success(`Excel gerado com ${data.length.toLocaleString('pt-BR')} pedido(s).`)
+        } else {
+          try {
+            exportOrdersToPdf(data, appliedFilters, labels)
+          } catch (err) {
+            if (err instanceof Error && err.message === 'popup') {
+              toast.error(
+                'Não foi possível abrir a janela de impressão. Permita pop-ups para gerar o PDF.',
+              )
+              return
+            }
+            throw err
+          }
+          toast.success(
+            `PDF com ${data.length.toLocaleString('pt-BR')} pedido(s) gerado — utilize "Salvar como PDF" na janela de impressão.`,
+          )
+        }
+      } catch {
+        toast.error('Falha ao gerar a exportação. Tente novamente.')
+      } finally {
+        setExporting(null)
+      }
+    },
+    [appliedFilters, buildFilter, describeFilters, exporting],
+  )
+
   const statusBadge = (status?: string) => {
     if (!status) return null
     const colorEntry = statuses.find((s) => s.value === status)
@@ -498,6 +601,30 @@ export default function SalesOrdersQueryPage() {
             >
               <Eraser className="mr-2 h-4 w-4" />
               Limpar Filtro
+            </Button>
+            <Button
+              onClick={() => runExport('excel')}
+              disabled={exporting !== null}
+              className="h-10 border border-[#005B2E] bg-[#005B2E] px-5 text-white hover:bg-[#00401f]"
+            >
+              {exporting === 'excel' ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+              )}
+              Exportar Excel
+            </Button>
+            <Button
+              onClick={() => runExport('pdf')}
+              disabled={exporting !== null}
+              className="h-10 border border-[#C9A227] bg-[#C9A227] px-5 text-[#1f2937] hover:bg-[#a98a1f]"
+            >
+              {exporting === 'pdf' ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="mr-2 h-4 w-4" />
+              )}
+              Exportar PDF
             </Button>
           </div>
         </div>
