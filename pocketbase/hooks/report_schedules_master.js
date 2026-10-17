@@ -1,10 +1,9 @@
 // ============================================================================
-// Cron Periódico Geral de Varredura de Agendamentos de Relatórios do Jetro ERP
-// Suporta frequências: daily, weekly, biweekly (quinzenal), monthly
-// Fuso horário: America/Sao_Paulo (UTC-3)
+// Cron Job Master para Agendamentos de Relatórios do Jetro ERP
+// Executado a cada 10 minutos para verificar e disparar relatórios programados
 // ============================================================================
 
-cronAdd('report_schedules_master_scan', '*/15 * * * *', () => {
+cronAdd('report_schedules_master', '*/10 * * * *', () => {
   function parseJSON(str, fallback) {
     if (!str) return fallback
     if (typeof str === 'object') return str
@@ -43,7 +42,6 @@ cronAdd('report_schedules_master_scan', '*/15 * * * *', () => {
     }
     return table
   }
-
   var CRC_TABLE = crc32Table()
 
   function crc32(bytes) {
@@ -265,7 +263,6 @@ cronAdd('report_schedules_master_scan', '*/15 * * * *', () => {
       })
   }
 
-  // Resolução dinâmica de datas no fuso UTC-3
   function resolveDynamicDateRangeServer(range, dateFromFixed, dateToFixed, nowDate) {
     var spOffsetMs = -3 * 60 * 60 * 1000
     var spDate = new Date(nowDate.getTime() + spOffsetMs)
@@ -555,6 +552,198 @@ cronAdd('report_schedules_master_scan', '*/15 * * * *', () => {
         ],
       }
     }
+    if (reportId === 'estoque-movimentacoes') {
+      return {
+        collection: 'stock_movements',
+        dateField: 'created',
+        amountField: 'quantidade',
+        title: 'Movimentações de Estoque',
+        columns: [
+          { key: 'created', label: 'Data/Hora', width: 18, type: 'date' },
+          { key: 'tipo_movimentacao', label: 'Tipo Mov.', width: 18, type: 'text' },
+          { key: 'documento_origem', label: 'Documento', width: 16, type: 'text' },
+          { key: 'produto_nome', label: 'Produto', width: 30, type: 'text' },
+          { key: 'produto_codigo', label: 'Código', width: 14, type: 'text' },
+          { key: 'lote', label: 'Lote', width: 14, type: 'text' },
+          { key: 'quantidade', label: 'Quantidade', width: 14, type: 'number' },
+          { key: 'saldo_anterior', label: 'Saldo Ant.', width: 14, type: 'number' },
+          { key: 'saldo_atual', label: 'Saldo Atual', width: 14, type: 'number' },
+          { key: 'responsavel', label: 'Responsável', width: 18, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'estoque-produtos-saldo') {
+      return {
+        collection: 'products',
+        dateField: 'created',
+        amountField: 'stock',
+        title: 'Saldo e Posição de Produtos',
+        columns: [
+          { key: 'code', label: 'Código', width: 14, type: 'text' },
+          { key: 'name', label: 'Produto', width: 34, type: 'text' },
+          { key: 'brand', label: 'Marca', width: 16, type: 'text' },
+          { key: 'category', label: 'Categoria', width: 16, type: 'text' },
+          { key: 'unit', label: 'Unidade', width: 10, type: 'text' },
+          { key: 'stock', label: 'Estoque Atual', width: 14, type: 'number' },
+          { key: 'min_stock', label: 'Estoque Mín.', width: 14, type: 'number' },
+          { key: 'cost_price', label: 'Custo', width: 14, type: 'currency' },
+          { key: 'price', label: 'Preço Venda', width: 14, type: 'currency' },
+          { key: 'active', label: 'Ativo', width: 10, type: 'boolean' },
+        ],
+      }
+    }
+    if (reportId === 'estoque-recebimento-wms') {
+      return {
+        collection: 'wms_receipts',
+        dateField: 'created',
+        title: 'Recebimento de Mercadorias (WMS)',
+        columns: [
+          { key: 'numero_recebimento', label: 'Nº Recebimento', width: 16, type: 'text' },
+          { key: 'fornecedor', label: 'Fornecedor', width: 30, type: 'text' },
+          { key: 'nota_fiscal', label: 'NF', width: 14, type: 'text' },
+          { key: 'data_prevista', label: 'Data Prevista', width: 14, type: 'date' },
+          { key: 'data_recebida', label: 'Data Recebida', width: 14, type: 'date' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+          { key: 'responsavel', label: 'Responsável', width: 18, type: 'text' },
+          { key: 'created', label: 'Registro', width: 16, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'fiscal-nfe') {
+      return {
+        collection: 'nfe_records',
+        dateField: 'created',
+        amountField: 'total_value',
+        title: 'Notas Fiscais Eletrônicas (NF-e)',
+        columns: [
+          { key: 'nfe_number', label: 'Nº NF-e', width: 14, type: 'text' },
+          { key: 'client_name', label: 'Destinatário', width: 32, type: 'text' },
+          { key: 'client_cnpj', label: 'CNPJ/CPF', width: 18, type: 'text' },
+          { key: 'total_value', label: 'Valor Total', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status SEFAZ', width: 16, type: 'text' },
+          { key: 'chave_acesso', label: 'Chave de Acesso', width: 44, type: 'text' },
+          { key: 'created', label: 'Data Emissão', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'fiscal-cte') {
+      return {
+        collection: 'cte_records',
+        dateField: 'created',
+        amountField: 'valor_prestacao',
+        title: 'Conhecimentos de Transporte (CT-e)',
+        columns: [
+          { key: 'cte_number', label: 'Nº CT-e', width: 14, type: 'text' },
+          { key: 'remetente', label: 'Remetente', width: 28, type: 'text' },
+          { key: 'destinatario', label: 'Destinatário', width: 28, type: 'text' },
+          { key: 'valor_prestacao', label: 'Valor Frete', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+          { key: 'created', label: 'Emissão', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'fiscal-nfse') {
+      return {
+        collection: 'nfse_records',
+        dateField: 'created',
+        amountField: 'valor',
+        title: 'Notas Fiscais de Serviço (NFS-e)',
+        columns: [
+          { key: 'nfse_number', label: 'Nº NFS-e', width: 14, type: 'text' },
+          { key: 'tomador', label: 'Tomador', width: 34, type: 'text' },
+          { key: 'valor', label: 'Valor dos Serviços', width: 18, type: 'currency' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+          { key: 'created', label: 'Emissão', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'rh-colaboradores') {
+      return {
+        collection: 'rh_employees',
+        dateField: 'data_admissao',
+        title: 'Quadro de Colaboradores (RH)',
+        columns: [
+          { key: 'matricula', label: 'Matrícula', width: 14, type: 'text' },
+          { key: 'nome_completo', label: 'Nome do Colaborador', width: 34, type: 'text' },
+          { key: 'cargo', label: 'Cargo', width: 22, type: 'text' },
+          { key: 'departamento', label: 'Departamento', width: 20, type: 'text' },
+          { key: 'situacao', label: 'Situação', width: 14, type: 'text' },
+          { key: 'data_admissao', label: 'Admissão', width: 14, type: 'text' },
+          { key: 'tipo_contrato', label: 'Vínculo', width: 14, type: 'text' },
+          { key: 'empresa', label: 'Empresa', width: 18, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'rh-ponto-frequencia') {
+      return {
+        collection: 'rh_time_records',
+        dateField: 'data',
+        title: 'Espelho de Ponto e Frequência',
+        columns: [
+          { key: 'data', label: 'Data', width: 14, type: 'date' },
+          { key: 'employee_name', label: 'Colaborador', width: 32, type: 'text' },
+          { key: 'entrada', label: 'Entrada', width: 12, type: 'text' },
+          { key: 'saida_intervalo', label: 'Almoço Saída', width: 14, type: 'text' },
+          { key: 'retorno_intervalo', label: 'Almoço Retorno', width: 14, type: 'text' },
+          { key: 'saida', label: 'Saída', width: 12, type: 'text' },
+          { key: 'horas_trabalhadas', label: 'Horas Trab.', width: 14, type: 'text' },
+          { key: 'horas_extras', label: 'Extras', width: 12, type: 'text' },
+          { key: 'banco_horas', label: 'B. Horas', width: 12, type: 'text' },
+          { key: 'situacao', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'rh-folha-pagamento') {
+      return {
+        collection: 'rh_payroll',
+        dateField: 'created',
+        amountField: 'valor_liquido',
+        title: 'Folha de Pagamento Consolidada',
+        columns: [
+          { key: 'competencia', label: 'Competência', width: 14, type: 'text' },
+          { key: 'tipo_folha', label: 'Tipo Folha', width: 16, type: 'text' },
+          { key: 'departamento', label: 'Departamento', width: 20, type: 'text' },
+          { key: 'quantidade_colaboradores', label: 'Colaboradores', width: 14, type: 'number' },
+          { key: 'valor_bruto', label: 'Total Bruto', width: 16, type: 'currency' },
+          { key: 'total_descontos', label: 'Descontos', width: 14, type: 'currency' },
+          { key: 'valor_liquido', label: 'Total Líquido', width: 16, type: 'currency' },
+          { key: 'situacao', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'dp-afastamentos') {
+      return {
+        collection: 'dp_leaves',
+        dateField: 'created',
+        title: 'Afastamentos e Licenças Médicas',
+        columns: [
+          { key: 'employee_name', label: 'Colaborador', width: 32, type: 'text' },
+          { key: 'tipo_afastamento', label: 'Tipo', width: 20, type: 'text' },
+          { key: 'data_inicio', label: 'Início', width: 14, type: 'date' },
+          { key: 'data_fim', label: 'Fim', width: 14, type: 'date' },
+          { key: 'cid', label: 'CID', width: 12, type: 'text' },
+          { key: 'medico', label: 'Médico', width: 22, type: 'text' },
+          { key: 'situacao', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'compras-pedidos') {
+      return {
+        collection: 'purchase_orders',
+        dateField: 'created',
+        amountField: 'total_value',
+        title: 'Pedidos de Compra (Suprimentos)',
+        columns: [
+          { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+          { key: 'supplier_name', label: 'Fornecedor', width: 32, type: 'text' },
+          { key: 'buyer', label: 'Comprador', width: 18, type: 'text' },
+          { key: 'total_value', label: 'Valor Total', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+          { key: 'delivery_forecast', label: 'Previsão Entrega', width: 16, type: 'date' },
+          { key: 'created', label: 'Data Emissão', width: 18, type: 'date' },
+        ],
+      }
+    }
     // Default: Consulta de Pedidos
     return {
       collection: 'sales_orders',
@@ -607,6 +796,129 @@ cronAdd('report_schedules_master_scan', '*/15 * * * *', () => {
       if (f.rota && f.rota !== 'all') parts.push('rota ~ "' + f.rota + '"')
       if (f.transportadora && f.transportadora !== 'all')
         parts.push('transportadora ~ "' + f.transportadora + '"')
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'estoque-movimentacoes') {
+      if (f.tipo_movimentacao && f.tipo_movimentacao !== 'all') {
+        parts.push('tipo_movimentacao = "' + f.tipo_movimentacao + '"')
+      }
+      if (f.search && f.search !== 'all') {
+        parts.push(
+          '(produto_nome ~ "' +
+            f.search +
+            '" || produto_codigo ~ "' +
+            f.search +
+            '" || documento_origem ~ "' +
+            f.search +
+            '" || lote ~ "' +
+            f.search +
+            '")',
+        )
+      }
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'estoque-produtos-saldo') {
+      if (f.status === 'active') parts.push('active = true')
+      if (f.status === 'inactive') parts.push('active = false')
+      if (f.category && f.category !== 'all') parts.push('category ~ "' + f.category + '"')
+      if (f.brand && f.brand !== 'all') parts.push('brand ~ "' + f.brand + '"')
+      if (f.search && f.search !== 'all') {
+        parts.push(
+          '(name ~ "' + f.search + '" || code ~ "' + f.search + '" || ean ~ "' + f.search + '")',
+        )
+      }
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'estoque-recebimento-wms') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.fornecedor && f.fornecedor !== 'all') parts.push('fornecedor ~ "' + f.fornecedor + '"')
+      if (f.nota_fiscal && f.nota_fiscal !== 'all')
+        parts.push('nota_fiscal ~ "' + f.nota_fiscal + '"')
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'fiscal-nfe') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.client && f.client !== 'all') {
+        parts.push('(client_name ~ "' + f.client + '" || client_cnpj ~ "' + f.client + '")')
+      }
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'fiscal-cte') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.remetente && f.remetente !== 'all') parts.push('remetente ~ "' + f.remetente + '"')
+      if (f.destinatario && f.destinatario !== 'all')
+        parts.push('destinatario ~ "' + f.destinatario + '"')
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'fiscal-nfse') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.tomador && f.tomador !== 'all') parts.push('tomador ~ "' + f.tomador + '"')
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'rh-colaboradores') {
+      if (f.situacao && f.situacao !== 'all') parts.push('situacao = "' + f.situacao + '"')
+      if (f.departamento && f.departamento !== 'all')
+        parts.push('departamento ~ "' + f.departamento + '"')
+      if (f.cargo && f.cargo !== 'all') parts.push('cargo ~ "' + f.cargo + '"')
+      if (f.tipo_contrato && f.tipo_contrato !== 'all')
+        parts.push('tipo_contrato = "' + f.tipo_contrato + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'rh-ponto-frequencia') {
+      if (f.situacao && f.situacao !== 'all') parts.push('situacao = "' + f.situacao + '"')
+      if (f.employee_name && f.employee_name !== 'all')
+        parts.push('employee_name ~ "' + f.employee_name + '"')
+      if (dateRange.dateFrom) parts.push('data >= "' + dateRange.dateFrom.substring(0, 10) + '"')
+      if (dateRange.dateTo) parts.push('data <= "' + dateRange.dateTo.substring(0, 10) + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'rh-folha-pagamento') {
+      if (f.competencia && f.competencia !== 'all')
+        parts.push('competencia ~ "' + f.competencia + '"')
+      if (f.tipo_folha && f.tipo_folha !== 'all') parts.push('tipo_folha = "' + f.tipo_folha + '"')
+      if (f.situacao && f.situacao !== 'all') parts.push('situacao = "' + f.situacao + '"')
+      if (f.departamento && f.departamento !== 'all')
+        parts.push('departamento ~ "' + f.departamento + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'dp-afastamentos') {
+      if (f.tipo_afastamento && f.tipo_afastamento !== 'all')
+        parts.push('tipo_afastamento = "' + f.tipo_afastamento + '"')
+      if (f.employee_name && f.employee_name !== 'all')
+        parts.push('employee_name ~ "' + f.employee_name + '"')
+      if (f.situacao && f.situacao !== 'all') parts.push('situacao = "' + f.situacao + '"')
+      if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
+      if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
+      return parts.join(' && ')
+    }
+
+    if (reportId === 'compras-pedidos') {
+      if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
+      if (f.supplier_name && f.supplier_name !== 'all')
+        parts.push('supplier_name ~ "' + f.supplier_name + '"')
+      if (f.buyer && f.buyer !== 'all') parts.push('buyer ~ "' + f.buyer + '"')
       if (dateRange.dateFrom) parts.push('created >= "' + dateRange.dateFrom + '"')
       if (dateRange.dateTo) parts.push('created <= "' + dateRange.dateTo + '"')
       return parts.join(' && ')
