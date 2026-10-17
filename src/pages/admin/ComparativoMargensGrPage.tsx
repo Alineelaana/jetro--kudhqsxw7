@@ -55,6 +55,9 @@ import {
   type MargemParametroRecord,
 } from '@/services/margens-comparativo'
 import { exportMargensToExcel, exportMargensToPdf } from '@/lib/margens-gr-export'
+import { downloadModeloExcel } from '@/lib/margens-gr-template'
+import { ImportMargensDialog } from '@/components/margens-gr/ImportMargensDialog'
+import { Upload, FileDown } from 'lucide-react'
 
 export default function ComparativoMargensGrPage() {
   const { userRole } = useAuth()
@@ -86,6 +89,9 @@ export default function ComparativoMargensGrPage() {
   // Diálogo para adicionar novo SKU manualmente
   const [isNewSkuOpen, setIsNewSkuOpen] = useState(false)
   const [newSkuData, setNewSkuData] = useState({ produto: '', cmv: '', preco_rivoli: '' })
+
+  // Diálogo de importação de Excel (.xlsx)
+  const [isImportOpen, setIsImportOpen] = useState(false)
 
   // Diálogo de confirmação de exclusão
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
@@ -366,6 +372,29 @@ export default function ComparativoMargensGrPage() {
 
             <div className="h-5 w-px bg-gray-200 mx-1" />
 
+            {/* BOTÃO DE IMPORTAÇÃO DE EXCEL (RBAC: canEdit) */}
+            {canEdit && (
+              <Button
+                size="sm"
+                onClick={() => setIsImportOpen(true)}
+                className="text-xs h-8 bg-[#005B2E] hover:bg-[#004724] text-white shadow-xs font-semibold"
+              >
+                <Upload className="w-3.5 h-3.5 mr-1.5" />
+                Importar Excel
+              </Button>
+            )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadModeloExcel()}
+              className="text-xs h-8 text-gray-700 hover:text-[#005B2E]"
+              title="Baixar planilha de modelo com os cabeçalhos esperados para carga"
+            >
+              <FileDown className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
+              Baixar Modelo
+            </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -637,26 +666,37 @@ export default function ComparativoMargensGrPage() {
                     <strong>Collections</strong> &gt; <strong>margens_comparativo_gr</strong> &gt;{' '}
                     <em>Import CSV/Excel</em>) ou cadastrados através do botão abaixo.
                   </p>
-                  <div className="mt-6 flex items-center gap-3">
+                  <div className="mt-6 flex items-center gap-3 flex-wrap justify-center">
                     {canEdit && (
                       <Button
                         size="sm"
-                        onClick={() => setIsNewSkuOpen(true)}
-                        className="bg-[#005B2E] hover:bg-[#004724] text-white text-xs h-8"
+                        onClick={() => setIsImportOpen(true)}
+                        className="bg-[#005B2E] hover:bg-[#004724] text-white text-xs h-8 font-semibold shadow-xs"
                       >
-                        <Plus className="w-3.5 h-3.5 mr-1.5" />
-                        Cadastrar Primeiro Produto
+                        <Upload className="w-3.5 h-3.5 mr-1.5" />
+                        Importar Planilha Excel (.xlsx)
                       </Button>
                     )}
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={loadData}
-                      className="text-xs h-8 text-gray-700"
+                      onClick={() => downloadModeloExcel()}
+                      className="text-xs h-8 text-gray-700 hover:text-[#005B2E]"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                      Recarregar Dados
+                      <FileDown className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
+                      Baixar Modelo (.xlsx)
                     </Button>
+                    {canEdit && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsNewSkuOpen(true)}
+                        className="text-xs h-8 text-gray-700"
+                      >
+                        <Plus className="w-3.5 h-3.5 mr-1.5" />
+                        Cadastrar Manualmente
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
@@ -1057,6 +1097,14 @@ export default function ComparativoMargensGrPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* MODAL DE IMPORTAÇÃO DE EXCEL (.xlsx / .csv) */}
+      <ImportMargensDialog
+        open={isImportOpen}
+        onOpenChange={setIsImportOpen}
+        onImportSuccess={loadData}
+        existingRecordsCount={dbRows.length}
+      />
     </div>
   )
 }

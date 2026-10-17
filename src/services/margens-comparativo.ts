@@ -130,3 +130,83 @@ export async function saveMultipleMargensItems(
     })
   }
 }
+
+export interface ImportItemPayload {
+  produto: string
+  cmv: number
+  preco_rivoli: number
+  ordem?: number
+  ativo?: boolean
+}
+
+export interface BatchImportResult {
+  importados: number
+  ignorados: number
+  erros: Array<{ linha: number; produto: string; erro: string }>
+}
+
+/**
+ * Remove todos os registros existentes da coleção margens_comparativo_gr.
+ */
+export async function clearAllMargensComparativo(): Promise<number> {
+  const existing = await pb
+    .collection('margens_comparativo_gr')
+    .getFullList<{ id: string }>({ fields: 'id' })
+  let deletedCount = 0
+  for (const item of existing) {
+    try {
+      await pb.collection('margens_comparativo_gr').delete(item.id)
+      deletedCount++
+    } catch (err) {
+      console.warn(`Erro ao excluir item ${item.id} na limpeza:`, err)
+    }
+  }
+  return deletedCount
+}
+
+/**
+ * Importa uma lista de itens em lote na coleção margens_comparativo_gr.
+ * Suporta opção de substituir todos os registros existentes ou adicionar aos já cadastrados.
+ */
+export async function batchImportMargens(
+  items: ImportItemPayload[],
+  mode: 'replace' | 'append',
+  onProgress?: (current: number, total: number) => void,
+): Promise<BatchImportResult> {
+  if (mode === 'replace') {
+    await clearAllMargensComparativo()
+  }
+
+  let importados = 0
+  const erros: Array<{ linha: number; produto: string; erro: string }> = []
+
+  const total = items.length
+  for (let i = 0; i < total; i++) {
+    const item = items[i]
+    try {
+      await pb.collection('margens_comparativo_gr').create({
+        produto: item.produto,
+        cmv: item.cmv,
+        preco_rivoli: item.preco_rivoli,
+        ordem: item.ordem ?? i + 1,
+        ativo: item.ativo ?? true,
+      })
+      importados++
+    } catch (err) {
+      erros.push({
+        linha: i + 1,
+        produto: item.produto,
+        erro: err instanceof Error ? err.message : String(err),
+      })
+    }
+    if (onProgress) {
+      onProgress(i + 1, total)
+    }
+  }
+
+  return {
+    importados,
+    ignorados: erros.length,
+    erros,
+  }
+}
