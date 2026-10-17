@@ -312,11 +312,18 @@ export function FinancialReports() {
   }
 
   const handleCsv = () => {
-    exportToCsv(
-      report.rows as Record<string, unknown>[],
-      `${report.title.toLowerCase().replace(/\s+/g, '_')}.csv`,
-      { module: `Financeiro > ${report.title}`, format: 'csv', filters: {} },
-    )
+    const dataObjects = report.rows.map((row) => {
+      const obj: Record<string, unknown> = {}
+      report.headers.forEach((h, idx) => {
+        obj[h] = row[idx] ?? ''
+      })
+      return obj
+    })
+    exportToCsv(dataObjects, `${report.title.toLowerCase().replace(/\s+/g, '_')}.csv`, {
+      module: `Financeiro > ${report.title}`,
+      format: 'csv',
+      filters: {},
+    })
   }
 
   return (

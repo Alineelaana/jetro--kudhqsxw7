@@ -71,7 +71,7 @@ export function QualityExtendedPanel() {
     try {
       await createNonConformity({
         description: String(fd.get('description') || ''),
-        severity: String(fd.get('severity') || 'media'),
+        severity: String(fd.get('severity') || 'media') as any,
         status: 'aberta',
         quantity_affected: Number(fd.get('quantity_affected') || 0),
         root_cause: String(fd.get('root_cause') || ''),

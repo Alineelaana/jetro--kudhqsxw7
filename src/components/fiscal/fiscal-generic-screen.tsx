@@ -44,9 +44,10 @@ export function FiscalGenericScreen({ config }: { config: FiscalScreenConfig }) 
   }, [])
   useRealtime(config.collection, () => load())
 
+  const primaryField = config.fields[0]?.name || 'name'
   const filtered = records.filter((r) => {
     if (!search) return true
-    const nameVal = (r[config.nameField] as string) || ''
+    const nameVal = (r[primaryField] as string) || ''
     return nameVal.toLowerCase().includes(search.toLowerCase())
   })
 
@@ -180,9 +181,7 @@ export function FiscalGenericScreen({ config }: { config: FiscalScreenConfig }) 
               <tbody>
                 {filtered.map((r) => (
                   <tr key={r.id as string} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-3 font-medium">
-                      {(r[config.nameField] as string) || '—'}
-                    </td>
+                    <td className="px-3 py-3 font-medium">{(r[primaryField] as string) || '—'}</td>
                     {displayFields.map((f) => (
                       <td key={f.name} className="px-3 py-3 hidden md:table-cell text-xs">
                         {(r[f.name] as string) || '—'}

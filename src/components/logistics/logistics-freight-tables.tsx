@@ -141,19 +141,21 @@ export function LogisticsFreightTables() {
               ) : (
                 filtered.map((r, i) => (
                   <tr key={i} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 font-medium">{r.nome_tabela || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell">{r.transportadora || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.regiao_origem || '—'}
+                    <td className="px-3 py-2 font-medium">{String(r.nome_tabela || '—')}</td>
+                    <td className="px-3 py-2 hidden md:table-cell">
+                      {String(r.transportadora || '—')}
                     </td>
                     <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.regiao_destino || '—'}
+                      {String(r.regiao_origem || '—')}
+                    </td>
+                    <td className="px-3 py-2 hidden md:table-cell text-xs">
+                      {String(r.regiao_destino || '—')}
                     </td>
                     <td className="px-3 py-2">
                       <span
                         className={`text-xs font-bold px-2 py-0.5 rounded ${r.situacao === 'Ativa' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
                       >
-                        {r.situacao}
+                        {String(r.situacao || '')}
                       </span>
                     </td>
                     <td className="px-3 py-2">

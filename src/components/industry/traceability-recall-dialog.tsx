@@ -150,8 +150,10 @@ export function TraceabilityRecallDialog({
                         <p className="text-muted-foreground">OP: {String(q.order_number || '—')}</p>
                       </div>
                       <div className="flex gap-1 shrink-0">
-                        {q.severity && (
-                          <Badge className={sevColor[q.severity] || ''}>{q.severity}</Badge>
+                        {Boolean(q.severity) && (
+                          <Badge className={sevColor[String(q.severity)] || ''}>
+                            {String(q.severity)}
+                          </Badge>
                         )}
                         <Badge variant="outline">
                           {String(q.status || q.quality_status || '—')}

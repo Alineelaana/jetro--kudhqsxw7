@@ -33,7 +33,7 @@ export function FinancialCashFlow() {
       const interval =
         viewMode === 'daily' ? 1 : viewMode === 'weekly' ? 7 : viewMode === 'monthly' ? 30 : 1
       const newRows: any[] = []
-      let saldo = mov.reduce(
+      let saldo = (mov as any[]).reduce(
         (s: number, m: any) => s + (parseFloat(m.entrada || '0') - parseFloat(m.saida || '0')),
         0,
       )

@@ -67,11 +67,13 @@ export function CrmErpIntegrationPanel() {
                   className="flex items-center justify-between text-sm border-b last:border-b-0 pb-2 last:pb-0"
                 >
                   <div>
-                    <span className="font-bold">{o.order_number}</span>
-                    <span className="text-muted-foreground ml-2">{o.client_name || '—'}</span>
+                    <span className="font-bold">{String(o.order_number || '')}</span>
+                    <span className="text-muted-foreground ml-2">
+                      {String(o.client_name || '—')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">{o.status}</span>
+                    <span className="text-xs text-muted-foreground">{String(o.status || '')}</span>
                     <span className="font-bold">
                       R${' '}
                       {(parseFloat(o.total_value as string) || 0).toLocaleString('pt-BR', {

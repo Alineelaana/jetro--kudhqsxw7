@@ -266,6 +266,7 @@ export interface DRELineResult {
   value: number
   is_calculated: boolean
   sign: string
+  level?: number
   percentage_of_revenue?: number
 }
 export interface DREResult {

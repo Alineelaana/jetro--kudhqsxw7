@@ -39,7 +39,12 @@ export function ChatProductivityDashboard() {
       setConversations(convs)
       setMessages(msgs)
       const map: UserMap = {}
-      for (const u of users as Array<{ id: string; name: string; email: string; avatar: string }>) {
+      for (const u of users as unknown as Array<{
+        id: string
+        name: string
+        email: string
+        avatar: string
+      }>) {
         map[u.id] = { name: u.name || u.email, avatar: u.avatar || '' }
       }
       setUserMap(map)

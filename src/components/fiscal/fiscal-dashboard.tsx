@@ -113,16 +113,16 @@ export function FiscalDashboard() {
     const creditsAvail = arr('credits').filter(
       (c) => (c as Record<string, string>)?.situacao === 'Disponivel',
     )
-    const totalCBS = creditsAvail.reduce(
-      (s, c) => s + parseFloat((c as Record<string, string>)?.cbs || '0'),
+    const totalCBS = (creditsAvail as any[]).reduce(
+      (s: number, c: any) => s + (parseFloat(c?.cbs || '0') || 0),
       0,
     )
-    const totalIBS = creditsAvail.reduce(
-      (s, c) => s + parseFloat((c as Record<string, string>)?.ibs || '0'),
+    const totalIBS = (creditsAvail as any[]).reduce(
+      (s: number, c: any) => s + (parseFloat(c?.ibs || '0') || 0),
       0,
     )
-    const totalSel = creditsAvail.reduce(
-      (s, c) => s + parseFloat((c as Record<string, string>)?.imposto_seletivo || '0'),
+    const totalSel = (creditsAvail as any[]).reduce(
+      (s: number, c: any) => s + (parseFloat(c?.imposto_seletivo || '0') || 0),
       0,
     )
     return {

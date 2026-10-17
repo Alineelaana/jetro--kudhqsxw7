@@ -67,8 +67,8 @@ export function LogisticsDashboard() {
       const vehiclesInOp = vehicles.filter((v) => v.situacao === 'Em Rota').length
       const vehiclesAvailable = vehicles.filter((v) => v.situacao === 'Disponível').length
       const driversOnRoute = drivers.filter((d) => d.situacao === 'Em Rota').length
-      const totalFreightCost = freights.reduce(
-        (sum, f) => sum + parseFloat(f.valor_total || '0'),
+      const totalFreightCost = (freights as any[]).reduce(
+        (sum: number, f: any) => sum + parseFloat(f.valor_total || '0'),
         0,
       )
       const deliveredCount = Math.max(delivered, 1)

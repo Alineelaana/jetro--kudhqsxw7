@@ -74,7 +74,7 @@ export function InternalBudgetDialog({ open, onOpenChange, onSuccess }: Props) {
         .then((data) => {
           const names = (data || [])
             .filter((s: unknown) => s && typeof s === 'object' && 'name' in s)
-            .map((s: { name: string }) => s.name)
+            .map((s: any) => String(s.name || ''))
             .filter(Boolean)
           setServices(names)
         })

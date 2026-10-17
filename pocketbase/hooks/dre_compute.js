@@ -133,6 +133,7 @@ routerAdd(
         line_key: key,
         label: sRec.getString('label'),
         group: sRec.getString('group'),
+        level: sRec.getInt('level') || 1,
         order: sRec.getInt('order'),
         value: value,
         is_calculated: isCalc,

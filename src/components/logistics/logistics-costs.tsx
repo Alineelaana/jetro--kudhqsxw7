@@ -150,14 +150,14 @@ export function LogisticsCosts() {
               ) : (
                 filtered.map((r, i) => (
                   <tr key={i} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 font-medium">{r.descricao || '—'}</td>
+                    <td className="px-3 py-2 font-medium">{String(r.descricao || '—')}</td>
                     <td className="px-3 py-2">
                       <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                        {r.tipo_custo}
+                        {String(r.tipo_custo || '')}
                       </span>
                     </td>
                     <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.entrega || r.rota || '—'}
+                      {String(r.entrega || r.rota || '—')}
                     </td>
                     <td className="px-3 py-2 text-right font-bold">
                       {fmtCurrency(String(r.valor || '0'))}

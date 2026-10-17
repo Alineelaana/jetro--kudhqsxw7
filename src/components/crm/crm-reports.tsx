@@ -53,7 +53,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 export function CrmReports() {
   const [data, setData] = useState<Record<string, unknown> | null>(null)
-  const [selected, setSelected] = useState(CRM_REPORT_TYPES[0])
+  const [selected, setSelected] = useState<string>(CRM_REPORT_TYPES[0])
   const [aiLoading, setAiLoading] = useState(false)
   const { user, userRole } = useAuth()
 

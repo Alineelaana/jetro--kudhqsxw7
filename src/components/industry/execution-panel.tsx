@@ -99,7 +99,7 @@ export function ExecutionPanel() {
         resource_id: String(fd.get('resource_id') || '') || undefined,
         operator_name: (user?.name as string) || 'Operador',
         operation_name: String(fd.get('operation_name') || ''),
-        type: String(fd.get('type') || 'producao'),
+        type: String(fd.get('type') || 'producao') as any,
         quantity_produced: Number(fd.get('quantity_produced') || 0),
         quantity_rejected: Number(fd.get('quantity_rejected') || 0),
         team_name: String(fd.get('team_name') || ''),

@@ -199,7 +199,11 @@ export function FinancialReceivables() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {(f.options || [...RECEIVABLE_STATUS]).map((o) => (
+                      {(
+                        ((f as any).options as readonly string[] | undefined) || [
+                          ...RECEIVABLE_STATUS,
+                        ]
+                      ).map((o) => (
                         <SelectItem key={o} value={o}>
                           {o}
                         </SelectItem>

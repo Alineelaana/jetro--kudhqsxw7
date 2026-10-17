@@ -1,5 +1,6 @@
 import pb from '@/lib/pocketbase/client'
-import type { DRELineResult, DREResult, BIFilters } from '@/lib/bi-types'
+import type { BIFilters } from '@/lib/bi-types'
+import type { DRELineResult, DREResult } from '@/lib/controladoria-types'
 import {
   getDREStructure,
   getAccountMappings,

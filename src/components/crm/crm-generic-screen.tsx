@@ -58,7 +58,7 @@ const CONFIGS: Record<
     load: () => Promise<any[]>
     create: (d: Record<string, unknown>) => Promise<any>
     update: (id: string, d: Record<string, unknown>) => Promise<any>
-    del: (id: string) => Promise<void>
+    del: (id: string) => Promise<unknown>
     collection: string
   }
 > = {

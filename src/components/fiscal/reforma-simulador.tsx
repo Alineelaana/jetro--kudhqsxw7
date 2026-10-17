@@ -35,8 +35,8 @@ export function ReformaSimulador() {
   useEffect(() => {
     Promise.all([getProducts(), getReformConfigs()])
       .then(([p, rc]) => {
-        setProducts(p as Record<string, unknown>[])
-        setReformCfg(rc as Record<string, unknown>[])
+        setProducts(p as unknown as Record<string, unknown>[])
+        setReformCfg(rc as unknown as Record<string, unknown>[])
       })
       .catch(() => {})
       .finally(() => setLoading(false))

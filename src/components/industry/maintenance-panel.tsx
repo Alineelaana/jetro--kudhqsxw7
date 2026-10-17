@@ -75,13 +75,13 @@ export function MaintenancePanel() {
     try {
       await createMaintenanceSchedule({
         resource_id: resourceId,
-        type: String(fd.get('type') || 'preventiva'),
+        type: String(fd.get('type') || 'preventiva') as any,
         title: String(fd.get('title') || ''),
         description: String(fd.get('description') || ''),
         frequency_days: Number(fd.get('frequency_days') || 0),
         next_maintenance: String(fd.get('next_maintenance') || ''),
         status: 'agendada',
-        impact_on_production: String(fd.get('impact_on_production') || 'baixo'),
+        impact_on_production: String(fd.get('impact_on_production') || 'baixo') as any,
         estimated_downtime_hours: Number(fd.get('estimated_downtime_hours') || 0),
         responsible: 'Manutencao',
       })
@@ -95,7 +95,7 @@ export function MaintenancePanel() {
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
-      await updateMaintenanceSchedule(id, { status })
+      await updateMaintenanceSchedule(id, { status: status as any })
       toast({ title: 'Status atualizado' })
       load()
     } catch {

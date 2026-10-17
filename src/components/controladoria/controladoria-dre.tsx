@@ -191,7 +191,9 @@ export function ControladoriaDRE() {
                     )}
                   >
                     <td className="py-2 px-2">
-                      <span style={{ paddingLeft: `${(l.level - 1) * 12}px` }}>{l.label}</span>
+                      <span style={{ paddingLeft: `${((l.level ?? 1) - 1) * 12}px` }}>
+                        {l.label}
+                      </span>
                     </td>
                     <td className="py-2 px-2 text-right font-medium">R$ {fmt(l.value)}</td>
                     <td className="py-2 px-2 text-right text-muted-foreground">

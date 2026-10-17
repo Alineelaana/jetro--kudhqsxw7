@@ -92,10 +92,10 @@ export function LogisticsIndicators() {
       0,
     )
     const totalFreight = (data.freights as Array<Record<string, unknown>>).reduce(
-      (s, f) => s + parseFloat((f.valor_total as string) || '0'),
+      (s: number, f: Record<string, unknown>) => s + parseFloat((f.valor_total as string) || '0'),
       0,
     )
-    const avgCost = delivered > 0 ? totalCost / delivered : 0
+    const avgCost = (delivered as number) > 0 ? (totalCost as number) / (delivered as number) : 0
     const occ = (data.occurrences as Array<Record<string, unknown>>).filter(
       (o) => o.situacao === 'Aberta' || o.situacao === 'Em Análise',
     ).length
@@ -224,7 +224,7 @@ export function LogisticsIndicators() {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label={({ name }: { name: string }) => name}
+                  label={((entry: any) => String(entry?.name ?? '')) as any}
                   labelLine={false}
                 >
                   {costChart.map((_, i) => (
