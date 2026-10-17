@@ -47,7 +47,7 @@ export function DpFgtsDigital() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-lg font-bold">FGTS Digital</h3>
-        {totals.diverggencias > 0 && (
+        {totals.divergencias > 0 && (
           <span className="flex items-center gap-1 text-sm font-bold text-red-600 bg-red-50 px-3 py-1 rounded">
             <AlertTriangle className="w-4 h-4" /> {totals.divergencias} divergência(s)
           </span>

@@ -116,6 +116,16 @@ export interface IndustrialKpi {
   responsible: string
   created: string
   updated: string
+  mtbf_hours?: number
+  mttr_hours?: number
+  machine_efficiency?: number
+  line_efficiency?: number
+  forecast_production?: number
+  actual_production?: number
+  operator_efficiency?: number
+  avg_production_time?: number
+  bottleneck_count?: number
+  cost_per_order?: number
   expand?: { resource_id?: { id: string; name: string } }
 }
 

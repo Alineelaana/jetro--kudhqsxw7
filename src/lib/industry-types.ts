@@ -61,6 +61,8 @@ export interface BomVersion {
   id: string
   product_id: string
   version: number
+  revision_number?: number | string
+  revision_status?: string
   type: string
   status: string
   vigencia_inicial: string
