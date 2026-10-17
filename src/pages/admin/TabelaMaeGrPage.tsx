@@ -15,7 +15,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { JetroSpreadsheet } from '@/components/spreadsheet/JetroSpreadsheet'
+import { ImportTabelaMaeDialog } from '@/components/spreadsheet/ImportTabelaMaeDialog'
 import { getWorkbookBySlug, saveWorkbook } from '@/services/spreadsheet-storage'
+import { exportWorkbookToExcel } from '@/lib/spreadsheet-file-utils'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import type { SheetData, WorkbookData } from '@/types/spreadsheet'
@@ -61,6 +63,7 @@ export default function TabelaMaeGrPage() {
   const [workbook, setWorkbook] = useState<WorkbookData>(createInitialTabelaMaeWorkbook())
   const [currentVersion, setCurrentVersion] = useState<number>(1)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 
   // Carrega snapshot existente do banco de dados
   const loadTabelaMae = useCallback(async () => {
@@ -194,6 +197,33 @@ export default function TabelaMaeGrPage() {
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setIsImportModalOpen(true)}
+              disabled={!canEdit || loading}
+              className="text-xs h-8 bg-emerald-50 text-[#005B2E] border-emerald-300 hover:bg-emerald-100"
+            >
+              <Upload className="w-3.5 h-3.5 mr-1.5" />
+              Importar Planilha Excel (.xlsx)
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                exportWorkbookToExcel(workbook, 'TABELA_MAE_GR.xlsx')
+                toast({
+                  title: 'Exportação concluída',
+                  description: 'Arquivo TABELA_MAE_GR.xlsx gerado com todas as abas e fórmulas.',
+                })
+              }}
+              className="text-xs h-8 text-gray-700"
+            >
+              <Download className="w-3.5 h-3.5 mr-1.5" />
+              Exportar Excel
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
               onClick={loadTabelaMae}
               disabled={loading}
               className="text-xs h-8 text-gray-700"
@@ -235,9 +265,23 @@ export default function TabelaMaeGrPage() {
             onAutoSave={handleAutoSave}
             hasUnsavedChanges={hasUnsavedChanges}
             saving={saving}
+            onCustomImportClick={() => setIsImportModalOpen(true)}
           />
         )}
       </div>
+
+      {/* DIÁLOGO DE IMPORTAÇÃO MULTI-ABA TOLERANTE */}
+      <ImportTabelaMaeDialog
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+        currentWorkbook={workbook}
+        currentVersion={currentVersion}
+        onImportSuccess={async (newWb, newVer) => {
+          setWorkbook(newWb)
+          setCurrentVersion(newVer)
+          setHasUnsavedChanges(false)
+        }}
+      />
     </div>
   )
 }

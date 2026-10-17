@@ -1,5 +1,30 @@
-import type { SheetData, WorkbookData } from '@/types/spreadsheet'
+import type { CellData, SheetData, WorkbookData } from '@/types/spreadsheet'
 import { colIndexToLetter } from '@/lib/spreadsheet-formula-engine'
+
+/**
+ * Informações e metadados de uma aba extraída do arquivo Excel
+ */
+export interface ExtractedSheetInfo {
+  index: number
+  sheetId: string
+  name: string
+  sheetPath: string
+  cells: Record<string, CellData>
+  maxCol: number
+  maxRow: number
+  totalNonEmptyCells: number
+  totalNonEmptyRows: number
+  // Matriz 2D de strings para análise estrutural (linha 1-based, col 0-based)
+  rawMatrix: string[][]
+  // Fórmulas detectadas nas células
+  formulaCount: number
+  unsupportedFormulas: string[]
+}
+
+export interface ExtractedWorkbook {
+  sheetNames: string[]
+  sheets: ExtractedSheetInfo[]
+}
 
 /**
  * Converte um arquivo .xlsx ou .csv em WorkbookData estruturado
@@ -37,11 +62,23 @@ export async function parseFileToWorkbook(file: File): Promise<WorkbookData> {
 
   // Arquivo .xlsx: descompacta o contêiner ZIP no browser
   const buffer = await file.arrayBuffer()
-  const sheets = await extractSheetsFromXlsxBuffer(buffer)
+  const extracted = await extractFullWorkbookFromXlsxBuffer(buffer)
 
-  if (sheets.length === 0) {
+  if (extracted.sheets.length === 0) {
     throw new Error('Não foi possível extrair nenhuma aba válida do arquivo Excel.')
   }
+
+  const sheets: SheetData[] = extracted.sheets.map((s, idx) => ({
+    id: `sheet-${idx + 1}`,
+    name: s.name,
+    cells: s.cells,
+    columns: Array.from({ length: Math.max(s.maxCol + 3, 15) }, (_, i) => ({
+      id: colIndexToLetter(i),
+      width: i === 0 ? 240 : 130,
+    })),
+    rowsCount: Math.max(s.maxRow + 10, 50),
+    order: idx,
+  }))
 
   return {
     sheets,
@@ -93,59 +130,145 @@ function matrixToSingleSheetWorkbook(matrix: string[][], sheetName = 'Planilha1'
 }
 
 /**
- * Leitor nativo de arquivos XLSX via DecompressionStream do navegador
+ * Extrai todas as abas e dados detalhados de um buffer XLSX
  */
-async function extractSheetsFromXlsxBuffer(buffer: ArrayBuffer): Promise<SheetData[]> {
+export async function extractFullWorkbookFromXlsxBuffer(
+  buffer: ArrayBuffer,
+): Promise<ExtractedWorkbook> {
   const bytes = new Uint8Array(buffer)
   const files = await readZipEntries(bytes)
 
-  // 1. Lê workbook.xml para saber os nomes das abas
+  // 1. Lê workbook.xml e rels do workbook para mapear sheetId -> caminho do arquivo .xml
   const workbookXml = files.get('xl/workbook.xml') || ''
-  const sheetNames = parseWorkbookXmlSheetNames(workbookXml)
+  const workbookRelsXml = files.get('xl/_rels/workbook.xml.rels') || ''
+
+  const sheetDefinitions = parseWorkbookXmlSheetDefinitions(workbookXml, workbookRelsXml)
 
   // 2. Lê sharedStrings.xml
   const sharedStringsXml = files.get('xl/sharedstrings.xml') || ''
   const sharedStrings = parseSharedStrings(sharedStringsXml)
 
-  // 3. Lê cada worksheet
-  const sheets: SheetData[] = []
-  let sheetIndex = 1
+  // 3. Lê cada worksheet mapeada ou busca por fallback
+  const sheets: ExtractedSheetInfo[] = []
 
-  while (true) {
-    const sheetPath = `xl/worksheets/sheet${sheetIndex}.xml`
-    const sheetXml = files.get(sheetPath)
-    if (!sheetXml) break
+  let idx = 0
+  for (const def of sheetDefinitions) {
+    const cleanPath = def.targetPath.toLowerCase().replace(/\\/g, '/')
+    let sheetXml = files.get(cleanPath)
 
-    const name = sheetNames[sheetIndex - 1] || `Aba ${sheetIndex}`
-    const { cells, maxCol, maxRow } = parseWorksheetXml(sheetXml, sharedStrings)
+    if (!sheetXml) {
+      // Tenta caminhos alternativos
+      const alt1 = `xl/worksheets/sheet${idx + 1}.xml`
+      const alt2 = `worksheets/sheet${idx + 1}.xml`
+      sheetXml = files.get(alt1) || files.get(alt2)
+    }
 
-    const columns = Array.from({ length: Math.max(maxCol + 3, 15) }, (_, i) => ({
-      id: colIndexToLetter(i),
-      width: i === 0 ? 240 : 130,
-    }))
-
-    sheets.push({
-      id: `sheet-${sheetIndex}`,
-      name,
-      cells,
-      columns,
-      rowsCount: Math.max(maxRow + 10, 50),
-      order: sheetIndex - 1,
-    })
-
-    sheetIndex++
+    if (sheetXml) {
+      const parsed = parseWorksheetXml(sheetXml, sharedStrings)
+      sheets.push({
+        index: idx,
+        sheetId: def.sheetId || `sheet-${idx + 1}`,
+        name: def.name,
+        sheetPath: def.targetPath,
+        ...parsed,
+      })
+      idx++
+    }
   }
 
-  return sheets
+  // Fallback caso workbook.xml não liste sheets ou caminhos sejam diferentes
+  if (sheets.length === 0) {
+    let sheetIndex = 1
+    while (true) {
+      const sheetPath = `xl/worksheets/sheet${sheetIndex}.xml`
+      const sheetXml = files.get(sheetPath)
+      if (!sheetXml) break
+
+      const name = `Aba ${sheetIndex}`
+      const parsed = parseWorksheetXml(sheetXml, sharedStrings)
+
+      sheets.push({
+        index: sheetIndex - 1,
+        sheetId: `sheet-${sheetIndex}`,
+        name,
+        sheetPath,
+        ...parsed,
+      })
+
+      sheetIndex++
+    }
+  }
+
+  return {
+    sheetNames: sheets.map((s) => s.name),
+    sheets,
+  }
 }
 
-function parseWorkbookXmlSheetNames(xml: string): string[] {
-  const names: string[] = []
-  const matches = xml.matchAll(/<sheet[^>]*name="([^"]+)"/g)
-  for (const m of matches) {
-    names.push(unescapeXml(m[1]))
+/**
+ * Lê definições de abas do workbook.xml correlacionando com xl/_rels/workbook.xml.rels
+ */
+interface SheetDef {
+  name: string
+  sheetId: string
+  rId: string
+  targetPath: string
+}
+
+function parseWorkbookXmlSheetDefinitions(
+  workbookXml: string,
+  workbookRelsXml: string,
+): SheetDef[] {
+  const relsMap = new Map<string, string>() // rId -> targetPath
+  if (workbookRelsXml) {
+    const relMatches = workbookRelsXml.matchAll(
+      /<Relationship[^>]+Id="([^"]+)"[^>]+Target="([^"]+)"/g,
+    )
+    for (const m of relMatches) {
+      const rId = m[1]
+      let target = m[2]
+      if (!target.startsWith('xl/') && !target.startsWith('/')) {
+        target = `xl/${target}`
+      }
+      relsMap.set(rId, target.replace(/^\//, ''))
+    }
   }
-  return names
+
+  const defs: SheetDef[] = []
+  const sheetMatches = workbookXml.matchAll(
+    /<sheet[^>]+name="([^"]+)"[^>]+sheetId="([^"]+)"[^>]+r:id="([^"]+)"/g,
+  )
+
+  for (const m of sheetMatches) {
+    const name = unescapeXml(m[1])
+    const sheetId = m[2]
+    const rId = m[3]
+    const target = relsMap.get(rId) || `xl/worksheets/sheet${defs.length + 1}.xml`
+    defs.push({ name, sheetId, rId, targetPath: target })
+  }
+
+  if (defs.length === 0) {
+    // Tenta formato com atributos em ordem diferente
+    const looseMatches = workbookXml.matchAll(/<sheet\s+([^>]+)\/?>/g)
+    let counter = 1
+    for (const lm of looseMatches) {
+      const attrs = lm[1]
+      const nameMatch = attrs.match(/name="([^"]+)"/)
+      const sheetIdMatch = attrs.match(/sheetId="([^"]+)"/)
+      const rIdMatch = attrs.match(/r:id="([^"]+)"/)
+
+      if (nameMatch) {
+        const name = unescapeXml(nameMatch[1])
+        const sheetId = sheetIdMatch ? sheetIdMatch[1] : String(counter)
+        const rId = rIdMatch ? rIdMatch[1] : `rId${counter}`
+        const target = relsMap.get(rId) || `xl/worksheets/sheet${counter}.xml`
+        defs.push({ name, sheetId, rId, targetPath: target })
+        counter++
+      }
+    }
+  }
+
+  return defs
 }
 
 function parseSharedStrings(xml: string): string[] {
@@ -164,14 +287,65 @@ function parseSharedStrings(xml: string): string[] {
   return strings
 }
 
+/**
+ * Funções suportadas pela SpreadsheetFormulaEngine
+ */
+const SUPPORTED_FORMULA_FUNCTIONS = new Set([
+  'SOMA',
+  'SUM',
+  'MEDIA',
+  'AVERAGE',
+  'MAX',
+  'MÁXIMO',
+  'MIN',
+  'MÍNIMO',
+  'CONT.SE',
+  'COUNTIF',
+  'SE',
+  'IF',
+  'ARRED',
+  'ROUND',
+])
+
+function checkFormulaSupport(formula: string): { isSupported: boolean; fnName?: string } {
+  const clean = formula.trim()
+  const fnMatch = clean.match(/^([A-Za-z_À-ÿ]+)\(/)
+  if (!fnMatch) {
+    // É expressão puramente aritmética (+, -, *, /, etc.)
+    return { isSupported: true }
+  }
+
+  const fnName = fnMatch[1].toUpperCase()
+  if (SUPPORTED_FORMULA_FUNCTIONS.has(fnName)) {
+    return { isSupported: true, fnName }
+  }
+  return { isSupported: false, fnName }
+}
+
 function parseWorksheetXml(
   xml: string,
   sharedStrings: string[],
-): { cells: SheetData['cells']; maxCol: number; maxRow: number } {
+): {
+  cells: SheetData['cells']
+  maxCol: number
+  maxRow: number
+  totalNonEmptyCells: number
+  totalNonEmptyRows: number
+  rawMatrix: string[][]
+  formulaCount: number
+  unsupportedFormulas: string[]
+} {
   const cells: SheetData['cells'] = {}
   let maxCol = 5
   let maxRow = 20
+  let totalNonEmptyCells = 0
+  let formulaCount = 0
+  const unsupportedFormulasSet = new Set<string>()
 
+  // Matriz de linhas 1-based (índice 0 não usado ou deixado vazio)
+  const rowMap = new Map<number, Map<number, string>>()
+
+  // Localiza todas as linhas e células
   const cellMatches = xml.matchAll(/<c\s+r="([A-Z0-9]+)"([^>]*)>(.*?)<\/c>/gs)
 
   for (const m of cellMatches) {
@@ -184,11 +358,17 @@ function parseWorksheetXml(
 
     // Fórmula: <f>...</f>
     const fMatch = content.match(/<f[^>]*>(.*?)<\/f>/s)
-    const formula = fMatch ? unescapeXml(fMatch[1]) : undefined
+    let formula = fMatch ? unescapeXml(fMatch[1]) : undefined
 
-    // Valor: <v>...</v>
+    // Valor pré-calculado pelo Excel: <v>...</v>
     const vMatch = content.match(/<v[^>]*>(.*?)<\/v>/s)
     let valStr = vMatch ? unescapeXml(vMatch[1]) : ''
+
+    // Inline string: <is><t>...</t></is>
+    const isMatch = content.match(/<is>.*?<t[^>]*>(.*?)<\/t>.*?<\/is>/s)
+    if (isMatch && !valStr) {
+      valStr = unescapeXml(isMatch[1])
+    }
 
     if (cellType === 's') {
       const idx = parseInt(valStr, 10)
@@ -199,9 +379,7 @@ function parseWorksheetXml(
       valStr = valStr === '1' ? 'VERDADEIRO' : 'FALSO'
     }
 
-    const raw = formula ? `=${formula}` : valStr
-
-    // Atualiza dimensões máximas
+    // Coordenadas
     const colLetters = cellRef.replace(/[0-9]/g, '')
     const rowNum = parseInt(cellRef.replace(/[A-Z]/g, ''), 10)
     let colIdx = 0
@@ -213,14 +391,68 @@ function parseWorksheetXml(
     if (colIdx > maxCol) maxCol = colIdx
     if (rowNum > maxRow) maxRow = rowNum
 
+    // Salva na matriz para processamento de cabeçalhos/seções
+    if (!rowMap.has(rowNum)) {
+      rowMap.set(rowNum, new Map<number, string>())
+    }
+    const cellValueForMatrix = valStr !== '' ? valStr : formula ? `=${formula}` : ''
+    if (cellValueForMatrix !== '') {
+      rowMap.get(rowNum)!.set(colIdx, cellValueForMatrix)
+    }
+
+    // Validação de suporte a fórmulas da engine
+    let cellError: string | undefined
+    if (formula) {
+      formulaCount++
+      const { isSupported, fnName } = checkFormulaSupport(formula)
+      if (!isSupported && fnName) {
+        unsupportedFormulasSet.add(fnName)
+        cellError = '#VALOR!' // Sinaliza função do Excel não suportada
+      }
+    }
+
+    // Detecta se é código longo (EAN/DUN) ou texto puro
+    // Se a célula não tem fórmula e é um código EAN/DUN (13 ou 14 dígitos), trata como string pura
+    const isEanOrDun = /^\d{13,14}$/.test(valStr.trim())
+
+    const raw = formula ? `=${formula}` : valStr
+
+    if (raw !== '') {
+      totalNonEmptyCells++
+    }
+
     cells[cellRef] = {
       raw,
-      formula,
+      formula: cellError ? undefined : formula,
+      computedValue: isEanOrDun ? valStr.trim() : undefined,
+      error: cellError,
       style: rowNum <= 2 ? { bold: true } : undefined,
     }
   }
 
-  return { cells, maxCol, maxRow }
+  // Constrói rawMatrix normalizada
+  const rawMatrix: string[][] = []
+  for (let r = 1; r <= maxRow; r++) {
+    const rowValues: string[] = []
+    const cols = rowMap.get(r)
+    for (let c = 0; c <= maxCol; c++) {
+      rowValues.push(cols?.get(c) || '')
+    }
+    rawMatrix.push(rowValues)
+  }
+
+  const nonEmptyRowsCount = rawMatrix.filter((row) => row.some((c) => c.trim() !== '')).length
+
+  return {
+    cells,
+    maxCol,
+    maxRow,
+    totalNonEmptyCells,
+    totalNonEmptyRows: nonEmptyRowsCount,
+    rawMatrix,
+    formulaCount,
+    unsupportedFormulas: Array.from(unsupportedFormulasSet),
+  }
 }
 
 function unescapeXml(str: string): string {

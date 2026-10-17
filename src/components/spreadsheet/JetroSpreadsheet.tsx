@@ -30,6 +30,7 @@ interface JetroSpreadsheetProps {
   hasUnsavedChanges?: boolean
   saving?: boolean
   customHeader?: React.ReactNode
+  onCustomImportClick?: () => void
 }
 
 export const JetroSpreadsheet: React.FC<JetroSpreadsheetProps> = ({
@@ -579,7 +580,7 @@ export const JetroSpreadsheet: React.FC<JetroSpreadsheetProps> = ({
         onInsertCol={handleInsertCol}
         onDeleteCol={handleDeleteCol}
         onExportExcel={handleExportExcel}
-        onImportClick={() => fileInputRef.current?.click()}
+        onImportClick={onCustomImportClick || (() => fileInputRef.current?.click())}
         onOpenHistory={() => setIsHistoryOpen(true)}
         isProtected={isProtected}
         onToggleProtect={() => setIsProtected((p) => !p)}

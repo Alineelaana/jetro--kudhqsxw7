@@ -1644,53 +1644,52 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/planilhas/convertidas/tabela-mae-gr',
     title: 'Tabela Mãe GR — Planilha Mestre Interativa',
     moduleGroup: 'Planilhas Convertidas',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-03-30',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-03-31',
     author: 'Engenharia de Software Jetro',
     objective: {
       title: 'Objetivo',
       content:
-        'Disponibilizar uma planilha genérica de edição livre no formato Excel/Google Sheets dentro do ERP Jetro, permitindo ao usuário importar a Tabela Mãe Gran Romano, editar qualquer célula ou fórmula, criar novas abas, salvar com versionamento e exportar com compatibilidade total.',
+        'Disponibilizar uma planilha genérica de edição livre no formato Excel/Google Sheets dentro do ERP Jetro, permitindo ao usuário importar a Tabela Mãe Gran Romano completa (com até dezenas de abas como Consumo salmoura, INSUMOS, MP, CMV, COMPARATIVO, TABELA MÃE, TAB VAREJO/ATACAREJO/ATACADO/DISTRIBUIDOR), editar qualquer célula ou fórmula, criar/remover abas, salvar snapshots versionados no banco e exportar com compatibilidade total.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Grade bidirecional interativa com suporte a milhares de células e colunas alfabéticas.\n- Edição completa com barra de fórmulas e atalhos universais de teclado.\n- Gerenciamento de abas (adicionar, renomear e excluir abas).\n- Importador drag & drop de arquivos Excel (.xlsx) mantendo todas as abas originais do arquivo importado.\n- Persistência com autosave em segundo plano e salvamento manual com histórico auditado de versões.\n- Exportação de arquivo Excel (.xlsx) contendo abas e fórmulas preservadas.',
+        '- Importador multi-aba tolerante com seletor de abas, contagem de linhas úteis, detecção de cabeçalhos de 1 a 3 linhas e remoção de colunas repetidas de título estadual.\n- Preservação fiel de blocos de seção verticais (ex: VIDRO, SACHÊ, BALDE) estilizados em destaque na grade.\n- Tratamento seguro de códigos EAN e DUN como texto sem truncamento de zeros ou dígitos.\n- Leitura e gravação de fórmulas ativas com sinalização #VALOR! para funções do Excel não suportadas pela engine web.\n- Modo de gravação flexível: Substituir workbook inteiro (padrão) ou Adicionar/mesclar abas ao snapshot existente.\n- Grade bidirecional interativa com suporte a milhares de células, colunas alfabéticas, atalhos de teclado e proteção de células.\n- Exportação Excel (.xlsx) completa com todas as abas, valores e tags de fórmula preservadas.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- A coleção nasce 100% vazia (nenhuma linha de produto hardcoded no sistema).\n- Dados entram exclusivamente via upload do arquivo pelo usuário em runtime.\n- Edições respeitam travas de proteção quando a planilha estiver bloqueada.\n- Alterações geram registros de autoria e carimbo de data/hora.',
+        '- A coleção nasce 100% vazia (rigorosamente nenhuma linha de produto hardcoded no sistema).\n- Dados entram exclusivamente via upload do arquivo pelo usuário em runtime.\n- Edições respeitam travas de proteção e RBAC (permissão concedida a SUP, COMERCIAL e FINANCEIRO).\n- Alterações geram registros de autoria, versionamento sequencial e histórico na coleção `planilhas_versoes`.\n- Controle de concorrência otimista com alerta em caso de sobrescrita simultânea.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O usuário acessa Planilhas Convertidas > Tabela Mãe GR.\n2. Caso não existam dados, a grade inicial é apresentada com estrutura aberta.\n3. O usuário importa seu arquivo Excel ou digita dados nas células.\n4. O motor avalia fórmulas locais ou referências entre abas e o estado é persistido no banco.',
+        '1. O usuário acessa Planilhas Convertidas > Tabela Mãe GR.\n2. Caso a base esteja vazia, clica em "Importar Planilha Excel (.xlsx)" no cabeçalho ou na toolbar.\n3. Seleciona o arquivo "TABELA MÃE - AGO 2026.xlsx"; o sistema lista todas as 10 abas com linhas úteis e status de seções.\n4. O usuário ajusta as abas e colunas na prévia interativa e confirma a importação.\n5. O snapshot versionado é salvo em `planilhas_workbooks` e `planilhas_versoes` e renderizado na grade.\n6. O usuário pode editar valores/fórmulas, salvar alterações ou exportar o workbook completo para Excel.',
     },
     dataSource: {
       title: 'Origem dos Dados',
-      content:
-        '- Coleções PocketBase: `tabela_mae_gr`, `planilhas_workbooks`, `planilhas_versoes`.',
+      content: '- Coleções PocketBase: `planilhas_workbooks`, `planilhas_versoes`.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Processamento assíncrono de XML/ZIP para leitura e geração de workbooks SpreadsheetML (.xlsx).',
+        '- Extrator OpenXML/ZIP nativo do navegador via DecompressionStream.\n- Gerador de arquivo SpreadsheetML (.xlsx) puro sem dependências externas.',
     },
     permissions: {
       title: 'Permissões',
       content:
-        '- Acesso: `canViewPlanilhasTabelaMaeGr(role)` (SUP, PADRAO, FINANCEIRO, COMERCIAL).\n- Edição: `canEditPlanilhasConvertidas(role)` (SUP, FINANCEIRO, COMERCIAL).',
+        '- Visualização: `canViewPlanilhasTabelaMaeGr(role)` (SUP, PADRAO, FINANCEIRO, COMERCIAL).\n- Edição: `canEditPlanilhasConvertidas(role)` (SUP, FINANCEIRO, COMERCIAL).',
     },
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `JetroSpreadsheet`, `TabelaMaeGrPage`.\n- Serviços: `spreadsheet-storage.ts`, `spreadsheet-file-utils.ts`.',
+        '- Componentes: `JetroSpreadsheet`, `TabelaMaeGrPage`, `ImportTabelaMaeDialog`.\n- Serviços e utilitários: `spreadsheet-storage.ts`, `spreadsheet-file-utils.ts`, `tabela-mae-structure-parser.ts`, `spreadsheet-formula-engine.ts`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Alerta amigável em caso de arquivo corrompido ou formato incompatível.\n- Fallback resiliente caso haja perda de conexão durante a gravação.',
+        '- Alerta amigável em caso de arquivo corrompido ou formato incompatível.\n- Marcação clara de funções de fórmula não suportadas (#VALOR!) no relatório de importação.\n- Alerta de conflito de concorrência com detecção de versão de servidor.',
     },
   },
 }

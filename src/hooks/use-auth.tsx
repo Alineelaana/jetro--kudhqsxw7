@@ -3,8 +3,20 @@ import { ClientResponseError } from 'pocketbase'
 import pb from '@/lib/pocketbase/client'
 import { extractFieldErrors, getErrorMessage, type FieldErrors } from '@/lib/pocketbase/errors'
 
+export interface AuthUser {
+  id?: string
+  name?: string
+  email?: string
+  role?: string
+  active?: boolean
+  mfa_enabled?: boolean
+  mfa_secret?: string
+  [key: string]: unknown
+}
+
 interface AuthContextType {
-  user: Record<string, unknown> | null
+  user: AuthUser | null
+  currentUser?: AuthUser | null
   isAuthenticated: boolean
   isAdmin: boolean
   userRole: string
@@ -290,7 +302,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user as AuthUser | null,
+        currentUser: user as AuthUser | null,
         isAuthenticated,
         isAdmin,
         userRole,
