@@ -22,7 +22,7 @@ export function ControladoriaSimulator() {
 
   const load = async () => {
     try {
-      setSimulations((await getSimulations()) as SimulationRecord[])
+      setSimulations((await getSimulations()) as unknown as SimulationRecord[])
       const exec = await getExecutiveAnalytics({}).catch(() => null)
       if (exec) setBaseRevenue(exec.faturamento)
     } catch {

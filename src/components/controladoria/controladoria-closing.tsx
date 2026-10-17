@@ -49,7 +49,7 @@ export function ControladoriaClosing() {
 
   const load = async () => {
     try {
-      setClosings((await getClosings()) as ClosingRecord[])
+      setClosings((await getClosings()) as unknown as ClosingRecord[])
     } catch {
       /* ignore */
     }
@@ -208,7 +208,7 @@ export function ControladoriaClosing() {
                         {new Date(t.date as string).toLocaleString('pt-BR')}
                       </span>
                       <span>
-                        — {t.action} por {t.user}
+                        — {String(t.action)} por {String(t.user)}
                       </span>
                     </div>
                   ))}

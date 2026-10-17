@@ -12,6 +12,7 @@ export interface CreateUserData {
   filial_id?: string
   departamento?: string
   cargo?: string
+  inactivity_timeout_minutes?: number
 }
 
 export async function getUsers() {
@@ -27,6 +28,10 @@ export async function createUser(data: CreateUserData): Promise<void> {
     role: data.role,
     cpf: data.cpf || '',
     active: data.active !== undefined ? data.active : true,
+    inactivity_timeout_minutes:
+      typeof data.inactivity_timeout_minutes === 'number' && data.inactivity_timeout_minutes > 0
+        ? data.inactivity_timeout_minutes
+        : 5,
   }
   if (data.avatar) {
     recordData.avatar = data.avatar
@@ -53,6 +58,7 @@ export interface UpdateUserData {
   filial_id?: string
   departamento?: string
   cargo?: string
+  inactivity_timeout_minutes?: number
 }
 
 export async function updateUser(userId: string, data: UpdateUserData): Promise<void> {
@@ -61,6 +67,9 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   if (data.role !== undefined) recordData.role = data.role
   if (data.cpf !== undefined) recordData.cpf = data.cpf
   if (data.active !== undefined) recordData.active = data.active
+  if (data.inactivity_timeout_minutes !== undefined) {
+    recordData.inactivity_timeout_minutes = data.inactivity_timeout_minutes
+  }
   if (data.password) {
     recordData.password = data.password
     recordData.passwordConfirm = data.password

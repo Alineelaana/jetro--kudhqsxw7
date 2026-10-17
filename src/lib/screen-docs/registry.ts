@@ -381,7 +381,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Apenas o perfil SUP pode alterar chaves de segurança, configurações de MFA e matriz de permissões.\n- Parâmetros alterados aplicam-se a novas sessões ou após recarregamento dos dados de sistema.',
+        '- Apenas o perfil SUP pode alterar chaves de segurança, configurações de MFA e matriz de permissões.\n- Parâmetros alterados aplicam-se a novas sessões ou após recarregamento dos dados de sistema.\n- Política de Inatividade de Sessão: o encerramento automático por ociosidade é governado individualmente por usuário (`inactivity_timeout_minutes` com default de 5 minutos configurado na aba de usuários em Central de Cadastros), sendo monitorado em toda a aplicação autenticada pelo componente `InactivityTracker`.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
@@ -538,12 +538,12 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     features: {
       title: 'Funcionalidades',
       content:
-        '- Tabela unificada com pesquisa por Razão Social, Nome Fantasia, CNPJ/CPF.\n- Formulário com abas: Dados Cadastrais (PF/PJ), Endereços, Contatos e Responsáveis, Dados Financeiros e Restrições de Crédito.\n- Consulta automática de CNPJ e CEP.\n- Controle de ativação/inativação de parceiros.',
+        '- Tabela unificada com pesquisa por Razão Social, Nome Fantasia, CNPJ/CPF.\n- Formulário com abas: Dados Cadastrais (PF/PJ), Endereços, Contatos e Responsáveis, Dados Financeiros e Restrições de Crédito.\n- Consulta automática de CNPJ e CEP.\n- Controle de ativação/inativação de parceiros.\n- Aba de Cadastro e Gestão de Usuários do Sistema (UserManagement) com definição individual de tempo de inatividade para encerramento automático de sessão.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Validação obrigatória de CNPJ/CPF com dígito verificador.\n- Parceiros marcados com restrição de crédito exigem liberação especial para emissão de novos pedidos.\n- Exclusão de parceiros bloqueada caso existam transações vinculadas.',
+        '- Validação obrigatória de CNPJ/CPF com dígito verificador.\n- Parceiros marcados com restrição de crédito exigem liberação especial para emissão de novos pedidos.\n- Exclusão de parceiros bloqueada caso existam transações vinculadas.\n- Controle de Inatividade de Usuários: cada usuário possui configuração individual de "Tempo de inatividade para deslogar" (em minutos, campo `inactivity_timeout_minutes` na coleção `users`, mínimo 1 min, máximo 480 min). O padrão para novos usuários e usuários existentes é de 5 minutos, sendo editável por administradores a qualquer momento. O frontend monitora interações reais (mouse, teclado, cliques, toque, scroll) e exibe contagem regressiva nos últimos 30 segundos com opção "Continuar conectado" antes de deslogar por inatividade e redirecionar para o login com aviso explicativo.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
@@ -552,7 +552,8 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     },
     dataSource: {
       title: 'Origem dos Dados',
-      content: '- Coleções: `partners`, `partner_types`, `partner_addresses`, `partner_financial`.',
+      content:
+        '- Coleções: `partners`, `partner_types`, `partner_addresses`, `partner_financial`, `users`.',
     },
     integrations: {
       title: 'Integrações',
@@ -565,7 +566,8 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     },
     dependencies: {
       title: 'Dependências',
-      content: 'Componentes de `src/components/partner-*` e `src/components/cadastros/*`.',
+      content:
+        'Componentes de `src/components/partner-*`, `src/components/cadastros/*`, `UserManagement`, `UserEditDialog` e `InactivityTracker`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',

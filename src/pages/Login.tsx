@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,19 +16,32 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
+  Clock,
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { login, isAuthenticated, loading, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [inactivityNotice, setInactivityNotice] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [submitting, setSubmitting] = useState(false)
+
+  // Captura mensagem de inatividade se redirecionado pelo InactivityTracker
+  useEffect(() => {
+    const state = location.state as { inactivityMessage?: string } | null
+    if (state?.inactivityMessage) {
+      setInactivityNotice(state.inactivityMessage)
+      // Limpa do state do histórico para não reaparecer após refresh
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -201,6 +214,15 @@ export default function LoginPage() {
                   <p className="text-xs text-destructive font-medium">{fieldErrors.password}</p>
                 )}
               </div>
+
+              {inactivityNotice && (
+                <div className="flex items-start gap-2.5 text-sm text-amber-800 bg-amber-500/15 dark:text-amber-300 dark:bg-amber-950/40 rounded-lg p-3 border border-amber-500/30">
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <span className="font-medium text-xs sm:text-sm leading-relaxed">
+                    {inactivityNotice}
+                  </span>
+                </div>
+              )}
 
               {error && !hasFieldError && (
                 <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-lg p-3 border border-destructive/30">

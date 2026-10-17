@@ -626,7 +626,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
     if (isTypingInput) return
 
     const currentPhrase = animatedPhrases[phraseIndex] || animatedPhrases[0]
-    let timeout: NodeJS.Timeout
+    let timeout: ReturnType<typeof setTimeout>
 
     if (!isDeleting) {
       if (displayedText.length < currentPhrase.length) {

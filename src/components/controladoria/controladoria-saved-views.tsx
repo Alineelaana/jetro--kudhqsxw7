@@ -95,7 +95,7 @@ export function ControladoriaSavedViews() {
                 <div>
                   <h3 className="font-bold text-sm">{String(v.name || '—')}</h3>
                   <Badge variant="outline" className="text-xs mt-1">
-                    {VIEW_TYPES[String(v.view_type || '')] || v.view_type}
+                    {VIEW_TYPES[String(v.view_type || '')] || String(v.view_type || '')}
                   </Badge>
                 </div>
                 {v.is_shared && <Share2 className="w-4 h-4 text-[#C89B3C]" />}

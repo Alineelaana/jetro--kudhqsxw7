@@ -108,7 +108,7 @@ export function ControladoriaComments() {
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-[#005B2E]" />
                   <Badge variant="outline" className="text-xs">
-                    {ENTITY_TYPES[String(c.entity_type || '')] || c.entity_type}
+                    {ENTITY_TYPES[String(c.entity_type || '')] || String(c.entity_type || '')}
                   </Badge>
                   {c.period && (
                     <span className="text-xs text-muted-foreground">{String(c.period)}</span>

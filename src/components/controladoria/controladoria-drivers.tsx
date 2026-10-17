@@ -24,7 +24,7 @@ export function ControladoriaDrivers() {
 
   const load = async () => {
     try {
-      setDrivers((await getDrivers()) as DriverDefinition[])
+      setDrivers((await getDrivers()) as unknown as DriverDefinition[])
     } catch {
       /* ignore */
     }

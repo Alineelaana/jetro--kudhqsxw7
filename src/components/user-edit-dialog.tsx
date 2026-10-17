@@ -33,6 +33,7 @@ interface UserEditDialogProps {
     filial_id?: string
     cargo?: string
     departamento?: string
+    inactivity_timeout_minutes?: number
   } | null
   onSuccess: () => void
 }
@@ -71,6 +72,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [filialId, setFilialId] = useState('')
   const [cargo, setCargo] = useState('')
   const [departamento, setDepartamento] = useState('')
+  const [inactivityTimeout, setInactivityTimeout] = useState('5')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
   const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
 
@@ -87,6 +89,11 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setFilialId(user.filial_id || '')
       setCargo(user.cargo || '')
       setDepartamento(user.departamento || '')
+      setInactivityTimeout(
+        typeof user.inactivity_timeout_minutes === 'number'
+          ? String(user.inactivity_timeout_minutes)
+          : '5',
+      )
     }
   }, [user])
 
@@ -128,6 +135,11 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setError('A nova senha deve ter no mínimo 8 caracteres.')
       return
     }
+    const parsedTimeout = parseInt(inactivityTimeout, 10)
+    if (isNaN(parsedTimeout) || parsedTimeout < 1 || parsedTimeout > 480) {
+      setError('O tempo de inatividade deve ser um número inteiro entre 1 e 480 minutos.')
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
@@ -141,6 +153,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
         filial_id: filialId,
         cargo: cargo.trim() || undefined,
         departamento: departamento.trim() || undefined,
+        inactivity_timeout_minutes: parsedTimeout,
       })
       toast({
         title: 'Usuário Atualizado',
@@ -267,6 +280,24 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
                 className="focus-visible:ring-[#005B2E]"
               />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-semibold">
+              Tempo de inatividade para deslogar (minutos)
+            </Label>
+            <Input
+              type="number"
+              min={1}
+              max={480}
+              value={inactivityTimeout}
+              onChange={(e) => setInactivityTimeout(e.target.value)}
+              placeholder="Ex: 5"
+              className="focus-visible:ring-[#005B2E]"
+            />
+            <p className="text-xs text-muted-foreground">
+              Define quanto tempo o usuário pode permanecer ocioso antes de ser deslogado
+              automaticamente (1 a 480 min). Padrão: 5.
+            </p>
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold">Nova Senha (opcional)</Label>

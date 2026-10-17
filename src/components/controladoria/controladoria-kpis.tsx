@@ -30,7 +30,7 @@ export function ControladoriaKPIs() {
 
   const load = async () => {
     try {
-      setKpis((await getKPIs()) as KPIDefinition[])
+      setKpis((await getKPIDefinitions()) as unknown as KPIDefinition[])
     } catch {
       /* ignore */
     }

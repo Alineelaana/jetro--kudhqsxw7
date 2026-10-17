@@ -57,6 +57,7 @@ interface UserRecord {
   mfa_enabled?: boolean
   cargo?: string
   departamento?: string
+  inactivity_timeout_minutes?: number
 }
 
 export function UserManagement() {
@@ -68,6 +69,7 @@ export function UserManagement() {
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('PADRAO')
   const [cpf, setCpf] = useState('')
+  const [inactivityTimeout, setInactivityTimeout] = useState('5')
   const [avatar, setAvatar] = useState<File | null>(null)
   const [cpfError, setCpfError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -111,6 +113,11 @@ export function UserManagement() {
       setError('CPF inválido.')
       return
     }
+    const parsedTimeout = parseInt(inactivityTimeout, 10)
+    if (isNaN(parsedTimeout) || parsedTimeout < 1 || parsedTimeout > 480) {
+      setError('O tempo de inatividade deve ser um número inteiro entre 1 e 480 minutos.')
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
@@ -122,12 +129,14 @@ export function UserManagement() {
         cpf: cpf.replace(/\D/g, ''),
         avatar,
         active: true,
+        inactivity_timeout_minutes: parsedTimeout,
       })
       setName('')
       setEmail('')
       setPassword('')
       setRole('PADRAO')
       setCpf('')
+      setInactivityTimeout('5')
       setAvatar(null)
       setCpfError('')
       toast({
@@ -255,6 +264,23 @@ export function UserManagement() {
               </Select>
             </div>
             <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">
+                Tempo de inatividade para deslogar (minutos)
+              </Label>
+              <Input
+                type="number"
+                min={1}
+                max={480}
+                value={inactivityTimeout}
+                onChange={(e) => setInactivityTimeout(e.target.value)}
+                placeholder="Ex: 5"
+                className="focus-visible:ring-[#005B2E]"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Padrão: 5 minutos (mínimo 1, máximo 480 min). A sessão encerra após inatividade.
+              </p>
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-sm font-semibold">Foto de Perfil</Label>
               <div className="flex items-center gap-3">
                 <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors text-sm">
@@ -352,6 +378,9 @@ export function UserManagement() {
                           {u.cargo && (
                             <p className="text-xs text-muted-foreground">Cargo: {u.cargo}</p>
                           )}
+                          <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">
+                            Inatividade: {u.inactivity_timeout_minutes ?? 5} min
+                          </p>
                         </div>
                       </div>
                     </div>

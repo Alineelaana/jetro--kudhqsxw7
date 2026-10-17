@@ -11,6 +11,7 @@ export interface AuthUser {
   active?: boolean
   mfa_enabled?: boolean
   mfa_secret?: string
+  inactivity_timeout_minutes?: number
   [key: string]: unknown
 }
 

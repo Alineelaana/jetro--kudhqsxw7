@@ -108,7 +108,7 @@ export function BiStock() {
               {data.lowStockItems.length > 0 ? (
                 data.lowStockItems.map((p, i) => (
                   <TableRow key={i}>
-                    <TableCell className="font-medium">{p.name || '—'}</TableCell>
+                    <TableCell className="font-medium">{String(p.name || '—')}</TableCell>
                     <TableCell className="text-right">{String(p.stock ?? 0)}</TableCell>
                     <TableCell className="text-right">{String(p.min_stock ?? 0)}</TableCell>
                     <TableCell className="text-center">

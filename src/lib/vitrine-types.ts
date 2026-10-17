@@ -7,6 +7,7 @@ export type VitrineType =
   | 'imagem_texto'
   | 'bloco_promocional'
   | 'aviso'
+  | 'banner_full'
 export type VitrineDisplayPage =
   | 'home_banner'
   | 'home_middle'

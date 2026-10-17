@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T18:46:08.638Z",
+  "generatedAt": "2026-10-17T18:55:56.284Z",
   "collections": [
     {
       "name": "users",
@@ -109,6 +109,12 @@
         {
           "name": "mfa_verified_at",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "inactivity_timeout_minutes",
+          "type": "number",
           "required": false,
           "system": false
         }

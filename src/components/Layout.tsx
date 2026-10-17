@@ -8,6 +8,7 @@ import { AdminSidebar } from '@/components/admin-sidebar'
 import { useAuth } from '@/hooks/use-auth'
 import { canViewScreenDocs } from '@/lib/permissions'
 import { ScreenLogicDrawer } from '@/components/screen-docs/screen-logic-drawer'
+import { InactivityTracker } from '@/components/inactivity-tracker'
 import { Button } from '@/components/ui/button'
 import { FileCode2 } from 'lucide-react'
 
@@ -45,6 +46,7 @@ export default function Layout() {
   if (showSidebar) {
     return (
       <div className="flex h-screen flex-col overflow-hidden">
+        <InactivityTracker />
         <SiteHeader />
         <div className="flex flex-1 overflow-hidden">
           <AdminSidebar />
@@ -93,6 +95,7 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <InactivityTracker />
       {!isRootLogin && <SiteHeader />}
       <main className="flex-1">
         <Outlet />
