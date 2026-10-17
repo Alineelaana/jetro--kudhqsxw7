@@ -135,7 +135,7 @@ export async function convertProposalToOrder(proposalId: string, userName: strin
     other_expenses: '0',
     tax_value: '0',
     total_value: (proposal as Record<string, unknown>).total || '0',
-    company: (proposal as Record<string, unknown>).company || 'Velora Log',
+    company: (proposal as Record<string, unknown>).company || 'Jetro Logística',
     branch: (proposal as Record<string, unknown>).filial || 'Matriz',
     history: [
       {
@@ -160,7 +160,7 @@ export async function convertProposalToOrder(proposalId: string, userName: strin
     description: `Proposta convertida em pedido ${orderRes.number}`,
     user_name: userName,
     date: new Date().toISOString(),
-    company: ((proposal as Record<string, unknown>).company as string) || 'Velora Log',
+    company: ((proposal as Record<string, unknown>).company as string) || 'Jetro Logística',
     filial: ((proposal as Record<string, unknown>).filial as string) || 'Matriz',
   })
   logCRMAudit(

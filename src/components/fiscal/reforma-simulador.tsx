@@ -129,7 +129,7 @@ export function ReformaSimulador() {
         diferenca_percent: result.difPercent.toFixed(2),
         scenario_name: `Simulação Reforma - ${operacao}`,
         created_by: (user?.name as string) || '',
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
       })
       toast.success('Simulação salva sem alterar preço oficial')

@@ -35,7 +35,7 @@ export function SendMessageDialog({
   authorName = 'Atendente',
   onSuccess,
 }: SendMessageDialogProps) {
-  const [subject, setSubject] = useState('Orçamento Velora Log — Proposta Comercial')
+  const [subject, setSubject] = useState('Orçamento Jetro Logística — Proposta Comercial')
   const [content, setContent] = useState(
     `Olá ${clientName},\n\nConforme solicitado, enviamos em anexo/abaixo os detalhes do seu orçamento para a operação logística.\n\nFicamos à disposição para quaisquer dúvidas.`,
   )
@@ -121,17 +121,15 @@ export function SendMessageDialog({
           {/* Email Professional Signature Preview */}
           <div className="border border-border/80 rounded-xl p-4 bg-muted/20 space-y-3">
             <Label className="text-xs uppercase font-extrabold tracking-wider text-muted-foreground">
-              Assinatura Profissional Velora Log
+              Assinatura Profissional Jetro Logística
             </Label>
             <div className="space-y-2">
               <p className="text-sm text-foreground">Atenciosamente,</p>
-              <p className="text-sm font-bold text-[#005B2E]">
-                {authorName} — Velora Log Operações Logísticas
-              </p>
+              <p className="text-sm font-bold text-[#005B2E]">{authorName} — Jetro Logística</p>
               <div className="rounded-lg overflow-hidden border border-border shadow-sm max-w-[580px]">
                 <img
                   src={signatureImg}
-                  alt="Assinatura Comercial Velora Log"
+                  alt="Assinatura Comercial Jetro Logística"
                   className="w-full h-auto object-contain block"
                 />
               </div>

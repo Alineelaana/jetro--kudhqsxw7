@@ -9,7 +9,7 @@ export interface MenuHistoryEntry {
 export type MenuHistory = Record<string, MenuHistoryEntry>
 
 function getStorageKey(userId?: string): string {
-  return `veloralog:menu-history:${userId || 'anonymous'}`
+  return `jetro:menu-history:${userId || 'anonymous'}`
 }
 
 export function useMenuHistory(userId?: string) {

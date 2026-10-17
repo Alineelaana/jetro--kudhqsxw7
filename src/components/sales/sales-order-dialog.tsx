@@ -246,7 +246,7 @@ export function SalesOrderDialog({ open, onOpenChange, order, onSaved }: Props) 
         total_value: String(totalValue.toFixed(2)),
         status,
         responsible_user: userName,
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
         history: [
           ...(order?.history || []),

@@ -161,7 +161,7 @@ export async function generateBoletoFromReceivable(record: any): Promise<void> {
     data_vencimento: record.data_vencimento || '',
     banco: record.conta_bancaria || 'Banco do Brasil',
     status: 'Registrado',
-    empresa: record.empresa || 'Velora Log',
+    empresa: record.empresa || 'Jetro Logística',
     filial: record.filial || 'Matriz',
   })
 }
@@ -171,13 +171,13 @@ export async function generatePixFromReceivable(record: any): Promise<void> {
     cliente: record.cliente || '',
     titulo_id: record.id,
     identificador_transacao: `PIX-${Date.now().toString(36).toUpperCase()}`,
-    chave_pix: 'veloralog@pix.com.br',
+    chave_pix: 'jetro@pix.com.br',
     valor: record.valor_original || '0',
     data_geracao: new Date().toISOString().split('T')[0],
     data_vencimento: record.data_vencimento || '',
     status: 'Gerado',
     tipo_pix: 'Dinâmico',
-    empresa: record.empresa || 'Velora Log',
+    empresa: record.empresa || 'Jetro Logística',
     filial: record.filial || 'Matriz',
   })
 }

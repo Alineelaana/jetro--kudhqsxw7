@@ -256,7 +256,7 @@ export async function moveOpportunityStage(
     description: `Etapa alterada — tempo na etapa anterior: ${timeInStage}h`,
     user_name: userName,
     date: now,
-    company: 'Velora Log',
+    company: 'Jetro Logística',
     filial: 'Matriz',
   })
 }

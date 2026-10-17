@@ -73,7 +73,7 @@ export default function ClientRegister() {
           <CardContent className="pt-6 space-y-4">
             <p className="text-sm text-muted-foreground">
               Seu pré-cadastro foi recebido com sucesso! Você será notificado por e-mail assim que
-              seu cadastro for validado pela equipe Velora Log.
+              seu cadastro for validado pela equipe Jetro.
             </p>
             <Button
               asChild

@@ -93,7 +93,7 @@ export function NfsePanel() {
         status: 'Autorizada',
         authorization_protocol: String(Date.now()),
         responsible_user: userName,
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
       })
       logFiscalAudit('create', 'nfse_records', '', `NFS-e emitida para ${form.tomador}`)

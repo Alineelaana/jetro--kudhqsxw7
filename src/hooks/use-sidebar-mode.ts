@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 function getStorageKey(userId?: string): string {
-  return `veloralog:sidebar-mode:${userId || 'anonymous'}`
+  return `jetro:sidebar-mode:${userId || 'anonymous'}`
 }
 
 export type SidebarMode = 'expanded' | 'rail'

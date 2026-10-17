@@ -299,7 +299,7 @@ export function ManualBudgetDialog({
                 type="email"
                 value={form.responsible_email}
                 onChange={(e) => set('responsible_email', e.target.value)}
-                placeholder="responsavel@veloralog.com.br"
+                placeholder="responsavel@jetrolog.com.br"
                 className="h-9 focus-visible:ring-[#005B2E]"
               />
             </div>

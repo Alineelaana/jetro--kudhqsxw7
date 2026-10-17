@@ -110,7 +110,7 @@ export function NfcePanel() {
         payment_method: paymentMethod,
         change_amount: String(change.toFixed(2)),
         authorization_protocol: String(Date.now()),
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
         responsible_user: userName,
       })

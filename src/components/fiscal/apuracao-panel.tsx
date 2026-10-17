@@ -55,7 +55,7 @@ export function ApuracaoPanel() {
         ...form,
         status: 'Processado',
         responsible_user: userName,
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
       })
       logFiscalAudit('create', 'fiscal_apuracao', '', `Apuração ${form.tributo} - ${form.periodo}`)

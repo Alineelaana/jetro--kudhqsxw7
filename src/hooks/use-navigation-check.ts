@@ -5,7 +5,7 @@ import {
   type FlatMenuItem,
 } from '@/lib/navigation-regression-test'
 
-const STORAGE_KEY = 'veloralog:nav-baseline'
+const STORAGE_KEY = 'jetro:nav-baseline'
 
 export interface NavigationCheckResult {
   violations: string[]

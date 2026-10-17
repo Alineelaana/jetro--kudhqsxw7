@@ -56,7 +56,7 @@ export function CartaCorrecao() {
         correcao_texto: correctionText,
         status: 'Autorizada',
         protocolo: String(Date.now()),
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
         responsible_user: userName,
       })

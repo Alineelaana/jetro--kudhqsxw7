@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 function getStorageKey(userId?: string): string {
-  return `veloralog:menu-favorites:${userId || 'anonymous'}`
+  return `jetro:menu-favorites:${userId || 'anonymous'}`
 }
 
 export function useMenuFavorites(userId?: string) {

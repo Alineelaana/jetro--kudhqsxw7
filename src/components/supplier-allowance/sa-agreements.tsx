@@ -68,7 +68,7 @@ export function SaAgreements() {
 
   const openNew = () => {
     setEditing(null)
-    setForm({ status: 'rascunho', currency: 'BRL', company: 'Velora Log', branch: 'Matriz' })
+    setForm({ status: 'rascunho', currency: 'BRL', company: 'Jetro Logística', branch: 'Matriz' })
     setDialogOpen(true)
   }
   const openEdit = (r: any) => {

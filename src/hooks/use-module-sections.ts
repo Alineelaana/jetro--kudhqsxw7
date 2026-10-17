@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 function getStorageKey(module: string, userId?: string): string {
-  return `veloralog:module-sections:${module}:${userId || 'anonymous'}`
+  return `jetro:module-sections:${module}:${userId || 'anonymous'}`
 }
 
 export function useModuleSections(module: string, userId?: string) {

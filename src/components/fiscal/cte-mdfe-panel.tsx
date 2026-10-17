@@ -72,7 +72,7 @@ export function CtePanel() {
         status: 'Autorizada',
         authorization_protocol: String(Date.now()),
         responsible_user: userName,
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
       })
       logFiscalAudit('create', 'cte_records', '', `CT-e emitida para ${form.tomador}`)
@@ -335,7 +335,7 @@ export function MdfePanel() {
         authorization_protocol: String(Date.now()),
         encerrado: false,
         responsible_user: userName,
-        company: 'Velora Log',
+        company: 'Jetro Logística',
         branch: 'Matriz',
       })
       logFiscalAudit('create', 'mdfe_records', '', `MDF-e emitido - ${form.uf_carregamento}`)
