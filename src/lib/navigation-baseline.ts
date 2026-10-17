@@ -179,6 +179,12 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
     classification: 'A',
   },
   {
+    route: '/admin/central-documentacao',
+    label: 'Central de Documentação Técnica',
+    group: 'Administração',
+    classification: 'A',
+  },
+  {
     route: '/admin/phase0-foundation',
     label: 'Phase0 Foundation',
     group: 'Administração',

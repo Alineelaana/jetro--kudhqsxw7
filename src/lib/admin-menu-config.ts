@@ -46,6 +46,7 @@ import {
   canManageBackups,
   canConsultCosts,
   canViewConformidade,
+  canViewScreenDocs,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -127,6 +128,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewConfiguracoes,
       },
       { label: 'Auditoria', icon: FileSearch, route: '/admin/auditoria', perm: canViewAuditLogs },
+      {
+        label: 'Central de Documentação Técnica',
+        icon: FileText,
+        route: '/admin/central-documentacao',
+        perm: canViewScreenDocs,
+      },
       {
         label: 'Configurações',
         icon: Settings,

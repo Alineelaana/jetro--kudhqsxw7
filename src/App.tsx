@@ -92,6 +92,7 @@ import Promotions from './pages/Promotions'
 import Precificacao from './pages/Precificacao'
 import Auditoria from './pages/Auditoria'
 import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
+import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
 import TradeMarketing from './pages/TradeMarketing'
@@ -1164,6 +1165,10 @@ const App = () => (
                         <Route
                           path="/admin/agendamento-relatorios"
                           element={<ReportSchedulesPage />}
+                        />
+                        <Route
+                          path="/admin/central-documentacao"
+                          element={<CentralDocumentacaoPage />}
                         />
                         <Route path="/admin/auditoria" element={<Auditoria />} />
                         <Route

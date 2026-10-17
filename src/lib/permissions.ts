@@ -247,3 +247,12 @@ export function canViewConformidade(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
+
+/**
+ * Permissão para acessar a Central de Documentação Técnica e o Drawer de Lógica da Tela.
+ * Exclusivo para usuários autorizados: perfil SUP (Superusuário / Administrador / TI).
+ */
+export function canViewScreenDocs(role: string | undefined): boolean {
+  if (!role) return false
+  return role === 'SUP'
+}
