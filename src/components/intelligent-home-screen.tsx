@@ -8,35 +8,45 @@ export function IntelligentHomeScreen() {
   const { user, signOut } = useAuth()
 
   return (
-    <div className="flex flex-col min-h-full p-4 sm:p-6 max-w-7xl mx-auto w-full pb-16">
-      <div className="flex items-center justify-between mb-4 px-1">
+    <div className="flex flex-col min-h-full p-4 sm:p-6 max-w-7xl mx-auto w-full pb-12 space-y-6">
+      {/* Barra de identificação superior discreta e profissional */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-0.5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-            Tela Inicial Inteligente
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Assistente inteligente nativo do ERP Jetro — pronto para responder consultas e análises
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-950 tracking-tight">
+              Tela Inicial Inteligente
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#005B2E]/10 text-[#005B2E] border border-[#005B2E]/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#005B2E]" />
+              ERP Jetro
+            </span>
+          </div>
+          <p className="text-xs text-gray-600 mt-1 font-medium">
+            Assistente executivo com consultas em tempo real, inteligência de dados e agenda
+            integrada
           </p>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2.5">
           <NotificationBell />
           <button
             onClick={signOut}
-            className="text-gray-500 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-gray-100 cursor-pointer"
-            title="Sair"
+            className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-red-600 transition-colors px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-red-50 hover:border-red-200 cursor-pointer shadow-2xs"
+            title="Encerrar sessão"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sair</span>
           </button>
         </div>
       </div>
 
-      {/* 1ª área: Jetro On-line pronto pra responder (preservada integralmente com tudo existente) */}
-      <div className="min-h-[580px] w-full">
-        <JetroOnlineChat className="h-full border border-gray-200/90 shadow-sm" />
-      </div>
+      {/* 1ª área principal: Jetro On-line pronto pra responder */}
+      <section className="w-full">
+        <JetroOnlineChat className="min-h-[560px]" />
+      </section>
 
-      {/* 2ª área: Calendário Mensal e Agenda Inteligente Jetro ocupando toda a largura */}
-      <div className="w-full mt-6">
+      {/* 2ª área: Calendário Mensal e Agenda Corporativa Jetro ocupando toda a largura */}
+      <section className="w-full">
         <JetroCalendar
           currentUser={
             user
@@ -50,7 +60,7 @@ export function IntelligentHomeScreen() {
               : undefined
           }
         />
-      </div>
+      </section>
     </div>
   )
 }

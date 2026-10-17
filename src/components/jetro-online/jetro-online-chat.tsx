@@ -479,9 +479,19 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
   } = useJetroOnline()
 
   const [input, setInput] = useState('')
-  const [, setIsTypingInput] = useState(false)
+  const [isTypingInput, setIsTypingInput] = useState(false)
   const [showHistorySidebar, setShowHistorySidebar] = useState(false)
   const [selectedFilterCategory, setSelectedFilterCategory] = useState<string>('todas')
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+
+  // Auto-resize para textarea mantendo limite confortável
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      const scrollHeight = textareaRef.current.scrollHeight
+      textareaRef.current.style.height = `${Math.min(Math.max(scrollHeight, 48), 160)}px`
+    }
+  }, [input])
 
   // Identificação do perfil do usuário para sugestões personalizadas
   const effectiveRole = useMemo(() => {
@@ -612,6 +622,9 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
+    // Se o usuário estiver digitando no input/textarea, não altera as frases animadas para não distrair
+    if (isTypingInput) return
+
     const currentPhrase = animatedPhrases[phraseIndex] || animatedPhrases[0]
     let timeout: NodeJS.Timeout
 
@@ -637,17 +650,20 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
     }
 
     return () => clearTimeout(timeout)
-  }, [displayedText, isDeleting, phraseIndex, animatedPhrases])
+  }, [displayedText, isDeleting, phraseIndex, animatedPhrases, isTypingInput])
 
   const handleSend = (textToSend?: string) => {
     const query = (textToSend || input).trim()
     if (!query || loading) return
     send(query)
     setInput('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
     }
@@ -658,49 +674,49 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
   return (
     <div
       className={cn(
-        'relative flex flex-col w-full bg-linear-to-b from-white via-white to-gray-50/50 rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden',
+        'relative flex flex-col w-full bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden',
         className,
       )}
     >
-      {/* Top Banner / Cabeçalho da IA Jetro On-line */}
-      <div className="relative px-6 py-5 bg-linear-to-r from-[#005B2E] via-[#014724] to-[#005B2E] text-white border-b-4 border-[#C9A227] flex flex-wrap items-center justify-between gap-4">
-        {/* Glow decorativo de fundo */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#C9A227]/20 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-8 left-1/3 w-40 h-40 bg-[#005B2E]/40 rounded-full blur-xl pointer-events-none" />
-
-        <div className="relative z-10 flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#C9A227] to-[#8F7014] text-white flex items-center justify-center shadow-md ring-2 ring-white/30">
-            <Bot className="w-6 h-6 text-white" />
+      {/* Top Header Corporativo da IA Jetro On-line — Claro, Elegante e com Alto Contraste */}
+      <div className="relative px-5 sm:px-6 py-4 bg-white border-b border-gray-200/90 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#005B2E]/10 border border-[#005B2E]/20 text-[#005B2E] flex items-center justify-center shrink-0 shadow-2xs">
+            <Bot className="w-5 h-5 text-[#005B2E]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
+              <span className="font-bold text-base sm:text-lg tracking-tight text-gray-900">
                 Jetro On-line
               </span>
-              <Badge className="bg-[#C9A227] text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs hover:bg-[#b59020]">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#005B2E]/10 text-[#005B2E] border border-[#005B2E]/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#005B2E] animate-pulse" />
+                Pronto para responder
+              </span>
+              <Badge
+                variant="outline"
+                className="hidden sm:inline-flex border-[#C9A227]/40 text-[#9A7B1C] bg-amber-50/50 text-[10px] font-bold uppercase tracking-wider"
+              >
                 IA Nativa ERP
               </Badge>
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Online
-              </span>
             </div>
-            <p className="text-xs text-emerald-100/90 font-medium mt-0.5">
-              Consultas com regras comerciais reais, gráficos integrados e filtros por perfil
+            <p className="text-xs text-gray-600 font-medium mt-0.5">
+              Consultas corporativas com critérios comerciais reais, dados auditados e gráficos
+              executivos
             </p>
           </div>
         </div>
 
-        {/* Ações superiores: Nova conversa e Histórico */}
-        <div className="relative z-10 flex items-center gap-2">
+        {/* Ações superiores: Nova consulta e Histórico */}
+        <div className="flex items-center gap-2">
           {conversations.length > 0 && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20 text-xs h-8 px-3"
+              className="border-gray-200 hover:border-[#005B2E] bg-white hover:bg-gray-50 text-gray-700 text-xs h-8 px-3 transition-colors"
             >
-              <MessageSquare className="w-3.5 h-3.5 mr-1.5 text-[#C9A227]" />
+              <MessageSquare className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
               Histórico ({conversations.length})
             </Button>
           )}
@@ -708,7 +724,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
             <Button
               size="sm"
               onClick={newConversation}
-              className="bg-[#C9A227] hover:bg-[#b59020] text-[#00381C] font-semibold text-xs h-8 px-3 shadow-xs"
+              className="bg-[#005B2E] hover:bg-[#01361D] text-white font-semibold text-xs h-8 px-3 shadow-xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5 mr-1" />
               Nova Consulta
@@ -766,61 +782,56 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
 
         {/* Área central com histórico de mensagens ou tela de boas-vindas */}
         <div className="flex-1 flex flex-col justify-between overflow-hidden">
-          <ScrollArea className="flex-1 p-5 sm:p-6">
+          <ScrollArea className="flex-1 p-5 sm:p-6 bg-slate-50/30">
             {!hasMessages ? (
-              <div className="max-w-3xl mx-auto py-4 space-y-6">
-                {/* 1. Título e Saudação com Efeito de Digitação */}
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#005B2E]/10 text-[#005B2E] text-xs font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-                    Jetro On-line com critérios comerciais reais e gráficos
+              <div className="max-w-3xl mx-auto py-2 sm:py-4 space-y-5">
+                {/* 1. Título e Saudação com Efeito de Digitação — Visual Limpo e Elegante */}
+                <div className="space-y-2 text-center sm:text-left">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#005B2E]/10 text-[#005B2E] text-xs font-semibold">
+                    <Sparkles className="w-3.5 h-3.5 text-[#9A7B1C]" />
+                    <span>Assistente ERP com critérios comerciais e fiscais auditados</span>
                   </div>
 
-                  {/* Frases com efeito typewriter */}
-                  <div className="min-h-[44px] flex items-center">
+                  {/* Frases animadas em ciclo */}
+                  <div className="min-h-[44px] flex items-center justify-center sm:justify-start">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center">
                       <span>{displayedText}</span>
-                      <span className="inline-block w-0.5 h-7 ml-1 bg-[#005B2E] animate-pulse" />
+                      <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 bg-[#005B2E] animate-pulse" />
                     </h1>
                   </div>
 
-                  {/* 3. Texto de orientação permanente */}
-                  <p className="text-sm text-gray-500 font-normal">
-                    Faça uma pergunta, solicite rankings, análises de faturamento com gráficos ou
-                    explore informações do seu departamento.
+                  {/* Texto de orientação discreto */}
+                  <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed max-w-2xl">
+                    Pergunte sobre produtos mais vendidos, faturamento por período, clientes
+                    inativos, situação fiscal ou consulte dados operacionais com tabelas e gráficos
+                    automáticos.
                   </p>
                 </div>
 
-                {/* Badge de Governança de Acesso do Usuário */}
-                <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-gray-50 border border-gray-200/70 text-xs text-gray-600">
+                {/* Badge de Governança e Contexto do Usuário — discreto e neutro */}
+                <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 shadow-2xs">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-[#005B2E] shrink-0" />
-                    <span>
-                      Conectado como{' '}
-                      <strong>{(user?.name as string) || (user?.email as string)}</strong> (
-                      <span className="text-[#005B2E] font-semibold">
-                        {(user?.role as string) || 'Acesso Padrão'}
+                    <span className="text-gray-700">
+                      Usuário:{' '}
+                      <strong className="text-gray-900">
+                        {(user?.name as string) || (user?.email as string)}
+                      </strong>{' '}
+                      • Perfil:{' '}
+                      <span className="inline-flex items-center px-1.5 py-0.2 rounded font-semibold text-[#005B2E] bg-[#005B2E]/10">
+                        {effectiveRole === 'admin' ? 'Gestor / Admin' : effectiveRole.toUpperCase()}
                       </span>
-                      ) — Perfil ativo:{' '}
-                      <strong className="text-gray-900 uppercase">
-                        {effectiveRole === 'admin'
-                          ? 'Gestor / Admin (Acesso Geral)'
-                          : effectiveRole}
-                      </strong>
                     </span>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className="border-[#005B2E]/30 text-[#005B2E] text-[10px]"
-                  >
-                    Critérios Fiscais & Comerciais Reais
-                  </Badge>
+                  <span className="text-[11px] text-gray-500 font-medium hidden sm:inline">
+                    Regras de faturamento comercial Jetro
+                  </span>
                 </div>
 
-                {/* Filtro por categoria (quando admin/gestor) */}
+                {/* Filtro por categoria (quando admin/gestor) — discreto e limpo */}
                 {availableCategories.length > 0 && (
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mr-1">
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 scrollbar-none">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider shrink-0 mr-1">
                       Filtrar por área:
                     </span>
                     {availableCategories.map((cat) => (
@@ -828,10 +839,10 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                         key={cat}
                         onClick={() => setSelectedFilterCategory(cat)}
                         className={cn(
-                          'text-xs px-2.5 py-1 rounded-full transition-colors cursor-pointer',
+                          'text-xs px-2.5 py-1 rounded-md transition-all cursor-pointer whitespace-nowrap',
                           selectedFilterCategory === cat
                             ? 'bg-[#005B2E] text-white font-semibold shadow-2xs'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700',
+                            : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200',
                         )}
                       >
                         {cat === 'todas' ? 'Todas as Áreas' : cat}
@@ -840,13 +851,19 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                   </div>
                 )}
 
-                {/* 4. Botões de sugestões inteligentes por perfil */}
-                <div className="space-y-2.5 pt-1">
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-                    Sugestões inteligentes para o seu perfil:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {/* 4. Sugestões inteligentes em cards pequenos e elegantes (Requisito 4) */}
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
+                      Sugestões rápidas para o seu perfil:
+                    </p>
+                    <span className="text-[10px] text-gray-500 hidden sm:inline">
+                      Clique para preencher e consultar
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                     {displayedSuggestions.map((sug) => {
                       const Icon = sug.icon
                       return (
@@ -854,25 +871,21 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                           key={sug.id}
                           onClick={() => handleSend(sug.prompt)}
                           disabled={loading}
-                          className="flex items-start gap-3 p-3.5 text-left rounded-xl border border-gray-200 hover:border-[#005B2E] bg-white hover:bg-[#005B2E]/5 transition-all duration-200 group shadow-2xs hover:shadow-sm cursor-pointer disabled:opacity-50"
+                          title={sug.prompt}
+                          className="flex items-center gap-2.5 p-2.5 text-left rounded-lg border border-gray-200/90 hover:border-[#005B2E] bg-white hover:bg-emerald-50/30 transition-all group shadow-2xs hover:shadow-xs cursor-pointer disabled:opacity-50"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-[#005B2E]/10 group-hover:bg-[#005B2E] text-[#005B2E] group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
-                            <Icon className="w-4 h-4" />
+                          <div className="w-7 h-7 rounded-md bg-gray-100 group-hover:bg-[#005B2E]/10 text-gray-600 group-hover:text-[#005B2E] flex items-center justify-center shrink-0 transition-colors">
+                            <Icon className="w-3.5 h-3.5" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1">
-                              <p className="text-xs font-bold text-gray-900 group-hover:text-[#005B2E] transition-colors truncate">
-                                {sug.title}
-                              </p>
-                              <span className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 font-medium">
-                                {sug.category}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-gray-500 line-clamp-1 mt-0.5">
-                              {sug.prompt}
+                            <p className="text-xs font-semibold text-gray-800 group-hover:text-[#005B2E] transition-colors truncate">
+                              {sug.title}
                             </p>
+                            <span className="text-[10px] text-gray-500 truncate block">
+                              {sug.category}
+                            </span>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#005B2E] group-hover:translate-x-0.5 transition-all self-center shrink-0" />
+                          <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#005B2E] group-hover:translate-x-0.5 transition-all shrink-0" />
                         </button>
                       )
                     })}
@@ -995,20 +1008,20 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
             )}
           </ScrollArea>
 
-          {/* Caixa de mensagens com botão de envio */}
-          <div className="p-4 bg-white border-t border-gray-200">
-            {/* Atalhos rápidos quando o histórico está visível */}
+          {/* Caixa de mensagens centralizada como elemento central de destaque (Requisito 5) */}
+          <div className="p-3 sm:p-4 bg-white border-t border-gray-200">
+            {/* Atalhos rápidos no topo da caixa quando o histórico está visível */}
             {hasMessages && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-2.5 mb-2 scrollbar-none">
-                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider shrink-0">
-                  Perguntas rápidas:
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 scrollbar-none max-w-4xl mx-auto">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider shrink-0 mr-1">
+                  Atalhos:
                 </span>
                 {profileSuggestions.slice(0, 6).map((sug) => (
                   <button
                     key={sug.id}
                     onClick={() => handleSend(sug.prompt)}
                     disabled={loading}
-                    className="text-[11px] px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50 hover:bg-[#005B2E]/5 hover:border-[#005B2E] text-gray-700 hover:text-[#005B2E] whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
+                    className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-gray-200 bg-gray-50 hover:bg-emerald-50 hover:border-[#005B2E] text-gray-700 hover:text-[#005B2E] whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {sug.title}
                   </button>
@@ -1016,40 +1029,61 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
               </div>
             )}
 
-            <div className="relative flex items-center gap-2">
-              <Input
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value)
-                  setIsTypingInput(e.target.value.length > 0)
-                }}
-                onFocus={() => setIsTypingInput(true)}
-                onBlur={() => setIsTypingInput(false)}
-                onKeyDown={handleKeyDown}
-                placeholder="Digite sua mensagem… (ex: Compare o faturamento dos últimos 3 meses em gráfico)"
-                disabled={loading}
-                className="pr-12 py-5.5 text-sm rounded-xl border-gray-300 focus-visible:ring-2 focus-visible:ring-[#005B2E] focus-visible:border-transparent bg-gray-50/50 hover:bg-white transition-all shadow-2xs"
-              />
-              <Button
-                onClick={() => handleSend()}
-                disabled={loading || !input.trim()}
-                className="absolute right-1.5 h-8.5 w-8.5 p-0 rounded-lg bg-[#005B2E] hover:bg-[#01361D] text-white shadow-xs transition-colors disabled:opacity-40 cursor-pointer"
-              >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-              </Button>
-            </div>
-            <div className="flex items-center justify-between mt-2 px-1 text-[11px] text-gray-400">
-              <span>
-                Pressione <strong>Enter</strong> para enviar
-              </span>
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#005B2E]" />
-                Segurança com perfil auditado e regras de faturamento Jetro
-              </span>
+            {/* Container da caixa centralizada, confortável e destacada */}
+            <div className="max-w-4xl mx-auto">
+              <div className="relative rounded-xl border border-gray-300 hover:border-gray-400 focus-within:border-[#005B2E] focus-within:ring-2 focus-within:ring-[#005B2E]/20 bg-white transition-all shadow-xs">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  rows={1}
+                  onChange={(e) => {
+                    setInput(e.target.value)
+                    setIsTypingInput(e.target.value.length > 0)
+                  }}
+                  onFocus={() => setIsTypingInput(true)}
+                  onBlur={() => setIsTypingInput(false)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Pergunte ao Jetro On-line… (ex: Qual o produto mais vendido no mês? Compare o faturamento em gráfico)"
+                  disabled={loading}
+                  className="w-full resize-none bg-transparent px-4 pt-3.5 pb-12 sm:pb-3.5 sm:pr-14 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none min-h-[48px] max-h-[160px] leading-relaxed"
+                />
+
+                {/* Botão de envio moderno alinhado à direita */}
+                <div className="absolute right-2 bottom-2 flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    onClick={() => handleSend()}
+                    disabled={loading || !input.trim()}
+                    className="h-8.5 w-8.5 p-0 rounded-lg bg-[#005B2E] hover:bg-[#01361D] text-white shadow-xs transition-colors disabled:opacity-40 cursor-pointer shrink-0"
+                    title="Enviar pergunta (Enter)"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Linha de rodapé discreta com instruções e segurança */}
+              <div className="flex flex-wrap items-center justify-between mt-2 px-1 text-[11px] text-gray-500 gap-1">
+                <span>
+                  Pressione{' '}
+                  <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-700 text-[10px] font-mono">
+                    Enter
+                  </kbd>{' '}
+                  para enviar •{' '}
+                  <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-700 text-[10px] font-mono">
+                    Shift + Enter
+                  </kbd>{' '}
+                  para nova linha
+                </span>
+                <span className="flex items-center gap-1 text-gray-500">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#005B2E]" />
+                  Acesso corporativo seguro e auditado
+                </span>
+              </div>
             </div>
           </div>
         </div>

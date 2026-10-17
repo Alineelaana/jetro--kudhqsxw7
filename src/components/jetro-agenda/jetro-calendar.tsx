@@ -310,63 +310,67 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
   }, [currentYear, currentMonth])
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden my-6">
+    <div className="w-full bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
       <TooltipProvider>
         {/* ==================================================================== */}
-        {/* CABEÇALHO DO CALENDÁRIO / AGENDA JETRO */}
+        {/* CABEÇALHO DO CALENDÁRIO / AGENDA JETRO — Padrão Corporativo Refinado */}
         {/* ==================================================================== */}
-        <div className="p-4 sm:p-6 border-b border-gray-200 bg-linear-to-r from-emerald-950/5 via-white to-amber-950/5">
+        <div className="p-4 sm:p-5 border-b border-gray-200/90 bg-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Título e Mês/Ano em Destaque */}
+            {/* Título e Mês/Ano em Destaque — Padrão claro e sem fundos pesados */}
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#005B2E] to-[#01361D] flex items-center justify-center text-white shadow-md shadow-emerald-900/10 shrink-0">
-                <CalendarIcon className="w-6 h-6 text-[#C9A227]" />
+              <div className="w-10 h-10 rounded-xl bg-[#005B2E]/10 border border-[#005B2E]/20 flex items-center justify-center text-[#005B2E] shrink-0 shadow-2xs">
+                <CalendarIcon className="w-5 h-5 text-[#005B2E]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-                    {MONTH_NAMES_PT[currentMonth]} {currentYear}
+                  <h2 className="text-lg sm:text-xl font-extrabold text-gray-900 tracking-tight">
+                    {MONTH_NAMES_PT[currentMonth]} de {currentYear}
                   </h2>
-                  <Badge className="bg-[#005B2E] text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5">
-                    Agenda Jetro
-                  </Badge>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-700 border border-gray-200">
+                    Agenda Corporativa
+                  </span>
                 </div>
-                <p className="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-0.5">
-                  <Clock className="w-3.5 h-3.5 text-[#C9A227]" />
-                  Horário Oficial de Brasília (America/Sao_Paulo) • Feriados Nacionais Oficiais
+                <p className="text-xs text-gray-500 font-medium flex items-center gap-1 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-gray-400" />
+                  Horário Oficial de Brasília • Feriados nacionais oficiais integrados
                 </p>
               </div>
             </div>
 
-            {/* Ações e Navegação */}
+            {/* Ações e Navegação: Anterior | Hoje | Próximo | Minhas Tarefas | Novo Compromisso */}
             <div className="flex flex-wrap items-center gap-2">
-              {/* Botões de Navegação */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-0.5 border border-gray-200">
+              {/* Controles de Navegação: Anterior | Hoje | Próximo */}
+              <div className="inline-flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200 shadow-2xs">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handlePrevMonth}
                   title="Mês anterior"
-                  className="h-8 w-8 p-0 text-gray-700 hover:text-gray-900 hover:bg-white rounded-md"
+                  className="h-8 px-2.5 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-white rounded-md transition-colors"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+                  Anterior
                 </Button>
+                <div className="w-px h-4 bg-gray-200 mx-0.5" />
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleGoToday}
-                  className="h-8 px-3 text-xs font-bold text-gray-700 hover:text-[#005B2E] hover:bg-white rounded-md"
+                  className="h-8 px-3 text-xs font-bold text-gray-800 hover:text-[#005B2E] hover:bg-white rounded-md transition-colors"
                 >
                   Hoje
                 </Button>
+                <div className="w-px h-4 bg-gray-200 mx-0.5" />
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleNextMonth}
                   title="Próximo mês"
-                  className="h-8 w-8 p-0 text-gray-700 hover:text-gray-900 hover:bg-white rounded-md"
+                  className="h-8 px-2.5 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-white rounded-md transition-colors"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  Próximo
+                  <ChevronRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </div>
 
@@ -378,7 +382,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                   setListViewInitialTab('all')
                   setIsListViewOpen(true)
                 }}
-                className="h-8 text-xs font-bold border-gray-300 text-gray-700 hover:text-[#005B2E] hover:border-[#005B2E]"
+                className="h-8 text-xs font-semibold border-gray-200 bg-white text-gray-700 hover:text-[#005B2E] hover:border-[#005B2E] hover:bg-emerald-50/30 transition-colors shadow-2xs"
               >
                 <ListTodo className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
                 Minhas Tarefas ({appointments.length})
@@ -388,7 +392,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
               <Button
                 size="sm"
                 onClick={() => handleOpenNewAppointment(todayDateStr)}
-                className="h-8 text-xs font-bold bg-[#005B2E] hover:bg-[#01361D] text-white shadow-xs px-3.5"
+                className="h-8 text-xs font-bold bg-[#005B2E] hover:bg-[#01361D] text-white shadow-xs px-3.5 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />
                 Novo Compromisso
@@ -396,30 +400,30 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
             </div>
           </div>
 
-          {/* Barra de Filtros e Legenda de Categorias */}
-          <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            {/* Legenda de Categorias com cores corporativas */}
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-gray-400 font-bold text-[11px] uppercase tracking-wider mr-1">
-                Categorias:
+          {/* Barra de Filtros e Legenda de Categorias — mais compacta e neutra */}
+          <div className="mt-3.5 pt-3.5 border-t border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            {/* Legenda de Categorias com cores corporativas suaves e texto escuro */}
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+              <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider mr-1">
+                Legenda:
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-[11px] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-blue-500" /> Tarefas
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600" /> Tarefas
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200 text-[11px] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-purple-500" /> Reuniões
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-purple-50 text-purple-900 border border-purple-200 text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-600" /> Reuniões
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-[#C9A227]/40 text-[11px] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-[#C9A227]" /> Compromissos
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 text-amber-950 border border-amber-200 text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227]" /> Compromissos
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 text-[#005B2E] border border-emerald-200 text-[11px] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-[#005B2E]" /> Lembretes
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 text-[#004d26] border border-emerald-200 text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#005B2E]" /> Lembretes
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-50 text-red-700 border border-red-200 text-[11px] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-red-500" /> Urgentes
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-50 text-red-900 border border-red-200 text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-600" /> Urgentes
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-semibold">
-                <Flag className="w-2.5 h-2.5 text-rose-600" /> Feriados Nacionais
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-rose-50 text-rose-900 border border-rose-200 text-[10px] font-semibold">
+                <Flag className="w-2.5 h-2.5 text-rose-600" /> Feriados
               </span>
             </div>
 
@@ -429,7 +433,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                 value={filterType}
                 onValueChange={(v) => setFilterType(v as AppointmentType | 'all')}
               >
-                <SelectTrigger className="h-7 text-xs border-gray-200 w-28 bg-white">
+                <SelectTrigger className="h-7 text-xs border-gray-200 w-28 bg-white text-gray-700">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -446,7 +450,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                 value={filterPriority}
                 onValueChange={(v) => setFilterPriority(v as AppointmentPriority | 'all')}
               >
-                <SelectTrigger className="h-7 text-xs border-gray-200 w-28 bg-white">
+                <SelectTrigger className="h-7 text-xs border-gray-200 w-28 bg-white text-gray-700">
                   <SelectValue placeholder="Prioridade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -462,7 +466,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                 value={filterStatus}
                 onValueChange={(v) => setFilterStatus(v as AppointmentStatus | 'all')}
               >
-                <SelectTrigger className="h-7 text-xs border-gray-200 w-28 bg-white">
+                <SelectTrigger className="h-7 text-xs border-gray-200 w-28 bg-white text-gray-700">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -479,7 +483,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                 size="sm"
                 onClick={loadAppointments}
                 title="Recarregar agenda"
-                className="h-7 w-7 p-0 text-gray-500 hover:text-[#005B2E]"
+                className="h-7 w-7 p-0 text-gray-500 hover:text-[#005B2E] transition-colors"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               </Button>
@@ -491,22 +495,22 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
         {/* GRADE DO CALENDÁRIO MENSAL (DOMINGO A SÁBADO, LARGURA TOTAL) */}
         {/* ==================================================================== */}
         <div className="w-full">
-          {/* Cabeçalho dos Dias da Semana */}
-          <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50/80 text-center font-bold text-xs uppercase tracking-wider text-gray-600">
+          {/* Cabeçalho dos Dias da Semana com contraste impecável */}
+          <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50/90 text-center font-bold text-xs uppercase tracking-wider text-gray-700">
             {WEEKDAYS_PT.map((day) => (
               <div
                 key={day.full}
-                className={`py-3 px-1 border-r last:border-r-0 border-gray-200/80 ${
-                  day.isWeekend ? 'bg-amber-50/40 text-[#9A7B1C]' : 'text-gray-700'
+                className={`py-2.5 px-1 border-r last:border-r-0 border-gray-200 ${
+                  day.isWeekend ? 'bg-slate-100/70 text-slate-800' : 'text-gray-800'
                 }`}
               >
-                <span className="hidden sm:inline">{day.full}</span>
-                <span className="sm:hidden">{day.short}</span>
+                <span className="hidden sm:inline font-bold">{day.full}</span>
+                <span className="sm:hidden font-bold">{day.short}</span>
               </div>
             ))}
           </div>
 
-          {/* Grade dos Dias */}
+          {/* Grade dos Dias com divisores e células confortáveis */}
           <div className="grid grid-cols-7 auto-rows-fr bg-gray-200 gap-px">
             {calendarGrid.map((cell) => {
               const maxVisible = 2
@@ -517,21 +521,21 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                 <div
                   key={cell.dateStr}
                   onClick={() => handleOpenNewAppointment(cell.dateStr)}
-                  className={`min-h-[110px] sm:min-h-[135px] p-1.5 sm:p-2 bg-white flex flex-col justify-between transition-all cursor-pointer group hover:bg-emerald-50/30 ${
-                    !cell.isCurrentMonth ? 'bg-gray-50/60 text-gray-400 opacity-60' : ''
-                  } ${cell.isWeekend && cell.isCurrentMonth ? 'bg-slate-50/50' : ''} ${
-                    cell.isToday ? 'ring-2 ring-inset ring-[#005B2E] bg-emerald-50/20' : ''
+                  className={`min-h-[105px] sm:min-h-[125px] p-1.5 sm:p-2 bg-white flex flex-col justify-between transition-all cursor-pointer group hover:bg-emerald-50/20 ${
+                    !cell.isCurrentMonth ? 'bg-gray-50/80 text-gray-400' : ''
+                  } ${cell.isWeekend && cell.isCurrentMonth ? 'bg-slate-50/60' : ''} ${
+                    cell.isToday ? 'ring-2 ring-inset ring-[#005B2E] bg-emerald-50/30' : ''
                   }`}
                 >
-                  {/* Cabeçalho da Célula: Número do Dia + Indicadores */}
+                  {/* Cabeçalho da Célula: Número do Dia + Indicador discreto */}
                   <div className="flex items-start justify-between gap-1 mb-1">
                     <div className="flex items-center gap-1">
                       <span
-                        className={`text-xs sm:text-sm font-bold flex items-center justify-center rounded-full transition-transform ${
+                        className={`text-xs sm:text-sm font-bold flex items-center justify-center rounded-md transition-all ${
                           cell.isToday
-                            ? 'w-6 h-6 sm:w-7 sm:h-7 bg-[#005B2E] text-white shadow-xs font-black'
+                            ? 'px-1.5 py-0.5 bg-[#005B2E] text-white shadow-2xs font-extrabold'
                             : cell.isCurrentMonth
-                              ? 'text-gray-800 group-hover:scale-110'
+                              ? 'text-gray-900 group-hover:text-[#005B2E]'
                               : 'text-gray-400'
                         }`}
                       >
@@ -551,20 +555,20 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                         e.stopPropagation()
                         handleOpenNewAppointment(cell.dateStr)
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-[#005B2E] hover:text-white text-gray-400 transition-opacity cursor-pointer"
+                      className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-[#005B2E] hover:text-white text-gray-500 transition-opacity cursor-pointer"
                       title="Adicionar compromisso neste dia"
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  {/* Feriado Nacional em Destaque */}
+                  {/* Feriado Nacional em Destaque Suave e com Alto Contraste */}
                   {cell.holiday && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div
                           onClick={(e) => e.stopPropagation()}
-                          className="mb-1 px-1.5 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-800 text-[10px] font-bold truncate flex items-center gap-1 shadow-2xs cursor-default"
+                          className="mb-1 px-1.5 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-900 text-[10px] font-bold truncate flex items-center gap-1 shadow-2xs cursor-default"
                         >
                           <Flag className="w-2.5 h-2.5 text-rose-600 shrink-0" />
                           <span className="truncate">{cell.holiday.name}</span>
@@ -580,7 +584,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                     </Tooltip>
                   )}
 
-                  {/* Lista de Atividades do Dia */}
+                  {/* Lista de Atividades do Dia em Formato Compacto */}
                   <div className="space-y-1 flex-1 overflow-hidden">
                     {visibleAppts.map((appt) => {
                       const typeConfig = TYPE_COLORS[appt.type] || TYPE_COLORS.Outros
@@ -594,18 +598,18 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                           title={`${appt.start_time ? appt.start_time + ' - ' : ''}${appt.title}`}
                           className={`text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded border transition-all flex items-center justify-between gap-1 shadow-2xs cursor-pointer ${
                             isDone
-                              ? 'bg-gray-100 text-gray-500 border-gray-200 line-through opacity-70'
+                              ? 'bg-gray-100 text-gray-500 border-gray-200 line-through opacity-75'
                               : isUrgent
-                                ? 'bg-red-50 text-red-900 border-red-300 font-bold hover:bg-red-100'
+                                ? 'bg-red-50 text-red-950 border-red-300 font-bold hover:bg-red-100/70'
                                 : `${typeConfig.bg} ${typeConfig.border} font-medium`
                           }`}
                         >
                           <div className="flex items-center gap-1 truncate min-w-0">
                             <span
-                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${isUrgent ? 'bg-red-500' : typeConfig.dot}`}
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${isUrgent ? 'bg-red-600' : typeConfig.dot}`}
                             />
                             {appt.start_time && (
-                              <span className="text-[9px] font-bold opacity-80 shrink-0">
+                              <span className="text-[9px] font-bold opacity-85 shrink-0 text-gray-700">
                                 {appt.start_time}
                               </span>
                             )}
@@ -613,12 +617,12 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                           </div>
 
                           <div className="flex items-center gap-0.5 shrink-0">
-                            {appt.has_reminder && <Bell className="w-2.5 h-2.5 text-[#C9A227]" />}
+                            {appt.has_reminder && <Bell className="w-2.5 h-2.5 text-[#9A7B1C]" />}
                             <button
                               type="button"
                               onClick={(e) => handleToggleCompleted(appt, e)}
-                              title={isDone ? 'Reabrir' : 'Concluir'}
-                              className="opacity-0 group-hover:opacity-100 hover:text-emerald-700 cursor-pointer"
+                              title={isDone ? 'Reabrir tarefa' : 'Concluir tarefa'}
+                              className="opacity-0 group-hover:opacity-100 hover:text-emerald-700 text-gray-500 cursor-pointer"
                             >
                               <CheckCircle2 className="w-3 h-3" />
                             </button>
@@ -627,7 +631,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                       )
                     })}
 
-                    {/* Botão "Ver mais" quando há muitas atividades no dia */}
+                    {/* Botão "+ Ver mais" compacto */}
                     {remainingCount > 0 && (
                       <button
                         type="button"
@@ -635,7 +639,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                           e.stopPropagation()
                           setDayDetailsDate(cell.dateStr)
                         }}
-                        className="w-full text-center text-[10px] font-bold text-[#005B2E] hover:text-[#01361D] bg-emerald-50/80 hover:bg-emerald-100/80 rounded py-0.5 transition-colors cursor-pointer"
+                        className="w-full text-center text-[10px] font-bold text-[#005B2E] hover:text-[#01361D] bg-emerald-50/70 hover:bg-emerald-100/80 rounded py-0.5 transition-colors cursor-pointer"
                       >
                         + Ver mais ({remainingCount})
                       </button>
@@ -647,17 +651,17 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
           </div>
         </div>
 
-        {/* Rodapé Informativo dos Feriados do Mês */}
+        {/* Rodapé Informativo dos Feriados do Mês — discreto e com alto contraste */}
         {currentMonthHolidays.length > 0 && (
-          <div className="p-4 bg-gray-50/60 border-t border-gray-200 flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-bold text-gray-700 flex items-center gap-1">
+          <div className="p-3 sm:p-4 bg-gray-50/80 border-t border-gray-200 flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-bold text-gray-800 flex items-center gap-1">
               <Flag className="w-3.5 h-3.5 text-rose-600" />
-              Feriados em {MONTH_NAMES_PT[currentMonth]}:
+              Feriados oficiais em {MONTH_NAMES_PT[currentMonth]}:
             </span>
             {currentMonthHolidays.map((h) => (
               <span
                 key={h.date}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-rose-200 text-rose-900 font-medium text-[11px] shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-rose-200 text-gray-800 font-medium text-[11px] shadow-2xs"
               >
                 <strong className="text-rose-700">Dia {h.day}:</strong> {h.name}
               </span>
