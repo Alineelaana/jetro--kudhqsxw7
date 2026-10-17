@@ -1,10 +1,10 @@
 import { Component, type ReactNode } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
-import { AdminDashboard } from '@/components/admin-dashboard'
+import { IntelligentHomeScreen } from '@/components/intelligent-home-screen'
 import { Loader2, RefreshCw, LogOut } from 'lucide-react'
 
-class AdminDashboardErrorBoundary extends Component<
+class IntelligentHomeErrorBoundary extends Component<
   { children: ReactNode; onSignOut: () => void },
   { hasError: boolean }
 > {
@@ -15,7 +15,7 @@ class AdminDashboardErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error): void {
-    console.error('AdminDashboard error:', error)
+    console.error('IntelligentHomeScreen error:', error)
   }
 
   handleRetry = (): void => {
@@ -26,7 +26,9 @@ class AdminDashboardErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <p className="text-muted-foreground">Erro ao carregar o dashboard.</p>
+          <p className="text-muted-foreground">
+            Erro ao carregar o assistente inteligente Jetro On-line.
+          </p>
           <div className="flex gap-2">
             <button
               onClick={this.handleRetry}
@@ -66,8 +68,8 @@ export default function Admin() {
   }
 
   return (
-    <AdminDashboardErrorBoundary onSignOut={signOut}>
-      <AdminDashboard />
-    </AdminDashboardErrorBoundary>
+    <IntelligentHomeErrorBoundary onSignOut={signOut}>
+      <IntelligentHomeScreen />
+    </IntelligentHomeErrorBoundary>
   )
 }

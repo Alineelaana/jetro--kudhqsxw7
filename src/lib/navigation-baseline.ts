@@ -7,6 +7,12 @@ export interface BaselineRoute {
 
 export const NAVIGATION_BASELINE: BaselineRoute[] = [
   { route: '/admin', label: 'Dashboard', group: 'Principal', classification: 'A' },
+  {
+    route: '/admin/dashboard',
+    label: 'Dashboard Tradicional',
+    group: 'Principal',
+    classification: 'A',
+  },
   { route: '/admin/notificacoes', label: 'Notificações', group: 'Principal', classification: 'A' },
   { route: '/admin/atendimento', label: 'Atendimento', group: 'Principal', classification: 'A' },
   {

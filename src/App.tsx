@@ -13,6 +13,7 @@ import Index from './pages/Index'
 import LoginPage from './pages/Login'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
+import DashboardPage from './pages/DashboardPage'
 import AdminRegister from './pages/AdminRegister'
 import AdminPasswordRecovery from './pages/AdminPasswordRecovery'
 
@@ -117,6 +118,7 @@ const App = () => (
                         <Route path="/" element={<LoginPage />} />
                         <Route path="/site" element={<Index />} />
                         <Route path="/admin" element={<Admin />} />
+                        <Route path="/admin/dashboard" element={<DashboardPage />} />
                         <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
 
                         <Route path="/admin/produtos" element={<Products />} />

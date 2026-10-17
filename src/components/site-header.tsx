@@ -42,9 +42,7 @@ export function SiteHeader() {
           onClick={() => setMobileMenuOpen(false)}
           className="flex items-center group py-1"
           title={
-            isAuthenticated
-              ? 'Página principal interna (Dashboard)'
-              : 'Retornar para a tela inicial / login'
+            isAuthenticated ? 'Tela Inicial Inteligente' : 'Retornar para a tela inicial / login'
           }
         >
           <img

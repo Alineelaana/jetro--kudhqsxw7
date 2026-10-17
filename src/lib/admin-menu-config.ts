@@ -681,7 +681,7 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/atendimento',
             perm: canViewAtendimentoModule,
           },
-          { label: 'Dashboard', icon: LayoutDashboard, route: '/admin' },
+          { label: 'Dashboard', icon: LayoutDashboard, route: '/admin/dashboard' },
           { label: 'Notificações', icon: Bell, route: '/admin/notificacoes' },
           {
             label: 'Solicitações de Orçamento',
