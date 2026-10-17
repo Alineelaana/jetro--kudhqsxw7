@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { getStockTransfers } from '@/services/stock'
+import type { StockTransfer } from '@/lib/stock-types'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'sonner'
@@ -25,7 +26,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function LogisticsTransfers() {
   const { user } = useAuth()
-  const [records, setRecords] = useState<Record<string, unknown>[]>([])
+  const [records, setRecords] = useState<StockTransfer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
@@ -44,15 +45,9 @@ export function LogisticsTransfers() {
 
   const filtered = records.filter((r) => {
     const t = search.toLowerCase().trim()
-    return (
-      !t ||
-      String(r.from_warehouse || '')
-        .toLowerCase()
-        .includes(t) ||
-      String(r.to_warehouse || '')
-        .toLowerCase()
-        .includes(t)
-    )
+    const fromW = String((r as any).from_warehouse || r.deposito_origem || '')
+    const toW = String((r as any).to_warehouse || r.deposito_destino || '')
+    return !t || fromW.toLowerCase().includes(t) || toW.toLowerCase().includes(t)
   })
 
   if (loading)
@@ -96,19 +91,27 @@ export function LogisticsTransfers() {
               ) : (
                 filtered.map((r, i) => (
                   <tr key={i} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 font-medium">{r.from_warehouse || r.origem || '—'}</td>
-                    <td className="px-3 py-2 font-medium">{r.to_warehouse || r.destino || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.tipo || 'Interna'}
+                    <td className="px-3 py-2 font-medium">
+                      {String(
+                        (r as any).from_warehouse || r.deposito_origem || (r as any).origem || '—',
+                      )}
+                    </td>
+                    <td className="px-3 py-2 font-medium">
+                      {String(
+                        (r as any).to_warehouse || r.deposito_destino || (r as any).destino || '—',
+                      )}
                     </td>
                     <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.created ? new Date(r.created as string).toLocaleDateString('pt-BR') : '—'}
+                      {String((r as any).tipo || 'Interna')}
+                    </td>
+                    <td className="px-3 py-2 hidden md:table-cell text-xs">
+                      {r.created ? new Date(r.created).toLocaleDateString('pt-BR') : '—'}
                     </td>
                     <td className="px-3 py-2">
                       <span
-                        className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[r.status as string] || 'bg-gray-100'}`}
+                        className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[r.status] || 'bg-gray-100'}`}
                       >
-                        {(r.status as string) || '—'}
+                        {r.status || '—'}
                       </span>
                     </td>
                   </tr>

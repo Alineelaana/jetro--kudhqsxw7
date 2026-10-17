@@ -76,27 +76,27 @@ export function LogisticsProofDelivery() {
             <Card key={i} className="border-2 border-[#005B2E]/20 shadow-md p-4">
               <div className="flex items-center gap-2 mb-3">
                 <FileCheck className="w-5 h-5 text-[#005B2E]" />
-                <span className="font-bold text-sm">{r.entrega || '—'}</span>
+                <span className="font-bold text-sm">{String(r.entrega || '—')}</span>
               </div>
               <div className="space-y-1 text-sm">
                 <p>
-                  <span className="text-muted-foreground">Cliente:</span> {r.cliente || '—'}
+                  <span className="text-muted-foreground">Cliente:</span> {String(r.cliente || '—')}
                 </p>
                 <p>
                   <span className="text-muted-foreground">Recebedor:</span>{' '}
-                  {r.recebedor_nome || '—'}
+                  {String(r.recebedor_nome || '—')}
                 </p>
                 <p>
                   <span className="text-muted-foreground">Documento:</span>{' '}
-                  {r.recebedor_documento || '—'}
+                  {String(r.recebedor_documento || '—')}
                 </p>
                 <p>
                   <span className="text-muted-foreground">Data/Hora:</span>{' '}
                   {r.data_hora ? new Date(String(r.data_hora)).toLocaleString('pt-BR') : '—'}
                 </p>
-                {r.observacoes && (
-                  <p className="text-xs text-muted-foreground mt-2">{r.observacoes}</p>
-                )}
+                {r.observacoes ? (
+                  <p className="text-xs text-muted-foreground mt-2">{String(r.observacoes)}</p>
+                ) : null}
               </div>
             </Card>
           ))}

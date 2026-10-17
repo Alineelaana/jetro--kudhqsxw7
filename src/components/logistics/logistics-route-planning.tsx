@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/select'
 import { getSalesOrders } from '@/services/sales'
 import { getVehicles, getDrivers, createRoute, createDelivery } from '@/services/logistics'
+import { calculateRoute } from '@/services/logistics-gps'
+import { LogisticsMap } from '@/components/logistics/logistics-map'
 import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from 'sonner'
 import { Search, Loader2, AlertTriangle, Check } from 'lucide-react'

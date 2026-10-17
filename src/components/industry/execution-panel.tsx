@@ -21,8 +21,10 @@ import {
 } from '@/components/ui/select'
 import { Play, Pause, Square, Loader2, Activity } from 'lucide-react'
 import { getApontamentos, createApontamento } from '@/services/industrial-extended'
-import { getProductionOrders } from '@/services/production-orders'
+import { getProductionOrders, type ProductionOrder } from '@/services/production-orders'
 import { getProductionResources } from '@/services/industry'
+import type { IndustrialApontamento, ApontamentoType } from '@/lib/industrial-extended-types'
+import type { ProductionResource } from '@/lib/industry-types'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
@@ -58,9 +60,9 @@ const TYPE_COLORS: Record<string, string> = {
 
 export function ExecutionPanel() {
   const { user } = useAuth()
-  const [orders, setOrders] = useState<any[]>([])
-  const [apontamentos, setApontamentos] = useState<any[]>([])
-  const [resources, setResources] = useState<any[]>([])
+  const [orders, setOrders] = useState<ProductionOrder[]>([])
+  const [apontamentos, setApontamentos] = useState<IndustrialApontamento[]>([])
+  const [resources, setResources] = useState<ProductionResource[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -71,9 +73,9 @@ export function ExecutionPanel() {
         getApontamentos(),
         getProductionResources(),
       ])
-      setOrders(o.filter((x: any) => x.status === 'em_producao' || x.status === 'planejada'))
+      setOrders(o.filter((x) => x.status === 'em_producao' || x.status === 'planejada'))
       setApontamentos(a)
-      setResources(r as any[])
+      setResources(r)
     } catch {
       /* ignore */
     }
@@ -99,7 +101,7 @@ export function ExecutionPanel() {
         resource_id: String(fd.get('resource_id') || '') || undefined,
         operator_name: (user?.name as string) || 'Operador',
         operation_name: String(fd.get('operation_name') || ''),
-        type: String(fd.get('type') || 'producao') as any,
+        type: String(fd.get('type') || 'producao') as ApontamentoType,
         quantity_produced: Number(fd.get('quantity_produced') || 0),
         quantity_rejected: Number(fd.get('quantity_rejected') || 0),
         team_name: String(fd.get('team_name') || ''),

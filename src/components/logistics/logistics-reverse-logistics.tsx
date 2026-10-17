@@ -189,11 +189,15 @@ export function LogisticsReverseLogistics() {
                 filtered.map((r, i) => (
                   <tr key={i} className="border-b border-border hover:bg-[#005B2E]/5">
                     <td className="px-3 py-2 font-mono text-xs font-bold text-[#C89B3C]">
-                      {r.numero_operacao}
+                      {String(r.numero_operacao || '')}
                     </td>
-                    <td className="px-3 py-2 font-medium">{r.cliente_fornecedor || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell">{r.tipo_operacao || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">{r.origem || '—'}</td>
+                    <td className="px-3 py-2 font-medium">{String(r.cliente_fornecedor || '—')}</td>
+                    <td className="px-3 py-2 hidden md:table-cell">
+                      {String(r.tipo_operacao || '—')}
+                    </td>
+                    <td className="px-3 py-2 hidden md:table-cell text-xs">
+                      {String(r.origem || '—')}
+                    </td>
                     <td className="px-3 py-2">
                       <span
                         className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[r.status as string] || 'bg-gray-100'}`}

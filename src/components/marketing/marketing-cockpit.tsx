@@ -87,22 +87,26 @@ export function MarketingCockpit() {
           <CardContent className="p-4">
             <h3 className="text-sm font-bold text-[#005B2E] mb-3">Investimento por Canal</h3>
             <div className="space-y-2">
-              {data.byChannel.map(([channel, value]) => (
-                <div key={channel} className="flex items-center justify-between text-sm">
-                  <span className="capitalize">{channel}</span>
-                  <div className="flex items-center gap-2 flex-1 max-w-xs ml-4">
-                    <div className="flex-1 bg-gray-100 rounded h-2 overflow-hidden">
-                      <div
-                        className="bg-[#005B2E] h-full"
-                        style={{ width: `${Math.min(100, (value / data.totalInvestment) * 100)}%` }}
-                      />
+              {data.byChannel.map(([channel, value]) => {
+                const numVal = Number(value) || 0
+                const pct =
+                  data.totalInvestment > 0
+                    ? Math.min(100, (numVal / data.totalInvestment) * 100)
+                    : 0
+                return (
+                  <div key={channel} className="flex items-center justify-between text-sm">
+                    <span className="capitalize">{channel}</span>
+                    <div className="flex items-center gap-2 flex-1 max-w-xs ml-4">
+                      <div className="flex-1 bg-gray-100 rounded h-2 overflow-hidden">
+                        <div className="bg-[#005B2E] h-full" style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="font-semibold text-[#005B2E] text-xs">
+                        R$ {numVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
                     </div>
-                    <span className="font-semibold text-[#005B2E] text-xs">
-                      R$ {value.toLocaleString('pt-BR')}
-                    </span>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>

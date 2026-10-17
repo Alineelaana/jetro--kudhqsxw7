@@ -87,7 +87,7 @@ export function LogisticsIndicators() {
     }).length
     const onTimeRate =
       delivered > 0 ? Math.round((delivered / Math.max(delivered + delayed, 1)) * 100) : 0
-    const totalCost = data.costs.reduce(
+    const totalCost = (data.costs as Array<Record<string, unknown>>).reduce(
       (s: number, c: Record<string, unknown>) => s + parseFloat((c.valor as string) || '0'),
       0,
     )

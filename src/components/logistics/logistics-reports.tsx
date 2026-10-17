@@ -202,11 +202,18 @@ export function LogisticsReports() {
   }
 
   const handleCsv = () => {
-    exportToCsv(
-      report.rows as Record<string, unknown>[],
-      `${report.title.toLowerCase().replace(/\s+/g, '_')}.csv`,
-      { module: `Logística > ${report.title}`, format: 'csv', filters: {} },
-    )
+    const records = report.rows.map((row) => {
+      const obj: Record<string, unknown> = {}
+      report.headers.forEach((h, idx) => {
+        obj[h] = row[idx] ?? ''
+      })
+      return obj
+    })
+    exportToCsv(records, `${report.title.toLowerCase().replace(/\s+/g, '_')}.csv`, {
+      module: `Logística > ${report.title}`,
+      format: 'csv',
+      filters: {},
+    })
   }
 
   return (

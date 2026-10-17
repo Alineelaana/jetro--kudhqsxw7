@@ -45,20 +45,22 @@ export function MarketingVersionHistory({ piece, onClose }: Props) {
                 key={i}
                 className="flex flex-wrap items-center gap-3 text-xs border-b pb-2 last:border-b-0"
               >
-                <span className="font-bold text-[#005B2E]">v{v.version}</span>
-                <span>{v.author || '—'}</span>
+                <span className="font-bold text-[#005B2E]">v{String(v.version ?? '')}</span>
+                <span>{String(v.author || '—')}</span>
                 <span className="text-muted-foreground">
-                  {v.date} {v.time || ''}
+                  {String(v.date ?? '')} {String(v.time || '')}
                 </span>
-                <span className="text-muted-foreground">{v.change_reason || ''}</span>
-                <span className="text-muted-foreground">Aprovador: {v.approver || '—'}</span>
+                <span className="text-muted-foreground">{String(v.change_reason || '')}</span>
+                <span className="text-muted-foreground">
+                  Aprovador: {String(v.approver || '—')}
+                </span>
                 <span
                   className={cn(
                     'px-2 py-0.5 rounded',
                     MK_STATUS_COLORS[v.status as string] || 'bg-gray-100',
                   )}
                 >
-                  {v.status}
+                  {String(v.status ?? '')}
                 </span>
               </div>
             ))}

@@ -26,24 +26,39 @@ export interface IndustrialShift {
   updated: string
 }
 
-export type ApontamentoType = 'inicio' | 'pausa' | 'retomada' | 'producao' | 'fim'
+export type ApontamentoType =
+  | 'inicio'
+  | 'pausa'
+  | 'retomada'
+  | 'producao'
+  | 'fim'
+  | 'consumo'
+  | 'parada'
+  | 'manutencao'
+  | 'refugo'
+  | 'perda'
+  | 'qualidade'
+  | 'rework'
 
 export interface IndustrialApontamento {
   id: string
   production_order_id: string
-  product_id: string
-  resource_id: string
+  product_id?: string
+  resource_id?: string
   operator_name: string
-  operation_name: string
+  operation_name?: string
   type: ApontamentoType
   quantity_produced: number
   quantity_rejected: number
-  start_time: string
-  end_time: string
-  duration_minutes: number
-  notes: string
-  lot_number: string
-  responsible: string
+  start_time?: string
+  end_time?: string
+  duration_minutes?: number
+  team_name?: string
+  stoppage_reason?: string
+  attachments?: unknown
+  notes?: string
+  lot_number?: string
+  responsible?: string
   created: string
   updated: string
   expand?: {

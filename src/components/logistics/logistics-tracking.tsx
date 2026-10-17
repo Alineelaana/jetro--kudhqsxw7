@@ -84,9 +84,9 @@ export function LogisticsTracking() {
               <Card key={i} className="border-2 border-[#005B2E]/20 shadow-md p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="font-bold text-[#005B2E]">{r.veiculo || '—'}</p>
+                    <p className="font-bold text-[#005B2E]">{String(r.veiculo || '—')}</p>
                     <p className="text-sm text-muted-foreground">
-                      {r.motorista || '—'} • {r.rota || '—'}
+                      {String(r.motorista || '—')} • {String(r.rota || '—')}
                     </p>
                   </div>
                   <span
@@ -97,19 +97,20 @@ export function LogisticsTracking() {
                 </div>
                 <div className="space-y-1 text-sm">
                   <p>
-                    <span className="text-muted-foreground">Cliente:</span> {r.cliente || '—'}
+                    <span className="text-muted-foreground">Cliente:</span>{' '}
+                    {String(r.cliente || '—')}
                   </p>
                   <p>
                     <span className="text-muted-foreground">Última localização:</span>{' '}
-                    {r.ultima_localizacao || '—'}
+                    {String(r.ultima_localizacao || '—')}
                   </p>
                   <p>
                     <span className="text-muted-foreground">Próxima parada:</span>{' '}
-                    {r.proxima_parada || '—'}
+                    {String(r.proxima_parada || '—')}
                   </p>
                   <p>
                     <span className="text-muted-foreground">Previsão:</span>{' '}
-                    {r.previsao_chegada || '—'}
+                    {String(r.previsao_chegada || '—')}
                   </p>
                 </div>
                 {linhaTempo.length > 0 && (
