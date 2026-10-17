@@ -82,7 +82,7 @@ export function SalesReturnsPanel() {
   }
   const handleEdit = (r: SalesReturn) => {
     setEditing(r)
-    setForm({ ...r } as Record<string, string>)
+    setForm(r as unknown as Record<string, string>)
     setDialogOpen(true)
   }
 

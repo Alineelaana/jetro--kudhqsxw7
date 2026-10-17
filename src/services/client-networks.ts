@@ -1,5 +1,6 @@
 import pb from '@/lib/pocketbase/client'
 import type { ClientNetwork, NetworkConsolidatedData, NetworkMemberData } from '@/lib/network-types'
+export type { ClientNetwork, NetworkConsolidatedData, NetworkMemberData } from '@/lib/network-types'
 
 export async function getNetworks(): Promise<ClientNetwork[]> {
   return pb.collection('client_networks').getFullList({ sort: '-created' }) as Promise<

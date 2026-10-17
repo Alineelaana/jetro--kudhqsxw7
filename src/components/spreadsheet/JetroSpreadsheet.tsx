@@ -44,6 +44,7 @@ export const JetroSpreadsheet: React.FC<JetroSpreadsheetProps> = ({
   hasUnsavedChanges = false,
   saving = false,
   customHeader,
+  onCustomImportClick,
 }) => {
   const { toast } = useToast()
 

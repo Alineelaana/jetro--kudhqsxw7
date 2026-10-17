@@ -46,14 +46,16 @@ export async function upsertMonitoringEntry(data: {
   }
 }
 
-export async function getMonitoringSummary(): Promise<{
+export interface SummaryData {
   total: number
   healthy: number
   degraded: number
   down: number
   unknown: number
   byType: Record<string, number>
-}> {
+}
+
+export async function getMonitoringSummary(): Promise<SummaryData> {
   const entries = await getMonitoringEntries()
   const summary = {
     total: entries.length,

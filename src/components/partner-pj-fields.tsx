@@ -79,7 +79,9 @@ export function PartnerPjFields({
       fieldMap[key] = getValue(data)
     })
     const hasEditedWithValues = Object.keys(fieldMap).some(
-      (field) => editedFields.current.has(field) && (form as Record<string, unknown>)[field],
+      (field) =>
+        editedFields.current.has(field) &&
+        (form as unknown as Record<string, unknown>)[field],
     )
     if (hasEditedWithValues) {
       setPendingData(fieldMap)

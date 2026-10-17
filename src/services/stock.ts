@@ -56,13 +56,13 @@ export async function getStockAdjustments(): Promise<StockAdjustment[]> {
   >
 }
 export async function createStockAdjustment(
-  data: Record<string, unknown>,
+  data: Record<string, unknown> | FormData,
 ): Promise<StockAdjustment> {
   return pb.collection('stock_adjustments').create(data) as Promise<StockAdjustment>
 }
 export async function updateStockAdjustment(
   id: string,
-  data: Record<string, unknown>,
+  data: Record<string, unknown> | FormData,
 ): Promise<StockAdjustment> {
   return pb.collection('stock_adjustments').update(id, data) as Promise<StockAdjustment>
 }

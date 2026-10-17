@@ -39,6 +39,7 @@ import { toast } from '@/hooks/use-toast'
 import { JustificationDialog } from '@/components/pricing/justification-dialog'
 import { createVaultEntry } from '@/services/pricing-governance'
 import { checkSmartBlocks } from '@/lib/pricing-permissions'
+import pb from '@/lib/pocketbase/client'
 
 export function PricingProducts() {
   const { user } = useAuth()
@@ -197,11 +198,9 @@ export function PricingProducts() {
         })
       }
       try {
-        const vaultCount = await import('@/lib/pocketbase/client').then((pb) =>
-          pb
-            .collection('price_vault')
-            .getList(1, 1, { filter: `product_id = "${selectedProductId}"` }),
-        )
+        const vaultCount = await pb
+          .collection('price_vault')
+          .getList(1, 1, { filter: `product_id = "${selectedProductId}"` })
         const versionNumber = (vaultCount.totalItems || 0) + 1
         await createVaultEntry({
           product_id: selectedProductId,

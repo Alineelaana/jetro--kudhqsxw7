@@ -38,7 +38,7 @@ export function NfcePanel() {
 
   useMemo(() => {
     getProducts()
-      .then((p) => setProducts(p as Array<Record<string, unknown>>))
+      .then((p) => setProducts(p as unknown as Array<Record<string, unknown>>))
       .catch(() => {})
   }, [])
 

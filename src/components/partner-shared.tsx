@@ -58,6 +58,9 @@ export interface PartnerRecord {
   restriction_reason: string
   restriction_history: RestrictionEntry[]
   documents_metadata: DocumentMetadata[]
+  rca_id?: string
+  televendas_id?: string
+  responsavel_comercial_digital_id?: string
   created: string
   updated: string
 }

@@ -381,19 +381,22 @@ export function PricingSimulations() {
                     </thead>
                     <tbody>
                       {comparisonRows.map(([label, curr, newVal], i) => {
-                        const diff = curr > 0 ? ((newVal - curr) / curr) * 100 : 0
+                        const labelStr = String(label)
+                        const currNum = Number(curr) || 0
+                        const newValNum = Number(newVal) || 0
+                        const diff = currNum > 0 ? ((newValNum - currNum) / currNum) * 100 : 0
                         return (
                           <tr key={i} className="border-b border-border">
-                            <td className="px-3 py-2 font-medium">{label}</td>
+                            <td className="px-3 py-2 font-medium">{labelStr}</td>
                             <td className="text-right px-3 py-2">
-                              {label.includes('%')
-                                ? `${formatCurrency(curr)}%`
-                                : `R$ ${formatCurrency(curr)}`}
+                              {labelStr.includes('%')
+                                ? `${formatCurrency(currNum)}%`
+                                : `R$ ${formatCurrency(currNum)}`}
                             </td>
                             <td className="text-right px-3 py-2 font-bold text-[#005B2E]">
-                              {label.includes('%')
-                                ? `${formatCurrency(newVal)}%`
-                                : `R$ ${formatCurrency(newVal)}`}
+                              {labelStr.includes('%')
+                                ? `${formatCurrency(newValNum)}%`
+                                : `R$ ${formatCurrency(newValNum)}`}
                             </td>
                             <td
                               className={`text-right px-3 py-2 ${diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-red-600' : ''}`}

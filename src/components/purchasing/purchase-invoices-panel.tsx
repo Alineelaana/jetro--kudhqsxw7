@@ -32,10 +32,10 @@ export function PurchaseInvoicesPanel() {
   useEffect(() => {
     load()
     getSuppliers()
-      .then((s) => setSuppliers(s as Array<Record<string, unknown>>))
+      .then((s) => setSuppliers(s as unknown as Array<Record<string, unknown>>))
       .catch(() => {})
     getProducts()
-      .then((p) => setProducts(p as Array<Record<string, unknown>>))
+      .then((p) => setProducts(p as unknown as Array<Record<string, unknown>>))
       .catch(() => {})
   }, [])
   useRealtime('purchase_invoices', () => load())

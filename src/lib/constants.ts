@@ -56,6 +56,15 @@ export interface DefaultFormField {
   options?: string[]
 }
 
+export interface ServiceItem {
+  id: string
+  title: string
+  description: string
+  icon: string
+  tags: string[]
+  highlight?: boolean
+}
+
 export interface SegmentItem {
   id: string
   title: string

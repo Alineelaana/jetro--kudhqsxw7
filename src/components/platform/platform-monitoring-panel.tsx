@@ -20,8 +20,6 @@ import type { PlatformMonitoringEntry } from '@/lib/platform-layer-types'
 import { useRealtime } from '@/hooks/use-realtime'
 import { cn } from '@/lib/utils'
 
-type SummaryData = Awaited<ReturnType<typeof getMonitoringSummary>>
-
 const STATUS_CONFIG = {
   healthy: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', label: 'Saudável' },
   degraded: { icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50', label: 'Degradado' },
