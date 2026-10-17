@@ -214,14 +214,15 @@ export function AtendimentoDetail({ id }: { id: string }) {
           </Button>
         </div>
       </div>
-      {record.classificacao_ia_sugerida && (
+      {(record as Record<string, any>).classificacao_ia_sugerida && (
         <Card className="border-2 border-purple-200 bg-purple-50">
           <CardContent className="py-3">
             <p className="text-sm font-bold text-purple-700">💡 Sugestão IA:</p>
             <p className="text-xs">
-              Motivo: {(record.classificacao_ia_sugerida as Record<string, unknown>)?.motivo || '—'}{' '}
-              • Prioridade:{' '}
-              {(record.classificacao_ia_sugerida as Record<string, unknown>)?.prioridade || '—'}
+              Motivo:{' '}
+              {String((record as Record<string, any>).classificacao_ia_sugerida?.motivo || '—')} •
+              Prioridade:{' '}
+              {String((record as Record<string, any>).classificacao_ia_sugerida?.prioridade || '—')}
             </p>
           </CardContent>
         </Card>
@@ -397,7 +398,7 @@ export function AtendimentoDetail({ id }: { id: string }) {
                       <span
                         className={cn(
                           'text-xs font-bold px-2 py-0.5 rounded',
-                          STAGE_STATUS.includes(s.status as never) ? 'bg-gray-100' : '',
+                          s.status ? 'bg-gray-100' : '',
                         )}
                       >
                         {s.status}

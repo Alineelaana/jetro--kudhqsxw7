@@ -9,11 +9,32 @@ interface State {
   hasError: boolean
 }
 
-class ErrorBoundaryClass extends Component<Props, State> {
-  state: State = { hasError: false }
+interface ErrorBoundaryProps extends Props {
+  locationPath?: string
+}
 
-  static getDerivedStateFromError(): State {
+interface ErrorBoundaryState extends State {
+  prevPath?: string
+}
+
+class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { hasError: false, prevPath: this.props.locationPath }
+
+  static getDerivedStateFromError(): Partial<ErrorBoundaryState> {
     return { hasError: true }
+  }
+
+  static getDerivedStateFromProps(
+    props: ErrorBoundaryProps,
+    state: ErrorBoundaryState,
+  ): Partial<ErrorBoundaryState> | null {
+    if (props.locationPath !== state.prevPath) {
+      return {
+        hasError: false,
+        prevPath: props.locationPath,
+      }
+    }
+    return null
   }
 
   componentDidCatch(error: Error): void {
@@ -50,5 +71,5 @@ class ErrorBoundaryClass extends Component<Props, State> {
 
 export function ErrorBoundary({ children }: { children: ReactNode }) {
   const location = useLocation()
-  return <ErrorBoundaryClass key={location.pathname}>{children}</ErrorBoundaryClass>
+  return <ErrorBoundaryClass locationPath={location.pathname}>{children}</ErrorBoundaryClass>
 }

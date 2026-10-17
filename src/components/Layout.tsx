@@ -26,6 +26,14 @@ export default function Layout() {
     if (!isAdmin) {
       window.scrollTo(0, 0)
     }
+    // Quando em rota admin com sidebar, resetamos o scroll da área de conteúdo (main) para o topo,
+    // garantindo que a nova tela abra no topo sem interferir na barra de rolagem do menu lateral.
+    if (isAdmin) {
+      const contentMain = document.getElementById('admin-main-content')
+      if (contentMain) {
+        contentMain.scrollTop = 0
+      }
+    }
   }, [pathname, isAdmin])
 
   if (showSidebar) {
@@ -38,7 +46,10 @@ export default function Layout() {
             <div className="bg-muted/30 border-b px-4 py-2 shrink-0">
               <GlobalSearchBar />
             </div>
-            <main className="flex-1 min-w-0 overflow-y-auto overscroll-contain">
+            <main
+              id="admin-main-content"
+              className="flex-1 min-w-0 overflow-y-auto overscroll-contain"
+            >
               <Outlet />
             </main>
           </div>

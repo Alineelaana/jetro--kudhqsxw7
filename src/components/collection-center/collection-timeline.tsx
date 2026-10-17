@@ -15,7 +15,6 @@ const ACTION_ICONS: Record<string, any> = {
   next_action: Clock,
   payment: CheckCircle,
   created: FileText,
-  next_action: Clock,
 }
 
 export function CollectionTimeline({ cliente }: { cliente: string | null }) {

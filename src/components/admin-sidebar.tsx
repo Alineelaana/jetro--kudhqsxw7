@@ -117,8 +117,12 @@ export function AdminSidebar() {
     flyouts: {},
   })
 
+  // Flag para evitar que restaurações de scroll sobrescrevam a posição com 0 durante renderizações intermediárias
+  const isRestoringRef = useRef(false)
+
   // Quando o usuário rola o menu expandido, armazenamos a posição
   const handleExpandedScroll = () => {
+    if (isRestoringRef.current) return
     if (expandedNavRef.current) {
       savedScrollRef.current.expanded = expandedNavRef.current.scrollTop
     }
@@ -126,6 +130,7 @@ export function AdminSidebar() {
 
   // Quando o usuário rola a barra rail, armazenamos a posição
   const handleRailScroll = () => {
+    if (isRestoringRef.current) return
     if (railNavRef.current) {
       savedScrollRef.current.rail = railNavRef.current.scrollTop
     }
@@ -133,6 +138,7 @@ export function AdminSidebar() {
 
   // Quando o usuário rola o flyout, armazenamos a posição da respectiva área
   const handleFlyoutScroll = () => {
+    if (isRestoringRef.current) return
     if (flyoutNavRef.current && railFlyoutArea) {
       savedScrollRef.current.flyouts[railFlyoutArea] = flyoutNavRef.current.scrollTop
     }
@@ -141,24 +147,35 @@ export function AdminSidebar() {
   // Preservar e restaurar posição de scroll entre renderizações e trocas de rota
   useEffect(() => {
     const restoreScrolls = () => {
-      if (!isSearching && expandedNavRef.current && savedScrollRef.current.expanded > 0) {
-        expandedNavRef.current.scrollTop = savedScrollRef.current.expanded
-      }
-      if (railNavRef.current && savedScrollRef.current.rail > 0) {
-        railNavRef.current.scrollTop = savedScrollRef.current.rail
-      }
-      if (
-        railFlyoutArea &&
-        flyoutNavRef.current &&
-        savedScrollRef.current.flyouts[railFlyoutArea]
-      ) {
-        flyoutNavRef.current.scrollTop = savedScrollRef.current.flyouts[railFlyoutArea]
+      isRestoringRef.current = true
+      try {
+        if (!isSearching && expandedNavRef.current && savedScrollRef.current.expanded > 0) {
+          expandedNavRef.current.scrollTop = savedScrollRef.current.expanded
+        }
+        if (railNavRef.current && savedScrollRef.current.rail > 0) {
+          railNavRef.current.scrollTop = savedScrollRef.current.rail
+        }
+        if (
+          railFlyoutArea &&
+          flyoutNavRef.current &&
+          savedScrollRef.current.flyouts[railFlyoutArea]
+        ) {
+          flyoutNavRef.current.scrollTop = savedScrollRef.current.flyouts[railFlyoutArea]
+        }
+      } finally {
+        isRestoringRef.current = false
       }
     }
 
     restoreScrolls()
-    const timer = setTimeout(restoreScrolls, 0)
-    return () => clearTimeout(timer)
+    const timer1 = setTimeout(restoreScrolls, 0)
+    const timer2 = setTimeout(restoreScrolls, 50)
+    const timer3 = setTimeout(restoreScrolls, 150)
+    return () => {
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+      clearTimeout(timer3)
+    }
   }, [pathname, isSearching, railFlyoutArea])
 
   // Objeto do item atualmente aberto no flyout (rail)
