@@ -30,6 +30,7 @@ import {
   CalendarClock,
   Container,
   ClipboardList,
+  FileSpreadsheet,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -48,6 +49,7 @@ import {
   canViewConformidade,
   canViewScreenDocs,
   canViewSegundoCerebro,
+  canViewPlanilhasConvertidas,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -677,6 +679,25 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Tabelas de Frete', route: '/admin/transporte/tabelas-frete' },
           { label: 'Veículos', route: '/admin/transporte/veiculos' },
           { label: 'Viagens', route: '/admin/transporte/viagens' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Planilhas Convertidas',
+    items: [
+      {
+        label: 'Planilhas Convertidas',
+        icon: FileSpreadsheet,
+        route: '/admin/planilhas/convertidas/comparativo-margens-gr',
+        perm: canViewPlanilhasConvertidas,
+        children: [
+          {
+            label: 'Comparativo Margens GR',
+            route: '/admin/planilhas/convertidas/comparativo-margens-gr',
+            icon: FileSpreadsheet,
+            perm: canViewPlanilhasConvertidas,
+          },
         ],
       },
     ],

@@ -94,6 +94,7 @@ import Auditoria from './pages/Auditoria'
 import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
 import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
 import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
+import ComparativoMargensGrPage from './pages/admin/ComparativoMargensGrPage'
 import Controladoria from './pages/Controladoria'
 import SupplierAllowance from './pages/SupplierAllowance'
 import TradeMarketing from './pages/TradeMarketing'
@@ -1172,6 +1173,10 @@ const App = () => (
                           element={<CentralDocumentacaoPage />}
                         />
                         <Route path="/admin/segundo-cerebro" element={<SegundoCerebroPage />} />
+                        <Route
+                          path="/admin/planilhas/convertidas/comparativo-margens-gr"
+                          element={<ComparativoMargensGrPage />}
+                        />
                         <Route path="/admin/auditoria" element={<Auditoria />} />
                         <Route
                           path="/admin/controladoria"

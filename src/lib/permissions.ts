@@ -305,3 +305,12 @@ export function canViewScreenDocs(role: string | undefined): boolean {
   if (!role) return false
   return role === 'SUP'
 }
+
+/**
+ * Permissão para visualizar o módulo "Planilhas Convertidas" e Comparativo Margens GR.
+ * Acessível a perfis operacionais de custos, comercial, financeiro e supervisores.
+ */
+export function canViewPlanilhasConvertidas(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+}
