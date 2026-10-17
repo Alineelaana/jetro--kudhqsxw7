@@ -23,7 +23,10 @@ export async function getNotifications(): Promise<Notification[]> {
 export async function getUnreadCount(): Promise<number> {
   const userId = pb.authStore.record?.id
   if (!userId) return 0
-  return pb.collection('notifications').count(`recipient = "${userId}" && read = false`)
+  const res = await pb
+    .collection('notifications')
+    .getList(1, 1, { filter: `recipient = "${userId}" && read = false` })
+  return res.totalItems || 0
 }
 
 export async function markNotificationAsRead(id: string): Promise<void> {

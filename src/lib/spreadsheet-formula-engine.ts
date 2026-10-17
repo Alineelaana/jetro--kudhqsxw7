@@ -154,7 +154,10 @@ export class SpreadsheetFormulaEngine {
         case 'SOMA':
         case 'SUM': {
           const values = this.resolveRangeOrList(argsRaw, currentSheet, depth)
-          return values.reduce((acc, curr) => acc + (typeof curr === 'number' ? curr : 0), 0)
+          return values.reduce<number>(
+            (acc, curr) => acc + (typeof curr === 'number' ? curr : 0),
+            0,
+          )
         }
         case 'MEDIA':
         case 'AVERAGE': {

@@ -256,3 +256,24 @@ export interface WmsRomaneio {
   created: string
   updated: string
 }
+
+export interface WmsBlindCount {
+  id: string
+  numero_contagem: string
+  inventario_id?: string
+  produto_id?: string
+  produto_nome: string
+  produto_codigo?: string
+  localizacao?: string
+  lote?: string
+  validade?: string
+  quantidade_contada?: number
+  primeira_contagem?: number
+  segunda_contagem?: number
+  operador_primeira?: string
+  operador_segunda?: string
+  divergencia?: boolean
+  status: string
+  created: string
+  updated: string
+}

@@ -93,9 +93,7 @@ export function SalesReports() {
         </Card>
         <Card className="border-2 border-[#005B2E]/20">
           <CardHeader className="py-3">
-            <CardTitle className="text-xs text-muted-foreground uppercase">
-              Ticket Médio
-            </CardTitle>
+            <CardTitle className="text-xs text-muted-foreground uppercase">Ticket Médio</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-black text-[#005B2E]">

@@ -132,32 +132,29 @@ export function getClientMessages(atendimentoId: string) {
 
 export function getAtendimentoStats() {
   return Promise.all([
-    pb.collection('service_centers').count('status = "Aberto"'),
-    pb.collection('service_centers').count('status = "Em Atendimento"'),
-    pb
-      .collection('service_centers')
-      .count(
+    pb.collection('service_centers').getList(1, 1, { filter: 'status = "Aberto"' }),
+    pb.collection('service_centers').getList(1, 1, { filter: 'status = "Em Atendimento"' }),
+    pb.collection('service_centers').getList(1, 1, {
+      filter:
         'status = "Aguardando Atendimento" || status = "Aguardando Cliente" || status = "Aguardando Outro Setor"',
-      ),
-    pb.collection('service_centers').count('status = "Finalizado"'),
-    pb
-      .collection('service_centers')
-      .count(
+    }),
+    pb.collection('service_centers').getList(1, 1, { filter: 'status = "Finalizado"' }),
+    pb.collection('service_centers').getList(1, 1, {
+      filter:
         'status != "Finalizado" && status != "Cancelado" && status != "Resolvido" && sla_cumprido = false',
-      ),
-    pb
-      .collection('service_centers')
-      .count(
+    }),
+    pb.collection('service_centers').getList(1, 1, {
+      filter:
         'status != "Finalizado" && status != "Cancelado" && status != "Resolvido" && sla_cumprido = true',
-      ),
+    }),
   ])
     .then(([abertos, emAtendimento, pendentes, finalizados, slaVencido, slaDentro]) => ({
-      abertos,
-      emAtendimento,
-      pendentes,
-      finalizados,
-      slaVencido,
-      slaDentro,
+      abertos: abertos.totalItems || 0,
+      emAtendimento: emAtendimento.totalItems || 0,
+      pendentes: pendentes.totalItems || 0,
+      finalizados: finalizados.totalItems || 0,
+      slaVencido: slaVencido.totalItems || 0,
+      slaDentro: slaDentro.totalItems || 0,
     }))
     .catch(() => ({
       abertos: 0,

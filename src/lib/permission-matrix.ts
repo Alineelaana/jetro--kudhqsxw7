@@ -119,7 +119,7 @@ export interface MatrixScreen {
   edit?: (role: string | undefined) => boolean
   delete?: (role: string | undefined) => boolean
   approve?: (role: string | undefined) => boolean
-  scope: 'ALL' | 'EMPRESA' | 'FILIAL'
+  scope?: 'ALL' | 'EMPRESA' | 'FILIAL'
 }
 
 const all = () => true

@@ -71,8 +71,8 @@ export async function getERPIntegrationData() {
         .getFullList({ sort: '-created' })
         .catch(() => []),
     ])
-    const totalReceivables = receivables.reduce(
-      (s: number, r: Record<string, unknown>) => s + (parseFloat(r.value as string) || 0),
+    const totalReceivables = (receivables as Record<string, unknown>[]).reduce<number>(
+      (s, r) => s + (parseFloat(r.value as string) || 0),
       0,
     )
     const overdueReceivables = receivables.filter((r: Record<string, unknown>) =>

@@ -180,6 +180,25 @@ export interface StrategicDecision {
   created: string
   updated: string
 }
+export interface StrategicRoadmap {
+  id: string
+  initiative_id?: string
+  year?: number
+  quarter?: 'Q1' | 'Q2' | 'Q3' | 'Q4' | string
+  month?: string
+  sprint?: string
+  area?: string
+  project_name?: string
+  priority?: string
+  dependencies?: unknown
+  status: 'planejado' | 'em_andamento' | 'concluido' | 'atrasado' | 'cancelado' | string
+  milestone?: string
+  company?: string
+  branch?: string
+  created?: string
+  updated?: string
+}
+
 export interface StrategicIndicator {
   id: string
   name: string

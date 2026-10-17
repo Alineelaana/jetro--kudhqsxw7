@@ -63,8 +63,8 @@ export const updateTrainingV2 = (id: string, data: Record<string, unknown>) =>
 
 export const getAiSettings = async (): Promise<AiModuleSettings | null> => {
   try {
-    const list = await pb.collection('ai_module_settings').getFullList()
-    return (list[0] as AiModuleSettings) || null
+    const list = await pb.collection('ai_module_settings').getFullList<AiModuleSettings>()
+    return list[0] || null
   } catch {
     return null
   }

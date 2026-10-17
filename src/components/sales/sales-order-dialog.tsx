@@ -573,7 +573,8 @@ export function SalesOrderDialog({ open, onOpenChange, order, onSaved }: Props) 
           <div className="text-right space-y-1">
             {form.price_table_id && (
               <p className="text-xs text-muted-foreground">
-                Tabela: {String(priceTables.find((t) => t.id === form.price_table_id)?.table_name || '—')}
+                Tabela:{' '}
+                {String(priceTables.find((t) => t.id === form.price_table_id)?.table_name || '—')}
               </p>
             )}
             <span className="text-lg font-black text-[#005B2E]">

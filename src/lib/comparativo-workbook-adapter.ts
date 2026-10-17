@@ -1,4 +1,4 @@
-import type { MargemRowCalculated, MargemParametros } from '@/lib/margens-gr-engine'
+import type { MargemCalculadaRow, MargemParametros } from '@/lib/margens-gr-engine'
 import type { SheetData, WorkbookData } from '@/types/spreadsheet'
 import { colIndexToLetter } from '@/lib/spreadsheet-formula-engine'
 

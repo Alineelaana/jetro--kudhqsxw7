@@ -4,9 +4,12 @@ import pbClient from '@/lib/pocketbase/client-client'
 interface ClientAuthContextType {
   client: Record<string, unknown> | null
   isAuthenticated: boolean
+  isClientAuthenticated: boolean
   signUp: (email: string, password: string, name?: string) => Promise<{ error: unknown }>
   signIn: (email: string, password: string) => Promise<{ error: unknown }>
   signOut: () => void
+  clientLogin: (email: string, password: string) => Promise<{ error: string | null }>
+  clientLogout: () => void
   loading: boolean
 }
 
@@ -113,15 +116,42 @@ export const ClientAuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const clientLogin = async (
+    email: string,
+    password: string,
+  ): Promise<{ error: string | null }> => {
+    try {
+      await pbClient.collection('clients').authWithPassword(email, password)
+      return { error: null }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Falha na autenticação'
+      return { error: msg }
+    }
+  }
+
   const signOut = () => {
     pbClient.authStore.clear()
     setClient(null)
     setIsAuthenticated(false)
   }
 
+  const clientLogout = () => {
+    signOut()
+  }
+
   return (
     <ClientAuthContext.Provider
-      value={{ client, isAuthenticated, signUp, signIn, signOut, loading }}
+      value={{
+        client,
+        isAuthenticated,
+        isClientAuthenticated: isAuthenticated,
+        signUp,
+        signIn,
+        signOut,
+        clientLogin,
+        clientLogout,
+        loading,
+      }}
     >
       {children}
     </ClientAuthContext.Provider>

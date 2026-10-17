@@ -38,10 +38,18 @@ export function useMenuBadges(userId?: string) {
           pb.collection('notifications').getFullList({
             filter: `recipient = "${userId}" && read = false`,
           }),
-          pb.collection('purchase_requests').count('status = "Aguardando Aprovação"'),
-          pb.collection('quotations').count('status = "Em Digitação" || status = "Em Análise"'),
-          pb.collection('pricing_approvals').count('status = "pending"'),
-          pb.collection('sales_orders').count('status = "Aguardando Aprovação"'),
+          pb.collection('purchase_requests').getList(1, 1, {
+            filter: 'status = "Aguardando Aprovação"',
+          }),
+          pb.collection('quotations').getList(1, 1, {
+            filter: 'status = "Em Digitação" || status = "Em Análise"',
+          }),
+          pb.collection('pricing_approvals').getList(1, 1, {
+            filter: 'status = "pending"',
+          }),
+          pb.collection('sales_orders').getList(1, 1, {
+            filter: 'status = "Aguardando Aprovação"',
+          }),
         ])
 
       const badgeMap: Record<string, number> = {}
@@ -53,11 +61,13 @@ export function useMenuBadges(userId?: string) {
 
       const pendingRisks = await pb
         .collection('pricing_risk_monitor')
-        .count('resolved = false && risk_index >= 50')
-      badgeMap['purchasing'] = (badgeMap['purchasing'] || 0) + (pendingPurchases as number)
+        .getList(1, 1, { filter: 'resolved = false && risk_index >= 50' })
+      badgeMap['purchasing'] = (badgeMap['purchasing'] || 0) + (pendingPurchases.totalItems || 0)
       badgeMap['pricing'] =
-        (badgeMap['pricing'] || 0) + (pendingApprovals as number) + (pendingRisks as number)
-      badgeMap['Vendas'] = (badgeMap['Vendas'] || 0) + (pendingSales as number)
+        (badgeMap['pricing'] || 0) +
+        (pendingApprovals.totalItems || 0) +
+        (pendingRisks.totalItems || 0)
+      badgeMap['Vendas'] = (badgeMap['Vendas'] || 0) + (pendingSales.totalItems || 0)
 
       setBadges(badgeMap)
     } catch {

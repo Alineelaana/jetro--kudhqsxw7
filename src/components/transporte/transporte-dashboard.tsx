@@ -69,15 +69,17 @@ export function TransporteDashboard() {
           if (['Entregue', 'Cancelada'].includes(d.status)) return false
           return d.data_prevista && d.data_prevista < today
         }).length,
-        withOccurrence: occurrences.filter((o: any) =>
-          ['Aberta', 'Em Análise'].includes(o.situacao),
-        ).length,
+        withOccurrence: occurrences.filter((o) => ['Aberta', 'Em Análise'].includes(o.situacao))
+          .length,
         vehiclesInOp: vehicles.filter((v) => v.situacao === 'Em Rota').length,
         vehiclesAvailable: vehicles.filter((v) => v.situacao === 'Disponível').length,
         driversOnRoute: drivers.filter((d) => d.situacao === 'Em Rota').length,
-        totalFreightCost: freights.reduce((sum, f) => sum + parseFloat(f.valor_total || '0'), 0),
+        totalFreightCost: freights.reduce<number>(
+          (sum, f) => sum + (parseFloat(f.valor_total || '0') || 0),
+          0,
+        ),
         avgCostPerDelivery:
-          freights.reduce((sum, f) => sum + parseFloat(f.valor_total || '0'), 0) /
+          freights.reduce<number>((sum, f) => sum + (parseFloat(f.valor_total || '0') || 0), 0) /
           Math.max(deliveries.length, 1),
         routesActive: 0,
         onTimeRate:
@@ -91,8 +93,8 @@ export function TransporteDashboard() {
         cargasFormacao: journeys.filter((j) =>
           ['Planejada', 'Aguardando Carregamento', 'Em Carregamento'].includes(j.status),
         ).length,
-        rastreamentoAtivo: (tracking as any[]).filter((t) =>
-          ['Em Trânsito', 'Saiu para Entrega'].includes(t.status),
+        rastreamentoAtivo: tracking.filter((t) =>
+          ['Em Trânsito', 'Saiu para Entrega'].includes(String(t.status || '')),
         ).length,
       })
     } catch {

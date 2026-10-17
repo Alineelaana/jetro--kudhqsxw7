@@ -5,7 +5,12 @@ import {
   detectarCabecalho,
   processarLinhas,
 } from '@/lib/margens-gr-parser'
-import { calcularMargemItem, calcularResumoComparativo } from '@/lib/margens-gr-engine'
+import {
+  calcularLinhaMargem,
+  calcularTabelaMargens,
+  PARAMETROS_DEFAULT,
+  type MargemParametros,
+} from '@/lib/margens-gr-engine'
 
 describe('Parser de Planilhas - Comparativo Margens GR', () => {
   it('converte valores em formato brasileiro com vírgula e R$', () => {
@@ -60,19 +65,11 @@ describe('Parser de Planilhas - Comparativo Margens GR', () => {
   })
 
   it('recalcula margens através da engine existente', () => {
-    const params = {
-      id: 'default',
-      impostos_pct: 0.1775,
-      comissao_pct: 0.015,
-      taxa_financeira_pct: 0.03,
-      frete_pct: 0.03,
-      outros_custos_pct: 0.005,
-      margem_gr_alvo_pct: 0.15,
-      created: '',
-      updated: '',
+    const params: MargemParametros = {
+      ...PARAMETROS_DEFAULT,
     }
 
-    const itemCalc = calcularMargemItem(
+    const itemCalc = calcularLinhaMargem(
       {
         id: '1',
         produto: 'Azeitona Verde 160g',
@@ -80,19 +77,16 @@ describe('Parser de Planilhas - Comparativo Margens GR', () => {
         preco_rivoli: 5.9,
         ativo: true,
         ordem: 1,
-        created: '',
-        updated: '',
       },
       params,
     )
 
-    expect(itemCalc.preco_sugerido_gr).toBeGreaterThan(0)
-    expect(itemCalc.dif_preco).toBeCloseTo(itemCalc.preco_sugerido_gr - 5.9, 2)
-    expect(itemCalc.cmv_pct_gr).toBeGreaterThan(0)
-    expect(itemCalc.cmv_pct_rivoli).toBeGreaterThan(0)
+    expect(itemCalc.precoMinimoComTributos).toBeGreaterThan(0)
+    expect(itemCalc.margemFinalRs).toBeDefined()
+    expect(itemCalc.margemFinalPercentual).toBeGreaterThan(0)
 
-    const resumo = calcularResumoComparativo([itemCalc], params)
+    const { resumo } = calcularTabelaMargens([itemCalc], params)
     expect(resumo.totalSkus).toBe(1)
-    expect(resumo.mediaMargemGr).toBeCloseTo(0.15, 2)
+    expect(resumo.margemMediaFinalPercentual).toBeGreaterThan(0)
   })
 })

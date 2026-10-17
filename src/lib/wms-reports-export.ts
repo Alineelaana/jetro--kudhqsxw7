@@ -76,13 +76,16 @@ export function exportWmsCsv(
   rows: (string | number)[][],
   userName: string,
 ): void {
-  exportToCsv(
-    rows as Record<string, unknown>[],
-    `${title.toLowerCase().replace(/\s+/g, '_')}.csv`,
-    {
-      module: `WMS > ${title}`,
-      format: 'csv',
-      filters: {},
-    },
-  )
+  const rowObjects: Record<string, unknown>[] = rows.map((row) => {
+    const obj: Record<string, unknown> = {}
+    headers.forEach((h, idx) => {
+      obj[h] = row[idx] ?? ''
+    })
+    return obj
+  })
+  exportToCsv(rowObjects, `${title.toLowerCase().replace(/\s+/g, '_')}.csv`, {
+    module: `WMS > ${title}`,
+    format: 'csv',
+    filters: {},
+  })
 }

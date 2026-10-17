@@ -14,8 +14,9 @@ export const createRoute = (data: Record<string, unknown>): Promise<LogisticsRou
   pb.collection('logistics_routes').create(data)
 export const updateRoute = (id: string, data: Record<string, unknown>): Promise<LogisticsRoute> =>
   pb.collection('logistics_routes').update(id, data)
-export const deleteRoute = (id: string): Promise<void> =>
-  pb.collection('logistics_routes').delete(id)
+export const deleteRoute = async (id: string): Promise<void> => {
+  await pb.collection('logistics_routes').delete(id)
+}
 
 export const getDeliveries = (): Promise<LogisticsDelivery[]> =>
   pb.collection('logistics_deliveries').getFullList({ sort: '-created' })

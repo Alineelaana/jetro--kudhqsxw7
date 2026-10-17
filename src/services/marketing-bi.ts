@@ -85,16 +85,13 @@ export async function getMarketingIntelligence(): Promise<GenericCenterData> {
           { key: 'investment', label: 'Investimento' },
         ],
         rows: Object.entries(
-          media.reduce(
-            (acc, m) => {
-              const k = String(m.channel || 'N/A')
-              if (!acc[k]) acc[k] = { count: 0, investment: 0 }
-              acc[k].count++
-              acc[k].investment += parseNum(m.investment)
-              return acc
-            },
-            {} as Record<string, { count: number; investment: number }>,
-          ),
+          media.reduce<Record<string, { count: number; investment: number }>>((acc, m) => {
+            const k = String(m.channel || 'N/A')
+            if (!acc[k]) acc[k] = { count: 0, investment: 0 }
+            acc[k].count++
+            acc[k].investment += parseNum(m.investment)
+            return acc
+          }, {}),
         ).map(([channel, data]) => ({
           channel,
           count: data.count,

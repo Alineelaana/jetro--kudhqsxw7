@@ -323,24 +323,18 @@ export async function getCrmReportData() {
     getLossReasons().catch(() => []),
   ])
   const leadsBySource = Object.entries(
-    leads.reduce(
-      (acc, l) => {
-        const k = l.lead_source || '—'
-        acc[k] = (acc[k] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    ),
+    leads.reduce<Record<string, number>>((acc, l) => {
+      const k = l.lead_source || '—'
+      acc[k] = (acc[k] || 0) + 1
+      return acc
+    }, {}),
   ).map(([name, count]) => ({ name, count }))
   const leadsByStatus = Object.entries(
-    leads.reduce(
-      (acc, l) => {
-        const k = l.status || '—'
-        acc[k] = (acc[k] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    ),
+    leads.reduce<Record<string, number>>((acc, l) => {
+      const k = l.status || '—'
+      acc[k] = (acc[k] || 0) + 1
+      return acc
+    }, {}),
   ).map(([name, count]) => ({ name, count }))
   const wonOpps = opps.filter((o) => o.status === 'Ganha')
   const lostOpps = opps.filter((o) => o.status === 'Perdida')

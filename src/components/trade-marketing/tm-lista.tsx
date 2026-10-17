@@ -12,7 +12,7 @@ import type { TradeMarketingAction } from '@/lib/trade-marketing-types'
 
 export function TmLista({ actions = [] }: { actions?: TradeMarketingAction[] }) {
   const statusLabel = (value: string) => {
-    const s = (ACTION_STATUS as Array<{ value: string; label: string }>).find(
+    const s = (ACTION_STATUS as readonly { value: string; label: string }[]).find(
       (s) => s.value === value,
     )
     return s ? s.label : value || '—'
@@ -39,16 +39,16 @@ export function TmLista({ actions = [] }: { actions?: TradeMarketingAction[] }) 
               </TableCell>
             </TableRow>
           ) : (
-            actions.map((action: any) => (
+            actions.map((action) => (
               <TableRow key={action.id}>
-                <TableCell className="font-medium">{action.name || action.title || '—'}</TableCell>
+                <TableCell className="font-medium">{action.title || '—'}</TableCell>
                 <TableCell>
                   <Badge variant="outline">{statusLabel(action.status)}</Badge>
                 </TableCell>
-                <TableCell>{action.responsible || '—'}</TableCell>
+                <TableCell>{action.responsible_name || '—'}</TableCell>
                 <TableCell>{action.start_date || '—'}</TableCell>
                 <TableCell>{action.end_date || '—'}</TableCell>
-                <TableCell>{action.budget || '—'}</TableCell>
+                <TableCell>{action.budget_planned || '—'}</TableCell>
               </TableRow>
             ))
           )}

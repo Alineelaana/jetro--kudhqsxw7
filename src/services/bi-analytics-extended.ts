@@ -232,14 +232,11 @@ export async function getLogisticsIntelligence(
           { key: 'count', label: 'Quantidade' },
         ],
         rows: Object.entries(
-          f.reduce(
-            (acc, d) => {
-              const s = (d.status as string) || 'N/A'
-              acc[s] = (acc[s] || 0) + 1
-              return acc
-            },
-            {} as Record<string, number>,
-          ),
+          f.reduce<Record<string, number>>((acc, d) => {
+            const s = (d.status as string) || 'N/A'
+            acc[s] = (acc[s] || 0) + 1
+            return acc
+          }, {}),
         ).map(([status, count]) => ({ status, count })),
       },
     ],

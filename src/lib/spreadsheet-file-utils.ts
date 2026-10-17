@@ -751,7 +751,12 @@ function createSimpleZip(entries: Array<{ name: string; data: Uint8Array }>): Bl
   eocdView.setUint32(16, centralOffset, true) // offset of start of central directory
   eocdView.setUint16(20, 0, true) // comment length
 
-  return new Blob([...localHeaders, ...centralHeaders, eocd], {
+  const parts: BlobPart[] = [
+    ...localHeaders.map((h) => h as Uint8Array<ArrayBuffer>),
+    ...centralHeaders.map((h) => h as Uint8Array<ArrayBuffer>),
+    eocd as Uint8Array<ArrayBuffer>,
+  ]
+  return new Blob(parts, {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   })
 }
