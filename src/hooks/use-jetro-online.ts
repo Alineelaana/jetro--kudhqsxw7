@@ -12,6 +12,11 @@ export function useJetroOnline() {
   const [messages, setMessages] = useState<JetroOnlineMessage[]>([])
   const [conversations, setConversations] = useState<JetroOnlineConversation[]>([])
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [serverUserContext, setServerUserContext] = useState<{
+    role?: string
+    departamento?: string
+    perfil_acesso?: string
+  } | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingHistory, setLoadingHistory] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
@@ -74,6 +79,9 @@ export function useJetroOnline() {
       try {
         const result = await sendJetroOnlineMessage(cleanText, conversationId || undefined)
         setConversationId(result.conversation_id)
+        if (result.user_context) {
+          setServerUserContext(result.user_context)
+        }
 
         const assistantMsg: JetroOnlineMessage = {
           id: result.message_id,
@@ -119,6 +127,7 @@ export function useJetroOnline() {
     messages,
     conversations,
     conversationId,
+    serverUserContext,
     loading,
     loadingHistory,
     send,

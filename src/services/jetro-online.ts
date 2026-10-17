@@ -26,6 +26,12 @@ export interface JetroOnlineConversation {
 /**
  * Envia uma mensagem para o assistente Jetro On-line
  */
+export interface JetroOnlineUserContext {
+  role?: string
+  departamento?: string
+  perfil_acesso?: string
+}
+
 export async function sendJetroOnlineMessage(
   message: string,
   conversationId?: string,
@@ -34,6 +40,7 @@ export async function sendJetroOnlineMessage(
   content: string
   citations?: JetroOnlineCitation[]
   message_id: string
+  user_context?: JetroOnlineUserContext
 }> {
   return pb.send('/backend/v1/jetro-online/chat', {
     method: 'POST',

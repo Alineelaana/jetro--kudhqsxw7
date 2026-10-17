@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Sparkles,
   Send,
@@ -9,15 +9,24 @@ import {
   Search,
   DollarSign,
   Users,
-  RefreshCw,
   Plus,
   MessageSquare,
   ChevronRight,
   ShieldCheck,
-  Building2,
   CheckCircle2,
+  Package,
+  Layers,
+  FileText,
+  FileCheck2,
+  AlertCircle,
+  UserCheck,
+  UserX,
+  Clock,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Receipt,
+  LucideIcon,
 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -25,9 +34,18 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/hooks/use-auth'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
 import { cn } from '@/lib/utils'
+import { JetroOnlineChartRenderer, type JetroChartSpec } from './jetro-online-chart-renderer'
 
 interface JetroOnlineChatProps {
   className?: string
+}
+
+export interface SmartSuggestionItem {
+  id: string
+  title: string
+  icon: LucideIcon
+  prompt: string
+  category: string
 }
 
 function getGreeting(date = new Date()): string {
@@ -44,11 +62,73 @@ function getFirstName(fullName?: string | null): string {
 }
 
 /**
- * Renderizador seguro de Markdown executivo para o Jetro On-line
+ * Extrai blocos ```chart ... ``` ou ```json ... ``` do texto do assistente
+ */
+interface ParsedContentPiece {
+  type: 'markdown' | 'chart'
+  content: string
+  chartSpec?: JetroChartSpec
+}
+
+function parseAssistantContent(rawText: string): ParsedContentPiece[] {
+  const pieces: ParsedContentPiece[] = []
+  // Regex para capturar blocos ```chart ... ``` ou ```json com type="bar"|"line"
+  const chartBlockRegex = /```(?:chart|json:chart)\s*([\s\S]*?)```/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = chartBlockRegex.exec(rawText)) !== null) {
+    if (match.index > lastIndex) {
+      const textBefore = rawText.substring(lastIndex, match.index)
+      if (textBefore.trim()) {
+        pieces.push({ type: 'markdown', content: textBefore })
+      }
+    }
+
+    const rawJson = match[1].trim()
+    try {
+      const parsed = JSON.parse(rawJson)
+      if (
+        parsed &&
+        (parsed.type === 'bar' || parsed.type === 'line') &&
+        Array.isArray(parsed.data)
+      ) {
+        pieces.push({
+          type: 'chart',
+          content: rawJson,
+          chartSpec: parsed as JetroChartSpec,
+        })
+      } else {
+        // Fallback: se não for especificação válida de gráfico, renderiza como markdown
+        pieces.push({ type: 'markdown', content: match[0] })
+      }
+    } catch {
+      // JSON inválido: preserva como texto
+      pieces.push({ type: 'markdown', content: match[0] })
+    }
+
+    lastIndex = chartBlockRegex.lastIndex
+  }
+
+  if (lastIndex < rawText.length) {
+    const trailingText = rawText.substring(lastIndex)
+    if (trailingText.trim()) {
+      pieces.push({ type: 'markdown', content: trailingText })
+    }
+  }
+
+  if (pieces.length === 0) {
+    pieces.push({ type: 'markdown', content: rawText })
+  }
+
+  return pieces
+}
+
+/**
+ * Renderizador de Markdown executivo para o Jetro On-line
  * Suporta tabelas em Markdown (| col | col |), títulos, listas, negrito e blocos de código
  */
 function MarkdownRenderer({ content }: { content: string }) {
-  // Dividir blocos por tabelas vs texto corrido
   const lines = content.split('\n')
   const blocks: Array<{ type: 'table' | 'text'; lines: string[] }> = []
 
@@ -80,7 +160,6 @@ function MarkdownRenderer({ content }: { content: string }) {
     <div className="space-y-3 text-sm leading-relaxed text-gray-800">
       {blocks.map((block, bIdx) => {
         if (block.type === 'table') {
-          // Renderizar tabela HTML estilizada com identidade Jetro (#005B2E)
           const validRows = block.lines
             .map((l) =>
               l
@@ -136,8 +215,6 @@ function MarkdownRenderer({ content }: { content: string }) {
           )
         }
 
-        // Bloco de texto com títulos, bullet points e parágrafos
-        const blockText = block.lines.join('\n')
         return (
           <div key={bIdx} className="space-y-1.5">
             {block.lines.map((rawLine, lIdx) => {
@@ -207,7 +284,6 @@ function MarkdownRenderer({ content }: { content: string }) {
 }
 
 function InlineFormat({ text }: { text: string }) {
-  // Regex simples para negrito **texto** e código `codigo`
   const parts: React.ReactNode[] = []
   const regex = /(\*\*[^*]+\*\*|`[^`]+`)/g
   let lastIndex = 0
@@ -244,14 +320,158 @@ function InlineFormat({ text }: { text: string }) {
   return <>{parts.length > 0 ? parts : text}</>
 }
 
+/**
+ * Sugestões inteligentes segmentadas por perfil/departamento
+ */
+const ALL_SUGGESTIONS: Record<string, SmartSuggestionItem[]> = {
+  comercial: [
+    {
+      id: 'com-1',
+      title: 'Produto mais vendido no mês',
+      icon: TrendingUp,
+      prompt:
+        'Qual foi o produto mais vendido neste mês? Por favor, informe quantidade vendida, faturamento comercial faturado e evolução comparativa em gráfico.',
+      category: 'Comercial',
+    },
+    {
+      id: 'com-2',
+      title: 'Última compra de cliente',
+      icon: Search,
+      prompt:
+        'Qual foi a última compra autorizada para os clientes? Apresente data, número do pedido, valor total faturado e status.',
+      category: 'Comercial',
+    },
+    {
+      id: 'com-3',
+      title: 'Qual é o ticket médio?',
+      icon: DollarSign,
+      prompt:
+        'Qual é o meu ticket médio no mês considerando pedidos faturados de venda comercial, excluindo bonificações e cancelados?',
+      category: 'Comercial',
+    },
+    {
+      id: 'com-4',
+      title: 'Clientes sem compra há 60 dias',
+      icon: Users,
+      prompt:
+        'Quais clientes autorizados estão sem realizar compras faturadas há mais de 60 dias? Apresente ranking e data da última compra.',
+      category: 'Comercial',
+    },
+  ],
+  estoque: [
+    {
+      id: 'est-1',
+      title: 'Produtos com saldo mais baixo',
+      icon: Package,
+      prompt:
+        'Quais são os produtos com saldo de estoque mais baixo ou abaixo do estoque mínimo? Apresente ranking em gráfico de barras.',
+      category: 'Estoque / Operação',
+    },
+    {
+      id: 'est-2',
+      title: 'Movimentações de estoque da semana',
+      icon: Layers,
+      prompt:
+        'Quais foram as principais movimentações e expedições de estoque realizadas na última semana?',
+      category: 'Estoque / Operação',
+    },
+    {
+      id: 'est-3',
+      title: 'Recebimentos WMS pendentes',
+      icon: Clock,
+      prompt:
+        'Quais são os recebimentos de notas fiscais e tarefas de armazenagem (putaway) pendentes no WMS hoje?',
+      category: 'Estoque / Operação',
+    },
+  ],
+  fiscal: [
+    {
+      id: 'fisc-1',
+      title: 'Notas emitidas no mês',
+      icon: FileText,
+      prompt:
+        'Quantas notas fiscais (NF-e) foram emitidas no mês atual e qual o valor total faturado? Exiba a evolução em gráfico.',
+      category: 'Fiscal',
+    },
+    {
+      id: 'fisc-2',
+      title: 'CT-e do período',
+      icon: FileCheck2,
+      prompt:
+        'Qual é o resumo e quantidade de Conhecimentos de Transporte Eletrônico (CT-e) autorizados no período recente?',
+      category: 'Fiscal',
+    },
+    {
+      id: 'fisc-3',
+      title: 'Notas com pendência',
+      icon: AlertCircle,
+      prompt:
+        'Existem notas fiscais rejeitadas, pendentes de autorização ou com cartas de correção no período?',
+      category: 'Fiscal',
+    },
+  ],
+  rh: [
+    {
+      id: 'rh-1',
+      title: 'Colaboradores ativos',
+      icon: UserCheck,
+      prompt:
+        'Qual é o total de colaboradores ativos na empresa por departamento? Apresente o comparativo em gráfico de barras.',
+      category: 'RH / DP',
+    },
+    {
+      id: 'rh-2',
+      title: 'Afastamentos em curso',
+      icon: UserX,
+      prompt:
+        'Quais colaboradores possuem afastamentos ou atestados médicos em andamento no departamento pessoal?',
+      category: 'RH / DP',
+    },
+    {
+      id: 'rh-3',
+      title: 'Faltas do mês',
+      icon: Clock,
+      prompt:
+        'Qual é o registro de faltas, atrasos e ocorrências de ponto apuradas na competência atual do DP?',
+      category: 'RH / DP',
+    },
+  ],
+  financeiro: [
+    {
+      id: 'fin-1',
+      title: 'Contas a receber vencendo',
+      icon: ArrowDownCircle,
+      prompt:
+        'Quais títulos de contas a receber estão vencendo nesta semana ou em atraso? Apresente valores por vencimento.',
+      category: 'Financeiro',
+    },
+    {
+      id: 'fin-2',
+      title: 'Contas a pagar da semana',
+      icon: ArrowUpCircle,
+      prompt:
+        'Quais são os compromissos de contas a pagar agendados para os próximos dias da semana corrente?',
+      category: 'Financeiro',
+    },
+    {
+      id: 'fin-3',
+      title: 'Recebimentos do dia',
+      icon: Receipt,
+      prompt:
+        'Qual foi o total de recebimentos e baixas financeiras registradas hoje nas contas bancárias da empresa?',
+      category: 'Financeiro',
+    },
+  ],
+}
+
 export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
   const { user } = useAuth()
   const {
     messages,
     conversations,
     conversationId,
+    serverUserContext,
     loading,
-    loadingHistory,
     send,
     newConversation,
     loadHistory,
@@ -259,30 +479,139 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
   } = useJetroOnline()
 
   const [input, setInput] = useState('')
-  const [isTypingInput, setIsTypingInput] = useState(false)
+  const [, setIsTypingInput] = useState(false)
   const [showHistorySidebar, setShowHistorySidebar] = useState(false)
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState<string>('todas')
+
+  // Identificação do perfil do usuário para sugestões personalizadas
+  const effectiveRole = useMemo(() => {
+    const rawRole = (serverUserContext?.role || (user?.role as string) || '').toUpperCase()
+    const rawDept = (
+      serverUserContext?.departamento ||
+      (user?.departamento as string) ||
+      ''
+    ).toUpperCase()
+    const rawPerfil = (
+      serverUserContext?.perfil_acesso ||
+      (user?.perfil_acesso as string) ||
+      ''
+    ).toUpperCase()
+
+    // Admin / Gestor amplo
+    if (
+      rawRole === 'SUP' ||
+      rawRole === 'ADMIN' ||
+      rawPerfil.includes('ADMIN') ||
+      rawPerfil.includes('DIRETORIA') ||
+      rawPerfil.includes('GESTOR')
+    ) {
+      return 'admin'
+    }
+    // Comercial / RCA / Vendedor
+    if (
+      rawRole === 'RCA' ||
+      rawRole === 'VENDEDOR' ||
+      rawRole === 'COMERCIAL' ||
+      rawRole === 'SDR' ||
+      rawDept.includes('COMERCIAL') ||
+      rawDept.includes('VENDAS')
+    ) {
+      return 'comercial'
+    }
+    // Financeiro
+    if (
+      rawRole === 'FINANCEIRO' ||
+      rawDept.includes('FINANCEIRO') ||
+      rawDept.includes('CONTROLADORIA')
+    ) {
+      return 'financeiro'
+    }
+    // Fiscal
+    if (rawDept.includes('FISCAL') || rawPerfil.includes('FISCAL')) {
+      return 'fiscal'
+    }
+    // Estoque / WMS / Operação
+    if (
+      rawDept.includes('ESTOQUE') ||
+      rawDept.includes('WMS') ||
+      rawDept.includes('LOGISTICA') ||
+      rawDept.includes('OPERAC')
+    ) {
+      return 'estoque'
+    }
+    // RH / DP
+    if (rawDept.includes('RH') || rawDept.includes('DP') || rawDept.includes('PESSOAS')) {
+      return 'rh'
+    }
+
+    return 'admin' // fallback com todas as opções
+  }, [user, serverUserContext])
+
+  // Sugestões inteligentes filtradas de acordo com as regras solicitadas
+  const profileSuggestions = useMemo(() => {
+    if (effectiveRole === 'admin') {
+      // Admin/gestor vê todas as sugestões
+      return [
+        ...ALL_SUGGESTIONS.comercial,
+        ...ALL_SUGGESTIONS.estoque,
+        ...ALL_SUGGESTIONS.fiscal,
+        ...ALL_SUGGESTIONS.financeiro,
+        ...ALL_SUGGESTIONS.rh,
+      ]
+    }
+    if (effectiveRole === 'comercial') {
+      return ALL_SUGGESTIONS.comercial
+    }
+    if (effectiveRole === 'estoque') {
+      return ALL_SUGGESTIONS.estoque
+    }
+    if (effectiveRole === 'fiscal') {
+      return ALL_SUGGESTIONS.fiscal
+    }
+    if (effectiveRole === 'rh') {
+      return ALL_SUGGESTIONS.rh
+    }
+    if (effectiveRole === 'financeiro') {
+      return ALL_SUGGESTIONS.financeiro
+    }
+    return ALL_SUGGESTIONS.comercial
+  }, [effectiveRole])
+
+  // Categorias disponíveis para filtro quando admin
+  const availableCategories = useMemo(() => {
+    if (effectiveRole !== 'admin') return []
+    return ['todas', 'Comercial', 'Estoque / Operação', 'Fiscal', 'Financeiro', 'RH / DP']
+  }, [effectiveRole])
+
+  const displayedSuggestions = useMemo(() => {
+    if (effectiveRole !== 'admin' || selectedFilterCategory === 'todas') {
+      return profileSuggestions
+    }
+    return profileSuggestions.filter((s) => s.category === selectedFilterCategory)
+  }, [effectiveRole, profileSuggestions, selectedFilterCategory])
 
   // 1. Saudação personalizada com primeiro nome
-  const firstName = getFirstName(user?.name)
+  const firstName = getFirstName(user?.name as string)
   const greeting = getGreeting()
   const userGreetingPhrase = `${greeting}, ${firstName}!`
 
   // 2. Frases animadas em ciclo (3 segundos por frase)
-  const animatedPhrases = [
-    userGreetingPhrase,
-    'Como posso ajudar?',
-    'O que você quer descobrir hoje?',
-    'Pronto(a) para explorar seus dados?',
-    'Em que posso ajudar agora?',
-  ]
+  const animatedPhrases = useMemo(
+    () => [
+      userGreetingPhrase,
+      'Como posso ajudar?',
+      'O que você quer descobrir hoje?',
+      'Pronto(a) para explorar seus dados?',
+      'Em que posso ajudar agora?',
+    ],
+    [userGreetingPhrase],
+  )
 
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Efeito visual de digitação contínuo a cada frase
   useEffect(() => {
-    // Se o usuário estiver ativamente digitando no input, não forçar re-render disruptivo
     const currentPhrase = animatedPhrases[phraseIndex] || animatedPhrases[0]
     let timeout: NodeJS.Timeout
 
@@ -292,7 +621,6 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
           setDisplayedText(currentPhrase.slice(0, displayedText.length + 1))
         }, 40)
       } else {
-        // Pausa de 3 segundos com a frase completa antes de apagar/trocar
         timeout = setTimeout(() => {
           setIsDeleting(true)
         }, 3000)
@@ -324,32 +652,6 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
       handleSend()
     }
   }
-
-  // 4. Botões de sugestões inteligentes
-  const smartSuggestions = [
-    {
-      title: 'Produto mais vendido no mês',
-      icon: TrendingUp,
-      prompt:
-        'Qual foi o produto mais vendido neste mês? Por favor, informe quantidade vendida, faturamento gerado e período considerado.',
-    },
-    {
-      title: 'Última compra de um cliente',
-      icon: Search,
-      prompt:
-        'Qual foi a última compra autorizada para os clientes? Por favor, apresente data, número do pedido, valor total e situação.',
-    },
-    {
-      title: 'Qual é meu ticket médio?',
-      icon: DollarSign,
-      prompt: 'Qual é o meu ticket médio neste mês com base nos pedidos autorizados e faturados?',
-    },
-    {
-      title: 'Clientes sem compra há 60 dias',
-      icon: Users,
-      prompt: 'Quais clientes autorizados estão sem realizar compras há mais de 60 dias?',
-    },
-  ]
 
   const hasMessages = messages.length > 0
 
@@ -384,7 +686,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
               </span>
             </div>
             <p className="text-xs text-emerald-100/90 font-medium mt-0.5">
-              Consultas e análises em tempo real integradas às coleções reais do sistema
+              Consultas com regras comerciais reais, gráficos integrados e filtros por perfil
             </p>
           </div>
         </div>
@@ -426,7 +728,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
               </span>
               <button
                 onClick={() => setShowHistorySidebar(false)}
-                className="text-gray-400 hover:text-gray-600 text-xs"
+                className="text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
               >
                 ✕
               </button>
@@ -441,7 +743,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                       setShowHistorySidebar(false)
                     }}
                     className={cn(
-                      'w-full text-left p-2 rounded-lg text-xs transition-colors flex items-center gap-2 group',
+                      'w-full text-left p-2 rounded-lg text-xs transition-colors flex items-center gap-2 group cursor-pointer',
                       conv.id === conversationId
                         ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
                         : 'hover:bg-gray-200/60 text-gray-700',
@@ -471,7 +773,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                 <div className="space-y-2">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#005B2E]/10 text-[#005B2E] text-xs font-semibold">
                     <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-                    Jetro On-line, pronto pra responder
+                    Jetro On-line com critérios comerciais reais e gráficos
                   </div>
 
                   {/* Frases com efeito typewriter */}
@@ -484,50 +786,93 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
 
                   {/* 3. Texto de orientação permanente */}
                   <p className="text-sm text-gray-500 font-normal">
-                    Faça uma pergunta, faça uma análise ou explore as informações disponíveis.
+                    Faça uma pergunta, solicite rankings, análises de faturamento com gráficos ou
+                    explore informações do seu departamento.
                   </p>
                 </div>
 
                 {/* Badge de Governança de Acesso do Usuário */}
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-gray-50 border border-gray-200/70 text-xs text-gray-600">
-                  <ShieldCheck className="w-4 h-4 text-[#005B2E] shrink-0" />
-                  <span>
-                    Conectado como <strong>{user?.name || user?.email}</strong> (
-                    <span className="text-[#005B2E] font-semibold">
-                      {user?.role || 'Acesso Padrão'}
+                <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-gray-50 border border-gray-200/70 text-xs text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-[#005B2E] shrink-0" />
+                    <span>
+                      Conectado como{' '}
+                      <strong>{(user?.name as string) || (user?.email as string)}</strong> (
+                      <span className="text-[#005B2E] font-semibold">
+                        {(user?.role as string) || 'Acesso Padrão'}
+                      </span>
+                      ) — Perfil ativo:{' '}
+                      <strong className="text-gray-900 uppercase">
+                        {effectiveRole === 'admin'
+                          ? 'Gestor / Admin (Acesso Geral)'
+                          : effectiveRole}
+                      </strong>
                     </span>
-                    ) — Filtros e permissões de dados são validados no servidor em cada consulta.
-                  </span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="border-[#005B2E]/30 text-[#005B2E] text-[10px]"
+                  >
+                    Critérios Fiscais & Comerciais Reais
+                  </Badge>
                 </div>
 
-                {/* 4. Botões de sugestões inteligentes */}
-                <div className="space-y-2.5 pt-2">
+                {/* Filtro por categoria (quando admin/gestor) */}
+                {availableCategories.length > 0 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mr-1">
+                      Filtrar por área:
+                    </span>
+                    {availableCategories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedFilterCategory(cat)}
+                        className={cn(
+                          'text-xs px-2.5 py-1 rounded-full transition-colors cursor-pointer',
+                          selectedFilterCategory === cat
+                            ? 'bg-[#005B2E] text-white font-semibold shadow-2xs'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700',
+                        )}
+                      >
+                        {cat === 'todas' ? 'Todas as Áreas' : cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* 4. Botões de sugestões inteligentes por perfil */}
+                <div className="space-y-2.5 pt-1">
                   <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-                    Sugestões inteligentes para começar:
+                    Sugestões inteligentes para o seu perfil:
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {smartSuggestions.map((sug, i) => {
+                    {displayedSuggestions.map((sug) => {
                       const Icon = sug.icon
                       return (
                         <button
-                          key={i}
+                          key={sug.id}
                           onClick={() => handleSend(sug.prompt)}
                           disabled={loading}
-                          className="flex items-start gap-3 p-3.5 text-left rounded-xl border border-gray-200 hover:border-[#005B2E] bg-white hover:bg-[#005B2E]/5 transition-all duration-200 group shadow-2xs hover:shadow-sm"
+                          className="flex items-start gap-3 p-3.5 text-left rounded-xl border border-gray-200 hover:border-[#005B2E] bg-white hover:bg-[#005B2E]/5 transition-all duration-200 group shadow-2xs hover:shadow-sm cursor-pointer disabled:opacity-50"
                         >
                           <div className="w-8 h-8 rounded-lg bg-[#005B2E]/10 group-hover:bg-[#005B2E] text-[#005B2E] group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
                             <Icon className="w-4 h-4" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-gray-900 group-hover:text-[#005B2E] transition-colors truncate">
-                              {sug.title}
-                            </p>
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="text-xs font-bold text-gray-900 group-hover:text-[#005B2E] transition-colors truncate">
+                                {sug.title}
+                              </p>
+                              <span className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 font-medium">
+                                {sug.category}
+                              </span>
+                            </div>
                             <p className="text-[11px] text-gray-500 line-clamp-1 mt-0.5">
-                              Clique para consultar dados reais do ERP
+                              {sug.prompt}
                             </p>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#005B2E] group-hover:translate-x-0.5 transition-all self-center" />
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#005B2E] group-hover:translate-x-0.5 transition-all self-center shrink-0" />
                         </button>
                       )
                     })}
@@ -539,6 +884,8 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
               <div className="max-w-4xl mx-auto space-y-4">
                 {messages.map((msg, idx) => {
                   const isUser = msg.role === 'user'
+                  const parsedPieces = !isUser ? parseAssistantContent(msg.content) : []
+
                   return (
                     <div
                       key={idx}
@@ -585,7 +932,16 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                         {isUser ? (
                           <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                         ) : (
-                          <MarkdownRenderer content={msg.content} />
+                          <div className="space-y-3">
+                            {parsedPieces.map((piece, pIdx) => {
+                              if (piece.type === 'chart' && piece.chartSpec) {
+                                return (
+                                  <JetroOnlineChartRenderer key={pIdx} spec={piece.chartSpec} />
+                                )
+                              }
+                              return <MarkdownRenderer key={pIdx} content={piece.content} />
+                            })}
+                          </div>
                         )}
 
                         {/* Citações / Fontes dos dados */}
@@ -626,7 +982,10 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                     </div>
                     <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-none px-4 py-3 text-xs text-gray-600 flex items-center gap-2 shadow-2xs">
                       <Loader2 className="w-4 h-4 text-[#005B2E] animate-spin" />
-                      <span>Jetro On-line está consultando os dados reais do ERP...</span>
+                      <span>
+                        Jetro On-line está consultando os dados reais e aplicando regras
+                        comerciais...
+                      </span>
                     </div>
                   </div>
                 )}
@@ -636,7 +995,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
             )}
           </ScrollArea>
 
-          {/* 5. Caixa de mensagens com botão de envio */}
+          {/* Caixa de mensagens com botão de envio */}
           <div className="p-4 bg-white border-t border-gray-200">
             {/* Atalhos rápidos quando o histórico está visível */}
             {hasMessages && (
@@ -644,12 +1003,12 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                 <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider shrink-0">
                   Perguntas rápidas:
                 </span>
-                {smartSuggestions.map((sug, i) => (
+                {profileSuggestions.slice(0, 6).map((sug) => (
                   <button
-                    key={i}
+                    key={sug.id}
                     onClick={() => handleSend(sug.prompt)}
                     disabled={loading}
-                    className="text-[11px] px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50 hover:bg-[#005B2E]/5 hover:border-[#005B2E] text-gray-700 hover:text-[#005B2E] whitespace-nowrap transition-colors"
+                    className="text-[11px] px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50 hover:bg-[#005B2E]/5 hover:border-[#005B2E] text-gray-700 hover:text-[#005B2E] whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {sug.title}
                   </button>
@@ -667,14 +1026,14 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                 onFocus={() => setIsTypingInput(true)}
                 onBlur={() => setIsTypingInput(false)}
                 onKeyDown={handleKeyDown}
-                placeholder="Digite sua mensagem… (ex: Qual foi o produto mais vendido neste mês?)"
+                placeholder="Digite sua mensagem… (ex: Compare o faturamento dos últimos 3 meses em gráfico)"
                 disabled={loading}
                 className="pr-12 py-5.5 text-sm rounded-xl border-gray-300 focus-visible:ring-2 focus-visible:ring-[#005B2E] focus-visible:border-transparent bg-gray-50/50 hover:bg-white transition-all shadow-2xs"
               />
               <Button
                 onClick={() => handleSend()}
                 disabled={loading || !input.trim()}
-                className="absolute right-1.5 h-8.5 w-8.5 p-0 rounded-lg bg-[#005B2E] hover:bg-[#01361D] text-white shadow-xs transition-colors disabled:opacity-40"
+                className="absolute right-1.5 h-8.5 w-8.5 p-0 rounded-lg bg-[#005B2E] hover:bg-[#01361D] text-white shadow-xs transition-colors disabled:opacity-40 cursor-pointer"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -689,7 +1048,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
               </span>
               <span className="flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#005B2E]" />
-                Segurança com perfil auditado
+                Segurança com perfil auditado e regras de faturamento Jetro
               </span>
             </div>
           </div>

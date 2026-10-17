@@ -91,6 +91,11 @@ routerAdd(
         content: result.content,
         citations: result.citations,
         message_id: result.message_id,
+        user_context: {
+          role: userRole || 'PADRAO',
+          departamento: userDept || 'Geral',
+          perfil_acesso: userPerfil || 'Padrão',
+        },
       })
     } catch (err) {
       if (err instanceof SkipAiConfigError) {
