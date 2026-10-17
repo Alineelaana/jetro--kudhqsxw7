@@ -84,6 +84,7 @@ export interface MenuGroup {
 
 /**
  * Ordena alfabeticamente itens e seus respectivos submenus por nome exibido (label) em pt-BR.
+ * Validação de integridade do menu administrativo.
  */
 export function sortMenuItems(items: MenuEntry[]): MenuEntry[] {
   return [...items]
