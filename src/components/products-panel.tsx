@@ -43,6 +43,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 interface ConfirmState {
   type: 'delete' | 'activate' | 'inactivate'
@@ -308,133 +309,189 @@ export function ProductsPanel() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#01361D] text-white">
-                      <th className="text-left px-4 py-3 font-bold hidden md:table-cell">Código</th>
-                      <th className="text-left px-4 py-3 font-bold">Nome</th>
-                      <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">EAN</th>
-                      <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">NCM</th>
-                      <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">Preço</th>
-                      <th className="text-left px-4 py-3 font-bold">Estoque</th>
-                      <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">Fotos</th>
-                      <th className="text-left px-4 py-3 font-bold">Status</th>
-                      <th className="text-center px-4 py-3 font-bold">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((p) => (
-                      <tr
-                        key={p?.id || Math.random()}
-                        className={`border-b border-border hover:bg-[#005B2E]/5 transition-colors ${(p?.stock ?? 0) <= (p?.min_stock ?? 0) ? 'bg-amber-50/60' : ''}`}
+            (() => {
+              const columns: JetroColumnDef<Product>[] = [
+                {
+                  id: 'code',
+                  header: 'Código',
+                  accessorKey: 'code',
+                  dataType: 'text',
+                  defaultWidth: 120,
+                  cell: ({ row }) => (
+                    <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                      {row?.code || '—'}
+                    </span>
+                  ),
+                },
+                {
+                  id: 'name',
+                  header: 'Nome',
+                  accessorKey: 'name',
+                  dataType: 'text',
+                  defaultWidth: 260,
+                  cell: ({ row }) => (
+                    <div>
+                      <div className="font-semibold text-foreground">{row?.name || '—'}</div>
+                      {row?.description && (
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                          {row.description}
+                        </p>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  id: 'ean',
+                  header: 'EAN',
+                  accessorKey: 'ean',
+                  dataType: 'text',
+                  defaultWidth: 130,
+                  cell: ({ row }) => <span className="font-mono text-xs">{row?.ean || '—'}</span>,
+                },
+                {
+                  id: 'ncm',
+                  header: 'NCM',
+                  accessorKey: 'ncm',
+                  dataType: 'text',
+                  defaultWidth: 110,
+                  cell: ({ row }) => <span className="font-mono text-xs">{row?.ncm || '—'}</span>,
+                },
+                {
+                  id: 'price',
+                  header: 'Preço',
+                  accessorKey: 'price',
+                  dataType: 'currency',
+                  align: 'right',
+                  defaultWidth: 120,
+                  cell: ({ row }) => (
+                    <span className="font-semibold">{row?.price ? `R$ ${row.price}` : '—'}</span>
+                  ),
+                },
+                {
+                  id: 'stock',
+                  header: 'Estoque',
+                  accessorKey: 'stock',
+                  dataType: 'number',
+                  defaultWidth: 140,
+                  cell: ({ row }) => (
+                    <div>
+                      <StockCell product={row} onUpdate={handleStockUpdate} />
+                      {(row?.stock ?? 0) <= (row?.min_stock ?? 0) && (
+                        <span className="inline-block mt-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                          Estoque baixo
+                        </span>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  id: 'photos',
+                  header: 'Fotos',
+                  sortable: false,
+                  defaultWidth: 100,
+                  cell: ({ row }) => (
+                    <div className="flex items-center gap-1">
+                      {(row?.photos || []).length > 0 && (
+                        <img
+                          src={getProductPhotoUrl(row.id, row.photos[0], '100x100')}
+                          alt={row.name}
+                          className="w-7 h-7 rounded object-cover border border-border"
+                        />
+                      )}
+                      <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                        <ImageIcon className="w-3 h-3" />
+                        {(row?.photos || []).length}
+                      </span>
+                    </div>
+                  ),
+                },
+                {
+                  id: 'active',
+                  header: 'Status',
+                  accessorKey: 'active',
+                  dataType: 'boolean',
+                  defaultWidth: 110,
+                  cell: ({ row }) => (
+                    <span
+                      className={`text-xs font-bold px-2 py-1 rounded inline-block ${
+                        row?.active !== false
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {row?.active !== false ? 'Ativo' : 'Inativo'}
+                    </span>
+                  ),
+                },
+                {
+                  id: 'actions',
+                  header: 'Ações',
+                  align: 'center',
+                  sortable: false,
+                  hideable: false,
+                  resizable: false,
+                  draggable: false,
+                  defaultWidth: 120,
+                  cell: ({ row }) => (
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEdit(row)}
+                        className="h-7 w-7 p-0 text-[#005B2E] hover:bg-[#005B2E]/10"
+                        title="Editar"
+                        disabled={!row}
                       >
-                        <td className="px-4 py-3 hidden md:table-cell">
-                          <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                            {p?.code || '—'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 font-medium">
-                          {p?.name || '—'}
-                          {p?.description && (
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                              {p.description}
-                            </p>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 hidden sm:table-cell">{p?.ean || '—'}</td>
-                        <td className="px-4 py-3 hidden lg:table-cell">{p?.ncm || '—'}</td>
-                        <td className="px-4 py-3 hidden sm:table-cell">
-                          {p?.price ? `R$ ${p.price}` : '—'}
-                        </td>
-                        <td className="px-4 py-3">
-                          <StockCell product={p} onUpdate={handleStockUpdate} />
-                          {(p?.stock ?? 0) <= (p?.min_stock ?? 0) && (
-                            <span className="inline-block mt-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
-                              Estoque baixo
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 hidden lg:table-cell">
-                          <div className="flex items-center gap-1">
-                            {(p?.photos || []).length > 0 && (
-                              <img
-                                src={getProductPhotoUrl(p.id, p.photos[0], '100x100')}
-                                alt={p.name}
-                                className="w-8 h-8 rounded object-cover border border-border"
-                              />
-                            )}
-                            <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                              <ImageIcon className="w-3 h-3" />
-                              {(p?.photos || []).length}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`text-xs font-bold px-2 py-1 rounded ${
-                              p?.active !== false
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : 'bg-gray-100 text-gray-600'
-                            }`}
-                          >
-                            {p?.active !== false ? 'Ativo' : 'Inativo'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-center gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEdit(p)}
-                              className="text-[#005B2E] hover:bg-[#005B2E]/10"
-                              title="Editar"
-                              disabled={!p}
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </Button>
-                            {p?.active !== false ? (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setConfirm({ type: 'inactivate', product: p })}
-                                className="text-orange-600 hover:bg-orange-50"
-                                title="Inativar"
-                                disabled={!p}
-                              >
-                                <Power className="w-3.5 h-3.5" />
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setConfirm({ type: 'activate', product: p })}
-                                className="text-emerald-600 hover:bg-emerald-50"
-                                title="Ativar"
-                                disabled={!p}
-                              >
-                                <Power className="w-3.5 h-3.5" />
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setConfirm({ type: 'delete', product: p })}
-                              className="text-red-600 hover:bg-red-50"
-                              title="Excluir"
-                              disabled={!p}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      {row?.active !== false ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setConfirm({ type: 'inactivate', product: row })}
+                          className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-50"
+                          title="Inativar"
+                          disabled={!row}
+                        >
+                          <Power className="w-3.5 h-3.5" />
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setConfirm({ type: 'activate', product: row })}
+                          className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
+                          title="Ativar"
+                          disabled={!row}
+                        >
+                          <Power className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setConfirm({ type: 'delete', product: row })}
+                        className="h-7 w-7 p-0 text-red-600 hover:bg-red-50"
+                        title="Excluir"
+                        disabled={!row}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ),
+                },
+              ]
+
+              return (
+                <JetroTable
+                  screenId="cadastros.produtos.list"
+                  columns={columns}
+                  data={filtered}
+                  exportTitle="Cadastro de Produtos — Jetro ERP"
+                  exportFilename="produtos-jetro.xlsx"
+                />
+              )
+            })()
           )}
         </>
       )}

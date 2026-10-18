@@ -35,6 +35,7 @@ import {
   exportOrdersToPdf,
   fetchAllForExport,
 } from './sales-orders-query-export'
+import { JetroTable, type JetroColumnDef, type SortState } from '@/components/jetro-table'
 
 // Cores de status mapeadas a partir da collection order_statuses (parametrizável)
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -409,14 +410,42 @@ export default function SalesOrdersQueryPage() {
     return parts.join(' && ')
   }, [])
 
+  const [currentSort, setCurrentSort] = useState<SortState | null>(null)
+
   const fetchOrders = useCallback(
-    async (f: typeof emptyFilters, targetPage: number, size: number) => {
+    async (
+      f: typeof emptyFilters,
+      targetPage: number,
+      size: number,
+      sortOverride?: SortState | null,
+    ) => {
       setLoading(true)
       try {
         const filter = buildFilter(f)
+        const activeSort = sortOverride !== undefined ? sortOverride : currentSort
+        let sortExpr = '-created'
+        if (activeSort) {
+          const colMap: Record<string, string> = {
+            order_number: 'order_number',
+            integration_order_number: 'integration_order_number',
+            client_name: 'client_name',
+            customer_cnpj: 'customer_cnpj',
+            team: 'team',
+            rca_name: 'rca_name',
+            created: 'created',
+            operation_type: 'operation_type',
+            sales_channel: 'sales_channel',
+            total_value: 'total_value',
+            status: 'status',
+            is_invoiced: 'is_invoiced',
+          }
+          const field = colMap[activeSort.columnId] || activeSort.columnId
+          sortExpr = activeSort.direction === 'desc' ? `-${field}` : `+${field}`
+        }
+
         const result = (await pb.collection('sales_orders').getList(targetPage, size, {
           filter,
-          sort: '-created',
+          sort: sortExpr,
         })) as { items: SalesOrderRow[]; totalItems: number }
         setRows(result.items || [])
         setTotalItems(result.totalItems || 0)
@@ -427,7 +456,7 @@ export default function SalesOrdersQueryPage() {
         setLoading(false)
       }
     },
-    [buildFilter],
+    [buildFilter, currentSort],
   )
 
   const handleConsult = useCallback(() => {
@@ -798,129 +827,212 @@ export default function SalesOrdersQueryPage() {
         </div>
       )}
 
-      <div className="flex-1 p-4 md:p-6">
-        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1200px] text-left text-sm">
-              <thead>
-                <tr className="border-b bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-4 py-3 font-semibold">Nº Pedido</th>
-                  <th className="px-4 py-3 font-semibold">Nº Integração</th>
-                  <th className="px-4 py-3 font-semibold">Cliente</th>
-                  <th className="px-4 py-3 font-semibold">CNPJ</th>
-                  <th className="px-4 py-3 font-semibold">Equipe</th>
-                  <th className="px-4 py-3 font-semibold">RCA</th>
-                  <th className="px-4 py-3 font-semibold">Data</th>
-                  <th className="px-4 py-3 font-semibold">Operação</th>
-                  <th className="px-4 py-3 font-semibold">Canal</th>
-                  <th className="px-4 py-3 text-right font-semibold">Valor</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                  <th className="px-4 py-3 font-semibold">Saldo</th>
-                  <th className="px-4 py-3 font-semibold">Faturamento</th>
-                  <th className="px-4 py-3 text-center font-semibold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading &&
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={`skeleton-${i}`} className="border-b">
-                      <td colSpan={14} className="px-4 py-3">
-                        <Skeleton className="h-5 w-full" />
-                      </td>
-                    </tr>
-                  ))}
-                {!loading &&
-                  rows.map((row) => (
-                    <tr key={row.id} className="border-b transition hover:bg-emerald-50/40">
-                      <td className="px-4 py-2.5 font-medium text-[#005B2E]">
-                        {row.order_number || '—'}
-                      </td>
-                      <td className="px-4 py-2.5 text-gray-600">
-                        {row.integration_order_number || '—'}
-                      </td>
-                      <td className="px-4 py-2.5 text-gray-700">{row.client_name || '—'}</td>
-                      <td className="px-4 py-2.5 text-gray-500">{row.customer_cnpj || '—'}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{row.team || '—'}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{row.rca_name || '—'}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{formatDateTime(row.created)}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{row.operation_type || '—'}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{row.sales_channel || '—'}</td>
-                      <td className="px-4 py-2.5 text-right font-medium text-gray-800">
-                        {formatCurrency(row.total_value)}
-                      </td>
-                      <td className="px-4 py-2.5">{statusBadge(row.status)}</td>
-                      <td className="px-4 py-2.5">
-                        {row.is_balance ? (
-                          <Badge className="border-transparent bg-amber-100 text-amber-700">
-                            É saldo
-                          </Badge>
-                        ) : row.generated_balance ? (
-                          <Badge className="border-transparent bg-indigo-100 text-indigo-700">
-                            Gerou saldo
-                          </Badge>
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2.5">
-                        {row.is_invoiced ? (
-                          <Badge className="border-transparent bg-emerald-100 text-emerald-700">
-                            Faturado
-                          </Badge>
-                        ) : (
-                          <Badge className="border-transparent bg-gray-100 text-gray-600">
-                            Não faturado
-                          </Badge>
-                        )}
-                      </td>
-                      <td className="px-4 py-2.5 text-center">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 text-[#005B2E] hover:bg-emerald-50"
-                          onClick={() => openDetail(row)}
-                        >
-                          <Eye className="mr-1 h-4 w-4" />
-                          Detalhes
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                {!loading && rows.length === 0 && (
-                  <tr>
-                    <td colSpan={14} className="px-4 py-10 text-center text-gray-500">
-                      Nenhum pedido encontrado com os filtros informados.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+      <div className="flex-1 p-4 md:p-6 space-y-4">
+        {(() => {
+          const tableColumns: JetroColumnDef<SalesOrderRow>[] = [
+            {
+              id: 'order_number',
+              header: 'Nº Pedido',
+              accessorKey: 'order_number',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ row }) => (
+                <span className="font-semibold text-[#005B2E]">{row.order_number || '—'}</span>
+              ),
+            },
+            {
+              id: 'integration_order_number',
+              header: 'Nº Integração',
+              accessorKey: 'integration_order_number',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ row }) => (
+                <span className="text-gray-600">{row.integration_order_number || '—'}</span>
+              ),
+            },
+            {
+              id: 'client_name',
+              header: 'Cliente',
+              accessorKey: 'client_name',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ row }) => (
+                <span className="text-gray-700 font-medium">{row.client_name || '—'}</span>
+              ),
+            },
+            {
+              id: 'customer_cnpj',
+              header: 'CNPJ',
+              accessorKey: 'customer_cnpj',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ row }) => (
+                <span className="text-gray-500 font-mono">{row.customer_cnpj || '—'}</span>
+              ),
+            },
+            {
+              id: 'team',
+              header: 'Equipe',
+              accessorKey: 'team',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ row }) => <span className="text-gray-600">{row.team || '—'}</span>,
+            },
+            {
+              id: 'rca_name',
+              header: 'RCA',
+              accessorKey: 'rca_name',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ row }) => <span className="text-gray-600">{row.rca_name || '—'}</span>,
+            },
+            {
+              id: 'created',
+              header: 'Data',
+              accessorKey: 'created',
+              dataType: 'date',
+              defaultWidth: 160,
+              cell: ({ row }) => (
+                <span className="text-gray-600">{formatDateTime(row.created)}</span>
+              ),
+            },
+            {
+              id: 'operation_type',
+              header: 'Operação',
+              accessorKey: 'operation_type',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ row }) => <span className="text-gray-600">{row.operation_type || '—'}</span>,
+            },
+            {
+              id: 'sales_channel',
+              header: 'Canal',
+              accessorKey: 'sales_channel',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ row }) => <span className="text-gray-600">{row.sales_channel || '—'}</span>,
+            },
+            {
+              id: 'total_value',
+              header: 'Valor',
+              accessorKey: 'total_value',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 140,
+              cell: ({ row }) => (
+                <span className="font-semibold text-gray-800">
+                  {formatCurrency(row.total_value)}
+                </span>
+              ),
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ row }) => statusBadge(row.status),
+            },
+            {
+              id: 'is_balance',
+              header: 'Saldo',
+              dataType: 'text',
+              defaultWidth: 130,
+              getSortValue: (row) =>
+                row.is_balance ? 'É saldo' : row.generated_balance ? 'Gerou saldo' : '—',
+              cell: ({ row }) =>
+                row.is_balance ? (
+                  <Badge className="border-transparent bg-amber-100 text-amber-700">É saldo</Badge>
+                ) : row.generated_balance ? (
+                  <Badge className="border-transparent bg-indigo-100 text-indigo-700">
+                    Gerou saldo
+                  </Badge>
+                ) : (
+                  <span className="text-gray-400">—</span>
+                ),
+            },
+            {
+              id: 'is_invoiced',
+              header: 'Faturamento',
+              accessorKey: 'is_invoiced',
+              dataType: 'boolean',
+              defaultWidth: 140,
+              cell: ({ row }) =>
+                row.is_invoiced ? (
+                  <Badge className="border-transparent bg-emerald-100 text-emerald-700">
+                    Faturado
+                  </Badge>
+                ) : (
+                  <Badge className="border-transparent bg-gray-100 text-gray-600">
+                    Não faturado
+                  </Badge>
+                ),
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              draggable: false,
+              defaultWidth: 110,
+              cell: ({ row }) => (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 text-[#005B2E] hover:bg-emerald-50"
+                  onClick={() => openDetail(row)}
+                >
+                  <Eye className="mr-1 h-4 w-4" />
+                  Detalhes
+                </Button>
+              ),
+            },
+          ]
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t bg-gray-50 px-4 py-3 text-sm text-gray-600">
-            <span>
-              {totalItems} pedido(s) encontrado(s) — página {page} de {totalPages}
-            </span>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+          return (
+            <div className="space-y-3">
+              <JetroTable
+                screenId="comercial.pedidos.consulta"
+                columns={tableColumns}
+                data={rows}
+                loading={loading}
+                emptyMessage="Nenhum pedido encontrado com os filtros informados."
+                clientSorting={false}
+                externalSorting={currentSort}
+                onSortingChange={(newSort) => {
+                  setCurrentSort(newSort)
+                  fetchOrders(appliedFilters, page, perPage, newSort)
+                }}
+                enableExport={false}
+              />
+
+              <div className="flex flex-wrap items-center justify-between gap-3 border rounded-lg bg-white px-4 py-3 text-sm text-gray-600 shadow-sm">
+                <span>
+                  {totalItems} pedido(s) encontrado(s) — página {page} de {totalPages}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )
+        })()}
       </div>
 
       {/* Modal de gerenciamento e criação de agendamentos */}

@@ -18,6 +18,7 @@ import {
 } from '@/lib/atendimento-types'
 import { Search, Loader2, Inbox } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 export function AtendimentoList({ statusFilter }: { statusFilter: string }) {
   const [records, setRecords] = useState<AtendimentoRecord[]>([])
@@ -57,6 +58,97 @@ export function AtendimentoList({ statusFilter }: { statusFilter: string }) {
     )
   })
 
+  const columns: JetroColumnDef<AtendimentoRecord>[] = [
+    {
+      id: 'protocol',
+      header: 'Protocolo',
+      accessorKey: 'protocol',
+      dataType: 'text',
+      defaultWidth: 160,
+      cell: ({ row }) => (
+        <Link
+          to={`/admin/atendimento/detalhe/${row.id}`}
+          className="text-[#005B2E] font-bold hover:underline"
+        >
+          {row.protocol}
+        </Link>
+      ),
+    },
+    {
+      id: 'client_name',
+      header: 'Cliente',
+      accessorKey: 'client_name',
+      dataType: 'text',
+      defaultWidth: 220,
+      cell: ({ row }) => <span>{row.client_name || '—'}</span>,
+    },
+    {
+      id: 'prioridade',
+      header: 'Prioridade',
+      accessorKey: 'prioridade',
+      dataType: 'text',
+      defaultWidth: 130,
+      cell: ({ row }) => <span>{row.prioridade || '—'}</span>,
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      accessorKey: 'status',
+      dataType: 'text',
+      defaultWidth: 160,
+      cell: ({ row }) => (
+        <span
+          className={cn(
+            'text-xs font-bold px-2 py-0.5 rounded inline-block',
+            STATUS_BADGE_COLORS[row.status] || '',
+          )}
+        >
+          {row.status}
+        </span>
+      ),
+    },
+    {
+      id: 'sla',
+      header: 'SLA',
+      dataType: 'text',
+      defaultWidth: 120,
+      getSortValue: (row) => {
+        const isOverdue =
+          row.data_hora_limite &&
+          new Date(row.data_hora_limite).getTime() < Date.now() &&
+          !row.sla_cumprido &&
+          row.status !== 'Finalizado' &&
+          row.status !== 'Cancelado'
+        return isOverdue ? '1_Vencido' : row.sla_cumprido ? '2_Cumprido' : '3_Pendente'
+      },
+      cell: ({ row }) => {
+        const isOverdue =
+          row.data_hora_limite &&
+          new Date(row.data_hora_limite).getTime() < Date.now() &&
+          !row.sla_cumprido &&
+          row.status !== 'Finalizado' &&
+          row.status !== 'Cancelado'
+        return isOverdue ? (
+          <span className="text-xs font-bold text-red-600">Vencido</span>
+        ) : row.sla_cumprido ? (
+          <span className="text-xs font-bold text-green-600">Cumprido</span>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        )
+      },
+    },
+    {
+      id: 'created',
+      header: 'Abertura',
+      accessorKey: 'created',
+      dataType: 'date',
+      defaultWidth: 160,
+      cell: ({ row }) => (
+        <span>{row.created ? new Date(row.created).toLocaleString('pt-BR') : '—'}</span>
+      ),
+    },
+  ]
+
   return (
     <div className="space-y-4">
       <Card className="border-2 border-[#005B2E]/20">
@@ -89,6 +181,7 @@ export function AtendimentoList({ statusFilter }: { statusFilter: string }) {
           <p className="text-sm text-muted-foreground">{filtered.length} registro(s)</p>
         </CardContent>
       </Card>
+
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
@@ -101,68 +194,13 @@ export function AtendimentoList({ statusFilter }: { statusFilter: string }) {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">Protocolo</th>
-                  <th className="text-left px-3 py-3 font-bold">Cliente</th>
-                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Prioridade</th>
-                  <th className="text-left px-3 py-3 font-bold">Status</th>
-                  <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">SLA</th>
-                  <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Abertura</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((r) => {
-                  const isOverdue =
-                    r.data_hora_limite &&
-                    new Date(r.data_hora_limite).getTime() < Date.now() &&
-                    !r.sla_cumprido &&
-                    r.status !== 'Finalizado' &&
-                    r.status !== 'Cancelado'
-                  return (
-                    <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                      <td className="px-3 py-2">
-                        <Link
-                          to={`/admin/atendimento/detalhe/${r.id}`}
-                          className="text-[#005B2E] font-bold hover:underline"
-                        >
-                          {r.protocol}
-                        </Link>
-                      </td>
-                      <td className="px-3 py-2">{r.client_name || '—'}</td>
-                      <td className="px-3 py-2 hidden md:table-cell">{r.prioridade || '—'}</td>
-                      <td className="px-3 py-2">
-                        <span
-                          className={cn(
-                            'text-xs font-bold px-2 py-0.5 rounded',
-                            STATUS_BADGE_COLORS[r.status] || '',
-                          )}
-                        >
-                          {r.status}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 hidden lg:table-cell">
-                        {isOverdue ? (
-                          <span className="text-xs font-bold text-red-600">Vencido</span>
-                        ) : r.sla_cumprido ? (
-                          <span className="text-xs font-bold text-green-600">Cumprido</span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 hidden lg:table-cell">
-                        {r.created ? new Date(r.created).toLocaleString('pt-BR') : '—'}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <JetroTable
+          screenId="atendimento.central.list"
+          columns={columns}
+          data={filtered}
+          exportTitle="Central de Atendimentos — Jetro ERP"
+          exportFilename="atendimentos-jetro.xlsx"
+        />
       )}
     </div>
   )
