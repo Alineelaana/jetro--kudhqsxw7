@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
 import { PublicJehChat } from '@/components/public-jeh-chat'
+import { JetroTourOverlay } from '@/components/jetro-tours/tour-overlay'
 import { GlobalSearchBar } from '@/components/enterprise/global-search-bar'
 import { AdminSidebar } from '@/components/admin-sidebar'
 import { useAuth } from '@/hooks/use-auth'
@@ -83,6 +84,7 @@ export default function Layout() {
             </main>
           </div>
         </div>
+        <JetroTourOverlay />
         <FloatingChat />
 
         {canAccessDocs && (
@@ -114,6 +116,7 @@ export default function Layout() {
         )}
       </main>
       {showFooter && <SiteFooter />}
+      <JetroTourOverlay />
       {isAuthenticated && !isRootLogin && <FloatingChat />}
       {!isAuthenticated && <PublicJehChat />}
     </div>

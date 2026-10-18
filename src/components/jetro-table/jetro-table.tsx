@@ -347,6 +347,7 @@ export function JetroTable<T extends Record<string, any>>({
             <Button
               variant="outline"
               size="sm"
+              data-tour-id="pedidos-btn-personalizar-colunas"
               onClick={() => setCustomizerOpen(true)}
               className="h-8 text-xs font-semibold border-border hover:bg-muted"
               title="Personalizar colunas visíveis e ordem"
@@ -376,7 +377,7 @@ export function JetroTable<T extends Record<string, any>>({
       <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse text-left">
-            <thead>
+            <thead data-tour-id="pedidos-tabela-head">
               <tr className="bg-[#005B2E] text-white select-none">
                 {visibleColumns.map((col) => {
                   const isSorted = activeSorting?.columnId === col.id

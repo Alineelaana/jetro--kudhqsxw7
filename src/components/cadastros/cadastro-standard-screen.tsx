@@ -155,7 +155,10 @@ export function CadastroStandardScreen({ config }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div
+        data-tour-id="cadastro-screen-header"
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+      >
         <h2 className="text-xl font-black text-foreground">{config.label}</h2>
         <div className="flex flex-wrap gap-2">
           <input
@@ -183,6 +186,7 @@ export function CadastroStandardScreen({ config }: Props) {
             <FileSpreadsheet className="w-4 h-4 mr-1.5" /> Exportar
           </Button>
           <Button
+            data-tour-id="cadastro-btn-novo"
             onClick={handleNew}
             className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
           >
@@ -193,7 +197,7 @@ export function CadastroStandardScreen({ config }: Props) {
       <Card className="border-2 border-[#005B2E]/20">
         <CardContent className="py-4 space-y-3">
           <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+            <div className="relative flex-1" data-tour-id="cadastro-search-input">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 value={search}
@@ -221,141 +225,143 @@ export function CadastroStandardScreen({ config }: Props) {
           <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
         </div>
       ) : (
-        <JetroTable
-          screenId={`cadastros.padrao.${config.collection}`}
-          columns={[
-            {
-              id: 'code',
-              header: 'Código',
-              accessorKey: 'code',
-              dataType: 'text',
-              defaultWidth: 120,
-              cell: ({ value }) => (
-                <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                  {String(value || '—')}
-                </span>
-              ),
-            },
-            {
-              id: 'name',
-              header: 'Nome',
-              accessorKey: 'name',
-              dataType: 'text',
-              defaultWidth: 260,
-              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
-            },
-            {
-              id: 'created',
-              header: 'Data de Cadastro',
-              accessorKey: 'created',
-              dataType: 'date',
-              defaultWidth: 140,
-              cell: ({ value }) => (
-                <span className="text-muted-foreground text-xs">
-                  {fmtDate(String(value || ''))}
-                </span>
-              ),
-            },
-            {
-              id: 'active',
-              header: 'Situação',
-              accessorKey: 'active',
-              dataType: 'boolean',
-              defaultWidth: 110,
-              getSortValue: (row) => (row.active !== false ? 'Ativo' : 'Inativo'),
-              cell: ({ row }) => (
-                <span
-                  className={`text-xs font-bold px-2 py-1 rounded ${row.active !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
-                >
-                  {row.active !== false ? 'Ativo' : 'Inativo'}
-                </span>
-              ),
-            },
-            {
-              id: 'responsible_user',
-              header: 'Responsável',
-              accessorKey: 'responsible_user',
-              dataType: 'text',
-              defaultWidth: 160,
-              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
-            },
-            {
-              id: 'actions',
-              header: 'Ações',
-              align: 'center',
-              sortable: false,
-              hideable: false,
-              resizable: false,
-              draggable: false,
-              defaultWidth: 180,
-              cell: ({ row: r }) => (
-                <div className="flex items-center justify-center gap-0.5">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleView(r)}
-                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
-                    title="Visualizar"
+        <div data-tour-id="cadastro-table-container">
+          <JetroTable
+            screenId={`cadastros.padrao.${config.collection}`}
+            columns={[
+              {
+                id: 'code',
+                header: 'Código',
+                accessorKey: 'code',
+                dataType: 'text',
+                defaultWidth: 120,
+                cell: ({ value }) => (
+                  <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                    {String(value || '—')}
+                  </span>
+                ),
+              },
+              {
+                id: 'name',
+                header: 'Nome',
+                accessorKey: 'name',
+                dataType: 'text',
+                defaultWidth: 260,
+                cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+              },
+              {
+                id: 'created',
+                header: 'Data de Cadastro',
+                accessorKey: 'created',
+                dataType: 'date',
+                defaultWidth: 140,
+                cell: ({ value }) => (
+                  <span className="text-muted-foreground text-xs">
+                    {fmtDate(String(value || ''))}
+                  </span>
+                ),
+              },
+              {
+                id: 'active',
+                header: 'Situação',
+                accessorKey: 'active',
+                dataType: 'boolean',
+                defaultWidth: 110,
+                getSortValue: (row) => (row.active !== false ? 'Ativo' : 'Inativo'),
+                cell: ({ row }) => (
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded ${row.active !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleEdit(r)}
-                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
-                    title="Editar"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDuplicate(r)}
-                    className="text-blue-600 hover:bg-blue-50 h-7 w-7 p-0"
-                    title="Duplicar"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </Button>
-                  {r.active !== false ? (
+                    {row.active !== false ? 'Ativo' : 'Inativo'}
+                  </span>
+                ),
+              },
+              {
+                id: 'responsible_user',
+                header: 'Responsável',
+                accessorKey: 'responsible_user',
+                dataType: 'text',
+                defaultWidth: 160,
+                cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+              },
+              {
+                id: 'actions',
+                header: 'Ações',
+                align: 'center',
+                sortable: false,
+                hideable: false,
+                resizable: false,
+                draggable: false,
+                defaultWidth: 180,
+                cell: ({ row: r }) => (
+                  <div className="flex items-center justify-center gap-0.5">
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setConfirm({ type: 'inactivate', record: r })}
-                      className="text-orange-600 hover:bg-orange-50 h-7 w-7 p-0"
-                      title="Inativar"
+                      onClick={() => handleView(r)}
+                      className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                      title="Visualizar"
                     >
-                      <Power className="w-3.5 h-3.5" />
+                      <Eye className="w-3.5 h-3.5" />
                     </Button>
-                  ) : (
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setConfirm({ type: 'activate', record: r })}
-                      className="text-emerald-600 hover:bg-emerald-50 h-7 w-7 p-0"
-                      title="Ativar"
+                      onClick={() => handleEdit(r)}
+                      className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                      title="Editar"
                     >
-                      <Power className="w-3.5 h-3.5" />
+                      <Pencil className="w-3.5 h-3.5" />
                     </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setConfirm({ type: 'delete', record: r })}
-                    className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
-                    title="Excluir"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              ),
-            },
-          ]}
-          data={filtered}
-          emptyMessage="Nenhum registro encontrado. Clique em 'Novo Cadastro' para começar."
-          exportTitle={`${config.label} — Cadastros Jetro`}
-          exportFilename={`cadastro-${config.collection}.xlsx`}
-        />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDuplicate(r)}
+                      className="text-blue-600 hover:bg-blue-50 h-7 w-7 p-0"
+                      title="Duplicar"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </Button>
+                    {r.active !== false ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setConfirm({ type: 'inactivate', record: r })}
+                        className="text-orange-600 hover:bg-orange-50 h-7 w-7 p-0"
+                        title="Inativar"
+                      >
+                        <Power className="w-3.5 h-3.5" />
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setConfirm({ type: 'activate', record: r })}
+                        className="text-emerald-600 hover:bg-emerald-50 h-7 w-7 p-0"
+                        title="Ativar"
+                      >
+                        <Power className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setConfirm({ type: 'delete', record: r })}
+                      className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                      title="Excluir"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            data={filtered}
+            emptyMessage="Nenhum registro encontrado. Clique em 'Novo Cadastro' para começar."
+            exportTitle={`${config.label} — Cadastros Jetro`}
+            exportFilename={`cadastro-${config.collection}.xlsx`}
+          />
+        </div>
       )}
       <CadastroFormDialog
         config={config}

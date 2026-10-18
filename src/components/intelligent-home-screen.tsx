@@ -8,7 +8,10 @@ export function IntelligentHomeScreen() {
   const { user, signOut } = useAuth()
 
   return (
-    <div className="flex flex-col min-h-full p-4 sm:p-6 max-w-7xl mx-auto w-full pb-12 space-y-6">
+    <div
+      className="flex flex-col min-h-full p-4 sm:p-6 max-w-7xl mx-auto w-full pb-12 space-y-6"
+      data-tour-id="admin-home-header"
+    >
       {/* Barra superior com controles funcionais (Notificações e Sair) */}
       <div className="flex items-center justify-end gap-2.5 px-0.5 pt-1 pb-1">
         <NotificationBell />
@@ -28,7 +31,7 @@ export function IntelligentHomeScreen() {
       </section>
 
       {/* 2ª área: Calendário Mensal e Agenda Corporativa Jetro ocupando toda a largura */}
-      <section className="w-full">
+      <section className="w-full" data-tour-id="admin-home-cards">
         <JetroCalendar
           currentUser={
             user

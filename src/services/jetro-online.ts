@@ -92,6 +92,8 @@ export interface JetroTourStep {
   texto: string
   seletor?: string
   posicao?: 'top' | 'bottom' | 'left' | 'right'
+  acaoEsperada?: 'click' | 'focus' | 'observe' | 'select'
+  dicaInterativa?: string
 }
 
 export interface JetroTour {
@@ -103,6 +105,27 @@ export interface JetroTour {
   etapas: JetroTourStep[]
   ativo: boolean
   ordem?: number
+  permissao_necessaria?: string
+  status_revisao?: 'ok' | 'revisao_necessaria'
+  etapa_afetada?: number
+  ultima_validacao?: string
+}
+
+export interface JetroTourExecution {
+  id?: string
+  tour_id: string
+  tour_titulo: string
+  rota: string
+  modulo?: string
+  user_id?: string
+  user_name?: string
+  user_role?: string
+  status: 'iniciado' | 'concluido' | 'interrompido'
+  etapa_final: number
+  total_etapas: number
+  tempo_segundos?: number
+  observacoes?: string
+  created?: string
 }
 
 export interface JetroOnlinePergunta {
@@ -245,12 +268,57 @@ export async function incrementSugestaoClicks(sugestaoId: string): Promise<void>
 
 export async function getJetroTourForRoute(pathname: string): Promise<JetroTour | null> {
   try {
+    const cleanPath = pathname.replace(/\/$/, '') || '/'
     const list = await pb.collection('jetro_tours').getList<JetroTour>(1, 1, {
-      filter: `ativo = true && (rota = "${pathname}" || rota = "${pathname.replace(/\/$/, '')}")`,
+      filter: `ativo = true && (rota = "${pathname}" || rota = "${cleanPath}")`,
       sort: 'ordem',
     })
-    return list.items[0] || null
+    if (list.items.length > 0) return list.items[0]
+
+    // Fallback: buscar pelo catálogo embutido de tours do Jetro
+    const local = JETRO_TOURS_CATALOG.find(
+      (t) => t.ativo && (t.rota === pathname || t.rota === cleanPath),
+    )
+    return local || null
+  } catch {
+    const cleanPath = pathname.replace(/\/$/, '') || '/'
+    const local = JETRO_TOURS_CATALOG.find(
+      (t) => t.ativo && (t.rota === pathname || t.rota === cleanPath),
+    )
+    return local || null
+  }
+}
+
+/**
+ * Registra o início ou conclusão/interrupção de um tour para fins de métricas e auditoria
+ */
+export async function recordTourExecution(
+  data: Omit<JetroTourExecution, 'id' | 'created'>,
+): Promise<string | null> {
+  try {
+    const user = pb.authStore.record as { id?: string; name?: string; role?: string } | null
+    const payload = {
+      ...data,
+      user_id: data.user_id || user?.id || '',
+      user_name: data.user_name || user?.name || 'Operador',
+      user_role: data.user_role || user?.role || 'PADRAO',
+    }
+    const rec = await pb.collection('jetro_tour_executions').create(payload)
+    return rec.id
   } catch {
     return null
   }
 }
+
+export async function updateTourExecution(
+  id: string,
+  data: Partial<JetroTourExecution>,
+): Promise<void> {
+  try {
+    await pb.collection('jetro_tour_executions').update(id, data)
+  } catch {
+    /* ignore */
+  }
+}
+
+import { JETRO_TOURS_CATALOG } from '@/lib/tours/tours-catalog'

@@ -596,6 +596,7 @@ export default function SalesOrdersQueryPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
+            data-tour-id="pedidos-btn-toggle-filtro"
             onClick={() => setShowFilters((s) => !s)}
             className="flex items-center gap-2 rounded-md px-2 py-1.5 text-base font-medium text-gray-700 transition hover:bg-gray-100"
           >
@@ -620,6 +621,7 @@ export default function SalesOrdersQueryPage() {
               ))}
             </select>
             <Button
+              data-tour-id="pedidos-btn-consultar"
               onClick={handleConsult}
               className="h-10 bg-[#1e3a6e] px-5 text-white hover:bg-[#16305a]"
             >
@@ -670,7 +672,7 @@ export default function SalesOrdersQueryPage() {
       </div>
 
       {showFilters && (
-        <div className="border-b bg-white px-6 py-5">
+        <div data-tour-id="pedidos-filtros-container" className="border-b bg-white px-6 py-5">
           <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
             <FilterSelect
               label="Origem:"
@@ -976,10 +978,11 @@ export default function SalesOrdersQueryPage() {
               hideable: false,
               draggable: false,
               defaultWidth: 110,
-              cell: ({ row }) => (
+              cell: ({ row, index }) => (
                 <Button
                   size="sm"
                   variant="ghost"
+                  {...(index === 0 ? { 'data-tour-id': 'pedidos-btn-detalhes-primeiro' } : {})}
                   className="h-8 text-[#005B2E] hover:bg-emerald-50"
                   onClick={() => openDetail(row)}
                 >

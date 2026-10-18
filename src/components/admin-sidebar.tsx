@@ -217,11 +217,13 @@ export function AdminSidebar() {
   return (
     <div className="relative flex h-full shrink-0" ref={flyoutRef}>
       <aside
+        data-tour-id="admin-sidebar-nav"
         className={cn(
-          'h-full shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out',
-          effectiveRail ? 'w-16' : 'w-60',
+          'border-r bg-card transition-all duration-300 flex flex-col shrink-0 h-full select-none relative',
+          effectiveRail ? 'w-16' : 'w-64',
         )}
       >
+        {' '}
         {/* Cabeçalho do Sidebar */}
         <div
           className={cn(
@@ -287,7 +289,6 @@ export function AdminSidebar() {
             </>
           )}
         </div>
-
         {/* MODO RAIL (ÍCONES COMPACTOS) */}
         {effectiveRail ? (
           <nav

@@ -35,6 +35,7 @@ import {
   type JetroTour,
 } from '@/services/jetro-online'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useTour } from '@/lib/tours/tour-context'
 import { Button } from '@/components/ui/button'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
@@ -122,6 +123,7 @@ export function FloatingChat() {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { startTour, availableTourForCurrentRoute } = useTour()
 
   const {
     messages,
@@ -280,9 +282,11 @@ export function FloatingChat() {
   }
 
   const handleStartTour = () => {
-    if (!activeTour || !activeTour.etapas || activeTour.etapas.length === 0) return
-    setCurrentTourStepIndex(0)
-    setTourModalOpen(true)
+    const tourToRun = activeTour || availableTourForCurrentRoute
+    if (!tourToRun || !tourToRun.etapas || tourToRun.etapas.length === 0) return
+    // Minimiza o chat flutuante para liberar a tela inteira para o tour visual interativo
+    setIsFloatingOpen(false)
+    startTour(tourToRun)
   }
 
   const handleSelectSugestao = (sug: JetroOnlineSugestao) => {
@@ -423,12 +427,12 @@ export function FloatingChat() {
               </button>
 
               {/* Botão Tour (apenas ativo se tour configurado) */}
-              {activeTour ? (
+              {activeTour || availableTourForCurrentRoute ? (
                 <button
                   type="button"
                   onClick={handleStartTour}
-                  className="flex-1 max-w-[130px] h-8 rounded-md bg-[#2D3748] hover:bg-[#1A202C] text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-                  title={`Iniciar tour guiado: ${activeTour.titulo}`}
+                  className="flex-1 max-w-[130px] h-8 rounded-md bg-[#2D3748] hover:bg-[#1A202C] text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer border border-[#C9A227]/40"
+                  title={`Iniciar tour guiado interativo: ${(activeTour || availableTourForCurrentRoute)?.titulo}`}
                 >
                   <MousePointer2 className="w-3.5 h-3.5 fill-white text-white" />
                   <span>Tour</span>
@@ -660,6 +664,23 @@ export function FloatingChat() {
                                 ))}
                               </div>
                             )}
+
+                            {/* Botão de Ação: Iniciar Tour Guiado (quando sugerido na resposta) */}
+                            {(activeTour || availableTourForCurrentRoute) &&
+                              /tour|tutorial|passo a passo|como funciona|ensinar|guia/i.test(
+                                msg.content,
+                              ) && (
+                                <div className="mt-2.5 pt-2 border-t border-emerald-200/60">
+                                  <Button
+                                    size="sm"
+                                    onClick={handleStartTour}
+                                    className="h-8 text-xs bg-[#005B2E] hover:bg-[#004724] text-white font-semibold shadow-xs flex items-center gap-1.5"
+                                  >
+                                    <MousePointer2 className="w-3.5 h-3.5 fill-white" />
+                                    <span>Iniciar Tour Guiado desta Tela</span>
+                                  </Button>
+                                </div>
+                              )}
 
                             {/* Citações e Fontes Consultadas */}
                             {msg.citations && msg.citations.length > 0 && (
