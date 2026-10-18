@@ -203,7 +203,7 @@ export function extrairPrimeiroNome(
  * Linha 1 de boas-vindas conforme TRATAMENTO cadastrado:
  * - Tratamento masculino: "Seja bem-vindo ao Jetro Sistema Inteligente!"
  * - Tratamento feminino: "Seja bem-vinda ao Jetro Sistema Inteligente!"
- * - Sem preferência/neutro: "Boas-vindas ao Jetro Sistema Inteligente!"
+ * - Sem preferência/neutro: "Seja bem vindo (a) ao Jetro ,Sistema Inteligente!"
  */
 export function getMensagemTratamento(tratamento?: string | null): string {
   const norm = String(tratamento || '')
@@ -215,7 +215,7 @@ export function getMensagemTratamento(tratamento?: string | null): string {
   if (norm === 'feminino' || norm === 'f' || norm === 'ela' || norm === 'sra') {
     return 'Seja bem-vinda ao Jetro Sistema Inteligente!'
   }
-  return 'Boas-vindas ao Jetro Sistema Inteligente!'
+  return 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!'
 }
 
 /**

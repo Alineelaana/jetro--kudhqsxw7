@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
 import { PublicJehChat } from '@/components/public-jeh-chat'
+import { JetroRightFloatingWidgets } from '@/components/jetro-right-floating-widgets'
 import { JetroTourOverlay } from '@/components/jetro-tours/tour-overlay'
 import { GlobalSearchBar } from '@/components/enterprise/global-search-bar'
 import { AdminSidebar } from '@/components/admin-sidebar'
@@ -102,6 +103,7 @@ export default function Layout() {
         <JetroTourOverlay />
         <FloatingChat />
         <JetroCustomizationDrawer />
+        <JetroRightFloatingWidgets />
 
         {canAccessDocs && (
           <ScreenLogicDrawer
@@ -133,7 +135,9 @@ export default function Layout() {
       </main>
       {showFooter && <SiteFooter />}
       <JetroTourOverlay />
-      {isAuthenticated && !isRootLogin && <FloatingChat />}
+      {!isRootLogin && <FloatingChat />}
+      {!isRootLogin && <JetroCustomizationDrawer />}
+      {!isRootLogin && <JetroRightFloatingWidgets />}
       {!isAuthenticated && <PublicJehChat />}
     </div>
   )

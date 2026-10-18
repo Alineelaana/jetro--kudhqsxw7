@@ -280,8 +280,8 @@ export function PublicJehChat() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 select-none">
-      {/* Botão Flutuante Discreto da Jeh quando fechado */}
+    <div className="fixed bottom-5 left-5 z-50 select-none">
+      {/* Botão Flutuante Discreto da Jeh quando fechado (posicionado na lateral esquerda para não sobrepor os widgets da direita) */}
       {!isOpen && (
         <button
           onClick={handleOpen}

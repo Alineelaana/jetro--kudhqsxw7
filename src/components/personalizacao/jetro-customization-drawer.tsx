@@ -60,9 +60,8 @@ export function JetroCustomizationDrawer() {
     'aparencia' | 'layout' | 'textos' | 'tabelas' | 'ia' | 'acessibilidade'
   >('aparencia')
 
-  if (!isAuthenticated) {
-    return null
-  }
+  // Permitir acesso a personalizações tanto para usuários autenticados quanto no modo visitante/site
+  // (preferências locais salvas em localStorage para visitantes)
 
   const handleReset = async () => {
     await restoreDefaults()

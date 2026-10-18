@@ -234,9 +234,7 @@ export function FloatingChat() {
     }
   }, [isDismissed])
 
-  if (!isAuthenticated) {
-    return null
-  }
+  // Permitir acesso tanto autenticado quanto no site institucional
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()

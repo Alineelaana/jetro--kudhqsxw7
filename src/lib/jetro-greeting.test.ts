@@ -63,14 +63,14 @@ export function runGreetingValidationSuite(): {
   // 2. CASOS DE TRATAMENTO OBRIGATÓRIOS
   // - Masculino: "Seja bem-vindo ao Jetro Sistema Inteligente!"
   // - Feminino: "Seja bem-vinda ao Jetro Sistema Inteligente!"
-  // - Sem preferência/neutro: "Boas-vindas ao Jetro Sistema Inteligente!"
+  // - Sem preferência/neutro: "Seja bem vindo (a) ao Jetro ,Sistema Inteligente!"
   const treatmentCases = [
     { input: 'masculino', expected: 'Seja bem-vindo ao Jetro Sistema Inteligente!' },
     { input: 'feminino', expected: 'Seja bem-vinda ao Jetro Sistema Inteligente!' },
-    { input: 'neutro', expected: 'Boas-vindas ao Jetro Sistema Inteligente!' },
-    { input: '', expected: 'Boas-vindas ao Jetro Sistema Inteligente!' },
-    { input: null, expected: 'Boas-vindas ao Jetro Sistema Inteligente!' },
-    { input: undefined, expected: 'Boas-vindas ao Jetro Sistema Inteligente!' },
+    { input: 'neutro', expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
+    { input: '', expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
+    { input: null, expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
+    { input: undefined, expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
   ]
 
   for (const tc of treatmentCases) {
