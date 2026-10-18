@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
+import { PublicJehChat } from '@/components/public-jeh-chat'
 import { GlobalSearchBar } from '@/components/enterprise/global-search-bar'
 import { AdminSidebar } from '@/components/admin-sidebar'
 import { useAuth } from '@/hooks/use-auth'
@@ -114,6 +115,7 @@ export default function Layout() {
       </main>
       {showFooter && <SiteFooter />}
       {isAuthenticated && !isRootLogin && <FloatingChat />}
+      {!isAuthenticated && <PublicJehChat />}
     </div>
   )
 }
