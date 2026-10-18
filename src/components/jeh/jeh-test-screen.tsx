@@ -90,7 +90,13 @@ export function JehTestScreen() {
     setSending(true)
 
     try {
-      const response = await JehAssistantService.sendTestMessage(questionText)
+      // Passar histórico das últimas mensagens trocadas
+      const historyPayload = messages
+        .filter((m) => m.id !== 'welcome')
+        .slice(-6)
+        .map((m) => ({ role: m.role, content: m.content }))
+
+      const response = await JehAssistantService.sendTestMessage(questionText, historyPayload)
       const assistantMsg: TestChatMessage = {
         id: `ast_${Date.now()}`,
         role: 'assistant',

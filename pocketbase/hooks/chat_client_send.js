@@ -90,26 +90,58 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     }
 
     if (shouldAiRespond) {
+      // 1. Coletar Base de Conhecimento e Q&As aprovados da Jeh
       var trainingContent = ''
       try {
-        var trainings = $app.findRecordsByFilter('ai_training', "id != ''", '-created', 50, 0)
-        if (trainings.length > 0) {
-          trainingContent = '\n\n--- CONTEÚDO DE TREINAMENTO DA EMPRESA ---\n'
-          for (var i = 0; i < trainings.length; i++) {
-            var t = trainings[i]
-            var tType = t.getString('type')
-            var tLabel =
-              tType === 'qa'
-                ? 'Pergunta e Resposta'
-                : tType === 'template'
-                  ? 'Template de Resposta'
-                  : 'Instrução'
-            trainingContent +=
-              '\n[' + tLabel + '] ' + t.getString('title') + ':\n' + t.getString('content') + '\n'
-          }
-          trainingContent += '--- FIM DO CONTEÚDO DE TREINAMENTO ---\n'
+        var qas = $app.findRecordsByFilter(
+          'jeh_qa',
+          "approval_status = 'aprovado'",
+          '-hit_count',
+          30,
+          0,
+        )
+        var knows = $app.findRecordsByFilter(
+          'jeh_knowledge',
+          "approval_status = 'aprovado'",
+          '-updated',
+          30,
+          0,
+        )
+
+        var snippets = []
+        for (var qi = 0; qi < qas.length; qi++) {
+          var q = qas[qi]
+          snippets.push(
+            '[P&R: ' + q.getString('canonical_question') + ']: ' + q.getString('official_answer'),
+          )
+        }
+        for (var ki = 0; ki < knows.length; ki++) {
+          var k = knows[ki]
+          snippets.push('[' + k.getString('title') + ']: ' + k.getString('content'))
+        }
+        if (snippets.length > 0) {
+          trainingContent =
+            '\n\n--- BASE DE CONHECIMENTO OFICIAL E RESPOSTAS APROVADAS ---\n' +
+            snippets.join('\n\n') +
+            '\n--- FIM DA BASE OFICIAL ---\n'
         }
       } catch (_) {}
+
+      // Fallback para ai_training se jeh_* não estiver populado
+      if (!trainingContent) {
+        try {
+          var trainings = $app.findRecordsByFilter('ai_training', "id != ''", '-created', 30, 0)
+          if (trainings.length > 0) {
+            trainingContent = '\n\n--- CONTEÚDO DE TREINAMENTO DA EMPRESA ---\n'
+            for (var i = 0; i < trainings.length; i++) {
+              var t = trainings[i]
+              trainingContent +=
+                '\n[' + t.getString('title') + ']:\n' + t.getString('content') + '\n'
+            }
+            trainingContent += '--- FIM DO CONTEÚDO DE TREINAMENTO ---\n'
+          }
+        } catch (_) {}
+      }
 
       var historyMessages = []
       try {
@@ -130,17 +162,18 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       } catch (_) {}
 
       var systemPrompt =
-        'Você é a Jeh, assistente virtual inteligente da plataforma Jetro. Seja educada, simpática e profissional. Responda sempre em português brasileiro de forma breve e clara.'
-      systemPrompt +=
-        '\n\nVocê atua orientando sobre as soluções e recursos da plataforma Jetro, ajudando a esclarecer dúvidas e apresentar o ecossistema.'
-      systemPrompt +=
-        '\nSe o cliente perguntar sobre assuntos totalmente fora do escopo da empresa, redirecione educadamente para um atendente humano, informando que um consultor entrará em contato.'
-      systemPrompt +=
-        '\nMantenha uma persona consistente e profissional, alinhada com a identidade da Jetro.'
+        'QUEM VOCÊ É\n' +
+        'Você é a Jeh, assistente virtual do Jetro — Plataforma Inteligente de Gestão Empresarial.\n' +
+        'Atenda em português do Brasil, com educação, simpatia e objetividade. Explique termos técnicos quando necessário e adapte a resposta à necessidade do cliente.\n\n' +
+        'REGRAS OBRIGATÓRIAS:\n' +
+        '1. IDENTIFICAÇÃO ANTES DO ATENDIMENTO: Solicite nome, telefone com DDD e melhor e-mail antes de apresentar o sistema.\n' +
+        '2. O QUE É O JETRO: Plataforma inteligente de gestão empresarial modular que conecta informações, reduz tarefas manuais e apoia decisões com indicadores para serviços, distribuidoras, atacadistas, indústrias, comércio e multicompanhia.\n' +
+        '3. QUANDO PERGUNTAREM O QUE O JETRO FAZ: responder "O Jetro reúne áreas como financeiro, vendas e CRM, compras, estoque, produção, gestão de pessoas, marketing, atendimento e indicadores em uma plataforma modular. A proposta é conectar os setores e facilitar a gestão. Qual é o segmento da sua empresa e qual área você precisa organizar primeiro?"\n' +
+        '4. ORIGEM DO NOME: Inspirado no sogro e conselheiro de Moisés (Êxodo 18 - organização e distribuição de responsabilidades). Não apresentar como tradução literal.\n' +
+        '5. QUANDO NÃO SOUBER: "[Nome], ainda não tenho essa informação confirmada. Nossa equipe pode verificar esse ponto e orientar você pelo WhatsApp: https://wa.me/5531991297619"\n' +
+        '6. LIMITES E SEGURANÇA: Não invente preços, planos, descontos, prazos ou garantias. Não confunda módulo de logística com serviços físicos. Não solicite senhas ou dados bancários.'
 
       if (trainingContent) {
-        systemPrompt +=
-          '\n\nUse o conteúdo de treinamento abaixo como base para suas respostas, adaptando-se ao modelo de trabalho e formato de serviço da empresa:'
         systemPrompt += trainingContent
       }
 

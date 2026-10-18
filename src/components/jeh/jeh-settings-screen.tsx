@@ -38,6 +38,8 @@ export function JehSettingsScreen() {
   const [channels, setChannels] = useState<
     { channel: string; value: string; description?: string }[]
   >([])
+  const [leadSource, setLeadSource] = useState('Jeh — Site Jetro')
+  const [greetingMessage, setGreetingMessage] = useState('')
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelValue, setNewChannelValue] = useState('')
 
@@ -53,6 +55,11 @@ export function JehSettingsScreen() {
       setStatus(data.assistant_status)
       setDefaultMessage(data.unanswered_default_message)
       setChannels(data.contact_channels || [])
+      setLeadSource(data.lead_source || 'Jeh — Site Jetro')
+      setGreetingMessage(
+        data.greeting_message ||
+          'Olá! Sou a Jeh, assistente virtual do Jetro. 😊 Para começarmos, me informe seu nome, telefone com DDD e melhor e-mail. Esses dados serão utilizados para registrar seu atendimento e permitir que nossa equipe retorne seu contato.',
+      )
     } catch {
       toast({
         title: 'Erro ao carregar configurações',
@@ -102,6 +109,8 @@ export function JehSettingsScreen() {
         assistant_status: status,
         unanswered_default_message: defaultMessage.trim(),
         contact_channels: channels,
+        lead_source: leadSource.trim(),
+        greeting_message: greetingMessage.trim(),
       })
       toast({
         title: 'Configurações salvas com sucesso',
@@ -198,6 +207,54 @@ export function JehSettingsScreen() {
                 </span>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* REGRAS MANDATÓRIAS DE LEADS & IDENTIFICAÇÃO */}
+        <Card className="border shadow-xs">
+          <CardHeader className="p-5 pb-3">
+            <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#005B2E]" />
+              Identificação Obrigatória e Captação de Leads
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Configurações de abertura do atendimento e registro de leads na base central do Jetro.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-2 space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-gray-700">
+                Origem de Leads (persistida no CRM)
+              </Label>
+              <Input
+                value={leadSource}
+                onChange={(e) => setLeadSource(e.target.value)}
+                disabled={!hasAdminPerm || saving}
+                className="h-8 text-xs font-mono"
+                placeholder="Ex: Jeh — Site Jetro"
+              />
+              <p className="text-[11px] text-gray-500">
+                Todo lead gerado por atendimento da Jeh é registrado com esta origem oficial.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-gray-700">
+                Mensagem de Abertura Obrigatória
+              </Label>
+              <Textarea
+                rows={3}
+                value={greetingMessage}
+                onChange={(e) => setGreetingMessage(e.target.value)}
+                disabled={!hasAdminPerm || saving}
+                className="text-xs leading-relaxed"
+                placeholder="Mensagem de saudação solicitando identificação..."
+              />
+              <p className="text-[11px] text-gray-500">
+                A Jeh solicita nome, telefone com DDD e melhor e-mail antes de apresentar o sistema
+                ou responder perguntas.
+              </p>
+            </div>
           </CardContent>
         </Card>
 

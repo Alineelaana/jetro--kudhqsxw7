@@ -72,11 +72,15 @@ export interface JehSettingsConfig {
     value: string
     description?: string
   }[]
+  lead_source?: string
+  greeting_message?: string
 }
 
 const SETTING_KEY_STATUS = 'jeh_assistant_status'
 const SETTING_KEY_DEFAULT_MSG = 'jeh_unanswered_default_message'
 const SETTING_KEY_CONTACT_CHANNELS = 'jeh_contact_channels'
+const SETTING_KEY_LEAD_SOURCE = 'jeh_lead_source'
+const SETTING_KEY_GREETING_MSG = 'jeh_greeting_message'
 
 export const JehAssistantService = {
   // ==========================================
@@ -124,12 +128,17 @@ export const JehAssistantService = {
   async getSettings(): Promise<JehSettingsConfig> {
     const status = await this.getAssistantStatus()
     let defaultMsg =
-      'Ainda não possuo essa informação em minha base oficial. Nossa equipe institucional pode ajudar diretamente através dos nossos canais oficiais.'
+      '[Nome], ainda não tenho essa informação confirmada. Nossa equipe pode verificar esse ponto e orientar você pelo WhatsApp: https://wa.me/5531991297619'
     let channels: { channel: string; value: string; description?: string }[] = [
-      { channel: 'E-mail', value: 'contato@jetro.com.br', description: 'Atendimento geral' },
-      { channel: 'WhatsApp', value: '+55 11 99999-0000', description: 'Suporte institucional' },
-      { channel: 'Site', value: 'https://jetro.com.br', description: 'Portal oficial' },
+      {
+        channel: 'WhatsApp Oficial',
+        value: 'https://wa.me/5531991297619',
+        description: 'Atendimento comercial, demonstração, dúvidas e cotações',
+      },
     ]
+    let leadSource = 'Jeh — Site Jetro'
+    let greetingMsg =
+      'Olá! Sou a Jeh, assistente virtual do Jetro. 😊 Para começarmos, me informe seu nome, telefone com DDD e melhor e-mail. Esses dados serão utilizados para registrar seu atendimento e permitir que nossa equipe retorne seu contato.'
 
     try {
       const msgRec = await pb
@@ -151,10 +160,30 @@ export const JehAssistantService = {
       // Usa padrão
     }
 
+    try {
+      const srcRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_LEAD_SOURCE}"`)
+      if (srcRec?.value) leadSource = srcRec.value
+    } catch {
+      // Usa padrão
+    }
+
+    try {
+      const grtRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_GREETING_MSG}"`)
+      if (grtRec?.value) greetingMsg = grtRec.value
+    } catch {
+      // Usa padrão
+    }
+
     return {
       assistant_status: status,
       unanswered_default_message: defaultMsg,
       contact_channels: channels,
+      lead_source: leadSource,
+      greeting_message: greetingMsg,
     }
   },
 
@@ -208,6 +237,46 @@ export const JehAssistantService = {
         })
       }
     }
+
+    if (config.lead_source !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_LEAD_SOURCE}"`)
+      } catch {
+        record = null
+      }
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: config.lead_source })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_LEAD_SOURCE,
+          value: config.lead_source,
+          description: 'Origem padrão para leads cadastrados pela Jeh',
+        })
+      }
+    }
+
+    if (config.greeting_message !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_GREETING_MSG}"`)
+      } catch {
+        record = null
+      }
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: config.greeting_message })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_GREETING_MSG,
+          value: config.greeting_message,
+          description: 'Mensagem de abertura mandatória da Jeh para identificação',
+        })
+      }
+    }
   },
 
   // ==========================================
@@ -228,7 +297,8 @@ export const JehAssistantService = {
       totalQA = qaList.totalItems
       for (const item of qaList.items) {
         const cat = (item as any).category || 'Geral'
-        subjectMap[cat] = (subjectMap[cat] || 0) + ((item as any).access_count || 1)
+        subjectMap[cat] =
+          (subjectMap[cat] || 0) + ((item as any).hit_count || (item as any).access_count || 1)
       }
     } catch {
       // Coleção vazia ou não acessível
@@ -248,7 +318,7 @@ export const JehAssistantService = {
     try {
       const evalList = await pb.collection('jeh_test_evaluations').getList(1, 500)
       for (const item of evalList.items) {
-        const r = (item as any).evaluation
+        const r = (item as any).rating || (item as any).evaluation
         if (r === 'correta') evaluatedCorrect++
         if (r === 'parcial' || r === 'incorreta') evaluatedImprovement++
       }
@@ -287,8 +357,10 @@ export const JehAssistantService = {
   // ==========================================
   async listKnowledge(filter?: string, sort = '-updated'): Promise<JehKnowledgeItem[]> {
     try {
+      // Mapear filtro caso passe status = ... para approval_status = ...
+      const backendFilter = filter ? filter.replace(/\bstatus\b/g, 'approval_status') : undefined
       const records = await pb.collection('jeh_knowledge').getFullList({
-        filter,
+        filter: backendFilter,
         sort,
       })
       return records.map((r: any) => ({
@@ -297,9 +369,9 @@ export const JehAssistantService = {
         category: r.category,
         content: r.content,
         keywords: r.keywords || '',
-        status: r.status,
-        responsible: r.responsible || '',
-        source_document: r.source_document || '',
+        status: (r.approval_status || r.status || 'rascunho') as JehKnowledgeStatus,
+        responsible: r.responsible_name || r.responsible || '',
+        source_document: r.source_file || r.source_document || '',
         created: r.created,
         updated: r.updated,
       }))
@@ -318,14 +390,15 @@ export const JehAssistantService = {
     responsible?: string
     source_document?: string
   }): Promise<JehKnowledgeItem> {
+    const statusVal = data.status || 'rascunho'
     const record = await pb.collection('jeh_knowledge').create({
       title: data.title,
       category: data.category,
       content: data.content,
       keywords: data.keywords || '',
-      status: data.status || 'rascunho',
-      responsible: data.responsible || pb.authStore.record?.email || '',
-      source_document: data.source_document || '',
+      approval_status: statusVal,
+      responsible_name: data.responsible || pb.authStore.record?.email || 'Administrador',
+      source_type: data.source_document ? 'manual' : '',
     })
     return {
       id: record.id,
@@ -333,25 +406,36 @@ export const JehAssistantService = {
       category: (record as any).category,
       content: (record as any).content,
       keywords: (record as any).keywords,
-      status: (record as any).status,
-      responsible: (record as any).responsible,
-      source_document: (record as any).source_document,
+      status: ((record as any).approval_status ||
+        (record as any).status ||
+        statusVal) as JehKnowledgeStatus,
+      responsible: (record as any).responsible_name || (record as any).responsible,
+      source_document: (record as any).source_file || (record as any).source_document,
       created: record.created,
       updated: record.updated,
     }
   },
 
   async updateKnowledge(id: string, data: Partial<JehKnowledgeItem>): Promise<JehKnowledgeItem> {
-    const record = await pb.collection('jeh_knowledge').update(id, data)
+    const payload: any = { ...data }
+    if (data.status) {
+      payload.approval_status = data.status
+    }
+    if (data.responsible) {
+      payload.responsible_name = data.responsible
+    }
+    const record = await pb.collection('jeh_knowledge').update(id, payload)
     return {
       id: record.id,
       title: (record as any).title,
       category: (record as any).category,
       content: (record as any).content,
       keywords: (record as any).keywords,
-      status: (record as any).status,
-      responsible: (record as any).responsible,
-      source_document: (record as any).source_document,
+      status: ((record as any).approval_status ||
+        (record as any).status ||
+        'rascunho') as JehKnowledgeStatus,
+      responsible: (record as any).responsible_name || (record as any).responsible,
+      source_document: (record as any).source_file || (record as any).source_document,
       created: record.created,
       updated: record.updated,
     }
@@ -367,8 +451,17 @@ export const JehAssistantService = {
   // ==========================================
   async listQA(filter?: string, sort = '-created'): Promise<JehQAItem[]> {
     try {
+      // Converter status = 'ativo' para approval_status = 'aprovado' no filtro se necessário
+      let backendFilter = filter
+      if (backendFilter) {
+        backendFilter = backendFilter
+          .replace(/status\s*=\s*['"]ativo['"]/g, "approval_status = 'aprovado'")
+          .replace(/status\s*=\s*['"]inativo['"]/g, "approval_status = 'inativo'")
+          .replace(/status\s*=\s*['"]rascunho['"]/g, "approval_status = 'rascunho'")
+      }
+
       const records = await pb.collection('jeh_qa').getFullList({
-        filter,
+        filter: backendFilter,
         sort,
       })
       return records.map((r: any) => {
@@ -382,14 +475,19 @@ export const JehAssistantService = {
             variations = r.variations.split('\n').filter(Boolean)
           }
         }
+        const canonQ = r.canonical_question || r.question || ''
+        const rawStatus = r.approval_status || r.status || 'aprovado'
+        const mappedStatus: JehQAStatus =
+          rawStatus === 'aprovado' ? 'ativo' : rawStatus === 'inativo' ? 'inativo' : 'rascunho'
+
         return {
           id: r.id,
-          question: r.question,
-          official_answer: r.official_answer,
+          question: canonQ,
+          official_answer: r.official_answer || '',
           variations,
-          category: r.category,
-          access_count: r.access_count || 0,
-          status: r.status,
+          category: r.category || 'Geral',
+          access_count: r.hit_count ?? r.access_count ?? 0,
+          status: mappedStatus,
           created: r.created,
           updated: r.updated,
         }
@@ -407,37 +505,56 @@ export const JehAssistantService = {
     category: string
     status?: JehQAStatus
   }): Promise<JehQAItem> {
+    const rawStatus = data.status || 'ativo'
+    const approvalStatus =
+      rawStatus === 'ativo' ? 'aprovado' : rawStatus === 'inativo' ? 'inativo' : 'rascunho'
     const record = await pb.collection('jeh_qa').create({
-      question: data.question,
+      canonical_question: data.question,
       official_answer: data.official_answer,
-      variations: data.variations,
-      category: data.category,
-      access_count: 0,
-      status: data.status || 'ativo',
+      variations: data.variations || [],
+      category: data.category || 'FAQ',
+      hit_count: 0,
+      approval_status: approvalStatus,
+      keywords: data.question.toLowerCase(),
+      responsible_name: pb.authStore.record?.email || 'Administrador',
     })
     return {
       id: record.id,
-      question: (record as any).question,
+      question: (record as any).canonical_question || (record as any).question,
       official_answer: (record as any).official_answer,
       variations: Array.isArray((record as any).variations) ? (record as any).variations : [],
       category: (record as any).category,
-      access_count: (record as any).access_count || 0,
-      status: (record as any).status,
+      access_count: (record as any).hit_count || 0,
+      status: rawStatus,
       created: record.created,
       updated: record.updated,
     }
   },
 
   async updateQA(id: string, data: Partial<JehQAItem>): Promise<JehQAItem> {
-    const record = await pb.collection('jeh_qa').update(id, data)
+    const payload: any = {}
+    if (data.question !== undefined) payload.canonical_question = data.question
+    if (data.official_answer !== undefined) payload.official_answer = data.official_answer
+    if (data.variations !== undefined) payload.variations = data.variations
+    if (data.category !== undefined) payload.category = data.category
+    if (data.access_count !== undefined) payload.hit_count = data.access_count
+    if (data.status !== undefined) {
+      payload.approval_status =
+        data.status === 'ativo' ? 'aprovado' : data.status === 'inativo' ? 'inativo' : 'rascunho'
+    }
+    const record = await pb.collection('jeh_qa').update(id, payload)
+    const rawStatus = (record as any).approval_status || (record as any).status || 'aprovado'
+    const mappedStatus: JehQAStatus =
+      rawStatus === 'aprovado' ? 'ativo' : rawStatus === 'inativo' ? 'inativo' : 'rascunho'
+
     return {
       id: record.id,
-      question: (record as any).question,
+      question: (record as any).canonical_question || (record as any).question,
       official_answer: (record as any).official_answer,
       variations: Array.isArray((record as any).variations) ? (record as any).variations : [],
       category: (record as any).category,
-      access_count: (record as any).access_count || 0,
-      status: (record as any).status,
+      access_count: (record as any).hit_count ?? (record as any).access_count ?? 0,
+      status: mappedStatus,
       created: record.created,
       updated: record.updated,
     }
@@ -451,22 +568,27 @@ export const JehAssistantService = {
   // ==========================================
   // PERGUNTAS SEM RESPOSTA (jeh_unanswered)
   // ==========================================
-  async listUnanswered(filter?: string, sort = '-occurrences'): Promise<JehUnansweredItem[]> {
+  async listUnanswered(filter?: string, sort = '-created'): Promise<JehUnansweredItem[]> {
     try {
       const records = await pb.collection('jeh_unanswered').getFullList({
         filter,
-        sort,
+        sort: sort === '-occurrences' ? '-count' : sort,
       })
-      return records.map((r: any) => ({
-        id: r.id,
-        question: r.question,
-        date: r.date || r.created,
-        occurrences: r.occurrences || 1,
-        subject: r.subject || '',
-        status: r.status,
-        created: r.created,
-        updated: r.updated,
-      }))
+      return records.map((r: any) => {
+        const rawStatus = r.status || 'pendente'
+        const mappedStatus: JehUnansweredStatus =
+          rawStatus === 'respondida' ? 'respondido' : (rawStatus as JehUnansweredStatus)
+        return {
+          id: r.id,
+          question: r.question,
+          date: r.last_asked_at || r.created,
+          occurrences: r.count || r.occurrences || 1,
+          subject: r.identified_topic || r.subject || 'Geral',
+          status: mappedStatus,
+          created: r.created,
+          updated: r.updated,
+        }
+      })
     } catch (err) {
       console.error('Erro ao listar perguntas sem resposta Jeh:', err)
       return []
@@ -474,7 +596,8 @@ export const JehAssistantService = {
   },
 
   async updateUnansweredStatus(id: string, status: JehUnansweredStatus): Promise<void> {
-    await pb.collection('jeh_unanswered').update(id, { status })
+    const backendStatus = status === 'respondido' ? 'respondida' : status
+    await pb.collection('jeh_unanswered').update(id, { status: backendStatus })
   },
 
   async convertUnansweredToQA(
@@ -497,14 +620,18 @@ export const JehAssistantService = {
   // ==========================================
   // TESTE INTERNO E AVALIAÇÕES (jeh_test_evaluations + hook test-chat)
   // ==========================================
-  async sendTestMessage(message: string): Promise<{ reply: string; sources?: any[] }> {
+  async sendTestMessage(
+    message: string,
+    history: any[] = [],
+  ): Promise<{ reply: string; sources?: any[] }> {
     try {
       const response = await pb.send('/backend/v1/jeh/test-chat', {
         method: 'POST',
-        body: { message },
+        body: { message, history },
       })
       return {
-        reply: response?.reply || 'Sem resposta retornada pelo agente de teste.',
+        reply:
+          response?.response || response?.reply || 'Sem resposta retornada pelo agente de teste.',
         sources: response?.sources || [],
       }
     } catch (err: any) {
@@ -521,19 +648,21 @@ export const JehAssistantService = {
     suggested_answer?: string
   }): Promise<JehTestEvaluationItem> {
     const record = await pb.collection('jeh_test_evaluations').create({
-      question: data.question,
-      assistant_reply: data.assistant_reply,
-      evaluation: data.evaluation,
-      notes: data.notes || '',
-      suggested_answer: data.suggested_answer || '',
+      user_name: pb.authStore.record?.name || pb.authStore.record?.email || 'Administrador',
+      user_question: data.question,
+      assistant_response: data.assistant_reply,
+      rating: data.evaluation,
+      feedback_notes: data.notes || '',
+      suggested_correction: data.suggested_answer || '',
+      status: 'pendente_validacao',
     })
     return {
       id: record.id,
-      question: (record as any).question,
-      assistant_reply: (record as any).assistant_reply,
-      evaluation: (record as any).evaluation,
-      notes: (record as any).notes,
-      suggested_answer: (record as any).suggested_answer,
+      question: (record as any).user_question || (record as any).question,
+      assistant_reply: (record as any).assistant_response || (record as any).assistant_reply,
+      evaluation: ((record as any).rating || (record as any).evaluation) as JehEvaluationRating,
+      notes: (record as any).feedback_notes || (record as any).notes,
+      suggested_answer: (record as any).suggested_correction || (record as any).suggested_answer,
       created: record.created,
       updated: record.updated,
     }
@@ -547,11 +676,11 @@ export const JehAssistantService = {
       })
       return records.map((r: any) => ({
         id: r.id,
-        question: r.question,
-        assistant_reply: r.assistant_reply,
-        evaluation: r.evaluation,
-        notes: r.notes || '',
-        suggested_answer: r.suggested_answer || '',
+        question: r.user_question || r.question || '',
+        assistant_reply: r.assistant_response || r.assistant_reply || '',
+        evaluation: (r.rating || r.evaluation || 'correta') as JehEvaluationRating,
+        notes: r.feedback_notes || r.notes || '',
+        suggested_answer: r.suggested_correction || r.suggested_answer || '',
         created: r.created,
         updated: r.updated,
       }))
@@ -565,9 +694,9 @@ export const JehAssistantService = {
   // TREINAMENTO E PROCESSAMENTO DA BASE
   // ==========================================
   async reindexKnowledgeBase(): Promise<{ processedCount: number; timestamp: string }> {
-    // Simula validação/indexação de integridade dos registros de conhecimento e Q&A
-    const kb = await this.listKnowledge('status = "aprovado"')
-    const qa = await this.listQA('status = "ativo"')
+    // Validação/indexação de integridade dos registros de conhecimento e Q&A aprovados
+    const kb = await this.listKnowledge("approval_status = 'aprovado'")
+    const qa = await this.listQA("approval_status = 'aprovado'")
     return {
       processedCount: kb.length + qa.length,
       timestamp: new Date().toISOString(),
