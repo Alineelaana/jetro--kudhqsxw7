@@ -55,8 +55,8 @@ export function SiteFooter() {
                 </a>
               </li>
               <li>
-                <a href="#nine-ia" className="hover:text-white transition-colors">
-                  Inteligência Artificial (Jeh)
+                <a href="#jeh" className="hover:text-white transition-colors">
+                  Assistentes de IA (Jeh e Jetro On-line)
                 </a>
               </li>
               <li>

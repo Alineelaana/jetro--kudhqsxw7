@@ -5,13 +5,12 @@ import {
   MessageSquare,
   BarChart3,
   Clock,
-  Layers,
   GraduationCap,
+  Compass,
   ShieldCheck,
   Send,
   Loader2,
   Video,
-  Compass,
   ArrowRight,
   HelpCircle,
   CheckCircle2,
@@ -58,47 +57,42 @@ const DEMO_DIALOGUES: DemoDialogue[] = [
   },
 ]
 
-const BENEFIT_CARDS = [
+// 6 Cards EXATOS exigidos na especificação (item 6)
+const JETRO_ONLINE_CARDS = [
   {
     id: '01',
-    title: '01. Converse com seus dados',
-    description:
-      'Faça perguntas sobre informações disponíveis no ERP e obtenha respostas sem precisar procurar manualmente em diversas telas.',
+    title: 'Consultas inteligentes',
+    description: 'Perguntas sobre clientes, pedidos, produtos e outras informações autorizadas.',
     icon: MessageSquare,
   },
   {
     id: '02',
-    title: '02. Análises que ajudam a decidir',
-    description:
-      'Consulte indicadores, acompanhe resultados e solicite análises de informações comerciais, financeiras e operacionais.',
+    title: 'Análise de resultados',
+    description: 'Apoio na interpretação de indicadores comerciais, financeiros e operacionais.',
     icon: BarChart3,
   },
   {
     id: '03',
-    title: '03. Menos tempo procurando, mais tempo produzindo',
-    description:
-      'Encontre informações relevantes com mais agilidade e simplifique tarefas de consulta e acompanhamento.',
+    title: 'Produtividade',
+    description: 'Redução do tempo gasto procurando informações em diferentes telas.',
     icon: Clock,
   },
   {
     id: '04',
-    title: '04. Inteligência integrada à operação',
-    description:
-      'O Jetro On-line foi projetado para trabalhar com os módulos e informações do próprio sistema, conforme as integrações disponíveis.',
-    icon: Layers,
-  },
-  {
-    id: '05',
-    title: '05. Aprendizado dentro do ERP',
-    description:
-      'Por meio da Universidade Jetro, o assistente poderá recomendar vídeos de treinamento e tours interativos para ajudar os usuários a utilizar as funcionalidades do sistema.',
+    title: 'Universidade Jetro',
+    description: 'Recomendação de vídeos e treinamentos relacionados às dúvidas dos usuários.',
     icon: GraduationCap,
   },
   {
+    id: '05',
+    title: 'Tours guiados',
+    description: 'Orientação interativa para aprender a utilizar as funcionalidades do ERP.',
+    icon: Compass,
+  },
+  {
     id: '06',
-    title: '06. Informações com controle de acesso',
-    description:
-      'O assistente deverá respeitar as permissões de cada usuário, apresentando somente as informações às quais ele possui acesso.',
+    title: 'Segurança',
+    description: 'Acesso às informações conforme as permissões individuais de cada usuário.',
     icon: ShieldCheck,
   },
 ]
@@ -151,111 +145,141 @@ export function JetroOnlineSection() {
   return (
     <section
       id="jetro-online"
-      className="relative bg-gradient-to-b from-[#002413] via-[#00381C] to-[#001D0F] text-white py-16 sm:py-24 lg:py-28 overflow-hidden border-y border-[#C9A227]/30"
+      className="relative bg-gradient-to-b from-[#002212] via-[#002C18] to-[#001D0F] text-white py-16 sm:py-20 lg:py-24 overflow-hidden border-b border-[#C9A227]/30"
     >
-      {/* Elementos sutis de fundo tecnológico / iluminação ambiente */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#005B2E]/40 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#C9A227]/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#005B2E]/10 rounded-full blur-[180px] pointer-events-none" />
+      {/* Elementos sutis de iluminação de fundo */}
+      <div className="absolute -top-32 -right-32 w-80 h-80 bg-[#005B2E]/30 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-10 -left-20 w-80 h-80 bg-[#C9A227]/15 rounded-full blur-[130px] pointer-events-none" />
 
-      <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 space-y-16 sm:space-y-24">
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 space-y-16 sm:space-y-20">
         {/* ============================================================== */}
-        {/* 1. BLOCO DE INTRODUÇÃO COM IMAGEM EM DESTAQUE EXPRESSIVO      */}
+        {/* 1. APRESENTAÇÃO DO JETRO ON-LINE (FOTO REDUZIDA, TEXTO EXATO)   */}
         {/* ============================================================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          {/* Lado Esquerdo: Imagem Oficial em Destaque Expressivo */}
-          <div className="lg:col-span-5 flex justify-center">
-            <div className="relative group w-full max-w-[340px] sm:max-w-[400px]">
-              {/* Efeito de halo dourado elegante */}
-              <div className="absolute -inset-2.5 rounded-full bg-gradient-to-tr from-[#005B2E] via-[#C9A227] to-[#FFE28A] opacity-60 blur-xl group-hover:opacity-85 transition-opacity duration-500 animate-pulse" />
-
-              {/* Moldura circular com borda dourada sofisticada */}
-              <div className="relative aspect-square w-full rounded-full p-2 bg-gradient-to-tr from-[#C9A227] via-[#FFE28A] to-[#8E6E17] shadow-2xl">
-                <div className="w-full h-full rounded-full overflow-hidden bg-[#002613] relative border-2 border-[#00381C]">
-                  <img
-                    src={JETRO_ONLINE_AVATAR_URL}
-                    alt="Assistente Jetro On-line"
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  {/* Badge sutil com indicador verde pulsante */}
-                  <div className="absolute bottom-5 sm:bottom-7 left-1/2 -translate-x-1/2 bg-[#002817]/90 backdrop-blur-md border border-[#C9A227]/80 px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
-                    </span>
-                    <span className="text-[11px] font-bold tracking-wider text-white uppercase">
-                      Jetro On-line Ativo
-                    </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Coluna Visual: foto média/pequena de identificação circular */}
+          <div className="lg:col-span-4 flex justify-center lg:justify-start">
+            <div className="relative flex flex-col items-center text-center">
+              {/* Moldura circular compacta (180px sm / 208px md) */}
+              <div className="relative group">
+                <div className="absolute -inset-2 rounded-full bg-gradient-to-tr from-[#005B2E] via-[#C9A227] to-[#FFE28A] opacity-60 blur-lg group-hover:opacity-85 transition-opacity duration-500" />
+                <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full p-1.5 bg-gradient-to-tr from-[#C9A227] via-[#FFE28A] to-[#8E6E17] shadow-xl">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-[#002613] relative border-2 border-[#00381C]">
+                    <img
+                      src={JETRO_ONLINE_AVATAR_URL}
+                      alt="Assistente Jetro On-line"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
                 </div>
+              </div>
+
+              {/* Badge de Identificação */}
+              <div className="mt-4 flex flex-col items-center gap-1.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#001F12] border border-[#C9A227]/50 shadow-sm">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+                  </span>
+                  <span className="text-[11px] font-bold tracking-wider text-[#FFE28A] uppercase">
+                    Jetro On-line Integrado
+                  </span>
+                </div>
+                <span className="text-[11px] text-slate-300 font-medium">
+                  Assistente Inteligente Operacional do ERP
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Lado Direito: Textos do Usuário */}
-          <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#005B2E]/60 border border-[#C9A227]/60 text-[#FFE28A] text-xs sm:text-sm font-bold uppercase tracking-wider backdrop-blur-xs">
+          {/* Coluna Textual: Título, Subtítulo e Texto EXATO de apresentação (item 6) */}
+          <div className="lg:col-span-8 space-y-5 text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#005B2E]/60 border border-[#C9A227]/60 text-[#FFE28A] text-xs sm:text-sm font-bold uppercase tracking-wider">
               <Sparkles className="w-4 h-4 text-[#C9A227]" />
-              <span>A inteligência que transforma dados em respostas.</span>
+              <span>Ambiente Operacional do ERP & Decisão Diária</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Seu ERP agora conversa com você.
-            </h2>
+            <div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
+                Jetro On-line
+              </h2>
+              <p className="text-lg sm:text-xl text-[#FFE28A] font-semibold mt-1">
+                Seu ERP conversa com você. Seus dados ajudam a encontrar respostas.
+              </p>
+            </div>
 
-            <div className="space-y-4 text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+            {/* Texto EXATO exigido na especificação (item 6) */}
+            <div className="space-y-3.5 text-slate-200 text-sm sm:text-base leading-relaxed">
               <p>
-                Imagine ter um assistente inteligente disponível para ajudar a compreender
-                informações, consultar dados, analisar resultados e encontrar respostas sem precisar
-                navegar por diversas telas e relatórios.
+                O Jetro On-line é o assistente inteligente integrado ao ambiente operacional do ERP.
               </p>
               <p>
-                Com o Jetro On-line, você pode fazer perguntas em linguagem natural e receber
-                informações organizadas para apoiar suas atividades e decisões.
+                Ele foi desenvolvido para ajudar os usuários a encontrar informações, interpretar
+                indicadores, analisar resultados e compreender as funcionalidades do sistema por
+                meio de conversas em linguagem natural.
               </p>
-              <p className="font-semibold text-white pt-1 border-l-2 border-[#C9A227] pl-3.5">
-                Mais do que um chat, o Jetro On-line foi concebido para ser um assistente
-                inteligente integrado à gestão empresarial.
+              <p className="font-medium text-white border-l-2 border-[#C9A227] pl-3">
+                Em vez de navegar por diversas telas para localizar uma informação, o usuário pode
+                fazer uma pergunta e receber uma resposta organizada, de acordo com os dados
+                disponíveis e suas permissões de acesso.
               </p>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Button
+                onClick={() => handleScrollToSection('solucoes')}
+                className="bg-[#C9A227] hover:bg-[#b58f1f] text-[#002816] font-extrabold text-sm px-6 py-5 rounded-xl shadow-lg transition-all cursor-pointer group"
+              >
+                <span>Conhecer os Módulos do ERP</span>
+                <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleScrollToSection('orcamento')}
+                className="border-[#C9A227]/70 text-white hover:bg-white/10 font-bold text-sm px-6 py-5 rounded-xl cursor-pointer"
+              >
+                Solicitar Demonstração Operacional
+              </Button>
             </div>
           </div>
         </div>
 
         {/* ============================================================== */}
-        {/* 2. 6 CARDS DE BENEFÍCIOS (ELEGANTES, ÍCONES DISCRETOS, OBJETIVOS) */}
+        {/* 2. 6 CARDS EXATOS DO JETRO ON-LINE (ITEM 6)                    */}
         {/* ============================================================== */}
-        <div className="space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="space-y-6">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
             <span className="text-xs font-bold uppercase tracking-widest text-[#FFE28A]">
-              Benefícios Estratégicos
+              Recursos Operacionais Integrados
             </span>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Gestão ágil com inteligência integrada a cada etapa da sua empresa
+              Inteligência aplicada ao dia a dia da gestão empresarial
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {BENEFIT_CARDS.map((card) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {JETRO_ONLINE_CARDS.map((card) => {
               const Icon = card.icon
               return (
                 <div
                   key={card.id}
-                  className="group relative rounded-2xl p-6 sm:p-7 bg-[#002B17]/70 hover:bg-[#00381E] border border-[#C9A227]/30 hover:border-[#C9A227] transition-all duration-300 shadow-xl space-y-3 backdrop-blur-xs hover:-translate-y-1"
+                  className="rounded-2xl p-5 sm:p-6 bg-[#002613]/85 hover:bg-[#003119] border border-[#C9A227]/30 hover:border-[#C9A227] transition-all duration-300 shadow-md flex flex-col justify-between space-y-3 group"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 rounded-xl bg-[#001D0F] border border-[#C9A227]/50 text-[#FFE28A] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
-                      <Icon className="w-5 h-5 text-[#C9A227]" />
+                    <div className="h-9 w-9 rounded-xl bg-[#00190D] border border-[#C9A227]/50 text-[#FFE28A] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                      <Icon className="w-4 h-4 text-[#C9A227]" />
                     </div>
                     <span className="text-xs font-mono font-bold text-[#C9A227]/70 group-hover:text-[#FFE28A]">
                       {card.id}
                     </span>
                   </div>
-                  <h4 className="text-base sm:text-lg font-bold text-white group-hover:text-[#FFE28A] transition-colors leading-snug">
-                    {card.title}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    {card.description}
-                  </p>
+                  <div className="space-y-1.5">
+                    <h4 className="text-base font-bold text-white group-hover:text-[#FFE28A] transition-colors leading-snug">
+                      {card.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                      {card.description}
+                    </p>
+                  </div>
                 </div>
               )
             })}
@@ -263,10 +287,10 @@ export function JetroOnlineSection() {
         </div>
 
         {/* ============================================================== */}
-        {/* 3. ÁREA DE EXEMPLOS E EXPERIÊNCIA INTERATIVA                  */}
+        {/* 3. DEMO INTERATIVA DO JETRO ON-LINE                           */}
         {/* ============================================================== */}
         <div className="space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#005B2E]/60 text-emerald-200 text-xs font-semibold border border-emerald-500/40">
               <Bot className="w-3.5 h-3.5 text-[#C9A227]" />
               <span>Experiência Interativa Demonstrativa</span>
@@ -299,10 +323,10 @@ export function JetroOnlineSection() {
                       type="button"
                       onClick={() => handleSelectQuestion(dialogue.id)}
                       className={cn(
-                        'w-full text-left p-4 rounded-xl border transition-all duration-200 cursor-pointer shadow-md group relative overflow-hidden',
+                        'w-full text-left p-3.5 rounded-xl border transition-all duration-200 cursor-pointer shadow-md group relative overflow-hidden',
                         isSelected
                           ? 'bg-[#004724] border-[#C9A227] ring-1 ring-[#C9A227]'
-                          : 'bg-[#002816]/80 hover:bg-[#00341D] border-emerald-900/60 hover:border-[#C9A227]/50 text-slate-200',
+                          : 'bg-[#002414]/80 hover:bg-[#003119] border-emerald-900/60 hover:border-[#C9A227]/50 text-slate-200',
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -316,7 +340,7 @@ export function JetroOnlineSection() {
                           </span>
                         )}
                       </div>
-                      <p className="mt-2 text-sm font-semibold text-white group-hover:text-[#FFE28A] transition-colors leading-snug">
+                      <p className="mt-2 text-xs sm:text-sm font-semibold text-white group-hover:text-[#FFE28A] transition-colors leading-snug">
                         "{dialogue.userQuestion}"
                       </p>
                     </button>
@@ -327,19 +351,19 @@ export function JetroOnlineSection() {
               <div className="p-3 rounded-lg bg-black/40 border border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-[#C9A227] shrink-0" />
                 <span>
-                  Ambiente demonstrativo com cenários ilustrativos. Nenhum dado operacional restrito
-                  é exposto no site público.
+                  Ambiente demonstrativo com cenários ilustrativos. Jetro On-line com dados reais é
+                  restrito aos usuários autenticados no ERP com perfil autorizado.
                 </span>
               </div>
             </div>
 
             {/* Lado Direito: Chat Interativo Demonstrativo */}
             <div className="lg:col-span-7">
-              <div className="rounded-2xl border-2 border-[#C9A227]/70 bg-[#001F12] shadow-2xl overflow-hidden flex flex-col h-[460px]">
+              <div className="rounded-2xl border-2 border-[#C9A227]/70 bg-[#001F12] shadow-2xl overflow-hidden flex flex-col h-[480px]">
                 {/* Cabeçalho do Chat Demonstrativo */}
                 <div className="bg-gradient-to-r from-[#002B17] via-[#003B20] to-[#002B17] px-4 py-3 border-b border-[#C9A227]/40 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#001A0E]">
+                    <div className="relative h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#001A0E]">
                       <img
                         src={JETRO_ONLINE_AVATAR_URL}
                         alt="Jetro On-line"
@@ -423,7 +447,7 @@ export function JetroOnlineSection() {
                 </div>
 
                 {/* Caixa Inferior Simulada */}
-                <div className="p-3 bg-[#002414] border-t border-emerald-900/60 flex items-center gap-2">
+                <div className="p-3 bg-[#002414] border-t border-emerald-900/60 flex items-center gap-2 shrink-0">
                   <div className="flex-1 bg-[#00190D] border border-emerald-900 rounded-xl px-3 py-2 text-xs text-slate-400 flex items-center justify-between">
                     <span className="truncate">
                       Clique em outra pergunta sugerida ao lado para testar...
@@ -444,7 +468,7 @@ export function JetroOnlineSection() {
         </div>
 
         {/* ============================================================== */}
-        {/* 4. BLOCO DE APRENDIZADO — UNIVERSIDADE JETRO                  */}
+        {/* 4. BLOCO EDUCACIONAL — UNIVERSIDADE JETRO & TOURS GUIADOS      */}
         {/* ============================================================== */}
         <div className="rounded-3xl p-8 sm:p-10 lg:p-12 bg-gradient-to-r from-[#002816] via-[#00381E] to-[#002816] border border-[#C9A227]/40 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-[#C9A227]/10 rounded-full blur-[100px] pointer-events-none" />
@@ -541,7 +565,7 @@ export function JetroOnlineSection() {
         {/* ============================================================== */}
         {/* 5. FECHAMENTO — CITAÇÃO E BOTÃO "CONHECER O JETRO"             */}
         {/* ============================================================== */}
-        <div className="text-center max-w-3xl mx-auto space-y-6 pt-4">
+        <div className="text-center max-w-3xl mx-auto space-y-6 pt-2">
           <span className="text-xs font-bold uppercase tracking-widest text-[#FFE28A]">
             Evolução Contínua
           </span>

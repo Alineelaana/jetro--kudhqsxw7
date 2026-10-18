@@ -13,8 +13,8 @@ export function SiteHeader() {
     { label: 'Início', href: '#' },
     { label: 'Plataforma', href: '#plataforma' },
     { label: 'Soluções', href: '#solucoes' },
+    { label: 'Inteligências Artificiais', href: '#jeh' },
     { label: 'Segmentos', href: '#segmentos' },
-    { label: 'Inteligência Artificial', href: '#nine-ia' },
     { label: 'Sobre', href: '#sobre' },
     { label: 'Contato', href: '#contato' },
   ]

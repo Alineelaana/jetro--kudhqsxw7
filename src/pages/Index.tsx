@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { HeroSection } from '@/components/hero-section'
+import { JehSection } from '@/components/jeh-section'
 import { JetroOnlineSection } from '@/components/jetro-online-section'
-import { SegmentsSection } from '@/components/segments-section'
+import { AiComparisonSection } from '@/components/ai-comparison-section'
 import { PlatformModulesSection } from '@/components/platform-modules-section'
-import { NineIaSection } from '@/components/nine-ia-section'
+import { SegmentsSection } from '@/components/segments-section'
 import { BudgetForm } from '@/components/budget-form'
 import { FinalCTA } from '@/components/final-cta'
 import { SeoHead } from '@/components/seo-head'
@@ -18,10 +19,11 @@ export default function Index() {
     <main className="min-h-screen bg-background">
       <SeoHead />
       <HeroSection />
+      <JehSection />
       <JetroOnlineSection />
+      <AiComparisonSection />
       <PlatformModulesSection />
       <SegmentsSection />
-      <NineIaSection />
 
       <section id="contato" className="bg-white relative">
         <div id="orcamento" className="max-w-4xl mx-auto px-0">

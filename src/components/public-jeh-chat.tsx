@@ -87,6 +87,17 @@ export function PublicJehChat() {
     }
   }, [messages, isOpen])
 
+  // Listener global para permitir que botões na página institucional abram a Jeh diretamente
+  useEffect(() => {
+    const handleOpenCustom = () => {
+      handleOpen()
+    }
+    window.addEventListener('open-jeh-chat', handleOpenCustom)
+    return () => {
+      window.removeEventListener('open-jeh-chat', handleOpenCustom)
+    }
+  }, [])
+
   // Se o usuário logado está no ERP interno, ou se a assistente NÃO estiver 'ativa', não renderiza o widget público
   if (assistantStatus !== 'ativa' || isAuthenticated) {
     return null
