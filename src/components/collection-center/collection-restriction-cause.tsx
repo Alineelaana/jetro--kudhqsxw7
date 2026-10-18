@@ -56,7 +56,7 @@ export function CollectionRestrictionCause({
       </div>
       {canViewOrigin && originName && (
         <a
-          href={`/admin/cadastros?search=${encodeURIComponent(originName)}`}
+          href={`/admin/cadastros/clientes?search=${encodeURIComponent(originName)}`}
           className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 mt-2"
         >
           <ExternalLink className="w-3 h-3" /> Ver cliente de origem

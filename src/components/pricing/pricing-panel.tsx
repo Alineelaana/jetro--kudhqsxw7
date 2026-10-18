@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
 import { PricingProducts } from '@/components/pricing/pricing-products'
 import { PricingSimulations } from '@/components/pricing/pricing-simulations'
 import { PricingTables } from '@/components/pricing/pricing-tables'
@@ -15,7 +13,7 @@ import { PricingAISuggestions } from '@/components/pricing/pricing-ai-suggestion
 import { Calculator } from 'lucide-react'
 import { AdminBackButton } from '@/components/admin-back-button'
 
-type SubTab =
+export type PricingSubTab =
   | 'products'
   | 'simulations'
   | 'tables'
@@ -29,23 +27,27 @@ type SubTab =
   | 'comparator'
   | 'ai'
 
-const SUB_TABS: { id: SubTab; label: string }[] = [
-  { id: 'products', label: 'Central de Preços' },
-  { id: 'simulations', label: 'Simulações' },
-  { id: 'tables', label: 'Tabelas de Preços' },
-  { id: 'approvals', label: 'Aprovações' },
-  { id: 'versions', label: 'Versões' },
-  { id: 'timeline', label: 'Linha do Tempo' },
-  { id: 'vault', label: 'Cofre de Preços' },
-  { id: 'risk', label: 'Monitor de Riscos' },
-  { id: 'comparator', label: 'Comparador de Custos' },
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'intelligence', label: 'Inteligência Comercial' },
-  { id: 'ai', label: 'Sugestões IA' },
-]
+const TAB_TITLES: Record<PricingSubTab, string> = {
+  products: 'Central de Preços',
+  simulations: 'Simulações de Preços',
+  tables: 'Tabelas de Preços',
+  approvals: 'Aprovações de Preços',
+  dashboard: 'Dashboard de Precificação',
+  intelligence: 'Inteligência Comercial de Precificação',
+  versions: 'Versões de Preços',
+  timeline: 'Linha do Tempo de Preços',
+  vault: 'Cofre de Preços',
+  risk: 'Monitor de Riscos de Precificação',
+  comparator: 'Comparador de Custos',
+  ai: 'Sugestões IA de Precificação',
+}
 
-export function PricingPanel() {
-  const [activeTab, setActiveTab] = useState<SubTab>('products')
+interface PricingPanelProps {
+  activeTab?: PricingSubTab
+}
+
+export function PricingPanel({ activeTab = 'products' }: PricingPanelProps) {
+  const title = TAB_TITLES[activeTab] || 'Precificação'
 
   const renderContent = () => {
     switch (activeTab) {
@@ -83,23 +85,7 @@ export function PricingPanel() {
       <div className="flex items-center gap-2">
         <AdminBackButton fallback="/admin" />
         <Calculator className="w-5 h-5 text-[#005B2E]" />
-        <h2 className="text-xl font-black text-foreground">Precificação</h2>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {SUB_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-              activeTab === tab.id
-                ? 'bg-[#005B2E] text-white'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+        <h2 className="text-xl font-black text-foreground">{title}</h2>
       </div>
       {renderContent()}
     </div>

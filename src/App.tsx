@@ -126,7 +126,11 @@ const App = () => (
                         <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
 
                         <Route path="/admin/produtos" element={<Products />} />
-                        <Route path="/admin/cadastros" element={<Cadastros />} />
+                        <Route
+                          path="/admin/cadastros"
+                          element={<Navigate to="/admin/cadastros/bancos" replace />}
+                        />
+                        <Route path="/admin/cadastros/:screen" element={<Cadastros />} />
                         <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
                         <Route path="/admin/regras-comissao" element={<CommissionRules />} />
                         <Route path="/admin/logistica" element={<Logistics screen="dashboard" />} />
@@ -1180,7 +1184,11 @@ const App = () => (
                           path="/admin/trade-marketing/aplicacao-produtos"
                           element={<SupplierAllowance screen="appropriations" />}
                         />
-                        <Route path="/admin/precificacao" element={<Precificacao />} />
+                        <Route
+                          path="/admin/precificacao"
+                          element={<Navigate to="/admin/precificacao/aprovacoes" replace />}
+                        />
+                        <Route path="/admin/precificacao/:screen" element={<Precificacao />} />
                         <Route
                           path="/admin/agendamento-relatorios"
                           element={<ReportSchedulesPage />}
