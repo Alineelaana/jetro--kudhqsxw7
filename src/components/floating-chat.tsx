@@ -234,7 +234,10 @@ export function FloatingChat() {
     }
   }, [isDismissed])
 
-  // Permitir acesso tanto autenticado quanto no site institucional
+  // Somente usuários autenticados no ERP têm acesso ao Jetro On-line
+  if (!isAuthenticated) {
+    return null
+  }
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()

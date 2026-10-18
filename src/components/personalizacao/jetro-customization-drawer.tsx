@@ -60,8 +60,10 @@ export function JetroCustomizationDrawer() {
     'aparencia' | 'layout' | 'textos' | 'tabelas' | 'ia' | 'acessibilidade'
   >('aparencia')
 
-  // Permitir acesso a personalizações tanto para usuários autenticados quanto no modo visitante/site
-  // (preferências locais salvas em localStorage para visitantes)
+  // Exclusivo para usuários autenticados no ERP Jetro
+  if (!isAuthenticated) {
+    return null
+  }
 
   const handleReset = async () => {
     await restoreDefaults()

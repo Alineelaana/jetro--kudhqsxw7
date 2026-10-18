@@ -141,10 +141,10 @@ export default function Layout() {
         )}
       </main>
       {showFooter && <SiteFooter />}
-      <JetroTourOverlay />
-      {!isRootLogin && <FloatingChat />}
-      {!isRootLogin && <JetroCustomizationDrawer />}
-      {!isRootLogin && <JetroRightFloatingWidgets />}
+      {isAuthenticated && <JetroTourOverlay />}
+      {isAuthenticated && <FloatingChat />}
+      {isAuthenticated && <JetroCustomizationDrawer />}
+      {isAuthenticated && <JetroRightFloatingWidgets />}
       {!isAuthenticated && <PublicJehChat />}
 
       {canAccessDocs && (

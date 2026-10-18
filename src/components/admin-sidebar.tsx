@@ -15,13 +15,10 @@ import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { useJetroOnline } from '@/hooks/use-jetro-online'
-
 import { ADMIN_MENU, type MenuEntry, type MenuChild } from '@/lib/admin-menu-config'
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Bot, Settings } from 'lucide-react'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 interface SearchResult {
@@ -46,11 +43,9 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
   const [railFlyoutArea, setRailFlyoutArea] = useState<string | null>(null)
   const flyoutRef = useRef<HTMLDivElement>(null)
 
-  const { preferences, updatePreference, isCustomizerOpen, setIsCustomizerOpen } =
-    useUserPreferences()
+  const { preferences, updatePreference } = useUserPreferences()
   const { isFavorite, toggleFavorite } = useMenuFavorites(user?.id as string)
   const { isRail: localIsRail, toggle: toggleSidebarLocal } = useSidebarMode(user?.id as string)
-  const { setIsFloatingOpen, isFloatingOpen } = useJetroOnline()
 
   // O estado do sidebar sincroniza com as preferências do usuário
   const isRail = !preferences.sidebarExpanded
@@ -401,64 +396,6 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 )
               })}
             </nav>
-
-            {/* SEÇÃO FIXA INFERIOR NO MODO RAIL — JETRO ON-LINE E PERSONALIZAR */}
-            <div className="shrink-0 p-1.5 border-t border-[#C9A227]/30 bg-[#002817] flex flex-col items-center gap-1.5">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsFloatingOpen(!isFloatingOpen)
-                      if (onMobileClose) onMobileClose()
-                    }}
-                    className={cn(
-                      'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all text-[#E4C46A] hover:bg-[#00381C] hover:text-white',
-                      isFloatingOpen
-                        ? 'bg-[#C9A227] text-slate-950 font-bold'
-                        : 'bg-[#00140b] border border-[#C9A227]/40',
-                    )}
-                    aria-label="Jetro On-line"
-                  >
-                    <Bot className="w-5 h-5 shrink-0" />
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="right"
-                  className="bg-[#00140b] text-[#E4C46A] border-[#C9A227]/40 font-semibold"
-                >
-                  Jetro On-line (Assistente ERP)
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsCustomizerOpen(!isCustomizerOpen)
-                      if (onMobileClose) onMobileClose()
-                    }}
-                    className={cn(
-                      'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all text-[#E4C46A] hover:bg-[#00381C] hover:text-white',
-                      isCustomizerOpen
-                        ? 'bg-[#C9A227] text-slate-950 font-bold'
-                        : 'bg-[#00140b] border border-[#C9A227]/40',
-                    )}
-                    aria-label="Personalizar Jetro"
-                  >
-                    <Settings className="w-5 h-5 shrink-0" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="right"
-                  className="bg-[#00140b] text-[#E4C46A] border-[#C9A227]/40 font-semibold"
-                >
-                  Personalizar Jetro (Interface, Tema, Tabelas)
-                </TooltipContent>
-              </Tooltip>
-            </div>
           </>
         ) : (
           /* MODO EXPANDIDO (COMPORTAMENTO ACCORDION COMPLETO) */
@@ -560,64 +497,6 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 </>
               )}
             </nav>
-
-            {/* SEÇÃO FIXA NO RODAPÉ DA SIDEBAR: ASSISTENTE & PERSONALIZAÇÃO (VISUAL PREMIUM VERDE-ESCURO E DOURADO) */}
-            <div className="shrink-0 p-2.5 border-t border-[#C9A227]/30 bg-[#002817] text-white space-y-1.5 shadow-inner">
-              <div className="px-1 text-[10px] font-bold text-[#E4C46A] tracking-wider uppercase flex items-center justify-between">
-                <span>Assistente & Sistema</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              </div>
-
-              {/* Botão Jetro On-line */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsFloatingOpen(!isFloatingOpen)
-                  if (onMobileClose) onMobileClose()
-                }}
-                className={cn(
-                  'w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer',
-                  isFloatingOpen
-                    ? 'bg-[#C9A227] text-slate-950 border-[#E4C46A] shadow-md'
-                    : 'bg-[#00140b] text-[#E4C46A] hover:bg-[#00381C] hover:text-white border-[#C9A227]/40',
-                )}
-                title="Abrir o assistente inteligente Jetro On-line"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-md bg-[#002817] border border-[#C9A227]/50 flex items-center justify-center text-[#E4C46A] shrink-0">
-                    <Bot className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="truncate">Jetro On-line</span>
-                </div>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 font-mono border border-emerald-500/40">
-                  IA
-                </span>
-              </button>
-
-              {/* Botão Personalizar */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsCustomizerOpen(!isCustomizerOpen)
-                  if (onMobileClose) onMobileClose()
-                }}
-                className={cn(
-                  'w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer',
-                  isCustomizerOpen
-                    ? 'bg-[#C9A227] text-slate-950 border-[#E4C46A] shadow-md'
-                    : 'bg-[#00140b] text-[#E4C46A] hover:bg-[#00381C] hover:text-white border-[#C9A227]/40',
-                )}
-                title="Personalizar Jetro (Interface, Aparência, Textos e Tabelas)"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-md bg-[#002817] border border-[#C9A227]/50 flex items-center justify-center text-[#E4C46A] shrink-0">
-                    <Settings className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="truncate">Personalizar</span>
-                </div>
-                <span className="text-[10px] text-white/60 font-normal">Ajustes</span>
-              </button>
-            </div>
           </>
         )}
       </aside>
