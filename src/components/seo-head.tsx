@@ -5,7 +5,12 @@ export function SeoHead() {
   const { getCmsData, loading } = useCmsContent()
 
   useEffect(() => {
-    document.title = 'Jetro | Plataforma Inteligente de Gestão Empresarial'
+    // Título institucional alinhado ao reposicionamento solicitado
+    const defaultTitle = 'Jetro | Inteligência que conecta sua gestão — ERP Inteligente'
+    const defaultDescription =
+      'Plataforma de gestão empresarial desenvolvida para integrar processos, organizar informações, acompanhar operações e transformar dados em conhecimento para decisões mais inteligentes. Comercial, financeiro, fiscal, WMS, RH, BI e inteligência artificial.'
+
+    document.title = defaultTitle
 
     let metaDesc = document.querySelector('meta[name="description"]')
     if (!metaDesc) {
@@ -13,10 +18,56 @@ export function SeoHead() {
       metaDesc.setAttribute('name', 'description')
       document.head.appendChild(metaDesc)
     }
-    metaDesc.setAttribute(
-      'content',
-      'Gestão integrada para empresas de serviços, distribuidoras, atacadistas, indústrias e operações comerciais. Financeiro, vendas, pessoas, operações e inteligência em uma única plataforma.',
-    )
+    metaDesc.setAttribute('content', defaultDescription)
+
+    // Open Graph Tags
+    const setOgTag = (property: string, content: string) => {
+      let tag = document.querySelector(`meta[property="${property}"]`)
+      if (!tag) {
+        tag = document.createElement('meta')
+        tag.setAttribute('property', property)
+        document.head.appendChild(tag)
+      }
+      tag.setAttribute('content', content)
+    }
+
+    setOgTag('og:title', defaultTitle)
+    setOgTag('og:description', defaultDescription)
+    setOgTag('og:type', 'website')
+    setOgTag('og:site_name', 'Jetro ERP')
+    setOgTag('og:locale', 'pt_BR')
+
+    // Schema.org Structured Data (JSON-LD)
+    const jsonLdId = 'jetro-seo-structured-data'
+    let scriptTag = document.getElementById(jsonLdId) as HTMLScriptElement | null
+    if (!scriptTag) {
+      scriptTag = document.createElement('script')
+      scriptTag.id = jsonLdId
+      scriptTag.type = 'application/ld+json'
+      document.head.appendChild(scriptTag)
+    }
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'Jetro ERP Inteligente',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web, Cloud',
+      description: defaultDescription,
+      creator: {
+        '@type': 'Organization',
+        name: 'SAF TECNOLOGIA E GESTAO LTDA',
+        taxID: '65.768.215/0001-00',
+      },
+      offers: {
+        '@type': 'Offer',
+        availability: 'https://schema.org/InStock',
+        price: '0.00',
+        priceCurrency: 'BRL',
+      },
+    }
+
+    scriptTag.textContent = JSON.stringify(structuredData)
 
     if (loading) return
     if (typeof getCmsData !== 'function') return
@@ -25,9 +76,11 @@ export function SeoHead() {
       if (seo && typeof seo === 'object') {
         if (typeof seo.title === 'string' && seo.title) {
           document.title = seo.title
+          setOgTag('og:title', seo.title)
         }
         if (typeof seo.description === 'string' && seo.description) {
           metaDesc.setAttribute('content', seo.description)
+          setOgTag('og:description', seo.description)
         }
       }
     } catch {

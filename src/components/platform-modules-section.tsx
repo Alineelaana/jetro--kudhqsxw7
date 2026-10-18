@@ -1,131 +1,345 @@
 import {
-  DollarSign,
   TrendingUp,
-  ShoppingCart,
-  Package,
-  Factory,
-  BarChart3,
+  DollarSign,
+  Receipt,
+  Truck,
+  Shield,
   Users,
-  UserCheck,
-  ShieldCheck,
-  Megaphone,
-  Store,
-  Headphones,
   LineChart,
-  Bot,
-  CheckCircle,
+  Megaphone,
+  Layers,
+  FileSpreadsheet,
+  Headphones,
+  BrainCircuit,
+  GraduationCap,
+  CalendarDays,
+  FileCheck2,
 } from 'lucide-react'
 
-export function PlatformModulesSection() {
-  const pillars = [
-    {
-      title: 'Gestão Integrada',
-      desc: 'Conexão ponta a ponta de todos os setores corporativos em tempo real.',
-    },
-    {
-      title: 'Inteligência Empresarial',
-      desc: 'Dashboards, BI executivo, projeções e indicadores para tomada de decisão.',
-    },
-    {
-      title: 'Automação de Processos',
-      desc: 'Workflows automáticos e eliminação de tarefas manuais repetitivas.',
-    },
-    {
-      title: 'Gestão Financeira',
-      desc: 'Fluxo de caixa, DRE, contas a pagar/receber, conciliação e crédito.',
-    },
-    {
-      title: 'Gestão Comercial',
-      desc: 'Funil de vendas, CRM, tabelas de preço, comissões e propostas.',
-    },
-    {
-      title: 'Gestão de Pessoas',
-      desc: 'RH, Departamento Pessoal, folha, ponto, SST e performance.',
-    },
-    {
-      title: 'Operações & Logística',
-      desc: 'Estoque, compras, produção, armazenagem, frota e expedição.',
-    },
-    {
-      title: 'Governança & Segurança',
-      desc: 'Matriz de permissões, auditoria corporativa e conformidade fiscal.',
-    },
-  ]
+interface ModuleItem {
+  id: string
+  title: string
+  category: string
+  icon: React.ElementType
+  description: string
+  status: 'Funcional' | 'Em desenvolvimento'
+  highlights: string[]
+}
 
-  const modules = [
-    { name: 'Financeiro', icon: DollarSign },
-    { name: 'Comercial / CRM', icon: TrendingUp },
-    { name: 'Compras', icon: ShoppingCart },
-    { name: 'Estoque', icon: Package },
-    { name: 'Produção / Indústria', icon: Factory },
-    { name: 'Controladoria', icon: BarChart3 },
-    { name: 'RH', icon: Users },
-    { name: 'DP', icon: UserCheck },
-    { name: 'SST', icon: ShieldCheck },
-    { name: 'Marketing', icon: Megaphone },
-    { name: 'Trade Marketing', icon: Store },
-    { name: 'Atendimento', icon: Headphones },
-    { name: 'BI Executive', icon: LineChart },
-    { name: 'IA Jeh', icon: Bot },
+export function PlatformModulesSection() {
+  const modules: ModuleItem[] = [
+    {
+      id: 'comercial',
+      title: 'Gestão Comercial & CRM',
+      category: 'Vendas & Relacionamento',
+      icon: TrendingUp,
+      status: 'Funcional',
+      description:
+        'Ciclo comercial completo: cadastro qualificado de clientes PF/PJ, orçamentos, pedidos de venda com reserva de estoque, regras de comissionamento, múltiplos canais e funil de vendas integrado.',
+      highlights: [
+        'Pedidos de venda com status e histórico',
+        'Controle de limites e regras de comissão',
+        'Cotações e propostas com alçadas',
+        'Funil CRM e histórico consolidado',
+      ],
+    },
+    {
+      id: 'financeiro',
+      title: 'Gestão Financeira & Cobrança',
+      category: 'Finanças & Controladoria',
+      icon: DollarSign,
+      status: 'Funcional',
+      description:
+        'Controle rigoroso de contas a pagar e a receber, conciliação bancária por extrato, fluxo de caixa diário/projetado, centro de cobrança ativo com réguas e liquidação via Pix, boletos e cartões.',
+      highlights: [
+        'Contas a pagar e receber com centros de custo',
+        'Centro de cobrança executivo com régua de ações',
+        'Fechamento e conciliação bancária',
+        'Transferências, caixas e aprovações financeiras',
+      ],
+    },
+    {
+      id: 'fiscal',
+      title: 'Gestão Fiscal & Tributária',
+      category: 'Conformidade Fiscal',
+      icon: Receipt,
+      status: 'Funcional',
+      description:
+        'Emissão e controle de NF-e, NFS-e, CT-e e MDF-e, manifestação do destinatário, cartas de correção, apuração de impostos e simulações para a Reforma Tributária (IBS/CBS).',
+      highlights: [
+        'Emissão e gestão de NF-e e NFC-e',
+        'Painel integrado para NFS-e, CT-e e MDF-e',
+        'Manifestação e cartas de correção',
+        'Simulador da Reforma Tributária (IBS/CBS)',
+      ],
+    },
+    {
+      id: 'logistica-wms',
+      title: 'Operações, Logística & WMS',
+      category: 'Cadeia de Suprimentos',
+      icon: Truck,
+      status: 'Funcional',
+      description:
+        'Orquestração logística de ponta a ponta: gestão de armazém (WMS com recebimento, putaway, ondas, separação e conferência cega), romaneios, frotas, motoristas, rastreamento de entregas e logística reversa.',
+      highlights: [
+        'WMS completo (recebimento, ondas, separação e conferência)',
+        'Controle de frotas, motoristas e tabelas de frete',
+        'Roteirização de entregas e comprovantes (POD)',
+        'Logística reversa e ocorrências em trânsito',
+      ],
+    },
+    {
+      id: 'governanca-seguranca',
+      title: 'Administração, Governança & Auditoria',
+      category: 'Segurança & Governança',
+      icon: Shield,
+      status: 'Funcional',
+      description:
+        'Segurança corporativa em múltiplos níveis: matriz detalhada de permissões por perfil, autenticação multifator (MFA), trilha de auditoria completa (audit logs), sessões ativas e backups versionados.',
+      highlights: [
+        'Trilha de auditoria com criticidade e origem de ação',
+        'Matriz de permissões por tela e perfil',
+        'Autenticação multifator (MFA / 2FA)',
+        'Backups do banco e exportação de dados',
+      ],
+    },
+    {
+      id: 'dp-rh',
+      title: 'Departamento Pessoal & RH',
+      category: 'Capital Humano',
+      icon: Users,
+      status: 'Funcional',
+      description:
+        'Gestão completa do ciclo do colaborador: admissões, contratos de trabalho, ponto eletrônico com banco de horas, férias, desligamentos, monitor eSocial, FGTS Digital e módulos de SST (NR-1, PGR, PCMSO e ASO).',
+      highlights: [
+        'Registro de ponto, banco de horas e extras',
+        'Férias, afastamentos e cálculo rescisório',
+        'Monitor eSocial e conformidade trabalhista',
+        'Segurança do Trabalho: NR-1, PGR, PCMSO e ASO',
+      ],
+    },
+    {
+      id: 'bi-inteligencia',
+      title: 'Inteligência & Análise de Dados (BI)',
+      category: 'Visão Estratégica',
+      icon: LineChart,
+      status: 'Funcional',
+      description:
+        'Centro analítico multimodular com dashboards executivos, drill-down em tempo real, cruzamento entre vendas, estoque e margens, projeções com cenários e agendamento de relatórios periódicos por e-mail.',
+      highlights: [
+        'Dashboards executivo, comercial e financeiro',
+        'Análises cruzadas de margem, custo e giro',
+        'Agendamento automático de relatórios por e-mail',
+        'Filtros salvos e exportação em Excel/CSV/PDF',
+      ],
+    },
+    {
+      id: 'marketing-enterprise',
+      title: 'Marketing Enterprise & Criativo',
+      category: 'Comunicação & Campanhas',
+      icon: Megaphone,
+      status: 'Funcional',
+      description:
+        'Gestão de demandas e ativos de marketing: central de briefings com templates padronizados, fluxo de aprovação de peças, calendário editorial integrado, biblioteca de marca e histórico de versões.',
+      highlights: [
+        'Templates de briefing e solicitações criativas',
+        'Fluxo de aprovação de peças com anotações',
+        'Calendário editorial de publicações',
+        'Biblioteca de ativos e controle de versões',
+      ],
+    },
+    {
+      id: 'verbas',
+      title: 'Gestão de Verbas & Acordos Comerciais',
+      category: 'Trade & Comercial',
+      icon: Layers,
+      status: 'Funcional',
+      description:
+        'Controle rigoroso de verbas de fornecedores e acordos de trade marketing: acompanhamento de saldo disponível, apuração por produto/linha, comprovações e liquidação vinculada ao faturamento.',
+      highlights: [
+        'Contratos e saldos de verbas de fornecedores',
+        'Apuração por campanha e período',
+        'Comprovações de execução de mídia e trade',
+        'Integração com contas a receber/pagar',
+      ],
+    },
+    {
+      id: 'planilhas-convertidas',
+      title: 'Planilhas Convertidas & Jetro Table',
+      category: 'Produtividade & Operação',
+      icon: FileSpreadsheet,
+      status: 'Funcional',
+      description:
+        'Transformação de planilhas operacionais e financeiras em telas estruturadas dentro do ERP, mantendo flexibilidade de cálculo com governança, histórico, permissões e componente Jetro Table.',
+      highlights: [
+        'Componente Jetro Table com ordenação e visibilidade de colunas',
+        'Preservação de regras de negócio sem quebra de fórmulas',
+        'Exportação rápida para Excel e relatórios formatados',
+        'Controle de quem edita e quem apenas visualiza',
+      ],
+    },
+    {
+      id: 'chamados-atendimento',
+      title: 'Central de Chamados & Atendimento',
+      category: 'Suporte & SLA',
+      icon: Headphones,
+      status: 'Funcional',
+      description:
+        'Atendimento interno e suporte operacional organizado por setores, motivos de contato, fluxos com triagem automática, controle estrito de SLA e relatórios de tempo de resposta.',
+      highlights: [
+        'Abertura e tramitação com histórico de mensagens',
+        'Controle de SLA por criticidade e setor',
+        'Filas de atendimento e distribuição de responsáveis',
+        'Relatórios de produtividade e resolutividade',
+      ],
+    },
+    {
+      id: 'ia-dupla',
+      title: 'Arquitetura de Duas IAs (Jeh & Jetro On-line)',
+      category: 'Inteligência Artificial Nativa',
+      icon: BrainCircuit,
+      status: 'Funcional',
+      description:
+        'Duas inteligências complementares: a assistente Jeh dedicada à recepção comercial, triagem e captação de leads, e o Jetro On-line como copiloto interno para consultas analíticas e navegação no ERP.',
+      highlights: [
+        'Jeh: triagem comercial e base de conhecimento no site',
+        'Jetro On-line: copiloto em linguagem natural e gráficos',
+        'Respeito rigoroso aos perfis e permissões internas',
+        'Integração transparente ao fluxo de vendas e CRM',
+      ],
+    },
+    {
+      id: 'universidade-tours',
+      title: 'Universidade Jetro & Tours Guiados',
+      category: 'Capacitação & Adoção',
+      icon: GraduationCap,
+      status: 'Funcional',
+      description:
+        'Aceleração da curva de aprendizado da equipe com vídeos tutoriais divididos por módulo, manuais práticos e tours interativos passo a passo sobrepostos às telas reais do sistema.',
+      highlights: [
+        'Vídeos de capacitação organizados por módulo',
+        'Tours interativos na própria interface do sistema',
+        'Busca rápida de tutoriais e procedimentos padrão',
+        'Orientação guiada para novos colaboradores',
+      ],
+    },
+    {
+      id: 'agenda-executiva',
+      title: 'Agenda & Compromissos Corporativos',
+      category: 'Produtividade & Gestão de Tempo',
+      icon: CalendarDays,
+      status: 'Funcional',
+      description:
+        'Agenda executiva centralizada para compromissos de negócios, reuniões comerciais, prazos de entrega e marcos operacionais, com lembretes automáticos e vinculação a clientes e parceiros.',
+      highlights: [
+        'Visão mensal, semanal e lista consolidada',
+        'Lembretes vinculados a pedidos e cobranças',
+        'Filtro por responsável e tipo de compromisso',
+        'Registro de notas e encaminhamentos',
+      ],
+    },
+    {
+      id: 'pcp-industria',
+      title: 'Planejamento e Controle da Produção (PCP)',
+      category: 'Indústria & Manufatura',
+      icon: FileCheck2,
+      status: 'Em desenvolvimento',
+      description:
+        'Módulo industrial avançado em consolidação: estruturas de produto (BOM), rotas de fabricação, fases de produção, capacidade instalada, ordens de produção e rastreabilidade fabril.',
+      highlights: [
+        'Engenharia de produtos e listas técnicas (BOM)',
+        'Ordens de produção com apontamentos parciais',
+        'Cockpit fabril e capacidade de máquinas',
+        'Previsão de conclusão conforme cronograma técnico',
+      ],
+    },
   ]
 
   return (
-    <section id="plataforma" className="bg-white relative">
-      <div
-        id="solucoes"
-        className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center max-w-3xl space-y-3"
-      >
-        <span className="inline-block px-4 py-1.5 rounded-full bg-[#005A36]/10 text-[#005A36] text-xs sm:text-sm font-extrabold uppercase tracking-wider">
-          Arquitetura de Soluções
-        </span>
-        <h2 className="text-3xl sm:text-4xl font-black text-[#005A36]">
-          Entregas e Pilares do Ecossistema Jetro
-        </h2>
-        <p className="text-muted-foreground text-base sm:text-lg">
-          Um ecossistema completo e modular, projetado para oferecer visibilidade total, eficiência
-          operacional e previsibilidade financeira.
-        </p>
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {pillars.map((p) => (
-            <div
-              key={p.title}
-              className="p-5 rounded-xl border border-border bg-slate-50/80 hover:bg-white hover:border-[#005A36] transition-all space-y-2"
-            >
-              <div className="flex items-center gap-2 text-[#005A36] font-bold text-lg">
-                <CheckCircle className="h-5 w-5 text-[#C89B3C] shrink-0" />
-                <h3>{p.title}</h3>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">{p.desc}</p>
-            </div>
-          ))}
+    <section
+      id="solucoes"
+      className="py-20 sm:py-28 bg-[#001c10] text-white border-t border-white/5"
+    >
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
+        {/* Cabeçalho da Seção */}
+        <div className="text-center max-w-3xl mx-auto space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-[#C9A227]/30 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
+            Soluções & Módulos Integrados
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
+            Uma plataforma. <span className="text-[#C9A227]">Diferentes áreas da sua empresa.</span>
+          </h2>
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+            O Jetro unifica os departamentos operacionais, administrativos e estratégicos da sua
+            organização em um único sistema, eliminando controles isolados e retrabalho.
+          </p>
         </div>
 
-        <div className="bg-gradient-to-r from-[#002817] via-[#004225] to-[#002817] rounded-2xl p-8 sm:p-12 text-white shadow-2xl">
-          <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
-            <h3 className="text-2xl sm:text-3xl font-bold text-white">Módulos e Áreas de Gestão</h3>
-            <p className="text-sm text-gray-300">
-              Ecossistema preparado para integrar gradualmente os setores da sua empresa de acordo
-              com o seu ritmo de expansão.
-            </p>
-          </div>
+        {/* Grid de Módulos Reais */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {modules.map((m) => {
+            const Icon = m.icon
+            const isDev = m.status === 'Em desenvolvimento'
+            return (
+              <div
+                key={m.id}
+                className="group relative rounded-2xl p-6 bg-slate-950/70 border border-white/10 hover:border-[#C9A227]/50 transition-all duration-300 flex flex-col justify-between shadow-lg hover:shadow-[#C9A227]/10"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-[#C9A227] group-hover:scale-105 transition-transform">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span
+                      className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border ${
+                        isDev
+                          ? 'bg-amber-950/60 text-amber-300 border-amber-500/30'
+                          : 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30'
+                      }`}
+                    >
+                      {m.status}
+                    </span>
+                  </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            {modules.map((m) => {
-              const IconClass = m.icon
-              return (
-                <div
-                  key={m.name}
-                  className="flex flex-col items-center text-center p-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-colors"
-                >
-                  <IconClass className="h-6 w-6 text-[#E5B85C] mb-2" />
-                  <span className="text-xs font-semibold text-white">{m.name}</span>
+                  <div>
+                    <span className="text-[11px] font-semibold text-[#C9A227] tracking-wider uppercase block">
+                      {m.category}
+                    </span>
+                    <h3 className="text-lg font-bold text-white group-hover:text-[#f6d77c] transition-colors mt-0.5">
+                      {m.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    {m.description}
+                  </p>
                 </div>
-              )
-            })}
-          </div>
+
+                <div className="pt-5 mt-5 border-t border-white/5">
+                  <ul className="space-y-1.5">
+                    {m.highlights.map((h, i) => (
+                      <li
+                        key={i}
+                        className="text-[11px] sm:text-xs text-slate-300 flex items-start gap-2"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227] mt-1.5 shrink-0" />
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Nota de transparência técnica */}
+        <div className="p-4 rounded-xl bg-slate-900/60 border border-white/10 text-center max-w-3xl mx-auto">
+          <p className="text-xs text-slate-400">
+            <strong className="text-slate-200">Compromisso com a realidade:</strong> todos os
+            módulos classificados como funcionais estão ativos na base oficial do Jetro ERP na Skip
+            Cloud, disponíveis para demonstração com dados homologados.
+          </p>
         </div>
       </div>
     </section>

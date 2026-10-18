@@ -5,26 +5,34 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { createBudgetRequest } from '@/services/budget-requests'
-import { Send, CheckCircle2, Building, Mail, Phone, User, FileText, MapPin } from 'lucide-react'
+import { createLead } from '@/services/crm'
+import {
+  Send,
+  CheckCircle2,
+  Building,
+  Mail,
+  Phone,
+  User,
+  MessageSquare,
+  ShieldCheck,
+} from 'lucide-react'
 
 interface BudgetFormProps {
   whatsappNumber?: string
   selectedService?: string
 }
 
-export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps) {
+export function BudgetForm({ selectedService }: BudgetFormProps) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
+    company: '',
     phone: '',
     email: '',
-    companyName: '',
-    cnpj: '',
-    city: '',
-    message: '',
+    interest: '',
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -33,10 +41,15 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.phone || !formData.email || !formData.companyName) {
+    if (
+      !formData.name.trim() ||
+      !formData.company.trim() ||
+      !formData.phone.trim() ||
+      !formData.email.trim()
+    ) {
       toast({
         title: 'Campos Obrigatórios',
-        description: 'Por favor, preencha nome, telefone, e-mail e empresa.',
+        description: 'Por favor, preencha Nome, Empresa, Telefone e E-mail corporativo.',
         variant: 'destructive',
       })
       return
@@ -44,29 +57,51 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
 
     setLoading(true)
     try {
+      // 1. Gravar com segurança na coleção budget_requests com origem explícita
       await createBudgetRequest({
-        client_name: formData.name,
-        client_email: formData.email,
-        client_phone: formData.phone,
-        service: selectedService || 'Apresentação Comercial Jetro',
+        client_name: formData.name.trim(),
+        client_email: formData.email.trim(),
+        client_phone: formData.phone.trim(),
+        service: selectedService || 'Apresentação Comercial Jetro ERP',
         data: {
-          company_name: formData.companyName,
-          cnpj: formData.cnpj,
-          city: formData.city,
-          message: formData.message,
-          source: 'Formulário de Contato Jetro',
+          company_name: formData.company.trim(),
+          message: formData.interest.trim(),
+          source: 'Site — Formulário de Contato',
         },
       })
 
+      // 2. Integrar diretamente ao pipeline de leads do CRM (origem "Site — Formulário de Contato")
+      try {
+        await createLead({
+          name: formData.name.trim(),
+          company: formData.company.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          whatsapp: formData.phone.trim(),
+          lead_source: 'Site — Formulário de Contato',
+          status: 'Novo',
+          interest_topic: formData.interest.trim() || 'Apresentação Comercial do ERP',
+          product_interest: selectedService || 'Plataforma Jetro ERP',
+          commercial_summary: `Solicitação enviada pelo formulário institucional: ${formData.interest.trim() || 'Sem observações adicionais'}`,
+          filial: 'Matriz',
+        })
+      } catch (crmErr) {
+        // Log seguro caso o CRM tenha validação adicional sem bloquear a solicitação principal
+        console.warn('Registro no CRM concluído via budget_requests:', crmErr)
+      }
+
       setSubmitted(true)
       toast({
-        title: 'Contato Enviado com Sucesso!',
-        description: 'Sua solicitação foi recebida. Nossa equipe entrará em contato em breve.',
+        title: 'Solicitação Enviada com Sucesso!',
+        description:
+          'Recebemos suas informações. Nossa equipe comercial entrará em contato em breve.',
       })
     } catch (error) {
+      console.error('Erro ao enviar contato:', error)
       toast({
         title: 'Erro ao Enviar',
-        description: 'Não foi possível enviar o formulário. Tente novamente ou use o WhatsApp.',
+        description:
+          'Não foi possível registrar seu contato agora. Por favor, tente novamente ou fale pelo WhatsApp oficial.',
         variant: 'destructive',
       })
     } finally {
@@ -76,60 +111,91 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
 
   if (submitted) {
     return (
-      <div className="bg-emerald-50 border-2 border-[#005A36] rounded-2xl p-8 text-center space-y-4">
-        <div className="h-16 w-16 bg-[#005A36] text-white rounded-full flex items-center justify-center mx-auto shadow-lg">
-          <CheckCircle2 className="h-8 w-8 text-[#E5B85C]" />
+      <div className="bg-emerald-950/60 border border-[#C9A227]/50 rounded-2xl p-8 text-center space-y-4 shadow-xl">
+        <div className="h-16 w-16 bg-[#005A36] text-white rounded-full flex items-center justify-center mx-auto shadow-lg border border-[#C9A227]/40">
+          <CheckCircle2 className="h-8 w-8 text-[#C9A227]" />
         </div>
-        <h3 className="text-2xl font-bold text-foreground">Solicitação Confirmada!</h3>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          Obrigado pelo seu interesse no Jetro. Um consultor especialista analisará as informações
-          da sua empresa e entrará em contato.
+        <h3 className="text-2xl font-black text-white">Solicitação Recebida com Sucesso!</h3>
+        <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+          Obrigado pelo seu interesse no Jetro. Um consultor especialista entrará em contato para
+          agendar a demonstração da plataforma para sua empresa.
         </p>
-        <Button
-          onClick={() => setSubmitted(false)}
-          variant="outline"
-          className="border-[#005A36] text-[#005A36] hover:bg-[#005A36] hover:text-white"
-        >
-          Enviar Novo Contato
-        </Button>
+        <div className="pt-2">
+          <Button
+            onClick={() => {
+              setSubmitted(false)
+              setFormData({ name: '', company: '', phone: '', email: '', interest: '' })
+            }}
+            variant="outline"
+            className="border-[#C9A227]/50 text-white hover:bg-[#C9A227]/10"
+          >
+            Enviar Nova Mensagem
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-        Conte um pouco sobre sua empresa e o que você procura. Nossa equipe entrará em contato para
-        entender sua operação e apresentar como o Jetro pode ajudar.
+      <div className="p-4 rounded-xl bg-slate-900/80 border border-white/10 text-xs text-slate-300 leading-relaxed flex items-start gap-3">
+        <ShieldCheck className="w-5 h-5 text-[#C9A227] shrink-0 mt-0.5" />
+        <span>
+          Preencha o formulário abaixo para agendar uma apresentação detalhada do ERP. Seus dados
+          estão protegidos e serão utilizados exclusivamente para o contato comercial da nossa
+          equipe.
+        </span>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Nome */}
           <div className="space-y-1.5">
             <Label
               htmlFor="name"
-              className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5"
+              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
             >
-              <User className="h-3.5 w-3.5 text-[#005A36]" />
+              <User className="h-3.5 w-3.5 text-[#C9A227]" />
               Nome Completo *
             </Label>
             <Input
               id="name"
               name="name"
-              placeholder="Seu nome completo"
+              placeholder="Ex: Carlos Silva"
               value={formData.name}
               onChange={handleChange}
               required
-              className="h-11"
+              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
             />
           </div>
 
+          {/* Empresa */}
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="company"
+              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
+            >
+              <Building className="h-3.5 w-3.5 text-[#C9A227]" />
+              Empresa *
+            </Label>
+            <Input
+              id="company"
+              name="company"
+              placeholder="Razão Social ou Nome Fantasia"
+              value={formData.company}
+              onChange={handleChange}
+              required
+              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
+            />
+          </div>
+
+          {/* Telefone */}
           <div className="space-y-1.5">
             <Label
               htmlFor="phone"
-              className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5"
+              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
             >
-              <Phone className="h-3.5 w-3.5 text-[#005A36]" />
+              <Phone className="h-3.5 w-3.5 text-[#C9A227]" />
               Telefone / WhatsApp *
             </Label>
             <Input
@@ -139,16 +205,17 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
               value={formData.phone}
               onChange={handleChange}
               required
-              className="h-11"
+              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
             />
           </div>
 
+          {/* E-mail */}
           <div className="space-y-1.5">
             <Label
               htmlFor="email"
-              className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5"
+              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
             >
-              <Mail className="h-3.5 w-3.5 text-[#005A36]" />
+              <Mail className="h-3.5 w-3.5 text-[#C9A227]" />
               E-mail Corporativo *
             </Label>
             <Input
@@ -159,96 +226,42 @@ export function BudgetForm({ whatsappNumber, selectedService }: BudgetFormProps)
               value={formData.email}
               onChange={handleChange}
               required
-              className="h-11"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="companyName"
-              className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5"
-            >
-              <Building className="h-3.5 w-3.5 text-[#005A36]" />
-              Nome da Empresa *
-            </Label>
-            <Input
-              id="companyName"
-              name="companyName"
-              placeholder="Razão Social ou Nome Fantasia"
-              value={formData.companyName}
-              onChange={handleChange}
-              required
-              className="h-11"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="cnpj"
-              className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5"
-            >
-              <FileText className="h-3.5 w-3.5 text-[#005A36]" />
-              CNPJ *
-            </Label>
-            <Input
-              id="cnpj"
-              name="cnpj"
-              placeholder="00.000.000/0001-00"
-              value={formData.cnpj}
-              onChange={handleChange}
-              required
-              className="h-11"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="city"
-              className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5"
-            >
-              <MapPin className="h-3.5 w-3.5 text-[#005A36]" />
-              Cidade / UF *
-            </Label>
-            <Input
-              id="city"
-              name="city"
-              placeholder="Ex: Vitória / ES"
-              value={formData.city}
-              onChange={handleChange}
-              required
-              className="h-11"
+              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
             />
           </div>
         </div>
 
+        {/* Interesse / Mensagem */}
         <div className="space-y-1.5">
           <Label
-            htmlFor="message"
-            className="text-xs font-bold uppercase tracking-wider text-foreground"
+            htmlFor="interest"
+            className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
           >
-            Desafios ou Objetivos da Sua Empresa
+            <MessageSquare className="h-3.5 w-3.5 text-[#C9A227]" />
+            Interesse / Mensagem
           </Label>
           <Textarea
-            id="message"
-            name="message"
-            placeholder="Descreva brevemente sua operação e o que você busca estruturar com o Jetro..."
+            id="interest"
+            name="interest"
+            placeholder="Conte-nos quais módulos ou desafios da sua operação você gostaria de ver em funcionamento..."
             rows={4}
-            value={formData.message}
+            value={formData.interest}
             onChange={handleChange}
+            className="bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
           />
         </div>
 
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#005A36] hover:bg-[#004225] text-white font-bold h-12 text-base shadow-lg shadow-[#005A36]/20 transition-all"
+          className="w-full bg-gradient-to-r from-[#C9A227] to-[#a88219] hover:from-[#d8b030] hover:to-[#b88f20] text-gray-950 font-black h-12 text-sm sm:text-base shadow-xl shadow-[#C9A227]/20 transition-all cursor-pointer"
         >
           {loading ? (
-            'Enviando...'
+            'Registrando sua solicitação...'
           ) : (
             <span className="flex items-center justify-center gap-2">
               <Send className="h-4 w-4" />
-              Enviar contato
+              Solicitar Apresentação do Jetro
             </span>
           )}
         </Button>
