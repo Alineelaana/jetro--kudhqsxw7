@@ -42,7 +42,6 @@ export default function VariableRemuneration({ screen = 'dashboard' }: { screen?
         return <VrCommunications />
       case 'goals-seller':
         return <VrSellerView />
-    switch (activeTab) {
       case 'dashboard':
         return <VrDashboard />
       case 'rules':
