@@ -92,6 +92,7 @@ import SST from './pages/SST'
 import Promotions from './pages/Promotions'
 import Precificacao from './pages/Precificacao'
 import Auditoria from './pages/Auditoria'
+import UsersAdminPage from './pages/UsersAdminPage'
 import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
 import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
 import {
@@ -1354,6 +1355,7 @@ const App = () => (
                             path="/admin/planilhas/convertidas/tabela-mae-gr"
                             element={<TabelaMaeGrPage />}
                           />
+                          <Route path="/admin/usuarios" element={<UsersAdminPage />} />
                           <Route path="/admin/auditoria" element={<Auditoria />} />
                           <Route
                             path="/admin/controladoria"

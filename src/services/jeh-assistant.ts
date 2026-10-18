@@ -1,4 +1,4 @@
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 
 export type JehKnowledgeStatus = 'rascunho' | 'aprovado' | 'revisar' | 'inativo'
 export type JehQAStatus = 'ativo' | 'inativo' | 'rascunho'

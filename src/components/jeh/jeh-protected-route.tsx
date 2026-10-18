@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { canManageJehAssistant } from '@/lib/permissions'
 import { useToast } from '@/hooks/use-toast'
 import { ShieldAlert } from 'lucide-react'

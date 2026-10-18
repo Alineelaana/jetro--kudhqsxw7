@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/hooks/use-toast'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { JetroTable } from '@/components/jetro-table'
 import type { JetroColumnDef } from '@/components/jetro-table/types'
 import { JehPageHeader } from './jeh-header'
