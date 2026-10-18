@@ -178,6 +178,15 @@ export function canManageJehAssistant(role: string | undefined): boolean {
   return ['SUP', 'ADMIN'].includes(role)
 }
 
+/**
+ * Permissão específica para a Central de Configurações do Jetro On-line
+ * Apenas administradores e supervisores autorizados.
+ */
+export function canManageJetroOnline(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'ADMIN'].includes(role)
+}
+
 export function canViewFiscal(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)

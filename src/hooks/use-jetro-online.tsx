@@ -26,7 +26,7 @@ interface JetroOnlineContextValue {
   serverUserContext?: JetroOnlineUserContext
   isFloatingOpen: boolean
   setIsFloatingOpen: (open: boolean) => void
-  send: (text: string) => Promise<void>
+  send: (text: string, extra?: { modulo?: string; rota_origem?: string }) => Promise<void>
   newConversation: () => void
   loadHistory: (convId: string) => Promise<void>
   endRef: React.RefObject<HTMLDivElement | null>
@@ -81,12 +81,12 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
   }, [])
 
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, extra?: { modulo?: string; rota_origem?: string }) => {
       if (!text.trim() || loading) return
       setMessages((prev) => [...prev, { role: 'user', content: text }])
       setLoading(true)
       try {
-        const result = await sendJetroOnlineMessage(text, conversationId || undefined)
+        const result = await sendJetroOnlineMessage(text, conversationId || undefined, extra)
         if (result.conversation_id) {
           setConversationId(result.conversation_id)
         }
@@ -99,6 +99,7 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
             role: 'assistant',
             content: result.content,
             citations: result.citations,
+            recommended_videos: result.recommended_videos,
           },
         ])
         loadConversations()

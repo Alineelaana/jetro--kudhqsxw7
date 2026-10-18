@@ -106,6 +106,16 @@ import {
   JehSettingsScreen,
   JehProtectedRoute,
 } from '@/components/jeh'
+import { JetroOnlineLayout } from '@/components/jetro-online-central/jetro-online-layout'
+import { JetroOnlineGeneralSettingsScreen } from '@/components/jetro-online-central/jetro-online-general-settings'
+import { JetroOnlineUniversidadeScreen } from '@/components/jetro-online-central/jetro-online-universidade'
+import { JetroOnlinePerguntasScreen } from '@/components/jetro-online-central/jetro-online-perguntas'
+import { JetroOnlineHistoricoScreen } from '@/components/jetro-online-central/jetro-online-historico'
+import { JetroOnlineSugestoesScreen } from '@/components/jetro-online-central/jetro-online-sugestoes'
+import { JetroOnlineRecursosScreen } from '@/components/jetro-online-central/jetro-online-recursos'
+import { JetroOnlineToursScreen } from '@/components/jetro-online-central/jetro-online-tours'
+import { JetroOnlineRelatoriosScreen } from '@/components/jetro-online-central/jetro-online-relatorios'
+import { JetroOnlineProtectedRoute } from '@/components/jetro-online-central/jetro-online-protected-route'
 import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
 import ComparativoMargensGrPage from './pages/admin/ComparativoMargensGrPage'
 import TabelaMaeGrPage from './pages/admin/TabelaMaeGrPage'
@@ -388,6 +398,28 @@ const App = () => (
                             path="/admin/estoque/wms-managerial"
                             element={<WmsScreen screen="wms-managerial" />}
                           />
+                          {/* Central de Configurações do Jetro On-line */}
+                          <Route
+                            path="/admin/configuracoes/jetro-online"
+                            element={
+                              <JetroOnlineProtectedRoute>
+                                <JetroOnlineLayout />
+                              </JetroOnlineProtectedRoute>
+                            }
+                          >
+                            <Route index element={<JetroOnlineGeneralSettingsScreen />} />
+                            <Route
+                              path="universidade"
+                              element={<JetroOnlineUniversidadeScreen />}
+                            />
+                            <Route path="perguntas" element={<JetroOnlinePerguntasScreen />} />
+                            <Route path="historico" element={<JetroOnlineHistoricoScreen />} />
+                            <Route path="sugestoes" element={<JetroOnlineSugestoesScreen />} />
+                            <Route path="recursos" element={<JetroOnlineRecursosScreen />} />
+                            <Route path="tours" element={<JetroOnlineToursScreen />} />
+                            <Route path="relatorios" element={<JetroOnlineRelatoriosScreen />} />
+                          </Route>
+
                           <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
                             <Route index element={<Navigate to="dados-empresa" replace />} />
                             <Route path="dados-empresa" element={<EmpresaScreen />} />

@@ -31,6 +31,7 @@ import {
   Container,
   ClipboardList,
   FileSpreadsheet,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -52,6 +53,7 @@ import {
   canViewPlanilhasConvertidas,
   canViewPlanilhasTabelaMaeGr,
   canManageJehAssistant,
+  canManageJetroOnline,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -176,6 +178,25 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         icon: Users,
         route: '/admin/usuarios',
         perm: canManageUsers,
+      },
+      {
+        label: 'Configurações do Jetro On-line',
+        icon: Sparkles,
+        route: '/admin/configuracoes/jetro-online',
+        perm: canManageJetroOnline,
+        children: [
+          { label: 'Configurações Gerais', route: '/admin/configuracoes/jetro-online' },
+          { label: 'Universidade Jetro', route: '/admin/configuracoes/jetro-online/universidade' },
+          { label: 'Perguntas dos Usuários', route: '/admin/configuracoes/jetro-online/perguntas' },
+          { label: 'Histórico de Conversas', route: '/admin/configuracoes/jetro-online/historico' },
+          { label: 'Sugestões Inteligentes', route: '/admin/configuracoes/jetro-online/sugestoes' },
+          { label: 'Recursos do Assistente', route: '/admin/configuracoes/jetro-online/recursos' },
+          { label: 'Tours Guiados', route: '/admin/configuracoes/jetro-online/tours' },
+          {
+            label: 'Relatórios de Utilização',
+            route: '/admin/configuracoes/jetro-online/relatorios',
+          },
+        ],
       },
       {
         label: 'Configurações',
