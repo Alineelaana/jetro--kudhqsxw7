@@ -3,6 +3,7 @@ import { Building2, ExternalLink, Instagram, Sparkles, ArrowUpRight } from 'luci
 import {
   getPublicSiteClients,
   getSiteClientLogoUrl,
+  resolveSiteClientLogoUrl,
   type SiteClient,
 } from '@/services/site-clients'
 import { buildInstagramUrl } from '@/services/site-testimonials'
@@ -78,33 +79,33 @@ export function SiteClientsSection() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {clients.map((client) => {
-              const logoUrl = getSiteClientLogoUrl(client)
+              const logoUrl = resolveSiteClientLogoUrl(client)
               const instaUrl = client.instagram ? buildInstagramUrl(client.instagram) : ''
 
               return (
                 <div
                   key={client.id}
-                  className="group relative rounded-2xl bg-gradient-to-b from-[#002817]/90 to-[#001a0f]/90 border border-[#C9A227]/30 hover:border-[#C9A227] p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#C9A227]/10"
+                  className="group relative rounded-2xl bg-gradient-to-b from-[#002817]/90 to-[#00140b]/95 border border-[#C9A227]/30 hover:border-[#C9A227] p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#C9A227]/15"
                 >
                   {/* Brilho dourado no hover */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#C9A227]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#C9A227]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-                  {/* Área do Logo ou Tipografia elegante */}
-                  <div className="h-28 flex items-center justify-center p-3 rounded-xl bg-black/40 border border-white/5 relative">
+                  {/* Área do Logo com fundo suave/claro harmonioso com a paleta #002817/#00140b e dourado */}
+                  <div className="h-32 flex items-center justify-center p-3.5 rounded-xl bg-white/[0.97] border border-[#C9A227]/40 shadow-inner relative overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[#C9A227]/20 group-hover:border-[#C9A227]">
                     {logoUrl ? (
                       <img
                         src={logoUrl}
-                        alt={`Logotipo ${client.nome}`}
-                        className="max-h-20 max-w-full object-contain filter drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+                        alt={`Logotipo oficial de ${client.nome}`}
+                        className="max-h-24 max-w-full w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                         loading="lazy"
                       />
                     ) : (
-                      <div className="text-center px-2">
-                        <span className="font-serif tracking-wider font-bold text-lg sm:text-xl text-[#f6d77c] group-hover:text-white transition-colors block">
+                      <div className="text-center px-3 py-2">
+                        <span className="font-serif tracking-wider font-bold text-base sm:text-lg text-[#002817] block">
                           {client.nome}
                         </span>
-                        <span className="text-[10px] tracking-widest uppercase text-emerald-400/80 mt-1 block">
-                          Parceiro Jetro
+                        <span className="text-[9px] tracking-widest uppercase text-[#8E6E17] font-semibold mt-0.5 block">
+                          Parceiro Oficial Jetro
                         </span>
                       </div>
                     )}

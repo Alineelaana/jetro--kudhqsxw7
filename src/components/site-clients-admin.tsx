@@ -40,6 +40,7 @@ import {
   updateSiteClient,
   deleteSiteClient,
   getSiteClientLogoUrl,
+  resolveSiteClientLogoUrl,
   type SiteClient,
 } from '@/services/site-clients'
 import { normalizeInstagramHandle, buildInstagramUrl } from '@/services/site-testimonials'
@@ -110,7 +111,7 @@ export default function SiteClientsAdmin() {
     setOrdem(c.ordem || 1)
     setAtivo(c.ativo !== false)
     setLogoFile(null)
-    setLogoPreview(getSiteClientLogoUrl(c))
+    setLogoPreview(resolveSiteClientLogoUrl(c))
     setDialogOpen(true)
   }
 
@@ -359,7 +360,7 @@ export default function SiteClientsAdmin() {
                 </tr>
               ) : (
                 filteredClients.map((client) => {
-                  const logoUrl = getSiteClientLogoUrl(client)
+                  const logoUrl = resolveSiteClientLogoUrl(client)
                   const isAtivo = client.ativo !== false
                   const instaUrl = client.instagram ? buildInstagramUrl(client.instagram) : ''
 

@@ -1,4 +1,6 @@
 import pb from '@/lib/pocketbase/client'
+import logoGranRomanoOfficial from '@/assets/whatsapp-image-2026-10-18-at-13.46.16-1-0a268.jpeg'
+import logoDecEldoradoOfficial from '@/assets/whatsapp-image-2026-10-18-at-13.46.16-e400b.jpeg'
 
 export interface SiteClient {
   id: string
@@ -17,6 +19,33 @@ export interface SiteClient {
 export function getSiteClientLogoUrl(client: SiteClient): string | null {
   if (!client.logo) return null
   return pb.files.getUrl(client, client.logo)
+}
+
+/**
+ * Mapeamento estático confiável de logos oficiais para clientes homologados.
+ * Utilizado como fallback prioritário quando o campo `logo` do banco de dados ainda não tiver arquivo persistido,
+ * garantindo renderização imediata sem depender exclusivamente do upload do backend.
+ * Se o registro possuir `logo` anexado via PocketBase, o arquivo do banco PREVALECE para respeitar o CRUD administrativo.
+ */
+export const OFFICIAL_CLIENT_LOGOS_FALLBACK: Record<string, string> = {
+  'gran romano': logoGranRomanoOfficial,
+  'dec eldorado': logoDecEldoradoOfficial,
+}
+
+export function resolveSiteClientLogoUrl(client: SiteClient): string | null {
+  // 1. Prioridade máxima: arquivo do banco de dados (permite substituição via painel Admin)
+  const dbUrl = getSiteClientLogoUrl(client)
+  if (dbUrl) return dbUrl
+
+  // 2. Fallback confiável: assets oficiais salvos no repositório por correspondência de nome
+  const normalizedName = (client.nome || '').trim().toLowerCase()
+  for (const [key, assetUrl] of Object.entries(OFFICIAL_CLIENT_LOGOS_FALLBACK)) {
+    if (normalizedName.includes(key) || key.includes(normalizedName)) {
+      return assetUrl
+    }
+  }
+
+  return null
 }
 
 export async function getPublicSiteClients(): Promise<SiteClient[]> {

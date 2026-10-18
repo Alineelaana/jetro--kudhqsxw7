@@ -200,16 +200,16 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canManageJetroOnline,
         children: [
           { label: 'Configurações Gerais', route: '/admin/configuracoes/jetro-online' },
-          { label: 'Universidade Jetro', route: '/admin/configuracoes/jetro-online/universidade' },
-          { label: 'Perguntas dos Usuários', route: '/admin/configuracoes/jetro-online/perguntas' },
           { label: 'Histórico de Conversas', route: '/admin/configuracoes/jetro-online/historico' },
-          { label: 'Sugestões Inteligentes', route: '/admin/configuracoes/jetro-online/sugestoes' },
+          { label: 'Perguntas dos Usuários', route: '/admin/configuracoes/jetro-online/perguntas' },
           { label: 'Recursos do Assistente', route: '/admin/configuracoes/jetro-online/recursos' },
-          { label: 'Tours Guiados', route: '/admin/configuracoes/jetro-online/tours' },
           {
             label: 'Relatórios de Utilização',
             route: '/admin/configuracoes/jetro-online/relatorios',
           },
+          { label: 'Sugestões Inteligentes', route: '/admin/configuracoes/jetro-online/sugestoes' },
+          { label: 'Tours Guiados', route: '/admin/configuracoes/jetro-online/tours' },
+          { label: 'Universidade Jetro', route: '/admin/configuracoes/jetro-online/universidade' },
         ],
       },
       {
