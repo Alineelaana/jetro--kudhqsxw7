@@ -148,10 +148,10 @@ export function PublicJehChat() {
     try {
       const resp = await sendChatMessage({
         message: text,
-        conversationId: conversationId || undefined,
-        clientName: detectedName || 'Visitante',
-        clientEmail: detectedEmail || undefined,
-        clientPhone: detectedPhone || undefined,
+        conversation_id: conversationId || undefined,
+        client_name: detectedName || 'Visitante',
+        client_email: detectedEmail || undefined,
+        client_phone: detectedPhone || undefined,
       })
 
       if (resp?.conversation_id) {

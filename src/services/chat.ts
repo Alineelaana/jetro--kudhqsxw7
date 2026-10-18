@@ -24,11 +24,11 @@ export interface ChatConversation {
 
 export async function sendChatMessage(params: {
   conversation_id?: string
-  client_name: string
-  client_email: string
-  client_phone: string
+  client_name?: string
+  client_email?: string
+  client_phone?: string
   message: string
-}): Promise<{ conversation_id: string }> {
+}): Promise<{ conversation_id: string; response?: string; lead_created?: boolean }> {
   return pb.send('/backend/v1/chat/send', {
     method: 'POST',
     body: JSON.stringify(params),
