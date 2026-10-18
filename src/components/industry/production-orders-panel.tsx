@@ -19,7 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ClipboardList, Plus, Loader2, ChevronRight } from 'lucide-react'
+import {
+  ClipboardList,
+  Plus,
+  Loader2,
+  ChevronRight,
+  LayoutGrid,
+  Table as TableIcon,
+} from 'lucide-react'
 import {
   getProductionOrders,
   createProductionOrder,
@@ -32,6 +39,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 import type { ProductionOrder } from '@/services/production-orders'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 const STATUS_LABELS: Record<string, string> = {
   rascunho: 'Rascunho',
@@ -74,6 +82,7 @@ export function ProductionOrdersPanel() {
   const [boms, setBoms] = useState<Record<string, unknown>[]>([])
   const [routes, setRoutes] = useState<Record<string, unknown>[]>([])
   const [submitting, setSubmitting] = useState(false)
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
 
   const load = async () => {
     try {
@@ -155,140 +164,370 @@ export function ProductionOrdersPanel() {
           <ClipboardList className="w-6 h-6 text-[#005B2E]" />
           <h2 className="text-xl font-black text-foreground">Ordens de Produção</h2>
         </div>
-        <Button
-          onClick={() => setDialogOpen(true)}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Nova Ordem
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-lg border p-0.5 bg-muted/40">
+            <Button
+              size="sm"
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              className={`h-8 px-2.5 text-xs ${viewMode === 'table' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+              onClick={() => setViewMode('table')}
+              title="Visualização em Tabela"
+            >
+              <TableIcon className="w-4 h-4 mr-1" /> Tabela
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === 'cards' ? 'default' : 'ghost'}
+              className={`h-8 px-2.5 text-xs ${viewMode === 'cards' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+              onClick={() => setViewMode('cards')}
+              title="Visualização em Cards"
+            >
+              <LayoutGrid className="w-4 h-4 mr-1" /> Cards
+            </Button>
+          </div>
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Nova Ordem
+          </Button>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {orders.map((o) => (
-          <Card key={o.id} className="border-2 border-[#005B2E]/20">
-            <CardContent className="py-3">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="font-bold text-sm">{o.order_number}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {o.expand?.product_id?.name || '—'} • Qtd: {o.quantity} {o.unit}
-                  </p>
-                </div>
-                <Badge className={STATUS_COLORS[o.status] || 'bg-gray-100 text-gray-600'}>
-                  {STATUS_LABELS[o.status] || o.status}
+
+      {viewMode === 'table' ? (
+        <JetroTable
+          screenId="industria.ordens_producao"
+          columns={[
+            {
+              id: 'order_number',
+              header: 'Nº Ordem',
+              accessorKey: 'order_number',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ value }) => (
+                <span className="font-mono font-bold text-[#C89B3C] text-xs">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'product_name',
+              header: 'Produto',
+              dataType: 'text',
+              defaultWidth: 240,
+              getSortValue: (row) => row.expand?.product_id?.name || '',
+              cell: ({ row }) => (
+                <span className="font-medium">{row.expand?.product_id?.name || '—'}</span>
+              ),
+            },
+            {
+              id: 'quantity',
+              header: 'Quantidade',
+              accessorKey: 'quantity',
+              dataType: 'number',
+              align: 'right',
+              defaultWidth: 120,
+              getSortValue: (row) => parseFloat(row.quantity) || 0,
+              cell: ({ row }) => (
+                <span>
+                  {row.quantity} {row.unit}
+                </span>
+              ),
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              defaultWidth: 140,
+              getSortValue: (row) => STATUS_LABELS[row.status] || row.status,
+              cell: ({ row }) => (
+                <Badge className={STATUS_COLORS[row.status] || 'bg-gray-100 text-gray-600'}>
+                  {STATUS_LABELS[row.status] || row.status}
                 </Badge>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>Resp: {o.responsible || '—'}</span>
-                {o.start_date && <span>• Início: {o.start_date}</span>}
-                {o.order_type && (
-                  <span>• Tipo: {ORDER_TYPE_LABELS[o.order_type] || o.order_type}</span>
-                )}
-              </div>
-              <div className="flex gap-1 mt-2 flex-wrap">
-                {o.status === 'rascunho' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(o.id, 'planejada')}
-                  >
-                    Planejar
-                  </Button>
-                )}
-                {o.status === 'planejada' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(o.id, 'liberada')}
-                  >
-                    Liberar
-                  </Button>
-                )}
-                {o.status === 'liberada' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(o.id, 'em_producao')}
-                  >
-                    Iniciar
-                  </Button>
-                )}
-                {o.status === 'em_producao' && (
-                  <>
+              ),
+            },
+            {
+              id: 'order_type',
+              header: 'Tipo',
+              accessorKey: 'order_type',
+              dataType: 'text',
+              defaultWidth: 130,
+              getSortValue: (row) =>
+                row.order_type ? ORDER_TYPE_LABELS[row.order_type] || row.order_type : '—',
+              cell: ({ row }) => (
+                <span className="text-xs">
+                  {row.order_type ? ORDER_TYPE_LABELS[row.order_type] || row.order_type : '—'}
+                </span>
+              ),
+            },
+            {
+              id: 'start_date',
+              header: 'Início',
+              accessorKey: 'start_date',
+              dataType: 'date',
+              defaultWidth: 110,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'responsible',
+              header: 'Responsável',
+              accessorKey: 'responsible',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'actions',
+              header: 'Ações de Status',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 200,
+              cell: ({ row: o }) => (
+                <div className="flex gap-1 flex-wrap">
+                  {o.status === 'rascunho' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(o.id, 'planejada')}
+                    >
+                      Planejar
+                    </Button>
+                  )}
+                  {o.status === 'planejada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(o.id, 'liberada')}
+                    >
+                      Liberar
+                    </Button>
+                  )}
+                  {o.status === 'liberada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(o.id, 'em_producao')}
+                    >
+                      Iniciar
+                    </Button>
+                  )}
+                  {o.status === 'em_producao' && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs px-2"
+                        onClick={() => handleStatusChange(o.id, 'parcial')}
+                      >
+                        Parcial
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs px-2"
+                        onClick={() => handleStatusChange(o.id, 'inspecao')}
+                      >
+                        Inspeção
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs px-2"
+                        onClick={() => handleStatusChange(o.id, 'concluida')}
+                      >
+                        Concluir
+                      </Button>
+                    </>
+                  )}
+                  {o.status === 'parcial' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(o.id, 'em_producao')}
+                    >
+                      Retomar
+                    </Button>
+                  )}
+                  {o.status === 'inspecao' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(o.id, 'concluida')}
+                    >
+                      Aprovar
+                    </Button>
+                  )}
+                  {o.status === 'concluida' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(o.id, 'fechada')}
+                    >
+                      Fechar
+                    </Button>
+                  )}
+                  {o.status !== 'concluida' &&
+                    o.status !== 'cancelada' &&
+                    o.status !== 'fechada' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs px-2 text-red-600"
+                        onClick={() => handleStatusChange(o.id, 'cancelada')}
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                </div>
+              ),
+            },
+          ]}
+          data={orders}
+          emptyMessage="Nenhuma ordem de produção cadastrada."
+          exportTitle="Ordens de Produção — Indústria Jetro"
+          exportFilename="ordens-producao.xlsx"
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {orders.map((o) => (
+            <Card key={o.id} className="border-2 border-[#005B2E]/20">
+              <CardContent className="py-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-bold text-sm">{o.order_number}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {o.expand?.product_id?.name || '—'} • Qtd: {o.quantity} {o.unit}
+                    </p>
+                  </div>
+                  <Badge className={STATUS_COLORS[o.status] || 'bg-gray-100 text-gray-600'}>
+                    {STATUS_LABELS[o.status] || o.status}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>Resp: {o.responsible || '—'}</span>
+                  {o.start_date && <span>• Início: {o.start_date}</span>}
+                  {o.order_type && (
+                    <span>• Tipo: {ORDER_TYPE_LABELS[o.order_type] || o.order_type}</span>
+                  )}
+                </div>
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {o.status === 'rascunho' && (
                     <Button
                       size="sm"
                       variant="outline"
                       className="h-7 text-xs"
-                      onClick={() => handleStatusChange(o.id, 'parcial')}
+                      onClick={() => handleStatusChange(o.id, 'planejada')}
                     >
-                      Parcial
+                      Planejar
                     </Button>
+                  )}
+                  {o.status === 'planejada' && (
                     <Button
                       size="sm"
                       variant="outline"
                       className="h-7 text-xs"
-                      onClick={() => handleStatusChange(o.id, 'inspecao')}
+                      onClick={() => handleStatusChange(o.id, 'liberada')}
                     >
-                      Inspeção
+                      Liberar
                     </Button>
+                  )}
+                  {o.status === 'liberada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(o.id, 'em_producao')}
+                    >
+                      Iniciar
+                    </Button>
+                  )}
+                  {o.status === 'em_producao' && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        onClick={() => handleStatusChange(o.id, 'parcial')}
+                      >
+                        Parcial
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        onClick={() => handleStatusChange(o.id, 'inspecao')}
+                      >
+                        Inspeção
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        onClick={() => handleStatusChange(o.id, 'concluida')}
+                      >
+                        Concluir
+                      </Button>
+                    </>
+                  )}
+                  {o.status === 'parcial' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(o.id, 'em_producao')}
+                    >
+                      Retomar
+                    </Button>
+                  )}
+                  {o.status === 'inspecao' && (
                     <Button
                       size="sm"
                       variant="outline"
                       className="h-7 text-xs"
                       onClick={() => handleStatusChange(o.id, 'concluida')}
                     >
-                      Concluir
+                      Aprovar
                     </Button>
-                  </>
-                )}
-                {o.status === 'parcial' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(o.id, 'em_producao')}
-                  >
-                    Retomar
-                  </Button>
-                )}
-                {o.status === 'inspecao' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(o.id, 'concluida')}
-                  >
-                    Aprovar
-                  </Button>
-                )}
-                {o.status === 'concluida' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(o.id, 'fechada')}
-                  >
-                    Fechar
-                  </Button>
-                )}
-                {o.status !== 'concluida' && o.status !== 'cancelada' && o.status !== 'fechada' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs text-red-600"
-                    onClick={() => handleStatusChange(o.id, 'cancelada')}
-                  >
-                    Cancelar
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      {orders.length === 0 && (
+                  )}
+                  {o.status === 'concluida' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(o.id, 'fechada')}
+                    >
+                      Fechar
+                    </Button>
+                  )}
+                  {o.status !== 'concluida' &&
+                    o.status !== 'cancelada' &&
+                    o.status !== 'fechada' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs text-red-600"
+                        onClick={() => handleStatusChange(o.id, 'cancelada')}
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {orders.length === 0 && viewMode === 'cards' && (
         <Card className="border-2 border-dashed border-border">
           <CardContent className="py-12 text-center">
             <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-3" />

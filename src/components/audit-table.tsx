@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Eye, AlertTriangle, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AuditLog } from '@/services/audit-logs'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 const CRITICIDADE_STYLES: Record<string, string> = {
   Baixa: 'bg-gray-100 text-gray-700',
@@ -39,94 +40,141 @@ export function AuditTable({ logs, loading, error, onViewDetails, onRetry }: Pro
       </Card>
     )
   }
-  if (logs.length === 0) {
-    return (
-      <Card className="border-2 border-dashed">
-        <CardContent className="py-12 text-center text-muted-foreground">
-          Nenhum registro de auditoria encontrado.
-        </CardContent>
-      </Card>
-    )
-  }
+
+  const columns: JetroColumnDef<AuditLog>[] = [
+    {
+      id: 'date',
+      header: 'Data',
+      accessorKey: 'created',
+      dataType: 'date',
+      defaultWidth: 110,
+      cell: ({ value }) => (
+        <span className="whitespace-nowrap text-xs">
+          {value ? new Date(String(value)).toLocaleDateString('pt-BR') : '—'}
+        </span>
+      ),
+    },
+    {
+      id: 'time',
+      header: 'Hora',
+      accessorKey: 'created',
+      dataType: 'text',
+      defaultWidth: 90,
+      cell: ({ value }) => (
+        <span className="whitespace-nowrap font-mono text-xs">
+          {value
+            ? new Date(String(value)).toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : '—'}
+        </span>
+      ),
+    },
+    {
+      id: 'user_name',
+      header: 'Usuário',
+      accessorKey: 'user_name',
+      dataType: 'text',
+      defaultWidth: 160,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1 truncate text-xs font-medium">
+          {row.is_suspicious && <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />}
+          <span className="truncate">{row.user_name || '—'}</span>
+        </div>
+      ),
+    },
+    {
+      id: 'user_role',
+      header: 'Perfil',
+      accessorKey: 'user_role',
+      dataType: 'text',
+      defaultWidth: 130,
+      cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+    },
+    {
+      id: 'action',
+      header: 'Ação',
+      accessorKey: 'action',
+      dataType: 'text',
+      defaultWidth: 130,
+      cell: ({ value }) => (
+        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#005B2E]/10 text-[#005B2E]">
+          {String(value || '—')}
+        </span>
+      ),
+    },
+    {
+      id: 'criticidade',
+      header: 'Criticidade',
+      accessorKey: 'criticidade',
+      dataType: 'text',
+      defaultWidth: 120,
+      cell: ({ value }) =>
+        value ? (
+          <span
+            className={cn(
+              'text-xs font-bold px-2 py-0.5 rounded',
+              CRITICIDADE_STYLES[String(value)] || 'bg-gray-100 text-gray-700',
+            )}
+          >
+            {String(value)}
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        ),
+    },
+    {
+      id: 'module',
+      header: 'Módulo',
+      accessorKey: 'module',
+      dataType: 'text',
+      defaultWidth: 130,
+      cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+    },
+    {
+      id: 'target_summary',
+      header: 'Registro',
+      accessorKey: 'target_summary',
+      dataType: 'text',
+      defaultWidth: 200,
+      cell: ({ value }) => (
+        <span className="text-xs text-muted-foreground truncate block max-w-xs">
+          {String(value || '—')}
+        </span>
+      ),
+    },
+    {
+      id: 'actions',
+      header: 'Ações',
+      align: 'center',
+      sortable: false,
+      hideable: false,
+      resizable: false,
+      draggable: false,
+      defaultWidth: 110,
+      cell: ({ row: log }) => (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => onViewDetails(log)}
+          className="border-[#005B2E] text-[#005B2E] h-7 px-2 text-xs"
+        >
+          <Eye className="w-3.5 h-3.5 mr-1" /> Detalhes
+        </Button>
+      ),
+    },
+  ]
 
   return (
-    <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-[#01361D] text-white">
-              <th className="text-left px-3 py-3 font-bold">Data</th>
-              <th className="text-left px-3 py-3 font-bold">Hora</th>
-              <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Usuário</th>
-              <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Perfil</th>
-              <th className="text-left px-3 py-3 font-bold">Ação</th>
-              <th className="text-left px-3 py-3 font-bold">Criticidade</th>
-              <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Módulo</th>
-              <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">Registro</th>
-              <th className="text-center px-3 py-3 font-bold">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log) => (
-              <tr
-                key={log.id}
-                className={cn(
-                  'border-b border-border hover:bg-[#005B2E]/5',
-                  log.is_suspicious && 'bg-red-50/60',
-                )}
-              >
-                <td className="px-3 py-2 whitespace-nowrap">
-                  {new Date(log.created).toLocaleDateString('pt-BR')}
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  {new Date(log.created).toLocaleTimeString('pt-BR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </td>
-                <td className="px-3 py-2 hidden sm:table-cell max-w-[150px] truncate">
-                  {log.is_suspicious && (
-                    <AlertTriangle className="w-3 h-3 text-red-600 inline mr-1" />
-                  )}
-                  {log.user_name || '—'}
-                </td>
-                <td className="px-3 py-2 hidden md:table-cell">{log.user_role || '—'}</td>
-                <td className="px-3 py-2">
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#005B2E]/10 text-[#005B2E]">
-                    {log.action}
-                  </span>
-                </td>
-                <td className="px-3 py-2">
-                  {log.criticidade && (
-                    <span
-                      className={cn(
-                        'text-xs font-bold px-2 py-0.5 rounded',
-                        CRITICIDADE_STYLES[log.criticidade] || 'bg-gray-100 text-gray-700',
-                      )}
-                    >
-                      {log.criticidade}
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2 hidden lg:table-cell">{log.module}</td>
-                <td className="px-3 py-2 hidden lg:table-cell max-w-[200px] truncate">
-                  {log.target_summary || '—'}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onViewDetails(log)}
-                    className="border-[#005B2E] text-[#005B2E]"
-                  >
-                    <Eye className="w-3.5 h-3.5 mr-1" /> Detalhes
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Card>
+    <JetroTable
+      screenId="auditoria.logs"
+      columns={columns}
+      data={logs}
+      onRowClick={(log) => onViewDetails(log)}
+      emptyMessage="Nenhum registro de auditoria encontrado."
+      exportTitle="Logs de Auditoria — Jetro"
+      exportFilename="auditoria-logs.xlsx"
+    />
   )
 }

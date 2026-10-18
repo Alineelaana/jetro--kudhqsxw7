@@ -4,6 +4,7 @@ import { Loader2, Link2 } from 'lucide-react'
 import { getMkAttributions } from '@/services/marketing'
 import type { MkResultAttribution } from '@/lib/marketing-types'
 import { useRealtime } from '@/hooks/use-realtime'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 export function MarketingAttribution() {
   const [items, setItems] = useState<MkResultAttribution[]>([])
@@ -76,41 +77,72 @@ export function MarketingAttribution() {
           </CardContent>
         </Card>
       </div>
-      {items.length === 0 ? (
-        <Card className="border-2 border-dashed">
-          <CardContent className="py-12 text-center">
-            <Link2 className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Nenhuma atribuição registrada.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="border-2 border-[#005B2E]/20 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-3 py-2">Campanha</th>
-                <th className="text-left px-3 py-2">Canal</th>
-                <th className="text-left px-3 py-2">Lead</th>
-                <th className="text-left px-3 py-2">Pedido</th>
-                <th className="text-left px-3 py-2">Receita</th>
-                <th className="text-left px-3 py-2">Método</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((a) => (
-                <tr key={a.id} className="border-b hover:bg-[#005B2E]/5">
-                  <td className="px-3 py-2">{a.campaign_name || '—'}</td>
-                  <td className="px-3 py-2 text-xs">{a.channel || '—'}</td>
-                  <td className="px-3 py-2 text-xs">{a.lead_name || '—'}</td>
-                  <td className="px-3 py-2 text-xs">{a.order_number || '—'}</td>
-                  <td className="px-3 py-2 font-semibold text-[#005B2E]">R$ {a.revenue || '0'}</td>
-                  <td className="px-3 py-2 text-xs">{a.attribution_method}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
-      )}
+      <JetroTable
+        screenId="marketing.atribuicao"
+        columns={[
+          {
+            id: 'campaign_name',
+            header: 'Campanha',
+            accessorKey: 'campaign_name',
+            dataType: 'text',
+            defaultWidth: 200,
+            cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+          },
+          {
+            id: 'channel',
+            header: 'Canal',
+            accessorKey: 'channel',
+            dataType: 'text',
+            defaultWidth: 120,
+            cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+          },
+          {
+            id: 'lead_name',
+            header: 'Lead',
+            accessorKey: 'lead_name',
+            dataType: 'text',
+            defaultWidth: 160,
+            cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+          },
+          {
+            id: 'order_number',
+            header: 'Pedido',
+            accessorKey: 'order_number',
+            dataType: 'text',
+            defaultWidth: 120,
+            cell: ({ value }) => <span className="text-xs font-mono">{String(value || '—')}</span>,
+          },
+          {
+            id: 'revenue',
+            header: 'Receita',
+            accessorKey: 'revenue',
+            dataType: 'currency',
+            align: 'right',
+            defaultWidth: 130,
+            getSortValue: (row) => parseFloat(row.revenue) || 0,
+            cell: ({ value }) => (
+              <span className="font-semibold text-[#005B2E]">
+                R${' '}
+                {parseFloat(String(value || '0')).toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
+            ),
+          },
+          {
+            id: 'attribution_method',
+            header: 'Método',
+            accessorKey: 'attribution_method',
+            dataType: 'text',
+            defaultWidth: 130,
+            cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+          },
+        ]}
+        data={items}
+        emptyMessage="Nenhuma atribuição registrada."
+        exportTitle="Atribuição de Resultado — Marketing Jetro"
+        exportFilename="atribuicao-marketing.xlsx"
+      />
     </div>
   )
 }

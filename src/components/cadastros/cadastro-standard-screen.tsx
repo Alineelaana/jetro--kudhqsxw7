@@ -30,6 +30,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { CadastroFormDialog } from '@/components/cadastros/cadastro-form-dialog'
 import { type CadastroConfig, type CadastroRecord } from '@/lib/cadastros-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import {
   Plus,
   Search,
@@ -219,120 +220,142 @@ export function CadastroStandardScreen({ config }: Props) {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
         </div>
-      ) : filtered.length === 0 ? (
-        <Card className="border-2 border-dashed">
-          <CardContent className="py-16 text-center">
-            <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-bold mb-1">Nenhum registro encontrado.</p>
-            <p className="text-sm text-muted-foreground">Clique em "Novo Cadastro" para começar.</p>
-          </CardContent>
-        </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-4 py-3 font-bold">Código</th>
-                  <th className="text-left px-4 py-3 font-bold">Nome</th>
-                  <th className="text-left px-4 py-3 font-bold hidden md:table-cell">
-                    Data de Cadastro
-                  </th>
-                  <th className="text-left px-4 py-3 font-bold">Situação</th>
-                  <th className="text-left px-4 py-3 font-bold hidden lg:table-cell">
-                    Responsável
-                  </th>
-                  <th className="text-center px-4 py-3 font-bold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((r) => (
-                  <tr
-                    key={r.id}
-                    className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
+        <JetroTable
+          screenId={`cadastros.padrao.${config.collection}`}
+          columns={[
+            {
+              id: 'code',
+              header: 'Código',
+              accessorKey: 'code',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'name',
+              header: 'Nome',
+              accessorKey: 'name',
+              dataType: 'text',
+              defaultWidth: 260,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'created',
+              header: 'Data de Cadastro',
+              accessorKey: 'created',
+              dataType: 'date',
+              defaultWidth: 140,
+              cell: ({ value }) => (
+                <span className="text-muted-foreground text-xs">
+                  {fmtDate(String(value || ''))}
+                </span>
+              ),
+            },
+            {
+              id: 'active',
+              header: 'Situação',
+              accessorKey: 'active',
+              dataType: 'boolean',
+              defaultWidth: 110,
+              getSortValue: (row) => (row.active !== false ? 'Ativo' : 'Inativo'),
+              cell: ({ row }) => (
+                <span
+                  className={`text-xs font-bold px-2 py-1 rounded ${row.active !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
+                >
+                  {row.active !== false ? 'Ativo' : 'Inativo'}
+                </span>
+              ),
+            },
+            {
+              id: 'responsible_user',
+              header: 'Responsável',
+              accessorKey: 'responsible_user',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 180,
+              cell: ({ row: r }) => (
+                <div className="flex items-center justify-center gap-0.5">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleView(r)}
+                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                    title="Visualizar"
                   >
-                    <td className="px-4 py-3">
-                      <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                        {r.code || '—'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-medium">{r.name || '—'}</td>
-                    <td className="px-4 py-3 hidden md:table-cell">{fmtDate(r.created)}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${r.active !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
-                      >
-                        {r.active !== false ? 'Ativo' : 'Inativo'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 hidden lg:table-cell">{r.responsible_user || '—'}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-0.5">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleView(r)}
-                          className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8 w-8 p-0"
-                          title="Visualizar"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleEdit(r)}
-                          className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8 w-8 p-0"
-                          title="Editar"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDuplicate(r)}
-                          className="text-blue-600 hover:bg-blue-50 h-8 w-8 p-0"
-                          title="Duplicar"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </Button>
-                        {r.active !== false ? (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setConfirm({ type: 'inactivate', record: r })}
-                            className="text-orange-600 hover:bg-orange-50 h-8 w-8 p-0"
-                            title="Inativar"
-                          >
-                            <Power className="w-3.5 h-3.5" />
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setConfirm({ type: 'activate', record: r })}
-                            className="text-emerald-600 hover:bg-emerald-50 h-8 w-8 p-0"
-                            title="Ativar"
-                          >
-                            <Power className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirm({ type: 'delete', record: r })}
-                          className="text-red-600 hover:bg-red-50 h-8 w-8 p-0"
-                          title="Excluir"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+                    <Eye className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleEdit(r)}
+                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                    title="Editar"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDuplicate(r)}
+                    className="text-blue-600 hover:bg-blue-50 h-7 w-7 p-0"
+                    title="Duplicar"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                  {r.active !== false ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setConfirm({ type: 'inactivate', record: r })}
+                      className="text-orange-600 hover:bg-orange-50 h-7 w-7 p-0"
+                      title="Inativar"
+                    >
+                      <Power className="w-3.5 h-3.5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setConfirm({ type: 'activate', record: r })}
+                      className="text-emerald-600 hover:bg-emerald-50 h-7 w-7 p-0"
+                      title="Ativar"
+                    >
+                      <Power className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setConfirm({ type: 'delete', record: r })}
+                    className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                    title="Excluir"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+          data={filtered}
+          emptyMessage="Nenhum registro encontrado. Clique em 'Novo Cadastro' para começar."
+          exportTitle={`${config.label} — Cadastros Jetro`}
+          exportFilename={`cadastro-${config.collection}.xlsx`}
+        />
       )}
       <CadastroFormDialog
         config={config}

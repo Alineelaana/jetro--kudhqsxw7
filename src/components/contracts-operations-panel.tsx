@@ -25,6 +25,7 @@ import { ContractFormDialog } from '@/components/contract-form-dialog'
 import type { ContractOperation } from '@/lib/contract-types'
 import { Plus, Search, Pencil, Trash2, Loader2, FileText, Package } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 const STATUS_COLORS: Record<string, string> = {
   Rascunho: 'bg-gray-100 text-gray-700',
@@ -193,89 +194,120 @@ export function ContractsOperationsPanel() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#01361D] text-white">
-                      <th className="text-left px-4 py-3 font-bold">Nome</th>
-                      <th className="text-center px-4 py-3 font-bold hidden sm:table-cell">
-                        Serviços
-                      </th>
-                      <th className="text-right px-4 py-3 font-bold hidden sm:table-cell">
-                        Valor Total
-                      </th>
-                      <th className="text-left px-4 py-3 font-bold">Status</th>
-                      <th className="text-left px-4 py-3 font-bold hidden md:table-cell">
-                        Criado em
-                      </th>
-                      <th className="text-center px-4 py-3 font-bold">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((c) => {
-                      const services = Array.isArray(c.services) ? c.services : []
-                      const total = parseBR(c.total_value || '')
-                      return (
-                        <tr
-                          key={c.id}
-                          className="border-b border-border hover:bg-[#005B2E]/5 transition-colors"
-                        >
-                          <td className="px-4 py-3 font-medium">
-                            {c.name || '—'}
-                            {services.length > 0 && (
-                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                                {services.map((s) => s.name).join(', ')}
-                              </p>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center hidden sm:table-cell">
-                            <span className="text-xs font-bold text-[#005B2E]">
-                              {services.length}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right hidden sm:table-cell">
-                            <span className="font-semibold text-[#005B2E]">{formatBRL(total)}</span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[c.status] || 'bg-gray-100 text-gray-700'}`}
-                            >
-                              {c.status || '—'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
-                            {c.created ? new Date(c.created).toLocaleDateString('pt-BR') : '—'}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center justify-center gap-1">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleEdit(c)}
-                                className="text-[#005B2E] hover:bg-[#005B2E]/10"
-                                title="Editar"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setDeleteTarget(c)}
-                                className="text-red-600 hover:bg-red-50"
-                                title="Excluir"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+            <JetroTable
+              screenId="contratos.operacoes"
+              columns={[
+                {
+                  id: 'name',
+                  header: 'Nome',
+                  accessorKey: 'name',
+                  dataType: 'text',
+                  defaultWidth: 260,
+                  cell: ({ row }) => {
+                    const services = Array.isArray(row.services) ? row.services : []
+                    return (
+                      <div>
+                        <span className="font-medium">{row.name || '—'}</span>
+                        {services.length > 0 && (
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                            {services.map((s) => s.name).join(', ')}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  },
+                },
+                {
+                  id: 'services',
+                  header: 'Serviços',
+                  dataType: 'number',
+                  align: 'center',
+                  defaultWidth: 100,
+                  getSortValue: (row) => (Array.isArray(row.services) ? row.services.length : 0),
+                  cell: ({ row }) => (
+                    <span className="text-xs font-bold text-[#005B2E]">
+                      {Array.isArray(row.services) ? row.services.length : 0}
+                    </span>
+                  ),
+                },
+                {
+                  id: 'total_value',
+                  header: 'Valor Total',
+                  accessorKey: 'total_value',
+                  dataType: 'currency',
+                  align: 'right',
+                  defaultWidth: 140,
+                  getSortValue: (row) => parseBR(row.total_value || ''),
+                  cell: ({ row }) => (
+                    <span className="font-semibold text-[#005B2E]">
+                      {formatBRL(parseBR(row.total_value || ''))}
+                    </span>
+                  ),
+                },
+                {
+                  id: 'status',
+                  header: 'Status',
+                  accessorKey: 'status',
+                  dataType: 'text',
+                  defaultWidth: 130,
+                  cell: ({ value }) => (
+                    <span
+                      className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[String(value)] || 'bg-gray-100 text-gray-700'}`}
+                    >
+                      {String(value || '—')}
+                    </span>
+                  ),
+                },
+                {
+                  id: 'created',
+                  header: 'Criado em',
+                  accessorKey: 'created',
+                  dataType: 'date',
+                  defaultWidth: 120,
+                  cell: ({ value }) => (
+                    <span className="text-muted-foreground text-xs">
+                      {value ? new Date(String(value)).toLocaleDateString('pt-BR') : '—'}
+                    </span>
+                  ),
+                },
+                {
+                  id: 'actions',
+                  header: 'Ações',
+                  align: 'center',
+                  sortable: false,
+                  hideable: false,
+                  resizable: false,
+                  draggable: false,
+                  defaultWidth: 100,
+                  cell: ({ row: c }) => (
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEdit(c)}
+                        className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                        title="Editar"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDeleteTarget(c)}
+                        className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                        title="Excluir"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ),
+                },
+              ]}
+              data={filtered}
+              emptyMessage="Nenhum contrato/operação encontrado."
+              exportTitle="Contratos e Operações — Jetro"
+              exportFilename="contratos-operacoes.xlsx"
+            />
           )}
         </>
       )}

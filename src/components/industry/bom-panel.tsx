@@ -30,6 +30,7 @@ import { getIndustrialItems } from '@/services/industry'
 import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from '@/hooks/use-toast'
 import type { BomVersion, BomComponent } from '@/lib/industry-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 export function BomPanel() {
   const [boms, setBoms] = useState<BomVersion[]>([])
@@ -194,30 +195,59 @@ export function BomPanel() {
                 )}
               </div>
             )}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-3 font-bold">Ordem</th>
-                    <th className="text-left py-2 px-3 font-bold">Item</th>
-                    <th className="text-left py-2 px-3 font-bold">Qtd</th>
-                    <th className="text-left py-2 px-3 font-bold">Unidade</th>
-                    <th className="text-left py-2 px-3 font-bold">Perda</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {components.map((c) => (
-                    <tr key={c.id} className="border-b border-border">
-                      <td className="py-2 px-3">{c.ordem}</td>
-                      <td className="py-2 px-3 font-medium">{c.expand?.item_id?.name || '—'}</td>
-                      <td className="py-2 px-3">{c.quantidade}</td>
-                      <td className="py-2 px-3">{c.unidade}</td>
-                      <td className="py-2 px-3">{c.perda_prevista}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <JetroTable
+              screenId="industria.bom.componentes"
+              columns={[
+                {
+                  id: 'ordem',
+                  header: 'Ordem',
+                  accessorKey: 'ordem',
+                  dataType: 'number',
+                  defaultWidth: 90,
+                  cell: ({ value }) => <span>{String(value || '0')}</span>,
+                },
+                {
+                  id: 'item',
+                  header: 'Item',
+                  dataType: 'text',
+                  defaultWidth: 260,
+                  getSortValue: (row) => row.expand?.item_id?.name || '',
+                  cell: ({ row }) => (
+                    <span className="font-medium">{row.expand?.item_id?.name || '—'}</span>
+                  ),
+                },
+                {
+                  id: 'quantidade',
+                  header: 'Qtd',
+                  accessorKey: 'quantidade',
+                  dataType: 'number',
+                  align: 'right',
+                  defaultWidth: 110,
+                  cell: ({ value }) => <span>{String(value || '0')}</span>,
+                },
+                {
+                  id: 'unidade',
+                  header: 'Unidade',
+                  accessorKey: 'unidade',
+                  dataType: 'text',
+                  defaultWidth: 100,
+                  cell: ({ value }) => <span>{String(value || '—')}</span>,
+                },
+                {
+                  id: 'perda_prevista',
+                  header: 'Perda',
+                  accessorKey: 'perda_prevista',
+                  dataType: 'number',
+                  align: 'right',
+                  defaultWidth: 110,
+                  cell: ({ value }) => <span>{String(value || '0')}</span>,
+                },
+              ]}
+              data={components}
+              emptyMessage="Nenhum componente vinculado a esta BOM."
+              exportTitle={`BOM Componentes — ${selectedBom.expand?.product_id?.name || 'Item'}`}
+              exportFilename="bom-componentes.xlsx"
+            />
           </CardContent>
         </Card>
       )}

@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Loader2, Plus, Briefcase, AlertCircle } from 'lucide-react'
+import { Loader2, Plus, Briefcase, AlertCircle, LayoutGrid, Table as TableIcon } from 'lucide-react'
 import { getMkJobs, createMkJob, updateMkJob } from '@/services/marketing'
 import { MK_JOB_TYPES, MK_JOB_STATUS, MK_STATUS_COLORS } from '@/lib/marketing-types'
 import type { MkJob } from '@/lib/marketing-types'
@@ -26,12 +26,14 @@ import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 export function MarketingJobs() {
   const { user } = useAuth()
   const [items, setItems] = useState<MkJob[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
   const [form, setForm] = useState<Record<string, string>>({
     title: '',
     type: 'arte',
@@ -110,9 +112,31 @@ export function MarketingJobs() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-[#005B2E]">Gestor de Jobs</h2>
-        <Button onClick={() => setDialogOpen(true)} className="bg-[#005B2E] hover:bg-[#01361D]">
-          <Plus className="w-4 h-4 mr-1" /> Novo Job
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-lg border p-0.5 bg-muted/40">
+            <Button
+              size="sm"
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              className={`h-8 px-2.5 text-xs ${viewMode === 'table' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+              onClick={() => setViewMode('table')}
+              title="Visualização em Tabela"
+            >
+              <TableIcon className="w-4 h-4 mr-1" /> Tabela
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === 'cards' ? 'default' : 'ghost'}
+              className={`h-8 px-2.5 text-xs ${viewMode === 'cards' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+              onClick={() => setViewMode('cards')}
+              title="Visualização em Cards"
+            >
+              <LayoutGrid className="w-4 h-4 mr-1" /> Cards
+            </Button>
+          </div>
+          <Button onClick={() => setDialogOpen(true)} className="bg-[#005B2E] hover:bg-[#01361D]">
+            <Plus className="w-4 h-4 mr-1" /> Novo Job
+          </Button>
+        </div>
       </div>
       {lateJobs.length > 0 && (
         <Card className="border-2 border-red-300 bg-red-50">
@@ -122,7 +146,132 @@ export function MarketingJobs() {
           </CardContent>
         </Card>
       )}
-      {items.length === 0 ? (
+
+      {viewMode === 'table' ? (
+        <JetroTable
+          screenId="marketing.jobs"
+          columns={[
+            {
+              id: 'job_number',
+              header: 'Nº Job',
+              accessorKey: 'job_number',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="font-mono text-xs text-[#C89B3C] font-semibold">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'title',
+              header: 'Título',
+              accessorKey: 'title',
+              dataType: 'text',
+              defaultWidth: 260,
+              cell: ({ row }) => (
+                <div>
+                  <span className="font-semibold text-sm">{row.title}</span>
+                  {row.description && (
+                    <p className="text-xs text-muted-foreground truncate">{row.description}</p>
+                  )}
+                </div>
+              ),
+            },
+            {
+              id: 'type',
+              header: 'Tipo',
+              accessorKey: 'type',
+              dataType: 'text',
+              defaultWidth: 140,
+              getSortValue: (row) =>
+                MK_JOB_TYPES.find((t) => t.value === row.type)?.label || row.type,
+              cell: ({ row }) => (
+                <span className="text-xs">
+                  {MK_JOB_TYPES.find((t) => t.value === row.type)?.label || row.type} • v
+                  {row.version || 1}
+                </span>
+              ),
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              defaultWidth: 140,
+              getSortValue: (row) =>
+                MK_JOB_STATUS.find((s) => s.value === row.status)?.label || row.status,
+              cell: ({ row }) => (
+                <span
+                  className={cn(
+                    'text-xs px-2 py-0.5 rounded font-medium',
+                    MK_STATUS_COLORS[row.status] || 'bg-gray-100',
+                  )}
+                >
+                  {MK_JOB_STATUS.find((s) => s.value === row.status)?.label || row.status}
+                </span>
+              ),
+            },
+            {
+              id: 'deadline',
+              header: 'Prazo',
+              accessorKey: 'deadline',
+              dataType: 'date',
+              defaultWidth: 120,
+              cell: ({ row }) => {
+                const isLate =
+                  row.deadline &&
+                  new Date(row.deadline) < new Date() &&
+                  !['encerrado', 'cancelado'].includes(row.status)
+                return (
+                  <span
+                    className={cn(
+                      'text-xs',
+                      isLate ? 'text-red-600 font-bold' : 'text-muted-foreground',
+                    )}
+                  >
+                    {row.deadline || '—'}
+                  </span>
+                )
+              },
+            },
+            {
+              id: 'responsible_name',
+              header: 'Responsável',
+              accessorKey: 'responsible_name',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 140,
+              cell: ({ row: j }) => {
+                if (['encerrado', 'cancelado'].includes(j.status)) return null
+                return (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => advanceStatus(j)}
+                  >
+                    Avançar Status
+                  </Button>
+                )
+              },
+            },
+          ]}
+          data={items}
+          emptyMessage="Nenhum job cadastrado."
+          exportTitle="Jobs de Marketing Enterprise — Jetro"
+          exportFilename="marketing-jobs.xlsx"
+        />
+      ) : items.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-12 text-center">
             <Briefcase className="w-10 h-10 text-muted-foreground mx-auto mb-3" />

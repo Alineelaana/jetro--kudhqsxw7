@@ -9,14 +9,7 @@ import { BiStatCard } from './bi-stat-card'
 import { BiDrillDown } from './bi-drill-down'
 import { exportBIPdf, exportBIPrint } from '@/lib/bi-export'
 import type { GenericCenterData, BIFilters } from '@/lib/bi-types'
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from '@/components/ui/table'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 interface CenterWrapperProps {
   title: string
@@ -100,46 +93,34 @@ export function BiCenterWrapper({
           </button>
         ))}
       </div>
-      {data.tables.map((table, i) => (
-        <Card key={i} className="border-2 border-[#005B2E]/20">
-          <CardContent className="py-4">
-            <h3 className="font-bold text-[#005B2E] mb-3">{table.title}</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {table.columns.map((col) => (
-                    <TableHead key={col.key}>{col.label}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {table.rows.length > 0 ? (
-                  table.rows.map((row, ri) => (
-                    <TableRow
-                      key={ri}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => setDrillTarget(table.title)}
-                    >
-                      {table.columns.map((col) => (
-                        <TableCell key={col.key}>{String(row[col.key] ?? '—')}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={table.columns.length}
-                      className="text-center text-muted-foreground"
-                    >
-                      Sem dados
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      ))}
+      {data.tables.map((table, i) => {
+        const tableColumns: JetroColumnDef<Record<string, unknown>>[] = table.columns.map(
+          (col) => ({
+            id: col.key,
+            header: col.label,
+            accessorKey: col.key,
+            dataType: 'text',
+            cell: ({ value }) => <span>{String(value ?? '—')}</span>,
+          }),
+        )
+        const screenKey = `bi.center.${title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.${table.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}`
+        return (
+          <Card key={i} className="border-2 border-[#005B2E]/20">
+            <CardContent className="py-4 space-y-3">
+              <h3 className="font-bold text-[#005B2E]">{table.title}</h3>
+              <JetroTable
+                screenId={screenKey}
+                columns={tableColumns}
+                data={table.rows}
+                onRowClick={() => setDrillTarget(table.title)}
+                emptyMessage="Sem dados disponíveis."
+                exportTitle={`${title} — ${table.title}`}
+                exportFilename={`${table.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.xlsx`}
+              />
+            </CardContent>
+          </Card>
+        )
+      })}
       <BiDrillDown target={drillTarget} onClose={() => setDrillTarget(null)} />
     </div>
   )

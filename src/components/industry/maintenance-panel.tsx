@@ -19,7 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Wrench, Plus, Loader2, AlertCircle, Gauge } from 'lucide-react'
+import {
+  Wrench,
+  Plus,
+  Loader2,
+  AlertCircle,
+  Gauge,
+  LayoutGrid,
+  Table as TableIcon,
+} from 'lucide-react'
 import {
   getMaintenanceSchedules,
   createMaintenanceSchedule,
@@ -28,6 +36,7 @@ import {
 import { getProductionResources } from '@/services/industry'
 import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from '@/hooks/use-toast'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 const STATUS_COLORS: Record<string, string> = {
   agendada: 'bg-blue-100 text-blue-700',
@@ -47,6 +56,7 @@ export function MaintenancePanel() {
   const [resources, setResources] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
 
   const load = async () => {
     try {
@@ -115,14 +125,36 @@ export function MaintenancePanel() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Wrench className="w-6 h-6 text-[#005B2E]" />
-          <h2 className="text-xl font-black text-foreground">Manutencao</h2>
+          <h2 className="text-xl font-black text-foreground">Manutenção</h2>
         </div>
-        <Button
-          onClick={() => setDialogOpen(true)}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Nova Manutencao
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-lg border p-0.5 bg-muted/40">
+            <Button
+              size="sm"
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              className={`h-8 px-2.5 text-xs ${viewMode === 'table' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+              onClick={() => setViewMode('table')}
+              title="Visualização em Tabela"
+            >
+              <TableIcon className="w-4 h-4 mr-1" /> Tabela
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === 'cards' ? 'default' : 'ghost'}
+              className={`h-8 px-2.5 text-xs ${viewMode === 'cards' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+              onClick={() => setViewMode('cards')}
+              title="Visualização em Cards"
+            >
+              <LayoutGrid className="w-4 h-4 mr-1" /> Cards
+            </Button>
+          </div>
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Nova Manutenção
+          </Button>
+        </div>
       </div>
       {schedules.filter((s) => s.status === 'atrasada').length > 0 && (
         <Card className="border-2 border-red-200 bg-red-50/50">
@@ -177,65 +209,192 @@ export function MaintenancePanel() {
           </CardContent>
         </Card>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {schedules.map((s) => (
-          <Card key={s.id} className="border-2 border-[#005B2E]/20">
-            <CardContent className="py-4">
-              <div className="flex items-start justify-between mb-2">
+      {viewMode === 'table' ? (
+        <JetroTable
+          screenId="industria.manutencao"
+          columns={[
+            {
+              id: 'title',
+              header: 'Título',
+              accessorKey: 'title',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ row }) => (
                 <div>
-                  <p className="font-bold text-sm">{s.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {s.expand?.resource_id?.name || '—'} • {TYPE_LABELS[s.type] || s.type}
-                  </p>
+                  <span className="font-medium">{row.title}</span>
+                  {row.description && (
+                    <p className="text-xs text-muted-foreground truncate">{row.description}</p>
+                  )}
                 </div>
-                <Badge className={STATUS_COLORS[s.status] || 'bg-gray-100'}>{s.status}</Badge>
-              </div>
-              {s.description && (
-                <p className="text-xs text-muted-foreground mb-2">{s.description}</p>
-              )}
-              <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                {s.next_maintenance && <span>Proxima: {s.next_maintenance}</span>}
-                {s.frequency_days > 0 && <span>• A cada {s.frequency_days} dias</span>}
-                {s.estimated_downtime_hours > 0 && (
-                  <span>• {s.estimated_downtime_hours}h parada</span>
+              ),
+            },
+            {
+              id: 'resource',
+              header: 'Recurso',
+              dataType: 'text',
+              defaultWidth: 180,
+              getSortValue: (row) => row.expand?.resource_id?.name || '',
+              cell: ({ row }) => <span>{row.expand?.resource_id?.name || '—'}</span>,
+            },
+            {
+              id: 'type',
+              header: 'Tipo',
+              accessorKey: 'type',
+              dataType: 'text',
+              defaultWidth: 130,
+              getSortValue: (row) => TYPE_LABELS[row.type] || row.type,
+              cell: ({ value }) => (
+                <span>{TYPE_LABELS[String(value)] || String(value || '—')}</span>
+              ),
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              defaultWidth: 140,
+              cell: ({ value }) => (
+                <Badge className={STATUS_COLORS[String(value)] || 'bg-gray-100'}>
+                  {String(value || '—')}
+                </Badge>
+              ),
+            },
+            {
+              id: 'next_maintenance',
+              header: 'Próxima Data',
+              accessorKey: 'next_maintenance',
+              dataType: 'date',
+              defaultWidth: 130,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'frequency_days',
+              header: 'Freq. (dias)',
+              accessorKey: 'frequency_days',
+              dataType: 'number',
+              align: 'right',
+              defaultWidth: 110,
+              cell: ({ value }) => <span>{value ? `${value}d` : '—'}</span>,
+            },
+            {
+              id: 'estimated_downtime_hours',
+              header: 'Parada Est.',
+              accessorKey: 'estimated_downtime_hours',
+              dataType: 'number',
+              align: 'right',
+              defaultWidth: 110,
+              cell: ({ value }) => <span>{value ? `${value}h` : '—'}</span>,
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 160,
+              cell: ({ row: s }) => (
+                <div className="flex gap-1">
+                  {s.status === 'agendada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(s.id, 'em_andamento')}
+                    >
+                      Iniciar
+                    </Button>
+                  )}
+                  {s.status === 'em_andamento' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2"
+                      onClick={() => handleStatusChange(s.id, 'concluida')}
+                    >
+                      Concluir
+                    </Button>
+                  )}
+                  {s.status !== 'concluida' && s.status !== 'cancelada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs px-2 text-red-600"
+                      onClick={() => handleStatusChange(s.id, 'cancelada')}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+          data={schedules}
+          emptyMessage="Nenhuma manutenção cadastrada."
+          exportTitle="Manutenção Industrial — Jetro"
+          exportFilename="manutencao-industrial.xlsx"
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {schedules.map((s) => (
+            <Card key={s.id} className="border-2 border-[#005B2E]/20">
+              <CardContent className="py-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="font-bold text-sm">{s.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {s.expand?.resource_id?.name || '—'} • {TYPE_LABELS[s.type] || s.type}
+                    </p>
+                  </div>
+                  <Badge className={STATUS_COLORS[s.status] || 'bg-gray-100'}>{s.status}</Badge>
+                </div>
+                {s.description && (
+                  <p className="text-xs text-muted-foreground mb-2">{s.description}</p>
                 )}
-              </div>
-              <div className="flex gap-1">
-                {s.status === 'agendada' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(s.id, 'em_andamento')}
-                  >
-                    Iniciar
-                  </Button>
-                )}
-                {s.status === 'em_andamento' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs"
-                    onClick={() => handleStatusChange(s.id, 'concluida')}
-                  >
-                    Concluir
-                  </Button>
-                )}
-                {s.status !== 'concluida' && s.status !== 'cancelada' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs text-red-600"
-                    onClick={() => handleStatusChange(s.id, 'cancelada')}
-                  >
-                    Cancelar
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                  {s.next_maintenance && <span>Proxima: {s.next_maintenance}</span>}
+                  {s.frequency_days > 0 && <span>• A cada {s.frequency_days} dias</span>}
+                  {s.estimated_downtime_hours > 0 && (
+                    <span>• {s.estimated_downtime_hours}h parada</span>
+                  )}
+                </div>
+                <div className="flex gap-1">
+                  {s.status === 'agendada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(s.id, 'em_andamento')}
+                    >
+                      Iniciar
+                    </Button>
+                  )}
+                  {s.status === 'em_andamento' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => handleStatusChange(s.id, 'concluida')}
+                    >
+                      Concluir
+                    </Button>
+                  )}
+                  {s.status !== 'concluida' && s.status !== 'cancelada' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs text-red-600"
+                      onClick={() => handleStatusChange(s.id, 'cancelada')}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>

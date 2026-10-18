@@ -11,7 +11,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Loader2, CheckCircle, XCircle, FileCheck, Clock, RotateCcw } from 'lucide-react'
+import {
+  Loader2,
+  CheckCircle,
+  XCircle,
+  FileCheck,
+  Clock,
+  RotateCcw,
+  LayoutGrid,
+  Table as TableIcon,
+} from 'lucide-react'
 import { getMkPieces, updateMkPiece, createMkVersion } from '@/services/marketing'
 import { MK_PIECE_TYPES, MK_PIECE_STATUS, MK_STATUS_COLORS } from '@/lib/marketing-types'
 import type { MkContentPiece } from '@/lib/marketing-types'
@@ -21,6 +30,7 @@ import { canApprovePiece, canPublishPiece } from '@/lib/marketing-permissions'
 import { MarketingVersionHistory } from '@/components/marketing/marketing-version-history'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 function getNextStatus(piece: MkContentPiece): string | null {
   if (piece.status === 'criacao') return 'revisao_marketing'
@@ -43,6 +53,7 @@ export function MarketingPieceApproval() {
   const { user, userRole } = useAuth()
   const [items, setItems] = useState<MkContentPiece[]>([])
   const [loading, setLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
   const [historyPiece, setHistoryPiece] = useState<MkContentPiece | null>(null)
   const [actionDialog, setActionDialog] = useState<{
     piece: MkContentPiece
@@ -170,7 +181,29 @@ export function MarketingPieceApproval() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-[#005B2E]">Central de Aprovação de Peças</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-[#005B2E]">Central de Aprovação de Peças</h2>
+        <div className="flex items-center rounded-lg border p-0.5 bg-muted/40">
+          <Button
+            size="sm"
+            variant={viewMode === 'table' ? 'default' : 'ghost'}
+            className={`h-8 px-2.5 text-xs ${viewMode === 'table' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+            onClick={() => setViewMode('table')}
+            title="Visualização em Tabela"
+          >
+            <TableIcon className="w-4 h-4 mr-1" /> Tabela
+          </Button>
+          <Button
+            size="sm"
+            variant={viewMode === 'cards' ? 'default' : 'ghost'}
+            className={`h-8 px-2.5 text-xs ${viewMode === 'cards' ? 'bg-[#005B2E] text-white hover:bg-[#01361D]' : ''}`}
+            onClick={() => setViewMode('cards')}
+            title="Visualização em Cards"
+          >
+            <LayoutGrid className="w-4 h-4 mr-1" /> Cards
+          </Button>
+        </div>
+      </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {stats.map((s) => (
           <Card key={s.label} className="border-2 border-[#005B2E]/20">
@@ -182,7 +215,162 @@ export function MarketingPieceApproval() {
           </Card>
         ))}
       </div>
-      {display.length === 0 ? (
+
+      {viewMode === 'table' ? (
+        <JetroTable
+          screenId="marketing.aprovacao_pecas"
+          columns={[
+            {
+              id: 'version',
+              header: 'Versão',
+              accessorKey: 'current_version',
+              dataType: 'number',
+              defaultWidth: 90,
+              cell: ({ row }) => (
+                <span className="font-mono text-xs text-[#C89B3C] font-bold">
+                  v{row.current_version || 1}
+                </span>
+              ),
+            },
+            {
+              id: 'title',
+              header: 'Título',
+              accessorKey: 'title',
+              dataType: 'text',
+              defaultWidth: 260,
+              cell: ({ row }) => (
+                <div>
+                  <span className="font-semibold text-sm">{row.title}</span>
+                  {row.rejection_reason && (
+                    <p className="text-xs text-red-600 truncate">Motivo: {row.rejection_reason}</p>
+                  )}
+                </div>
+              ),
+            },
+            {
+              id: 'type',
+              header: 'Tipo',
+              accessorKey: 'type',
+              dataType: 'text',
+              defaultWidth: 140,
+              getSortValue: (row) =>
+                MK_PIECE_TYPES.find((t) => t.value === row.type)?.label || row.type,
+              cell: ({ row }) => (
+                <span className="text-xs">
+                  {MK_PIECE_TYPES.find((t) => t.value === row.type)?.label || row.type}
+                </span>
+              ),
+            },
+            {
+              id: 'compliance',
+              header: 'Compliance',
+              accessorKey: 'needs_compliance',
+              dataType: 'boolean',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) =>
+                value ? (
+                  <Badge variant="outline" className="text-[10px]">
+                    Requer
+                  </Badge>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Não</span>
+                ),
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              defaultWidth: 140,
+              getSortValue: (row) =>
+                MK_PIECE_STATUS.find((s) => s.value === row.status)?.label || row.status,
+              cell: ({ row }) => (
+                <span
+                  className={cn(
+                    'text-xs px-2 py-0.5 rounded font-medium',
+                    MK_STATUS_COLORS[row.status] || 'bg-gray-100',
+                  )}
+                >
+                  {MK_PIECE_STATUS.find((s) => s.value === row.status)?.label || row.status}
+                </span>
+              ),
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 260,
+              cell: ({ row: p }) => (
+                <div className="flex flex-wrap gap-1">
+                  {canApprovePiece(userRole) && p.status !== 'aprovado' && (
+                    <Button
+                      size="sm"
+                      className="bg-[#005B2E] hover:bg-[#01361D] text-xs h-7 px-2"
+                      onClick={() => handleApprove(p)}
+                    >
+                      Aprovar
+                    </Button>
+                  )}
+                  {canApprovePiece(userRole) && getPrevStatus(p) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7 px-2"
+                      onClick={() => {
+                        setActionDialog({ piece: p, type: 'change' })
+                        setReason('')
+                      }}
+                    >
+                      <RotateCcw className="w-3 h-3 mr-1" /> Alterar
+                    </Button>
+                  )}
+                  {canPublishPiece(userRole) && p.status === 'aprovado' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7 px-2"
+                      onClick={() => handlePublish(p)}
+                    >
+                      Publicar
+                    </Button>
+                  )}
+                  {canApprovePiece(userRole) &&
+                    p.status !== 'aprovado' &&
+                    p.status !== 'publicado' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 text-xs h-7 px-2"
+                        onClick={() => {
+                          setActionDialog({ piece: p, type: 'reject' })
+                          setReason('')
+                        }}
+                      >
+                        Rejeitar
+                      </Button>
+                    )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-xs h-7 px-2"
+                    onClick={() => setHistoryPiece(p)}
+                  >
+                    Versões
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+          data={display}
+          emptyMessage="Nenhuma peça pendente de aprovação."
+          exportTitle="Central de Aprovação de Peças — Marketing Jetro"
+          exportFilename="aprovacao-pecas-marketing.xlsx"
+        />
+      ) : display.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-12 text-center">
             <FileCheck className="w-10 h-10 text-muted-foreground mx-auto mb-3" />

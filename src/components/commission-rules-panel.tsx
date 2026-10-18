@@ -42,6 +42,7 @@ import { useAuthorization } from '@/hooks/use-authorization'
 import { canManageCommissionRules } from '@/lib/commercial-responsibles-permissions'
 import { Plus, Pencil, Trash2, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 
 const ROLE_LABELS: Record<string, string> = {
   RCA: 'RCA',
@@ -194,81 +195,126 @@ export function CommissionRulesPanel() {
           </Button>
         )}
       </div>
-      <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-3 py-3 font-bold">Papel</th>
-                <th className="text-left px-3 py-3 font-bold">Percentual</th>
-                <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Divisão (%)</th>
-                <th className="text-left px-3 py-3 font-bold">Prioridade</th>
-                <th className="text-left px-3 py-3 font-bold hidden md:table-cell">
-                  Aplicabilidade
-                </th>
-                <th className="text-left px-3 py-3 font-bold">Status</th>
-                {canManage && <th className="text-center px-3 py-3 font-bold">Ações</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {visibleRules.map((r) => (
-                <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                  <td className="px-3 py-3 font-medium">{ROLE_LABELS[r.role] || r.role}</td>
-                  <td className="px-3 py-3">{r.percentage || '—'}%</td>
-                  <td className="px-3 py-3 hidden sm:table-cell">
-                    {r.split_percentage ? `${r.split_percentage}%` : '—'}
-                  </td>
-                  <td className="px-3 py-3">{r.priority}</td>
-                  <td className="px-3 py-3 hidden md:table-cell text-xs">
-                    {APPLICABILITY_OPTIONS.find((a) => a.value === r.applicability)?.label ||
-                      r.applicability ||
-                      '—'}
-                  </td>
-                  <td className="px-3 py-3">
-                    <span
-                      className={`text-xs font-bold px-2 py-1 rounded ${r.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
-                    >
-                      {r.active ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </td>
-                  {canManage && (
-                    <td className="px-3 py-3">
-                      <div className="flex gap-0.5 justify-center">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => openEdit(r)}
-                          className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8 w-8 p-0"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setDeleteId(r.id)}
-                          className="text-red-600 hover:bg-red-50 h-8 w-8 p-0"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))}
-              {visibleRules.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={canManage ? 7 : 6}
-                    className="px-3 py-8 text-center text-muted-foreground"
-                  >
-                    Nenhuma regra encontrada
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <JetroTable
+        screenId="comissoes.regras"
+        columns={[
+          {
+            id: 'role',
+            header: 'Papel',
+            accessorKey: 'role',
+            dataType: 'text',
+            defaultWidth: 200,
+            getSortValue: (row: CommissionRule) => ROLE_LABELS[row.role] || row.role,
+            cell: ({ row }: { row: CommissionRule }) => (
+              <span className="font-medium">{ROLE_LABELS[row.role] || row.role}</span>
+            ),
+          },
+          {
+            id: 'percentage',
+            header: 'Percentual',
+            accessorKey: 'percentage',
+            dataType: 'percent',
+            align: 'right',
+            defaultWidth: 120,
+            getSortValue: (row: CommissionRule) => parseFloat(row.percentage) || 0,
+            cell: ({ value }: { value: unknown }) => <span>{String(value || '—')}%</span>,
+          },
+          {
+            id: 'split_percentage',
+            header: 'Divisão (%)',
+            accessorKey: 'split_percentage',
+            dataType: 'percent',
+            align: 'right',
+            defaultWidth: 120,
+            getSortValue: (row: CommissionRule) => parseFloat(row.split_percentage || '0') || 0,
+            cell: ({ value }: { value: unknown }) => (
+              <span>{value ? `${String(value)}%` : '—'}</span>
+            ),
+          },
+          {
+            id: 'priority',
+            header: 'Prioridade',
+            accessorKey: 'priority',
+            dataType: 'number',
+            align: 'center',
+            defaultWidth: 100,
+            cell: ({ value }: { value: unknown }) => <span>{String(value || '1')}</span>,
+          },
+          {
+            id: 'applicability',
+            header: 'Aplicabilidade',
+            accessorKey: 'applicability',
+            dataType: 'text',
+            defaultWidth: 180,
+            getSortValue: (row: CommissionRule) =>
+              APPLICABILITY_OPTIONS.find((a) => a.value === row.applicability)?.label ||
+              row.applicability ||
+              '—',
+            cell: ({ row }: { row: CommissionRule }) => (
+              <span className="text-xs">
+                {APPLICABILITY_OPTIONS.find((a) => a.value === row.applicability)?.label ||
+                  row.applicability ||
+                  '—'}
+              </span>
+            ),
+          },
+          {
+            id: 'active',
+            header: 'Status',
+            accessorKey: 'active',
+            dataType: 'boolean',
+            align: 'center',
+            defaultWidth: 110,
+            cell: ({ value }: { value: unknown }) => (
+              <span
+                className={`text-xs font-bold px-2 py-1 rounded ${value ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
+              >
+                {value ? 'Ativo' : 'Inativo'}
+              </span>
+            ),
+          },
+          ...(canManage
+            ? [
+                {
+                  id: 'actions',
+                  header: 'Ações',
+                  align: 'center' as const,
+                  sortable: false,
+                  hideable: false,
+                  resizable: false,
+                  draggable: false,
+                  defaultWidth: 100,
+                  cell: ({ row: r }: { row: CommissionRule }) => (
+                    <div className="flex gap-0.5 justify-center">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => openEdit(r)}
+                        className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                        title="Editar"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDeleteId(r.id)}
+                        className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                        title="Excluir"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ),
+                },
+              ]
+            : []),
+        ]}
+        data={visibleRules}
+        emptyMessage="Nenhuma regra de comissão encontrada."
+        exportTitle="Regras de Comissão — Jetro"
+        exportFilename="regras-comissao.xlsx"
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">

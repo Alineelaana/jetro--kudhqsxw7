@@ -20,14 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from '@/components/ui/table'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Loader2, Plus, Trash2, Bookmark } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -182,58 +175,87 @@ export function BiSavedViews() {
             <Bookmark className="w-4 h-4 text-[#005B2E]" />
             <h3 className="font-bold text-[#005B2E]">Relatórios Salvos</h3>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Criado por</TableHead>
-                <TableHead className="text-center">Compartilhado</TableHead>
-                {canDeleteBIReport(userRole) && <TableHead className="text-right">Ações</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reports.length > 0 ? (
-                reports.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell>
-                      <div>
-                        <span className="font-medium">{r.name}</span>
-                        {r.description && (
-                          <p className="text-xs text-muted-foreground">{r.description}</p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {REPORT_TYPES.find((t) => t.value === r.report_type)?.label ||
-                          r.report_type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{r.created_by_name || '—'}</TableCell>
-                    <TableCell className="text-center">{r.is_shared ? 'Sim' : 'Não'}</TableCell>
-                    {canDeleteBIReport(userRole) && (
-                      <TableCell className="text-right">
+          <JetroTable
+            screenId="bi.saved_views"
+            columns={[
+              {
+                id: 'name',
+                header: 'Nome',
+                accessorKey: 'name',
+                dataType: 'text',
+                defaultWidth: 260,
+                cell: ({ row }) => (
+                  <div>
+                    <span className="font-medium">{row.name}</span>
+                    {row.description && (
+                      <p className="text-xs text-muted-foreground">{row.description}</p>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                id: 'report_type',
+                header: 'Tipo',
+                accessorKey: 'report_type',
+                dataType: 'text',
+                defaultWidth: 140,
+                getSortValue: (row) =>
+                  REPORT_TYPES.find((t) => t.value === row.report_type)?.label || row.report_type,
+                cell: ({ row }) => (
+                  <Badge variant="outline">
+                    {REPORT_TYPES.find((t) => t.value === row.report_type)?.label ||
+                      row.report_type}
+                  </Badge>
+                ),
+              },
+              {
+                id: 'created_by_name',
+                header: 'Criado por',
+                accessorKey: 'created_by_name',
+                dataType: 'text',
+                defaultWidth: 160,
+                cell: ({ value }) => <span>{String(value || '—')}</span>,
+              },
+              {
+                id: 'is_shared',
+                header: 'Compartilhado',
+                accessorKey: 'is_shared',
+                dataType: 'boolean',
+                align: 'center',
+                defaultWidth: 130,
+                cell: ({ value }) => <span>{value ? 'Sim' : 'Não'}</span>,
+              },
+              ...(canDeleteBIReport(userRole)
+                ? [
+                    {
+                      id: 'actions',
+                      header: 'Ações',
+                      align: 'right' as const,
+                      sortable: false,
+                      hideable: false,
+                      resizable: false,
+                      draggable: false,
+                      defaultWidth: 80,
+                      cell: ({ row }: { row: BIReport }) => (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(r.id, r.name)}
+                          onClick={() => handleDelete(row.id, row.name)}
+                          className="h-8 w-8 p-0 text-red-500 hover:bg-red-50"
+                          title="Excluir"
                         >
-                          <Trash2 className="w-4 h-4 text-red-500" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    Nenhum relatório salvo
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                      ),
+                    },
+                  ]
+                : []),
+            ]}
+            data={reports}
+            emptyMessage="Nenhum relatório salvo."
+            exportTitle="Relatórios Salvos — BI Jetro"
+            exportFilename="bi-relatorios-salvos.xlsx"
+          />
         </CardContent>
       </Card>
     </div>
