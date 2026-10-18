@@ -6,6 +6,7 @@ import {
   type TableUserPreferences,
 } from './types'
 import { useTablePreferences } from './use-table-preferences'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { compareValues } from './table-sort'
 import { exportTableToExcel, exportTableToPdf } from './table-export'
 import { ColumnCustomizerDialog } from './column-customizer-dialog'
@@ -85,6 +86,7 @@ export function JetroTable<T extends Record<string, any>>({
   onRowClick,
 }: JetroTableProps<T>) {
   const { preferences, savePreferences, restoreDefaults } = useTablePreferences(screenId, columns)
+  const { preferences: globalPrefs } = useUserPreferences()
 
   const [customizerOpen, setCustomizerOpen] = useState(false)
   const [draggedColId, setDraggedColId] = useState<string | null>(null)
@@ -377,7 +379,10 @@ export function JetroTable<T extends Record<string, any>>({
       <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse text-left">
-            <thead data-tour-id="pedidos-tabela-head">
+            <thead
+              data-tour-id="pedidos-tabela-head"
+              className={globalPrefs.tableStickyHeader ? 'sticky top-0 z-10' : ''}
+            >
               <tr className="bg-[#005B2E] text-white select-none">
                 {visibleColumns.map((col) => {
                   const isSorted = activeSorting?.columnId === col.id
@@ -514,7 +519,11 @@ export function JetroTable<T extends Record<string, any>>({
                       onClick={() => onRowClick?.(row)}
                       className={`border-b border-border/60 transition-colors ${
                         onRowClick ? 'cursor-pointer hover:bg-[#005B2E]/5' : 'hover:bg-muted/40'
-                      } ${index % 2 === 1 ? 'bg-muted/15' : 'bg-card'}`}
+                      } ${
+                        globalPrefs.tableStripedRows && index % 2 === 1
+                          ? 'bg-muted/20 dark:bg-muted/10'
+                          : 'bg-card'
+                      }`}
                     >
                       {visibleColumns.map((col) => {
                         let value: unknown = ''

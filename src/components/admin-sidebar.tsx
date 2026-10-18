@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useSidebarMode } from '@/hooks/use-sidebar-mode'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { ADMIN_MENU, type MenuEntry, type MenuChild } from '@/lib/admin-menu-config'
 import { MenuLink } from '@/components/admin-menu-link'
@@ -38,8 +39,17 @@ export function AdminSidebar() {
   const [railFlyoutArea, setRailFlyoutArea] = useState<string | null>(null)
   const flyoutRef = useRef<HTMLDivElement>(null)
 
+  const { preferences, updatePreference } = useUserPreferences()
   const { isFavorite, toggleFavorite } = useMenuFavorites(user?.id as string)
-  const { isRail, toggle: toggleSidebar } = useSidebarMode(user?.id as string)
+  const { isRail: localIsRail, toggle: toggleSidebarLocal } = useSidebarMode(user?.id as string)
+
+  // O estado do sidebar sincroniza com as preferências do usuário
+  const isRail = !preferences.sidebarExpanded
+  const toggleSidebar = () => {
+    updatePreference('sidebarExpanded', !preferences.sidebarExpanded)
+    toggleSidebarLocal()
+  }
+
   const [searchQuery, setSearchQuery] = useState('')
   const isSearching = searchQuery.trim().length > 0
 
@@ -220,7 +230,7 @@ export function AdminSidebar() {
         data-tour-id="admin-sidebar-nav"
         className={cn(
           'border-r bg-card transition-all duration-300 flex flex-col shrink-0 h-full select-none relative',
-          effectiveRail ? 'w-16' : 'w-64',
+          effectiveRail ? 'w-16' : preferences.sidebarWidth === 'compact' ? 'w-56' : 'w-64',
         )}
       >
         {' '}

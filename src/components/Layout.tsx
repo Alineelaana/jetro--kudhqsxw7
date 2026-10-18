@@ -14,6 +14,8 @@ import { InactivityTracker } from '@/components/inactivity-tracker'
 import { AttributionFooter } from '@/components/attribution-footer'
 import { Button } from '@/components/ui/button'
 import { FileCode2 } from 'lucide-react'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
+import { JetroCustomizationDrawer } from '@/components/personalizacao/jetro-customization-drawer'
 
 function isInternalPath(pathname: string): boolean {
   if (pathname === '/') return true
@@ -26,6 +28,7 @@ function isInternalPath(pathname: string): boolean {
 export default function Layout() {
   const { pathname } = useLocation()
   const { isAuthenticated, loading, userRole } = useAuth()
+  const { preferences } = useUserPreferences()
   const [screenLogicOpen, setScreenLogicOpen] = useState(false)
   const canAccessDocs = canViewScreenDocs(userRole)
   const isAdmin = pathname.startsWith('/admin')
@@ -50,7 +53,10 @@ export default function Layout() {
     return (
       <div className="flex h-screen flex-col overflow-hidden">
         <InactivityTracker />
-        <SiteHeader />
+        {/* Fixar Cabeçalho: respeita preferência do usuário */}
+        <div className={preferences.fixHeader ? 'sticky top-0 z-30 shrink-0' : 'shrink-0'}>
+          <SiteHeader />
+        </div>
         <div className="flex flex-1 overflow-hidden">
           <AdminSidebar />
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -75,17 +81,27 @@ export default function Layout() {
             </div>
             <main
               id="admin-main-content"
-              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between"
+              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between admin-main-padded"
             >
               <div className="flex-1">
                 <Outlet />
               </div>
-              <AttributionFooter variant="muted" context="sistema" />
+              {/* Fixar Rodapé: respeita preferência do usuário */}
+              <div
+                className={
+                  preferences.fixFooter
+                    ? 'sticky bottom-0 z-20 bg-background/95 backdrop-blur-xs border-t border-border'
+                    : ''
+                }
+              >
+                <AttributionFooter variant="muted" context="sistema" />
+              </div>
             </main>
           </div>
         </div>
         <JetroTourOverlay />
         <FloatingChat />
+        <JetroCustomizationDrawer />
 
         {canAccessDocs && (
           <ScreenLogicDrawer

@@ -71,6 +71,11 @@
 }
 
 @layer utilities {
+  /* Escala progressiva de texto do Jetro */
+  .jetro-text-scaled {
+    font-size: var(--jetro-text-scale, 100%);
+  }
+
   .bg-flag-green {
     background-color: #005b2e;
   }
@@ -208,4 +213,108 @@
   .ken-burns {
     animation: none;
   }
+}
+
+/* ==========================================================================
+   PERSONALIZAÇÃO JETRO — REGRAS GLOBAIS DE INTERFACE & ACESSIBILIDADE
+   ========================================================================== */
+
+/* 1. Desativação de Animações / Redução de Movimento */
+html.jetro-no-animations *,
+html.jetro-no-animations *::before,
+html.jetro-no-animations *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* 2. Alto Contraste */
+html.jetro-high-contrast {
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  contrast: 1.15;
+}
+html.dark.jetro-high-contrast {
+  --border: 0 0% 70%;
+  --input: 0 0% 70%;
+  --muted-foreground: 0 0% 90%;
+}
+html.jetro-high-contrast button,
+html.jetro-high-contrast input,
+html.jetro-high-contrast select,
+html.jetro-high-contrast textarea {
+  border-width: 2px !important;
+}
+
+/* 3. Destaque de Foco para Navegação por Teclado */
+html.jetro-focus-highlight *:focus-visible {
+  outline: 3px solid #c9a227 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.35) !important;
+}
+
+/* 4. Elementos Interativos Ampliados (Touch Targets) */
+html.jetro-large-targets button,
+html.jetro-large-targets input,
+html.jetro-large-targets select,
+html.jetro-large-targets textarea,
+html.jetro-large-targets [role='button'] {
+  min-height: 2.75rem !important;
+}
+html.jetro-large-targets .table-action-btn {
+  min-height: 2.25rem !important;
+  min-width: 2.25rem !important;
+}
+
+/* 5. Escala de Tamanho de Textos */
+html.jetro-text-compact {
+  font-size: 92%;
+}
+html.jetro-text-normal {
+  font-size: 100%;
+}
+html.jetro-text-large {
+  font-size: 108%;
+}
+
+/* 6. Densidade da Interface (Espaçamento) */
+html.jetro-density-compact body {
+  --jetro-spacing-unit: 0.75;
+}
+html.jetro-density-compact .admin-main-padded,
+html.jetro-density-compact main > div {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+html.jetro-density-spacious body {
+  --jetro-spacing-unit: 1.25;
+}
+html.jetro-density-spacious .admin-main-padded,
+html.jetro-density-spacious main > div {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+/* 7. Densidade e Estilo das Tabelas */
+html.jetro-table-compact table th,
+html.jetro-table-compact table td {
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+}
+html.jetro-table-spacious table th,
+html.jetro-table-spacious table td {
+  padding-top: 0.85rem !important;
+  padding-bottom: 0.85rem !important;
+}
+html.jetro-table-dividers table td,
+html.jetro-table-dividers table th {
+  border-right: 1px solid hsl(var(--border) / 0.5) !important;
+}
+html.jetro-table-dividers table td:last-child,
+html.jetro-table-dividers table th:last-child {
+  border-right: none !important;
+}
+html.jetro-table-striped table tbody tr:nth-child(even) {
+  background-color: hsl(var(--muted) / 0.35);
 }

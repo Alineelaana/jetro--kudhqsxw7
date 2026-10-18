@@ -33,6 +33,7 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/hooks/use-auth'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { cn } from '@/lib/utils'
 import { JetroOnlineChartRenderer, type JetroChartSpec } from './jetro-online-chart-renderer'
 import { JETRO_ONLINE_AVATAR_URL } from '@/lib/jetro-online-assets'
@@ -467,6 +468,7 @@ const ALL_SUGGESTIONS: Record<string, SmartSuggestionItem[]> = {
 
 export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
   const { user } = useAuth()
+  const { preferences: userPrefs } = useUserPreferences()
   const {
     messages,
     conversations,
@@ -768,8 +770,12 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                   {/* Frases animadas em ciclo */}
                   <div className="min-h-[44px] flex items-center justify-center">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center justify-center text-center">
-                      <span>{displayedText}</span>
-                      <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 bg-[#005B2E] animate-pulse" />
+                      <span>
+                        {userPrefs.jetroOnlineTypingEffect ? displayedText : userGreetingPhrase}
+                      </span>
+                      {userPrefs.jetroOnlineTypingEffect && (
+                        <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 bg-[#005B2E] animate-pulse" />
+                      )}
                     </h1>
                   </div>
 
@@ -825,45 +831,47 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                 )}
 
                 {/* 4. Sugestões inteligentes em cards pequenos e elegantes (Requisito 4) */}
-                <div className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-                      Sugestões rápidas para o seu perfil:
-                    </p>
-                    <span className="text-[10px] text-gray-500 hidden sm:inline">
-                      Clique para preencher e consultar
-                    </span>
-                  </div>
+                {userPrefs.jetroOnlineSuggestions && (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wider flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
+                        Sugestões rápidas para o seu perfil:
+                      </p>
+                      <span className="text-[10px] text-gray-500 hidden sm:inline">
+                        Clique para preencher e consultar
+                      </span>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {displayedSuggestions.map((sug) => {
-                      const Icon = sug.icon
-                      return (
-                        <button
-                          key={sug.id}
-                          onClick={() => handleSend(sug.prompt)}
-                          disabled={loading}
-                          title={sug.prompt}
-                          className="flex items-center gap-2.5 p-2.5 text-left rounded-lg border border-gray-200/90 hover:border-[#005B2E] bg-white hover:bg-emerald-50/30 transition-all group shadow-2xs hover:shadow-xs cursor-pointer disabled:opacity-50"
-                        >
-                          <div className="w-7 h-7 rounded-md bg-gray-100 group-hover:bg-[#005B2E]/10 text-gray-600 group-hover:text-[#005B2E] flex items-center justify-center shrink-0 transition-colors">
-                            <Icon className="w-3.5 h-3.5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-800 group-hover:text-[#005B2E] transition-colors truncate">
-                              {sug.title}
-                            </p>
-                            <span className="text-[10px] text-gray-500 truncate block">
-                              {sug.category}
-                            </span>
-                          </div>
-                          <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#005B2E] group-hover:translate-x-0.5 transition-all shrink-0" />
-                        </button>
-                      )
-                    })}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {displayedSuggestions.map((sug) => {
+                        const Icon = sug.icon
+                        return (
+                          <button
+                            key={sug.id}
+                            onClick={() => handleSend(sug.prompt)}
+                            disabled={loading}
+                            title={sug.prompt}
+                            className="flex items-center gap-2.5 p-2.5 text-left rounded-lg border border-gray-200/90 hover:border-[#005B2E] bg-white hover:bg-emerald-50/30 transition-all group shadow-2xs hover:shadow-xs cursor-pointer disabled:opacity-50"
+                          >
+                            <div className="w-7 h-7 rounded-md bg-gray-100 group-hover:bg-[#005B2E]/10 text-gray-600 group-hover:text-[#005B2E] flex items-center justify-center shrink-0 transition-colors">
+                              <Icon className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-gray-800 group-hover:text-[#005B2E] transition-colors truncate">
+                                {sug.title}
+                              </p>
+                              <span className="text-[10px] text-gray-500 truncate block">
+                                {sug.category}
+                              </span>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#005B2E] group-hover:translate-x-0.5 transition-all shrink-0" />
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               /* Histórico de Mensagens */

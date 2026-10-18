@@ -130,6 +130,7 @@ import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
 import { getMarketingIntelligence } from '@/services/marketing-bi'
 import CollectionCenterConfig from './pages/CollectionCenterConfig'
 import CollectionCenterCertification from './pages/CollectionCenterCertification'
+import { UserPreferencesProvider } from '@/hooks/use-user-preferences'
 
 const App = () => (
   <BrowserRouter>
@@ -141,1512 +142,1586 @@ const App = () => (
               <SystemParamsProvider>
                 <ClientAuthProvider>
                   <CmsContentProvider>
-                    <JetroOnlineProvider>
-                      <TourProvider>
-                        <Toaster />
-                        <Sonner />
-                        <Routes>
-                          <Route element={<Layout />}>
-                            <Route path="/" element={<LoginPage />} />
-                            <Route path="/site" element={<Index />} />
-                            <Route path="/admin" element={<Admin />} />
-                            <Route path="/admin/dashboard" element={<DashboardPage />} />
-                            <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
+                    <UserPreferencesProvider>
+                      <JetroOnlineProvider>
+                        <TourProvider>
+                          <Toaster />
+                          <Sonner />
+                          <Routes>
+                            <Route element={<Layout />}>
+                              <Route path="/" element={<LoginPage />} />
+                              <Route path="/site" element={<Index />} />
+                              <Route path="/admin" element={<Admin />} />
+                              <Route path="/admin/dashboard" element={<DashboardPage />} />
+                              <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
 
-                            <Route path="/admin/produtos" element={<Products />} />
-                            <Route
-                              path="/admin/cadastros"
-                              element={<Navigate to="/admin/cadastros/bancos" replace />}
-                            />
-                            <Route path="/admin/cadastros/:screen" element={<Cadastros />} />
-                            <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
-                            <Route path="/admin/regras-comissao" element={<CommissionRules />} />
-                            <Route
-                              path="/admin/logistica"
-                              element={<Logistics screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/logistica/rotas"
-                              element={<Logistics screen="routes" />}
-                            />
-                            <Route
-                              path="/admin/logistica/entregas"
-                              element={<Logistics screen="deliveries" />}
-                            />
-                            <Route
-                              path="/admin/logistica/veiculos"
-                              element={<Logistics screen="vehicles" />}
-                            />
-                            <Route
-                              path="/admin/logistica/motoristas"
-                              element={<Logistics screen="drivers" />}
-                            />
-                            <Route
-                              path="/admin/logistica/romaneios"
-                              element={<Logistics screen="romaneios" />}
-                            />
-                            <Route
-                              path="/admin/logistica/fretes"
-                              element={<Logistics screen="freights" />}
-                            />
-                            <Route
-                              path="/admin/logistica/tabelas-frete"
-                              element={<Logistics screen="freight_tables" />}
-                            />
-                            <Route
-                              path="/admin/logistica/rastreamento"
-                              element={<Logistics screen="tracking" />}
-                            />
-                            <Route
-                              path="/admin/logistica/ocorrencias"
-                              element={<Logistics screen="occurrences" />}
-                            />
-                            <Route
-                              path="/admin/logistica/comprovantes"
-                              element={<Logistics screen="proof" />}
-                            />
-                            <Route
-                              path="/admin/logistica/custos"
-                              element={<Logistics screen="costs" />}
-                            />
-                            <Route
-                              path="/admin/logistica/planejamento"
-                              element={<Logistics screen="orchestration_planning" />}
-                            />
-                            <Route
-                              path="/admin/logistica/indicadores"
-                              element={<Logistics screen="indicators" />}
-                            />
-                            <Route
-                              path="/admin/logistica/reversa"
-                              element={<Logistics screen="reverse_logistics" />}
-                            />
-                            <Route
-                              path="/admin/logistica/app-motorista"
-                              element={<Logistics screen="driver_app" />}
-                            />
-                            <Route
-                              path="/admin/logistica/relatorios"
-                              element={<Logistics screen="reports" />}
-                            />
-                            <Route
-                              path="/admin/logistica/transferencias"
-                              element={<Logistics screen="transfers" />}
-                            />
-                            <Route
-                              path="/admin/logistica/coletas"
-                              element={<Logistics screen="collections" />}
-                            />
-                            <Route
-                              path="/admin/logistica/excecoes"
-                              element={<Logistics screen="exceptions" />}
-                            />
-                            <Route
-                              path="/admin/transporte"
-                              element={<Transporte screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/transporte/cargas"
-                              element={<Transporte screen="load_building" />}
-                            />
-                            <Route
-                              path="/admin/transporte/roteirizacao"
-                              element={<Transporte screen="routing" />}
-                            />
-                            <Route
-                              path="/admin/transporte/viagens"
-                              element={<Transporte screen="journeys" />}
-                            />
-                            <Route
-                              path="/admin/transporte/rotas"
-                              element={<Transporte screen="routes" />}
-                            />
-                            <Route
-                              path="/admin/transporte/entregas"
-                              element={<Transporte screen="deliveries" />}
-                            />
-                            <Route
-                              path="/admin/transporte/veiculos"
-                              element={<Transporte screen="vehicles" />}
-                            />
-                            <Route
-                              path="/admin/transporte/motoristas"
-                              element={<Transporte screen="drivers" />}
-                            />
-                            <Route
-                              path="/admin/transporte/fretes"
-                              element={<Transporte screen="freights" />}
-                            />
-                            <Route
-                              path="/admin/transporte/tabelas-frete"
-                              element={<Transporte screen="freight_tables" />}
-                            />
-                            <Route
-                              path="/admin/transporte/rastreamento"
-                              element={<Transporte screen="tracking" />}
-                            />
-                            <Route
-                              path="/admin/transporte/ocorrencias"
-                              element={<Transporte screen="occurrences" />}
-                            />
-                            <Route
-                              path="/admin/transporte/comprovantes"
-                              element={<Transporte screen="proof" />}
-                            />
-                            <Route
-                              path="/admin/transporte/custos"
-                              element={<Transporte screen="costs" />}
-                            />
-                            <Route
-                              path="/admin/transporte/app-motorista"
-                              element={<Transporte screen="driver_app" />}
-                            />
-                            <Route
-                              path="/admin/transporte/relatorios"
-                              element={<Transporte screen="reports" />}
-                            />
-                            <Route path="/admin/vendas" element={<SalesDashboardPage />} />
-                            <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
-                            <Route
-                              path="/admin/vendas/consulta-pedidos"
-                              element={<SalesOrdersQueryPage />}
-                            />
-                            <Route path="/admin/vendas/faturamento" element={<InvoicingPage />} />
-                            <Route path="/admin/vendas/nfe" element={<NfePage />} />
-                            <Route path="/admin/vendas/nfce" element={<NfcePage />} />
-                            <Route path="/admin/vendas/contratos" element={<ContractsPage />} />
-                            <Route path="/admin/vendas/devolucoes" element={<SalesReturnsPage />} />
-                            <Route path="/admin/vendas/historico" element={<SalesHistoryPage />} />
-                            <Route
-                              path="/admin/estoque"
-                              element={<StockPage screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/estoque/movimentacoes"
-                              element={<StockPage screen="movements" />}
-                            />
-                            <Route
-                              path="/admin/estoque/inventario"
-                              element={<StockPage screen="inventory" />}
-                            />
-                            <Route
-                              path="/admin/estoque/transferencias"
-                              element={<StockPage screen="transfers" />}
-                            />
-                            <Route
-                              path="/admin/estoque/ajustes"
-                              element={<StockPage screen="adjustments" />}
-                            />
-                            <Route
-                              path="/admin/estoque/lotes"
-                              element={<StockPage screen="batches" />}
-                            />
-                            <Route
-                              path="/admin/estoque/validade"
-                              element={<StockPage screen="expiry" />}
-                            />
-                            <Route
-                              path="/admin/estoque/localizacoes"
-                              element={<StockPage screen="locations" />}
-                            />
-                            <Route
-                              path="/admin/estoque/separacao"
-                              element={<StockPage screen="picking" />}
-                            />
-                            <Route
-                              path="/admin/estoque/conferencia"
-                              element={<StockPage screen="checking" />}
-                            />
-                            <Route
-                              path="/admin/estoque/expedicao"
-                              element={<StockPage screen="expedition" />}
-                            />
-                            <Route
-                              path="/admin/estoque/recebimento"
-                              element={<StockPage screen="receiving" />}
-                            />
-                            <Route
-                              path="/admin/estoque/enderecamento"
-                              element={<StockPage screen="putaway" />}
-                            />
-                            <Route
-                              path="/admin/estoque/ondas"
-                              element={<StockPage screen="waves" />}
-                            />
-                            <Route
-                              path="/admin/estoque/reabastecimento"
-                              element={<StockPage screen="replenishment" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-alertas"
-                              element={<WmsScreen screen="wms-alerts" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-relatorios"
-                              element={<WmsScreen screen="wms-reports" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-pallets"
-                              element={<WmsScreen screen="wms-pallets" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-volumes"
-                              element={<WmsScreen screen="wms-volumes" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-coletores"
-                              element={<WmsScreen screen="wms-collectors" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-operadores"
-                              element={<WmsScreen screen="wms-operators" />}
-                            />
-                            <Route
-                              path="/admin/estoque/wms-managerial"
-                              element={<WmsScreen screen="wms-managerial" />}
-                            />
-                            {/* Central de Configurações do Jetro On-line */}
-                            <Route
-                              path="/admin/configuracoes/jetro-online"
-                              element={
-                                <JetroOnlineProtectedRoute>
-                                  <JetroOnlineLayout />
-                                </JetroOnlineProtectedRoute>
-                              }
-                            >
-                              <Route index element={<JetroOnlineGeneralSettingsScreen />} />
+                              <Route path="/admin/produtos" element={<Products />} />
                               <Route
-                                path="universidade"
-                                element={<JetroOnlineUniversidadeScreen />}
+                                path="/admin/cadastros"
+                                element={<Navigate to="/admin/cadastros/bancos" replace />}
                               />
-                              <Route path="perguntas" element={<JetroOnlinePerguntasScreen />} />
-                              <Route path="historico" element={<JetroOnlineHistoricoScreen />} />
-                              <Route path="sugestoes" element={<JetroOnlineSugestoesScreen />} />
-                              <Route path="recursos" element={<JetroOnlineRecursosScreen />} />
-                              <Route path="tours" element={<JetroOnlineToursScreen />} />
-                              <Route path="relatorios" element={<JetroOnlineRelatoriosScreen />} />
-                            </Route>
-
-                            <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
-                              <Route index element={<Navigate to="dados-empresa" replace />} />
-                              <Route path="dados-empresa" element={<EmpresaScreen />} />
-                              <Route path="parametros" element={<ParametrosScreen />} />
-                              <Route path="permissoes" element={<PermissionMatrixScreen />} />
-                              <Route path="logs" element={<LogsScreen />} />
+                              <Route path="/admin/cadastros/:screen" element={<Cadastros />} />
+                              <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
+                              <Route path="/admin/regras-comissao" element={<CommissionRules />} />
                               <Route
-                                path="integracoes"
-                                element={<ConfigCrudScreen config={INTEGRATIONS_CONFIG} />}
-                              />
-                              <Route path="apis" element={<ApisScreen />} />
-                              <Route
-                                path="importacao-exportacao"
-                                element={<ImportExportScreen />}
+                                path="/admin/logistica"
+                                element={<Logistics screen="dashboard" />}
                               />
                               <Route
-                                path="modelos-email"
-                                element={<ConfigCrudScreen config={EMAIL_TEMPLATE_CONFIG} />}
+                                path="/admin/logistica/rotas"
+                                element={<Logistics screen="routes" />}
                               />
                               <Route
-                                path="modelos-documentos"
-                                element={<ConfigCrudScreen config={DOC_TEMPLATE_CONFIG} />}
+                                path="/admin/logistica/entregas"
+                                element={<Logistics screen="deliveries" />}
                               />
                               <Route
-                                path="notificacoes"
-                                element={<ConfigCrudScreen config={NOTIFICATION_CONFIG} />}
+                                path="/admin/logistica/veiculos"
+                                element={<Logistics screen="vehicles" />}
                               />
                               <Route
-                                path="numeracoes"
-                                element={<ConfigCrudScreen config={NUMERATION_CONFIG} />}
+                                path="/admin/logistica/motoristas"
+                                element={<Logistics screen="drivers" />}
                               />
-                              <Route path="seguranca" element={<SegurancaScreen />} />
-                              <Route path="backup" element={<BackupScreen />} />
-                            </Route>
-                            <Route
-                              path="/admin/financeiro"
-                              element={<Financial screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/contas-receber"
-                              element={<Financial screen="receivables" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/contas-pagar"
-                              element={<Financial screen="payables" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/fluxo-caixa"
-                              element={<Financial screen="cash_flow" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/conciliacao"
-                              element={<Financial screen="reconciliation" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/tesouraria"
-                              element={<Financial screen="treasury" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/cheques"
-                              element={<Financial screen="checks" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/cartoes"
-                              element={<Financial screen="cards" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/boletos"
-                              element={<Financial screen="boletos" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/pix"
-                              element={<Financial screen="pix" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/cobrancas"
-                              element={<Financial screen="collections" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/cobranca-config"
-                              element={<CollectionCenterConfig />}
-                            />
-                            <Route
-                              path="/admin/financeiro/cobranca-certificacao"
-                              element={<CollectionCenterCertification />}
-                            />
-                            <Route
-                              path="/admin/financeiro/caixa"
-                              element={<Financial screen="cash_register" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/movimentacoes"
-                              element={<Financial screen="movements" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/transferencias"
-                              element={<Financial screen="transfers" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/aprovacoes"
-                              element={<Financial screen="approvals" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/fechamento"
-                              element={<Financial screen="closing" />}
-                            />
-                            <Route
-                              path="/admin/financeiro/relatorios"
-                              element={<Financial screen="reports" />}
-                            />
-                            <Route path="/admin/rh" element={<RH screen="dashboard" />} />
-                            <Route
-                              path="/admin/rh/colaboradores"
-                              element={<RH screen="employees" />}
-                            />
-                            <Route path="/admin/rh/cargos" element={<RH screen="positions" />} />
-                            <Route
-                              path="/admin/rh/departamentos"
-                              element={<RH screen="departments" />}
-                            />
-                            <Route path="/admin/rh/ponto" element={<RH screen="time_control" />} />
-                            <Route path="/admin/rh/ferias" element={<RH screen="vacations" />} />
-                            <Route path="/admin/rh/folha" element={<RH screen="payroll" />} />
-                            <Route path="/admin/rh/beneficios" element={<RH screen="benefits" />} />
-                            <Route
-                              path="/admin/rh/treinamentos"
-                              element={<RH screen="trainings" />}
-                            />
-                            <Route
-                              path="/admin/rh/documentos"
-                              element={<RH screen="documents" />}
-                            />
-                            <Route
-                              path="/admin/rh/aprovacoes"
-                              element={<RH screen="approvals" />}
-                            />
-                            <Route path="/admin/rh/relatorios" element={<RH screen="reports" />} />
-                            <Route path="/admin/conformidade" element={<Conformidade />} />
-                            <Route path="/admin/fiscal" element={<Fiscal screen="dashboard" />} />
-                            <Route
-                              path="/admin/fiscal/entrada"
-                              element={<Fiscal screen="entrada" />}
-                            />
-                            <Route path="/admin/fiscal/nfe" element={<Fiscal screen="nfe" />} />
-                            <Route path="/admin/fiscal/nfse" element={<Fiscal screen="nfse" />} />
-                            <Route path="/admin/fiscal/nfce" element={<Fiscal screen="nfce" />} />
-                            <Route path="/admin/fiscal/cte" element={<Fiscal screen="cte" />} />
-                            <Route path="/admin/fiscal/mdfe" element={<Fiscal screen="mdfe" />} />
-                            <Route
-                              path="/admin/fiscal/apuracao"
-                              element={<Fiscal screen="apuracao" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-dashboard"
-                              element={<Fiscal screen="reforma_dashboard" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-cbs-ibs"
-                              element={<Fiscal screen="reforma_cbs_ibs" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-seletivo"
-                              element={<Fiscal screen="reforma_seletivo" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-classificacao"
-                              element={<Fiscal screen="reforma_classificacao" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-regras"
-                              element={<Fiscal screen="reforma_regras" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-transicao"
-                              element={<Fiscal screen="reforma_transicao" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-creditos"
-                              element={<Fiscal screen="reforma_creditos" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-simulador"
-                              element={<Fiscal screen="reforma_simulador" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/reforma-validacao"
-                              element={<Fiscal screen="reforma_validacao" />}
-                            />
-                            <Route path="/admin/fiscal/sped" element={<Fiscal screen="sped" />} />
-                            <Route
-                              path="/admin/fiscal/livros"
-                              element={<Fiscal screen="livros" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/correcao"
-                              element={<Fiscal screen="correcao" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/manifestacao"
-                              element={<Fiscal screen="manifestacao" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/documentos"
-                              element={<Fiscal screen="documentos" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/inutilizacao"
-                              element={<Fiscal screen="inutilizacao" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/certificados"
-                              element={<Fiscal screen="certificados" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/configuracoes"
-                              element={<Fiscal screen="configuracoes" />}
-                            />
-                            <Route
-                              path="/admin/fiscal/relatorios"
-                              element={<Fiscal screen="relatorios" />}
-                            />
-                            <Route path="/admin/crm" element={<CRM screen="dashboard" />} />
-                            <Route path="/admin/crm/leads" element={<CRM screen="leads" />} />
-                            <Route
-                              path="/admin/crm/oportunidades"
-                              element={<CRM screen="oportunidades" />}
-                            />
-                            <Route path="/admin/crm/funil" element={<CRM screen="funil" />} />
-                            <Route
-                              path="/admin/crm/funil-config"
-                              element={<CRM screen="funil-config" />}
-                            />
-                            <Route path="/admin/crm/agenda" element={<CRM screen="agenda" />} />
-                            <Route
-                              path="/admin/crm/propostas"
-                              element={<CRM screen="propostas" />}
-                            />
-                            <Route
-                              path="/admin/crm/historico"
-                              element={<CRM screen="historico" />}
-                            />
-                            <Route
-                              path="/admin/crm/atividades"
-                              element={<CRM screen="atividades" />}
-                            />
-                            <Route
-                              path="/admin/crm/motivos-perda"
-                              element={<CRM screen="motivos-perda" />}
-                            />
-                            <Route path="/admin/crm/metas" element={<CRM screen="metas" />} />
-                            <Route
-                              path="/admin/crm/automacao"
-                              element={<CRM screen="automacao" />}
-                            />
-                            <Route
-                              path="/admin/crm/relatorios"
-                              element={<CRM screen="relatorios" />}
-                            />
-                            <Route path="/admin/notificacoes" element={<Notifications />} />
-                            <Route
-                              path="/admin/ia/dashboard"
-                              element={<AIModule screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/ia/assistente"
-                              element={<AIModule screen="assistant" />}
-                            />
-                            <Route
-                              path="/admin/ia/agentes"
-                              element={<AIModule screen="agents" />}
-                            />
-                            <Route
-                              path="/admin/ia/automacoes"
-                              element={<AIModule screen="automations" />}
-                            />
-                            <Route path="/admin/ia/fluxos" element={<AIModule screen="flows" />} />
-                            <Route
-                              path="/admin/ia/base-conhecimento"
-                              element={<AIModule screen="knowledge" />}
-                            />
-                            <Route
-                              path="/admin/ia/treinamento"
-                              element={<AIModule screen="training" />}
-                            />
-                            <Route
-                              path="/admin/ia/historico"
-                              element={<AIModule screen="history" />}
-                            />
-                            <Route
-                              path="/admin/ia/aprovacoes"
-                              element={<AIModule screen="approvals" />}
-                            />
-                            <Route
-                              path="/admin/ia/configuracoes"
-                              element={<AIModule screen="settings" />}
-                            />
-                            <Route path="/admin/governanca-adapta" element={<AdaptaGovernance />} />
-                            <Route
-                              path="/admin/industria"
-                              element={<Industry screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/industria/catalogo"
-                              element={<Industry screen="catalogo" />}
-                            />
-                            <Route
-                              path="/admin/industria/especificacoes"
-                              element={<Industry screen="especificacoes" />}
-                            />
-                            <Route
-                              path="/admin/industria/conversoes"
-                              element={<Industry screen="conversoes" />}
-                            />
-                            <Route
-                              path="/admin/industria/bom"
-                              element={<Industry screen="bom" />}
-                            />
-                            <Route
-                              path="/admin/industria/engenharia-bom"
-                              element={<Industry screen="engenharia-bom" />}
-                            />
-                            <Route
-                              path="/admin/industria/formulacoes"
-                              element={<Industry screen="formulacoes" />}
-                            />
-                            <Route
-                              path="/admin/industria/engenharia"
-                              element={<Industry screen="engenharia" />}
-                            />
-                            <Route
-                              path="/admin/industria/recursos"
-                              element={<Industry screen="recursos" />}
-                            />
-                            <Route
-                              path="/admin/industria/roteiros"
-                              element={<Industry screen="roteiros" />}
-                            />
-                            <Route
-                              path="/admin/industria/capacidade"
-                              element={<Industry screen="capacidade" />}
-                            />
-                            <Route
-                              path="/admin/industria/plano-mestre"
-                              element={<Industry screen="plano-mestre" />}
-                            />
-                            <Route
-                              path="/admin/industria/aps"
-                              element={<Industry screen="aps" />}
-                            />
-                            <Route
-                              path="/admin/industria/planejamento"
-                              element={<Industry screen="planejamento" />}
-                            />
-                            <Route
-                              path="/admin/industria/custos"
-                              element={<Industry screen="custos" />}
-                            />
-                            <Route
-                              path="/admin/industria/ordens-producao"
-                              element={<Industry screen="ordens-producao" />}
-                            />
-                            <Route
-                              path="/admin/industria/execucao"
-                              element={<Industry screen="execucao" />}
-                            />
-                            <Route
-                              path="/admin/industria/fases"
-                              element={<Industry screen="fases" />}
-                            />
-                            <Route
-                              path="/admin/industria/qualidade"
-                              element={<Industry screen="qualidade" />}
-                            />
-                            <Route
-                              path="/admin/industria/rastreabilidade"
-                              element={<Industry screen="rastreabilidade" />}
-                            />
-                            <Route
-                              path="/admin/industria/kpis"
-                              element={<Industry screen="kpis" />}
-                            />
-                            <Route
-                              path="/admin/industria/manutencao"
-                              element={<Industry screen="manutencao" />}
-                            />
-                            <Route
-                              path="/admin/industria/calibracao"
-                              element={<Industry screen="calibracao" />}
-                            />
-                            <Route
-                              path="/admin/industria/executivo"
-                              element={<Industry screen="executivo" />}
-                            />
-                            <Route
-                              path="/admin/industria/cockpit"
-                              element={<Industry screen="cockpit" />}
-                            />
-                            <Route
-                              path="/admin/industria/intelligence"
-                              element={<Industry screen="intelligence" />}
-                            />
-                            <Route
-                              path="/admin/industria/adapta"
-                              element={<Industry screen="adapta" />}
-                            />
-                            <Route path="/admin/phase0-foundation" element={<Phase0Foundation />} />
-                            <Route path="/admin/platform-layer" element={<PlatformLayer />} />
-                            <Route path="/admin/blueprint" element={<Blueprint />} />
-                            <Route path="/admin/cadastro" element={<AdminRegister />} />
-                            <Route
-                              path="/admin/recuperar-senha"
-                              element={<AdminPasswordRecovery />}
-                            />
-                            <Route
-                              path="/admin/remuneracao"
-                              element={<VariableRemuneration screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/regras"
-                              element={<VariableRemuneration screen="rules" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/apuracao"
-                              element={<VariableRemuneration screen="apuration" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/simulador"
-                              element={<VariableRemuneration screen="simulator" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/aprovacoes"
-                              element={<VariableRemuneration screen="approvals" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/historico"
-                              element={<VariableRemuneration screen="history" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/contestacoes"
-                              element={<VariableRemuneration screen="contests" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/campanhas"
-                              element={<VariableRemuneration screen="campaigns" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/ranking"
-                              element={<VariableRemuneration screen="ranking" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/metas"
-                              element={<VariableRemuneration screen="goals" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/metas-gestao"
-                              element={<VariableRemuneration screen="goals-management" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/metas-premiacoes"
-                              element={<VariableRemuneration screen="goals-awards" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/metas-comunicacoes"
-                              element={<VariableRemuneration screen="goals-communications" />}
-                            />
-                            <Route
-                              path="/admin/remuneracao/metas-vendedor"
-                              element={<VariableRemuneration screen="goals-seller" />}
-                            />
-                            <Route path="/admin/bi" element={<BI screen="dashboard" />} />
-                            <Route path="/admin/bi/executive" element={<BI screen="executive" />} />
-                            <Route
-                              path="/admin/bi/commercial"
-                              element={<BI screen="commercial" />}
-                            />
-                            <Route
-                              path="/admin/bi/financial-intel"
-                              element={<BI screen="financial-intel" />}
-                            />
-                            <Route
-                              path="/admin/bi/industrial-intel"
-                              element={<BI screen="industrial-intel" />}
-                            />
-                            <Route
-                              path="/admin/bi/logistics-intel"
-                              element={<BI screen="logistics-intel" />}
-                            />
-                            <Route
-                              path="/admin/bi/stock-intel"
-                              element={<BI screen="stock-intel" />}
-                            />
-                            <Route
-                              path="/admin/bi/fiscal-intel"
-                              element={<BI screen="fiscal-intel" />}
-                            />
-                            <Route
-                              path="/admin/bi/purchasing-intel"
-                              element={<BI screen="purchasing-intel" />}
-                            />
-                            <Route path="/admin/bi/crm-intel" element={<BI screen="crm-intel" />} />
-                            <Route
-                              path="/admin/bi/trade-intel"
-                              element={<BI screen="trade-intel" />}
-                            />
-                            <Route path="/admin/bi/rh-intel" element={<BI screen="rh-intel" />} />
-                            <Route
-                              path="/admin/bi/quality-intel"
-                              element={<BI screen="quality-intel" />}
-                            />
-                            <Route
-                              path="/admin/bi/maintenance-intel"
-                              element={<BI screen="maintenance-intel" />}
-                            />
-                            <Route path="/admin/bi/vr-intel" element={<BI screen="vr-intel" />} />
-                            <Route
-                              path="/admin/bi/custom-dashboards"
-                              element={<BI screen="custom-dashboards" />}
-                            />
-                            <Route path="/admin/bi/ai-adapta" element={<BI screen="ai-adapta" />} />
-                            <Route
-                              path="/admin/bi/cross-module"
-                              element={<BI screen="cross-module" />}
-                            />
-                            <Route
-                              path="/admin/bi/projection"
-                              element={<BI screen="projection" />}
-                            />
-                            <Route path="/admin/bi/sales" element={<BI screen="sales" />} />
-                            <Route path="/admin/bi/stock" element={<BI screen="stock" />} />
-                            <Route path="/admin/bi/financial" element={<BI screen="financial" />} />
-                            <Route
-                              path="/admin/bi/industrial"
-                              element={<BI screen="industrial" />}
-                            />
-                            <Route
-                              path="/admin/bi/saved-views"
-                              element={<BI screen="saved-views" />}
-                            />
-                            <Route
-                              path="/admin/bi/marketing-intel"
-                              element={
-                                <BiCenterWrapper
-                                  title="Inteligência de Marketing"
-                                  description="Indicadores de marketing enterprise"
-                                  loadFunction={getMarketingIntelligence}
-                                  realtimeCollection="mk_requests"
+                              <Route
+                                path="/admin/logistica/romaneios"
+                                element={<Logistics screen="romaneios" />}
+                              />
+                              <Route
+                                path="/admin/logistica/fretes"
+                                element={<Logistics screen="freights" />}
+                              />
+                              <Route
+                                path="/admin/logistica/tabelas-frete"
+                                element={<Logistics screen="freight_tables" />}
+                              />
+                              <Route
+                                path="/admin/logistica/rastreamento"
+                                element={<Logistics screen="tracking" />}
+                              />
+                              <Route
+                                path="/admin/logistica/ocorrencias"
+                                element={<Logistics screen="occurrences" />}
+                              />
+                              <Route
+                                path="/admin/logistica/comprovantes"
+                                element={<Logistics screen="proof" />}
+                              />
+                              <Route
+                                path="/admin/logistica/custos"
+                                element={<Logistics screen="costs" />}
+                              />
+                              <Route
+                                path="/admin/logistica/planejamento"
+                                element={<Logistics screen="orchestration_planning" />}
+                              />
+                              <Route
+                                path="/admin/logistica/indicadores"
+                                element={<Logistics screen="indicators" />}
+                              />
+                              <Route
+                                path="/admin/logistica/reversa"
+                                element={<Logistics screen="reverse_logistics" />}
+                              />
+                              <Route
+                                path="/admin/logistica/app-motorista"
+                                element={<Logistics screen="driver_app" />}
+                              />
+                              <Route
+                                path="/admin/logistica/relatorios"
+                                element={<Logistics screen="reports" />}
+                              />
+                              <Route
+                                path="/admin/logistica/transferencias"
+                                element={<Logistics screen="transfers" />}
+                              />
+                              <Route
+                                path="/admin/logistica/coletas"
+                                element={<Logistics screen="collections" />}
+                              />
+                              <Route
+                                path="/admin/logistica/excecoes"
+                                element={<Logistics screen="exceptions" />}
+                              />
+                              <Route
+                                path="/admin/transporte"
+                                element={<Transporte screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/transporte/cargas"
+                                element={<Transporte screen="load_building" />}
+                              />
+                              <Route
+                                path="/admin/transporte/roteirizacao"
+                                element={<Transporte screen="routing" />}
+                              />
+                              <Route
+                                path="/admin/transporte/viagens"
+                                element={<Transporte screen="journeys" />}
+                              />
+                              <Route
+                                path="/admin/transporte/rotas"
+                                element={<Transporte screen="routes" />}
+                              />
+                              <Route
+                                path="/admin/transporte/entregas"
+                                element={<Transporte screen="deliveries" />}
+                              />
+                              <Route
+                                path="/admin/transporte/veiculos"
+                                element={<Transporte screen="vehicles" />}
+                              />
+                              <Route
+                                path="/admin/transporte/motoristas"
+                                element={<Transporte screen="drivers" />}
+                              />
+                              <Route
+                                path="/admin/transporte/fretes"
+                                element={<Transporte screen="freights" />}
+                              />
+                              <Route
+                                path="/admin/transporte/tabelas-frete"
+                                element={<Transporte screen="freight_tables" />}
+                              />
+                              <Route
+                                path="/admin/transporte/rastreamento"
+                                element={<Transporte screen="tracking" />}
+                              />
+                              <Route
+                                path="/admin/transporte/ocorrencias"
+                                element={<Transporte screen="occurrences" />}
+                              />
+                              <Route
+                                path="/admin/transporte/comprovantes"
+                                element={<Transporte screen="proof" />}
+                              />
+                              <Route
+                                path="/admin/transporte/custos"
+                                element={<Transporte screen="costs" />}
+                              />
+                              <Route
+                                path="/admin/transporte/app-motorista"
+                                element={<Transporte screen="driver_app" />}
+                              />
+                              <Route
+                                path="/admin/transporte/relatorios"
+                                element={<Transporte screen="reports" />}
+                              />
+                              <Route path="/admin/vendas" element={<SalesDashboardPage />} />
+                              <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                              <Route
+                                path="/admin/vendas/consulta-pedidos"
+                                element={<SalesOrdersQueryPage />}
+                              />
+                              <Route path="/admin/vendas/faturamento" element={<InvoicingPage />} />
+                              <Route path="/admin/vendas/nfe" element={<NfePage />} />
+                              <Route path="/admin/vendas/nfce" element={<NfcePage />} />
+                              <Route path="/admin/vendas/contratos" element={<ContractsPage />} />
+                              <Route
+                                path="/admin/vendas/devolucoes"
+                                element={<SalesReturnsPage />}
+                              />
+                              <Route
+                                path="/admin/vendas/historico"
+                                element={<SalesHistoryPage />}
+                              />
+                              <Route
+                                path="/admin/estoque"
+                                element={<StockPage screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/estoque/movimentacoes"
+                                element={<StockPage screen="movements" />}
+                              />
+                              <Route
+                                path="/admin/estoque/inventario"
+                                element={<StockPage screen="inventory" />}
+                              />
+                              <Route
+                                path="/admin/estoque/transferencias"
+                                element={<StockPage screen="transfers" />}
+                              />
+                              <Route
+                                path="/admin/estoque/ajustes"
+                                element={<StockPage screen="adjustments" />}
+                              />
+                              <Route
+                                path="/admin/estoque/lotes"
+                                element={<StockPage screen="batches" />}
+                              />
+                              <Route
+                                path="/admin/estoque/validade"
+                                element={<StockPage screen="expiry" />}
+                              />
+                              <Route
+                                path="/admin/estoque/localizacoes"
+                                element={<StockPage screen="locations" />}
+                              />
+                              <Route
+                                path="/admin/estoque/separacao"
+                                element={<StockPage screen="picking" />}
+                              />
+                              <Route
+                                path="/admin/estoque/conferencia"
+                                element={<StockPage screen="checking" />}
+                              />
+                              <Route
+                                path="/admin/estoque/expedicao"
+                                element={<StockPage screen="expedition" />}
+                              />
+                              <Route
+                                path="/admin/estoque/recebimento"
+                                element={<StockPage screen="receiving" />}
+                              />
+                              <Route
+                                path="/admin/estoque/enderecamento"
+                                element={<StockPage screen="putaway" />}
+                              />
+                              <Route
+                                path="/admin/estoque/ondas"
+                                element={<StockPage screen="waves" />}
+                              />
+                              <Route
+                                path="/admin/estoque/reabastecimento"
+                                element={<StockPage screen="replenishment" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-alertas"
+                                element={<WmsScreen screen="wms-alerts" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-relatorios"
+                                element={<WmsScreen screen="wms-reports" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-pallets"
+                                element={<WmsScreen screen="wms-pallets" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-volumes"
+                                element={<WmsScreen screen="wms-volumes" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-coletores"
+                                element={<WmsScreen screen="wms-collectors" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-operadores"
+                                element={<WmsScreen screen="wms-operators" />}
+                              />
+                              <Route
+                                path="/admin/estoque/wms-managerial"
+                                element={<WmsScreen screen="wms-managerial" />}
+                              />
+                              {/* Central de Configurações do Jetro On-line */}
+                              <Route
+                                path="/admin/configuracoes/jetro-online"
+                                element={
+                                  <JetroOnlineProtectedRoute>
+                                    <JetroOnlineLayout />
+                                  </JetroOnlineProtectedRoute>
+                                }
+                              >
+                                <Route index element={<JetroOnlineGeneralSettingsScreen />} />
+                                <Route
+                                  path="universidade"
+                                  element={<JetroOnlineUniversidadeScreen />}
                                 />
-                              }
-                            />
-                            <Route
-                              path="/admin/bi/report-center"
-                              element={<BI screen="report-center" />}
-                            />
-                            <Route
-                              path="/admin/performance"
-                              element={<Performance screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/performance/comercial"
-                              element={<Performance screen="comercial" />}
-                            />
-                            <Route
-                              path="/admin/performance/financeiro"
-                              element={<Performance screen="financeiro" />}
-                            />
-                            <Route
-                              path="/admin/performance/fiscal"
-                              element={<Performance screen="fiscal" />}
-                            />
-                            <Route
-                              path="/admin/performance/compras"
-                              element={<Performance screen="compras" />}
-                            />
-                            <Route
-                              path="/admin/performance/estoque"
-                              element={<Performance screen="estoque" />}
-                            />
-                            <Route
-                              path="/admin/performance/logistica"
-                              element={<Performance screen="logistica" />}
-                            />
-                            <Route
-                              path="/admin/performance/producao"
-                              element={<Performance screen="producao" />}
-                            />
-                            <Route
-                              path="/admin/performance/marketing"
-                              element={<Performance screen="marketing" />}
-                            />
-                            <Route
-                              path="/admin/performance/rh"
-                              element={<Performance screen="rh" />}
-                            />
-                            <Route
-                              path="/admin/performance/ti"
-                              element={<Performance screen="ti" />}
-                            />
-                            <Route
-                              path="/admin/performance/administrativo"
-                              element={<Performance screen="administrativo" />}
-                            />
-                            <Route
-                              path="/admin/performance/estrategico"
-                              element={<Performance screen="estrategico" />}
-                            />
-                            <Route
-                              path="/admin/performance/geral"
-                              element={<Performance screen="geral" />}
-                            />
-                            <Route
-                              path="/admin/performance/gamification"
-                              element={<Performance screen="gamification" />}
-                            />
-                            <Route
-                              path="/admin/performance/config"
-                              element={<Performance screen="config" />}
-                            />
-                            <Route
-                              path="/admin/performance/chat"
-                              element={<Performance screen="chat" />}
-                            />
-                            <Route
-                              path="/admin/validade"
-                              element={<ValidityAlerts screen="alerts" />}
-                            />
-                            <Route
-                              path="/admin/validade/dashboard"
-                              element={<ValidityAlerts screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/validade/regras"
-                              element={<ValidityAlerts screen="regras" />}
-                            />
-                            <Route
-                              path="/admin/validade/chat"
-                              element={<ValidityAlerts screen="chat" />}
-                            />
-                            <Route
-                              path="/admin/atendimento"
-                              element={<Atendimento screen="dashboard" />}
-                            />
-                            <Route path="/admin/dp" element={<DP screen="dashboard" />} />
-                            <Route
-                              path="/admin/dp/admissions"
-                              element={<DP screen="admissions" />}
-                            />
-                            <Route path="/admin/dp/contracts" element={<DP screen="contracts" />} />
-                            <Route
-                              path="/admin/dp/contract-changes"
-                              element={<DP screen="contract_changes" />}
-                            />
-                            <Route path="/admin/dp/jornadas" element={<DP screen="jornadas" />} />
-                            <Route path="/admin/dp/escalas" element={<DP screen="escalas" />} />
-                            <Route path="/admin/dp/ponto" element={<DP screen="time_control" />} />
-                            <Route
-                              path="/admin/dp/banco-horas"
-                              element={<DP screen="bank_hours" />}
-                            />
-                            <Route
-                              path="/admin/dp/horas-extras"
-                              element={<DP screen="horas_extras" />}
-                            />
-                            <Route path="/admin/dp/folha" element={<DP screen="payroll" />} />
-                            <Route path="/admin/dp/rubricas" element={<DP screen="rubricas" />} />
-                            <Route path="/admin/dp/ferias" element={<DP screen="vacations" />} />
-                            <Route
-                              path="/admin/dp/13-salario"
-                              element={<DP screen="13th_salary" />}
-                            />
-                            <Route path="/admin/dp/afastamentos" element={<DP screen="leaves" />} />
-                            <Route path="/admin/dp/licencas" element={<DP screen="licenses" />} />
-                            <Route path="/admin/dp/beneficios" element={<DP screen="benefits" />} />
-                            <Route
-                              path="/admin/dp/rescisoes"
-                              element={<DP screen="dismissals" />}
-                            />
-                            <Route
-                              path="/admin/dp/reintegracao"
-                              element={<DP screen="reinstatement" />}
-                            />
-                            <Route path="/admin/dp/esocial" element={<DP screen="esocial" />} />
-                            <Route
-                              path="/admin/dp/esocial-monitor"
-                              element={<DP screen="esocial_monitor" />}
-                            />
-                            <Route path="/admin/dp/fgts" element={<DP screen="fgts_digital" />} />
-                            <Route path="/admin/dp/encargos" element={<DP screen="charges" />} />
-                            <Route
-                              path="/admin/dp/tabelas-tributarias"
-                              element={<DP screen="tax_tables" />}
-                            />
-                            <Route
-                              path="/admin/dp/consignados"
-                              element={<DP screen="consignments" />}
-                            />
-                            <Route path="/admin/dp/sindicatos" element={<DP screen="unions" />} />
-                            <Route
-                              path="/admin/dp/convencoes"
-                              element={<DP screen="collective_agreements" />}
-                            />
-                            <Route
-                              path="/admin/dp/dissidio"
-                              element={<DP screen="wage_adjustments" />}
-                            />
-                            <Route
-                              path="/admin/dp/provisoes"
-                              element={<DP screen="provisions" />}
-                            />
-                            <Route path="/admin/dp/exames" element={<DP screen="exams" />} />
-                            <Route path="/admin/dp/epis" element={<DP screen="uniforms_epis" />} />
-                            <Route
-                              path="/admin/dp/documentos-obrigatorios"
-                              element={<DP screen="mandatory_docs" />}
-                            />
-                            <Route
-                              path="/admin/dp/esocial-layouts"
-                              element={<DP screen="esocial_layouts" />}
-                            />
-                            <Route path="/admin/dp/relatorios" element={<DP screen="reports" />} />
-                            <Route path="/admin/dp/adapta" element={<DP screen="adapta" />} />
-                            <Route path="/admin/sst" element={<SST screen="dashboard" />} />
-                            <Route path="/admin/sst/cockpit" element={<SST screen="cockpit" />} />
-                            <Route
-                              path="/admin/sst/esocial-monitor"
-                              element={<SST screen="esocial_monitor" />}
-                            />
-                            <Route
-                              path="/admin/sst/compliance"
-                              element={<SST screen="compliance_dashboard" />}
-                            />
-                            <Route
-                              path="/admin/sst/training-matrix"
-                              element={<SST screen="training_matrix" />}
-                            />
-                            <Route path="/admin/sst/adapta" element={<SST screen="adapta" />} />
-                            <Route path="/admin/sst/reports" element={<SST screen="reports" />} />
-                            <Route path="/admin/sst/gro" element={<SST screen="gro" />} />
-                            <Route
-                              path="/admin/sst/risk-inventory"
-                              element={<SST screen="risk_inventory" />}
-                            />
-                            <Route
-                              path="/admin/sst/risk-matrix"
-                              element={<SST screen="risk_matrix_config" />}
-                            />
-                            <Route
-                              path="/admin/sst/action-plans"
-                              element={<SST screen="action_plans" />}
-                            />
-                            <Route
-                              path="/admin/sst/work-environments"
-                              element={<SST screen="work_environments" />}
-                            />
-                            <Route
-                              path="/admin/sst/exposure-groups"
-                              element={<SST screen="exposure_groups" />}
-                            />
-                            <Route
-                              path="/admin/sst/environmental-assessments"
-                              element={<SST screen="environmental_assessments" />}
-                            />
-                            <Route path="/admin/sst/ltcat" element={<SST screen="ltcat" />} />
-                            <Route path="/admin/sst/pcmso" element={<SST screen="pcmso" />} />
-                            <Route path="/admin/sst/aso" element={<SST screen="aso" />} />
-                            <Route
-                              path="/admin/sst/medical-records"
-                              element={<SST screen="medical_records" />}
-                            />
-                            <Route path="/admin/sst/epis" element={<SST screen="epis" />} />
-                            <Route path="/admin/sst/epcs" element={<SST screen="epcs" />} />
-                            <Route
-                              path="/admin/sst/accidents"
-                              element={<SST screen="accidents" />}
-                            />
-                            <Route path="/admin/sst/cat" element={<SST screen="cat" />} />
-                            <Route
-                              path="/admin/sst/incidents"
-                              element={<SST screen="incidents" />}
-                            />
-                            <Route path="/admin/sst/cipa" element={<SST screen="cipa" />} />
-                            <Route path="/admin/sst/sesmt" element={<SST screen="sesmt" />} />
-                            <Route
-                              path="/admin/sst/ergonomics"
-                              element={<SST screen="ergonomics" />}
-                            />
-                            <Route
-                              path="/admin/sst/inspections"
-                              element={<SST screen="inspections" />}
-                            />
-                            <Route path="/admin/sst/apr" element={<SST screen="apr" />} />
-                            <Route
-                              path="/admin/sst/work-permits"
-                              element={<SST screen="work_permits" />}
-                            />
-                            <Route path="/admin/sst/lockout" element={<SST screen="lockout" />} />
-                            <Route
-                              path="/admin/sst/confined-spaces"
-                              element={<SST screen="confined_spaces" />}
-                            />
-                            <Route
-                              path="/admin/sst/height-work"
-                              element={<SST screen="height_work" />}
-                            />
-                            <Route
-                              path="/admin/sst/emergencies"
-                              element={<SST screen="emergencies" />}
-                            />
-                            <Route path="/admin/sst/brigade" element={<SST screen="brigade" />} />
-                            <Route
-                              path="/admin/sst/moc"
-                              element={<SST screen="management_of_change" />}
-                            />
-                            <Route
-                              path="/admin/sst/nr-catalog"
-                              element={<SST screen="nr_catalog" />}
-                            />
-                            <Route
-                              path="/admin/sst/non-conformities"
-                              element={<SST screen="non_conformities" />}
-                            />
-                            <Route
-                              path="/admin/sst/psychosocial-assessments"
-                              element={<SST screen="psychosocial_assessments" />}
-                            />
-                            <Route path="/admin/sst/dds" element={<SST screen="dds" />} />
-                            <Route
-                              path="/admin/sst/vaccination"
-                              element={<SST screen="vaccination" />}
-                            />
-                            <Route
-                              path="/admin/sst/certificates"
-                              element={<SST screen="certificates" />}
-                            />
-                            <Route
-                              path="/admin/sst/documents"
-                              element={<SST screen="documents" />}
-                            />
-                            <Route
-                              path="/admin/sst/indicators"
-                              element={<SST screen="indicators" />}
-                            />
-                            <Route
-                              path="/admin/sst/obligations-calendar"
-                              element={<SST screen="obligations_calendar" />}
-                            />
-                            <Route
-                              path="/admin/promocoes"
-                              element={<Promotions screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/marketing"
-                              element={<MarketingEnterprise screen="cockpit" />}
-                            />
-                            <Route
-                              path="/admin/marketing/solicitacoes"
-                              element={<MarketingEnterprise screen="requests" />}
-                            />
-                            <Route
-                              path="/admin/marketing/jobs"
-                              element={<MarketingEnterprise screen="jobs" />}
-                            />
-                            <Route
-                              path="/admin/marketing/aprovacao-pecas"
-                              element={<MarketingEnterprise screen="approval" />}
-                            />
-                            <Route
-                              path="/admin/marketing/calendario"
-                              element={<MarketingEnterprise screen="calendar" />}
-                            />
-                            <Route
-                              path="/admin/marketing/midia"
-                              element={<MarketingEnterprise screen="media" />}
-                            />
-                            <Route
-                              path="/admin/marketing/atribuicao"
-                              element={<MarketingEnterprise screen="attribution" />}
-                            />
-                            <Route
-                              path="/admin/marketing/brand"
-                              element={<MarketingEnterprise screen="brand" />}
-                            />
-                            <Route
-                              path="/admin/marketing/biblioteca"
-                              element={<MarketingEnterprise screen="library" />}
-                            />
-                            <Route
-                              path="/admin/marketing/templates"
-                              element={<MarketingEnterprise screen="templates" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing"
-                              element={<TradeMarketing screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/calendario"
-                              element={<TradeMarketing screen="calendar" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/acoes"
-                              element={<TradeMarketing screen="actions" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/verbas-fornecedor"
-                              element={<TradeMarketing screen="verbas" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/materiais"
-                              element={<TradeMarketing screen="materials" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/prestacao-contas"
-                              element={<TradeMarketing screen="accountability" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/planejamento-anual"
-                              element={<TradeMarketing screen="annual-plan" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/adapta"
-                              element={<TradeMarketing screen="adapta" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/cotacoes-externas"
-                              element={<TradeMarketing screen="cotacoes-externas" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/conta-corrente"
-                              element={<SupplierAllowance screen="accounts" />}
-                            />
-                            <Route
-                              path="/admin/trade-marketing/aplicacao-produtos"
-                              element={<SupplierAllowance screen="appropriations" />}
-                            />
-                            <Route
-                              path="/admin/precificacao"
-                              element={<Navigate to="/admin/precificacao/aprovacoes" replace />}
-                            />
-                            <Route path="/admin/precificacao/:screen" element={<Precificacao />} />
-                            <Route
-                              path="/admin/agendamento-relatorios"
-                              element={<ReportSchedulesPage />}
-                            />
-                            <Route
-                              path="/admin/central-documentacao"
-                              element={<CentralDocumentacaoPage />}
-                            />
-                            {/* Central de Administração e Treinamento da Assistente Jeh */}
-                            <Route
-                              path="/admin/jeh"
-                              element={<Navigate to="/admin/jeh/visao-geral" replace />}
-                            />
-                            <Route
-                              path="/admin/jeh/visao-geral"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehOverviewScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/conhecimento"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehKnowledgeScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/perguntas-respostas"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehQAScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/treinamento"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehTrainingScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/testar"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehTestScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/sem-resposta"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehUnansweredScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/historico"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehHistoryScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path="/admin/jeh/configuracoes"
-                              element={
-                                <JehProtectedRoute>
-                                  <JehSettingsScreen />
-                                </JehProtectedRoute>
-                              }
-                            />
-                            <Route path="/admin/segundo-cerebro" element={<SegundoCerebroPage />} />
-                            <Route
-                              path="/admin/planilhas/convertidas/comparativo-margens-gr"
-                              element={<ComparativoMargensGrPage />}
-                            />
-                            <Route
-                              path="/admin/planilhas/convertidas/tabela-mae-gr"
-                              element={<TabelaMaeGrPage />}
-                            />
-                            <Route path="/admin/usuarios" element={<UsersAdminPage />} />
-                            <Route path="/admin/site-clientes" element={<SiteClientsAdmin />} />
-                            <Route
-                              path="/admin/site-depoimentos"
-                              element={<SiteTestimonialsAdmin />}
-                            />
-                            <Route path="/admin/auditoria" element={<Auditoria />} />
-                            <Route
-                              path="/admin/controladoria"
-                              element={<Controladoria screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/dre"
-                              element={<Controladoria screen="dre" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/dre-analitica"
-                              element={<Controladoria screen="dre-analitica" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/kpis"
-                              element={<Controladoria screen="kpis" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/drivers"
-                              element={<Controladoria screen="drivers" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/budget"
-                              element={<Controladoria screen="budget" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/forecast"
-                              element={<Controladoria screen="forecast" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/fechamento"
-                              element={<Controladoria screen="fechamento" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/simulador"
-                              element={<Controladoria screen="simulador" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/consolidacao"
-                              element={<Controladoria screen="consolidacao" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/materialidade"
-                              element={<Controladoria screen="materialidade" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/reclassificacoes"
-                              element={<Controladoria screen="reclassificacoes" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/visoes-salvas"
-                              element={<Controladoria screen="visoes-salvas" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/comentarios"
-                              element={<Controladoria screen="comentarios" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/centros-resultado"
-                              element={<Controladoria screen="centros-resultado" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/ebitda"
-                              element={<Controladoria screen="ebitda" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/adapta"
-                              element={<Controladoria screen="adapta" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/balanco"
-                              element={<Controladoria screen="balanco" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/fluxo-caixa"
-                              element={<Controladoria screen="fluxo-caixa" />}
-                            />
-                            <Route
-                              path="/admin/controladoria/configuracoes"
-                              element={<Controladoria screen="configuracoes" />}
-                            />
-                            <Route
-                              path="/admin/verbas"
-                              element={<SupplierAllowance screen="dashboard" />}
-                            />
-                            <Route
-                              path="/admin/verbas/cockpit"
-                              element={<SupplierAllowance screen="cockpit" />}
-                            />
-                            <Route
-                              path="/admin/verbas/acordos"
-                              element={<SupplierAllowance screen="agreements" />}
-                            />
-                            <Route
-                              path="/admin/verbas/conta-corrente"
-                              element={<SupplierAllowance screen="accounts" />}
-                            />
-                            <Route
-                              path="/admin/verbas/movimentacoes"
-                              element={<SupplierAllowance screen="movements" />}
-                            />
-                            <Route
-                              path="/admin/verbas/apuracoes"
-                              element={<SupplierAllowance screen="accruals" />}
-                            />
-                            <Route
-                              path="/admin/verbas/aplicacao-produtos"
-                              element={<SupplierAllowance screen="appropriations" />}
-                            />
-                            <Route
-                              path="/admin/verbas/consumos"
-                              element={<SupplierAllowance screen="consumptions" />}
-                            />
-                            <Route
-                              path="/admin/verbas/prestacao-contas"
-                              element={<SupplierAllowance screen="settlements" />}
-                            />
-                            <Route
-                              path="/admin/verbas/por-fornecedor"
-                              element={<TradeMarketing screen="verbas" />}
-                            />
-                            <Route
-                              path="/admin/verbas/cotacoes-externas"
-                              element={<TradeMarketing screen="cotacoes-externas" />}
-                            />
-                            <Route
-                              path="/admin/verbas/gastos-trade"
-                              element={<SupplierAllowance screen="trade-expenses" />}
-                            />
-                            <Route
-                              path="/admin/verbas/creditos-avulsos"
-                              element={<SupplierAllowance screen="adhoc-credits" />}
-                            />
-                            <Route
-                              path="/admin/verbas/documentos"
-                              element={<SupplierAllowance screen="documents" />}
-                            />
-                            <Route
-                              path="/admin/verbas/auditoria-corporativa"
-                              element={<SupplierAllowance screen="corporate-audit" />}
-                            />
-                            <Route
-                              path="/admin/verbas/contas-correntes"
-                              element={<SupplierAllowance screen="current-accounts" />}
-                            />
-                            <Route
-                              path="/admin/verbas/adapta"
-                              element={<SupplierAllowance screen="adapta-chat" />}
-                            />
-                            <Route
-                              path="/admin/verbas/versionamento-relatorios"
-                              element={<SupplierAllowance screen="report-versions" />}
-                            />
-                            <Route path="/cliente/login" element={<ClientLogin />} />
-                            <Route path="/cliente/cadastro" element={<ClientRegister />} />
-                            <Route path="/cliente/recuperar-senha" element={<PasswordRecovery />} />
-                            <Route
-                              path="/cliente/redefinir-senha"
-                              element={<ClientPasswordReset />}
-                            />
-                            <Route path="/_/" element={<ClientPasswordReset />} />
-                            <Route path="/cliente" element={<ClientArea />} />
-                            <Route path="/cliente/rastreamento" element={<ClientTracking />} />
-                            <Route
-                              path="/politica-de-privacidade"
-                              element={<PoliticaPrivacidade />}
-                            />
-                            <Route path="/politica-comercial" element={<PoliticaComercial />} />
-                            <Route path="/termos-de-uso" element={<TermosDeUso />} />
-                            <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
-                            <Route path="/politica-de-seguranca" element={<PoliticaSeguranca />} />
-                            <Route
-                              path="/central-de-privacidade"
-                              element={<CentralDePrivacidade />}
-                            />
-                            <Route path="/canal-de-privacidade" element={<CanalDePrivacidade />} />
-                            <Route
-                              path="/politica-de-licenciamento"
-                              element={<PoliticaLicenciamento />}
-                            />
-                            <Route path="/politica-de-sla" element={<PoliticaSla />} />
-                            <Route
-                              path="/politica-de-backup-continuidade"
-                              element={<PoliticaBackupContinuidade />}
-                            />
-                            <Route path="*" element={<NotFound />} />
-                          </Route>
-                        </Routes>
-                      </TourProvider>
-                    </JetroOnlineProvider>
+                                <Route path="perguntas" element={<JetroOnlinePerguntasScreen />} />
+                                <Route path="historico" element={<JetroOnlineHistoricoScreen />} />
+                                <Route path="sugestoes" element={<JetroOnlineSugestoesScreen />} />
+                                <Route path="recursos" element={<JetroOnlineRecursosScreen />} />
+                                <Route path="tours" element={<JetroOnlineToursScreen />} />
+                                <Route
+                                  path="relatorios"
+                                  element={<JetroOnlineRelatoriosScreen />}
+                                />
+                              </Route>
+
+                              <Route path="/admin/configuracoes" element={<ConfiguracoesLayout />}>
+                                <Route index element={<Navigate to="dados-empresa" replace />} />
+                                <Route path="dados-empresa" element={<EmpresaScreen />} />
+                                <Route path="parametros" element={<ParametrosScreen />} />
+                                <Route path="permissoes" element={<PermissionMatrixScreen />} />
+                                <Route path="logs" element={<LogsScreen />} />
+                                <Route
+                                  path="integracoes"
+                                  element={<ConfigCrudScreen config={INTEGRATIONS_CONFIG} />}
+                                />
+                                <Route path="apis" element={<ApisScreen />} />
+                                <Route
+                                  path="importacao-exportacao"
+                                  element={<ImportExportScreen />}
+                                />
+                                <Route
+                                  path="modelos-email"
+                                  element={<ConfigCrudScreen config={EMAIL_TEMPLATE_CONFIG} />}
+                                />
+                                <Route
+                                  path="modelos-documentos"
+                                  element={<ConfigCrudScreen config={DOC_TEMPLATE_CONFIG} />}
+                                />
+                                <Route
+                                  path="notificacoes"
+                                  element={<ConfigCrudScreen config={NOTIFICATION_CONFIG} />}
+                                />
+                                <Route
+                                  path="numeracoes"
+                                  element={<ConfigCrudScreen config={NUMERATION_CONFIG} />}
+                                />
+                                <Route path="seguranca" element={<SegurancaScreen />} />
+                                <Route path="backup" element={<BackupScreen />} />
+                              </Route>
+                              <Route
+                                path="/admin/financeiro"
+                                element={<Financial screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/contas-receber"
+                                element={<Financial screen="receivables" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/contas-pagar"
+                                element={<Financial screen="payables" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/fluxo-caixa"
+                                element={<Financial screen="cash_flow" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/conciliacao"
+                                element={<Financial screen="reconciliation" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/tesouraria"
+                                element={<Financial screen="treasury" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/cheques"
+                                element={<Financial screen="checks" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/cartoes"
+                                element={<Financial screen="cards" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/boletos"
+                                element={<Financial screen="boletos" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/pix"
+                                element={<Financial screen="pix" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/cobrancas"
+                                element={<Financial screen="collections" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/cobranca-config"
+                                element={<CollectionCenterConfig />}
+                              />
+                              <Route
+                                path="/admin/financeiro/cobranca-certificacao"
+                                element={<CollectionCenterCertification />}
+                              />
+                              <Route
+                                path="/admin/financeiro/caixa"
+                                element={<Financial screen="cash_register" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/movimentacoes"
+                                element={<Financial screen="movements" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/transferencias"
+                                element={<Financial screen="transfers" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/aprovacoes"
+                                element={<Financial screen="approvals" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/fechamento"
+                                element={<Financial screen="closing" />}
+                              />
+                              <Route
+                                path="/admin/financeiro/relatorios"
+                                element={<Financial screen="reports" />}
+                              />
+                              <Route path="/admin/rh" element={<RH screen="dashboard" />} />
+                              <Route
+                                path="/admin/rh/colaboradores"
+                                element={<RH screen="employees" />}
+                              />
+                              <Route path="/admin/rh/cargos" element={<RH screen="positions" />} />
+                              <Route
+                                path="/admin/rh/departamentos"
+                                element={<RH screen="departments" />}
+                              />
+                              <Route
+                                path="/admin/rh/ponto"
+                                element={<RH screen="time_control" />}
+                              />
+                              <Route path="/admin/rh/ferias" element={<RH screen="vacations" />} />
+                              <Route path="/admin/rh/folha" element={<RH screen="payroll" />} />
+                              <Route
+                                path="/admin/rh/beneficios"
+                                element={<RH screen="benefits" />}
+                              />
+                              <Route
+                                path="/admin/rh/treinamentos"
+                                element={<RH screen="trainings" />}
+                              />
+                              <Route
+                                path="/admin/rh/documentos"
+                                element={<RH screen="documents" />}
+                              />
+                              <Route
+                                path="/admin/rh/aprovacoes"
+                                element={<RH screen="approvals" />}
+                              />
+                              <Route
+                                path="/admin/rh/relatorios"
+                                element={<RH screen="reports" />}
+                              />
+                              <Route path="/admin/conformidade" element={<Conformidade />} />
+                              <Route path="/admin/fiscal" element={<Fiscal screen="dashboard" />} />
+                              <Route
+                                path="/admin/fiscal/entrada"
+                                element={<Fiscal screen="entrada" />}
+                              />
+                              <Route path="/admin/fiscal/nfe" element={<Fiscal screen="nfe" />} />
+                              <Route path="/admin/fiscal/nfse" element={<Fiscal screen="nfse" />} />
+                              <Route path="/admin/fiscal/nfce" element={<Fiscal screen="nfce" />} />
+                              <Route path="/admin/fiscal/cte" element={<Fiscal screen="cte" />} />
+                              <Route path="/admin/fiscal/mdfe" element={<Fiscal screen="mdfe" />} />
+                              <Route
+                                path="/admin/fiscal/apuracao"
+                                element={<Fiscal screen="apuracao" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-dashboard"
+                                element={<Fiscal screen="reforma_dashboard" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-cbs-ibs"
+                                element={<Fiscal screen="reforma_cbs_ibs" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-seletivo"
+                                element={<Fiscal screen="reforma_seletivo" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-classificacao"
+                                element={<Fiscal screen="reforma_classificacao" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-regras"
+                                element={<Fiscal screen="reforma_regras" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-transicao"
+                                element={<Fiscal screen="reforma_transicao" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-creditos"
+                                element={<Fiscal screen="reforma_creditos" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-simulador"
+                                element={<Fiscal screen="reforma_simulador" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/reforma-validacao"
+                                element={<Fiscal screen="reforma_validacao" />}
+                              />
+                              <Route path="/admin/fiscal/sped" element={<Fiscal screen="sped" />} />
+                              <Route
+                                path="/admin/fiscal/livros"
+                                element={<Fiscal screen="livros" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/correcao"
+                                element={<Fiscal screen="correcao" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/manifestacao"
+                                element={<Fiscal screen="manifestacao" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/documentos"
+                                element={<Fiscal screen="documentos" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/inutilizacao"
+                                element={<Fiscal screen="inutilizacao" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/certificados"
+                                element={<Fiscal screen="certificados" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/configuracoes"
+                                element={<Fiscal screen="configuracoes" />}
+                              />
+                              <Route
+                                path="/admin/fiscal/relatorios"
+                                element={<Fiscal screen="relatorios" />}
+                              />
+                              <Route path="/admin/crm" element={<CRM screen="dashboard" />} />
+                              <Route path="/admin/crm/leads" element={<CRM screen="leads" />} />
+                              <Route
+                                path="/admin/crm/oportunidades"
+                                element={<CRM screen="oportunidades" />}
+                              />
+                              <Route path="/admin/crm/funil" element={<CRM screen="funil" />} />
+                              <Route
+                                path="/admin/crm/funil-config"
+                                element={<CRM screen="funil-config" />}
+                              />
+                              <Route path="/admin/crm/agenda" element={<CRM screen="agenda" />} />
+                              <Route
+                                path="/admin/crm/propostas"
+                                element={<CRM screen="propostas" />}
+                              />
+                              <Route
+                                path="/admin/crm/historico"
+                                element={<CRM screen="historico" />}
+                              />
+                              <Route
+                                path="/admin/crm/atividades"
+                                element={<CRM screen="atividades" />}
+                              />
+                              <Route
+                                path="/admin/crm/motivos-perda"
+                                element={<CRM screen="motivos-perda" />}
+                              />
+                              <Route path="/admin/crm/metas" element={<CRM screen="metas" />} />
+                              <Route
+                                path="/admin/crm/automacao"
+                                element={<CRM screen="automacao" />}
+                              />
+                              <Route
+                                path="/admin/crm/relatorios"
+                                element={<CRM screen="relatorios" />}
+                              />
+                              <Route path="/admin/notificacoes" element={<Notifications />} />
+                              <Route
+                                path="/admin/ia/dashboard"
+                                element={<AIModule screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/ia/assistente"
+                                element={<AIModule screen="assistant" />}
+                              />
+                              <Route
+                                path="/admin/ia/agentes"
+                                element={<AIModule screen="agents" />}
+                              />
+                              <Route
+                                path="/admin/ia/automacoes"
+                                element={<AIModule screen="automations" />}
+                              />
+                              <Route
+                                path="/admin/ia/fluxos"
+                                element={<AIModule screen="flows" />}
+                              />
+                              <Route
+                                path="/admin/ia/base-conhecimento"
+                                element={<AIModule screen="knowledge" />}
+                              />
+                              <Route
+                                path="/admin/ia/treinamento"
+                                element={<AIModule screen="training" />}
+                              />
+                              <Route
+                                path="/admin/ia/historico"
+                                element={<AIModule screen="history" />}
+                              />
+                              <Route
+                                path="/admin/ia/aprovacoes"
+                                element={<AIModule screen="approvals" />}
+                              />
+                              <Route
+                                path="/admin/ia/configuracoes"
+                                element={<AIModule screen="settings" />}
+                              />
+                              <Route
+                                path="/admin/governanca-adapta"
+                                element={<AdaptaGovernance />}
+                              />
+                              <Route
+                                path="/admin/industria"
+                                element={<Industry screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/industria/catalogo"
+                                element={<Industry screen="catalogo" />}
+                              />
+                              <Route
+                                path="/admin/industria/especificacoes"
+                                element={<Industry screen="especificacoes" />}
+                              />
+                              <Route
+                                path="/admin/industria/conversoes"
+                                element={<Industry screen="conversoes" />}
+                              />
+                              <Route
+                                path="/admin/industria/bom"
+                                element={<Industry screen="bom" />}
+                              />
+                              <Route
+                                path="/admin/industria/engenharia-bom"
+                                element={<Industry screen="engenharia-bom" />}
+                              />
+                              <Route
+                                path="/admin/industria/formulacoes"
+                                element={<Industry screen="formulacoes" />}
+                              />
+                              <Route
+                                path="/admin/industria/engenharia"
+                                element={<Industry screen="engenharia" />}
+                              />
+                              <Route
+                                path="/admin/industria/recursos"
+                                element={<Industry screen="recursos" />}
+                              />
+                              <Route
+                                path="/admin/industria/roteiros"
+                                element={<Industry screen="roteiros" />}
+                              />
+                              <Route
+                                path="/admin/industria/capacidade"
+                                element={<Industry screen="capacidade" />}
+                              />
+                              <Route
+                                path="/admin/industria/plano-mestre"
+                                element={<Industry screen="plano-mestre" />}
+                              />
+                              <Route
+                                path="/admin/industria/aps"
+                                element={<Industry screen="aps" />}
+                              />
+                              <Route
+                                path="/admin/industria/planejamento"
+                                element={<Industry screen="planejamento" />}
+                              />
+                              <Route
+                                path="/admin/industria/custos"
+                                element={<Industry screen="custos" />}
+                              />
+                              <Route
+                                path="/admin/industria/ordens-producao"
+                                element={<Industry screen="ordens-producao" />}
+                              />
+                              <Route
+                                path="/admin/industria/execucao"
+                                element={<Industry screen="execucao" />}
+                              />
+                              <Route
+                                path="/admin/industria/fases"
+                                element={<Industry screen="fases" />}
+                              />
+                              <Route
+                                path="/admin/industria/qualidade"
+                                element={<Industry screen="qualidade" />}
+                              />
+                              <Route
+                                path="/admin/industria/rastreabilidade"
+                                element={<Industry screen="rastreabilidade" />}
+                              />
+                              <Route
+                                path="/admin/industria/kpis"
+                                element={<Industry screen="kpis" />}
+                              />
+                              <Route
+                                path="/admin/industria/manutencao"
+                                element={<Industry screen="manutencao" />}
+                              />
+                              <Route
+                                path="/admin/industria/calibracao"
+                                element={<Industry screen="calibracao" />}
+                              />
+                              <Route
+                                path="/admin/industria/executivo"
+                                element={<Industry screen="executivo" />}
+                              />
+                              <Route
+                                path="/admin/industria/cockpit"
+                                element={<Industry screen="cockpit" />}
+                              />
+                              <Route
+                                path="/admin/industria/intelligence"
+                                element={<Industry screen="intelligence" />}
+                              />
+                              <Route
+                                path="/admin/industria/adapta"
+                                element={<Industry screen="adapta" />}
+                              />
+                              <Route
+                                path="/admin/phase0-foundation"
+                                element={<Phase0Foundation />}
+                              />
+                              <Route path="/admin/platform-layer" element={<PlatformLayer />} />
+                              <Route path="/admin/blueprint" element={<Blueprint />} />
+                              <Route path="/admin/cadastro" element={<AdminRegister />} />
+                              <Route
+                                path="/admin/recuperar-senha"
+                                element={<AdminPasswordRecovery />}
+                              />
+                              <Route
+                                path="/admin/remuneracao"
+                                element={<VariableRemuneration screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/regras"
+                                element={<VariableRemuneration screen="rules" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/apuracao"
+                                element={<VariableRemuneration screen="apuration" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/simulador"
+                                element={<VariableRemuneration screen="simulator" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/aprovacoes"
+                                element={<VariableRemuneration screen="approvals" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/historico"
+                                element={<VariableRemuneration screen="history" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/contestacoes"
+                                element={<VariableRemuneration screen="contests" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/campanhas"
+                                element={<VariableRemuneration screen="campaigns" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/ranking"
+                                element={<VariableRemuneration screen="ranking" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/metas"
+                                element={<VariableRemuneration screen="goals" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/metas-gestao"
+                                element={<VariableRemuneration screen="goals-management" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/metas-premiacoes"
+                                element={<VariableRemuneration screen="goals-awards" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/metas-comunicacoes"
+                                element={<VariableRemuneration screen="goals-communications" />}
+                              />
+                              <Route
+                                path="/admin/remuneracao/metas-vendedor"
+                                element={<VariableRemuneration screen="goals-seller" />}
+                              />
+                              <Route path="/admin/bi" element={<BI screen="dashboard" />} />
+                              <Route
+                                path="/admin/bi/executive"
+                                element={<BI screen="executive" />}
+                              />
+                              <Route
+                                path="/admin/bi/commercial"
+                                element={<BI screen="commercial" />}
+                              />
+                              <Route
+                                path="/admin/bi/financial-intel"
+                                element={<BI screen="financial-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/industrial-intel"
+                                element={<BI screen="industrial-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/logistics-intel"
+                                element={<BI screen="logistics-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/stock-intel"
+                                element={<BI screen="stock-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/fiscal-intel"
+                                element={<BI screen="fiscal-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/purchasing-intel"
+                                element={<BI screen="purchasing-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/crm-intel"
+                                element={<BI screen="crm-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/trade-intel"
+                                element={<BI screen="trade-intel" />}
+                              />
+                              <Route path="/admin/bi/rh-intel" element={<BI screen="rh-intel" />} />
+                              <Route
+                                path="/admin/bi/quality-intel"
+                                element={<BI screen="quality-intel" />}
+                              />
+                              <Route
+                                path="/admin/bi/maintenance-intel"
+                                element={<BI screen="maintenance-intel" />}
+                              />
+                              <Route path="/admin/bi/vr-intel" element={<BI screen="vr-intel" />} />
+                              <Route
+                                path="/admin/bi/custom-dashboards"
+                                element={<BI screen="custom-dashboards" />}
+                              />
+                              <Route
+                                path="/admin/bi/ai-adapta"
+                                element={<BI screen="ai-adapta" />}
+                              />
+                              <Route
+                                path="/admin/bi/cross-module"
+                                element={<BI screen="cross-module" />}
+                              />
+                              <Route
+                                path="/admin/bi/projection"
+                                element={<BI screen="projection" />}
+                              />
+                              <Route path="/admin/bi/sales" element={<BI screen="sales" />} />
+                              <Route path="/admin/bi/stock" element={<BI screen="stock" />} />
+                              <Route
+                                path="/admin/bi/financial"
+                                element={<BI screen="financial" />}
+                              />
+                              <Route
+                                path="/admin/bi/industrial"
+                                element={<BI screen="industrial" />}
+                              />
+                              <Route
+                                path="/admin/bi/saved-views"
+                                element={<BI screen="saved-views" />}
+                              />
+                              <Route
+                                path="/admin/bi/marketing-intel"
+                                element={
+                                  <BiCenterWrapper
+                                    title="Inteligência de Marketing"
+                                    description="Indicadores de marketing enterprise"
+                                    loadFunction={getMarketingIntelligence}
+                                    realtimeCollection="mk_requests"
+                                  />
+                                }
+                              />
+                              <Route
+                                path="/admin/bi/report-center"
+                                element={<BI screen="report-center" />}
+                              />
+                              <Route
+                                path="/admin/performance"
+                                element={<Performance screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/performance/comercial"
+                                element={<Performance screen="comercial" />}
+                              />
+                              <Route
+                                path="/admin/performance/financeiro"
+                                element={<Performance screen="financeiro" />}
+                              />
+                              <Route
+                                path="/admin/performance/fiscal"
+                                element={<Performance screen="fiscal" />}
+                              />
+                              <Route
+                                path="/admin/performance/compras"
+                                element={<Performance screen="compras" />}
+                              />
+                              <Route
+                                path="/admin/performance/estoque"
+                                element={<Performance screen="estoque" />}
+                              />
+                              <Route
+                                path="/admin/performance/logistica"
+                                element={<Performance screen="logistica" />}
+                              />
+                              <Route
+                                path="/admin/performance/producao"
+                                element={<Performance screen="producao" />}
+                              />
+                              <Route
+                                path="/admin/performance/marketing"
+                                element={<Performance screen="marketing" />}
+                              />
+                              <Route
+                                path="/admin/performance/rh"
+                                element={<Performance screen="rh" />}
+                              />
+                              <Route
+                                path="/admin/performance/ti"
+                                element={<Performance screen="ti" />}
+                              />
+                              <Route
+                                path="/admin/performance/administrativo"
+                                element={<Performance screen="administrativo" />}
+                              />
+                              <Route
+                                path="/admin/performance/estrategico"
+                                element={<Performance screen="estrategico" />}
+                              />
+                              <Route
+                                path="/admin/performance/geral"
+                                element={<Performance screen="geral" />}
+                              />
+                              <Route
+                                path="/admin/performance/gamification"
+                                element={<Performance screen="gamification" />}
+                              />
+                              <Route
+                                path="/admin/performance/config"
+                                element={<Performance screen="config" />}
+                              />
+                              <Route
+                                path="/admin/performance/chat"
+                                element={<Performance screen="chat" />}
+                              />
+                              <Route
+                                path="/admin/validade"
+                                element={<ValidityAlerts screen="alerts" />}
+                              />
+                              <Route
+                                path="/admin/validade/dashboard"
+                                element={<ValidityAlerts screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/validade/regras"
+                                element={<ValidityAlerts screen="regras" />}
+                              />
+                              <Route
+                                path="/admin/validade/chat"
+                                element={<ValidityAlerts screen="chat" />}
+                              />
+                              <Route
+                                path="/admin/atendimento"
+                                element={<Atendimento screen="dashboard" />}
+                              />
+                              <Route path="/admin/dp" element={<DP screen="dashboard" />} />
+                              <Route
+                                path="/admin/dp/admissions"
+                                element={<DP screen="admissions" />}
+                              />
+                              <Route
+                                path="/admin/dp/contracts"
+                                element={<DP screen="contracts" />}
+                              />
+                              <Route
+                                path="/admin/dp/contract-changes"
+                                element={<DP screen="contract_changes" />}
+                              />
+                              <Route path="/admin/dp/jornadas" element={<DP screen="jornadas" />} />
+                              <Route path="/admin/dp/escalas" element={<DP screen="escalas" />} />
+                              <Route
+                                path="/admin/dp/ponto"
+                                element={<DP screen="time_control" />}
+                              />
+                              <Route
+                                path="/admin/dp/banco-horas"
+                                element={<DP screen="bank_hours" />}
+                              />
+                              <Route
+                                path="/admin/dp/horas-extras"
+                                element={<DP screen="horas_extras" />}
+                              />
+                              <Route path="/admin/dp/folha" element={<DP screen="payroll" />} />
+                              <Route path="/admin/dp/rubricas" element={<DP screen="rubricas" />} />
+                              <Route path="/admin/dp/ferias" element={<DP screen="vacations" />} />
+                              <Route
+                                path="/admin/dp/13-salario"
+                                element={<DP screen="13th_salary" />}
+                              />
+                              <Route
+                                path="/admin/dp/afastamentos"
+                                element={<DP screen="leaves" />}
+                              />
+                              <Route path="/admin/dp/licencas" element={<DP screen="licenses" />} />
+                              <Route
+                                path="/admin/dp/beneficios"
+                                element={<DP screen="benefits" />}
+                              />
+                              <Route
+                                path="/admin/dp/rescisoes"
+                                element={<DP screen="dismissals" />}
+                              />
+                              <Route
+                                path="/admin/dp/reintegracao"
+                                element={<DP screen="reinstatement" />}
+                              />
+                              <Route path="/admin/dp/esocial" element={<DP screen="esocial" />} />
+                              <Route
+                                path="/admin/dp/esocial-monitor"
+                                element={<DP screen="esocial_monitor" />}
+                              />
+                              <Route path="/admin/dp/fgts" element={<DP screen="fgts_digital" />} />
+                              <Route path="/admin/dp/encargos" element={<DP screen="charges" />} />
+                              <Route
+                                path="/admin/dp/tabelas-tributarias"
+                                element={<DP screen="tax_tables" />}
+                              />
+                              <Route
+                                path="/admin/dp/consignados"
+                                element={<DP screen="consignments" />}
+                              />
+                              <Route path="/admin/dp/sindicatos" element={<DP screen="unions" />} />
+                              <Route
+                                path="/admin/dp/convencoes"
+                                element={<DP screen="collective_agreements" />}
+                              />
+                              <Route
+                                path="/admin/dp/dissidio"
+                                element={<DP screen="wage_adjustments" />}
+                              />
+                              <Route
+                                path="/admin/dp/provisoes"
+                                element={<DP screen="provisions" />}
+                              />
+                              <Route path="/admin/dp/exames" element={<DP screen="exams" />} />
+                              <Route
+                                path="/admin/dp/epis"
+                                element={<DP screen="uniforms_epis" />}
+                              />
+                              <Route
+                                path="/admin/dp/documentos-obrigatorios"
+                                element={<DP screen="mandatory_docs" />}
+                              />
+                              <Route
+                                path="/admin/dp/esocial-layouts"
+                                element={<DP screen="esocial_layouts" />}
+                              />
+                              <Route
+                                path="/admin/dp/relatorios"
+                                element={<DP screen="reports" />}
+                              />
+                              <Route path="/admin/dp/adapta" element={<DP screen="adapta" />} />
+                              <Route path="/admin/sst" element={<SST screen="dashboard" />} />
+                              <Route path="/admin/sst/cockpit" element={<SST screen="cockpit" />} />
+                              <Route
+                                path="/admin/sst/esocial-monitor"
+                                element={<SST screen="esocial_monitor" />}
+                              />
+                              <Route
+                                path="/admin/sst/compliance"
+                                element={<SST screen="compliance_dashboard" />}
+                              />
+                              <Route
+                                path="/admin/sst/training-matrix"
+                                element={<SST screen="training_matrix" />}
+                              />
+                              <Route path="/admin/sst/adapta" element={<SST screen="adapta" />} />
+                              <Route path="/admin/sst/reports" element={<SST screen="reports" />} />
+                              <Route path="/admin/sst/gro" element={<SST screen="gro" />} />
+                              <Route
+                                path="/admin/sst/risk-inventory"
+                                element={<SST screen="risk_inventory" />}
+                              />
+                              <Route
+                                path="/admin/sst/risk-matrix"
+                                element={<SST screen="risk_matrix_config" />}
+                              />
+                              <Route
+                                path="/admin/sst/action-plans"
+                                element={<SST screen="action_plans" />}
+                              />
+                              <Route
+                                path="/admin/sst/work-environments"
+                                element={<SST screen="work_environments" />}
+                              />
+                              <Route
+                                path="/admin/sst/exposure-groups"
+                                element={<SST screen="exposure_groups" />}
+                              />
+                              <Route
+                                path="/admin/sst/environmental-assessments"
+                                element={<SST screen="environmental_assessments" />}
+                              />
+                              <Route path="/admin/sst/ltcat" element={<SST screen="ltcat" />} />
+                              <Route path="/admin/sst/pcmso" element={<SST screen="pcmso" />} />
+                              <Route path="/admin/sst/aso" element={<SST screen="aso" />} />
+                              <Route
+                                path="/admin/sst/medical-records"
+                                element={<SST screen="medical_records" />}
+                              />
+                              <Route path="/admin/sst/epis" element={<SST screen="epis" />} />
+                              <Route path="/admin/sst/epcs" element={<SST screen="epcs" />} />
+                              <Route
+                                path="/admin/sst/accidents"
+                                element={<SST screen="accidents" />}
+                              />
+                              <Route path="/admin/sst/cat" element={<SST screen="cat" />} />
+                              <Route
+                                path="/admin/sst/incidents"
+                                element={<SST screen="incidents" />}
+                              />
+                              <Route path="/admin/sst/cipa" element={<SST screen="cipa" />} />
+                              <Route path="/admin/sst/sesmt" element={<SST screen="sesmt" />} />
+                              <Route
+                                path="/admin/sst/ergonomics"
+                                element={<SST screen="ergonomics" />}
+                              />
+                              <Route
+                                path="/admin/sst/inspections"
+                                element={<SST screen="inspections" />}
+                              />
+                              <Route path="/admin/sst/apr" element={<SST screen="apr" />} />
+                              <Route
+                                path="/admin/sst/work-permits"
+                                element={<SST screen="work_permits" />}
+                              />
+                              <Route path="/admin/sst/lockout" element={<SST screen="lockout" />} />
+                              <Route
+                                path="/admin/sst/confined-spaces"
+                                element={<SST screen="confined_spaces" />}
+                              />
+                              <Route
+                                path="/admin/sst/height-work"
+                                element={<SST screen="height_work" />}
+                              />
+                              <Route
+                                path="/admin/sst/emergencies"
+                                element={<SST screen="emergencies" />}
+                              />
+                              <Route path="/admin/sst/brigade" element={<SST screen="brigade" />} />
+                              <Route
+                                path="/admin/sst/moc"
+                                element={<SST screen="management_of_change" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr-catalog"
+                                element={<SST screen="nr_catalog" />}
+                              />
+                              <Route
+                                path="/admin/sst/non-conformities"
+                                element={<SST screen="non_conformities" />}
+                              />
+                              <Route
+                                path="/admin/sst/psychosocial-assessments"
+                                element={<SST screen="psychosocial_assessments" />}
+                              />
+                              <Route path="/admin/sst/dds" element={<SST screen="dds" />} />
+                              <Route
+                                path="/admin/sst/vaccination"
+                                element={<SST screen="vaccination" />}
+                              />
+                              <Route
+                                path="/admin/sst/certificates"
+                                element={<SST screen="certificates" />}
+                              />
+                              <Route
+                                path="/admin/sst/documents"
+                                element={<SST screen="documents" />}
+                              />
+                              <Route
+                                path="/admin/sst/indicators"
+                                element={<SST screen="indicators" />}
+                              />
+                              <Route
+                                path="/admin/sst/obligations-calendar"
+                                element={<SST screen="obligations_calendar" />}
+                              />
+                              <Route
+                                path="/admin/promocoes"
+                                element={<Promotions screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/marketing"
+                                element={<MarketingEnterprise screen="cockpit" />}
+                              />
+                              <Route
+                                path="/admin/marketing/solicitacoes"
+                                element={<MarketingEnterprise screen="requests" />}
+                              />
+                              <Route
+                                path="/admin/marketing/jobs"
+                                element={<MarketingEnterprise screen="jobs" />}
+                              />
+                              <Route
+                                path="/admin/marketing/aprovacao-pecas"
+                                element={<MarketingEnterprise screen="approval" />}
+                              />
+                              <Route
+                                path="/admin/marketing/calendario"
+                                element={<MarketingEnterprise screen="calendar" />}
+                              />
+                              <Route
+                                path="/admin/marketing/midia"
+                                element={<MarketingEnterprise screen="media" />}
+                              />
+                              <Route
+                                path="/admin/marketing/atribuicao"
+                                element={<MarketingEnterprise screen="attribution" />}
+                              />
+                              <Route
+                                path="/admin/marketing/brand"
+                                element={<MarketingEnterprise screen="brand" />}
+                              />
+                              <Route
+                                path="/admin/marketing/biblioteca"
+                                element={<MarketingEnterprise screen="library" />}
+                              />
+                              <Route
+                                path="/admin/marketing/templates"
+                                element={<MarketingEnterprise screen="templates" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing"
+                                element={<TradeMarketing screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/calendario"
+                                element={<TradeMarketing screen="calendar" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/acoes"
+                                element={<TradeMarketing screen="actions" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/verbas-fornecedor"
+                                element={<TradeMarketing screen="verbas" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/materiais"
+                                element={<TradeMarketing screen="materials" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/prestacao-contas"
+                                element={<TradeMarketing screen="accountability" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/planejamento-anual"
+                                element={<TradeMarketing screen="annual-plan" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/adapta"
+                                element={<TradeMarketing screen="adapta" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/cotacoes-externas"
+                                element={<TradeMarketing screen="cotacoes-externas" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/conta-corrente"
+                                element={<SupplierAllowance screen="accounts" />}
+                              />
+                              <Route
+                                path="/admin/trade-marketing/aplicacao-produtos"
+                                element={<SupplierAllowance screen="appropriations" />}
+                              />
+                              <Route
+                                path="/admin/precificacao"
+                                element={<Navigate to="/admin/precificacao/aprovacoes" replace />}
+                              />
+                              <Route
+                                path="/admin/precificacao/:screen"
+                                element={<Precificacao />}
+                              />
+                              <Route
+                                path="/admin/agendamento-relatorios"
+                                element={<ReportSchedulesPage />}
+                              />
+                              <Route
+                                path="/admin/central-documentacao"
+                                element={<CentralDocumentacaoPage />}
+                              />
+                              {/* Central de Administração e Treinamento da Assistente Jeh */}
+                              <Route
+                                path="/admin/jeh"
+                                element={<Navigate to="/admin/jeh/visao-geral" replace />}
+                              />
+                              <Route
+                                path="/admin/jeh/visao-geral"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehOverviewScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/conhecimento"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehKnowledgeScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/perguntas-respostas"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehQAScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/treinamento"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehTrainingScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/testar"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehTestScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/sem-resposta"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehUnansweredScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/historico"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehHistoryScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/jeh/configuracoes"
+                                element={
+                                  <JehProtectedRoute>
+                                    <JehSettingsScreen />
+                                  </JehProtectedRoute>
+                                }
+                              />
+                              <Route
+                                path="/admin/segundo-cerebro"
+                                element={<SegundoCerebroPage />}
+                              />
+                              <Route
+                                path="/admin/planilhas/convertidas/comparativo-margens-gr"
+                                element={<ComparativoMargensGrPage />}
+                              />
+                              <Route
+                                path="/admin/planilhas/convertidas/tabela-mae-gr"
+                                element={<TabelaMaeGrPage />}
+                              />
+                              <Route path="/admin/usuarios" element={<UsersAdminPage />} />
+                              <Route path="/admin/site-clientes" element={<SiteClientsAdmin />} />
+                              <Route
+                                path="/admin/site-depoimentos"
+                                element={<SiteTestimonialsAdmin />}
+                              />
+                              <Route path="/admin/auditoria" element={<Auditoria />} />
+                              <Route
+                                path="/admin/controladoria"
+                                element={<Controladoria screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/dre"
+                                element={<Controladoria screen="dre" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/dre-analitica"
+                                element={<Controladoria screen="dre-analitica" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/kpis"
+                                element={<Controladoria screen="kpis" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/drivers"
+                                element={<Controladoria screen="drivers" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/budget"
+                                element={<Controladoria screen="budget" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/forecast"
+                                element={<Controladoria screen="forecast" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/fechamento"
+                                element={<Controladoria screen="fechamento" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/simulador"
+                                element={<Controladoria screen="simulador" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/consolidacao"
+                                element={<Controladoria screen="consolidacao" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/materialidade"
+                                element={<Controladoria screen="materialidade" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/reclassificacoes"
+                                element={<Controladoria screen="reclassificacoes" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/visoes-salvas"
+                                element={<Controladoria screen="visoes-salvas" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/comentarios"
+                                element={<Controladoria screen="comentarios" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/centros-resultado"
+                                element={<Controladoria screen="centros-resultado" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/ebitda"
+                                element={<Controladoria screen="ebitda" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/adapta"
+                                element={<Controladoria screen="adapta" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/balanco"
+                                element={<Controladoria screen="balanco" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/fluxo-caixa"
+                                element={<Controladoria screen="fluxo-caixa" />}
+                              />
+                              <Route
+                                path="/admin/controladoria/configuracoes"
+                                element={<Controladoria screen="configuracoes" />}
+                              />
+                              <Route
+                                path="/admin/verbas"
+                                element={<SupplierAllowance screen="dashboard" />}
+                              />
+                              <Route
+                                path="/admin/verbas/cockpit"
+                                element={<SupplierAllowance screen="cockpit" />}
+                              />
+                              <Route
+                                path="/admin/verbas/acordos"
+                                element={<SupplierAllowance screen="agreements" />}
+                              />
+                              <Route
+                                path="/admin/verbas/conta-corrente"
+                                element={<SupplierAllowance screen="accounts" />}
+                              />
+                              <Route
+                                path="/admin/verbas/movimentacoes"
+                                element={<SupplierAllowance screen="movements" />}
+                              />
+                              <Route
+                                path="/admin/verbas/apuracoes"
+                                element={<SupplierAllowance screen="accruals" />}
+                              />
+                              <Route
+                                path="/admin/verbas/aplicacao-produtos"
+                                element={<SupplierAllowance screen="appropriations" />}
+                              />
+                              <Route
+                                path="/admin/verbas/consumos"
+                                element={<SupplierAllowance screen="consumptions" />}
+                              />
+                              <Route
+                                path="/admin/verbas/prestacao-contas"
+                                element={<SupplierAllowance screen="settlements" />}
+                              />
+                              <Route
+                                path="/admin/verbas/por-fornecedor"
+                                element={<TradeMarketing screen="verbas" />}
+                              />
+                              <Route
+                                path="/admin/verbas/cotacoes-externas"
+                                element={<TradeMarketing screen="cotacoes-externas" />}
+                              />
+                              <Route
+                                path="/admin/verbas/gastos-trade"
+                                element={<SupplierAllowance screen="trade-expenses" />}
+                              />
+                              <Route
+                                path="/admin/verbas/creditos-avulsos"
+                                element={<SupplierAllowance screen="adhoc-credits" />}
+                              />
+                              <Route
+                                path="/admin/verbas/documentos"
+                                element={<SupplierAllowance screen="documents" />}
+                              />
+                              <Route
+                                path="/admin/verbas/auditoria-corporativa"
+                                element={<SupplierAllowance screen="corporate-audit" />}
+                              />
+                              <Route
+                                path="/admin/verbas/contas-correntes"
+                                element={<SupplierAllowance screen="current-accounts" />}
+                              />
+                              <Route
+                                path="/admin/verbas/adapta"
+                                element={<SupplierAllowance screen="adapta-chat" />}
+                              />
+                              <Route
+                                path="/admin/verbas/versionamento-relatorios"
+                                element={<SupplierAllowance screen="report-versions" />}
+                              />
+                              <Route path="/cliente/login" element={<ClientLogin />} />
+                              <Route path="/cliente/cadastro" element={<ClientRegister />} />
+                              <Route
+                                path="/cliente/recuperar-senha"
+                                element={<PasswordRecovery />}
+                              />
+                              <Route
+                                path="/cliente/redefinir-senha"
+                                element={<ClientPasswordReset />}
+                              />
+                              <Route path="/_/" element={<ClientPasswordReset />} />
+                              <Route path="/cliente" element={<ClientArea />} />
+                              <Route path="/cliente/rastreamento" element={<ClientTracking />} />
+                              <Route
+                                path="/politica-de-privacidade"
+                                element={<PoliticaPrivacidade />}
+                              />
+                              <Route path="/politica-comercial" element={<PoliticaComercial />} />
+                              <Route path="/termos-de-uso" element={<TermosDeUso />} />
+                              <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
+                              <Route
+                                path="/politica-de-seguranca"
+                                element={<PoliticaSeguranca />}
+                              />
+                              <Route
+                                path="/central-de-privacidade"
+                                element={<CentralDePrivacidade />}
+                              />
+                              <Route
+                                path="/canal-de-privacidade"
+                                element={<CanalDePrivacidade />}
+                              />
+                              <Route
+                                path="/politica-de-licenciamento"
+                                element={<PoliticaLicenciamento />}
+                              />
+                              <Route path="/politica-de-sla" element={<PoliticaSla />} />
+                              <Route
+                                path="/politica-de-backup-continuidade"
+                                element={<PoliticaBackupContinuidade />}
+                              />
+                              <Route path="*" element={<NotFound />} />
+                            </Route>
+                          </Routes>
+                        </TourProvider>
+                      </JetroOnlineProvider>
+                    </UserPreferencesProvider>
                   </CmsContentProvider>
                 </ClientAuthProvider>
               </SystemParamsProvider>

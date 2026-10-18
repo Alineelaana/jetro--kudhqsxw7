@@ -20,6 +20,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
 import { useAuth } from '@/hooks/use-auth'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { cn } from '@/lib/utils'
 import { JetroOnlineChartRenderer } from '@/components/jetro-online/jetro-online-chart-renderer'
 import {
@@ -124,6 +125,7 @@ export function FloatingChat() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { startTour, availableTourForCurrentRoute } = useTour()
+  const { preferences: userPrefs } = useUserPreferences()
 
   const {
     messages,
@@ -350,10 +352,12 @@ export function FloatingChat() {
               />
             </div>
             <span className="font-bold text-xs tracking-tight">Jetro On-line</span>
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
-            </span>
+            {userPrefs.jetroOnlineVisualNotifications && (
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+              </span>
+            )}
           </button>
 
           {/* Botão X para dispensar e deixar apenas alça */}
@@ -569,15 +573,19 @@ export function FloatingChat() {
                 {/* Bloco superior com a saudação grande em negrito + cursor de digitação */}
                 <div className="pt-8 sm:pt-12 text-center max-w-sm mx-auto">
                   <h2 className="text-2xl sm:text-[28px] font-extrabold text-gray-900 tracking-tight leading-snug">
-                    {typedGreeting}
-                    <span
-                      className={cn(
-                        'inline-block font-normal text-gray-700 ml-0.5',
-                        cursorVisible ? 'opacity-100' : 'opacity-0',
-                      )}
-                    >
-                      |
-                    </span>
+                    {userPrefs.jetroOnlineTypingEffect
+                      ? typedGreeting
+                      : config?.saudacao_principal || 'Como posso te ajudar hoje no Jetro?'}
+                    {userPrefs.jetroOnlineTypingEffect && (
+                      <span
+                        className={cn(
+                          'inline-block font-normal text-gray-700 ml-0.5',
+                          cursorVisible ? 'opacity-100' : 'opacity-0',
+                        )}
+                      >
+                        |
+                      </span>
+                    )}
                   </h2>
 
                   <p className="text-[13px] text-gray-500 mt-3 leading-relaxed max-w-xs mx-auto">
@@ -587,20 +595,22 @@ export function FloatingChat() {
                 </div>
 
                 {/* Bloco de sugestões inteligentes alinhadas à esquerda em pills arredondadas */}
-                <div className="space-y-2 pb-2">
-                  {displaySugestoes.map((sug) => (
-                    <button
-                      key={sug.id}
-                      type="button"
-                      onClick={() => handleSelectSugestao(sug)}
-                      disabled={loading}
-                      className="w-full text-left px-3.5 py-2 rounded-full border border-gray-200 bg-white hover:border-[#005B2E] hover:bg-emerald-50/40 text-gray-800 text-[12px] font-medium transition-all shadow-2xs group cursor-pointer disabled:opacity-50 block truncate"
-                      title={sug.descricao || sug.texto}
-                    >
-                      <span className="truncate group-hover:text-[#005B2E]">{sug.texto}</span>
-                    </button>
-                  ))}
-                </div>
+                {userPrefs.jetroOnlineSuggestions && (
+                  <div className="space-y-2 pb-2">
+                    {displaySugestoes.map((sug) => (
+                      <button
+                        key={sug.id}
+                        type="button"
+                        onClick={() => handleSelectSugestao(sug)}
+                        disabled={loading}
+                        className="w-full text-left px-3.5 py-2 rounded-full border border-gray-200 bg-white hover:border-[#005B2E] hover:bg-emerald-50/40 text-gray-800 text-[12px] font-medium transition-all shadow-2xs group cursor-pointer disabled:opacity-50 block truncate"
+                        title={sug.descricao || sug.texto}
+                      >
+                        <span className="truncate group-hover:text-[#005B2E]">{sug.texto}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               /* FLUXO DE MENSAGENS COM ROLAGEM */
