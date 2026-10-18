@@ -757,6 +757,22 @@ const App = () => (
                           path="/admin/remuneracao/metas"
                           element={<VariableRemuneration screen="goals" />}
                         />
+                        <Route
+                          path="/admin/remuneracao/metas-gestao"
+                          element={<VariableRemuneration screen="goals-management" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/metas-premiacoes"
+                          element={<VariableRemuneration screen="goals-awards" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/metas-comunicacoes"
+                          element={<VariableRemuneration screen="goals-communications" />}
+                        />
+                        <Route
+                          path="/admin/remuneracao/metas-vendedor"
+                          element={<VariableRemuneration screen="goals-seller" />}
+                        />
                         <Route path="/admin/bi" element={<BI screen="dashboard" />} />
                         <Route path="/admin/bi/executive" element={<BI screen="executive" />} />
                         <Route path="/admin/bi/commercial" element={<BI screen="commercial" />} />
