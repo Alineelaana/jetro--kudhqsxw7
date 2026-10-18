@@ -72,23 +72,20 @@ export function FloatingChat() {
   // quando desejar sem poluir nem atrapalhar a visualização da tela
   if (isDismissed) {
     return (
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="fixed top-1/2 -translate-y-1/2 right-0 z-40 select-none">
         <button
           id="floating-chat-trigger"
           onClick={handleReopen}
-          className="group flex items-center gap-2 bg-[#005A36]/90 hover:bg-[#005A36] text-white pl-2 pr-3 py-1.5 rounded-full shadow-lg border border-[#C89B3C]/70 backdrop-blur-xs transition-all duration-200 hover:scale-105"
-          aria-label="Reabrir chat com a Jeh"
-          title="Fale com a Jeh (Assistente Virtual)"
+          className="group flex items-center gap-1.5 bg-[#005B2E]/90 hover:bg-[#005B2E] text-white py-3 px-1.5 rounded-l-md shadow-md border-y border-l border-[#C89B3C]/50 backdrop-blur-sm transition-all duration-200 hover:pl-2.5 hover:pr-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B3C]"
+          aria-label="Fale com a Jeh"
+          title="Fale com a Jeh"
         >
-          <div className="relative h-6 w-6 rounded-full overflow-hidden border border-[#C89B3C]">
-            <img
-              src={nineAvatar}
-              alt="Jeh - Inteligência Artificial Jetro"
-              className="h-full w-full object-cover"
-            />
+          <div className="relative h-5 w-5 rounded-full overflow-hidden border border-[#C89B3C]/80 shrink-0">
+            <img src={nineAvatar} alt="Jeh" className="h-full w-full object-cover" />
           </div>
-          <span className="text-xs font-semibold text-white/95">Jeh</span>
-          <Sparkles className="h-3 w-3 text-[#E5B85C]" />
+          <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-semibold tracking-wider text-emerald-100 group-hover:text-white uppercase">
+            Fale com a Jeh
+          </span>
         </button>
       </div>
     )

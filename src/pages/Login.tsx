@@ -271,11 +271,6 @@ export default function LoginPage() {
                   </Link>
                 </Button>
               </div>
-
-              {/* Mensagem de atribuição abaixo do formulário de login */}
-              <div className="pt-2 text-center">
-                <AttributionFooter variant="inline" className="text-[11px] text-muted-foreground" />
-              </div>
             </div>
           </CardContent>
         </Card>

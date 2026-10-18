@@ -41,8 +41,15 @@ import {
   type ParsedItemCandidate,
 } from '@/lib/margens-gr-parser'
 import { downloadModeloExcel } from '@/lib/margens-gr-template'
-import { batchImportMargens, type BatchImportResult } from '@/services/margens-comparativo'
+import {
+  batchImportMargens,
+  type BatchImportResult,
+  getMargensParametros,
+  buildParametrosMap,
+} from '@/services/margens-comparativo'
 import { formatCurrencyBRL } from '@/lib/margens-gr-engine'
+import { buildComparativoWorkbook } from '@/lib/comparativo-workbook-adapter'
+import { saveWorkbook } from '@/services/spreadsheet-storage'
 
 interface ImportMargensDialogProps {
   open: boolean
@@ -245,6 +252,27 @@ export function ImportMargensDialog({
 
       // Adiciona na conta de ignorados as linhas descartadas na prévia
       result.ignorados += previewData.itensIgnorados.length
+
+      // Sincroniza o Workbook do JetroSpreadsheet gravando APENAS A, B, C
+      // e estabelecendo SEMPRE as fórmulas canônicas em D a K
+      try {
+        const paramRecords = await getMargensParametros()
+        const params = buildParametrosMap(paramRecords)
+        const wbItems = payload.map((p) => ({
+          produto: p.produto,
+          cmv: p.cmv,
+          preco_rivoli: p.preco_rivoli,
+        }))
+        const newWb = buildComparativoWorkbook(wbItems, params)
+        await saveWorkbook({
+          slug: 'comparativo-margens-gr',
+          titulo: 'Comparativo Margens GR',
+          workbookData: newWb,
+          changeSummary: 'Atualização pós-importação com fórmulas canônicas',
+        })
+      } catch (wbErr) {
+        console.warn('Aviso: falha ao sincronizar workbook com fórmulas canônicas:', wbErr)
+      }
 
       setFinalReport(result)
       setStep('summary')

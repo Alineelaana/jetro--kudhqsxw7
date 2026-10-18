@@ -1,5 +1,6 @@
 import type { CellData, SheetData, WorkbookData } from '@/types/spreadsheet'
 import { colIndexToLetter } from '@/lib/spreadsheet-formula-engine'
+import { normalizeComparativoWorkbook } from '@/lib/comparativo-workbook-adapter'
 
 /**
  * Informações e metadados de uma aba extraída do arquivo Excel
@@ -80,10 +81,25 @@ export async function parseFileToWorkbook(file: File): Promise<WorkbookData> {
     order: idx,
   }))
 
-  return {
+  const rawWb: WorkbookData = {
     sheets,
     activeSheetIndex: 0,
   }
+
+  // Se o arquivo contiver aba "Comparativo" ou colunas do modelo Comparativo Margens GR,
+  // normaliza para preservar apenas A, B, C e gravar sempre as fórmulas canônicas em D a K
+  const hasComparativoSheet = sheets.some(
+    (s) =>
+      s.name.toLowerCase().trim() === 'comparativo' ||
+      s.name.toLowerCase().includes('margens') ||
+      (s.cells['A1'] && String(s.cells['A1'].raw).toLowerCase().includes('produto')),
+  )
+
+  if (hasComparativoSheet) {
+    return normalizeComparativoWorkbook(rawWb)
+  }
+
+  return rawWb
 }
 
 /**

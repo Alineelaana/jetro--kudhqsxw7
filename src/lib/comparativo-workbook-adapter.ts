@@ -19,6 +19,79 @@ import { colIndexToLetter } from '@/lib/spreadsheet-formula-engine'
  * J: Margem final R$ -> =C{r}-B{r}-E{r}-F{r}-G{r}-H{r}-I{r}
  * K: Margem final % -> =SE(C{r}>0; J{r}/C{r}; 0)
  */
+/**
+ * Normaliza uma planilha importada ou editada para o padrão Comparativo Margens GR:
+ * - Mantém e valida a aba "Premissas & Parâmetros" com as fórmulas em B6 e B7.
+ * - Na aba "Comparativo", mantém APENAS as entradas de Produto (A), CMV (B) e Preço Rivoli (C).
+ * - Restabelece SEMPRE as fórmulas canônicas em D, E, F, G, H, I, J e K por linha,
+ *   substituindo quaisquer valores crus quebrados ou vazios trazidos pelo Excel.
+ */
+export function normalizeComparativoWorkbook(
+  workbook: WorkbookData,
+  defaultParams?: MargemParametros,
+): WorkbookData {
+  const params: MargemParametros = defaultParams || {
+    icmsPercentual: 1.2,
+    pisPercentual: 1.45,
+    cofinsPercentual: 6.68,
+    comissaoPercentual: 3.0,
+    fretePercentual: 3.0,
+  }
+
+  // Localiza aba "Comparativo" ou a primeira aba
+  let compSheet =
+    workbook.sheets.find(
+      (s) =>
+        s.name.toLowerCase().trim() === 'comparativo' || s.name.toLowerCase().includes('margens'),
+    ) || workbook.sheets[0]
+
+  if (!compSheet) {
+    return buildComparativoWorkbook([], params)
+  }
+
+  // Extrai linhas de dados a partir das colunas A, B, C (linha 2 em diante)
+  // Ignora linhas de totalizadores ("Totais", "Total", etc.)
+  const items: Array<{ produto: string; cmv: number; preco_rivoli: number }> = []
+  const maxRow = Math.max(compSheet.rowsCount || 0, 50)
+
+  for (let r = 2; r <= maxRow; r++) {
+    const cellA = compSheet.cells[`A${r}`]
+    const cellB = compSheet.cells[`B${r}`]
+    const cellC = compSheet.cells[`C${r}`]
+
+    const prodVal = cellA ? String(cellA.computedValue ?? cellA.raw ?? '').trim() : ''
+    if (!prodVal) continue
+
+    // Ignora linhas de resumo
+    if (/^totais?|^m[eé]dia|^resumo/i.test(prodVal)) {
+      continue
+    }
+
+    const parseNum = (cell?: typeof cellA): number => {
+      if (!cell) return 0
+      const v =
+        cell.computedValue !== undefined && cell.computedValue !== null
+          ? cell.computedValue
+          : cell.raw
+      if (typeof v === 'number') return v
+      const str = String(v ?? '')
+        .replace(/\s/g, '')
+        .replace('R$', '')
+      const parsed = parseFloat(str.replace(',', '.'))
+      return Number.isNaN(parsed) ? 0 : parsed
+    }
+
+    items.push({
+      produto: prodVal,
+      cmv: parseNum(cellB),
+      preco_rivoli: parseNum(cellC),
+    })
+  }
+
+  // Reconstrói com fórmulas canônicas garantidas
+  return buildComparativoWorkbook(items, params)
+}
+
 export function buildComparativoWorkbook(
   items: Array<{ produto: string; cmv: number; preco_rivoli: number }>,
   params: MargemParametros,

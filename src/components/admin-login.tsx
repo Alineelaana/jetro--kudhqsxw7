@@ -149,12 +149,7 @@ export function AdminLogin() {
             >
               Esqueci minha senha
             </Link>
-            <Link
-              to="/admin/cadastro"
-              className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-1"
-            >
-              Cadastre-se
-            </Link>
+
             <div className="pt-3 border-t border-border mt-3">
               <Button
                 asChild
@@ -165,9 +160,6 @@ export function AdminLogin() {
                   Acesse o site do Jetro
                 </Link>
               </Button>
-            </div>
-            <div className="pt-2 text-center">
-              <AttributionFooter variant="inline" className="text-[11px] text-muted-foreground" />
             </div>
           </form>
         </CardContent>

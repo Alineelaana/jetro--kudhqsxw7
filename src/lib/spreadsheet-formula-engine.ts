@@ -192,15 +192,22 @@ export class SpreadsheetFormulaEngine {
         case 'SE':
         case 'IF': {
           if (argsRaw.length < 2) return null
-          const condResult = this.evaluateSimpleExpression(argsRaw[0], currentSheet, depth)
-          const isTrue = Boolean(condResult) && condResult !== 0 && condResult !== '0'
+          const condResult = this.evaluateFormula(argsRaw[0], currentSheet, depth + 1)
+          const isTrue =
+            condResult === true ||
+            (typeof condResult === 'number' && condResult !== 0 && !Number.isNaN(condResult)) ||
+            (typeof condResult === 'string' &&
+              condResult !== '0' &&
+              condResult !== 'false' &&
+              condResult !== '' &&
+              condResult !== '#VALOR!')
           if (isTrue) {
-            return this.evaluateSimpleExpression(argsRaw[1], currentSheet, depth)
+            return this.evaluateFormula(argsRaw[1], currentSheet, depth + 1)
           }
           if (argsRaw.length >= 3) {
-            return this.evaluateSimpleExpression(argsRaw[2], currentSheet, depth)
+            return this.evaluateFormula(argsRaw[2], currentSheet, depth + 1)
           }
-          return false
+          return 0
         }
         case 'ARRED':
         case 'ROUND': {
@@ -238,13 +245,15 @@ export class SpreadsheetFormulaEngine {
     }
 
     // Substitui referências de células por seus valores numéricos ou strings
-    // Ex: "B3 * 1.2" ou "'Premissas'!B1" ou "B3 - C3 - D3"
-    const refRegex = /('?[A-Za-z0-9_À-ÿ\s]+'?!|\b)([A-Za-z]+[0-9]+)\b/g
+    // Ex: "B3 * 1.2" ou "'Premissas & Parâmetros'!B1" ou "B3 - C3 - D3"
+    // Regex suporta nomes de aba com aspas simples contendo caracteres especiais (ex: &)
+    const refRegex = /(?:'([^']+)'!|([A-Za-z0-9_À-ÿ\s&.-]+)!|\b)([A-Za-z]+[0-9]+)\b/g
 
-    const replaced = clean.replace(refRegex, (fullMatch, sheetPrefix, cellAddr) => {
+    const replaced = clean.replace(refRegex, (_fullMatch, quotedSheet, plainSheet, cellAddr) => {
       let targetSheet = currentSheet
-      if (sheetPrefix && sheetPrefix.endsWith('!')) {
-        const cleanSheetName = sheetPrefix.slice(0, -1).replace(/^'|'$/g, '').toLowerCase().trim()
+      const sheetNameCandidate = quotedSheet || plainSheet
+      if (sheetNameCandidate) {
+        const cleanSheetName = sheetNameCandidate.toLowerCase().trim()
         const found = this.sheetNameMap.get(cleanSheetName)
         if (found) {
           targetSheet = found
@@ -439,8 +448,46 @@ function safeEvalArithmetic(expr: string): CellValue {
     return numOnly
   }
 
+  // Se for booleano literal
+  if (sanitized === 'true' || sanitized === '1') return true
+  if (sanitized === 'false' || sanitized === '0') return false
+
+  // Se contiver operadores relacionais para comparação (ex: 150 > 0 ou C2 > 0)
+  const relMatch = sanitized.match(/^(.*?)(>=|<=|<>|!=|==|=|>|<)(.*)$/)
+  if (relMatch) {
+    const leftStr = relMatch[1]
+    const op = relMatch[2]
+    const rightStr = relMatch[3]
+
+    try {
+      const leftVal = Number(safeEvalArithmetic(leftStr))
+      const rightVal = Number(safeEvalArithmetic(rightStr))
+
+      if (!Number.isNaN(leftVal) && !Number.isNaN(rightVal)) {
+        switch (op) {
+          case '>':
+            return leftVal > rightVal
+          case '<':
+            return leftVal < rightVal
+          case '>=':
+            return leftVal >= rightVal
+          case '<=':
+            return leftVal <= rightVal
+          case '=':
+          case '==':
+            return leftVal === rightVal
+          case '<>':
+          case '!=':
+            return leftVal !== rightVal
+        }
+      }
+    } catch {
+      /* fallback para parsing normal */
+    }
+  }
+
   // Se contiver caracteres proibidos fora de matemática básica
-  if (/[^0-9.+\-*/%^()eE<>=!&|"]/.test(sanitized)) {
+  if (/[^0-9.+\-*/%^()eE]/.test(sanitized)) {
     return expr // Retorna o texto se não for expressão estritamente numérica
   }
 
