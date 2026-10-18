@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useAuth } from '@/hooks/use-auth'
+import { IntelligentHomeScreen } from '@/components/intelligent-home-screen'
 import { HeroSection } from '@/components/hero-section'
 import { AboutJetroSection } from '@/components/about-jetro-section'
 import { PlatformModulesSection } from '@/components/platform-modules-section'
@@ -19,9 +21,15 @@ import { useSettings } from '@/hooks/use-settings'
 import { PhoneCall, ShieldCheck, Mail, Sparkles } from 'lucide-react'
 
 export default function Index() {
+  const { isAuthenticated, loading } = useAuth()
   const { whatsappNumber } = useSettings()
   const safeWhatsapp = whatsappNumber || '5531991297619'
   const [selectedService] = useState<string>('Apresentação Comercial Jetro ERP')
+
+  // Se o usuário está logado, renderiza a tela inicial inteligente do ERP Jetro
+  if (!loading && isAuthenticated) {
+    return <IntelligentHomeScreen />
+  }
 
   const scrollToContact = () => {
     const el = document.getElementById('contato')

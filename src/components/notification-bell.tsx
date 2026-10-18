@@ -22,7 +22,12 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 
-export function NotificationBell() {
+interface NotificationBellProps {
+  className?: string
+  iconClassName?: string
+}
+
+export function NotificationBell({ className, iconClassName }: NotificationBellProps = {}) {
   const navigate = useNavigate()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [open, setOpen] = useState(false)
@@ -81,8 +86,8 @@ export function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5 text-[#005B2E]" />
+        <Button variant="ghost" size="icon" className={cn('relative', className)}>
+          <Bell className={cn('w-5 h-5 text-[#005B2E]', iconClassName)} />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
               {unreadCount > 9 ? '9+' : unreadCount}

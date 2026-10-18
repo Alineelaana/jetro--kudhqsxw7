@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { LogOut, Sparkles, Clock, Calendar as CalendarIcon, MessageSquare } from 'lucide-react'
+import { Sparkles, Calendar as CalendarIcon, MessageSquare } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
-import { NotificationBell } from '@/components/notification-bell'
 import { JetroCalendar } from '@/components/jetro-agenda/jetro-calendar'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
@@ -105,37 +104,12 @@ export function IntelligentHomeScreen() {
 
   return (
     <div
-      className="flex flex-col min-h-full p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full pb-12 space-y-5"
+      className="flex flex-col min-h-full p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full pb-12 space-y-4"
       data-tour-id="admin-home-header"
     >
       {/* ==================================================================== */}
-      {/* BARRA SUPERIOR DISCRETA COM NOTIFICAÇÕES E ENCERRAMENTO DE SESSÃO   */}
-      {/* ==================================================================== */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
-          <Clock className="w-3.5 h-3.5 text-[#005B2E] shrink-0" />
-          <span>
-            {saudacaoInfo.horaAtualFormatada} • Fuso:{' '}
-            <strong className="text-foreground font-semibold">{saudacaoInfo.fusoUtilizado}</strong>
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <NotificationBell />
-          <button
-            onClick={signOut}
-            className={`flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-red-600 px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 cursor-pointer shadow-2xs ${animClasses}`}
-            title="Encerrar sessão"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Sair</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ==================================================================== */}
       {/* FAIXA VERDE-ESMERALDA PROFUNDO INSTITUCIONAL COM DETALHES DOURADOS    */}
-      {/* APRESENTAÇÃO DE BOAS-VINDAS PERSONALIZADA                            */}
+      {/* APRESENTAÇÃO DE BOAS-VINDAS PERSONALIZADA (REPOSICIONADA PARA O TOPO) */}
       {/* ==================================================================== */}
       <section
         className={`relative overflow-hidden rounded-2xl border border-[#C9A227]/30 shadow-lg text-white ${animClasses}`}
@@ -158,10 +132,10 @@ export function IntelligentHomeScreen() {
           className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#C9A227]/60 to-transparent"
         />
 
-        <div className="relative px-5 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="relative px-5 py-5 sm:px-6 sm:py-6 lg:px-7 lg:py-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             {/* Bloco de Saudação e Mensagens de Boas-Vindas */}
-            <div className="space-y-3 max-w-3xl">
+            <div className="space-y-2.5 max-w-3xl">
               {/* Badge institucional discreta dourada */}
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#E4C46A] text-[11px] font-bold tracking-wide uppercase">
                 <Sparkles className="w-3 h-3 text-[#E4C46A]" />
@@ -169,12 +143,12 @@ export function IntelligentHomeScreen() {
               </div>
 
               {/* Saudação principal em destaque */}
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
                 {fraseSaudacao}
               </h1>
 
               {/* Mensagem de boas-vindas com tratamento cadastrado */}
-              <div className="space-y-1.5 text-sm sm:text-base text-emerald-100/95 leading-relaxed">
+              <div className="space-y-1 text-sm sm:text-base text-emerald-100/95 leading-relaxed">
                 <p className="font-semibold text-[#E4C46A]">{linhaBoasVindasTratamento}</p>
                 <p className="text-emerald-50/90 text-xs sm:text-sm">{TEXTO_AGENDA_CONFIRMAÇÃO}</p>
                 <p className="text-emerald-100/80 text-xs sm:text-sm pt-0.5">
@@ -194,7 +168,7 @@ export function IntelligentHomeScreen() {
             </div>
 
             {/* Ação rápida para abrir o Jetro On-line lateral */}
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0">
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setIsFloatingOpen(true)}
@@ -210,13 +184,13 @@ export function IntelligentHomeScreen() {
       </section>
 
       {/* ==================================================================== */}
-      {/* CALENDÁRIO E AGENDA CORPORATIVA JETRO (SEM CARDS/PAINÉIS DE CHAMADOS) */}
+      {/* CALENDÁRIO E AGENDA CORPORATIVA JETRO (REPOSICIONADOS MAIS PARA CIMA) */}
       {/* ==================================================================== */}
       <section className="w-full" data-tour-id="admin-home-agenda">
-        <div className="mb-2.5 flex items-center justify-between px-1">
+        <div className="mb-2 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-[#005B2E]" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Calendário e Agenda Corporativa
             </h2>
           </div>
