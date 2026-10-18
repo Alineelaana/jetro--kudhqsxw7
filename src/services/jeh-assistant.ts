@@ -31,12 +31,26 @@ export interface JehQAItem {
   updated: string
 }
 
+export type JehUnansweredClassification =
+  | 'sem_conteudo_base'
+  | 'resposta_incompleta'
+  | 'encaminhamento_desnecessario'
+  | 'falha_recuperacao'
+  | 'pergunta_frequente'
+  | 'coberta_pela_base'
+  | 'geral'
+
 export interface JehUnansweredItem {
   id: string
   question: string
   date: string
   occurrences: number
   subject?: string
+  classification?: JehUnansweredClassification
+  provided_answer?: string
+  approved_correction?: string
+  resolution_date?: string
+  source?: 'publico' | 'teste'
   status: JehUnansweredStatus
   created: string
   updated: string
@@ -584,6 +598,11 @@ export const JehAssistantService = {
           date: r.last_asked_at || r.created,
           occurrences: r.count || r.occurrences || 1,
           subject: r.identified_topic || r.subject || 'Geral',
+          classification: (r.classification || 'sem_conteudo_base') as JehUnansweredClassification,
+          provided_answer: r.provided_answer || '',
+          approved_correction: r.approved_correction || '',
+          resolution_date: r.resolution_date || '',
+          source: r.source || 'publico',
           status: mappedStatus,
           created: r.created,
           updated: r.updated,
@@ -595,9 +614,27 @@ export const JehAssistantService = {
     }
   },
 
-  async updateUnansweredStatus(id: string, status: JehUnansweredStatus): Promise<void> {
+  async updateUnansweredStatus(
+    id: string,
+    status: JehUnansweredStatus,
+    extra?: {
+      classification?: JehUnansweredClassification
+      approved_correction?: string
+    },
+  ): Promise<void> {
     const backendStatus = status === 'respondido' ? 'respondida' : status
-    await pb.collection('jeh_unanswered').update(id, { status: backendStatus })
+    const payload: any = { status: backendStatus }
+    if (extra?.classification) payload.classification = extra.classification
+    if (extra?.approved_correction) payload.approved_correction = extra.approved_correction
+    if (status === 'respondido') payload.resolution_date = new Date().toISOString()
+    await pb.collection('jeh_unanswered').update(id, payload)
+  },
+
+  async updateUnansweredClassification(
+    id: string,
+    classification: JehUnansweredClassification,
+  ): Promise<void> {
+    await pb.collection('jeh_unanswered').update(id, { classification })
   },
 
   async convertUnansweredToQA(
@@ -607,13 +644,20 @@ export const JehAssistantService = {
       official_answer: string
       variations: string[]
       category: string
+      classification?: JehUnansweredClassification
     },
   ): Promise<JehQAItem> {
     const newQA = await this.createQA({
-      ...data,
+      question: data.question,
+      official_answer: data.official_answer,
+      variations: data.variations,
+      category: data.category,
       status: 'ativo',
     })
-    await this.updateUnansweredStatus(unansweredId, 'respondido')
+    await this.updateUnansweredStatus(unansweredId, 'respondido', {
+      classification: data.classification,
+      approved_correction: data.official_answer,
+    })
     return newQA
   },
 

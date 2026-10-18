@@ -1,4 +1,4 @@
-// Asset oficial da Jeh
-import jehAvatarImg from '../../assets/jeh_avatar_1776519398863.jpg'
+// Asset oficial da Jeh (foto institucional)
+import jehAvatarImg from '../assets/retrato-profissional-de-jeh-9617d.png'
 
 export const JEH_AVATAR_URL = jehAvatarImg

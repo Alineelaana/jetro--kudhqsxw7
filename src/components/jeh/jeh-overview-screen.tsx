@@ -19,6 +19,7 @@ import {
   type JehOverviewStats,
   type JehAssistantStatus,
 } from '@/services/jeh-assistant'
+import { JEH_AVATAR_URL } from '@/lib/jeh-assets'
 import { JehPageHeader } from './jeh-header'
 import {
   HelpCircle,

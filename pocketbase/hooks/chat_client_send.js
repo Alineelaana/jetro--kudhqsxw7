@@ -2,7 +2,7 @@
 
 /**
  * Endpoint de chat público do site com a assistente Jeh (/backend/v1/chat/send)
- * 
+ *
  * Regras Obrigatórias e Diretrizes Oficiais do Treinamento Jeh:
  * 1. REGRA PRINCIPAL: Utilize primeiro as informações confirmadas da base de conhecimento
  *    para responder à pergunta. O WhatsApp deve complementar o atendimento, não substituir

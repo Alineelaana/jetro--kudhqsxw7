@@ -2,7 +2,7 @@
 
 /**
  * Migração 0239: Refinamento de Treinamento e Atendimento da Assistente Jeh
- * 
+ *
  * Entregas:
  * 1. Expandir valores do campo 'category' em jeh_knowledge e jeh_qa
  * 2. REGRA PRINCIPAL e FLUXO DE ATENDIMENTO oficial na jeh_knowledge (categoria "Regras de Atendimento")
@@ -204,7 +204,8 @@ migrate(
           'Olá, como funciona o Jetro?',
         ],
         category: 'Apresentação Institucional',
-        keywords: 'como funciona o sistema, como o jetro funciona, modular, setores, ia nativa, segundo cerebro',
+        keywords:
+          'como funciona o sistema, como o jetro funciona, modular, setores, ia nativa, segundo cerebro',
         official_answer:
           '[Nome], o Jetro é um sistema de gestão empresarial que reúne diferentes áreas da empresa em uma única plataforma, como vendas, financeiro, compras, estoque, produção, logística e gestão de pessoas.\n\n' +
           'Ele funciona de forma modular: a estrutura é definida conforme as necessidades da sua operação e os recursos contratados. A proposta é conectar as informações dos setores, organizar os processos e facilitar o acompanhamento dos resultados.\n\n' +
@@ -233,7 +234,8 @@ migrate(
           'Quais setores o sistema atende?',
         ],
         category: 'Módulos e Recursos',
-        keywords: 'quais areas reune, modulos, setores, vendas crm financeiro estoque producao logística rh dp sst bi',
+        keywords:
+          'quais areas reune, modulos, setores, vendas crm financeiro estoque producao logística rh dp sst bi',
         official_answer:
           'O Jetro reúne as principais áreas operacionais e estratégicas da empresa: Vendas e CRM, Financeiro e Controladoria, Compras e Suprimentos, Estoque e Armazenagem, Indústria e Produção (PCP), Logística e Transporte, Gestão de Pessoas (RH, DP e SST), Inteligência Empresarial (BI), além de ferramentas nativas como a IA Jeh, o Segundo Cérebro e telas de auditoria.',
       },
@@ -272,7 +274,8 @@ migrate(
           'Como funciona o Segundo Cérebro?',
         ],
         category: 'Módulos e Recursos',
-        keywords: 'segundo cerebro, pops, procedimentos, conhecimento corporativo, memoria institucional',
+        keywords:
+          'segundo cerebro, pops, procedimentos, conhecimento corporativo, memoria institucional',
         official_answer:
           'O Segundo Cérebro é uma ferramenta exclusiva do Jetro que centraliza orientações, procedimentos operacionais padrão (POPs), regras de negócio e o histórico de decisões da empresa. Ele preserva o conhecimento corporativo e evita que a operação dependa apenas da memória de pessoas específicas.',
       },
@@ -284,7 +287,8 @@ migrate(
           'Para que serve o controle de vencimentos e auditoria?',
         ],
         category: 'Auditoria e Compliance',
-        keywords: 'auditoria, rastreabilidade, controle de validades, vencimentos, lotes, contratos, licencas',
+        keywords:
+          'auditoria, rastreabilidade, controle de validades, vencimentos, lotes, contratos, licencas',
         official_answer:
           'As telas de auditoria do Jetro garantem rastreabilidade completa: registram quem criou, alterou ou excluiu cada dado ou documento no sistema. Já o controle de validades monitora preventivamente datas de vencimento de produtos, lotes, documentos regulatórios, licenças e contratos, emitindo alertas antes que vençam.',
       },
