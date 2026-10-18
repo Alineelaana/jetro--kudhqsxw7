@@ -1,56 +1,32 @@
-import pb from '@/lib/pocketbase/client'
+import { pb } from '@/lib/pocketbase/client'
 
-export type JehCategory =
-  | 'Institucional'
-  | 'O que é o Jetro'
-  | 'Funcionalidades'
-  | 'Departamentos'
-  | 'Implantação'
-  | 'Demonstração'
-  | 'Contato e Suporte'
-  | 'FAQ'
-  | 'Comercial'
-  | 'Outros'
-
-export const JEH_CATEGORIES: JehCategory[] = [
-  'Institucional',
-  'O que é o Jetro',
-  'Funcionalidades',
-  'Departamentos',
-  'Implantação',
-  'Demonstração',
-  'Contato e Suporte',
-  'FAQ',
-  'Comercial',
-  'Outros',
-]
-
-export type JehApprovalStatus = 'rascunho' | 'aprovado' | 'revisar' | 'inativo'
+export type JehKnowledgeStatus = 'rascunho' | 'aprovado' | 'revisar' | 'inativo'
+export type JehQAStatus = 'ativo' | 'inativo' | 'rascunho'
+export type JehUnansweredStatus = 'pendente' | 'em_analise' | 'respondido' | 'descartado'
+export type JehAssistantStatus = 'inativa' | 'ativa'
+export type JehEvaluationRating = 'correta' | 'parcial' | 'incorreta'
 
 export interface JehKnowledgeItem {
   id: string
   title: string
-  category: JehCategory
+  category: string
   content: string
   keywords?: string
-  approval_status: JehApprovalStatus
-  responsible_name?: string
-  source_file?: string
-  source_type?: string
+  status: JehKnowledgeStatus
+  responsible?: string
+  source_document?: string
   created: string
   updated: string
 }
 
-export interface JehQaItem {
+export interface JehQAItem {
   id: string
-  canonical_question: string
+  question: string
   official_answer: string
   variations: string[]
-  category: JehCategory
-  approval_status: JehApprovalStatus
-  keywords?: string
-  hit_count: number
-  responsible_name?: string
+  category: string
+  access_count: number
+  status: JehQAStatus
   created: string
   updated: string
 }
@@ -58,593 +34,543 @@ export interface JehQaItem {
 export interface JehUnansweredItem {
   id: string
   question: string
-  count: number
-  identified_topic?: string
-  status: 'pendente' | 'em_analise' | 'respondida' | 'descartada'
-  assigned_answer?: string
-  source?: 'publico' | 'teste'
-  last_asked_at?: string
+  date: string
+  occurrences: number
+  subject?: string
+  status: JehUnansweredStatus
   created: string
   updated: string
 }
 
 export interface JehTestEvaluationItem {
   id: string
-  user_name?: string
-  user_question: string
-  assistant_response: string
-  rating: 'correta' | 'parcial' | 'incorreta'
-  feedback_notes?: string
-  suggested_correction?: string
-  status?: 'pendente_validacao' | 'aprovada_na_base' | 'rejeitada'
-  target_category?: string
+  question: string
+  assistant_reply: string
+  evaluation: JehEvaluationRating
+  notes?: string
+  suggested_answer?: string
   created: string
   updated: string
 }
 
 export interface JehOverviewStats {
-  totalQuestionsReceived: number
-  totalAnswered: number
-  totalUnanswered: number
-  evaluationsCount: number
-  evaluationsCorrect: number
-  evaluationsPartial: number
-  evaluationsIncorrect: number
-  knowledgeCount: number
-  qaCount: number
+  totalQuestions: number
+  answeredCount: number
+  unansweredCount: number
+  evaluatedCorrectCount: number
+  evaluatedImprovementCount: number
+  topSubjects: { subject: string; count: number }[]
   lastKnowledgeUpdate: string | null
-  assistantStatus: 'ativa' | 'inativa'
-  topTopics: { topic: string; count: number }[]
+  assistantStatus: JehAssistantStatus
 }
 
-// -------------------------------------------------------------
-// STATUS DA ASSISTENTE (settings: jeh_assistant_status)
-// -------------------------------------------------------------
-
-export async function getJehAssistantStatus(): Promise<'ativa' | 'inativa'> {
-  try {
-    const rec = await pb.collection('settings').getFirstListItem('key="jeh_assistant_status"')
-    return (rec.value === 'ativa' ? 'ativa' : 'inativa')
-  } catch {
-    return 'inativa'
-  }
+export interface JehSettingsConfig {
+  assistant_status: JehAssistantStatus
+  unanswered_default_message: string
+  contact_channels: {
+    channel: string
+    value: string
+    description?: string
+  }[]
 }
 
-export async function updateJehAssistantStatus(newStatus: 'ativa' | 'inativa'): Promise<void> {
-  let rec: any = null
-  try {
-    rec = await pb.collection('settings').getFirstListItem('key="jeh_assistant_status"')
-  } catch {
-    rec = null
-  }
+const SETTING_KEY_STATUS = 'jeh_assistant_status'
+const SETTING_KEY_DEFAULT_MSG = 'jeh_unanswered_default_message'
+const SETTING_KEY_CONTACT_CHANNELS = 'jeh_contact_channels'
 
-  if (rec) {
-    await pb.collection('settings').update(rec.id, { value: newStatus })
-  } else {
-    await pb.collection('settings').create({
-      key: 'jeh_assistant_status',
-      value: newStatus,
-    })
-  }
-
-  // Se ativando ou desativando, também sincroniza floating_chat_visible
-  try {
-    const floatRec = await pb.collection('settings').getFirstListItem('key="floating_chat_visible"')
-    if (floatRec) {
-      await pb.collection('settings').update(floatRec.id, {
-        value: newStatus === 'ativa' ? 'true' : 'false',
-      })
+export const JehAssistantService = {
+  // ==========================================
+  // CONFIGURAÇÕES E STATUS (persistido em settings)
+  // ==========================================
+  async getAssistantStatus(): Promise<JehAssistantStatus> {
+    try {
+      const record = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_STATUS}"`)
+      return (record.value as JehAssistantStatus) || 'inativa'
+    } catch {
+      return 'inativa'
     }
-  } catch {
-    // Silencioso se settings não existir
-  }
-}
+  },
 
-// -------------------------------------------------------------
-// BASE DE CONHECIMENTO (jeh_knowledge)
-// -------------------------------------------------------------
+  async setAssistantStatus(status: JehAssistantStatus): Promise<boolean> {
+    try {
+      let record
+      try {
+        record = await pb.collection('settings').getFirstListItem(`key = "${SETTING_KEY_STATUS}"`)
+      } catch {
+        record = null
+      }
 
-export async function listJehKnowledge(params?: {
-  category?: string
-  approval_status?: string
-  search?: string
-}): Promise<JehKnowledgeItem[]> {
-  const filters: string[] = []
-  if (params?.category && params.category !== 'all') {
-    filters.push(`category = "${params.category}"`)
-  }
-  if (params?.approval_status && params.approval_status !== 'all') {
-    filters.push(`approval_status = "${params.approval_status}"`)
-  }
-  if (params?.search && params.search.trim()) {
-    const term = params.search.trim().replace(/"/g, '\\"')
-    filters.push(`(title ~ "${term}" || content ~ "${term}" || keywords ~ "${term}")`)
-  }
-
-  const filter = filters.length > 0 ? filters.join(' && ') : ''
-
-  const records = await pb.collection('jeh_knowledge').getFullList({
-    filter: filter || undefined,
-    sort: '-updated',
-  })
-
-  return records.map((r) => ({
-    id: r.id,
-    title: r.title,
-    category: r.category as JehCategory,
-    content: r.content,
-    keywords: r.keywords,
-    approval_status: r.approval_status as JehApprovalStatus,
-    responsible_name: r.responsible_name,
-    source_file: r.source_file,
-    source_type: r.source_type,
-    created: r.created,
-    updated: r.updated,
-  }))
-}
-
-export async function createJehKnowledge(data: {
-  title: string
-  category: JehCategory
-  content: string
-  keywords?: string
-  approval_status: JehApprovalStatus
-  responsible_name?: string
-  source_file?: File | null
-  source_type?: string
-}): Promise<JehKnowledgeItem> {
-  const formData = new FormData()
-  formData.append('title', data.title)
-  formData.append('category', data.category)
-  formData.append('content', data.content)
-  formData.append('approval_status', data.approval_status)
-  if (data.keywords) formData.append('keywords', data.keywords)
-  if (data.responsible_name) formData.append('responsible_name', data.responsible_name)
-  if (data.source_type) formData.append('source_type', data.source_type)
-  if (data.source_file) formData.append('source_file', data.source_file)
-
-  const rec = await pb.collection('jeh_knowledge').create(formData)
-  return rec as unknown as JehKnowledgeItem
-}
-
-export async function updateJehKnowledge(
-  id: string,
-  data: Partial<JehKnowledgeItem> & { source_file?: File | null },
-): Promise<JehKnowledgeItem> {
-  if (data.source_file) {
-    const formData = new FormData()
-    if (data.title) formData.append('title', data.title)
-    if (data.category) formData.append('category', data.category)
-    if (data.content) formData.append('content', data.content)
-    if (data.keywords !== undefined) formData.append('keywords', data.keywords || '')
-    if (data.approval_status) formData.append('approval_status', data.approval_status)
-    if (data.responsible_name) formData.append('responsible_name', data.responsible_name)
-    if (data.source_type) formData.append('source_type', data.source_type)
-    formData.append('source_file', data.source_file)
-    const rec = await pb.collection('jeh_knowledge').update(id, formData)
-    return rec as unknown as JehKnowledgeItem
-  }
-
-  const rec = await pb.collection('jeh_knowledge').update(id, data)
-  return rec as unknown as JehKnowledgeItem
-}
-
-export async function deleteJehKnowledge(id: string): Promise<void> {
-  await pb.collection('jeh_knowledge').delete(id)
-}
-
-// -------------------------------------------------------------
-// EXTRAÇÃO DE DOCUMENTOS (/backend/v1/jeh/extract-document)
-// -------------------------------------------------------------
-
-export async function extractDocumentContent(file: File): Promise<{
-  fileName: string
-  fileSize: number
-  text: string
-}> {
-  const formData = new FormData()
-  formData.append('file', file)
-
-  const res = await fetch('/backend/v1/jeh/extract-document', {
-    method: 'POST',
-    headers: {
-      Authorization: pb.authStore.token || '',
-    },
-    body: formData,
-  })
-
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}))
-    throw new Error(errData?.error || `Falha ao extrair documento (${res.status})`)
-  }
-
-  return await res.json()
-}
-
-// -------------------------------------------------------------
-// PERGUNTAS E RESPOSTAS CANÔNICAS (jeh_qa)
-// -------------------------------------------------------------
-
-export async function listJehQa(params?: {
-  category?: string
-  approval_status?: string
-  search?: string
-}): Promise<JehQaItem[]> {
-  const filters: string[] = []
-  if (params?.category && params.category !== 'all') {
-    filters.push(`category = "${params.category}"`)
-  }
-  if (params?.approval_status && params.approval_status !== 'all') {
-    filters.push(`approval_status = "${params.approval_status}"`)
-  }
-  if (params?.search && params.search.trim()) {
-    const term = params.search.trim().replace(/"/g, '\\"')
-    filters.push(`(canonical_question ~ "${term}" || official_answer ~ "${term}" || keywords ~ "${term}")`)
-  }
-
-  const filter = filters.length > 0 ? filters.join(' && ') : ''
-
-  const records = await pb.collection('jeh_qa').getFullList({
-    filter: filter || undefined,
-    sort: '-hit_count',
-  })
-
-  return records.map((r) => ({
-    id: r.id,
-    canonical_question: r.canonical_question,
-    official_answer: r.official_answer,
-    variations: Array.isArray(r.variations) ? r.variations : [],
-    category: r.category as JehCategory,
-    approval_status: r.approval_status as JehApprovalStatus,
-    keywords: r.keywords,
-    hit_count: Number(r.hit_count) || 0,
-    responsible_name: r.responsible_name,
-    created: r.created,
-    updated: r.updated,
-  }))
-}
-
-export async function createJehQa(data: {
-  canonical_question: string
-  official_answer: string
-  variations: string[]
-  category: JehCategory
-  approval_status: JehApprovalStatus
-  keywords?: string
-  hit_count?: number
-  responsible_name?: string
-}): Promise<JehQaItem> {
-  const payload = {
-    ...data,
-    hit_count: data.hit_count ?? 0,
-  }
-  const rec = await pb.collection('jeh_qa').create(payload)
-  return {
-    ...rec,
-    variations: Array.isArray(rec.variations) ? rec.variations : [],
-  } as unknown as JehQaItem
-}
-
-export async function updateJehQa(id: string, data: Partial<JehQaItem>): Promise<JehQaItem> {
-  const rec = await pb.collection('jeh_qa').update(id, data)
-  return {
-    ...rec,
-    variations: Array.isArray(rec.variations) ? rec.variations : [],
-  } as unknown as JehQaItem
-}
-
-export async function deleteJehQa(id: string): Promise<void> {
-  await pb.collection('jeh_qa').delete(id)
-}
-
-// -------------------------------------------------------------
-// PERGUNTAS SEM RESPOSTA (jeh_unanswered)
-// -------------------------------------------------------------
-
-export async function listJehUnanswered(params?: {
-  status?: string
-  source?: string
-}): Promise<JehUnansweredItem[]> {
-  const filters: string[] = []
-  if (params?.status && params.status !== 'all') {
-    filters.push(`status = "${params.status}"`)
-  }
-  if (params?.source && params.source !== 'all') {
-    filters.push(`source = "${params.source}"`)
-  }
-  const filter = filters.length > 0 ? filters.join(' && ') : ''
-
-  const records = await pb.collection('jeh_unanswered').getFullList({
-    filter: filter || undefined,
-    sort: '-count',
-  })
-
-  return records.map((r) => ({
-    id: r.id,
-    question: r.question,
-    count: Number(r.count) || 1,
-    identified_topic: r.identified_topic || 'Geral',
-    status: r.status,
-    assigned_answer: r.assigned_answer,
-    source: r.source || 'teste',
-    last_asked_at: r.last_asked_at,
-    created: r.created,
-    updated: r.updated,
-  }))
-}
-
-export async function updateJehUnanswered(
-  id: string,
-  data: Partial<JehUnansweredItem>,
-): Promise<JehUnansweredItem> {
-  const rec = await pb.collection('jeh_unanswered').update(id, data)
-  return rec as unknown as JehUnansweredItem
-}
-
-export async function deleteJehUnanswered(id: string): Promise<void> {
-  await pb.collection('jeh_unanswered').delete(id)
-}
-
-// -------------------------------------------------------------
-// TEST CHAT (/backend/v1/jeh/test-chat)
-// -------------------------------------------------------------
-
-export async function sendJehTestChat(params: {
-  message: string
-  history?: { role: 'user' | 'assistant'; content: string }[]
-}): Promise<{ response: string; isUnanswered: boolean }> {
-  const res = await fetch('/backend/v1/jeh/test-chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: pb.authStore.token || '',
-    },
-    body: JSON.stringify(params),
-  })
-
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}))
-    throw new Error(errData?.error || `Erro ao consultar teste da Jeh (${res.status})`)
-  }
-
-  return await res.json()
-}
-
-// -------------------------------------------------------------
-// AVALIAÇÕES DE TESTE (jeh_test_evaluations)
-// -------------------------------------------------------------
-
-export async function listJehEvaluations(params?: {
-  rating?: string
-  status?: string
-}): Promise<JehTestEvaluationItem[]> {
-  const filters: string[] = []
-  if (params?.rating && params.rating !== 'all') {
-    filters.push(`rating = "${params.rating}"`)
-  }
-  if (params?.status && params.status !== 'all') {
-    filters.push(`status = "${params.status}"`)
-  }
-  const filter = filters.length > 0 ? filters.join(' && ') : ''
-
-  const records = await pb.collection('jeh_test_evaluations').getFullList({
-    filter: filter || undefined,
-    sort: '-created',
-  })
-
-  return records.map((r) => ({
-    id: r.id,
-    user_name: r.user_name,
-    user_question: r.user_question,
-    assistant_response: r.assistant_response,
-    rating: r.rating,
-    feedback_notes: r.feedback_notes,
-    suggested_correction: r.suggested_correction,
-    status: r.status,
-    target_category: r.target_category,
-    created: r.created,
-    updated: r.updated,
-  }))
-}
-
-export async function createJehEvaluation(data: {
-  user_name?: string
-  user_question: string
-  assistant_response: string
-  rating: 'correta' | 'parcial' | 'incorreta'
-  feedback_notes?: string
-  suggested_correction?: string
-  target_category?: string
-  status?: 'pendente_validacao' | 'aprovada_na_base' | 'rejeitada'
-}): Promise<JehTestEvaluationItem> {
-  const rec = await pb.collection('jeh_test_evaluations').create({
-    ...data,
-    status: data.status || 'pendente_validacao',
-  })
-  return rec as unknown as JehTestEvaluationItem
-}
-
-export async function updateJehEvaluation(
-  id: string,
-  data: Partial<JehTestEvaluationItem>,
-): Promise<JehTestEvaluationItem> {
-  const rec = await pb.collection('jeh_test_evaluations').update(id, data)
-  return rec as unknown as JehTestEvaluationItem
-}
-
-// -------------------------------------------------------------
-// HISTÓRICO CONSOLIDADO DE ATENDIMENTOS (Origem: Teste x Público)
-// -------------------------------------------------------------
-
-export interface JehInteractionItem {
-  id: string
-  origin: 'teste' | 'publico'
-  user_name: string
-  question: string
-  response: string
-  date: string
-  rating?: 'correta' | 'parcial' | 'incorreta' | 'nao_avaliada'
-  status?: string
-}
-
-export async function listJehInteractionsHistory(): Promise<JehInteractionItem[]> {
-  const interactions: JehInteractionItem[] = []
-
-  // 1. Origem Teste: jeh_test_evaluations
-  try {
-    const evals = await pb.collection('jeh_test_evaluations').getFullList({
-      sort: '-created',
-    })
-    for (const ev of evals) {
-      interactions.push({
-        id: `eval_${ev.id}`,
-        origin: 'teste',
-        user_name: ev.user_name || 'Usuário em Teste',
-        question: ev.user_question,
-        response: ev.assistant_response,
-        date: ev.created,
-        rating: ev.rating,
-        status: ev.status,
-      })
-    }
-  } catch {
-    // Silencioso se der erro
-  }
-
-  // 2. Origem Teste: jeh_unanswered (com source='teste')
-  try {
-    const unans = await pb.collection('jeh_unanswered').getFullList({
-      sort: '-created',
-    })
-    for (const un of unans) {
-      interactions.push({
-        id: `unans_${un.id}`,
-        origin: (un.source === 'publico' ? 'publico' : 'teste'),
-        user_name: un.source === 'publico' ? 'Visitante Externo' : 'Teste de Equipe',
-        question: un.question,
-        response: un.assigned_answer || 'Não tenho essa informação confirmada no momento...',
-        date: un.last_asked_at || un.created,
-        rating: 'incorreta',
-        status: un.status,
-      })
-    }
-  } catch {
-    // Silencioso
-  }
-
-  // 3. Origem Público: chat_messages associadas a conversas com a IA
-  try {
-    const publicMsgs = await pb.collection('chat_messages').getList(1, 100, {
-      filter: 'sender = "ai" || sender = "client"',
-      sort: '-created',
-      expand: 'conversation_id',
-    })
-
-    // Agrupar pares pergunta-resposta
-    const convMap = new Map<string, { user?: string; clientText?: string; aiText?: string; date?: string }>()
-    for (const m of publicMsgs.items) {
-      const convId = m.conversation_id
-      if (!convMap.has(convId)) {
-        convMap.set(convId, {
-          user: (m.expand?.conversation_id?.client_name) || 'Visitante Público',
-          date: m.created,
+      if (record) {
+        await pb.collection('settings').update(record.id, {
+          value: status,
+          description: 'Status operacional da Assistente Institucional Jeh (ativa/inativa)',
+        })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_STATUS,
+          value: status,
+          description: 'Status operacional da Assistente Institucional Jeh (ativa/inativa)',
         })
       }
-      const entry = convMap.get(convId)!
-      if (m.sender === 'client' && !entry.clientText) {
-        entry.clientText = m.content
-      } else if (m.sender === 'ai' && !entry.aiText) {
-        entry.aiText = m.content
+      return true
+    } catch (err) {
+      console.error('Erro ao atualizar status da Jeh:', err)
+      throw err
+    }
+  },
+
+  async getSettings(): Promise<JehSettingsConfig> {
+    const status = await this.getAssistantStatus()
+    let defaultMsg =
+      'Ainda não possuo essa informação em minha base oficial. Nossa equipe institucional pode ajudar diretamente através dos nossos canais oficiais.'
+    let channels: { channel: string; value: string; description?: string }[] = [
+      { channel: 'E-mail', value: 'contato@jetro.com.br', description: 'Atendimento geral' },
+      { channel: 'WhatsApp', value: '+55 11 99999-0000', description: 'Suporte institucional' },
+      { channel: 'Site', value: 'https://jetro.com.br', description: 'Portal oficial' },
+    ]
+
+    try {
+      const msgRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_DEFAULT_MSG}"`)
+      if (msgRec?.value) defaultMsg = msgRec.value
+    } catch {
+      // Usa padrão
+    }
+
+    try {
+      const chRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_CONTACT_CHANNELS}"`)
+      if (chRec?.value) {
+        channels = typeof chRec.value === 'string' ? JSON.parse(chRec.value) : chRec.value
+      }
+    } catch {
+      // Usa padrão
+    }
+
+    return {
+      assistant_status: status,
+      unanswered_default_message: defaultMsg,
+      contact_channels: channels,
+    }
+  },
+
+  async saveSettings(config: Partial<JehSettingsConfig>): Promise<void> {
+    if (config.assistant_status) {
+      await this.setAssistantStatus(config.assistant_status)
+    }
+
+    if (config.unanswered_default_message !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_DEFAULT_MSG}"`)
+      } catch {
+        record = null
+      }
+      if (record) {
+        await pb
+          .collection('settings')
+          .update(record.id, { value: config.unanswered_default_message })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_DEFAULT_MSG,
+          value: config.unanswered_default_message,
+          description: 'Mensagem padrão da Jeh quando não encontrar resposta oficial',
+        })
       }
     }
 
-    convMap.forEach((val, convId) => {
-      if (val.clientText) {
-        interactions.push({
-          id: `conv_${convId}`,
-          origin: 'publico',
-          user_name: val.user || 'Visitante Externo',
-          question: val.clientText,
-          response: val.aiText || 'Atendimento em andamento',
-          date: val.date || new Date().toISOString(),
-          rating: 'nao_avaliada',
-          status: 'finalizada',
+    if (config.contact_channels !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_CONTACT_CHANNELS}"`)
+      } catch {
+        record = null
+      }
+      const val =
+        typeof config.contact_channels === 'string'
+          ? config.contact_channels
+          : JSON.stringify(config.contact_channels)
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: val })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_CONTACT_CHANNELS,
+          value: val,
+          description: 'Canais de contato apresentáveis pela Jeh',
         })
       }
+    }
+  },
+
+  // ==========================================
+  // INDICADORES DE VISÃO GERAL
+  // ==========================================
+  async getOverviewStats(): Promise<JehOverviewStats> {
+    const status = await this.getAssistantStatus()
+
+    let totalQA = 0
+    let totalUnanswered = 0
+    let evaluatedCorrect = 0
+    let evaluatedImprovement = 0
+    let lastUpdate: string | null = null
+    const subjectMap: Record<string, number> = {}
+
+    try {
+      const qaList = await pb.collection('jeh_qa').getList(1, 200, { sort: '-created' })
+      totalQA = qaList.totalItems
+      for (const item of qaList.items) {
+        const cat = (item as any).category || 'Geral'
+        subjectMap[cat] = (subjectMap[cat] || 0) + ((item as any).access_count || 1)
+      }
+    } catch {
+      // Coleção vazia ou não acessível
+    }
+
+    try {
+      const unList = await pb.collection('jeh_unanswered').getList(1, 200, { sort: '-created' })
+      totalUnanswered = unList.totalItems
+      for (const item of unList.items) {
+        const subj = (item as any).subject || 'Não classificado'
+        subjectMap[subj] = (subjectMap[subj] || 0) + ((item as any).occurrences || 1)
+      }
+    } catch {
+      // Silencioso
+    }
+
+    try {
+      const evalList = await pb.collection('jeh_test_evaluations').getList(1, 500)
+      for (const item of evalList.items) {
+        const r = (item as any).evaluation
+        if (r === 'correta') evaluatedCorrect++
+        if (r === 'parcial' || r === 'incorreta') evaluatedImprovement++
+      }
+    } catch {
+      // Silencioso
+    }
+
+    try {
+      const kbList = await pb.collection('jeh_knowledge').getList(1, 1, { sort: '-updated' })
+      if (kbList.items.length > 0) {
+        lastUpdate = kbList.items[0].updated
+      }
+    } catch {
+      // Silencioso
+    }
+
+    const topSubjects = Object.entries(subjectMap)
+      .map(([subject, count]) => ({ subject, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+
+    return {
+      totalQuestions: totalQA + totalUnanswered,
+      answeredCount: totalQA,
+      unansweredCount: totalUnanswered,
+      evaluatedCorrectCount: evaluatedCorrect,
+      evaluatedImprovementCount: evaluatedImprovement,
+      topSubjects,
+      lastKnowledgeUpdate: lastUpdate,
+      assistantStatus: status,
+    }
+  },
+
+  // ==========================================
+  // BASE DE CONHECIMENTO (jeh_knowledge)
+  // ==========================================
+  async listKnowledge(filter?: string, sort = '-updated'): Promise<JehKnowledgeItem[]> {
+    try {
+      const records = await pb.collection('jeh_knowledge').getFullList({
+        filter,
+        sort,
+      })
+      return records.map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        category: r.category,
+        content: r.content,
+        keywords: r.keywords || '',
+        status: r.status,
+        responsible: r.responsible || '',
+        source_document: r.source_document || '',
+        created: r.created,
+        updated: r.updated,
+      }))
+    } catch (err) {
+      console.error('Erro ao listar conhecimento Jeh:', err)
+      return []
+    }
+  },
+
+  async createKnowledge(data: {
+    title: string
+    category: string
+    content: string
+    keywords?: string
+    status?: JehKnowledgeStatus
+    responsible?: string
+    source_document?: string
+  }): Promise<JehKnowledgeItem> {
+    const record = await pb.collection('jeh_knowledge').create({
+      title: data.title,
+      category: data.category,
+      content: data.content,
+      keywords: data.keywords || '',
+      status: data.status || 'rascunho',
+      responsible: data.responsible || pb.authStore.record?.email || '',
+      source_document: data.source_document || '',
     })
-  } catch {
-    // Silencioso
-  }
+    return {
+      id: record.id,
+      title: (record as any).title,
+      category: (record as any).category,
+      content: (record as any).content,
+      keywords: (record as any).keywords,
+      status: (record as any).status,
+      responsible: (record as any).responsible,
+      source_document: (record as any).source_document,
+      created: record.created,
+      updated: record.updated,
+    }
+  },
 
-  // Ordenar por data decrescente
-  interactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  async updateKnowledge(id: string, data: Partial<JehKnowledgeItem>): Promise<JehKnowledgeItem> {
+    const record = await pb.collection('jeh_knowledge').update(id, data)
+    return {
+      id: record.id,
+      title: (record as any).title,
+      category: (record as any).category,
+      content: (record as any).content,
+      keywords: (record as any).keywords,
+      status: (record as any).status,
+      responsible: (record as any).responsible,
+      source_document: (record as any).source_document,
+      created: record.created,
+      updated: record.updated,
+    }
+  },
 
-  return interactions
-}
+  async deleteKnowledge(id: string): Promise<boolean> {
+    await pb.collection('jeh_knowledge').delete(id)
+    return true
+  },
 
-// -------------------------------------------------------------
-// INDICADORES DA VISÃO GERAL (Métricas reais)
-// -------------------------------------------------------------
+  // ==========================================
+  // PERGUNTAS E RESPOSTAS (jeh_qa)
+  // ==========================================
+  async listQA(filter?: string, sort = '-created'): Promise<JehQAItem[]> {
+    try {
+      const records = await pb.collection('jeh_qa').getFullList({
+        filter,
+        sort,
+      })
+      return records.map((r: any) => {
+        let variations: string[] = []
+        if (Array.isArray(r.variations)) {
+          variations = r.variations
+        } else if (typeof r.variations === 'string' && r.variations.trim()) {
+          try {
+            variations = JSON.parse(r.variations)
+          } catch {
+            variations = r.variations.split('\n').filter(Boolean)
+          }
+        }
+        return {
+          id: r.id,
+          question: r.question,
+          official_answer: r.official_answer,
+          variations,
+          category: r.category,
+          access_count: r.access_count || 0,
+          status: r.status,
+          created: r.created,
+          updated: r.updated,
+        }
+      })
+    } catch (err) {
+      console.error('Erro ao listar Q&A Jeh:', err)
+      return []
+    }
+  },
 
-export async function getJehOverviewStats(): Promise<JehOverviewStats> {
-  const [
-    assistantStatus,
-    knowledgeItems,
-    qaItems,
-    unansweredItems,
-    evaluations,
-  ] = await Promise.all([
-    getJehAssistantStatus(),
-    listJehKnowledge(),
-    listJehQa(),
-    listJehUnanswered(),
-    listJehEvaluations(),
-  ])
+  async createQA(data: {
+    question: string
+    official_answer: string
+    variations: string[]
+    category: string
+    status?: JehQAStatus
+  }): Promise<JehQAItem> {
+    const record = await pb.collection('jeh_qa').create({
+      question: data.question,
+      official_answer: data.official_answer,
+      variations: data.variations,
+      category: data.category,
+      access_count: 0,
+      status: data.status || 'ativo',
+    })
+    return {
+      id: record.id,
+      question: (record as any).question,
+      official_answer: (record as any).official_answer,
+      variations: Array.isArray((record as any).variations) ? (record as any).variations : [],
+      category: (record as any).category,
+      access_count: (record as any).access_count || 0,
+      status: (record as any).status,
+      created: record.created,
+      updated: record.updated,
+    }
+  },
 
-  const totalAnswered = qaItems.length + knowledgeItems.length
-  const totalUnanswered = unansweredItems.reduce((acc, curr) => acc + (curr.count || 1), 0)
-  const totalQuestionsReceived = totalAnswered + totalUnanswered + evaluations.length
+  async updateQA(id: string, data: Partial<JehQAItem>): Promise<JehQAItem> {
+    const record = await pb.collection('jeh_qa').update(id, data)
+    return {
+      id: record.id,
+      question: (record as any).question,
+      official_answer: (record as any).official_answer,
+      variations: Array.isArray((record as any).variations) ? (record as any).variations : [],
+      category: (record as any).category,
+      access_count: (record as any).access_count || 0,
+      status: (record as any).status,
+      created: record.created,
+      updated: record.updated,
+    }
+  },
 
-  const evaluationsCount = evaluations.length
-  const evaluationsCorrect = evaluations.filter((e) => e.rating === 'correta').length
-  const evaluationsPartial = evaluations.filter((e) => e.rating === 'parcial').length
-  const evaluationsIncorrect = evaluations.filter((e) => e.rating === 'incorreta').length
+  async deleteQA(id: string): Promise<boolean> {
+    await pb.collection('jeh_qa').delete(id)
+    return true
+  },
 
-  let lastKnowledgeUpdate: string | null = null
-  if (knowledgeItems.length > 0) {
-    lastKnowledgeUpdate = knowledgeItems[0].updated || knowledgeItems[0].created
-  }
+  // ==========================================
+  // PERGUNTAS SEM RESPOSTA (jeh_unanswered)
+  // ==========================================
+  async listUnanswered(filter?: string, sort = '-occurrences'): Promise<JehUnansweredItem[]> {
+    try {
+      const records = await pb.collection('jeh_unanswered').getFullList({
+        filter,
+        sort,
+      })
+      return records.map((r: any) => ({
+        id: r.id,
+        question: r.question,
+        date: r.date || r.created,
+        occurrences: r.occurrences || 1,
+        subject: r.subject || '',
+        status: r.status,
+        created: r.created,
+        updated: r.updated,
+      }))
+    } catch (err) {
+      console.error('Erro ao listar perguntas sem resposta Jeh:', err)
+      return []
+    }
+  },
 
-  // Assuntos mais frequentes (a partir das categorias de knowledge, qa e unanswered)
-  const topicCounts = new Map<string, number>()
-  for (const k of knowledgeItems) {
-    topicCounts.set(k.category, (topicCounts.get(k.category) || 0) + 1)
-  }
-  for (const q of qaItems) {
-    topicCounts.set(q.category, (topicCounts.get(q.category) || 0) + 1)
-  }
-  for (const u of unansweredItems) {
-    const top = u.identified_topic || 'Outros'
-    topicCounts.set(top, (topicCounts.get(top) || 0) + (u.count || 1))
-  }
+  async updateUnansweredStatus(id: string, status: JehUnansweredStatus): Promise<void> {
+    await pb.collection('jeh_unanswered').update(id, { status })
+  },
 
-  const topTopics = Array.from(topicCounts.entries())
-    .map(([topic, count]) => ({ topic, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5)
+  async convertUnansweredToQA(
+    unansweredId: string,
+    data: {
+      question: string
+      official_answer: string
+      variations: string[]
+      category: string
+    },
+  ): Promise<JehQAItem> {
+    const newQA = await this.createQA({
+      ...data,
+      status: 'ativo',
+    })
+    await this.updateUnansweredStatus(unansweredId, 'respondido')
+    return newQA
+  },
 
-  return {
-    totalQuestionsReceived,
-    totalAnswered,
-    totalUnanswered,
-    evaluationsCount,
-    evaluationsCorrect,
-    evaluationsPartial,
-    evaluationsIncorrect,
-    knowledgeCount: knowledgeItems.length,
-    qaCount: qaItems.length,
-    lastKnowledgeUpdate,
-    assistantStatus,
-    topTopics,
-  }
+  // ==========================================
+  // TESTE INTERNO E AVALIAÇÕES (jeh_test_evaluations + hook test-chat)
+  // ==========================================
+  async sendTestMessage(message: string): Promise<{ reply: string; sources?: any[] }> {
+    try {
+      const response = await pb.send('/backend/v1/jeh/test-chat', {
+        method: 'POST',
+        body: { message },
+      })
+      return {
+        reply: response?.reply || 'Sem resposta retornada pelo agente de teste.',
+        sources: response?.sources || [],
+      }
+    } catch (err: any) {
+      console.error('Erro ao chamar teste da Jeh:', err)
+      throw new Error(err.message || 'Falha na comunicação com o assistente de teste.')
+    }
+  },
+
+  async submitEvaluation(data: {
+    question: string
+    assistant_reply: string
+    evaluation: JehEvaluationRating
+    notes?: string
+    suggested_answer?: string
+  }): Promise<JehTestEvaluationItem> {
+    const record = await pb.collection('jeh_test_evaluations').create({
+      question: data.question,
+      assistant_reply: data.assistant_reply,
+      evaluation: data.evaluation,
+      notes: data.notes || '',
+      suggested_answer: data.suggested_answer || '',
+    })
+    return {
+      id: record.id,
+      question: (record as any).question,
+      assistant_reply: (record as any).assistant_reply,
+      evaluation: (record as any).evaluation,
+      notes: (record as any).notes,
+      suggested_answer: (record as any).suggested_answer,
+      created: record.created,
+      updated: record.updated,
+    }
+  },
+
+  async listEvaluations(filter?: string, sort = '-created'): Promise<JehTestEvaluationItem[]> {
+    try {
+      const records = await pb.collection('jeh_test_evaluations').getFullList({
+        filter,
+        sort,
+      })
+      return records.map((r: any) => ({
+        id: r.id,
+        question: r.question,
+        assistant_reply: r.assistant_reply,
+        evaluation: r.evaluation,
+        notes: r.notes || '',
+        suggested_answer: r.suggested_answer || '',
+        created: r.created,
+        updated: r.updated,
+      }))
+    } catch (err) {
+      console.error('Erro ao listar avaliações Jeh:', err)
+      return []
+    }
+  },
+
+  // ==========================================
+  // TREINAMENTO E PROCESSAMENTO DA BASE
+  // ==========================================
+  async reindexKnowledgeBase(): Promise<{ processedCount: number; timestamp: string }> {
+    // Simula validação/indexação de integridade dos registros de conhecimento e Q&A
+    const kb = await this.listKnowledge('status = "aprovado"')
+    const qa = await this.listQA('status = "ativo"')
+    return {
+      processedCount: kb.length + qa.length,
+      timestamp: new Date().toISOString(),
+    }
+  },
 }

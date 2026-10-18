@@ -5,56 +5,43 @@ import {
   getJetroOnlineMessages,
   type JetroOnlineMessage,
   type JetroOnlineConversation,
+  type JetroOnlineUserContext,
+  type JetroOnlineCitation,
 } from '@/services/jetro-online'
-import { displayableMessages, type AgentMessage } from '@/lib/skipAi'
+import { displayableMessages } from '@/lib/skipAi'
 
-interface JetroOnlineContextType {
+export type { JetroOnlineMessage, JetroOnlineConversation, JetroOnlineCitation, JetroOnlineUserContext }
+
+interface JetroOnlineContextValue {
   messages: JetroOnlineMessage[]
   conversations: JetroOnlineConversation[]
   conversationId: string | null
-  serverUserContext: {
-    role?: string
-    departamento?: string
-    perfil_acesso?: string
-  } | null
   loading: boolean
   loadingHistory: boolean
+  serverUserContext?: JetroOnlineUserContext
+  isFloatingOpen: boolean
+  setIsFloatingOpen: (open: boolean) => void
   send: (text: string) => Promise<void>
   newConversation: () => void
   loadHistory: (convId: string) => Promise<void>
-  loadConversations: () => Promise<void>
   endRef: React.RefObject<HTMLDivElement | null>
-  scrollToBottom: (smooth?: boolean) => void
-  // Controle de abertura sincronizada / navegação
-  isFloatingOpen: boolean
-  setIsFloatingOpen: (open: boolean) => void
 }
 
-const JetroOnlineContext = createContext<JetroOnlineContextType | null>(null)
+const JetroOnlineContext = createContext<JetroOnlineContextValue | null>(null)
 
 export function JetroOnlineProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<JetroOnlineMessage[]>([])
   const [conversations, setConversations] = useState<JetroOnlineConversation[]>([])
   const [conversationId, setConversationId] = useState<string | null>(null)
-  const [serverUserContext, setServerUserContext] = useState<{
-    role?: string
-    departamento?: string
-    perfil_acesso?: string
-  } | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingHistory, setLoadingHistory] = useState(false)
+  const [serverUserContext, setServerUserContext] = useState<JetroOnlineUserContext | undefined>(undefined)
   const [isFloatingOpen, setIsFloatingOpen] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
-  const scrollToBottom = useCallback((smooth = true) => {
-    endRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' })
-  }, [])
-
   useEffect(() => {
-    if (messages.length > 0) {
-      scrollToBottom(true)
-    }
-  }, [messages, scrollToBottom])
+    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   const loadConversations = useCallback(async () => {
     try {
@@ -69,14 +56,13 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
     setLoadingHistory(true)
     try {
       const data = await getJetroOnlineMessages(convId)
-      const displayable = displayableMessages((data.messages || []) as unknown as AgentMessage[])
+      const raw = data.messages || []
+      const displayable = displayableMessages(raw as any[])
       setMessages(
-        displayable.map((m) => ({
-          id: m.id,
+        displayable.map((m: any) => ({
           role: m.role,
           content: m.content,
           citations: m.citations,
-          created: m.created,
         })),
       )
       setConversationId(convId)
@@ -89,47 +75,32 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
 
   const send = useCallback(
     async (text: string) => {
-      const cleanText = text.trim()
-      if (!cleanText || loading) return
-
-      const userMsg: JetroOnlineMessage = {
-        role: 'user',
-        content: cleanText,
-        created: new Date().toISOString(),
-      }
-
-      setMessages((prev) => [...prev, userMsg])
+      if (!text.trim() || loading) return
+      setMessages((prev) => [...prev, { role: 'user', content: text }])
       setLoading(true)
-
       try {
-        const result = await sendJetroOnlineMessage(cleanText, conversationId || undefined)
-        setConversationId(result.conversation_id)
+        const result = await sendJetroOnlineMessage(text, conversationId || undefined)
+        if (result.conversation_id) {
+          setConversationId(result.conversation_id)
+        }
         if (result.user_context) {
           setServerUserContext(result.user_context)
         }
-
-        const assistantMsg: JetroOnlineMessage = {
-          id: result.message_id,
-          role: 'assistant',
-          content: result.content,
-          citations: result.citations,
-          created: new Date().toISOString(),
-        }
-
-        setMessages((prev) => [...prev, assistantMsg])
-        loadConversations()
-      } catch (err: any) {
-        const errMsg =
-          err?.data?.error ||
-          err?.message ||
-          'Não foi possível consultar os dados no momento. Verifique sua conexão e tente novamente.'
-
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            content: `⚠️ ${errMsg}`,
-            created: new Date().toISOString(),
+            content: result.content,
+            citations: result.citations,
+          },
+        ])
+        loadConversations()
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: 'Desculpe, ocorreu um erro ao consultar o Jetro On-line. Por favor, tente novamente.',
           },
         ])
       } finally {
@@ -148,30 +119,28 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
     loadConversations()
   }, [loadConversations])
 
-  const contextValue = {
+  const value: JetroOnlineContextValue = {
     messages,
     conversations,
     conversationId,
-    serverUserContext,
     loading,
     loadingHistory,
+    serverUserContext,
+    isFloatingOpen,
+    setIsFloatingOpen,
     send,
     newConversation,
     loadHistory,
-    loadConversations,
     endRef,
-    scrollToBottom,
-    isFloatingOpen,
-    setIsFloatingOpen,
   }
 
-  return <JetroOnlineContext.Provider value={contextValue}>{children}</JetroOnlineContext.Provider>
+  return <JetroOnlineContext.Provider value={value}>{children}</JetroOnlineContext.Provider>
 }
 
 export function useJetroOnline() {
   const ctx = useContext(JetroOnlineContext)
   if (!ctx) {
-    throw new Error('useJetroOnline deve ser utilizado dentro de um JetroOnlineProvider')
+    throw new Error('useJetroOnline must be used within a JetroOnlineProvider')
   }
   return ctx
 }

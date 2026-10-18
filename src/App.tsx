@@ -94,6 +94,17 @@ import Precificacao from './pages/Precificacao'
 import Auditoria from './pages/Auditoria'
 import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
 import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
+import {
+  JehOverviewScreen,
+  JehKnowledgeScreen,
+  JehQAScreen,
+  JehTrainingScreen,
+  JehTestScreen,
+  JehUnansweredScreen,
+  JehHistoryScreen,
+  JehSettingsScreen,
+  JehProtectedRoute,
+} from '@/components/jeh'
 import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
 import ComparativoMargensGrPage from './pages/admin/ComparativoMargensGrPage'
 import TabelaMaeGrPage from './pages/admin/TabelaMaeGrPage'
@@ -1264,6 +1275,75 @@ const App = () => (
                           <Route
                             path="/admin/central-documentacao"
                             element={<CentralDocumentacaoPage />}
+                          />
+                          {/* Central de Administração e Treinamento da Assistente Jeh */}
+                          <Route
+                            path="/admin/jeh"
+                            element={<Navigate to="/admin/jeh/visao-geral" replace />}
+                          />
+                          <Route
+                            path="/admin/jeh/visao-geral"
+                            element={
+                              <JehProtectedRoute>
+                                <JehOverviewScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/conhecimento"
+                            element={
+                              <JehProtectedRoute>
+                                <JehKnowledgeScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/perguntas-respostas"
+                            element={
+                              <JehProtectedRoute>
+                                <JehQAScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/treinamento"
+                            element={
+                              <JehProtectedRoute>
+                                <JehTrainingScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/testar"
+                            element={
+                              <JehProtectedRoute>
+                                <JehTestScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/sem-resposta"
+                            element={
+                              <JehProtectedRoute>
+                                <JehUnansweredScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/historico"
+                            element={
+                              <JehProtectedRoute>
+                                <JehHistoryScreen />
+                              </JehProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/admin/jeh/configuracoes"
+                            element={
+                              <JehProtectedRoute>
+                                <JehSettingsScreen />
+                              </JehProtectedRoute>
+                            }
                           />
                           <Route path="/admin/segundo-cerebro" element={<SegundoCerebroPage />} />
                           <Route

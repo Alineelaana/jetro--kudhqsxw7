@@ -51,6 +51,7 @@ import {
   canViewSegundoCerebro,
   canViewPlanilhasConvertidas,
   canViewPlanilhasTabelaMaeGr,
+  canManageJehAssistant,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -130,6 +131,38 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         icon: CalendarClock,
         route: '/admin/agendamento-relatorios',
         perm: canViewConfiguracoes,
+      },
+      {
+        label: 'Assistente Jeh',
+        icon: Bot,
+        route: '/admin/jeh',
+        perm: canManageJehAssistant,
+        children: [
+          {
+            label: 'Base de Conhecimento',
+            route: '/admin/jeh/conhecimento',
+            perm: canManageJehAssistant,
+          },
+          {
+            label: 'Configurações',
+            route: '/admin/jeh/configuracoes',
+            perm: canManageJehAssistant,
+          },
+          { label: 'Histórico', route: '/admin/jeh/historico', perm: canManageJehAssistant },
+          {
+            label: 'Perguntas e Respostas',
+            route: '/admin/jeh/perguntas-respostas',
+            perm: canManageJehAssistant,
+          },
+          {
+            label: 'Perguntas sem Resposta',
+            route: '/admin/jeh/sem-resposta',
+            perm: canManageJehAssistant,
+          },
+          { label: 'Testar Jeh', route: '/admin/jeh/testar', perm: canManageJehAssistant },
+          { label: 'Treinamento', route: '/admin/jeh/treinamento', perm: canManageJehAssistant },
+          { label: 'Visão Geral', route: '/admin/jeh/visao-geral', perm: canManageJehAssistant },
+        ],
       },
       { label: 'Auditoria', icon: FileSearch, route: '/admin/auditoria', perm: canViewAuditLogs },
       {
