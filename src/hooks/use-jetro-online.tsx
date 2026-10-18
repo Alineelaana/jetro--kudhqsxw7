@@ -10,7 +10,12 @@ import {
 } from '@/services/jetro-online'
 import { displayableMessages } from '@/lib/skipAi'
 
-export type { JetroOnlineMessage, JetroOnlineConversation, JetroOnlineCitation, JetroOnlineUserContext }
+export type {
+  JetroOnlineMessage,
+  JetroOnlineConversation,
+  JetroOnlineCitation,
+  JetroOnlineUserContext,
+}
 
 interface JetroOnlineContextValue {
   messages: JetroOnlineMessage[]
@@ -35,7 +40,9 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingHistory, setLoadingHistory] = useState(false)
-  const [serverUserContext, setServerUserContext] = useState<JetroOnlineUserContext | undefined>(undefined)
+  const [serverUserContext, setServerUserContext] = useState<JetroOnlineUserContext | undefined>(
+    undefined,
+  )
   const [isFloatingOpen, setIsFloatingOpen] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -100,7 +107,8 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
           ...prev,
           {
             role: 'assistant',
-            content: 'Desculpe, ocorreu um erro ao consultar o Jetro On-line. Por favor, tente novamente.',
+            content:
+              'Desculpe, ocorreu um erro ao consultar o Jetro On-line. Por favor, tente novamente.',
           },
         ])
       } finally {
