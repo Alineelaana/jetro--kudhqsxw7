@@ -228,9 +228,10 @@ export function CrmLeadDialog({
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="dados">
-          <TabsList>
+          <TabsList className="grid grid-cols-3">
             <TabsTrigger value="dados">Dados do Lead</TabsTrigger>
             <TabsTrigger value="qualif">Qualificação</TabsTrigger>
+            <TabsTrigger value="jeh">Atendimento Jeh</TabsTrigger>
           </TabsList>
           <TabsContent value="dados" className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -425,6 +426,97 @@ export function CrmLeadDialog({
               </div>
             </div>
           </TabsContent>
+          <TabsContent value="jeh" className="space-y-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#005B2E] uppercase tracking-wider">
+                  Resumo Comercial Automático da Jeh
+                </span>
+                {form.fill_status && (
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    Preenchimento: {form.fill_status}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed font-mono bg-white p-2.5 rounded border border-slate-200">
+                {form.commercial_summary || 'Nenhum resumo comercial gerado ainda pela Jeh.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-muted-foreground">
+                  Etapa de Qualificação
+                </Label>
+                <Input
+                  value={form.qualification_stage || 'Novo Lead'}
+                  readOnly
+                  className="bg-slate-50 text-xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-muted-foreground">
+                  Assunto de Interesse
+                </Label>
+                <Input
+                  value={form.interest_topic || form.product_interest || '—'}
+                  readOnly
+                  className="bg-slate-50 text-xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-muted-foreground">
+                  Sistema Atual Relatado
+                </Label>
+                <Input
+                  value={form.system_current || 'Não informado'}
+                  readOnly
+                  className="bg-slate-50 text-xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-muted-foreground">
+                  Primeiro Contato / Última Interação
+                </Label>
+                <Input
+                  value={`${form.first_contact_date ? new Date(form.first_contact_date).toLocaleString('pt-BR') : '—'} / ${form.last_interaction_date ? new Date(form.last_interaction_date).toLocaleString('pt-BR') : '—'}`}
+                  readOnly
+                  className="bg-slate-50 text-xs"
+                />
+              </div>
+            </div>
+
+            {form.chat_history &&
+              Array.isArray(form.chat_history) &&
+              form.chat_history.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-[#005B2E]">
+                    Histórico da Conversa com a Jeh
+                  </Label>
+                  <div className="max-h-60 overflow-y-auto space-y-2 border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-xs">
+                    {form.chat_history.map((h, idx) => (
+                      <div
+                        key={idx}
+                        className={`p-2 rounded ${
+                          h.sender === 'visitante'
+                            ? 'bg-[#005B2E]/10 border-l-2 border-[#005B2E]'
+                            : 'bg-white border border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                          <span className="font-bold text-slate-800">
+                            {h.sender === 'visitante' ? 'Visitante' : 'Jeh (Assistente)'}
+                          </span>
+                          <span>{h.time ? new Date(h.time).toLocaleTimeString('pt-BR') : ''}</span>
+                        </div>
+                        <p className="text-slate-700 whitespace-pre-wrap">{h.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+          </TabsContent>
+
           <TabsContent value="qualif" className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5 sm:col-span-2">

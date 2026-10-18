@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { MessageSquare, X, Send, Loader2, ChevronDown, Sparkles, ExternalLink } from 'lucide-react'
+import {
+  MessageSquare,
+  X,
+  Send,
+  Loader2,
+  ChevronDown,
+  Sparkles,
+  ExternalLink,
+  ShieldCheck,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { JEH_AVATAR_URL } from '@/lib/jeh-assets'
 import { Input } from '@/components/ui/input'
@@ -19,6 +28,10 @@ const STORAGE_KEY_CONV_ID = 'jeh_public_chat_conversation_id'
 const STORAGE_KEY_CLIENT_NAME = 'jeh_public_client_name'
 const STORAGE_KEY_CLIENT_EMAIL = 'jeh_public_client_email'
 const STORAGE_KEY_CLIENT_PHONE = 'jeh_public_client_phone'
+const STORAGE_KEY_CLIENT_COMPANY = 'jeh_public_client_company'
+
+export const OFFICIAL_JEH_GREETING =
+  'Olá! Seja muito bem-vindo(a) ao Jetro! 😊\nEu sou a Jeh, assistente virtual do Jetro, e estou aqui para ajudar você a conhecer melhor nosso sistema.\nAntes de começarmos, gostaria de saber um pouquinho sobre você para personalizar nosso atendimento.\nQual é o seu nome?'
 
 export function PublicJehChat() {
   const { isAuthenticated } = useAuth()
@@ -37,6 +50,9 @@ export function PublicJehChat() {
   )
   const [clientPhone, setClientPhone] = useState(
     () => localStorage.getItem(STORAGE_KEY_CLIENT_PHONE) || '',
+  )
+  const [clientCompany, setClientCompany] = useState(
+    () => localStorage.getItem(STORAGE_KEY_CLIENT_COMPANY) || '',
   )
   const [conversationId, setConversationId] = useState<string | null>(
     () => localStorage.getItem(STORAGE_KEY_CONV_ID) || null,
@@ -79,14 +95,11 @@ export function PublicJehChat() {
   const handleOpen = () => {
     setIsOpen(true)
     if (messages.length === 0) {
-      // Mensagem de abertura obrigatória oficial
-      const officialGreeting =
-        'Olá! Sou a Jeh, assistente virtual do Jetro. 😊 Antes de começarmos, me informe seu nome, telefone com DDD e melhor e-mail. Vamos usar esses dados para registrar seu atendimento e retornar seu contato sobre a plataforma.'
       setMessages([
         {
           id: 'welcome',
           sender: 'ai',
-          content: officialGreeting,
+          content: OFFICIAL_JEH_GREETING,
           created: new Date().toISOString(),
         },
       ])
@@ -102,6 +115,7 @@ export function PublicJehChat() {
     let detectedName = clientName
     let detectedEmail = clientEmail
     let detectedPhone = clientPhone
+    let detectedCompany = clientCompany
 
     if (!detectedEmail) {
       const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)
@@ -113,11 +127,31 @@ export function PublicJehChat() {
     }
 
     if (!detectedPhone) {
-      const phoneMatch = text.match(/(?:\(?\d{2}\)?\s*)?(?:9\s*)?\d{4,5}[-\s]?\d{4}/)
-      if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 10) {
-        detectedPhone = phoneMatch[0].trim()
-        setClientPhone(detectedPhone)
-        localStorage.setItem(STORAGE_KEY_CLIENT_PHONE, detectedPhone)
+      const phoneMatch = text.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?(?:9\s*)?\d{4,5}[-\s]?\d{4}/)
+      if (phoneMatch) {
+        const d = phoneMatch[0].replace(/\D/g, '')
+        if (d.length >= 10 && d.length <= 13) {
+          detectedPhone = phoneMatch[0].trim()
+          setClientPhone(detectedPhone)
+          localStorage.setItem(STORAGE_KEY_CLIENT_PHONE, detectedPhone)
+        }
+      }
+    }
+
+    if (!detectedCompany) {
+      const compMatch = text.match(
+        /(?:empresa\s+(?:é|e|chama-se|se\s+chama)?|trabalho\s+na|da\s+empresa|sou\s+da)\s+([A-Za-z0-9À-ÖØ-öø-ÿ\s&.-]{2,50})/i,
+      )
+      if (compMatch && compMatch[1]) {
+        const cCandidate = compMatch[1]
+          .split(/[.,;\n]/)[0]
+          .replace(/^(minha|nossa|uma)\s+/i, '')
+          .trim()
+        if (cCandidate.length >= 2 && !/^(não|nao|nenhuma|ainda|sou|aqui)$/i.test(cCandidate)) {
+          detectedCompany = cCandidate
+          setClientCompany(detectedCompany)
+          localStorage.setItem(STORAGE_KEY_CLIENT_COMPANY, detectedCompany)
+        }
       }
     }
 
@@ -127,8 +161,24 @@ export function PublicJehChat() {
       )
       if (nameMatch && nameMatch[1]) {
         const candidate = nameMatch[1].trim().split(/\s+/).slice(0, 4).join(' ')
-        if (!/^(apenas|aqui|um|uma|cliente|interessado)$/i.test(candidate)) {
+        if (!/^(apenas|aqui|um|uma|cliente|interessado|visitante|teste)$/i.test(candidate)) {
           detectedName = candidate
+          setClientName(detectedName)
+          localStorage.setItem(STORAGE_KEY_CLIENT_NAME, detectedName)
+        }
+      } else {
+        // Se a mensagem for apenas um nome próprio simples em resposta à recepção inicial
+        const words = text.split(/\s+/)
+        if (
+          messages.length <= 2 &&
+          words.length >= 1 &&
+          words.length <= 4 &&
+          /^[A-Za-zÀ-ÖØ-öø-ÿ]+(\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/.test(text) &&
+          !/^(olá|ola|oi|bom dia|boa tarde|boa noite|sim|não|nao|ok|quero|saber|ajuda|como|quem|qual|sistema|erp|jetro)$/i.test(
+            text,
+          )
+        ) {
+          detectedName = text
           setClientName(detectedName)
           localStorage.setItem(STORAGE_KEY_CLIENT_NAME, detectedName)
         }
@@ -150,9 +200,10 @@ export function PublicJehChat() {
       const resp = await sendChatMessage({
         message: text,
         conversation_id: conversationId || undefined,
-        client_name: detectedName || 'Visitante',
+        client_name: detectedName || undefined,
         client_email: detectedEmail || undefined,
         client_phone: detectedPhone || undefined,
+        client_company: detectedCompany || undefined,
       })
 
       if (resp?.conversation_id) {
@@ -162,7 +213,7 @@ export function PublicJehChat() {
 
       const aiReply =
         resp?.response ||
-        'Olá! Para confirmar esse ponto e orientar você de acordo com a sua operação, fale com nossa equipe pelo WhatsApp: https://wa.me/5531991297619'
+        'Olá! Estou à disposição para apresentar todas as soluções do ERP Jetro. O que você gostaria de conhecer primeiro?'
 
       setMessages((prev) => [
         ...prev,
@@ -173,14 +224,14 @@ export function PublicJehChat() {
           created: new Date().toISOString(),
         },
       ])
-    } catch (err: any) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
           id: 'err_' + Date.now(),
           sender: 'ai',
           content:
-            'Para confirmar esse ponto e orientar você de acordo com a sua operação, fale com nossa equipe pelo WhatsApp: https://wa.me/5531991297619',
+            'Tive uma pequena oscilação técnica, mas continuo aqui com você! Para negociações diretas ou falar com a equipe comercial, você também pode usar nosso WhatsApp oficial: https://wa.me/5531991297619. O que gostaria de saber sobre o Jetro?',
           created: new Date().toISOString(),
         },
       ])
@@ -244,7 +295,7 @@ export function PublicJehChat() {
 
       {/* Caixa de Diálogo da Jeh */}
       {isOpen && (
-        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#005B2E] overflow-hidden flex flex-col w-[360px] sm:w-[410px] h-[530px] transition-all duration-200 select-text">
+        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#005B2E] overflow-hidden flex flex-col w-[360px] sm:w-[420px] h-[550px] transition-all duration-200 select-text">
           {/* Cabeçalho Oficial Jeh (Verde escuro / Dourado) */}
           <div className="bg-gradient-to-r from-[#00381C] via-[#005B2E] to-[#00381C] text-white px-4 py-3 flex items-center justify-between border-b border-[#C9A227]/50 shrink-0">
             <div className="flex items-center gap-2.5">
@@ -276,6 +327,14 @@ export function PublicJehChat() {
             >
               <ChevronDown className="h-5 w-5" />
             </button>
+          </div>
+
+          {/* Aviso LGPD discreto */}
+          <div className="bg-emerald-50/80 border-b border-emerald-100 px-3 py-1 flex items-center gap-1.5 text-[10px] text-emerald-800">
+            <ShieldCheck className="w-3 h-3 text-[#005B2E] shrink-0" />
+            <span className="truncate">
+              Privacidade protegida (LGPD) • Coleta exclusiva para atendimento comercial Jetro.
+            </span>
           </div>
 
           {/* Área de Mensagens */}
@@ -340,7 +399,7 @@ export function PublicJehChat() {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Digite sua dúvida ou contato..."
+                placeholder="Digite sua dúvida ou mensagem..."
                 disabled={loading}
                 className="h-9 text-xs border-gray-300 focus-visible:ring-[#005B2E]"
               />
@@ -355,7 +414,7 @@ export function PublicJehChat() {
             </form>
 
             <div className="mt-1.5 flex items-center justify-between text-[10px] text-gray-400 px-1">
-              <span>Atendimento Institucional Jeh</span>
+              <span>Atendimento Consultivo Jeh</span>
               <a
                 href="https://wa.me/5531991297619"
                 target="_blank"

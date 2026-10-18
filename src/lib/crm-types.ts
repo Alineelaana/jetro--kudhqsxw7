@@ -208,6 +208,16 @@ export interface CrmLead {
   opportunity_id: string
   contacts: unknown[]
   attachments: string[]
+  conversation_id?: string
+  commercial_summary?: string
+  interest_topic?: string
+  system_current?: string
+  operational_pains?: string
+  qualification_stage?: string
+  fill_status?: string
+  first_contact_date?: string
+  last_interaction_date?: string
+  chat_history?: Array<{ sender: string; text: string; time: string }>
   created: string
   updated: string
 }

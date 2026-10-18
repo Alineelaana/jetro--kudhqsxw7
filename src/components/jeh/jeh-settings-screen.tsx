@@ -25,6 +25,8 @@ import {
   HelpCircle,
   PhoneCall,
   CheckCircle2,
+  Bell,
+  Lock,
 } from 'lucide-react'
 
 export function JehSettingsScreen() {
@@ -40,6 +42,10 @@ export function JehSettingsScreen() {
   >([])
   const [leadSource, setLeadSource] = useState('Jeh — Site Jetro')
   const [greetingMessage, setGreetingMessage] = useState('')
+  const [notificationRecipients, setNotificationRecipients] = useState('comercial@jetro.com.br')
+  const [notificationMode, setNotificationMode] = useState('imediato')
+  const [lgpdNotice, setLgpdNotice] = useState('')
+  const [recentNotifs, setRecentNotifs] = useState<any[]>([])
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelValue, setNewChannelValue] = useState('')
 
@@ -58,8 +64,16 @@ export function JehSettingsScreen() {
       setLeadSource(data.lead_source || 'Jeh — Site Jetro')
       setGreetingMessage(
         data.greeting_message ||
-          'Olá! Sou a Jeh, assistente virtual do Jetro. 😊 Para começarmos, me informe seu nome, telefone com DDD e melhor e-mail. Esses dados serão utilizados para registrar seu atendimento e permitir que nossa equipe retorne seu contato.',
+          'Olá! Seja muito bem-vindo(a) ao Jetro! 😊\nEu sou a Jeh, assistente virtual do Jetro, e estou aqui para ajudar você a conhecer melhor nosso sistema.\nAntes de começarmos, gostaria de saber um pouquinho sobre você para personalizar nosso atendimento.\nQual é o seu nome?',
       )
+      setNotificationRecipients(data.notification_recipients || 'comercial@jetro.com.br')
+      setNotificationMode(data.notification_mode || 'imediato')
+      setLgpdNotice(
+        data.lgpd_notice ||
+          'Seus dados são protegidos e tratados para atendimento comercial do Jetro de acordo com a LGPD.',
+      )
+      const notifs = await JehAssistantService.getRecentNotifications()
+      setRecentNotifs(notifs)
     } catch {
       toast({
         title: 'Erro ao carregar configurações',
@@ -111,6 +125,9 @@ export function JehSettingsScreen() {
         contact_channels: channels,
         lead_source: leadSource.trim(),
         greeting_message: greetingMessage.trim(),
+        notification_recipients: notificationRecipients.trim(),
+        notification_mode: notificationMode,
+        lgpd_notice: lgpdNotice.trim(),
       })
       toast({
         title: 'Configurações salvas com sucesso',
@@ -255,6 +272,96 @@ export function JehSettingsScreen() {
                 ou responder perguntas.
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* NOTIFICAÇÃO DE NOVOS LEADS */}
+        <Card className="border shadow-xs">
+          <CardHeader className="p-5 pb-3">
+            <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <Bell className="w-4 h-4 text-[#005B2E]" />
+              Notificação de Novos Leads & Resumo Comercial
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Quando um lead fornece dados suficientes de contato, avisa a equipe comercial com
+              dados do lead e resumo contextual.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-2 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-700">
+                  E-mails dos Destinatários Internos (separados por vírgula)
+                </Label>
+                <Input
+                  value={notificationRecipients}
+                  onChange={(e) => setNotificationRecipients(e.target.value)}
+                  disabled={!hasAdminPerm || saving}
+                  className="h-8 text-xs font-mono"
+                  placeholder="comercial@jetro.com.br, gestao@jetro.com.br"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-700">Modo de Envio</Label>
+                <select
+                  value={notificationMode}
+                  onChange={(e) => setNotificationMode(e.target.value)}
+                  disabled={!hasAdminPerm || saving}
+                  aria-label="Modo de Envio"
+                  className="h-8 w-full border rounded-md px-2 text-xs bg-white focus-visible:ring-1 focus-visible:ring-[#005B2E]"
+                >
+                  <option value="imediato">Envio Imediato a cada lead captado</option>
+                  <option value="consolidado">Fila Administrativa Consolidada</option>
+                </select>
+              </div>
+            </div>
+
+            {recentNotifs.length > 0 && (
+              <div className="space-y-2 pt-2 border-t">
+                <Label className="text-xs font-bold text-[#005B2E]">
+                  Últimos Avisos na Fila Administrativa ({recentNotifs.length})
+                </Label>
+                <div className="max-h-48 overflow-y-auto space-y-2 border rounded p-2 bg-slate-50 text-xs font-mono">
+                  {recentNotifs.slice(0, 5).map((n) => (
+                    <div key={n.id} className="p-2 bg-white rounded border border-slate-200">
+                      <div className="flex justify-between items-center text-[10px] text-muted-foreground mb-1">
+                        <span className="font-bold text-slate-800">
+                          {n.lead_name || 'Lead'} ({n.lead_number || 'Sem número'})
+                        </span>
+                        <span>{new Date(n.created).toLocaleString('pt-BR')}</span>
+                      </div>
+                      <p className="whitespace-pre-wrap text-[11px] text-slate-700">
+                        {n.notification_body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* LGPD E PRIVACIDADE */}
+        <Card className="border shadow-xs">
+          <CardHeader className="p-5 pb-3">
+            <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-emerald-700" />
+              Proteção de Dados (LGPD) e Aviso de Privacidade
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Aviso exibido aos visitantes no topo do chat informando o tratamento e segurança dos
+              dados.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-2 space-y-2">
+            <Textarea
+              rows={2}
+              value={lgpdNotice}
+              onChange={(e) => setLgpdNotice(e.target.value)}
+              disabled={!hasAdminPerm || saving}
+              className="text-xs"
+              placeholder="Aviso legal sobre retenção e privacidade de dados..."
+            />
           </CardContent>
         </Card>
 

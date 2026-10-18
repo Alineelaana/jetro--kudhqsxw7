@@ -88,6 +88,10 @@ export interface JehSettingsConfig {
   }[]
   lead_source?: string
   greeting_message?: string
+  notification_recipients?: string
+  notification_events?: string
+  notification_mode?: string
+  lgpd_notice?: string
 }
 
 const SETTING_KEY_STATUS = 'jeh_assistant_status'
@@ -95,6 +99,10 @@ const SETTING_KEY_DEFAULT_MSG = 'jeh_unanswered_default_message'
 const SETTING_KEY_CONTACT_CHANNELS = 'jeh_contact_channels'
 const SETTING_KEY_LEAD_SOURCE = 'jeh_lead_source'
 const SETTING_KEY_GREETING_MSG = 'jeh_greeting_message'
+const SETTING_KEY_NOTIF_RECIPIENTS = 'jeh_notification_recipients'
+const SETTING_KEY_NOTIF_EVENTS = 'jeh_notification_events'
+const SETTING_KEY_NOTIF_MODE = 'jeh_notification_mode'
+const SETTING_KEY_LGPD_NOTICE = 'jeh_lgpd_notice'
 
 export const JehAssistantService = {
   // ==========================================
@@ -192,12 +200,69 @@ export const JehAssistantService = {
       // Usa padrão
     }
 
+    let notifRecipients = 'comercial@jetro.com.br'
+    let notifEvents = 'lead_captured,demo_requested'
+    let notifMode = 'imediato'
+    let lgpdNotice =
+      'Seus dados são protegidos e tratados para atendimento comercial do Jetro de acordo com a LGPD.'
+
+    try {
+      const nrRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_NOTIF_RECIPIENTS}"`)
+      if (nrRec?.value) notifRecipients = nrRec.value
+    } catch {
+      /* intentionally ignored */
+    }
+
+    try {
+      const neRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_NOTIF_EVENTS}"`)
+      if (neRec?.value) notifEvents = neRec.value
+    } catch {
+      /* intentionally ignored */
+    }
+
+    try {
+      const nmRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_NOTIF_MODE}"`)
+      if (nmRec?.value) notifMode = nmRec.value
+    } catch {
+      /* intentionally ignored */
+    }
+
+    try {
+      const lgRec = await pb
+        .collection('settings')
+        .getFirstListItem(`key = "${SETTING_KEY_LGPD_NOTICE}"`)
+      if (lgRec?.value) lgpdNotice = lgRec.value
+    } catch {
+      /* intentionally ignored */
+    }
+
     return {
       assistant_status: status,
       unanswered_default_message: defaultMsg,
       contact_channels: channels,
       lead_source: leadSource,
       greeting_message: greetingMsg,
+      notification_recipients: notifRecipients,
+      notification_events: notifEvents,
+      notification_mode: notifMode,
+      lgpd_notice: lgpdNotice,
+    }
+  },
+
+  async getRecentNotifications(limit = 20): Promise<any[]> {
+    try {
+      return await pb.collection('jeh_notifications').getFullList({
+        sort: '-created',
+        requestKey: null,
+      })
+    } catch {
+      return []
     }
   },
 
@@ -288,6 +353,86 @@ export const JehAssistantService = {
           key: SETTING_KEY_GREETING_MSG,
           value: config.greeting_message,
           description: 'Mensagem de abertura mandatória da Jeh para identificação',
+        })
+      }
+    }
+
+    if (config.notification_recipients !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_NOTIF_RECIPIENTS}"`)
+      } catch {
+        /* intentionally ignored */
+      }
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: config.notification_recipients })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_NOTIF_RECIPIENTS,
+          value: config.notification_recipients,
+          description: 'E-mails destinatários das notificações de novos leads da Jeh',
+        })
+      }
+    }
+
+    if (config.notification_events !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_NOTIF_EVENTS}"`)
+      } catch {
+        /* intentionally ignored */
+      }
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: config.notification_events })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_NOTIF_EVENTS,
+          value: config.notification_events,
+          description: 'Eventos que disparam notificações da Jeh',
+        })
+      }
+    }
+
+    if (config.notification_mode !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_NOTIF_MODE}"`)
+      } catch {
+        /* intentionally ignored */
+      }
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: config.notification_mode })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_NOTIF_MODE,
+          value: config.notification_mode,
+          description: 'Modo de envio das notificações (imediato ou consolidado)',
+        })
+      }
+    }
+
+    if (config.lgpd_notice !== undefined) {
+      let record = null
+      try {
+        record = await pb
+          .collection('settings')
+          .getFirstListItem(`key = "${SETTING_KEY_LGPD_NOTICE}"`)
+      } catch {
+        /* intentionally ignored */
+      }
+      if (record) {
+        await pb.collection('settings').update(record.id, { value: config.lgpd_notice })
+      } else {
+        await pb.collection('settings').create({
+          key: SETTING_KEY_LGPD_NOTICE,
+          value: config.lgpd_notice,
+          description: 'Aviso LGPD de privacidade no chat da Jeh',
         })
       }
     }

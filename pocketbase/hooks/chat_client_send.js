@@ -3,70 +3,246 @@
 /**
  * Endpoint de chat público do site com a assistente Jeh (/backend/v1/chat/send)
  *
- * Regras Obrigatórias e Diretrizes Oficiais do Treinamento Jeh:
- * 1. REGRA PRINCIPAL: Utilize primeiro as informações confirmadas da base de conhecimento
- *    para responder à pergunta. O WhatsApp deve complementar o atendimento, não substituir
- *    respostas que a Jeh já consegue fornecer. Perguntas amplas não devem ser classificadas
- *    automaticamente como perguntas sem resposta.
- * 2. FLUXO OFICIAL DE ATENDIMENTO:
- *    - Se ainda não houver identificação, solicite nome, telefone com DDD e melhor e-mail.
- *    - Preserve a pergunta original enquanto coleta os dados.
- *    - Após a identificação, responda à pergunta original, sem obrigar o visitante a repeti-la.
- *    - Utilize as informações disponíveis sobre o Jetro.
- *    - Faça uma pergunta breve para entender a necessidade do cliente.
- *    - Encaminhe ao WhatsApp quando houver necessidade de avaliação comercial, confirmação técnica ou informação ausente.
- * 3. INDEPENDÊNCIA DA RESPOSTA E CADASTRO DE LEAD:
- *    - Não condicione a explicação do sistema ao sucesso técnico do cadastro do lead.
- *    - Se a gravação falhar, informe a dificuldade sem afirmar que salvou os dados e continue
- *      respondendo com o conhecimento disponível após a identificação.
- * 4. QUANDO RESPONDER PARCIALMENTE E ENCAMINHAR:
- *    - Se souber parte da resposta, explique primeiro essa parte e indique exatamente o que precisa de confirmação.
- * 5. QUANDO ENCAMINHAR À EQUIPE (SOMENTE NESTES CASOS):
- *    - Preços e condições comerciais; agendamento de demonstração; confirmação de integração específica;
- *      avaliação de personalização; prazos de implantação; suporte que exija acesso à conta; informação não documentada.
- *    - Nunca invente informações para evitar o encaminhamento.
+ * REGRAS DO USUÁRIO — FLUXO REFORMULADO:
+ * 1. Recepção inicial obrigatória com mensagem exata:
+ *    "Olá! Seja muito bem-vindo(a) ao Jetro! 😊\nEu sou a Jeh, assistente virtual do Jetro, e estou aqui para ajudar você a conhecer melhor nosso sistema.\nAntes de começarmos, gostaria de saber um pouquinho sobre você para personalizar nosso atendimento.\nQual é o seu nome?"
+ *    Após o nome, solicitar naturalmente o que falta (telefone com DDD, empresa, e-mail). Não interrogatório mecânico.
+ * 2. Captura automática e IMEDIATA de leads em Comercial → Leads:
+ *    A CADA informação fornecida, criar ou atualizar IMEDIATAMENTE o lead no banco (não esperar o término).
+ *    Deduplicação segura por telefone ou e-mail, ou pelo identificador da conversa (conversation_id).
+ *    Campos: nome, telefone, empresa, e-mail, primeiro contato, origem "Chat Jeh — Site Jetro", status,
+ *    assunto de interesse, histórico da conversa, última interação, situação do preenchimento dos dados (fill_status).
+ * 3. Continuidade natural:
+ *    Após coleta: "Prazer em conhecer você, [Nome]! 😊 Agora me conta: o que você gostaria de saber sobre o Jetro?"
+ *    NÃO encaminhar ao WhatsApp após o cadastro. Captura e atendimento inteligente funcionam juntos.
+ * 4. Prioridade absoluta: responder antes de encaminhar:
+ *    Consultar base → localizar → explicar de forma simples → perguntar se deseja saber mais.
+ *    WhatsApp (https://wa.me/5531991297619) SOMENTE quando: visitante solicitar, informação indisponível,
+ *    negociação de preços/contratos, solicitação explícita de demonstração/comercial.
+ * 5. Correção específica de "Como funciona o sistema?":
+ *    Explicar com base nas funcionalidades documentadas (ERP modular, áreas atendidas, IA nativa Jeh, Segundo Cérebro, auditoria/validades)
+ *    e terminar com: "Você gostaria de conhecer alguma funcionalidade específica ou entender como o Jetro poderia ajudar sua empresa?"
+ * 6. Qualificação comercial e Resumo Comercial Automático:
+ *    Gera resumo automático vinculado ao lead: quem é a pessoa, empresa, dúvidas, interesse identificado.
+ * 7. Notificação de novos leads:
+ *    Registra na fila administrativa jeh_notifications e tenta envio de e-mail transacional se configurado.
+ * 8. Pergunta sem resposta:
+ *    Registra na coleção jeh_unanswered se não coberta pela base oficial.
  */
 
 function extractContactInfo(text, current) {
   var name = current.name || ''
   var email = current.email || ''
   var phone = current.phone || ''
+  var company = current.company || ''
 
+  // 1. Extração de e-mail
   if (!email) {
     var emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)
     if (emailMatch) email = emailMatch[0].toLowerCase().trim()
   }
 
+  // 2. Extração de telefone com DDD (brasileiro)
   if (!phone) {
-    var phoneMatch = text.match(/(?:\(?\d{2}\)?\s*)?(?:9\s*)?\d{4,5}[-\s]?\d{4}/)
-    if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 10) {
-      phone = phoneMatch[0].trim()
+    var phoneMatch = text.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?(?:9\s*)?\d{4,5}[-\s]?\d{4}/)
+    if (phoneMatch) {
+      var digits = phoneMatch[0].replace(/\D/g, '')
+      if (digits.length >= 10 && digits.length <= 13) {
+        phone = phoneMatch[0].trim()
+      }
     }
   }
 
+  // 3. Extração de empresa
+  if (!company) {
+    var compMatch = text.match(
+      /(?:empresa\s+(?:é|e|chama-se|se\s+chama)?|trabalho\s+na|da\s+empresa|sou\s+da)\s+([A-Za-z0-9À-ÖØ-öø-ÿ\s&.-]{2,50})/i,
+    )
+    if (compMatch && compMatch[1]) {
+      var cCandidate = compMatch[1]
+        .split(/[.,;\n]/)[0]
+        .replace(/^(minha|nossa|uma)\s+/i, '')
+        .trim()
+      if (cCandidate.length >= 2 && !/^(não|nao|nenhuma|ainda|sou|aqui)$/i.test(cCandidate)) {
+        company = cCandidate
+      }
+    }
+  }
+
+  // 4. Extração de nome
   if (!name || name === 'Visitante') {
     var nameMatch = text.match(
       /(?:meu\s+nome\s+(?:é|e)|sou\s+(?:o|a)|me\s+chamo)\s+([A-Za-zÀ-ÖØ-öø-ÿ\s]{2,40})/i,
     )
     if (nameMatch && nameMatch[1]) {
       var candidate = nameMatch[1].trim().split(/\s+/).slice(0, 4).join(' ')
-      if (!/^(apenas|aqui|um|uma|cliente|interessado)$/i.test(candidate)) {
+      if (!/^(apenas|aqui|um|uma|cliente|interessado|visitante|teste)$/i.test(candidate)) {
         name = candidate
+      }
+    } else {
+      // Se a mensagem contém apenas 1 a 3 palavras simples sem pontuação nem números (típica resposta a "Qual é o seu nome?")
+      var trimmed = text.trim()
+      var words = trimmed.split(/\s+/)
+      if (
+        words.length >= 1 &&
+        words.length <= 4 &&
+        /^[A-Za-zÀ-ÖØ-öø-ÿ]+(\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/.test(trimmed) &&
+        !/^(olá|ola|oi|bom dia|boa tarde|boa noite|sim|não|nao|ok|quero|saber|ajuda|como|quem|qual|sistema|erp|jetro)$/i.test(
+          trimmed,
+        )
+      ) {
+        name = trimmed
       }
     }
   }
 
-  return { name: name, email: email, phone: phone }
+  return { name: name, email: email, phone: phone, company: company }
 }
 
-function syncLeadRecord(app, contact, leadSource, segment, interest, summary) {
+function detectInterestAndQualification(text, history) {
+  var full = (text + ' ' + (history || '')).toLowerCase()
+  var stage = 'Novo Lead'
+  var topic = 'Apresentação Geral'
+  var systemCurrent = ''
+  var operationalPains = ''
+  var demoRequested = false
+
+  if (
+    full.includes('demonstração') ||
+    full.includes('demonstracao') ||
+    full.includes('agendar') ||
+    full.includes('apresentar') ||
+    full.includes('apresentação')
+  ) {
+    stage = 'Solicita Demonstração'
+    demoRequested = true
+    topic = 'Solicitação de Demonstração'
+  } else if (
+    full.includes('contratar') ||
+    full.includes('preço') ||
+    full.includes('preco') ||
+    full.includes('valor') ||
+    full.includes('proposta') ||
+    full.includes('comprar')
+  ) {
+    stage = 'Interessado'
+    topic = 'Interesse Comercial / Contratação'
+  } else if (
+    full.includes('wms') ||
+    full.includes('estoque') ||
+    full.includes('logística') ||
+    full.includes('fiscal') ||
+    full.includes('produção') ||
+    full.includes('financeiro') ||
+    full.includes('rh')
+  ) {
+    stage = 'Em Atendimento'
+    topic = 'Módulos Operacionais'
+  }
+
+  // Detectar sistema atual se citado
+  var sysMatch = full.match(
+    /(?:usamos|uso|utilizo|sistema\s+atual|temos\s+o)\s+([a-z0-9\s-]{3,25})/i,
+  )
+  if (sysMatch && sysMatch[1]) {
+    systemCurrent = sysMatch[1].trim()
+  }
+
+  // Dificuldades
+  if (
+    full.includes('dificuldade') ||
+    full.includes('problema') ||
+    full.includes('gargalo') ||
+    full.includes('retrabalho')
+  ) {
+    operationalPains = 'Identificado relato de dores/dificuldades operacionais na conversa'
+  }
+
+  return {
+    stage: stage,
+    topic: topic,
+    systemCurrent: systemCurrent,
+    operationalPains: operationalPains,
+    demoRequested: demoRequested,
+  }
+}
+
+function generateCommercialSummary(contact, topic, convHistoryText) {
+  var who = contact.name || 'Visitante não identificado'
+  var comp = contact.company
+    ? 'representando a empresa ' + contact.company
+    : 'empresa ainda não informada'
+  var phoneStr = contact.phone ? 'Telefone: ' + contact.phone : 'Telefone pendente'
+  var emailStr = contact.email ? 'E-mail: ' + contact.email : 'E-mail pendente'
+
+  var doubts = 'Apresentou dúvidas sobre o sistema Jetro e seu funcionamento geral.'
+  var lower = (convHistoryText || '').toLowerCase()
+  if (lower.includes('como funciona')) {
+    doubts = 'Quis entender como o sistema e o ERP modular funcionam na prática.'
+  }
+  if (lower.includes('fiscal') || lower.includes('nfe')) {
+    doubts += ' Teve interesse específico na emissão e conformidade fiscal.'
+  }
+  if (lower.includes('logística') || lower.includes('estoque') || lower.includes('wms')) {
+    doubts += ' Focou em recursos logísticos, WMS e expedição.'
+  }
+  if (lower.includes('demonstração') || lower.includes('demonstracao')) {
+    doubts += ' Demonstrou interesse em agendar demonstração técnica.'
+  }
+
+  return (
+    'Resumo Comercial Automático da Jeh:\n' +
+    '• Contato: ' +
+    who +
+    ' (' +
+    comp +
+    ')\n' +
+    '• Meios de contato: ' +
+    phoneStr +
+    ' | ' +
+    emailStr +
+    '\n' +
+    '• Assunto principal: ' +
+    topic +
+    '\n' +
+    '• Diagnóstico da conversa: ' +
+    doubts
+  )
+}
+
+function syncLeadImmediate(app, convId, contact, userMsg, historySummary, chatHistoryObj) {
   var leadsCol = app.findCollectionByNameOrId('crm_leads')
   if (!leadsCol) return { success: false, error: 'Coleção crm_leads ausente' }
 
+  // Se não há NENHUM dado de contato ou nome (nem sequer nome diferente de Visitante), não cria lead fantasma
+  var hasAnyContact = !!(
+    (contact.name && contact.name !== 'Visitante') ||
+    contact.phone ||
+    contact.email ||
+    contact.company
+  )
+  if (!hasAnyContact) {
+    return { success: false, skipped: true, reason: 'Sem dados de identificação ainda' }
+  }
+
   var existing = null
 
-  // 1. Tentar localizar por e-mail
-  if (contact.email) {
+  // 1. Tentar localizar por conversation_id associado nesta mesma sessão
+  if (convId) {
+    try {
+      var cList = app.findRecordsByFilter(
+        'crm_leads',
+        "conversation_id = '" + convId.replace(/'/g, "\\'") + "'",
+        '-created',
+        1,
+        0,
+      )
+      if (cList && cList.length > 0) existing = cList[0]
+    } catch (_) {}
+  }
+
+  // 2. Tentar por e-mail correspondente para deduplicação / merge seguro
+  if (!existing && contact.email) {
     try {
       var cleanEmail = contact.email.replace(/'/g, "\\'")
       var list = app.findRecordsByFilter(
@@ -80,7 +256,7 @@ function syncLeadRecord(app, contact, leadSource, segment, interest, summary) {
     } catch (_) {}
   }
 
-  // 2. Se não achou por e-mail, tentar por telefone
+  // 3. Tentar por telefone correspondente (últimos 8 dígitos) para deduplicação segura
   if (!existing && contact.phone) {
     try {
       var digits = contact.phone.replace(/\D/g, '')
@@ -100,43 +276,72 @@ function syncLeadRecord(app, contact, leadSource, segment, interest, summary) {
   var nowIso = new Date().toISOString()
   var todayStr = nowIso.split('T')[0]
 
+  // Avaliação do preenchimento dos dados (fill_status)
+  var hasName = !!(contact.name && contact.name !== 'Visitante')
+  var hasPhone = !!contact.phone
+  var hasEmail = !!contact.email
+  var hasCompany = !!contact.company
+
+  var fillStatus = 'incompleto'
+  var filledCount =
+    (hasName ? 1 : 0) + (hasPhone ? 1 : 0) + (hasEmail ? 1 : 0) + (hasCompany ? 1 : 0)
+  if (filledCount >= 4) {
+    fillStatus = 'completo'
+  } else if (filledCount >= 2) {
+    fillStatus = 'parcial'
+  }
+
+  var qual = detectInterestAndQualification(userMsg, historySummary)
+  var summaryText = generateCommercialSummary(contact, qual.topic, historySummary + ' ' + userMsg)
+
   if (existing) {
-    if (
-      contact.name &&
-      (!existing.getString('name') || existing.getString('name') === 'Visitante')
-    ) {
+    if (hasName && (!existing.getString('name') || existing.getString('name') === 'Visitante')) {
       existing.set('name', contact.name)
     }
-    if (contact.phone && !existing.getString('phone')) {
+    if (contact.phone) {
       existing.set('phone', contact.phone)
       existing.set('whatsapp', contact.phone)
     }
-    if (contact.email && !existing.getString('email')) {
-      existing.set('email', contact.email)
+    if (contact.email) existing.set('email', contact.email)
+    if (contact.company) {
+      existing.set('trade_name', contact.company)
     }
-    if (segment && !existing.getString('segment')) {
-      existing.set('segment', segment)
+
+    if (convId && !existing.getString('conversation_id')) {
+      existing.set('conversation_id', convId)
     }
-    if (interest && !existing.getString('product_interest')) {
-      existing.set('product_interest', interest)
+    existing.set('fill_status', fillStatus)
+    existing.set('last_interaction_date', nowIso)
+    existing.set('interest_topic', qual.topic)
+    existing.set('commercial_summary', summaryText)
+
+    if (qual.stage && qual.stage !== 'Novo Lead') {
+      existing.set('qualification_stage', qual.stage)
+      if (qual.stage === 'Solicita Demonstração') {
+        existing.set('status', 'Qualificado')
+        existing.set('temperature', 'Quente')
+      } else if (qual.stage === 'Interessado') {
+        existing.set('temperature', 'Morno')
+      }
     }
-    if (summary) {
-      var prevObs = existing.getString('observations') || ''
-      existing.set(
-        'observations',
-        (prevObs ? prevObs + '\n' : '') + '[' + nowIso + '] Atendimento Jeh: ' + summary,
-      )
-    }
+
+    if (qual.systemCurrent) existing.set('system_current', qual.systemCurrent)
+    if (qual.operationalPains) existing.set('operational_pains', qual.operationalPains)
+    if (chatHistoryObj) existing.set('chat_history', chatHistoryObj)
+
     app.save(existing)
     return {
       success: true,
       lead_id: existing.id,
       lead_number: existing.getString('lead_number'),
       created: false,
+      fill_status: fillStatus,
+      demoRequested: qual.demoRequested,
+      commercial_summary: summaryText,
     }
   }
 
-  // Criar novo lead com numeração sequencial
+  // Criar NOVO lead com numeração sequencial segura
   var nextNumStr = 'LEAD-00001'
   try {
     var lastLeads = app.findRecordsByFilter('crm_leads', "id != ''", '-lead_number', 1, 0)
@@ -156,24 +361,92 @@ function syncLeadRecord(app, contact, leadSource, segment, interest, summary) {
   newLead.set('email', contact.email || '')
   newLead.set('phone', contact.phone || '')
   newLead.set('whatsapp', contact.phone || '')
-  newLead.set('person_type', 'PJ')
-  newLead.set('lead_source', leadSource || 'Jeh — Site Jetro')
+  newLead.set('trade_name', contact.company || '')
+  newLead.set('person_type', contact.company ? 'PJ' : 'PF')
+  newLead.set('lead_source', 'Chat Jeh — Site Jetro')
   newLead.set('entry_date', todayStr)
+  newLead.set('first_contact_date', nowIso)
+  newLead.set('last_interaction_date', nowIso)
   newLead.set('status', 'Novo')
   newLead.set('temperature', 'Morno')
   newLead.set('company', 'Jetro Logística')
   newLead.set('filial', 'Matriz')
-  if (segment) newLead.set('segment', segment)
-  if (interest) newLead.set('product_interest', interest)
-  if (summary) {
-    newLead.set(
-      'observations',
-      '[' + nowIso + '] Atendimento via Jeh (Site Institucional): ' + summary,
-    )
-  }
+  newLead.set('conversation_id', convId || '')
+  newLead.set('fill_status', fillStatus)
+  newLead.set('qualification_stage', qual.stage)
+  newLead.set('interest_topic', qual.topic)
+  newLead.set('commercial_summary', summaryText)
+  if (qual.systemCurrent) newLead.set('system_current', qual.systemCurrent)
+  if (qual.operationalPains) newLead.set('operational_pains', qual.operationalPains)
+  if (chatHistoryObj) newLead.set('chat_history', chatHistoryObj)
+
+  newLead.set(
+    'observations',
+    '[' + nowIso + '] Captado pela Jeh no Site Institucional. Origem: Chat Jeh — Site Jetro',
+  )
 
   app.save(newLead)
-  return { success: true, lead_id: newLead.id, lead_number: nextNumStr, created: true }
+  return {
+    success: true,
+    lead_id: newLead.id,
+    lead_number: nextNumStr,
+    created: true,
+    fill_status: fillStatus,
+    demoRequested: qual.demoRequested,
+    commercial_summary: summaryText,
+  }
+}
+
+function recordNotification(app, leadInfo, contact, eventType) {
+  try {
+    var notifCol = app.findCollectionByNameOrId('jeh_notifications')
+    if (!notifCol) return
+
+    var recipients = 'comercial@jetro.com.br'
+    try {
+      var rSet = app.findFirstRecordByData('settings', 'key', 'jeh_notification_recipients')
+      if (rSet && rSet.getString('value')) recipients = rSet.getString('value')
+    } catch (_) {}
+
+    var eventLabel =
+      eventType === 'demo_requested' ? 'Solicitação de Demonstração' : 'Novo lead captado'
+    var noticeBody =
+      eventLabel +
+      ' pela Jeh\n' +
+      'Nome: ' +
+      (contact.name || 'Não informado') +
+      '\n' +
+      'Empresa: ' +
+      (contact.company || 'Não informada') +
+      '\n' +
+      'Telefone: ' +
+      (contact.phone || 'Não informado') +
+      '\n' +
+      'E-mail: ' +
+      (contact.email || 'Não informado') +
+      '\n' +
+      'Interesse: ' +
+      (leadInfo.interest_topic || 'Conhecer as funcionalidades do Jetro.') +
+      '\n\n' +
+      (leadInfo.commercial_summary || '')
+
+    var notif = new Record(notifCol)
+    notif.set('lead_id', leadInfo.lead_id || '')
+    notif.set('lead_number', leadInfo.lead_number || '')
+    notif.set('lead_name', contact.name || '')
+    notif.set('lead_company', contact.company || '')
+    notif.set('lead_phone', contact.phone || '')
+    notif.set('lead_email', contact.email || '')
+    notif.set('interest', leadInfo.interest_topic || 'Conhecer o Jetro')
+    notif.set('commercial_summary', leadInfo.commercial_summary || '')
+    notif.set('event_type', eventType || 'lead_captured')
+    notif.set('notification_body', noticeBody)
+    notif.set('delivery_status', 'registrado')
+    notif.set('recipient_emails', recipients)
+    app.save(notif)
+  } catch (eNotif) {
+    console.log('Erro ao salvar notificação:', eNotif)
+  }
 }
 
 routerAdd('POST', '/backend/v1/chat/send', (e) => {
@@ -181,7 +454,7 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     var jehStatus = 'inativa'
     var greetingMsgSetting = ''
     var defaultMsgSetting = ''
-    var leadSourceSetting = 'Jeh — Site Jetro'
+    var leadSourceSetting = 'Chat Jeh — Site Jetro'
 
     try {
       var recStatus = $app.findFirstRecordByData('settings', 'key', 'jeh_assistant_status')
@@ -200,12 +473,7 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       if (recDef && recDef.getString('value')) defaultMsgSetting = recDef.getString('value')
     } catch (_) {}
 
-    try {
-      var recSrc = $app.findFirstRecordByData('settings', 'key', 'jeh_lead_source')
-      if (recSrc && recSrc.getString('value')) leadSourceSetting = recSrc.getString('value')
-    } catch (_) {}
-
-    // Bloqueio rigoroso se estiver inativa
+    // Bloqueio se estiver inativa externamente
     if (jehStatus !== 'ativa') {
       return e.json(403, {
         error: 'A assistente Jeh está temporariamente inativa para atendimento externo.',
@@ -218,11 +486,12 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     var clientName = (body.client_name || '').trim()
     var clientEmail = (body.client_email || '').trim().toLowerCase()
     var clientPhone = (body.client_phone || '').trim()
+    var clientCompany = (body.client_company || '').trim()
     var message = (body.message || '').trim()
 
     if (!message) return e.badRequestError('Mensagem é obrigatória')
 
-    // Gerenciar conversa em chat_conversations
+    // 1. Gerenciar conversa em chat_conversations
     var conversation = null
     if (convId) {
       try {
@@ -264,7 +533,7 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       $app.save(conversation)
     }
 
-    // Registrar mensagem do visitante
+    // 2. Registrar mensagem do visitante
     var msgCol = $app.findCollectionByNameOrId('chat_messages')
     var clientMsg = new Record(msgCol)
     clientMsg.set('conversation_id', conversation.id)
@@ -273,89 +542,98 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     clientMsg.set('author_name', clientName || conversation.getString('client_name') || 'Visitante')
     $app.save(clientMsg)
 
-    // Recuperar histórico da conversa
+    // 3. Recuperar histórico da conversa
     var historyMessages = []
     var allConvoText = message
-    var priorUserQuestions = []
+    var chatHistoryObj = []
     try {
       var recentMsgs = $app.findRecordsByFilter(
         'chat_messages',
         "conversation_id = '" + conversation.id + "'",
         '-created',
-        20,
+        30,
         0,
       )
       recentMsgs.reverse()
       for (var j = 0; j < recentMsgs.length; j++) {
         var hm = recentMsgs[j]
-        if (hm.id === clientMsg.id) continue
-        var role = hm.getString('sender') === 'client' ? 'user' : 'assistant'
-        var content = hm.getString('content') || ''
-        historyMessages.push({ role: role, content: content })
-        allConvoText += ' ' + content
-        if (role === 'user') {
-          priorUserQuestions.push(content)
-        }
+        var isClient = hm.getString('sender') === 'client'
+        var rRole = isClient ? 'user' : 'assistant'
+        var cCont = hm.getString('content') || ''
+        historyMessages.push({ role: rRole, content: cCont })
+        chatHistoryObj.push({
+          sender: isClient ? 'visitante' : 'jeh',
+          text: cCont,
+          time: hm.getString('created') || nowIso,
+        })
+        allConvoText += ' ' + cCont
       }
     } catch (_) {}
 
-    // Extração / atualização contínua dos dados de contato do visitante
-    var contact = extractContactInfo(allConvoText, {
+    // 4. Extração conversacional contínua dos dados de contato do visitante
+    var detected = extractContactInfo(allConvoText, {
       name: clientName || conversation.getString('client_name'),
       email: clientEmail || conversation.getString('client_email'),
       phone: clientPhone || conversation.getString('client_phone'),
+      company: clientCompany,
     })
 
     if (
-      contact.name &&
-      contact.name !== 'Visitante' &&
-      conversation.getString('client_name') !== contact.name
+      detected.name &&
+      detected.name !== 'Visitante' &&
+      conversation.getString('client_name') !== detected.name
     ) {
-      conversation.set('client_name', contact.name)
+      conversation.set('client_name', detected.name)
       $app.save(conversation)
     }
-    if (contact.email && conversation.getString('client_email') !== contact.email) {
-      conversation.set('client_email', contact.email)
+    if (detected.email && conversation.getString('client_email') !== detected.email) {
+      conversation.set('client_email', detected.email)
       $app.save(conversation)
     }
-    if (contact.phone && conversation.getString('client_phone') !== contact.phone) {
-      conversation.set('client_phone', contact.phone)
+    if (detected.phone && conversation.getString('client_phone') !== detected.phone) {
+      conversation.set('client_phone', detected.phone)
       $app.save(conversation)
     }
 
-    var hasAllThree = !!(
-      contact.name &&
-      contact.name !== 'Visitante' &&
-      contact.email &&
-      contact.phone
+    // 5. CAPTURA AUTOMÁTICA E IMEDIATA DO LEAD: A CADA INFORMAÇÃO, ATUALIZAR/CRIAR NO BANCO
+    var leadResult = syncLeadImmediate(
+      $app,
+      conversation.id,
+      detected,
+      message,
+      allConvoText,
+      chatHistoryObj,
     )
 
-    // Sincronizar lead se tiver os 3 dados
-    var leadSyncResult = null
-    if (hasAllThree) {
-      try {
-        leadSyncResult = syncLeadRecord(
-          $app,
-          contact,
-          leadSourceSetting,
-          '',
-          '',
-          'Conversa via chat público do site iniciada em ' + nowIso,
-        )
-      } catch (leadErr) {
-        console.log('Erro ao sincronizar lead:', leadErr)
-        leadSyncResult = { success: false, error: String(leadErr) }
-      }
+    // Se forneceu dados suficientes e solicitou demo ou lead criado, disparar notificação
+    if (
+      leadResult &&
+      leadResult.success &&
+      (leadResult.demoRequested || (leadResult.created && detected.phone))
+    ) {
+      recordNotification(
+        $app,
+        {
+          lead_id: leadResult.lead_id,
+          lead_number: leadResult.lead_number,
+          interest_topic: leadResult.demoRequested
+            ? 'Solicitação de Demonstração'
+            : 'Conhecer o Jetro',
+          commercial_summary: leadResult.commercial_summary,
+        },
+        detected,
+        leadResult.demoRequested ? 'demo_requested' : 'lead_captured',
+      )
     }
 
-    // Coletar Base de Conhecimento Oficial e Q&As aprovados
+    // 6. Base de Conhecimento Oficial e Q&As aprovados
     var trainingSnippets = []
     try {
       var qas = $app.findRecordsByFilter(
         'jeh_qa',
         "approval_status = 'aprovado'",
         '-updated',
-        60,
+        70,
         0,
       )
       for (var qi = 0; qi < qas.length; qi++) {
@@ -377,7 +655,7 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
         'jeh_knowledge',
         "approval_status = 'aprovado'",
         '-updated',
-        60,
+        70,
         0,
       )
       for (var ki = 0; ki < knows.length; ki++) {
@@ -393,129 +671,99 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       }
     } catch (_) {}
 
-    var officialGreetingFallback =
-      greetingMsgSetting ||
-      'Olá! Sou a Jeh, assistente virtual do Jetro. 😊 Antes de começarmos, me informe seu nome, telefone com DDD e melhor e-mail. Vamos usar esses dados para registrar seu atendimento e retornar seu contato sobre a plataforma.'
+    // 7. Instruções dinâmicas de coleta e resposta conversacional
+    var missingFields = []
+    if (!detected.name || detected.name === 'Visitante') missingFields.push('nome')
+    if (!detected.phone) missingFields.push('telefone com DDD')
+    if (!detected.company) missingFields.push('nome da empresa')
+    if (!detected.email) missingFields.push('e-mail')
 
-    var officialFallbackMsg =
-      defaultMsgSetting ||
-      '[Nome], para confirmar esse ponto e orientar você de acordo com a sua operação, fale com nossa equipe pelo WhatsApp: https://wa.me/5531991297619'
-
-    // Status da identificação do visitante
-    var missingItems = []
-    if (!contact.name || contact.name === 'Visitante') missingItems.push('seu nome')
-    if (!contact.phone) missingItems.push('seu telefone com DDD')
-    if (!contact.email) missingItems.push('seu melhor e-mail')
-
-    var identificationInstruction = ''
-    if (missingItems.length > 0) {
-      identificationInstruction =
-        'STATUS DE IDENTIFICAÇÃO DO VISITANTE:\n' +
-        'O visitante AINDA NÃO informou todos os 3 dados obrigatórios. Faltam exatamente: ' +
-        missingItems.join(', ') +
+    var collectionDirective = ''
+    if (missingFields.length > 0) {
+      collectionDirective =
+        'COLETA CONVERSACIONAL DE DADOS (REGRAS MANDATÓRIAS):\n' +
+        'Dados já conhecidos: Nome: ' +
+        (detected.name || 'Pendente') +
+        ', Telefone: ' +
+        (detected.phone || 'Pendente') +
+        ', Empresa: ' +
+        (detected.company || 'Pendente') +
+        ', E-mail: ' +
+        (detected.email || 'Pendente') +
         '.\n' +
-        'DIRETRIZES MANDATÓRIAS:\n' +
-        '1. Se for o primeiro contato ou se a pergunta do usuário ainda não tiver sido respondida por falta de dados, solicite educadamente APENAS os dados que faltam (' +
-        missingItems.join(', ') +
-        ').\n' +
-        '2. Mantenha a abertura oficial ou variação acolhedora: "' +
-        officialGreetingFallback +
-        '".\n' +
-        '3. PRESERVE A PERGUNTA ORIGINAL DO VISITANTE: Avise que logo após a identificação você responderá à pergunta feita (' +
-        JSON.stringify(message) +
-        '), sem obrigar o visitante a ter que repeti-la!\n' +
-        '4. Não avance em respostas comerciais ou explicações completas antes da identificação, a menos que o visitante expressamente se recuse a fornecer dados ("não quero passar", "responda logo"). Se o visitante se recusar, não seja inconveniente: forneça o WhatsApp oficial https://wa.me/5531991297619.'
+        'Dados que ainda faltam: ' +
+        missingFields.join(', ') +
+        '.\n' +
+        '- NÃO faça interrogatório nem pergunte tudo de uma vez. Colete de forma fluida e natural, perguntando apenas UM dado que falta de cada vez.\n' +
+        '- SE O VISITANTE INTERROMPER A COLETA PARA FAZER UMA PERGUNTA OU TIRAR DÚVIDA (ex: "como funciona o jetro?", "quais os módulos?"): RESPONDA A DÚVIDA IMEDIATAMENTE E COM PRIORIDADE TOTAL com a base oficial! NUNCA bloqueie o atendimento por falta de dados. Após responder a dúvida com qualidade, aí sim convide naturalmente a passar o próximo dado ou entender melhor o negócio dele.\n' +
+        '- Se o visitante se recusar a passar algum dado, respeite imediatamente e continue atendendo com as informações disponíveis.\n'
     } else {
-      var leadMsgState = ''
-      if (leadSyncResult && leadSyncResult.success) {
-        leadMsgState =
-          'REGISTRO DE LEAD: O contato foi salvo com sucesso (' +
-          (leadSyncResult.lead_number || 'Lead registrado') +
-          '). Você pode confirmar cordialmente que o contato foi registrado para atendimento da nossa equipe.'
-      } else {
-        leadMsgState =
-          'REGISTRO DE LEAD: A gravação técnica do lead falhou ou não pôde ser confirmada. ' +
-          'REGRA TEXTUAL: Não condicione a explicação do sistema ao sucesso técnico do cadastro do lead. ' +
-          'Se a gravação falhar, informe a dificuldade sem afirmar que salvou os dados e continue respondendo com o conhecimento disponível após a identificação.'
-      }
-
-      var previousQuestionNote = ''
-      if (priorUserQuestions.length > 0) {
-        previousQuestionNote =
-          'PERGUNTAS ANTERIORES DO VISITANTE NO HISTÓRICO: ' +
-          JSON.stringify(priorUserQuestions) +
-          '. Se o visitante acabou de se identificar e já havia feito uma pergunta anteriormente (ex: "como funciona o sistema?"), RETOME e RESPONDA IMEDIATAMENTE a essa pergunta original agora, sem obrigá-lo a perguntar de novo!\n'
-      }
-
-      identificationInstruction =
-        'STATUS DE IDENTIFICAÇÃO DO VISITANTE: IDENTIFICAÇÃO COMPLETA!\n' +
-        'Nome: ' +
-        contact.name +
-        ' | Telefone: ' +
-        contact.phone +
-        ' | E-mail: ' +
-        contact.email +
-        '\n' +
-        leadMsgState +
-        '\n' +
-        previousQuestionNote +
-        'Agora atenda com total prioridade utilizando a Base de Conhecimento Oficial.'
+      collectionDirective =
+        'IDENTIFICAÇÃO COMPLETA: Todos os dados foram coletados com sucesso (' +
+        detected.name +
+        ', ' +
+        detected.phone +
+        ', ' +
+        (detected.company || '') +
+        ', ' +
+        detected.email +
+        ').\n' +
+        'Se o usuário acabou de se identificar: Use a continuidade natural: "Prazer em conhecer você, ' +
+        (detected.name || '') +
+        '! 😊 Agora me conta: o que você gostaria de saber sobre o Jetro?" e responda com entusiasmo às perguntas feitas.\n' +
+        'NÃO ENCAMINHE AO WHATSAPP APÓS O CADASTRO! A captura de lead e o atendimento inteligente funcionam juntos.\n'
     }
 
-    // System Prompt com todas as regras oficiais do dono
+    // 8. Construção do System Prompt da Jeh com as regras na íntegra
     var systemPrompt =
-      'IDENTIDADE E POSICIONAMENTO:\n' +
-      'Você é a Jeh, inteligência artificial do ERP Jetro — Plataforma Inteligente de Gestão Empresarial.\n' +
-      'O Jetro tem a proposta de oferecer uma gestão ampla, integrada e inteligente, conectando processos, pessoas, informações e decisões.\n' +
-      'Nosso posicionamento é oferecer uma plataforma completa e em evolução contínua, com IA nativa, Segundo Cérebro, auditoria e rastreabilidade.\n' +
-      'REGRA: nunca afirme como fato comprovado que somos "o sistema mais completo, atualizado ou seguro do mercado" sem evidências comparativas; demonstre diferenciais pelas entregas documentadas.\n\n' +
-      'REGRA PRINCIPAL (DIRETRIZ OFICIAL):\n' +
-      '"Utilize primeiro as informações confirmadas da base de conhecimento para responder à pergunta. O WhatsApp deve complementar o atendimento, não substituir respostas que a Jeh já consegue fornecer. Perguntas amplas não devem ser classificadas automaticamente como perguntas sem resposta."\n\n' +
-      'FLUXO OFICIAL DE ATENDIMENTO:\n' +
-      '1. Se ainda não houver identificação, solicite nome, telefone com DDD e melhor e-mail, conforme a regra existente.\n' +
-      '2. Preserve a pergunta original enquanto coleta os dados.\n' +
-      '3. Após a identificação, responda à pergunta original, sem obrigar o visitante a repeti-la.\n' +
-      '4. Utilize as informações disponíveis sobre o Jetro.\n' +
-      '5. Faça uma pergunta breve para entender a necessidade do cliente.\n' +
-      '6. Encaminhe ao WhatsApp quando houver necessidade de avaliação comercial, confirmação técnica ou informação ausente.\n\n' +
-      'RESPOSTA OFICIAL PARA "COMO FUNCIONA O SISTEMA?" (e variações como "Olá, como funciona o sistema?", "Como o Jetro funciona?", etc.):\n' +
-      '"' +
-      contact.name +
-      ', o Jetro é um sistema de gestão empresarial que reúne diferentes áreas da empresa em uma única plataforma, como vendas, financeiro, compras, estoque, produção, logística e gestão de pessoas.\n\n' +
-      'Ele funciona de forma modular: a estrutura é definida conforme as necessidades da sua operação e os recursos contratados. A proposta é conectar as informações dos setores, organizar os processos e facilitar o acompanhamento dos resultados.\n\n' +
-      'Entre os diferenciais estão a IA nativa Jeh, o Segundo Cérebro, as telas de auditoria e o controle de validades e vencimentos de produtos, documentos e contratos.\n\n' +
-      'Atendemos indústrias, operações logísticas, atacadistas, distribuidoras e empresas de serviços. Qual é o segmento da sua empresa e o que você mais precisa organizar hoje?"\n\n' +
-      'ADAPTAÇÃO E OBJETIVIDADE:\n' +
-      'Adapte o tamanho da resposta ao contexto. Não envie toda a base de conhecimento de uma vez.\n\n' +
-      'QUANDO RESPONDER PARCIALMENTE E ENCAMINHAR:\n' +
-      'Se souber parte da resposta, explique primeiro essa parte e indique exatamente o que precisa de confirmação. ' +
-      'Exemplo oficial: "O Jetro possui uma área financeira que contempla contas a pagar e receber e fluxo de caixa. Sobre a integração com o seu banco específico, preciso que nossa equipe confirme: https://wa.me/5531991297619". ' +
-      'Não descarte toda a pergunta porque um detalhe específico está fora da base.\n\n' +
-      'QUANDO ENCAMINHAR À EQUIPE (SOMENTE NESTES CASOS):\n' +
-      'Encaminhe para https://wa.me/5531991297619 SOMENTE quando o cliente precisar de:\n' +
-      '- Preços e condições comerciais;\n' +
-      '- Agendamento de demonstração;\n' +
-      '- Confirmação de integração específica;\n' +
-      '- Avaliação de personalização;\n' +
-      '- Prazos de implantação;\n' +
-      '- Suporte que exija acesso à conta;\n' +
-      '- Informação não documentada.\n' +
-      'Nunca invente informações para evitar o encaminhamento.\n\n' +
-      'ISOLAMENTO E SEGURANÇA TOTAL:\n' +
-      'Você é a assistente pública do site. Você NÃO tem acesso a pedidos, estoque interno, notas fiscais, faturamento, financeiro ou dados sigilosos das empresas que usam o ERP.\n\n' +
-      identificationInstruction +
-      '\n\n' +
-      '--- BASE DE CONHECIMENTO OFICIAL E RESPOSTAS APROVADAS (RAG) ---\n' +
+      'VOCÊ É A JEH, ASSISTENTE VIRTUAL DO JETRO:\n' +
+      'Você é a assistente virtual pública do Jetro — Plataforma Inteligente de Gestão Empresarial.\n' +
+      'Personalidade: simpática, educada, profissional, comunicativa, atenciosa, prestativa, natural e consultiva.\n' +
+      'Use o primeiro nome do visitante quando apropriado. Evite respostas repetitivas, formais ou mecânicas.\n' +
+      'Você se identifica como inteligência artificial quando necessário, de forma leve e acolhedora.\n\n' +
+      'PRIORIDADE ABSOLUTA: RESPONDER ANTES DE ENCAMINHAR\n' +
+      'Fluxo mandatório: compreender a intenção do visitante → consultar a base de conhecimento → localizar informações → elaborar resposta clara e contextualizada → explicar de forma simples → perguntar se deseja saber mais.\n' +
+      'SOMENTE sugerir contato humano ou WhatsApp (https://wa.me/5531991297619) quando:\n' +
+      '1. O próprio visitante solicitar contato com um atendente ou especialista;\n' +
+      '2. A informação técnica/específica NÃO estiver disponível ou confirmável na base de conhecimento oficial;\n' +
+      '3. Exigir negociação comercial direta (preços sob medida, condições de pagamento, contratos personalizados);\n' +
+      '4. Desejo explícito de contratar ou agendar demonstração personalizada;\n' +
+      '5. Suporte especializado que exija acesso ao sistema ou à conta.\n' +
+      'Mesmo nesses casos, continue disponível e cordial para responder outras perguntas.\n\n' +
+      'CORREÇÃO OBRIGATÓRIA DE "COMO FUNCIONA O SISTEMA?":\n' +
+      'A pergunta "Como funciona o sistema?", "Como funciona o Jetro?" ou similares NUNCA DEVE VIRAR ENCAMINHAMENTO AO WHATSAPP!\n' +
+      'Você deve responder explicando com clareza:\n' +
+      '- O que é o Jetro: ERP integrado que conecta vendas, financeiro, fiscal, compras, estoque, produção (indústria), logística e pessoas (DP/RH/SST);\n' +
+      '- Como funciona: arquitetura modular onde a empresa ativa os módulos que precisa, com informações em tempo real conectadas;\n' +
+      '- Recursos de destaque: IA nativa Jeh, Segundo Cérebro, telas de auditoria e conformidade, rastreabilidade e controle de validades/vencimentos;\n' +
+      '- Benefícios operacionais: centralização de dados, fim do retrabalho e controle operacional seguro;\n' +
+      '- Finalize com: "Você gostaria de conhecer alguma funcionalidade específica ou entender como o Jetro poderia ajudar sua empresa?"\n' +
+      'NUNCA invente funcionalidades, preços, integrações ou prazos que não constem na base oficial.\n\n' +
+      'CONTINUIDADE NATURAL E QUALIFICAÇÃO CONSULTIVA:\n' +
+      'Sem transformar o atendimento em interrogatório, identifique naturalmente durante a conversa:\n' +
+      'segmento da empresa, principal necessidade/dor operacional, sistema atual (se citado), interesse em demonstração.\n\n' +
+      'PERGUNTAS SEM RESPOSTA NA BASE:\n' +
+      'Se o visitante fizer uma pergunta sobre funcionalidade ou regra não confirmada na base, informe cordialmente que ainda não tem essa validação exata documentada e ofereça o contato dos consultores pelo WhatsApp: https://wa.me/5531991297619, perguntando em seguida se ele quer saber sobre outras áreas documentadas.\n\n' +
+      'ISOLAMENTO E SEGURANÇA:\n' +
+      'Você está no site público institucional. Não tem acesso a dados internos ou sigilosos de clientes cadastrados no ERP.\n\n' +
+      collectionDirective +
+      '\n--- BASE DE CONHECIMENTO OFICIAL E RESPOSTAS APROVADAS (RAG) ---\n' +
       (trainingSnippets.length > 0
         ? trainingSnippets.join('\n\n')
-        : 'Base de conhecimento vazia.') +
+        : 'Base de conhecimento ativa.') +
       '\n--- FIM DA BASE OFICIAL ---'
 
     var aiMessages = [{ role: 'system', content: systemPrompt }]
     for (var k = 0; k < historyMessages.length; k++) {
       aiMessages.push(historyMessages[k])
     }
-    aiMessages.push({ role: 'user', content: message })
+    // Adicionar mensagem atual se não duplicada
+    if (
+      historyMessages.length === 0 ||
+      historyMessages[historyMessages.length - 1].content !== message
+    ) {
+      aiMessages.push({ role: 'user', content: message })
+    }
 
     var aiContent = ''
     try {
@@ -523,13 +771,14 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       aiContent = reply?.choices?.[0]?.message?.content || ''
     } catch (chatErr) {
       console.log('Erro ao chamar $ai.chat:', chatErr)
-      aiContent = officialFallbackMsg.replace('[Nome]', contact.name || 'Visitante')
     }
 
     if (!aiContent) {
-      aiContent = officialFallbackMsg.replace('[Nome]', contact.name || 'Visitante')
+      aiContent =
+        'Olá! Sou a Jeh, assistente virtual do Jetro. Como posso ajudar você hoje a conhecer nossa plataforma de gestão integrada?'
     }
 
+    // Registrar resposta da Jeh em chat_messages
     var aiMsg = new Record(msgCol)
     aiMsg.set('conversation_id', conversation.id)
     aiMsg.set('sender', 'ai')
@@ -537,58 +786,89 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     aiMsg.set('author_name', 'Jeh')
     $app.save(aiMsg)
 
-    // Se a resposta caiu em desconhecimento real, registrar em jeh_unanswered
-    // IMPORTANTE: Perguntas cobertas como "como funciona o sistema" NÃO devem ser registradas como sem resposta
-    var lowerMsg = message.toLowerCase()
-    var isBroadSystemQuestion =
-      lowerMsg.includes('como funciona') ||
-      lowerMsg.includes('o que é o jetro') ||
-      lowerMsg.includes('quais áreas') ||
-      lowerMsg.includes('atende distribuidora')
-
-    var isUnanswered =
-      !isBroadSystemQuestion &&
-      (aiContent.includes('não tenho essa informação confirmada') ||
-        aiContent.includes('ainda não tenho essa informação') ||
-        (aiContent.includes('fale com nossa equipe pelo WhatsApp') &&
-          !aiContent.includes('O Jetro é um sistema de gestão empresarial')))
-
-    if (isUnanswered) {
+    // Atualizar chat_history do lead com a resposta da Jeh
+    chatHistoryObj.push({
+      sender: 'jeh',
+      text: aiContent,
+      time: new Date().toISOString(),
+    })
+    if (leadResult && leadResult.lead_id) {
       try {
-        var unCol = $app.findCollectionByNameOrId('jeh_unanswered')
-        var cleanQ = message.toLowerCase().trim()
-        var unList = $app.findRecordsByFilter(
-          'jeh_unanswered',
-          "question ~ '" + cleanQ.replace(/'/g, "\\'") + "'",
-          '-created',
-          1,
-          0,
-        )
-        if (unList && unList.length > 0) {
-          var uRec = unList[0]
-          uRec.set('count', (uRec.getInt('count') || 1) + 1)
-          uRec.set('last_asked_at', nowIso)
-          uRec.set('provided_answer', aiContent)
-          $app.save(uRec)
-        } else {
-          var newUn = new Record(unCol)
-          newUn.set('question', message)
-          newUn.set('count', 1)
-          newUn.set('identified_topic', 'Geral')
-          newUn.set('status', 'pendente')
-          newUn.set('source', 'publico')
-          newUn.set('classification', 'sem_conteudo_base')
-          newUn.set('provided_answer', aiContent)
-          newUn.set('last_asked_at', nowIso)
-          $app.save(newUn)
+        var lRec = $app.findRecordById('crm_leads', leadResult.lead_id)
+        if (lRec) {
+          lRec.set('chat_history', chatHistoryObj)
+          $app.save(lRec)
         }
       } catch (_) {}
+    }
+
+    // 9. Pergunta sem resposta: se a Jeh expressar falta de informação, registrar em jeh_unanswered
+    var lowerMsg = message.toLowerCase()
+    var isBroadExploration =
+      lowerMsg.includes('como funciona') ||
+      lowerMsg.includes('o que é o jetro') ||
+      lowerMsg.includes('o que e o jetro') ||
+      lowerMsg.includes('quais módulos') ||
+      lowerMsg.includes('quais modulos') ||
+      lowerMsg.includes('quais áreas') ||
+      lowerMsg.includes('olá') ||
+      lowerMsg.includes('ola') ||
+      lowerMsg.includes('oi')
+
+    var indicatesMissingInfo =
+      !isBroadExploration &&
+      (aiContent.includes('não tenho essa informação confirmada') ||
+        aiContent.includes('não tenho essa confirmação') ||
+        aiContent.includes('ainda não tenho essa informação') ||
+        aiContent.includes('não localizei em minha base') ||
+        (aiContent.includes('WhatsApp') &&
+          aiContent.includes('nossa equipe pode detalhar') &&
+          !aiContent.includes('O Jetro é um sistema')))
+
+    if (indicatesMissingInfo) {
+      try {
+        var unCol = $app.findCollectionByNameOrId('jeh_unanswered')
+        if (unCol) {
+          var cleanQ = message.toLowerCase().trim()
+          var unList = $app.findRecordsByFilter(
+            'jeh_unanswered',
+            "question ~ '" + cleanQ.replace(/'/g, "\\'") + "'",
+            '-created',
+            1,
+            0,
+          )
+          if (unList && unList.length > 0) {
+            var uRec = unList[0]
+            uRec.set('count', (uRec.getInt('count') || 1) + 1)
+            uRec.set('last_asked_at', nowIso)
+            uRec.set('provided_answer', aiContent)
+            $app.save(uRec)
+          } else {
+            var newUn = new Record(unCol)
+            newUn.set('question', message)
+            newUn.set('count', 1)
+            newUn.set('identified_topic', 'Dúvida Geral')
+            newUn.set('status', 'pendente')
+            newUn.set('source', 'publico')
+            newUn.set('classification', 'sem_conteudo_base')
+            newUn.set('provided_answer', aiContent)
+            newUn.set('last_asked_at', nowIso)
+            $app.save(newUn)
+          }
+        }
+      } catch (eUn) {
+        console.log('Erro ao registrar jeh_unanswered:', eUn)
+      }
     }
 
     return e.json(200, {
       conversation_id: conversation.id,
       response: aiContent,
-      lead_created: leadSyncResult?.success || false,
+      lead_id: leadResult?.lead_id || null,
+      lead_number: leadResult?.lead_number || null,
+      lead_created: leadResult?.created || false,
+      fill_status: leadResult?.fill_status || 'incompleto',
+      commercial_summary: leadResult?.commercial_summary || null,
     })
   } catch (err) {
     return e.json(500, { error: 'Erro ao processar atendimento da Jeh: ' + String(err) })

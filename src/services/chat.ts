@@ -27,8 +27,17 @@ export async function sendChatMessage(params: {
   client_name?: string
   client_email?: string
   client_phone?: string
+  client_company?: string
   message: string
-}): Promise<{ conversation_id: string; response?: string; lead_created?: boolean }> {
+}): Promise<{
+  conversation_id: string
+  response?: string
+  lead_id?: string | null
+  lead_number?: string | null
+  lead_created?: boolean
+  fill_status?: string
+  commercial_summary?: string | null
+}> {
   return pb.send('/backend/v1/chat/send', {
     method: 'POST',
     body: JSON.stringify(params),
