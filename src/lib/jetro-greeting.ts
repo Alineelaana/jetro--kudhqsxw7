@@ -200,9 +200,23 @@ export function extrairPrimeiroNome(
 }
 
 /**
- * Linha 1 de boas-vindas conforme TRATAMENTO cadastrado:
+ * Textos fixos oficiais da tela inicial inteligente:
+ */
+export const TEXTO_AGENDA_CONFIRMAÇÃO =
+  'Confira sua agenda e seu calendário corporativos abaixo, organize seus compromissos e mantenha suas atividades em dia.'
+
+export const TEXTO_EXCELENTE_DIA_TRABALHO =
+  'Desejamos a você um excelente dia de trabalho! Sempre que precisar de ajuda, o Jetro On-line estará à sua disposição no canto direito da tela.'
+
+/**
+ * @deprecated Mantido para compatibilidade retrospectiva
+ */
+export const TEXTO_BOM_TRABALHO = TEXTO_EXCELENTE_DIA_TRABALHO
+
+/**
+ * Linha 1 de boas-vindas conforme TRATAMENTO cadastrado (mantido como fallback utilitário):
  * - Tratamento masculino: "Seja bem-vindo ao Jetro Sistema Inteligente!"
- * - Tratamento feminino: "Seja bem-vinda ao Jetro Sistema Inteligente!"
+ * - Feminino: "Seja bem-vinda ao Jetro Sistema Inteligente!"
  * - Sem preferência/neutro: "Seja bem vindo (a) ao Jetro ,Sistema Inteligente!"
  */
 export function getMensagemTratamento(tratamento?: string | null): string {
@@ -217,16 +231,6 @@ export function getMensagemTratamento(tratamento?: string | null): string {
   }
   return 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!'
 }
-
-/**
- * Textos fixos oficiais e obrigatórios:
- */
-export const TEXTO_AGENDA_CONFIRMAÇÃO =
-  'Confira sua agenda e seu calendário corporativos e não perca nenhum compromisso.'
-
-export const TEXTO_BOM_TRABALHO =
-  'Bom trabalho! Se precisar de ajuda, é só chamar o Jetro On-line no canto direito da sua tela.'
-
 /**
  * Constrói a frase de saudação completa com nome e ícone:
  * ex: "Bom dia, Carlos! ☀️" / "Boa tarde, Carlos! 🌤️" / "Boa noite, Carlos! 🌙"

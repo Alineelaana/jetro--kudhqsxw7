@@ -4,8 +4,11 @@
  */
 import {
   getSaudacaoPorHoraMinuto,
+  formatarSaudacaoCompleta,
   getMensagemTratamento,
   extrairPrimeiroNome,
+  TEXTO_AGENDA_CONFIRMAÇÃO,
+  TEXTO_EXCELENTE_DIA_TRABALHO,
   resolveSafeTimeZone,
   isValidTimeZone,
 } from './jetro-greeting'
@@ -102,7 +105,35 @@ export function runGreetingValidationSuite(): {
     })
   }
 
-  // 4. TRATAMENTO SEGURO DE FUSO HORÁRIO
+  // 4. FORMATO DA SAUDAÇÃO COMPLETA: "Boa tarde, Ana! 🌤️"
+  const saudacaoExemplo = formatarSaudacaoCompleta('Boa tarde', 'Ana', '🌤️')
+  results.push({
+    passed: saudacaoExemplo === 'Boa tarde, Ana! 🌤️',
+    description: 'Formato da saudação dinâmica com nome e emoji',
+    expected: 'Boa tarde, Ana! 🌤️',
+    actual: saudacaoExemplo,
+  })
+
+  // 5. NOVOS TEXTOS INSTITUCIONAIS DA TELA INICIAL
+  const textoEsperadoAgenda =
+    'Confira sua agenda e seu calendário corporativos abaixo, organize seus compromissos e mantenha suas atividades em dia.'
+  results.push({
+    passed: TEXTO_AGENDA_CONFIRMAÇÃO === textoEsperadoAgenda,
+    description: 'Texto de orientação de agenda e calendário corporativos',
+    expected: textoEsperadoAgenda,
+    actual: TEXTO_AGENDA_CONFIRMAÇÃO,
+  })
+
+  const textoEsperadoTrabalho =
+    'Desejamos a você um excelente dia de trabalho! Sempre que precisar de ajuda, o Jetro On-line estará à sua disposição no canto direito da tela.'
+  results.push({
+    passed: TEXTO_EXCELENTE_DIA_TRABALHO === textoEsperadoTrabalho,
+    description: 'Texto de votos de excelente dia de trabalho e Jetro On-line à disposição',
+    expected: textoEsperadoTrabalho,
+    actual: TEXTO_EXCELENTE_DIA_TRABALHO,
+  })
+
+  // 6. TRATAMENTO SEGURO DE FUSO HORÁRIO
   results.push({
     passed: isValidTimeZone('America/Sao_Paulo'),
     description: 'Fuso America/Sao_Paulo deve ser válido',

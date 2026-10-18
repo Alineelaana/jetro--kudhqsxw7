@@ -8,7 +8,6 @@ import {
   getSaudacaoAtual,
   formatarSaudacaoCompleta,
   extrairPrimeiroNome,
-  getMensagemTratamento,
   TEXTO_AGENDA_CONFIRMAÇÃO,
   getMsAteProximaVirada,
   resolveSafeTimeZone,
@@ -16,35 +15,28 @@ import {
 } from '@/lib/jetro-greeting'
 
 export function IntelligentHomeScreen() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const { setIsFloatingOpen } = useJetroOnline()
   const { preferences } = useUserPreferences()
 
-  // Extrair fuso e tratamento do usuário (ou das preferências)
+  // Extrair fuso e nome do usuário (ou das preferências)
   const userRecord = user as
     | {
         name?: string
         email?: string
         fuso_horario?: string
         timezone?: string
-        tratamento?: string
       }
     | null
     | undefined
 
   const userTimeZone = userRecord?.fuso_horario || userRecord?.timezone || null
   const safeTimeZone = useMemo(() => resolveSafeTimeZone(userTimeZone), [userTimeZone])
-  const tratamento = userRecord?.tratamento || null
 
   // Primeiro nome real extraído do cadastro — nunca fixo ou fictício
   const primeiroNome = useMemo(() => {
     return extrairPrimeiroNome(userRecord?.name, userRecord?.email)
   }, [userRecord?.name, userRecord?.email])
-
-  // Linha 1 de boas-vindas conforme TRATAMENTO
-  const linhaBoasVindasTratamento = useMemo(() => {
-    return getMensagemTratamento(tratamento)
-  }, [tratamento])
 
   // Estado da saudação dinâmica (calculada exclusivamente no fuso do cliente, nunca no servidor)
   const [saudacaoInfo, setSaudacaoInfo] = useState<SaudacaoInfo>(() => {
@@ -147,22 +139,23 @@ export function IntelligentHomeScreen() {
                 {fraseSaudacao}
               </h1>
 
-              {/* Mensagem de boas-vindas com tratamento cadastrado */}
-              <div className="space-y-1 text-sm sm:text-base text-emerald-100/95 leading-relaxed">
-                <p className="font-semibold text-[#E4C46A]">{linhaBoasVindasTratamento}</p>
-                <p className="text-emerald-50/90 text-xs sm:text-sm">{TEXTO_AGENDA_CONFIRMAÇÃO}</p>
-                <p className="text-emerald-100/80 text-xs sm:text-sm pt-0.5">
-                  Bom trabalho! Se precisar de ajuda, é só{' '}
+              {/* Mensagens de boas-vindas e orientações */}
+              <div className="space-y-1.5 text-sm sm:text-base text-emerald-100/95 leading-relaxed">
+                <p className="text-emerald-50/95 text-xs sm:text-sm font-medium">
+                  {TEXTO_AGENDA_CONFIRMAÇÃO}
+                </p>
+                <p className="text-emerald-100/85 text-xs sm:text-sm pt-0.5">
+                  Desejamos a você um excelente dia de trabalho! Sempre que precisar de ajuda, o{' '}
                   <button
                     type="button"
                     onClick={() => setIsFloatingOpen(true)}
                     className="inline-flex items-center gap-1 font-bold text-[#E4C46A] hover:text-white underline underline-offset-4 decoration-[#C9A227] hover:decoration-white transition-colors cursor-pointer"
-                    title="Abrir assistente Jetro On-line"
+                    title="Abrir assistente Jetro On-line no canto direito"
                   >
-                    <span>chamar o Jetro On-line</span>
+                    <span>Jetro On-line</span>
                     <MessageSquare className="w-3.5 h-3.5 inline shrink-0" />
                   </button>{' '}
-                  no canto direito da sua tela.
+                  estará à sua disposição no canto direito da tela.
                 </p>
               </div>
             </div>
