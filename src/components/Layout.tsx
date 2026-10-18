@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { FileCode2 } from 'lucide-react'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { JetroCustomizationDrawer } from '@/components/personalizacao/jetro-customization-drawer'
+import { cn } from '@/lib/utils'
 
 function isInternalPath(pathname: string): boolean {
   if (pathname === '/') return true
@@ -67,7 +68,7 @@ export default function Layout() {
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
             {/* Ocultar a barra de busca e botão duplicado na página inicial conforme solicitado pelo usuário */}
             {!isHomePage && (
-              <div className="bg-muted/30 border-b px-4 py-2 shrink-0 flex items-center justify-between gap-3">
+              <div className="bg-muted/30 border-b px-4 py-2 shrink-0 flex items-center justify-between gap-3 pr-12 sm:pr-14">
                 <div className="flex-1 min-w-0">
                   <GlobalSearchBar />
                 </div>
@@ -89,7 +90,7 @@ export default function Layout() {
             )}
             <main
               id="admin-main-content"
-              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between admin-main-padded"
+              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between admin-main-padded pr-12 sm:pr-14"
             >
               <div className="flex-1">
                 <Outlet />
@@ -129,7 +130,9 @@ export default function Layout() {
     <div className="flex min-h-screen flex-col">
       <InactivityTracker />
       {!isRootLogin && <SiteHeader onOpenScreenLogic={() => setScreenLogicOpen(true)} />}
-      <main className="flex-1 flex flex-col justify-between">
+      <main
+        className={cn('flex-1 flex flex-col justify-between', isAuthenticated && 'pr-12 sm:pr-14')}
+      >
         <div className="flex-1">
           <Outlet />
         </div>
