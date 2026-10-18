@@ -1,5 +1,4 @@
 import { type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
 import { ModulePageHeader } from '@/components/enterprise/module-page-header'
@@ -16,54 +15,11 @@ import { Loader2, Megaphone, Plus, Printer } from 'lucide-react'
 import { canViewTradeMarketing } from '@/lib/trade-marketing-permissions'
 import { ACTION_STATUS } from '@/lib/trade-marketing-types'
 import type { TmFilters } from '@/lib/trade-marketing-types'
-import { cn } from '@/lib/utils'
-
-const TABS = [
-  { id: 'cockpit', label: 'Cockpit' },
-  { id: 'calendar', label: 'Calendário' },
-  { id: 'kanban', label: 'Kanban' },
-  { id: 'list', label: 'Lista' },
-]
-
-const SECONDARY_LINKS = [
-  {
-    id: 'verbas',
-    label: 'Verbas por Fornecedor',
-    route: '/admin/trade-marketing/verbas-fornecedor',
-  },
-  { id: 'materials', label: 'Materiais', route: '/admin/trade-marketing/materiais' },
-  {
-    id: 'conta-corrente',
-    label: 'Conta Corrente',
-    route: '/admin/trade-marketing/conta-corrente',
-  },
-  {
-    id: 'aplicacao-produtos',
-    label: 'Aplicação em Produtos',
-    route: '/admin/trade-marketing/aplicacao-produtos',
-  },
-  {
-    id: 'accountability',
-    label: 'Prestação de Contas',
-    route: '/admin/trade-marketing/prestacao-contas',
-  },
-  { id: 'adapta', label: 'ADAPTA', route: '/admin/trade-marketing/adapta' },
-  {
-    id: 'cotacoes-externas',
-    label: 'Cotações Externas',
-    route: '/admin/trade-marketing/cotacoes-externas',
-  },
-  {
-    id: 'annual-plan',
-    label: 'Planejamento Anual',
-    route: '/admin/trade-marketing/planejamento-anual',
-  },
-]
 
 interface TmLayoutProps {
   children: ReactNode
-  activeTab: string
-  onTabChange: (tab: string) => void
+  activeTab?: string
+  onTabChange?: (tab: string) => void
   onNew: () => void
   onPrint: () => void
   filters: TmFilters
@@ -95,35 +51,6 @@ export function TmLayout({
         icon={Megaphone}
         breadcrumbs={[{ label: 'Admin', to: '/admin' }, { label: 'Trade Marketing' }]}
       />
-      <div className="flex flex-wrap gap-2 mb-3">
-        {TABS.map((tab) => (
-          <Button
-            key={tab.id}
-            variant={activeTab === tab.id ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onTabChange(tab.id)}
-            className={cn(activeTab === tab.id && 'bg-[#005B2E] hover:bg-[#01361D]')}
-          >
-            {tab.label}
-          </Button>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2 mb-4 border-b pb-3">
-        {SECONDARY_LINKS.map((link) => (
-          <Link
-            key={link.route}
-            to={link.route}
-            className={cn(
-              'text-xs font-semibold px-3 py-1.5 rounded transition-colors',
-              activeTab === link.id
-                ? 'bg-[#005B2E] text-white'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
-            )}
-          >
-            {link.label}
-          </Link>
-        ))}
-      </div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <Select
           value={filters.scope}

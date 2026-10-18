@@ -166,6 +166,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         icon: CalendarClock,
         route: '/admin/validade',
         perm: canViewValidityAlerts,
+        children: [
+          { label: 'Central de Alertas', route: '/admin/validade' },
+          { label: 'Chat IA', route: '/admin/validade/chat' },
+          { label: 'Dashboard', route: '/admin/validade/dashboard' },
+          { label: 'Regras', route: '/admin/validade/regras' },
+        ],
       },
     ],
   },

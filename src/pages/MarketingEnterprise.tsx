@@ -1,12 +1,8 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
 import { ModulePageHeader } from '@/components/enterprise/module-page-header'
-import { Button } from '@/components/ui/button'
 import { Megaphone, Loader2 } from 'lucide-react'
 import { canViewMarketing } from '@/lib/marketing-permissions'
-import { cn } from '@/lib/utils'
 import { MarketingRequestCenter } from '@/components/marketing/marketing-request-center'
 import { MarketingJobs } from '@/components/marketing/marketing-jobs'
 import { MarketingPieceApproval } from '@/components/marketing/marketing-piece-approval'
@@ -18,26 +14,13 @@ import { MarketingLibrary } from '@/components/marketing/marketing-library'
 import { MarketingAttribution } from '@/components/marketing/marketing-attribution'
 import { MarketingBriefingTemplates } from '@/components/marketing/marketing-briefing-templates'
 
-const TABS = [
-  { id: 'cockpit', label: 'Cockpit' },
-  { id: 'requests', label: 'Solicitações' },
-  { id: 'jobs', label: 'Jobs' },
-  { id: 'approval', label: 'Aprovação de Peças' },
-  { id: 'calendar', label: 'Calendário Editorial' },
-  { id: 'media', label: 'Mídia' },
-  { id: 'attribution', label: 'Atribuição' },
-  { id: 'brand', label: 'Brand' },
-  { id: 'library', label: 'Biblioteca' },
-  { id: 'templates', label: 'Templates' },
-]
-
 interface MarketingEnterpriseProps {
   screen?: string
 }
 
 export default function MarketingEnterprise({ screen = 'cockpit' }: MarketingEnterpriseProps) {
   const { isAuthenticated, loading, userRole } = useAuth()
-  const [activeTab, setActiveTab] = useState<string>(screen)
+  const activeTab = screen
 
   if (loading)
     return (
@@ -81,27 +64,6 @@ export default function MarketingEnterprise({ screen = 'cockpit' }: MarketingEnt
         icon={Megaphone}
         breadcrumbs={[{ label: 'Admin', to: '/admin' }, { label: 'Marketing' }]}
       />
-      <div className="flex flex-wrap gap-2 mb-4 border-b pb-3">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              'text-xs font-semibold px-3 py-1.5 rounded transition-colors',
-              activeTab === tab.id
-                ? 'bg-[#005B2E] text-white'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-        <Link to="/admin/trade-marketing" className="ml-auto">
-          <Button variant="outline" size="sm" className="text-xs">
-            Trade Marketing →
-          </Button>
-        </Link>
-      </div>
       {renderScreen()}
     </div>
   )
