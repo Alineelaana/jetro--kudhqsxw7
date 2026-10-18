@@ -116,7 +116,7 @@ export function UsersAdminPage() {
             alerts={userAlerts}
             onBack={() => setSelectedUser(null)}
             onRefresh={handleRefreshDetails}
-            canViewPreciseCoords={canViewPreciseCoords(userRole)}
+            canViewPreciseCoords={canViewUserPreciseCoords(userRole)}
             canTerminateSessions={canTerminateUserSessions(userRole)}
             canExport={canExportUserAudit(userRole)}
           />

@@ -159,6 +159,205 @@ const XLSX_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 /**
  * Exporta a tabela para Excel respeitando estritamente a ordem e visibilidade das colunas customizadas
  */
+/**
+ * Exporta uma lista de objetos diretamente para Excel (.xlsx) de forma padronizada
+ */
+export function exportToExcel(
+  records: Record<string, unknown>[],
+  filename = 'export-jetro.xlsx',
+  sheetTitle = 'Jetro ERP',
+) {
+  if (!records || records.length === 0) return
+
+  const keys = Object.keys(records[0])
+  const headerCells = keys.map((key, idx) => {
+    const ref = `${columnLetter(idx)}1`
+    return `<c r="${ref}" t="inlineStr" s="1"><is><t xml:space="preserve">${xmlEscape(key)}</t></is></c>`
+  })
+
+  const bodyRowsXml: string[] = []
+  records.forEach((row, rIdx) => {
+    const rowNum = rIdx + 2
+    const cellXmls = keys.map((key, cIdx) => {
+      const ref = `${columnLetter(cIdx)}${rowNum}`
+      const val = row[key]
+
+      if (val === null || val === undefined) {
+        return `<c r="${ref}" t="inlineStr" s="0"><is><t></t></is></c>`
+      }
+
+      if (typeof val === 'number') {
+        return `<c r="${ref}" t="n" s="3"><v>${val}</v></c>`
+      }
+
+      const strVal = String(val)
+      return `<c r="${ref}" t="inlineStr" s="0"><is><t xml:space="preserve">${xmlEscape(strVal)}</t></is></c>`
+    })
+
+    bodyRowsXml.push(`<row r="${rowNum}">${cellXmls.join('')}</row>`)
+  })
+
+  const colWidthsXml = keys
+    .map((_, i) => `<col min="${i + 1}" max="${i + 1}" width="20" customWidth="1"/>`)
+    .join('')
+
+  const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <cols>${colWidthsXml}</cols>
+  <sheetData>
+    <row r="1">${headerCells.join('')}</row>
+    ${bodyRowsXml.join('')}
+  </sheetData>
+</worksheet>`
+
+  const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="${xmlEscape(sheetTitle.slice(0, 31))}" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`
+
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>`
+
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`
+
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`
+
+  const encoder = new TextEncoder()
+  const zip = buildZip([
+    { name: '[Content_Types].xml', data: encoder.encode(contentTypes) },
+    { name: '_rels/.rels', data: encoder.encode(rootRels) },
+    { name: 'xl/workbook.xml', data: encoder.encode(workbookXml) },
+    { name: 'xl/_rels/workbook.xml.rels', data: encoder.encode(rels) },
+    { name: 'xl/styles.xml', data: encoder.encode(XLSX_STYLES) },
+    { name: 'xl/worksheets/sheet1.xml', data: encoder.encode(sheetXml) },
+  ])
+
+  downloadBlob(
+    new Blob([zip as unknown as BlobPart], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+    filename,
+  )
+}
+
+/**
+ * Exporta uma lista de objetos diretamente para PDF de impressão estilizado Jetro
+ */
+export function exportToPdf(
+  records: Record<string, unknown>[],
+  _filename = 'export-jetro.pdf',
+  title = 'Relatório de Dados — Jetro ERP',
+) {
+  if (!records || records.length === 0) return
+
+  const printWindow = window.open('', '_blank', 'width=1100,height=750')
+  if (!printWindow) return
+
+  const now = new Date().toLocaleString('pt-BR')
+  const keys = Object.keys(records[0])
+
+  const thHtml = keys
+    .map(
+      (k) =>
+        `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: left; border-bottom: 2px solid #C9A227;">${xmlEscape(k)}</th>`,
+    )
+    .join('')
+
+  const trsHtml = records
+    .map((row, idx) => {
+      const bg = idx % 2 === 0 ? '#ffffff' : '#f9fafb'
+      const tds = keys
+        .map((k) => {
+          const val = row[k]
+          const strVal = val === null || val === undefined ? '—' : String(val)
+          return `<td style="padding: 6px 10px; font-size: 11px; text-align: left; border-bottom: 1px solid #e5e7eb;">${xmlEscape(strVal)}</td>`
+        })
+        .join('')
+      return `<tr style="background-color: ${bg};">${tds}</tr>`
+    })
+    .join('')
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${xmlEscape(title)}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #111827; margin: 24px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #005B2E; padding-bottom: 14px; margin-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { width: 36px; height: 36px; background-color: #005B2E; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
+    .brand-title { font-size: 20px; font-weight: 800; color: #005B2E; margin: 0; }
+    .brand-subtitle { font-size: 12px; color: #6b7280; margin: 0; }
+    .meta { text-align: right; font-size: 11px; color: #6b7280; }
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    thead { background-color: #005B2E; color: #ffffff; }
+    .footer { margin-top: 20px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+    @media print {
+      body { margin: 10mm; }
+      thead { display: table-header-group; }
+      tr { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <h1 class="brand-title">JETRO ERP</h1>
+        <p class="brand-subtitle">${xmlEscape(title)}</p>
+      </div>
+    </div>
+    <div class="meta">
+      <div><strong>Emissão:</strong> ${now}</div>
+      <div><strong>Total de registros:</strong> ${records.length}</div>
+    </div>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>${thHtml}</tr>
+      </thead>
+      <tbody>
+        ${trsHtml}
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    Documento gerado pelo ERP Jetro
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 300);
+    };
+  </script>
+</body>
+</html>`
+
+  printWindow.document.open()
+  printWindow.document.write(html)
+  printWindow.document.close()
+}
+
+/**
+ * Exporta a tabela para Excel respeitando estritamente a ordem e visibilidade das colunas customizadas
+ */
 export function exportTableToExcel<T>(
   data: T[],
   columns: JetroColumnDef<T>[],

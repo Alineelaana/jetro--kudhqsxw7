@@ -243,7 +243,7 @@ export function UsersTable({
             ) : (
               <Monitor className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             )}
-            <span className="truncate">{value || 'Informação não registrada'}</span>
+            <span className="truncate">{String(value || 'Informação não registrada')}</span>
           </div>
         )
       },
