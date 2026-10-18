@@ -151,6 +151,34 @@ onRecordAfterCreateSuccess((e) => {
     $app.logger().error('Falha ao gravar historico inicial do chamado', 'error', String(histErr))
   }
 
+  // 1b. Gravar NOTIFICAÇÃO INDIVIDUAL no sino para o responsável atribuído
+  if (responsavelId) {
+    try {
+      var notifColInst = $app.findCollectionByNameOrId('notifications')
+      var nRec = new Record(notifColInst)
+      nRec.set('recipient', responsavelId)
+      nRec.set('title', 'Novo chamado atribuído a você')
+      nRec.set('message', 'Chamado #' + numero + ' — ' + assunto)
+      nRec.set('link', '/admin/chamados/' + chamadoId)
+      nRec.set('type', 'chamado_atribuido')
+      nRec.set('read', false)
+      $app.saveNoValidate(nRec)
+      $app
+        .logger()
+        .info(
+          'Notificacao individual criada para o responsavel do chamado',
+          'user',
+          responsavelId,
+          'chamado',
+          numero,
+        )
+    } catch (notifErr) {
+      $app
+        .logger()
+        .warn('Falha ao gerar notificacao de novo chamado no sino', 'error', String(notifErr))
+    }
+  }
+
   // 2. Disparo de e-mails de abertura (responsável, solicitante e convidados)
   try {
     var setorNome = 'Não especificado'
@@ -477,6 +505,43 @@ onRecordAfterUpdateSuccess((e) => {
       } catch (errNotif) {
         $app.logger().warn('Falha no envio de notificacao de status', 'error', String(errNotif))
       }
+    }
+
+    // Criar notificações no sino para os envolvidos (solicitante, responsável, aprovador)
+    try {
+      var notifColInstUp = $app.findCollectionByNameOrId('notifications')
+      var recipientsToNotify = []
+      if (solicitanteId) recipientsToNotify.push(solicitanteId)
+      if (responsavelId && recipientsToNotify.indexOf(responsavelId) === -1)
+        recipientsToNotify.push(responsavelId)
+      if (status === 'aprovacao' && aprovadorId && recipientsToNotify.indexOf(aprovadorId) === -1) {
+        recipientsToNotify.push(aprovadorId)
+      }
+
+      var notifType = status === 'aprovacao' ? 'chamado_aprovacao' : 'chamado_status'
+      var notifTitle =
+        status === 'aprovacao'
+          ? 'Aprovação de chamado solicitada'
+          : 'Chamado #' + numero + ' atualizado'
+      var notifMsg = 'Status: ' + status.toUpperCase() + ' — ' + assunto
+
+      for (var k = 0; k < recipientsToNotify.length; k++) {
+        var rId = recipientsToNotify[k]
+        try {
+          var nRecUp = new Record(notifColInstUp)
+          nRecUp.set('recipient', rId)
+          nRecUp.set('title', notifTitle)
+          nRecUp.set('message', notifMsg)
+          nRecUp.set('link', '/admin/chamados/' + chamadoId)
+          nRecUp.set('type', notifType)
+          nRecUp.set('read', false)
+          $app.saveNoValidate(nRecUp)
+        } catch (_) {}
+      }
+    } catch (notifUpErr) {
+      $app
+        .logger()
+        .warn('Falha ao gerar notificacao de status no sino', 'error', String(notifUpErr))
     }
   } catch (errUp) {
     $app.logger().error('Erro geral ao processar apos update do chamado', 'error', String(errUp))

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18T18:31:16.256Z",
+  "generatedAt": "2026-10-18T18:52:52.301Z",
   "collections": [
     {
       "name": "users",
@@ -115,6 +115,19 @@
         {
           "name": "inactivity_timeout_minutes",
           "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tratamento",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["masculino", "feminino", "neutro"]
+        },
+        {
+          "name": "fuso_horario",
+          "type": "text",
           "required": false,
           "system": false
         }
@@ -2100,7 +2113,7 @@
       "apiRules": {
         "list": "@request.auth.id != '' && recipient = @request.auth.id",
         "view": "@request.auth.id != '' && recipient = @request.auth.id",
-        "create": "@request.auth.role = 'SUP'",
+        "create": "@request.auth.id != ''",
         "update": "@request.auth.id != '' && recipient = @request.auth.id",
         "delete": "@request.auth.role = 'SUP'"
       },
@@ -2153,7 +2166,7 @@
         {
           "name": "type",
           "type": "select",
-          "required": true,
+          "required": false,
           "system": false,
           "selectValues": [
             "budget_created",
@@ -2172,6 +2185,10 @@
             "workflow_step",
             "agenda_reminder",
             "monitoring_alert",
+            "chamado_atribuido",
+            "chamado_status",
+            "chamado_comunicacao",
+            "chamado_aprovacao",
             "other"
           ]
         }

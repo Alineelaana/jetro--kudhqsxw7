@@ -2,7 +2,16 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { Bell, CheckCheck, Loader2, PackageX, TrendingDown } from 'lucide-react'
+import {
+  Bell,
+  CheckCheck,
+  Loader2,
+  PackageX,
+  TrendingDown,
+  LifeBuoy,
+  AlertCircle,
+  MessageCircle,
+} from 'lucide-react'
 import {
   getNotifications,
   markNotificationAsRead,
@@ -60,6 +69,12 @@ export function NotificationBell() {
     if (n.type === 'stock_low') return <PackageX className="w-4 h-4 text-amber-600 shrink-0" />
     if (n.type === 'price_below_cost')
       return <TrendingDown className="w-4 h-4 text-red-600 shrink-0" />
+    if (n.type === 'chamado_atribuido')
+      return <LifeBuoy className="w-4 h-4 text-[#005B2E] shrink-0" />
+    if (n.type === 'chamado_aprovacao')
+      return <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+    if (n.type === 'chamado_status' || n.type === 'chamado_comunicacao')
+      return <MessageCircle className="w-4 h-4 text-blue-600 shrink-0" />
     return null
   }
 

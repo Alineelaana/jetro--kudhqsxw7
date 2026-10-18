@@ -58,6 +58,12 @@ export function sanitizeUserPreferences(saved?: Partial<UserPreferences> | null)
       saved.jetroOnlineVisualNotifications !== undefined
         ? Boolean(saved.jetroOnlineVisualNotifications)
         : true,
+    timezone: saved.timezone || saved.fuso_horario || DEFAULT_USER_PREFERENCES.timezone,
+    fuso_horario: saved.fuso_horario || saved.timezone || DEFAULT_USER_PREFERENCES.fuso_horario,
+    tratamento:
+      saved.tratamento === 'masculino' || saved.tratamento === 'feminino'
+        ? saved.tratamento
+        : 'neutro',
   }
 }
 

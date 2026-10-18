@@ -19,6 +19,8 @@ import {
   AlertTriangle,
   Minus,
   Plus,
+  Globe,
+  UserCheck,
 } from 'lucide-react'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useAuth } from '@/hooks/use-auth'
@@ -883,6 +885,88 @@ export function JetroCustomizationDrawer() {
                     checked={preferences.largeTouchTargets}
                     onCheckedChange={(checked) => updatePreference('largeTouchTargets', checked)}
                   />
+                </div>
+              </div>
+
+              {/* FUSO HORÁRIO E TRATAMENTO PESSOAL */}
+              <div className="space-y-2 pt-2 border-t border-border">
+                <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground block">
+                  LOCALIZAÇÃO E SAUDAÇÃO PESSOAL
+                </span>
+
+                {/* Tratamento */}
+                <div className="p-3 rounded-xl border border-border bg-card space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <UserCheck className="w-4 h-4 text-[#005B2E]" />
+                    <span className="text-xs font-bold">Forma de Tratamento</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Define como o ERP se dirige a você nas boas-vindas da tela inicial.
+                  </p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { val: 'masculino', label: 'Bem-vindo' },
+                      { val: 'feminino', label: 'Bem-vinda' },
+                      { val: 'neutro', label: 'Neutro' },
+                    ].map((item) => (
+                      <button
+                        key={item.val}
+                        type="button"
+                        onClick={() =>
+                          updatePreference(
+                            'tratamento',
+                            item.val as 'masculino' | 'feminino' | 'neutro',
+                          )
+                        }
+                        className={cn(
+                          'py-1.5 text-xs rounded-lg font-semibold border transition-colors cursor-pointer',
+                          (preferences.tratamento || 'neutro') === item.val
+                            ? 'bg-[#005B2E] text-white border-[#005B2E]'
+                            : 'border-border bg-background hover:bg-muted text-muted-foreground',
+                        )}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Fuso Horário */}
+                <div className="p-3 rounded-xl border border-border bg-card space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Globe className="w-4 h-4 text-[#005B2E]" />
+                    <span className="text-xs font-bold">Fuso Horário Oficial</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Utilizado no cálculo exato da saudação e dos compromissos da agenda.
+                  </p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[
+                      { val: 'America/Sao_Paulo', label: 'Brasília (GMT-3)' },
+                      { val: 'America/Manaus', label: 'Manaus (GMT-4)' },
+                      { val: 'America/Cuiaba', label: 'Cuiabá (GMT-4)' },
+                      { val: 'America/Belem', label: 'Belém (GMT-3)' },
+                    ].map((tz) => (
+                      <button
+                        key={tz.val}
+                        type="button"
+                        onClick={() => {
+                          updatePreference('timezone', tz.val)
+                          updatePreference('fuso_horario', tz.val)
+                        }}
+                        className={cn(
+                          'p-2 text-xs text-left rounded-lg font-semibold border transition-colors cursor-pointer',
+                          (preferences.fuso_horario ||
+                            preferences.timezone ||
+                            'America/Sao_Paulo') === tz.val
+                            ? 'bg-[#005B2E] text-white border-[#005B2E]'
+                            : 'border-border bg-background hover:bg-muted text-muted-foreground',
+                        )}
+                      >
+                        {tz.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

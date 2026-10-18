@@ -41,6 +41,11 @@ export interface UserPreferences {
   jetroOnlineTypingEffect: boolean // efeitos de digitação on/off
   jetroOnlineResponseMode: 'compact' | 'detailed' // respostas compacto/detalhado
   jetroOnlineVisualNotifications: boolean // notificações visuais do assistente (ping/badge)
+
+  // PREFERÊNCIAS DE PERFIL / LOCALIZAÇÃO
+  timezone?: string
+  fuso_horario?: string
+  tratamento?: 'masculino' | 'feminino' | 'neutro'
 }
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
@@ -72,4 +77,7 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   jetroOnlineTypingEffect: true,
   jetroOnlineResponseMode: 'detailed',
   jetroOnlineVisualNotifications: true,
+  timezone: 'America/Sao_Paulo',
+  fuso_horario: 'America/Sao_Paulo',
+  tratamento: 'neutro',
 }
