@@ -148,28 +148,24 @@ export function JetroOnlineProvider({ children }: { children: React.ReactNode })
     loadConversations()
   }, [loadConversations])
 
-  return (
-    <JetroOnlineContext.Provider
-      value={{
-        messages,
-        conversations,
-        conversationId,
-        serverUserContext,
-        loading,
-        loadingHistory,
-        send,
-        newConversation,
-        loadHistory,
-        loadConversations,
-        endRef,
-        scrollToBottom,
-        isFloatingOpen,
-        setIsFloatingOpen,
-      }}
-    >
-      {children}
-    </JetroOnlineContext.Provider>
-  )
+  const contextValue = {
+    messages,
+    conversations,
+    conversationId,
+    serverUserContext,
+    loading,
+    loadingHistory,
+    send,
+    newConversation,
+    loadHistory,
+    loadConversations,
+    endRef,
+    scrollToBottom,
+    isFloatingOpen,
+    setIsFloatingOpen,
+  }
+
+  return <JetroOnlineContext.Provider value={contextValue}>{children}</JetroOnlineContext.Provider>
 }
 
 export function useJetroOnline() {
