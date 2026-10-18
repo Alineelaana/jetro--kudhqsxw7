@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { JehPageHeader } from './jeh-header'
 import { JehAssistantService, type JehEvaluationRating } from '@/services/jeh-assistant'
+import { JEH_AVATAR_URL } from '@/lib/jeh-assets'
 import {
   Bot,
   User,
@@ -265,8 +266,12 @@ export function JehTestScreen() {
       <Card className="border shadow-sm flex flex-col h-[650px] overflow-hidden">
         <CardHeader className="p-3.5 px-4 border-b bg-gray-50/70 flex flex-row items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#005B2E] text-white flex items-center justify-center">
-              <Bot className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-[#C9A227] shrink-0 bg-[#00381C] shadow-xs">
+              <img
+                src={JEH_AVATAR_URL}
+                alt="Srta. Jeh"
+                className="w-full h-full object-cover rounded-full"
+              />
             </div>
             <div>
               <div className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
@@ -274,8 +279,7 @@ export function JehTestScreen() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <p className="text-[10px] text-gray-500">
-                Endpoint interno{' '}
-                <code className="font-mono text-gray-700">/backend/v1/jeh/test-chat</code>
+                Conexão direta com a base de conhecimento e regras de atendimento
               </p>
             </div>
           </div>
@@ -299,11 +303,19 @@ export function JehTestScreen() {
               >
                 {/* AVATAR */}
                 <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white ${
-                    isAssistant ? 'bg-[#005B2E]' : 'bg-gray-800'
+                  className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
+                    isAssistant ? 'border border-[#C9A227] bg-[#00381C]' : 'bg-gray-800 text-white'
                   }`}
                 >
-                  {isAssistant ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
+                  {isAssistant ? (
+                    <img
+                      src={JEH_AVATAR_URL}
+                      alt="Jeh"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <User className="w-4 h-4" />
+                  )}
                 </div>
 
                 {/* CORPO DA MENSAGEM */}
@@ -407,8 +419,12 @@ export function JehTestScreen() {
 
           {sending && (
             <div className="flex gap-3 max-w-[80%] self-start">
-              <div className="w-7 h-7 rounded-full bg-[#005B2E] text-white flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-full overflow-hidden border border-[#C9A227] bg-[#00381C] shrink-0">
+                <img
+                  src={JEH_AVATAR_URL}
+                  alt="Jeh"
+                  className="w-full h-full object-cover rounded-full"
+                />
               </div>
               <div className="p-3 bg-white border border-gray-200 rounded-2xl rounded-tl-none text-xs text-gray-500 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#005B2E] animate-bounce" />

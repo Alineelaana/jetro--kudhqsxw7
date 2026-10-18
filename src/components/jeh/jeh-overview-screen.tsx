@@ -115,14 +115,18 @@ export function JehOverviewScreen() {
           }`}
         >
           <div className="flex items-start md:items-center gap-3.5">
-            <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                isAtiva
-                  ? 'bg-emerald-600 text-white shadow-md'
-                  : 'bg-amber-600 text-white shadow-md'
-              }`}
-            >
-              {isAtiva ? <Power className="w-6 h-6" /> : <PowerOff className="w-6 h-6" />}
+            <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#00381C]">
+              <img
+                src={JEH_AVATAR_URL}
+                alt="Srta. Jeh"
+                className="w-full h-full object-cover rounded-full"
+              />
+              <span
+                className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                  isAtiva ? 'bg-emerald-500' : 'bg-amber-500'
+                }`}
+                title={isAtiva ? 'Online / Ativa' : 'Pausada'}
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">

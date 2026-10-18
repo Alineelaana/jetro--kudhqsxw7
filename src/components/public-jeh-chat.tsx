@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { MessageSquare, X, Send, Loader2, ChevronDown, Sparkles, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { JEH_AVATAR_URL } from '@/lib/jeh-assets'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
@@ -226,8 +227,12 @@ export function PublicJehChat() {
           aria-label="Abrir chat institucional com a Jeh"
           title="Fale com a Jeh — Assistente Virtual do Jetro"
         >
-          <div className="relative h-7 w-7 rounded-full bg-[#00381C] flex items-center justify-center text-[#C9A227] border border-[#C9A227]/70 shrink-0 font-black text-xs shadow-inner">
-            J
+          <div className="relative h-7 w-7 rounded-full overflow-hidden border border-[#C9A227] shrink-0 shadow-inner bg-[#00381C]">
+            <img
+              src={JEH_AVATAR_URL}
+              alt="Jeh"
+              className="h-full w-full object-cover rounded-full"
+            />
           </div>
           <div className="text-left">
             <span className="block font-bold text-xs tracking-wide">Fale com a Jeh</span>
@@ -243,8 +248,12 @@ export function PublicJehChat() {
           {/* Cabeçalho Oficial Jeh (Verde escuro / Dourado) */}
           <div className="bg-gradient-to-r from-[#00381C] via-[#005B2E] to-[#00381C] text-white px-4 py-3 flex items-center justify-between border-b border-[#C9A227]/50 shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="h-9 w-9 rounded-full bg-[#002613] flex items-center justify-center border-2 border-[#C9A227] shrink-0 text-[#C9A227] font-black text-sm shadow-md">
-                J
+              <div className="h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#002613]">
+                <img
+                  src={JEH_AVATAR_URL}
+                  alt="Srta. Jeh"
+                  className="h-full w-full object-cover rounded-full"
+                />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -279,8 +288,12 @@ export function PublicJehChat() {
                   className={cn('flex items-start gap-2', isUser ? 'justify-end' : 'justify-start')}
                 >
                   {!isUser && (
-                    <div className="w-7 h-7 rounded-full bg-[#005B2E] text-[#C9A227] flex items-center justify-center shrink-0 mt-0.5 border border-[#C9A227]/50 shadow-2xs font-bold text-xs">
-                      J
+                    <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 mt-0.5 border border-[#C9A227]/70 shadow-2xs bg-[#002613]">
+                      <img
+                        src={JEH_AVATAR_URL}
+                        alt="Jeh"
+                        className="w-full h-full object-cover rounded-full"
+                      />
                     </div>
                   )}
 
@@ -304,8 +317,12 @@ export function PublicJehChat() {
 
             {loading && (
               <div className="flex items-center gap-2 text-gray-500 text-xs pl-1 py-1">
-                <div className="w-6 h-6 rounded-full bg-[#005B2E] text-[#C9A227] flex items-center justify-center shrink-0 border border-[#C9A227]/40 font-bold text-[10px]">
-                  J
+                <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-[#C9A227]/70 bg-[#002613]">
+                  <img
+                    src={JEH_AVATAR_URL}
+                    alt="Jeh"
+                    className="w-full h-full object-cover rounded-full"
+                  />
                 </div>
                 <div className="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1.5 rounded-2xl shadow-2xs">
                   <Loader2 className="w-3.5 h-3.5 text-[#005B2E] animate-spin" />
