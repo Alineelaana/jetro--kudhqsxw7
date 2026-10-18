@@ -21,6 +21,8 @@ export interface Chamado {
   prazo_resolucao?: string
   data_conclusao?: string
   cancelado_justificativa?: string
+  ultimo_alerta_em?: string
+  ultimo_alerta_tipo?: string
   created: string
   updated: string
   expand?: {
