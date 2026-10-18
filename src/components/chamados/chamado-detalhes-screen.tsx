@@ -141,10 +141,8 @@ export default function ChamadoDetalhesScreen() {
   const isSolicitante = user?.id === chamado.solicitante
   const isResponsavel = user?.id === chamado.profissional_responsavel
   const isAprovador = user?.id === chamado.aprovador
-  const isMaster =
-    userRole === 'SUP' ||
-    user?.perfil_acesso?.includes('admin') ||
-    user?.perfil_acesso?.includes('master')
+  const perfilStr = String((user as any)?.perfil_acesso || '').toLowerCase()
+  const isMaster = userRole === 'SUP' || perfilStr.includes('admin') || perfilStr.includes('master')
   const podeAlterarStatus =
     isResponsavel || isAprovador || isMaster || (isSolicitante && chamado.status === 'aprovacao')
 

@@ -36,6 +36,11 @@ import {
 } from '@/components/ui/dialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
+export function useJetroCustomization() {
+  const { isCustomizerOpen, setIsCustomizerOpen } = useUserPreferences()
+  return { isCustomizerOpen, setIsCustomizerOpen }
+}
+
 export function JetroCustomizationDrawer() {
   const { isAuthenticated } = useAuth()
   const {

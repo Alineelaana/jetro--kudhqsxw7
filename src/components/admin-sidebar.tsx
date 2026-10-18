@@ -16,7 +16,7 @@ import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
-import { useJetroCustomization } from '@/components/personalizacao/jetro-customization-drawer'
+
 import { ADMIN_MENU, type MenuEntry, type MenuChild } from '@/lib/admin-menu-config'
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
@@ -30,7 +30,11 @@ interface SearchResult {
   parent: string
 }
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  onMobileClose?: () => void
+}
+
+export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
   const { pathname } = useLocation()
   const { user, userRole } = useAuth()
   const isMobile = useIsMobile()
@@ -42,11 +46,11 @@ export function AdminSidebar() {
   const [railFlyoutArea, setRailFlyoutArea] = useState<string | null>(null)
   const flyoutRef = useRef<HTMLDivElement>(null)
 
-  const { preferences, updatePreference } = useUserPreferences()
+  const { preferences, updatePreference, isCustomizerOpen, setIsCustomizerOpen } =
+    useUserPreferences()
   const { isFavorite, toggleFavorite } = useMenuFavorites(user?.id as string)
   const { isRail: localIsRail, toggle: toggleSidebarLocal } = useSidebarMode(user?.id as string)
   const { setIsFloatingOpen, isFloatingOpen } = useJetroOnline()
-  const { setIsCustomizerOpen, isCustomizerOpen } = useJetroCustomization()
 
   // O estado do sidebar sincroniza com as preferências do usuário
   const isRail = !preferences.sidebarExpanded

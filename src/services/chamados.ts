@@ -1,4 +1,4 @@
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 
 export type ChamadoPrioridade = 'baixa' | 'normal' | 'alta' | 'urgente'
 export type ChamadoStatus = 'novo' | 'andamento' | 'aprovacao' | 'finalizado' | 'cancelado'

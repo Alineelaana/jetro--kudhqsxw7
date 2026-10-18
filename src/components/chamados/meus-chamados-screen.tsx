@@ -133,8 +133,10 @@ export default function MeusChamadosScreen() {
         id: 'numero',
         header: 'Número',
         accessorKey: 'numero',
-        cell: (info) => {
-          const val = String(info.getValue() || '')
+        dataType: 'text',
+        defaultWidth: 140,
+        cell: ({ value }) => {
+          const val = String(value || '')
           return (
             <span className="font-mono font-bold text-[#005B2E] dark:text-[#E4C46A]">{val}</span>
           )
@@ -144,21 +146,19 @@ export default function MeusChamadosScreen() {
         id: 'assunto',
         header: 'Assunto',
         accessorKey: 'assunto',
-        cell: (info) => {
-          const ch = info.row.original
+        dataType: 'text',
+        defaultWidth: 260,
+        cell: ({ row, value }) => {
+          const ch = row
           return (
             <div className="flex items-center gap-1.5 max-w-[280px]">
-              <span
-                className="truncate font-semibold text-foreground"
-                title={String(info.getValue())}
-              >
-                {String(info.getValue())}
+              <span className="truncate font-semibold text-foreground" title={String(value || '')}>
+                {String(value || '')}
               </span>
               {ch.anexos && ch.anexos.length > 0 && (
-                <Paperclip
-                  className="w-3.5 h-3.5 text-muted-foreground shrink-0"
-                  title={`${ch.anexos.length} anexo(s)`}
-                />
+                <span title={`${ch.anexos.length} anexo(s)`} className="inline-flex">
+                  <Paperclip className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </span>
               )}
             </div>
           )
@@ -167,9 +167,11 @@ export default function MeusChamadosScreen() {
       {
         id: 'solicitante',
         header: 'Solicitante',
-        accessorFn: (row) => row.expand?.solicitante?.name || row.solicitante,
-        cell: (info) => {
-          const name = String(info.getValue() || 'Sistema')
+        dataType: 'text',
+        defaultWidth: 160,
+        getSortValue: (row) => row.expand?.solicitante?.name || row.solicitante,
+        cell: ({ row }) => {
+          const name = row.expand?.solicitante?.name || row.solicitante || 'Sistema'
           return (
             <span className="text-xs text-foreground truncate block max-w-[140px]">{name}</span>
           )
@@ -178,19 +180,26 @@ export default function MeusChamadosScreen() {
       {
         id: 'setor_responsavel',
         header: 'Setor',
-        accessorFn: (row) => row.expand?.setor_responsavel?.name || 'Geral',
-        cell: (info) => (
-          <span className="text-xs text-muted-foreground truncate block max-w-[120px]">
-            {String(info.getValue())}
-          </span>
-        ),
+        dataType: 'text',
+        defaultWidth: 140,
+        getSortValue: (row) => row.expand?.setor_responsavel?.name || 'Geral',
+        cell: ({ row }) => {
+          const setor = row.expand?.setor_responsavel?.name || 'Geral'
+          return (
+            <span className="text-xs text-muted-foreground truncate block max-w-[120px]">
+              {setor}
+            </span>
+          )
+        },
       },
       {
         id: 'profissional_responsavel',
         header: 'Responsável',
-        accessorFn: (row) => row.expand?.profissional_responsavel?.name || 'Não atribuído',
-        cell: (info) => {
-          const name = String(info.getValue())
+        dataType: 'text',
+        defaultWidth: 150,
+        getSortValue: (row) => row.expand?.profissional_responsavel?.name || 'Não atribuído',
+        cell: ({ row }) => {
+          const name = row.expand?.profissional_responsavel?.name || 'Não atribuído'
           return (
             <span className="text-xs text-foreground truncate block max-w-[130px]">{name}</span>
           )
@@ -200,8 +209,10 @@ export default function MeusChamadosScreen() {
         id: 'prioridade',
         header: 'Prioridade',
         accessorKey: 'prioridade',
-        cell: (info) => {
-          const p = (info.getValue() as ChamadoPrioridade) || 'normal'
+        dataType: 'text',
+        defaultWidth: 120,
+        cell: ({ value }) => {
+          const p = (value as ChamadoPrioridade) || 'normal'
           const cfg = PRIORIDADE_LABELS[p] || {
             label: p,
             badgeClass: 'bg-slate-100 text-slate-800',
@@ -219,8 +230,10 @@ export default function MeusChamadosScreen() {
         id: 'status',
         header: 'Status',
         accessorKey: 'status',
-        cell: (info) => {
-          const s = (info.getValue() as ChamadoStatus) || 'novo'
+        dataType: 'text',
+        defaultWidth: 150,
+        cell: ({ value }) => {
+          const s = (value as ChamadoStatus) || 'novo'
           const cfg = STATUS_LABELS[s] || {
             label: s,
             bg: 'bg-slate-100',
@@ -240,8 +253,10 @@ export default function MeusChamadosScreen() {
         id: 'created',
         header: 'Abertura',
         accessorKey: 'created',
-        cell: (info) => {
-          const val = String(info.getValue() || '')
+        dataType: 'date',
+        defaultWidth: 150,
+        cell: ({ value }) => {
+          const val = String(value || '')
           if (!val) return '—'
           const date = new Date(val)
           return (
@@ -256,8 +271,10 @@ export default function MeusChamadosScreen() {
         id: 'updated',
         header: 'Última Atualização',
         accessorKey: 'updated',
-        cell: (info) => {
-          const val = String(info.getValue() || '')
+        dataType: 'date',
+        defaultWidth: 150,
+        cell: ({ value }) => {
+          const val = String(value || '')
           if (!val) return '—'
           const date = new Date(val)
           return (
@@ -271,8 +288,12 @@ export default function MeusChamadosScreen() {
       {
         id: 'acoes',
         header: 'Ações',
-        cell: (info) => {
-          const ch = info.row.original
+        sortable: false,
+        hideable: false,
+        defaultWidth: 110,
+        align: 'center',
+        cell: ({ row }) => {
+          const ch = row
           return (
             <Button
               size="sm"
@@ -451,12 +472,13 @@ export default function MeusChamadosScreen() {
       {/* Tabela Padrão do ERP Jetro (respeitando preferências de zebrado, linhas por página e customização) */}
       <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         <JetroTable
-          data={filteredData}
+          screenId="central-chamados-meus"
           columns={columns}
-          tableId="central-chamados-meus"
-          defaultPageSize={10}
-          isLoading={loading}
+          data={filteredData}
+          loading={loading}
           enableExport={true}
+          exportTitle="Central de Chamados — Jetro ERP"
+          exportFilename="meus-chamados.xlsx"
           emptyMessage="Nenhum chamado encontrado para os critérios selecionados."
         />
       </div>
