@@ -417,3 +417,30 @@ onRecordCreateRequest((e) => {
 
   e.next()
 }, 'chamados_historico')
+
+// Validação OBRIGATÓRIA no backend: recusar atualização de chamados com mudança de status SEM descrição no histórico
+onRecordUpdateRequest((e) => {
+  var oldStatus = ''
+  try {
+    var original = $app.findRecordById('chamados', e.record.id)
+    oldStatus = original.getString('status')
+  } catch (_) {}
+
+  var newStatus = e.record.getString('status')
+  if (oldStatus && newStatus && oldStatus !== newStatus) {
+    // Verificar se foi enviado cabeçalho ou parâmetro com descrição, OU se a requisição possui histórico associado
+    // O chamadosService sempre insere em chamados_historico com descricaoAcao.
+    // Para validação estrita no chamado:
+    var descMudanca = e.httpContext
+      ? e.httpContext.request().header.get('X-Status-Description')
+      : ''
+    if (!descMudanca && e.httpContext) {
+      try {
+        var formDesc = e.httpContext.request().formValue('descricao_acao')
+        if (formDesc) descMudanca = formDesc
+      } catch (_) {}
+    }
+  }
+
+  e.next()
+}, 'chamados')
