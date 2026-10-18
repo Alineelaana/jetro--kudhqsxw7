@@ -113,7 +113,7 @@ export default function Layout() {
         )}
       </main>
       {showFooter && <SiteFooter />}
-      {!isRootLogin && <FloatingChat />}
+      {isAuthenticated && !isRootLogin && <FloatingChat />}
     </div>
   )
 }

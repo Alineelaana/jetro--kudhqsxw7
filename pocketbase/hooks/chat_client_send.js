@@ -1,5 +1,21 @@
 routerAdd('POST', '/backend/v1/chat/send', (e) => {
   try {
+    // 1. Verificar se a assistente Jeh está ativa no banco de dados
+    var jehStatus = 'inativa'
+    try {
+      var rec = $app.findFirstRecordByData('settings', 'key', 'jeh_assistant_status')
+      if (rec) {
+        jehStatus = rec.getString('value') || 'inativa'
+      }
+    } catch (_) {}
+
+    if (jehStatus !== 'ativa') {
+      return e.json(403, {
+        error: 'A assistente Jeh está temporariamente inativa para atendimento externo.',
+        status: 'inativa',
+      })
+    }
+
     var body = e.requestInfo().body || {}
     var convId = body.conversation_id || ''
     var clientName = body.client_name || 'Visitante'

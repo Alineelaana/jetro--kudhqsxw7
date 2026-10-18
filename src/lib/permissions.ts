@@ -149,6 +149,15 @@ export function canManageAiTraining(role: string | undefined): boolean {
   return role === 'SUP'
 }
 
+/**
+ * Permissão específica para a Central de Administração e Treinamento da Assistente Jeh.
+ * Exclusivo para administradores e gestores autorizados.
+ */
+export function canManageJehAssistant(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'ADMIN'].includes(role)
+}
+
 export function canViewFiscal(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)

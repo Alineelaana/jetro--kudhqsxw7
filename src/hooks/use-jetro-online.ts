@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react'
 import {
   sendJetroOnlineMessage,
   getJetroOnlineConversations,
@@ -8,7 +8,31 @@ import {
 } from '@/services/jetro-online'
 import { displayableMessages, type AgentMessage } from '@/lib/skipAi'
 
-export function useJetroOnline() {
+interface JetroOnlineContextType {
+  messages: JetroOnlineMessage[]
+  conversations: JetroOnlineConversation[]
+  conversationId: string | null
+  serverUserContext: {
+    role?: string
+    departamento?: string
+    perfil_acesso?: string
+  } | null
+  loading: boolean
+  loadingHistory: boolean
+  send: (text: string) => Promise<void>
+  newConversation: () => void
+  loadHistory: (convId: string) => Promise<void>
+  loadConversations: () => Promise<void>
+  endRef: React.RefObject<HTMLDivElement | null>
+  scrollToBottom: (smooth?: boolean) => void
+  // Controle de abertura sincronizada / navegação
+  isFloatingOpen: boolean
+  setIsFloatingOpen: (open: boolean) => void
+}
+
+const JetroOnlineContext = createContext<JetroOnlineContextType | null>(null)
+
+export function JetroOnlineProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<JetroOnlineMessage[]>([])
   const [conversations, setConversations] = useState<JetroOnlineConversation[]>([])
   const [conversationId, setConversationId] = useState<string | null>(null)
@@ -19,6 +43,7 @@ export function useJetroOnline() {
   } | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingHistory, setLoadingHistory] = useState(false)
+  const [isFloatingOpen, setIsFloatingOpen] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = useCallback((smooth = true) => {
@@ -123,17 +148,34 @@ export function useJetroOnline() {
     loadConversations()
   }, [loadConversations])
 
-  return {
-    messages,
-    conversations,
-    conversationId,
-    serverUserContext,
-    loading,
-    loadingHistory,
-    send,
-    newConversation,
-    loadHistory,
-    endRef,
-    scrollToBottom,
+  return (
+    <JetroOnlineContext.Provider
+      value={{
+        messages,
+        conversations,
+        conversationId,
+        serverUserContext,
+        loading,
+        loadingHistory,
+        send,
+        newConversation,
+        loadHistory,
+        loadConversations,
+        endRef,
+        scrollToBottom,
+        isFloatingOpen,
+        setIsFloatingOpen,
+      }}
+    >
+      {children}
+    </JetroOnlineContext.Provider>
+  )
+}
+
+export function useJetroOnline() {
+  const ctx = useContext(JetroOnlineContext)
+  if (!ctx) {
+    throw new Error('useJetroOnline deve ser utilizado dentro de um JetroOnlineProvider')
   }
+  return ctx
 }

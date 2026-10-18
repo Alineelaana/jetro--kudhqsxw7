@@ -3,15 +3,10 @@ import { Bot, Sparkles, MessageSquare, Brain, Lightbulb } from 'lucide-react'
 import nineAvatar from '@/assets/whatsapp-image-2026-08-09-at-23.43.52-265df.jpeg'
 
 export function NineIaSection() {
-  const handleOpenNine = () => {
-    const chatBtn = document.getElementById('floating-chat-trigger')
-    if (chatBtn) {
-      chatBtn.click()
-    } else {
-      const budgetSection = document.getElementById('orcamento')
-      if (budgetSection) {
-        budgetSection.scrollIntoView({ behavior: 'smooth' })
-      }
+  const handleContactClick = () => {
+    const budgetSection = document.getElementById('orcamento')
+    if (budgetSection) {
+      budgetSection.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
@@ -79,12 +74,12 @@ export function NineIaSection() {
 
             <div className="pt-4">
               <Button
-                onClick={handleOpenNine}
+                onClick={handleContactClick}
                 size="lg"
-                className="bg-[#005A36] hover:bg-[#004225] text-white font-bold px-8 py-6 text-base rounded-lg shadow-lg shadow-[#005A36]/20"
+                className="bg-[#005A36] hover:bg-[#004225] text-white font-bold px-8 py-6 text-base rounded-lg shadow-lg shadow-[#005A36]/20 cursor-pointer"
               >
                 <MessageSquare className="mr-2 h-5 w-5 text-[#E5B85C]" />
-                Fale com a Jeh, nossa assistente virtual
+                Solicitar Apresentação e Demonstração
               </Button>
             </div>
           </div>
