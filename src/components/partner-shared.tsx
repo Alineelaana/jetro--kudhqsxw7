@@ -18,6 +18,7 @@ export interface PartnerFieldProps {
 
 export interface PartnerRecord {
   id: string
+  code?: string
   partner_type: string
   person_type: 'PF' | 'PJ'
   active: boolean
