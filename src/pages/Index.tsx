@@ -12,6 +12,8 @@ import { WhyJetroSection } from '@/components/why-jetro-section'
 import { FeaturesHighlightSection } from '@/components/features-highlight-section'
 import { BudgetForm } from '@/components/budget-form'
 import { FinalCTA } from '@/components/final-cta'
+import { SiteClientsSection } from '@/components/site-clients-section'
+import { SiteTestimonialsSection } from '@/components/site-testimonials-section'
 import { SeoHead } from '@/components/seo-head'
 import { useSettings } from '@/hooks/use-settings'
 import { PhoneCall, ShieldCheck, Mail, Sparkles } from 'lucide-react'
@@ -63,6 +65,12 @@ export default function Index() {
 
       {/* 10. Recursos Operacionais em Destaque */}
       <FeaturesHighlightSection />
+
+      {/* 10.1 Seção Nossos Clientes */}
+      <SiteClientsSection />
+
+      {/* 10.2 Seção Depoimentos de Clientes com Aprovação Administrativa */}
+      <SiteTestimonialsSection />
 
       {/* 11. Conversão Comercial & Formulário Estruturado */}
       <section

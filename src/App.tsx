@@ -94,6 +94,8 @@ import Promotions from './pages/Promotions'
 import Precificacao from './pages/Precificacao'
 import Auditoria from './pages/Auditoria'
 import UsersAdminPage from './pages/UsersAdminPage'
+import SiteClientsAdmin from './components/site-clients-admin'
+import SiteTestimonialsAdmin from './components/site-testimonials-admin'
 import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
 import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
 import {
@@ -1450,6 +1452,11 @@ const App = () => (
                               element={<TabelaMaeGrPage />}
                             />
                             <Route path="/admin/usuarios" element={<UsersAdminPage />} />
+                            <Route path="/admin/site-clientes" element={<SiteClientsAdmin />} />
+                            <Route
+                              path="/admin/site-depoimentos"
+                              element={<SiteTestimonialsAdmin />}
+                            />
                             <Route path="/admin/auditoria" element={<Auditoria />} />
                             <Route
                               path="/admin/controladoria"

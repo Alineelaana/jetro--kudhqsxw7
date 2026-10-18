@@ -32,6 +32,8 @@ import {
   ClipboardList,
   FileSpreadsheet,
   Sparkles,
+  Building2,
+  MessageSquare,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -172,6 +174,18 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         icon: FileText,
         route: '/admin/central-documentacao',
         perm: canViewScreenDocs,
+      },
+      {
+        label: 'Clientes do Site',
+        icon: Building2,
+        route: '/admin/site-clientes',
+        perm: canViewConfiguracoes,
+      },
+      {
+        label: 'Depoimentos',
+        icon: MessageSquare,
+        route: '/admin/site-depoimentos',
+        perm: canViewConfiguracoes,
       },
       {
         label: 'Usuários',
