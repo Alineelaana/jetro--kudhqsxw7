@@ -25,6 +25,13 @@ interface AuthContextType {
   login: (
     username: string,
     password: string,
+    coords?: {
+      latitude: number
+      longitude: number
+      accuracy: number
+      city?: string
+      state?: string
+    } | null,
   ) => Promise<{ error: string | null; fieldErrors: FieldErrors }>
   mfaLoginVerify: (code: string) => Promise<{ error: string | null }>
   mfaCancel: () => void
@@ -137,7 +144,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const login = async (username: string, password: string) => {
+  const login = async (
+    username: string,
+    password: string,
+    coords?: {
+      latitude: number
+      longitude: number
+      accuracy: number
+      city?: string
+      state?: string
+    } | null,
+  ) => {
     const trimmed = username.trim()
     const email = trimmed === 'Alineelaana' || trimmed === 'jetrosup' ? ADMIN_EMAIL : trimmed
     try {
@@ -165,9 +182,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(record)
       setIsAuthenticated(true)
+
+      const payload: Record<string, unknown> = {
+        action: 'login',
+        identity: email,
+      }
+      if (coords && typeof coords.latitude === 'number' && typeof coords.longitude === 'number') {
+        payload.latitude = coords.latitude
+        payload.longitude = coords.longitude
+        payload.accuracy = coords.accuracy
+        if (coords.city) payload.city = coords.city
+        if (coords.state) payload.state = coords.state
+      }
+
       pb.send('/backend/v1/audit/auth', {
         method: 'POST',
-        body: JSON.stringify({ action: 'login', identity: email }),
+        body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' },
       }).catch(() => {})
       return { error: null, fieldErrors: {} }

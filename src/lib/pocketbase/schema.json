@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18T10:43:49.942Z",
+  "generatedAt": "2026-10-18T11:08:12.344Z",
   "collections": [
     {
       "name": "users",
@@ -7337,6 +7337,54 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "last_activity",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ended_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "terminated_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_invalidated",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "location_origin",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

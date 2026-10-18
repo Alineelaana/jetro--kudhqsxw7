@@ -172,6 +172,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewScreenDocs,
       },
       {
+        label: 'Usuários',
+        icon: Users,
+        route: '/admin/usuarios',
+        perm: canManageUsers,
+      },
+      {
         label: 'Configurações',
         icon: Settings,
         route: '/admin/configuracoes',

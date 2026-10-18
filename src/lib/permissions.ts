@@ -140,6 +140,26 @@ export function canManageUsers(role: string | undefined): boolean {
   return role === 'SUP'
 }
 
+export function canViewUserAuditHistory(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canViewUserPreciseCoords(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canTerminateUserSessions(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canExportUserAudit(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
+export function canManageRetentionPolicy(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
 export function canManageCms(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP'].includes(role)

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { type FieldErrors } from '@/lib/pocketbase/errors'
-import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'
+import { Lock, User, AlertCircle, Loader2, MapPin } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import { AttributionFooter } from '@/components/attribution-footer'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
@@ -15,6 +15,7 @@ export function AdminLogin() {
   const { login, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [allowLocation, setAllowLocation] = useState(false)
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [submitting, setSubmitting] = useState(false)
@@ -44,7 +45,35 @@ export function AdminLogin() {
     setSubmitting(true)
     setError('')
     setFieldErrors({})
-    const { error: loginError, fieldErrors: fErrors } = await login(username.trim(), password)
+
+    let coords: { latitude: number; longitude: number; accuracy: number } | null = null
+    if (allowLocation && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      try {
+        coords = await new Promise<{ latitude: number; longitude: number; accuracy: number }>(
+          (resolve) => {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                resolve({
+                  latitude: pos.coords.latitude,
+                  longitude: pos.coords.longitude,
+                  accuracy: pos.coords.accuracy,
+                })
+              },
+              () => resolve(null as any),
+              { timeout: 4000, maximumAge: 60000 },
+            )
+          },
+        )
+      } catch (_) {
+        coords = null
+      }
+    }
+
+    const { error: loginError, fieldErrors: fErrors } = await login(
+      username.trim(),
+      password,
+      coords,
+    )
     setSubmitting(false)
     if (loginError) {
       setError(loginError)
@@ -125,6 +154,29 @@ export function AdminLogin() {
                 <span className="font-medium">{error}</span>
               </div>
             )}
+
+            <div className="flex items-start gap-2.5 p-2.5 rounded-lg border border-border/60 bg-muted/30">
+              <input
+                id="allow-location"
+                type="checkbox"
+                checked={allowLocation}
+                onChange={(e) => setAllowLocation(e.target.checked)}
+                className="mt-1 rounded border-[#005B2E] text-[#005B2E] focus:ring-[#005B2E] h-4 w-4 cursor-pointer"
+              />
+              <label
+                htmlFor="allow-location"
+                className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none"
+              >
+                <span className="font-semibold text-foreground flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-[#005B2E]" />
+                  Autorizar localização precisa neste acesso
+                </span>
+                <span>
+                  (Opcional para auditoria de segurança da sessão. Sem rastreamento contínuo).
+                </span>
+              </label>
+            </div>
+
             <Button
               type="submit"
               size="lg"

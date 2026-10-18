@@ -209,6 +209,12 @@ export const NAVIGATION_BASELINE: BaselineRoute[] = [
     classification: 'A',
   },
   {
+    route: '/admin/usuarios',
+    label: 'Usuários',
+    group: 'Administração',
+    classification: 'A',
+  },
+  {
     route: '/admin/controladoria',
     label: 'Controladoria',
     group: 'Inteligência',
@@ -545,6 +551,7 @@ export const STABLE_PERMISSION_KEYS: string[] = [
 export const RECOVERED_ROUTES: string[] = [
   '/admin/precificacao',
   '/admin/auditoria',
+  '/admin/usuarios',
   '/admin/controladoria',
   '/admin/verbas',
 ]
