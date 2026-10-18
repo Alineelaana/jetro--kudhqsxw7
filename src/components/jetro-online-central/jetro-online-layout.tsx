@@ -1,5 +1,6 @@
 import React from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { JETRO_ONLINE_AVATAR_URL } from '@/lib/jetro-online-assets'
 import {
   Settings,
   GraduationCap,
@@ -73,13 +74,25 @@ export function JetroOnlineLayout() {
       {/* Cabeçalho Oficial da Central */}
       <div className="border-b pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[#005B2E]">
-            <div className="h-8 w-8 rounded-lg bg-[#005B2E] text-white flex items-center justify-center shadow-xs">
-              <Sparkles className="w-4 h-4 text-[#C9A227]" />
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-[#C9A227] shadow-md bg-[#002613] shrink-0">
+              <img
+                src={JETRO_ONLINE_AVATAR_URL}
+                alt="Assistente Jetro On-line"
+                className="w-full h-full object-cover object-center"
+              />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-gray-900">
-              Central de Configurações do Jetro On-line
-            </h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold tracking-tight text-gray-900">
+                  Central de Configurações do Jetro On-line
+                </h1>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-[#005B2E]/10 text-[#005B2E] border border-[#005B2E]/20 px-2 py-0.5 rounded-full">
+                  <Sparkles className="w-3 h-3 text-[#C9A227]" />
+                  Assistente ERP
+                </span>
+              </div>
+            </div>
           </div>
           <p className="text-xs text-gray-500 mt-1">
             Gestão operacional, treinamento via Universidade Jetro, auditoria e personalização do

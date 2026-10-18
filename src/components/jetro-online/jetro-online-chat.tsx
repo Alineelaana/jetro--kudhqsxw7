@@ -35,6 +35,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
 import { cn } from '@/lib/utils'
 import { JetroOnlineChartRenderer, type JetroChartSpec } from './jetro-online-chart-renderer'
+import { JETRO_ONLINE_AVATAR_URL } from '@/lib/jetro-online-assets'
 
 interface JetroOnlineChatProps {
   className?: string
@@ -877,8 +878,12 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                       className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}
                     >
                       {!isUser && (
-                        <div className="w-8 h-8 rounded-lg bg-[#005B2E] text-white flex items-center justify-center shrink-0 shadow-2xs ring-1 ring-[#C9A227]/40">
-                          <Bot className="w-4 h-4" />
+                        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-2xs bg-[#002613] mt-0.5">
+                          <img
+                            src={JETRO_ONLINE_AVATAR_URL}
+                            alt="Jetro On-line"
+                            className="w-full h-full object-cover object-center"
+                          />
                         </div>
                       )}
 
@@ -962,8 +967,12 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                 {/* Indicador de carregamento */}
                 {loading && (
                   <div className="flex gap-3 items-center justify-start">
-                    <div className="w-8 h-8 rounded-lg bg-[#005B2E] text-white flex items-center justify-center shrink-0 animate-pulse">
-                      <Bot className="w-4 h-4" />
+                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-2xs bg-[#002613] animate-pulse">
+                      <img
+                        src={JETRO_ONLINE_AVATAR_URL}
+                        alt="Jetro On-line"
+                        className="w-full h-full object-cover object-center"
+                      />
                     </div>
                     <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-none px-4 py-3 text-xs text-gray-600 flex items-center gap-2 shadow-2xs">
                       <Loader2 className="w-4 h-4 text-[#005B2E] animate-spin" />

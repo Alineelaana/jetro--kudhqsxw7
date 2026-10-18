@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { HeroSection } from '@/components/hero-section'
+import { JetroOnlineSection } from '@/components/jetro-online-section'
 import { SegmentsSection } from '@/components/segments-section'
 import { PlatformModulesSection } from '@/components/platform-modules-section'
 import { NineIaSection } from '@/components/nine-ia-section'
@@ -17,6 +18,7 @@ export default function Index() {
     <main className="min-h-screen bg-background">
       <SeoHead />
       <HeroSection />
+      <JetroOnlineSection />
       <PlatformModulesSection />
       <SegmentsSection />
       <NineIaSection />

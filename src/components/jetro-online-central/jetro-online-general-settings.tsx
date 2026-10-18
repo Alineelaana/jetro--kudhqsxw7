@@ -10,7 +10,8 @@ import {
   updateJetroOnlineConfig,
   type JetroOnlineConfig,
 } from '@/services/jetro-online'
-import { Save, Settings, Sparkles, MessageCircle, RefreshCw } from 'lucide-react'
+import { Save, Settings, Sparkles, MessageCircle, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { JETRO_ONLINE_AVATAR_URL } from '@/lib/jetro-online-assets'
 
 export function JetroOnlineGeneralSettingsScreen() {
   const [config, setConfig] = useState<JetroOnlineConfig | null>(null)
@@ -107,6 +108,33 @@ export function JetroOnlineGeneralSettingsScreen() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-5 pt-2 space-y-4">
+          {/* Foto Oficial do Assistente */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3.5 rounded-xl bg-slate-50 border border-gray-200">
+            <div className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-[#C9A227] shadow-md bg-[#002613] shrink-0">
+              <img
+                src={JETRO_ONLINE_AVATAR_URL}
+                alt="Foto Oficial do Jetro On-line"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-900">
+                  Foto Oficial do Assistente Jetro On-line
+                </span>
+                <span className="text-[10px] font-semibold text-[#005B2E] bg-emerald-100/70 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-[#005B2E]" />
+                  Ativo no sistema
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-500 leading-relaxed max-w-xl">
+                Asset oficial padronizado com preservação visual: borda dourada, fundo verde-escuro
+                e enquadramento sem distorções, exibido no botão flutuante, cabeçalho do chat,
+                balões das conversas e materiais do ERP.
+              </p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-gray-700">Título do Assistente</Label>

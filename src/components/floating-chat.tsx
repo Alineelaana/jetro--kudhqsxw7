@@ -37,7 +37,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useTour } from '@/lib/tours/tour-context'
 import { Button } from '@/components/ui/button'
-import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import { JETRO_ONLINE_AVATAR_URL } from '@/lib/jetro-online-assets'
 
 const SESSION_DISMISSED_KEY = 'jetro_online_floating_dismissed'
 
@@ -311,17 +311,21 @@ export function FloatingChat() {
         <button
           id="floating-chat-trigger"
           onClick={handleReopen}
-          className="group flex items-center gap-1.5 bg-[#005B2E]/95 hover:bg-[#005B2E] text-white py-3 px-1.5 rounded-l-lg shadow-xl border-y border-l border-[#C9A227]/60 backdrop-blur-sm transition-all duration-200 hover:pl-2.5 hover:pr-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C9A227] cursor-pointer"
+          className="group flex items-center gap-1.5 bg-[#005B2E]/95 hover:bg-[#005B2E] text-white py-2.5 px-1.5 rounded-l-xl shadow-xl border-y border-l border-[#C9A227]/80 backdrop-blur-sm transition-all duration-200 hover:pl-2.5 hover:pr-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C9A227] cursor-pointer"
           aria-label="Abrir Jetro On-line"
           title="Jetro On-line — Assistente ERP Inteligente"
         >
-          <div className="relative h-6 w-6 rounded-md bg-[#00381C] text-white flex items-center justify-center border border-[#C9A227]/80 shrink-0 shadow-inner">
-            <Sparkles className="h-3.5 w-3.5 text-[#C9A227]" />
+          <div className="relative h-7 w-7 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-inner bg-[#00381C]">
+            <img
+              src={JETRO_ONLINE_AVATAR_URL}
+              alt="Jetro On-line"
+              className="h-full w-full object-cover object-center"
+            />
           </div>
           <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-bold tracking-wider text-emerald-100 group-hover:text-white uppercase">
             Jetro On-line
           </span>
-        </button>
+        </button>{' '}
       </div>
     )
   }
@@ -334,17 +338,21 @@ export function FloatingChat() {
           <button
             id="floating-chat-trigger"
             onClick={() => setIsFloatingOpen(true)}
-            className="flex items-center gap-2.5 bg-[#005B2E] hover:bg-[#004724] text-white px-4 py-3 rounded-full shadow-2xl border-2 border-[#C9A227] transition-all duration-300 hover:scale-105 cursor-pointer"
+            className="flex items-center gap-2.5 bg-[#005B2E] hover:bg-[#004724] text-white pl-2 pr-4 py-2 rounded-full shadow-2xl border-2 border-[#C9A227] transition-all duration-300 hover:scale-105 cursor-pointer"
             aria-label="Abrir Jetro On-line"
             title="Jetro On-line — Assistente ERP Inteligente"
           >
-            <div className="relative h-7 w-7 rounded-lg bg-[#00381C] flex items-center justify-center text-white border border-[#C9A227]/60">
-              <Sparkles className="h-4 w-4 text-[#C9A227]" />
+            <div className="relative h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#002613]">
+              <img
+                src={JETRO_ONLINE_AVATAR_URL}
+                alt="Jetro On-line"
+                className="h-full w-full object-cover object-center"
+              />
             </div>
             <span className="font-bold text-xs tracking-tight">Jetro On-line</span>
-            <span className="relative flex h-2 w-2">
+            <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
             </span>
           </button>
 
@@ -467,27 +475,31 @@ export function FloatingChat() {
                 <Menu className="w-5 h-5 text-gray-700" />
               </button>
 
-              {/* Logotipo e Nome "Jetro On-line" (substituindo IAglets) */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
+              {/* Logotipo e Nome "Jetro On-line" com Avatar Oficial */}
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#002613]">
                   <img
-                    src={logoJetro}
-                    alt="Jetro"
-                    className="h-5 w-5 object-cover rounded shadow-2xs border border-[#C9A227]/40"
+                    src={JETRO_ONLINE_AVATAR_URL}
+                    alt="Jetro On-line"
+                    className="h-full w-full object-cover object-center"
                   />
-                  <h3 className="text-base font-black tracking-tight text-gray-900 leading-none">
-                    Jetro <span className="text-[#005B2E]">On-line</span>
-                  </h3>
                 </div>
-                {/* Indicador de status: bolinha verde + "Online · Pronto para responder" */}
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                  </span>
-                  <span className="text-[11px] text-gray-500 font-medium">
-                    Online · Pronto para responder
-                  </span>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-sm font-black tracking-tight text-gray-900 leading-none">
+                      Jetro <span className="text-[#005B2E]">On-line</span>
+                    </h3>
+                  </div>
+                  {/* Indicador de status: bolinha verde + "Online · Pronto para responder" */}
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    <span className="text-[11px] text-gray-500 font-medium">
+                      Online · Pronto para responder
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -600,11 +612,23 @@ export function FloatingChat() {
                   return (
                     <div
                       key={idx}
-                      className={cn('flex flex-col', isUser ? 'items-end' : 'items-start')}
+                      className={cn(
+                        'flex items-start gap-2',
+                        isUser ? 'justify-end' : 'justify-start',
+                      )}
                     >
+                      {!isUser && (
+                        <div className="w-7 h-7 rounded-full overflow-hidden border border-[#C9A227] shrink-0 shadow-2xs mt-1 bg-[#002613]">
+                          <img
+                            src={JETRO_ONLINE_AVATAR_URL}
+                            alt="Jetro On-line"
+                            className="w-full h-full object-cover object-center"
+                          />
+                        </div>
+                      )}
                       <div
                         className={cn(
-                          'max-w-[88%] rounded-2xl p-3.5 text-xs shadow-2xs leading-relaxed',
+                          'max-w-[85%] rounded-2xl p-3.5 text-xs shadow-2xs leading-relaxed',
                           isUser
                             ? 'bg-[#005B2E] text-white rounded-br-xs font-medium'
                             : 'bg-slate-50 border border-gray-200 text-gray-800 rounded-bl-xs',
@@ -705,9 +729,20 @@ export function FloatingChat() {
 
                 {/* Indicador de carregamento */}
                 {loading && (
-                  <div className="flex items-center gap-2 text-[11px] text-gray-500 bg-slate-50 border border-gray-200 rounded-xl p-3 shadow-2xs max-w-[85%]">
-                    <Loader2 className="w-3.5 h-3.5 text-[#005B2E] animate-spin shrink-0" />
-                    <span>Consultando dados reais do ERP e aplicando regras de governança...</span>
+                  <div className="flex items-start gap-2">
+                    <div className="w-7 h-7 rounded-full overflow-hidden border border-[#C9A227] shrink-0 shadow-2xs mt-0.5 bg-[#002613]">
+                      <img
+                        src={JETRO_ONLINE_AVATAR_URL}
+                        alt="Jetro On-line"
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500 bg-slate-50 border border-gray-200 rounded-xl p-3 shadow-2xs max-w-[85%]">
+                      <Loader2 className="w-3.5 h-3.5 text-[#005B2E] animate-spin shrink-0" />
+                      <span>
+                        Consultando dados reais do ERP e aplicando regras de governança...
+                      </span>
+                    </div>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
