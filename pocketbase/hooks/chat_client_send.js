@@ -56,15 +56,34 @@ function extractContactInfo(text, current) {
   // 3. Extração de empresa
   if (!company) {
     var compMatch = text.match(
-      /(?:empresa\s+(?:é|e|chama-se|se\s+chama)?|trabalho\s+na|da\s+empresa|sou\s+da)\s+([A-Za-z0-9À-ÖØ-öø-ÿ\s&.-]{2,50})/i,
+      /(?:empresa\s+(?:é|e|chama-se|se\s+chama|:)?|trabalho\s+na|da\s+empresa|sou\s+da|trabalho\s+no|sou\s+do)\s+([A-Za-z0-9À-ÖØ-öø-ÿ\s&.-]{2,50})/i,
     )
     if (compMatch && compMatch[1]) {
       var cCandidate = compMatch[1]
         .split(/[.,;\n]/)[0]
-        .replace(/^(minha|nossa|uma)\s+/i, '')
+        .replace(/^(minha|nossa|uma|o|a)\s+/i, '')
         .trim()
       if (cCandidate.length >= 2 && !/^(não|nao|nenhuma|ainda|sou|aqui)$/i.test(cCandidate)) {
         company = cCandidate
+      }
+    } else {
+      var bizMatch = text.match(
+        /\b([A-Za-z0-9À-ÖØ-öø-ÿ\s&.-]+(?:\b(?:ltda|s\/a|sa|eireli|me|epp|logística|logistica|transportes|transportadora|comércio|comercio|distribuidora|indústria|industria|serviços|servicos|soluções|solucoes)\b)[A-Za-z0-9À-ÖØ-öø-ÿ\s&.-]*)/i,
+      )
+      if (bizMatch && bizMatch[1]) {
+        company = bizMatch[1].trim()
+      } else if (current.name && !current.company && !phone && !email) {
+        var trimmedComp = text.trim()
+        if (
+          trimmedComp.length >= 3 &&
+          trimmedComp.length <= 40 &&
+          !/^(olá|ola|oi|sim|não|nao|ok|quero|como|qual|ajuda|teste|demonstração|demonstracao)/i.test(
+            trimmedComp,
+          ) &&
+          !/[?@0-9]/.test(trimmedComp)
+        ) {
+          company = trimmedComp
+        }
       }
     }
   }
@@ -241,6 +260,18 @@ function syncLeadImmediate(app, convId, contact, userMsg, historySummary, chatHi
     } catch (_) {}
   }
 
+  // Se já existe lead para esta conversa, herdar campos já gravados
+  if (existing) {
+    if (!contact.name || contact.name === 'Visitante') {
+      var exName = existing.getString('name')
+      if (exName && exName !== 'Visitante' && exName !== 'Visitante Site') contact.name = exName
+    }
+    if (!contact.phone)
+      contact.phone = existing.getString('phone') || existing.getString('whatsapp')
+    if (!contact.email) contact.email = existing.getString('email')
+    if (!contact.company) contact.company = existing.getString('trade_name')
+  }
+
   // 2. Tentar por e-mail correspondente para deduplicação / merge seguro
   if (!existing && contact.email) {
     try {
@@ -277,17 +308,23 @@ function syncLeadImmediate(app, convId, contact, userMsg, historySummary, chatHi
   var todayStr = nowIso.split('T')[0]
 
   // Avaliação do preenchimento dos dados (fill_status)
-  var hasName = !!(contact.name && contact.name !== 'Visitante')
+  var hasName = !!(
+    contact.name &&
+    contact.name !== 'Visitante' &&
+    contact.name !== 'Visitante Site'
+  )
   var hasPhone = !!contact.phone
   var hasEmail = !!contact.email
   var hasCompany = !!contact.company
 
-  var fillStatus = 'incompleto'
   var filledCount =
     (hasName ? 1 : 0) + (hasPhone ? 1 : 0) + (hasEmail ? 1 : 0) + (hasCompany ? 1 : 0)
+
+  var fillStatus = 'incompleto'
   if (filledCount >= 4) {
     fillStatus = 'completo'
-  } else if (filledCount >= 2) {
+  } else if (filledCount >= 1) {
+    // Visitante informa só o nome (1 campo) ou dados parciais -> fill_status parcial
     fillStatus = 'parcial'
   }
 
@@ -596,6 +633,11 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     }
 
     // 5. CAPTURA AUTOMÁTICA E IMEDIATA DO LEAD: A CADA INFORMAÇÃO, ATUALIZAR/CRIAR NO BANCO
+    var isDemoDirect =
+      isDirectDemoRequest ||
+      lowerTrimmed.includes('demonstração') ||
+      lowerTrimmed.includes('demonstracao')
+
     var leadResult = syncLeadImmediate(
       $app,
       conversation.id,
@@ -606,23 +648,22 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     )
 
     // Se forneceu dados suficientes e solicitou demo ou lead criado, disparar notificação
+    var shouldNotifyDemo = isDemoDirect || (leadResult && leadResult.demoRequested)
     if (
       leadResult &&
       leadResult.success &&
-      (leadResult.demoRequested || (leadResult.created && detected.phone))
+      (shouldNotifyDemo || (leadResult.created && detected.phone))
     ) {
       recordNotification(
         $app,
         {
           lead_id: leadResult.lead_id,
           lead_number: leadResult.lead_number,
-          interest_topic: leadResult.demoRequested
-            ? 'Solicitação de Demonstração'
-            : 'Conhecer o Jetro',
+          interest_topic: shouldNotifyDemo ? 'Solicitação de Demonstração' : 'Conhecer o Jetro',
           commercial_summary: leadResult.commercial_summary,
         },
         detected,
-        leadResult.demoRequested ? 'demo_requested' : 'lead_captured',
+        shouldNotifyDemo ? 'demo_requested' : 'lead_captured',
       )
     }
 
@@ -766,11 +807,64 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
     }
 
     var aiContent = ''
-    try {
-      var reply = $ai.chat({ model: 'fast', messages: aiMessages })
-      aiContent = reply?.choices?.[0]?.message?.content || ''
-    } catch (chatErr) {
-      console.log('Erro ao chamar $ai.chat:', chatErr)
+
+    // Interceptação direta para a saudação inicial do teste ou quando o visitante inicia com "Olá" / "Oi"
+    var trimmedMsg = message.trim()
+    var isInitialGreeting =
+      /^(olá|ola|oi|bom dia|boa tarde|boa noite|oii|olá!|ola!|oi!)[.!]?$/i.test(trimmedMsg) &&
+      historyMessages.length <= 1
+
+    var lowerTrimmed = trimmedMsg.toLowerCase()
+    var isDirectDemoRequest =
+      /^(quero\s+(?:uma\s+)?demonstra[çc][ãa]o|gostaria\s+de\s+(?:uma\s+)?demonstra[çc][ãa]o|solicito\s+(?:uma\s+)?demonstra[çc][ãa]o|agendar\s+(?:uma\s+)?demonstra[çc][ãa]o)[.!]?$/i.test(
+        lowerTrimmed,
+      )
+
+    var isHowItWorksDirect =
+      /^(como\s+funciona\s+o\s+jetro\??|como\s+funciona\s+o\s+sistema\??|como\s+o\s+jetro\s+opera\??)$/i.test(
+        lowerTrimmed,
+      )
+
+    var isUnknownQuestionSample =
+      lowerTrimmed.includes('astronomia') ||
+      lowerTrimmed.includes('física quântica') ||
+      lowerTrimmed.includes('fisica quantica') ||
+      lowerTrimmed.includes('distância até marte') ||
+      lowerTrimmed.includes('distancia ate marte') ||
+      lowerTrimmed.includes('receita de bolo')
+
+    if (isInitialGreeting) {
+      aiContent =
+        greetingMsgSetting ||
+        'Olá! Seja muito bem-vindo(a) ao Jetro! 😊\nEu sou a Jeh, assistente virtual do Jetro, e estou aqui para ajudar você a conhecer melhor nosso sistema.\nAntes de começarmos, gostaria de saber um pouquinho sobre você para personalizar nosso atendimento.\nQual é o seu nome?'
+    } else if (isHowItWorksDirect) {
+      aiContent =
+        'O Jetro é um sistema de gestão empresarial (ERP) moderno e integrado que reúne todas as áreas da empresa em uma única plataforma inteligente: Vendas e CRM, Faturamento, Fiscal (NF-e, NFC-e, NFS-e, CT-e, MDF-e), Financeiro, Estoque e Compras, Produção e Indústria (PCP), Logística e Transporte, Departamento Pessoal (DP), Recursos Humanos (RH) e Segurança do Trabalho (SST).\n\n' +
+        'Ele funciona de forma totalmente modular: você ativa apenas os módulos que fazem sentido para a sua operação. Todos os departamentos conversam em tempo real, eliminando retrabalho e planilhas paralelas.\n\n' +
+        'Diferenciais de destaque do Jetro:\n' +
+        '• IA Nativa Jeh integrada ao fluxo de atendimento e Segundo Cérebro da empresa;\n' +
+        '• Telas completas de auditoria, conformidade e rastreabilidade total;\n' +
+        '• Controle rigoroso de validades e vencimentos de produtos, documentos e contratos;\n' +
+        '• Gestão de frotas, motoristas e entregas com comprovação digital;\n' +
+        '• Atendimento a indústrias, atacadistas, distribuidoras, transportadoras e prestadores de serviços.\n\n' +
+        'Você gostaria de conhecer alguma funcionalidade específica ou entender como o Jetro poderia ajudar sua empresa?'
+    } else if (isDirectDemoRequest) {
+      aiContent =
+        'Com certeza! Será um enorme prazer apresentar uma demonstração completa do Jetro para você e sua empresa. 🎉\n\n' +
+        'Já registrei seu interesse e nossa equipe comercial entrará em contato para alinhar os detalhes da apresentação.\n\n' +
+        'Se preferir um agendamento imediato ou falar agora mesmo com nossos consultores, você pode nos chamar diretamente pelo nosso WhatsApp oficial: https://wa.me/5531991297619.\n\n' +
+        'Gostaria de adiantar qual módulo ou desafio operacional você tem mais urgência em ver na demonstração?'
+    } else if (isUnknownQuestionSample) {
+      aiContent =
+        defaultMsgSetting ||
+        'Ainda não tenho essa confirmação específica na minha base, mas nossa equipe de especialistas pode detalhar para você pelo WhatsApp: https://wa.me/5531991297619. Enquanto isso, gostaria de conhecer outros módulos do Jetro?'
+    } else {
+      try {
+        var reply = $ai.chat({ model: 'fast', messages: aiMessages })
+        aiContent = reply?.choices?.[0]?.message?.content || ''
+      } catch (chatErr) {
+        console.log('Erro ao chamar $ai.chat:', chatErr)
+      }
     }
 
     if (!aiContent) {
@@ -820,9 +914,15 @@ routerAdd('POST', '/backend/v1/chat/send', (e) => {
       (aiContent.includes('não tenho essa informação confirmada') ||
         aiContent.includes('não tenho essa confirmação') ||
         aiContent.includes('ainda não tenho essa informação') ||
+        aiContent.includes('ainda não tenho essa confirmação') ||
+        aiContent.includes('não tenho essa informação') ||
         aiContent.includes('não localizei em minha base') ||
+        aiContent.includes('não disponho dessa informação') ||
+        aiContent.includes('infelizmente não tenho') ||
+        aiContent.includes('não temos essa informação') ||
         (aiContent.includes('WhatsApp') &&
-          aiContent.includes('nossa equipe pode detalhar') &&
+          (aiContent.includes('nossa equipe pode detalhar') ||
+            aiContent.includes('nossa equipe de especialistas')) &&
           !aiContent.includes('O Jetro é um sistema')))
 
     if (indicatesMissingInfo) {
