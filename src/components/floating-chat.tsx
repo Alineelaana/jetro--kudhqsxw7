@@ -306,74 +306,12 @@ export function FloatingChat() {
           { id: '3', texto: 'Quanto vendi para cada cliente?', ativo: true },
         ]
 
-  // Se dispensado, exibe alça lateral discreta
-  if (isDismissed) {
-    return (
-      <div className="fixed top-1/2 -translate-y-1/2 right-0 z-40 select-none">
-        <button
-          id="floating-chat-trigger"
-          onClick={handleReopen}
-          className="group flex items-center gap-1.5 bg-[#005B2E]/95 hover:bg-[#005B2E] text-white py-2.5 px-1.5 rounded-l-xl shadow-xl border-y border-l border-[#C9A227]/80 backdrop-blur-sm transition-all duration-200 hover:pl-2.5 hover:pr-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C9A227] cursor-pointer"
-          aria-label="Abrir Jetro On-line"
-          title="Jetro On-line — Assistente ERP Inteligente"
-        >
-          <div className="relative h-7 w-7 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-inner bg-[#00381C]">
-            <img
-              src={JETRO_ONLINE_AVATAR_URL}
-              alt="Jetro On-line"
-              className="h-full w-full object-cover object-center"
-            />
-          </div>
-          <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-bold tracking-wider text-emerald-100 group-hover:text-white uppercase">
-            Jetro On-line
-          </span>
-        </button>{' '}
-      </div>
-    )
-  }
-
   return (
     <>
-      {/* Botão de acionamento circular no canto inferior direito quando o painel lateral estiver fechado */}
-      {!isFloatingOpen && (
-        <div className="fixed bottom-5 right-5 z-40 select-none group">
-          <button
-            id="floating-chat-trigger"
-            onClick={() => setIsFloatingOpen(true)}
-            className="flex items-center gap-2.5 bg-[#005B2E] hover:bg-[#004724] text-white pl-2 pr-4 py-2 rounded-full shadow-2xl border-2 border-[#C9A227] transition-all duration-300 hover:scale-105 cursor-pointer"
-            aria-label="Abrir Jetro On-line"
-            title="Jetro On-line — Assistente ERP Inteligente"
-          >
-            <div className="relative h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#002613]">
-              <img
-                src={JETRO_ONLINE_AVATAR_URL}
-                alt="Jetro On-line"
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
-            <span className="font-bold text-xs tracking-tight">Jetro On-line</span>
-            {userPrefs.jetroOnlineVisualNotifications && (
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
-              </span>
-            )}
-          </button>
+      {/* Âncora invisível de compatibilidade */}
+      <span id="floating-chat-trigger" className="hidden" aria-hidden="true" />
 
-          {/* Botão X para dispensar e deixar apenas alça */}
-          <button
-            type="button"
-            onClick={handleDismiss}
-            aria-label="Ocultar Jetro On-line da tela"
-            title="Ocultar assistente"
-            className="absolute -top-1.5 -right-1.5 bg-neutral-900/90 hover:bg-red-600 text-white rounded-full p-1 shadow-md border border-white/30 transition-colors cursor-pointer"
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </div>
-      )}
-
-      {/* PAINEL LATERAL FLUTUANTE — REPRODUÇÃO FIEL DA REFERÊNCIA VISUAL */}
+      {/* PAINEL LATERAL DO JETRO ON-LINE (Abre somente quando acionado pela barra lateral) */}
       {isFloatingOpen && (
         <aside
           aria-label="Jetro On-line"

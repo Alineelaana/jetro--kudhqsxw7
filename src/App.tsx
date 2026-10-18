@@ -130,6 +130,9 @@ import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
 import { getMarketingIntelligence } from '@/services/marketing-bi'
 import CollectionCenterConfig from './pages/CollectionCenterConfig'
 import CollectionCenterCertification from './pages/CollectionCenterCertification'
+import MeusChamadosScreen from '@/components/chamados/meus-chamados-screen'
+import NovoChamadoScreen from '@/components/chamados/novo-chamado-screen'
+import ChamadoDetalhesScreen from '@/components/chamados/chamado-detalhes-screen'
 import { UserPreferencesProvider } from '@/hooks/use-user-preferences'
 
 const App = () => (
@@ -154,6 +157,14 @@ const App = () => (
                               <Route path="/admin" element={<Admin />} />
                               <Route path="/admin/dashboard" element={<DashboardPage />} />
                               <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
+
+                              {/* Central de Chamados Corporativa */}
+                              <Route path="/admin/chamados" element={<MeusChamadosScreen />} />
+                              <Route path="/admin/chamados/novo" element={<NovoChamadoScreen />} />
+                              <Route
+                                path="/admin/chamados/:id"
+                                element={<ChamadoDetalhesScreen />}
+                              />
 
                               <Route path="/admin/produtos" element={<Products />} />
                               <Route

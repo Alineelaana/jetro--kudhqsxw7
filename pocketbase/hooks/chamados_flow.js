@@ -1,0 +1,419 @@
+/**
+ * Hook para a Central de Chamados do Jetro ERP
+ * 1. Numeração sequencial atômica única no formato CH-{ANO}-{000001}
+ * 2. Validação obrigatória de justificativa ao cancelar
+ * 3. Criação de histórico inicial "Chamado aberto"
+ * 4. Validação estrita de descrição obrigatória ao alterar status
+ * 5. Disparo de e-mails em segundo plano nos ciclos de vida do chamado
+ */
+
+onRecordCreate((e) => {
+  var year = new Date().getFullYear()
+  var prefix = 'CH-' + year + '-'
+
+  // Obter contador atômico ou maior número do ano corrente
+  var seq = 1
+  try {
+    var lastRecords = $app.findRecordsByFilter(
+      'chamados',
+      'numero ~ "' + prefix + '"',
+      '-numero',
+      1,
+      0,
+    )
+    if (lastRecords && lastRecords.length > 0) {
+      var lastNum = lastRecords[0].getString('numero') || ''
+      var parts = lastNum.split('-')
+      if (parts.length === 3) {
+        var parsed = parseInt(parts[2], 10)
+        if (!isNaN(parsed) && parsed >= 1) {
+          seq = parsed + 1
+        }
+      }
+    }
+  } catch (errCount) {
+    try {
+      seq = ($app.countRecords('chamados') || 0) + 1
+    } catch (_) {
+      seq = 1
+    }
+  }
+
+  var padded = ('000000' + seq).slice(-6)
+  var numeroFinal = prefix + padded
+  e.record.set('numero', numeroFinal)
+
+  if (!e.record.getString('status')) {
+    e.record.set('status', 'novo')
+  }
+
+  e.next()
+}, 'chamados')
+
+// Após criar o chamado, gerar histórico inicial e disparar e-mail de abertura
+onRecordAfterCreateSuccess((e) => {
+  var rec = e.record
+  var chamadoId = rec.id
+  var numero = rec.getString('numero') || ''
+  var assunto = rec.getString('assunto') || ''
+  var prioridade = rec.getString('prioridade') || 'normal'
+  var status = rec.getString('status') || 'novo'
+  var solicitanteId = rec.getString('solicitante') || ''
+  var responsavelId = rec.getString('profissional_responsavel') || ''
+  var setorId = rec.getString('setor_responsavel') || ''
+
+  // 1. Criar registro inicial no histórico
+  try {
+    var histCol = $app.findCollectionByNameOrId('chamados_historico')
+    var histRec = new Record(histCol)
+    histRec.set('chamado', chamadoId)
+    histRec.set('usuario', solicitanteId || responsavelId)
+    histRec.set('status_anterior', '')
+    histRec.set('status_novo', status)
+    histRec.set('descricao_acao', 'Chamado aberto no sistema')
+    histRec.set('criado_em', new Date().toISOString())
+    $app.saveNoValidate(histRec)
+  } catch (histErr) {
+    $app.logger().error('Falha ao gravar historico inicial do chamado', 'error', String(histErr))
+  }
+
+  // 2. Disparo de e-mails de abertura (responsável, solicitante e convidados)
+  try {
+    var setorNome = 'Não especificado'
+    if (setorId) {
+      try {
+        var setorRec = $app.findRecordById('rh_departments', setorId)
+        setorNome = setorRec.getString('name') || setorRec.getString('code') || setorId
+      } catch (_) {}
+    }
+
+    var solicitanteEmail = ''
+    var solicitanteNome = 'Solicitante'
+    if (solicitanteId) {
+      try {
+        var solRec = $app.findRecordById('users', solicitanteId)
+        solicitanteEmail = solRec.getString('email') || ''
+        solicitanteNome = solRec.getString('name') || solicitanteEmail
+      } catch (_) {}
+    }
+
+    var respEmail = ''
+    var respNome = 'Profissional Responsável'
+    if (responsavelId) {
+      try {
+        var respRec = $app.findRecordById('users', responsavelId)
+        respEmail = respRec.getString('email') || ''
+        respNome = respRec.getString('name') || respEmail
+      } catch (_) {}
+    }
+
+    var convidadosRaw = rec.get('convidados_email')
+    var convidadosEmails = []
+    if (convidadosRaw) {
+      if (Array.isArray(convidadosRaw)) {
+        convidadosEmails = convidadosRaw
+      } else if (typeof convidadosRaw === 'string') {
+        try {
+          var parsed = JSON.parse(convidadosRaw)
+          if (Array.isArray(parsed)) convidadosEmails = parsed
+        } catch (_) {
+          if (convidadosRaw.indexOf('@') !== -1) convidadosEmails = [convidadosRaw]
+        }
+      }
+    }
+
+    var mailClient = $app.newMailClient()
+    var baseUrl = 'https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev'
+    var linkChamado = baseUrl + '/admin/chamados/' + chamadoId
+
+    // Template para membros internos (com link e detalhes completos)
+    var buildInternalHtml = function (tituloIntro, saudacao, detalhesExtras) {
+      return (
+        '<div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
+        '<div style="background: #002817; padding: 24px; text-align: center; border-bottom: 3px solid #C9A227;">' +
+        '<h2 style="color: #E4C46A; margin: 0; font-size: 20px; letter-spacing: 0.5px;">JETRO ERP — Central de Chamados</h2>' +
+        '<p style="color: #e2e8f0; font-size: 13px; margin: 6px 0 0;">' +
+        tituloIntro +
+        '</p>' +
+        '</div>' +
+        '<div style="padding: 24px;">' +
+        '<p style="font-size: 15px; margin-top: 0;">Olá, <strong>' +
+        saudacao +
+        '</strong>,</p>' +
+        '<p style="font-size: 14px; line-height: 1.5; color: #475569;">' +
+        'O chamado corporativo <strong>' +
+        numero +
+        '</strong> foi aberto e demanda seu acompanhamento.' +
+        '</p>' +
+        '<table style="width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 13px;">' +
+        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; width: 140px; border: 1px solid #e2e8f0;">Número:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; color: #005B2E; font-weight: bold;">' +
+        numero +
+        '</td></tr>' +
+        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Assunto:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;">' +
+        assunto +
+        '</td></tr>' +
+        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Setor Responsável:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;">' +
+        setorNome +
+        '</td></tr>' +
+        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Responsável:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;">' +
+        respNome +
+        '</td></tr>' +
+        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Solicitante:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;">' +
+        solicitanteNome +
+        '</td></tr>' +
+        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Prioridade:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; text-transform: uppercase; font-weight: bold;">' +
+        prioridade +
+        '</td></tr>' +
+        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Status:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; color: #b45309; font-weight: bold;">' +
+        status +
+        '</td></tr>' +
+        '</table>' +
+        detalhesExtras +
+        '<div style="text-align: center; margin: 24px 0 10px;">' +
+        '<a href="' +
+        linkChamado +
+        '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Visualizar Chamado no ERP</a>' +
+        '</div>' +
+        '</div>' +
+        '</div>'
+      )
+    }
+
+    // 2a. E-mail para o responsável
+    if (respEmail) {
+      try {
+        var msgResp = new MailerMessage({
+          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          to: [{ address: respEmail }],
+          subject: '[Jetro ERP] Novo Chamado Atribuído a Você: ' + numero + ' — ' + assunto,
+          html: buildInternalHtml(
+            'Você foi definido como responsável por este chamado',
+            respNome,
+            '',
+          ),
+        })
+        mailClient.send(msgResp)
+        $app
+          .logger()
+          .info(
+            'E-mail de novo chamado enviado ao responsavel',
+            'dest',
+            respEmail,
+            'chamado',
+            numero,
+          )
+      } catch (errM1) {
+        $app.logger().warn('Falha no envio de e-mail ao responsavel', 'error', String(errM1))
+      }
+    }
+
+    // 2b. E-mail de confirmação para o solicitante
+    if (solicitanteEmail && solicitanteEmail !== respEmail) {
+      try {
+        var msgSol = new MailerMessage({
+          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          to: [{ address: solicitanteEmail }],
+          subject: '[Jetro ERP] Confirmação de Abertura: Chamado ' + numero,
+          html: buildInternalHtml(
+            'Seu chamado foi registrado com sucesso',
+            solicitanteNome,
+            '<p style="font-size: 13px; color: #64748b;">Nossa equipe já foi notificada e iniciará o atendimento.</p>',
+          ),
+        })
+        mailClient.send(msgSol)
+        $app
+          .logger()
+          .info(
+            'E-mail de confirmacao enviado ao solicitante',
+            'dest',
+            solicitanteEmail,
+            'chamado',
+            numero,
+          )
+      } catch (errM2) {
+        $app.logger().warn('Falha no envio de confirmacao ao solicitante', 'error', String(errM2))
+      }
+    }
+
+    // 2c. E-mail restrito para convidados externos (sem anexos ou dados confidenciais)
+    for (var i = 0; i < convidadosEmails.length; i++) {
+      var convEmail = String(convidadosEmails[i] || '').trim()
+      if (!convEmail || convEmail === respEmail || convEmail === solicitanteEmail) continue
+      try {
+        var htmlExterno =
+          '<div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
+          '<div style="background: #002817; padding: 20px; text-align: center; border-bottom: 2px solid #C9A227;">' +
+          '<h3 style="color: #E4C46A; margin: 0;">JETRO — Notificação de Chamado</h3>' +
+          '</div>' +
+          '<div style="padding: 20px; font-size: 14px; line-height: 1.5;">' +
+          '<p>Você foi convidado para acompanhar o chamado corporativo <strong>' +
+          numero +
+          '</strong>.</p>' +
+          '<table style="width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px;">' +
+          '<tr><td style="padding: 6px; font-weight: bold; width: 120px;">Número:</td><td style="padding: 6px;">' +
+          numero +
+          '</td></tr>' +
+          '<tr><td style="padding: 6px; font-weight: bold;">Assunto:</td><td style="padding: 6px;">' +
+          assunto +
+          '</td></tr>' +
+          '<tr><td style="padding: 6px; font-weight: bold;">Status:</td><td style="padding: 6px; font-weight: bold; color: #005B2E;">' +
+          status +
+          '</td></tr>' +
+          '</table>' +
+          '<p style="font-size: 12px; color: #64748b;">Esta é uma mensagem automática informativa do sistema Jetro.</p>' +
+          '</div>' +
+          '</div>'
+
+        var msgConv = new MailerMessage({
+          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          to: [{ address: convEmail }],
+          subject: '[Jetro ERP] Acompanhamento de Chamado: ' + numero,
+          html: htmlExterno,
+        })
+        mailClient.send(msgConv)
+        $app
+          .logger()
+          .info('E-mail enviado a convidado externo', 'dest', convEmail, 'chamado', numero)
+      } catch (errConv) {
+        $app
+          .logger()
+          .warn('Falha no envio para convidado', 'dest', convEmail, 'error', String(errConv))
+      }
+    }
+  } catch (outerMailErr) {
+    $app.logger().error('Erro geral no envio de emails de chamado', 'error', String(outerMailErr))
+  }
+
+  e.next()
+}, 'chamados')
+
+// Validação de alteração de chamados (exigência de justificativa em cancelamento, etc.)
+onRecordUpdateRequest((e) => {
+  var rec = e.record
+  var novoStatus = rec.getString('status') || ''
+
+  if (novoStatus === 'cancelado') {
+    var justificativa = rec.getString('cancelado_justificativa') || ''
+    if (!justificativa || justificativa.trim().length < 5) {
+      throw new BadRequestError(
+        'É obrigatório informar uma justificativa com no mínimo 5 caracteres para cancelar o chamado.',
+      )
+    }
+  }
+
+  e.next()
+}, 'chamados')
+
+// Ao alterar status do chamado ou atualizar, disparar notificações por e-mail correspondentes
+onRecordAfterUpdateSuccess((e) => {
+  var rec = e.record
+  var chamadoId = rec.id
+  var numero = rec.getString('numero') || ''
+  var assunto = rec.getString('assunto') || ''
+  var status = rec.getString('status') || ''
+  var solicitanteId = rec.getString('solicitante') || ''
+  var responsavelId = rec.getString('profissional_responsavel') || ''
+  var aprovadorId = rec.getString('aprovador') || ''
+
+  try {
+    var mailClient = $app.newMailClient()
+    var baseUrl = 'https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev'
+    var linkChamado = baseUrl + '/admin/chamados/' + chamadoId
+
+    var emailsParaNotificar = []
+
+    // Notificar solicitante
+    if (solicitanteId) {
+      try {
+        var sRec = $app.findRecordById('users', solicitanteId)
+        var sEmail = sRec.getString('email')
+        if (sEmail)
+          emailsParaNotificar.push({ email: sEmail, nome: sRec.getString('name') || sEmail })
+      } catch (_) {}
+    }
+
+    // Notificar responsável
+    if (responsavelId) {
+      try {
+        var rRec = $app.findRecordById('users', responsavelId)
+        var rEmail = rRec.getString('email')
+        if (rEmail && (!emailsParaNotificar.length || emailsParaNotificar[0].email !== rEmail)) {
+          emailsParaNotificar.push({ email: rEmail, nome: rRec.getString('name') || rEmail })
+        }
+      } catch (_) {}
+    }
+
+    // Se estiver em aprovação, garantir notificação ao aprovador
+    if (status === 'aprovacao' && aprovadorId) {
+      try {
+        var aRec = $app.findRecordById('users', aprovadorId)
+        var aEmail = aRec.getString('email')
+        if (aEmail) {
+          emailsParaNotificar.push({ email: aEmail, nome: aRec.getString('name') || aEmail })
+        }
+      } catch (_) {}
+    }
+
+    var subject =
+      '[Jetro ERP] Atualização de Status do Chamado ' + numero + ' → ' + status.toUpperCase()
+    var html =
+      '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
+      '<div style="background: #002817; padding: 20px; text-align: center; border-bottom: 3px solid #C9A227;">' +
+      '<h2 style="color: #E4C46A; margin: 0; font-size: 18px;">JETRO ERP — Atualização de Chamado</h2>' +
+      '</div>' +
+      '<div style="padding: 24px;">' +
+      '<p style="font-size: 15px; margin-top: 0;">O status do chamado <strong>' +
+      numero +
+      '</strong> foi atualizado para: <strong style="color: #005B2E; text-transform: uppercase;">' +
+      status +
+      '</strong>.</p>' +
+      '<p style="font-size: 13px; color: #64748b;">Assunto: ' +
+      assunto +
+      '</p>' +
+      '<div style="text-align: center; margin: 24px 0 10px;">' +
+      '<a href="' +
+      linkChamado +
+      '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Abrir Chamado no Jetro</a>' +
+      '</div>' +
+      '</div>' +
+      '</div>'
+
+    for (var j = 0; j < emailsParaNotificar.length; j++) {
+      try {
+        var msg = new MailerMessage({
+          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          to: [{ address: emailsParaNotificar[j].email }],
+          subject: subject,
+          html: html,
+        })
+        mailClient.send(msg)
+        $app
+          .logger()
+          .info('E-mail de status enviado', 'dest', emailsParaNotificar[j].email, 'status', status)
+      } catch (errNotif) {
+        $app.logger().warn('Falha no envio de notificacao de status', 'error', String(errNotif))
+      }
+    }
+  } catch (errUp) {
+    $app.logger().error('Erro geral ao processar apos update do chamado', 'error', String(errUp))
+  }
+
+  e.next()
+}, 'chamados')
+
+// Validação OBRIGATÓRIA no backend: recusar histórico sem descrição da ação
+onRecordCreateRequest((e) => {
+  var desc = e.record.getString('descricao_acao') || ''
+  if (!desc || desc.trim().length < 3) {
+    throw new BadRequestError(
+      'É obrigatório informar a descrição da ação realizada (mínimo de 3 caracteres).',
+    )
+  }
+
+  // Preencher criado_em se vazio
+  if (!e.record.getString('criado_em')) {
+    e.record.set('criado_em', new Date().toISOString())
+  }
+
+  e.next()
+}, 'chamados_historico')

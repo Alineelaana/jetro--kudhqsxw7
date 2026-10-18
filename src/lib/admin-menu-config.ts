@@ -34,6 +34,7 @@ import {
   Sparkles,
   Building2,
   MessageSquare,
+  Inbox,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -245,6 +246,20 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Chat IA', route: '/admin/validade/chat' },
           { label: 'Dashboard', route: '/admin/validade/dashboard' },
           { label: 'Regras', route: '/admin/validade/regras' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Chamados',
+    items: [
+      {
+        label: 'Chamados',
+        icon: Inbox,
+        route: '/admin/chamados',
+        children: [
+          { label: 'Meus Chamados', route: '/admin/chamados' },
+          { label: 'Novo Chamado', route: '/admin/chamados/novo' },
         ],
       },
     ],

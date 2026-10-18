@@ -64,49 +64,8 @@ export function JetroCustomizationDrawer() {
 
   return (
     <>
-      {/* ============================================================== */}
-      {/* BOTÃO FLUTUANTE LATERAL DISCRETO (DIREITA)                    */}
-      {/* Posicionado logo acima do gatilho do Jetro On-line             */}
-      {/* ============================================================== */}
-      <div className="fixed bottom-20 right-5 z-40 select-none group">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              id="jetro-customization-trigger"
-              onClick={() => setIsCustomizerOpen(!isCustomizerOpen)}
-              className={cn(
-                'flex items-center gap-2 text-white pl-2.5 pr-3 py-2 rounded-full shadow-xl border-2 transition-all duration-200 cursor-pointer',
-                isCustomizerOpen
-                  ? 'bg-[#C9A227] hover:bg-[#b58f1f] text-slate-950 border-white'
-                  : 'bg-[#002817] hover:bg-[#00381C] text-[#E4C46A] border-[#C9A227]/70 hover:scale-105',
-              )}
-              aria-label="Personalizar Jetro"
-              title="Personalizar Jetro — Aparência, Layout, Textos e Tabelas"
-            >
-              <div
-                className={cn(
-                  'relative h-7 w-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-500',
-                  isCustomizerOpen
-                    ? 'rotate-90 bg-slate-950 text-[#C9A227]'
-                    : 'bg-[#00140b] text-[#E4C46A] group-hover:rotate-45',
-                )}
-              >
-                <Settings className="w-4 h-4" />
-              </div>
-              <span className="font-bold text-xs tracking-tight text-white hidden sm:inline">
-                Personalizar
-              </span>
-              {isSaving && <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227] animate-ping" />}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent
-            side="left"
-            className="font-medium bg-[#00140b] text-white border-[#C9A227]/40"
-          >
-            Personalizar Jetro (Interface, Tema, Textos, Tabelas)
-          </TooltipContent>
-        </Tooltip>
-      </div>
+      {/* Elemento oculto de âncora/compatibilidade para tours ou testes que busquem o seletor */}
+      <span id="jetro-customization-trigger" className="hidden" aria-hidden="true" />
 
       {/* BACKDROP QUANDO O PAINEL ESTIVER ABERTO (MOBILE) */}
       {isCustomizerOpen && (

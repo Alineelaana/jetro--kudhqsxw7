@@ -1,7 +1,7 @@
 import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { NotificationBell } from '@/components/notification-bell'
-import { JetroOnlineChat } from '@/components/jetro-online/jetro-online-chat'
+import { CentralChamadosHomeWidget } from '@/components/chamados/central-chamados-home-widget'
 import { JetroCalendar } from '@/components/jetro-agenda/jetro-calendar'
 
 export function IntelligentHomeScreen() {
@@ -25,12 +25,12 @@ export function IntelligentHomeScreen() {
         </button>
       </div>
 
-      {/* 1ª área principal: Jetro On-line pronto pra responder */}
-      <section className="w-full">
-        <JetroOnlineChat className="min-h-[560px]" />
+      {/* 1ª área principal: Central de Chamados do usuário (Substitui o centro do Jetro On-line, que agora abre na barra lateral) */}
+      <section className="w-full" data-tour-id="admin-home-chamados">
+        <CentralChamadosHomeWidget />
       </section>
 
-      {/* 2ª área: Calendário Mensal e Agenda Corporativa Jetro ocupando toda a largura */}
+      {/* 2ª área: Calendário Mensal e Agenda Corporativa Jetro mantidos intactos imediatamente abaixo */}
       <section className="w-full" data-tour-id="admin-home-cards">
         <JetroCalendar
           currentUser={

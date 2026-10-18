@@ -15,10 +15,13 @@ import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useJetroOnline } from '@/hooks/use-jetro-online'
+import { useJetroCustomization } from '@/components/personalizacao/jetro-customization-drawer'
 import { ADMIN_MENU, type MenuEntry, type MenuChild } from '@/lib/admin-menu-config'
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Bot, Settings } from 'lucide-react'
 import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
 
 interface SearchResult {
@@ -42,6 +45,8 @@ export function AdminSidebar() {
   const { preferences, updatePreference } = useUserPreferences()
   const { isFavorite, toggleFavorite } = useMenuFavorites(user?.id as string)
   const { isRail: localIsRail, toggle: toggleSidebarLocal } = useSidebarMode(user?.id as string)
+  const { setIsFloatingOpen, isFloatingOpen } = useJetroOnline()
+  const { setIsCustomizerOpen, isCustomizerOpen } = useJetroCustomization()
 
   // O estado do sidebar sincroniza com as preferências do usuário
   const isRail = !preferences.sidebarExpanded
@@ -301,97 +306,156 @@ export function AdminSidebar() {
         </div>
         {/* MODO RAIL (ÍCONES COMPACTOS) */}
         {effectiveRail ? (
-          <nav
-            ref={railNavRef}
-            onScroll={handleRailScroll}
-            className="flex-1 overflow-y-auto overscroll-contain py-2 px-1 flex flex-col items-center gap-1"
-          >
-            {ADMIN_MENU.map((group, groupIdx) => {
-              const visibleItems = group.items.filter((item) => !item.perm || item.perm(userRole))
-              if (visibleItems.length === 0) return null
+          <>
+            <nav
+              ref={railNavRef}
+              onScroll={handleRailScroll}
+              className="flex-1 overflow-y-auto overscroll-contain py-2 px-1 flex flex-col items-center gap-1"
+            >
+              {ADMIN_MENU.map((group, groupIdx) => {
+                const visibleItems = group.items.filter((item) => !item.perm || item.perm(userRole))
+                if (visibleItems.length === 0) return null
 
-              return (
-                <div
-                  key={group.title}
-                  className={cn(
-                    'w-full flex flex-col items-center gap-1',
-                    groupIdx > 0 && 'pt-1.5 mt-1 border-t border-gray-100',
-                  )}
-                >
-                  {visibleItems.map((item) => {
-                    const Icon = item.icon
-                    const active = isItemActive(item)
-                    const isFlyoutOpen = railFlyoutArea === item.route
-                    const hasChildren = !!item.children && item.children.length > 0
+                return (
+                  <div
+                    key={group.title}
+                    className={cn(
+                      'w-full flex flex-col items-center gap-1',
+                      groupIdx > 0 && 'pt-1.5 mt-1 border-t border-gray-100',
+                    )}
+                  >
+                    {visibleItems.map((item) => {
+                      const Icon = item.icon
+                      const active = isItemActive(item)
+                      const isFlyoutOpen = railFlyoutArea === item.route
+                      const hasChildren = !!item.children && item.children.length > 0
 
-                    if (hasChildren) {
+                      if (hasChildren) {
+                        return (
+                          <Tooltip key={item.route}>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setRailFlyoutArea((prev) =>
+                                    prev === item.route ? null : item.route,
+                                  )
+                                }}
+                                className={cn(
+                                  'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group',
+                                  active
+                                    ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold shadow-xs'
+                                    : isFlyoutOpen
+                                      ? 'bg-gray-100 text-[#005B2E]'
+                                      : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                                )}
+                                aria-label={item.label}
+                              >
+                                {active && (
+                                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#005B2E] rounded-r-sm" />
+                                )}
+                                <Icon className="w-5 h-5 shrink-0" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <span>{item.label}</span>
+                                <ChevronRight className="w-3 h-3 text-gray-400" />
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        )
+                      }
+
                       return (
                         <Tooltip key={item.route}>
                           <TooltipTrigger asChild>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setRailFlyoutArea((prev) =>
-                                  prev === item.route ? null : item.route,
-                                )
-                              }}
+                            <Link
+                              to={item.route}
+                              onClick={() => setRailFlyoutArea(null)}
                               className={cn(
                                 'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group',
                                 active
                                   ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold shadow-xs'
-                                  : isFlyoutOpen
-                                    ? 'bg-gray-100 text-[#005B2E]'
-                                    : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                                  : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
                               )}
                               aria-label={item.label}
                             >
-                              {/* Barra indicadora vertical para a área ativa */}
                               {active && (
                                 <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#005B2E] rounded-r-sm" />
                               )}
                               <Icon className="w-5 h-5 shrink-0" />
-                            </button>
+                            </Link>
                           </TooltipTrigger>
                           <TooltipContent side="right" className="font-medium">
-                            <div className="flex items-center gap-1.5">
-                              <span>{item.label}</span>
-                              <ChevronRight className="w-3 h-3 text-gray-400" />
-                            </div>
+                            {item.label}
                           </TooltipContent>
                         </Tooltip>
                       )
-                    }
+                    })}
+                  </div>
+                )
+              })}
+            </nav>
 
-                    return (
-                      <Tooltip key={item.route}>
-                        <TooltipTrigger asChild>
-                          <Link
-                            to={item.route}
-                            onClick={() => setRailFlyoutArea(null)}
-                            className={cn(
-                              'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group',
-                              active
-                                ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold shadow-xs'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
-                            )}
-                            aria-label={item.label}
-                          >
-                            {active && (
-                              <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#005B2E] rounded-r-sm" />
-                            )}
-                            <Icon className="w-5 h-5 shrink-0" />
-                          </Link>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="font-medium">
-                          {item.label}
-                        </TooltipContent>
-                      </Tooltip>
-                    )
-                  })}
-                </div>
-              )
-            })}
-          </nav>
+            {/* SEÇÃO FIXA INFERIOR NO MODO RAIL — JETRO ON-LINE E PERSONALIZAR */}
+            <div className="shrink-0 p-1.5 border-t border-[#C9A227]/30 bg-[#002817] flex flex-col items-center gap-1.5">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsFloatingOpen(!isFloatingOpen)
+                      if (onMobileClose) onMobileClose()
+                    }}
+                    className={cn(
+                      'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all text-[#E4C46A] hover:bg-[#00381C] hover:text-white',
+                      isFloatingOpen
+                        ? 'bg-[#C9A227] text-slate-950 font-bold'
+                        : 'bg-[#00140b] border border-[#C9A227]/40',
+                    )}
+                    aria-label="Jetro On-line"
+                  >
+                    <Bot className="w-5 h-5 shrink-0" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="right"
+                  className="bg-[#00140b] text-[#E4C46A] border-[#C9A227]/40 font-semibold"
+                >
+                  Jetro On-line (Assistente ERP)
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomizerOpen(!isCustomizerOpen)
+                      if (onMobileClose) onMobileClose()
+                    }}
+                    className={cn(
+                      'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all text-[#E4C46A] hover:bg-[#00381C] hover:text-white',
+                      isCustomizerOpen
+                        ? 'bg-[#C9A227] text-slate-950 font-bold'
+                        : 'bg-[#00140b] border border-[#C9A227]/40',
+                    )}
+                    aria-label="Personalizar Jetro"
+                  >
+                    <Settings className="w-5 h-5 shrink-0" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="right"
+                  className="bg-[#00140b] text-[#E4C46A] border-[#C9A227]/40 font-semibold"
+                >
+                  Personalizar Jetro (Interface, Tema, Tabelas)
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </>
         ) : (
           /* MODO EXPANDIDO (COMPORTAMENTO ACCORDION COMPLETO) */
           <>
@@ -492,6 +556,64 @@ export function AdminSidebar() {
                 </>
               )}
             </nav>
+
+            {/* SEÇÃO FIXA NO RODAPÉ DA SIDEBAR: ASSISTENTE & PERSONALIZAÇÃO (VISUAL PREMIUM VERDE-ESCURO E DOURADO) */}
+            <div className="shrink-0 p-2.5 border-t border-[#C9A227]/30 bg-[#002817] text-white space-y-1.5 shadow-inner">
+              <div className="px-1 text-[10px] font-bold text-[#E4C46A] tracking-wider uppercase flex items-center justify-between">
+                <span>Assistente & Sistema</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
+
+              {/* Botão Jetro On-line */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsFloatingOpen(!isFloatingOpen)
+                  if (onMobileClose) onMobileClose()
+                }}
+                className={cn(
+                  'w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer',
+                  isFloatingOpen
+                    ? 'bg-[#C9A227] text-slate-950 border-[#E4C46A] shadow-md'
+                    : 'bg-[#00140b] text-[#E4C46A] hover:bg-[#00381C] hover:text-white border-[#C9A227]/40',
+                )}
+                title="Abrir o assistente inteligente Jetro On-line"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-[#002817] border border-[#C9A227]/50 flex items-center justify-center text-[#E4C46A] shrink-0">
+                    <Bot className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="truncate">Jetro On-line</span>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 font-mono border border-emerald-500/40">
+                  IA
+                </span>
+              </button>
+
+              {/* Botão Personalizar */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomizerOpen(!isCustomizerOpen)
+                  if (onMobileClose) onMobileClose()
+                }}
+                className={cn(
+                  'w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer',
+                  isCustomizerOpen
+                    ? 'bg-[#C9A227] text-slate-950 border-[#E4C46A] shadow-md'
+                    : 'bg-[#00140b] text-[#E4C46A] hover:bg-[#00381C] hover:text-white border-[#C9A227]/40',
+                )}
+                title="Personalizar Jetro (Interface, Aparência, Textos e Tabelas)"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-[#002817] border border-[#C9A227]/50 flex items-center justify-center text-[#E4C46A] shrink-0">
+                    <Settings className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="truncate">Personalizar</span>
+                </div>
+                <span className="text-[10px] text-white/60 font-normal">Ajustes</span>
+              </button>
+            </div>
           </>
         )}
       </aside>
