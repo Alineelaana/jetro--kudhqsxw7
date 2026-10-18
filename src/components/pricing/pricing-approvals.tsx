@@ -26,6 +26,7 @@ import {
   type PricingApproval,
   type PricingConfig,
 } from '@/lib/pricing-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Check, X, Loader2, FileText, Clock } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -133,96 +134,143 @@ export function PricingApprovals() {
         </Select>
       </div>
 
-      {filtered.length === 0 ? (
+      {approvals.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <Clock className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg font-bold">
-              Nenhuma aprovação {filter === 'pending' ? 'pendente' : 'encontrada'}.
-            </p>
+            <p className="text-lg font-bold">Nenhuma aprovação encontrada.</p>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">Produto</th>
-                  <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">
-                    Preço Atual
-                  </th>
-                  <th className="text-left px-3 py-3 font-bold">Preço Solicitado</th>
-                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Margem</th>
-                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Mínima</th>
-                  <th className="text-left px-3 py-3 font-bold">Status</th>
-                  <th className="text-left px-3 py-3 font-bold hidden lg:table-cell">
-                    Solicitante
-                  </th>
-                  <th className="text-center px-3 py-3 font-bold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((a) => (
-                  <tr key={a.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-3">
-                      <span className="font-medium">{a.product_name}</span>
-                      <p className="text-xs text-muted-foreground">{a.product_code}</p>
-                    </td>
-                    <td className="px-3 py-3 hidden sm:table-cell">
-                      R$ {formatCurrency(a.current_price)}
-                    </td>
-                    <td className="px-3 py-3 font-bold text-[#005B2E]">
-                      R$ {formatCurrency(a.requested_price)}
-                    </td>
-                    <td className="px-3 py-3 hidden md:table-cell">
-                      {formatCurrency(a.margin_percent)}%
-                    </td>
-                    <td className="px-3 py-3 hidden md:table-cell">
-                      {formatCurrency(a.minimum_margin)}%
-                    </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${a.status === 'pending' ? 'bg-amber-100 text-amber-700' : a.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}
-                      >
-                        {a.status === 'pending'
-                          ? 'Aguardando'
-                          : a.status === 'approved'
-                            ? 'Aprovada'
-                            : 'Rejeitada'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 hidden lg:table-cell text-xs">{a.requester_name}</td>
-                    <td className="px-3 py-3">
-                      {a.status === 'pending' && (
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openDialog(a, 'approve')}
-                            className="text-emerald-600 hover:bg-emerald-50"
-                            title="Aprovar"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openDialog(a, 'reject')}
-                            className="text-red-600 hover:bg-red-50"
-                            title="Rejeitar"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <JetroTable
+          screenId="precificacao.aprovacoes"
+          columns={[
+            {
+              id: 'product_name',
+              header: 'Produto',
+              accessorKey: 'product_name',
+              dataType: 'text',
+              defaultWidth: 240,
+              cell: ({ row }) => (
+                <div>
+                  <span className="font-medium">{row.product_name}</span>
+                  {row.product_code && (
+                    <p className="text-xs text-muted-foreground">{row.product_code}</p>
+                  )}
+                </div>
+              ),
+            },
+            {
+              id: 'current_price',
+              header: 'Preço Atual',
+              accessorKey: 'current_price',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 120,
+              getSortValue: (row) => parseNum(row.current_price),
+              cell: ({ value }) => <span>R$ {formatCurrency(String(value || '0'))}</span>,
+            },
+            {
+              id: 'requested_price',
+              header: 'Preço Solicitado',
+              accessorKey: 'requested_price',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 130,
+              getSortValue: (row) => parseNum(row.requested_price),
+              cell: ({ value }) => (
+                <span className="font-bold text-[#005B2E]">
+                  R$ {formatCurrency(String(value || '0'))}
+                </span>
+              ),
+            },
+            {
+              id: 'margin_percent',
+              header: 'Margem',
+              accessorKey: 'margin_percent',
+              dataType: 'percent',
+              align: 'right',
+              defaultWidth: 100,
+              getSortValue: (row) => parseNum(row.margin_percent),
+              cell: ({ value }) => <span>{formatCurrency(String(value || '0'))}%</span>,
+            },
+            {
+              id: 'minimum_margin',
+              header: 'Mínima',
+              accessorKey: 'minimum_margin',
+              dataType: 'percent',
+              align: 'right',
+              defaultWidth: 100,
+              getSortValue: (row) => parseNum(row.minimum_margin),
+              cell: ({ value }) => <span>{formatCurrency(String(value || '0'))}%</span>,
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) => {
+                const s = String(value || '')
+                return (
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded ${s === 'pending' ? 'bg-amber-100 text-amber-700' : s === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}
+                  >
+                    {s === 'pending' ? 'Aguardando' : s === 'approved' ? 'Aprovada' : 'Rejeitada'}
+                  </span>
+                )
+              },
+            },
+            {
+              id: 'requester_name',
+              header: 'Solicitante',
+              accessorKey: 'requester_name',
+              dataType: 'text',
+              defaultWidth: 150,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 90,
+              cell: ({ row }) => {
+                if (row.status !== 'pending') return null
+                return (
+                  <div className="flex items-center justify-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => openDialog(row, 'approve')}
+                      className="text-emerald-600 hover:bg-emerald-50 h-7 w-7 p-0"
+                      title="Aprovar"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => openDialog(row, 'reject')}
+                      className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                      title="Rejeitar"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                )
+              },
+            },
+          ]}
+          data={filtered}
+          emptyMessage="Nenhuma aprovação corresponde aos filtros."
+          exportTitle="Aprovações de Preços — Central de Preços"
+          exportFilename="aprovacoes-precos-jetro.xlsx"
+        />
       )}
 
       {dialogOpen && (

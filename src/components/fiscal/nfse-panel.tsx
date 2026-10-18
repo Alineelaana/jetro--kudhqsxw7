@@ -26,6 +26,7 @@ import {
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { NFSE_STATUS, STATUS_COLORS } from '@/lib/fiscal-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Loader2, Plus, FileText, Check, X, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -149,7 +150,7 @@ export function NfsePanel() {
           </div>
         </CardContent>
       </Card>
-      {filtered.length === 0 ? (
+      {records.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -157,60 +158,95 @@ export function NfsePanel() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">Nº NFS-e</th>
-                  <th className="text-left px-3 py-3 font-bold">Tomador</th>
-                  <th className="text-left px-3 py-3 font-bold">Serviço</th>
-                  <th className="text-left px-3 py-3 font-bold">Valor</th>
-                  <th className="text-left px-3 py-3 font-bold">Status</th>
-                  <th className="text-center px-3 py-3 font-bold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((r) => (
-                  <tr key={r.id as string} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-3">
-                      <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                        {(r.nfse_number as string) || '—'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">{(r.tomador as string) || '—'}</td>
-                    <td className="px-3 py-3">{(r.servico as string) || '—'}</td>
-                    <td className="px-3 py-3 font-bold">R$ {(r.valor as string) || '0,00'}</td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[r.status as string] || ''}`}
-                      >
-                        {r.status as string}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center justify-center gap-1">
-                        {r.status === 'Autorizada' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() =>
-                              updateStatus(r.id as string, 'Cancelada', r.nfse_number as string)
-                            }
-                            className="text-red-600"
-                            title="Cancelar"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <JetroTable
+          screenId="fiscal.nfse"
+          columns={[
+            {
+              id: 'nfse_number',
+              header: 'Nº NFS-e',
+              accessorKey: 'nfse_number',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'tomador',
+              header: 'Tomador',
+              accessorKey: 'tomador',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'servico',
+              header: 'Serviço',
+              accessorKey: 'servico',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'valor',
+              header: 'Valor',
+              accessorKey: 'valor',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 130,
+              getSortValue: (row) => parseFloat(String(row.valor || '0').replace(',', '.')) || 0,
+              cell: ({ value }) => <span className="font-bold">R$ {String(value || '0,00')}</span>,
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[String(value || '')] || 'bg-gray-100 text-gray-600'}`}
+                >
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 80,
+              cell: ({ row }) => {
+                if (row.status !== 'Autorizada') return null
+                return (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      updateStatus(row.id as string, 'Cancelada', String(row.nfse_number || ''))
+                    }
+                    className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                    title="Cancelar NFS-e"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                )
+              },
+            },
+          ]}
+          data={filtered}
+          rowKey={(r) => (r.id as string) || String(Math.random())}
+          emptyMessage="Nenhuma NFS-e corresponde aos filtros."
+          exportTitle="Emissão de NFS-e — Jetro ERP"
+          exportFilename="nfse-jetro.xlsx"
+        />
       )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

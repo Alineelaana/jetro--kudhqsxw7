@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select'
 import { useRealtime } from '@/hooks/use-realtime'
 import { STATUS_COLORS, type FiscalScreenConfig } from '@/lib/fiscal-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Loader2, Plus, Search, Pencil, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import pb from '@/lib/pocketbase/client'
@@ -155,7 +156,7 @@ export function FiscalGenericScreen({ config }: { config: FiscalScreenConfig }) 
           </div>
         </CardContent>
       </Card>
-      {filtered.length === 0 ? (
+      {records.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -163,55 +164,81 @@ export function FiscalGenericScreen({ config }: { config: FiscalScreenConfig }) 
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">{config.nameLabel}</th>
-                  {displayFields.map((f) => (
-                    <th key={f.name} className="text-left px-3 py-3 font-bold hidden md:table-cell">
-                      {f.label}
-                    </th>
-                  ))}
-                  {config.statusField && <th className="text-left px-3 py-3 font-bold">Status</th>}
-                  <th className="text-center px-3 py-3 font-bold">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((r) => (
-                  <tr key={r.id as string} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-3 font-medium">{(r[primaryField] as string) || '—'}</td>
-                    {displayFields.map((f) => (
-                      <td key={f.name} className="px-3 py-3 hidden md:table-cell text-xs">
-                        {(r[f.name] as string) || '—'}
-                      </td>
-                    ))}
-                    {config.statusField && (
-                      <td className="px-3 py-3">
-                        <span
-                          className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[r[config.statusField] as string] || 'bg-gray-100 text-gray-600'}`}
-                        >
-                          {(r[config.statusField] as string) || '—'}
-                        </span>
-                      </td>
-                    )}
-                    <td className="px-3 py-3 text-center">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(r)}
-                        className="text-[#005B2E]"
+        <JetroTable
+          screenId={`fiscal.${config.collection}`}
+          columns={[
+            {
+              id: primaryField,
+              header: config.nameLabel,
+              accessorKey: primaryField,
+              dataType: 'text',
+              defaultWidth: 200,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            ...displayFields.map(
+              (f): JetroColumnDef<Record<string, unknown>> => ({
+                id: f.name,
+                header: f.label,
+                accessorKey: f.name,
+                dataType:
+                  f.type === 'number'
+                    ? 'number'
+                    : f.type === 'date'
+                      ? 'date'
+                      : f.name.toLowerCase().includes('valor')
+                        ? 'currency'
+                        : 'text',
+                defaultWidth: 140,
+                cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+              }),
+            ),
+            ...(config.statusField
+              ? [
+                  {
+                    id: config.statusField,
+                    header: 'Status',
+                    accessorKey: config.statusField,
+                    dataType: 'text' as const,
+                    align: 'center' as const,
+                    defaultWidth: 120,
+                    cell: ({ value }: { value: unknown }) => (
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[String(value || '')] || 'bg-gray-100 text-gray-600'}`}
                       >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+                        {String(value || '—')}
+                      </span>
+                    ),
+                  },
+                ]
+              : []),
+            {
+              id: 'actions',
+              header: 'Ação',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 70,
+              cell: ({ row }) => (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleEdit(row)}
+                  className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                  title="Editar"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+              ),
+            },
+          ]}
+          data={filtered}
+          rowKey={(r) => (r.id as string) || String(Math.random())}
+          emptyMessage="Nenhum registro corresponde aos filtros."
+          exportTitle={`${config.title} — Jetro ERP`}
+          exportFilename={`${config.collection}-jetro.xlsx`}
+        />
       )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

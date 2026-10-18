@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 import { DRIVER_STATUS, DRIVER_VINCULO, type LogisticsDriver } from '@/lib/logistics-types'
 import { canRegisterDrivers } from '@/lib/logistics-permissions'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Pencil, Search, Loader2, User } from 'lucide-react'
 
 export function LogisticsDrivers() {
@@ -120,68 +121,111 @@ export function LogisticsDrivers() {
           </Button>
         )}
       </div>
-      <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-3 py-2 font-bold">Nome</th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">CPF</th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">CNH</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Vínculo</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Telefone</th>
-                <th className="text-left px-3 py-2 font-bold">Situação</th>
-                {canRegisterDrivers(role) && (
-                  <th className="text-center px-3 py-2 font-bold">Ações</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-3 py-12 text-center text-muted-foreground">
-                    <User className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                    Nenhum motorista encontrado
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((r) => (
-                  <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 font-medium">{r.nome || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">{r.cpf || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.numero_cnh || '—'}
-                    </td>
-                    <td className="px-3 py-2 hidden lg:table-cell">{r.tipo_vinculo}</td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">{r.telefone || '—'}</td>
-                    <td className="px-3 py-2">
-                      <span
-                        className={`text-xs font-bold px-2 py-0.5 rounded ${r.situacao === 'Disponível' ? 'bg-emerald-100 text-emerald-700' : r.situacao === 'Em Rota' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}
+      {records.length === 0 ? (
+        <Card className="border-2 border-dashed">
+          <div className="px-3 py-12 text-center text-muted-foreground">
+            <User className="w-10 h-10 mx-auto mb-2 opacity-40" />
+            Nenhum motorista encontrado
+          </div>
+        </Card>
+      ) : (
+        <JetroTable
+          screenId="logistica.motoristas"
+          columns={[
+            {
+              id: 'nome',
+              header: 'Nome',
+              accessorKey: 'nome',
+              dataType: 'text',
+              defaultWidth: 200,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'cpf',
+              header: 'CPF',
+              accessorKey: 'cpf',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono">{String(value || '—')}</span>
+              ),
+            },
+            {
+              id: 'numero_cnh',
+              header: 'CNH',
+              accessorKey: 'numero_cnh',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono">{String(value || '—')}</span>
+              ),
+            },
+            {
+              id: 'tipo_vinculo',
+              header: 'Vínculo',
+              accessorKey: 'tipo_vinculo',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'telefone',
+              header: 'Telefone',
+              accessorKey: 'telefone',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'situacao',
+              header: 'Situação',
+              accessorKey: 'situacao',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) => {
+                const s = String(value || '')
+                return (
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded ${s === 'Disponível' ? 'bg-emerald-100 text-emerald-700' : s === 'Em Rota' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}
+                  >
+                    {s || '—'}
+                  </span>
+                )
+              },
+            },
+            ...(canRegisterDrivers(role)
+              ? [
+                  {
+                    id: 'actions',
+                    header: 'Ações',
+                    align: 'center' as const,
+                    sortable: false,
+                    hideable: false,
+                    resizable: false,
+                    draggable: false,
+                    defaultWidth: 70,
+                    cell: ({ row }: { row: LogisticsDriver }) => (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEdit(row)}
+                        className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                        title="Editar"
                       >
-                        {r.situacao}
-                      </span>
-                    </td>
-                    {canRegisterDrivers(role) && (
-                      <td className="px-3 py-2">
-                        <div className="flex justify-center">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(r)}
-                            className="text-[#005B2E] h-8 w-8 p-0"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                    ),
+                  },
+                ]
+              : []),
+          ]}
+          data={filtered}
+          emptyMessage="Nenhum motorista corresponde aos filtros."
+          exportTitle="Cadastro de Motoristas — Jetro ERP"
+          exportFilename="motoristas-jetro.xlsx"
+        />
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>

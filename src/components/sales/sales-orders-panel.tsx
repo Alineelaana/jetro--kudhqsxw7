@@ -14,6 +14,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { SalesOrderDialog } from '@/components/sales/sales-order-dialog'
 import { SALES_ORDER_STATUS, STATUS_COLORS, type SalesOrder } from '@/lib/sales-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Search, Pencil, Loader2, FileText, X, Copy, Printer, Package } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -140,7 +141,7 @@ export function SalesOrdersPanel() {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : orders.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -148,89 +149,133 @@ export function SalesOrdersPanel() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">Nº</th>
-                  <th className="text-left px-3 py-3 font-bold">Cliente</th>
-                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Vendedor</th>
-                  <th className="text-left px-3 py-3 font-bold">Valor Total</th>
-                  <th className="text-left px-3 py-3 font-bold">Status</th>
-                  <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Data</th>
-                  <th className="text-center px-3 py-3 font-bold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((o) => (
-                  <tr key={o.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-3">
-                      <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                        {o.order_number || '—'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 font-medium">{o.client_name || '—'}</td>
-                    <td className="px-3 py-3 hidden md:table-cell">{o.salesperson_name || '—'}</td>
-                    <td className="px-3 py-3 font-bold">R$ {o.total_value || '0,00'}</td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[o.status] || 'bg-gray-100 text-gray-600'}`}
-                      >
-                        {o.status || '—'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 text-xs hidden sm:table-cell">
-                      {o.created ? new Date(o.created).toLocaleDateString('pt-BR') : '—'}
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center justify-center gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleEdit(o)}
-                          className="text-[#005B2E] hover:bg-[#005B2E]/10"
-                          title="Editar"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDuplicate(o)}
-                          className="text-blue-600 hover:bg-blue-50"
-                          title="Duplicar"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handlePrint(o)}
-                          className="text-[#005B2E] hover:bg-[#005B2E]/10"
-                          title="Imprimir"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                        </Button>
-                        {o.status !== 'Cancelado' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleCancel(o)}
-                            className="text-red-600 hover:bg-red-50"
-                            title="Cancelar"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <JetroTable
+          screenId="vendas.pedidos"
+          columns={[
+            {
+              id: 'order_number',
+              header: 'Nº Pedido',
+              accessorKey: 'order_number',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'client_name',
+              header: 'Cliente',
+              accessorKey: 'client_name',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'salesperson_name',
+              header: 'Vendedor',
+              accessorKey: 'salesperson_name',
+              dataType: 'text',
+              defaultWidth: 150,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'total_value',
+              header: 'Valor Total',
+              accessorKey: 'total_value',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 130,
+              getSortValue: (row) =>
+                parseFloat(String(row.total_value || '0').replace(',', '.')) || 0,
+              cell: ({ value }) => <span className="font-bold">R$ {String(value || '0,00')}</span>,
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 130,
+              cell: ({ value }) => (
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[String(value || '')] || 'bg-gray-100 text-gray-600'}`}
+                >
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'created',
+              header: 'Data',
+              accessorKey: 'created',
+              dataType: 'date',
+              defaultWidth: 110,
+              cell: ({ value }) => (
+                <span className="text-xs">
+                  {value ? new Date(String(value)).toLocaleDateString('pt-BR') : '—'}
+                </span>
+              ),
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 130,
+              cell: ({ row }) => (
+                <div className="flex items-center justify-center gap-0.5">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleEdit(row)}
+                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                    title="Editar"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDuplicate(row)}
+                    className="text-blue-600 hover:bg-blue-50 h-7 w-7 p-0"
+                    title="Duplicar"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handlePrint(row)}
+                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                    title="Imprimir"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                  </Button>
+                  {row.status !== 'Cancelado' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleCancel(row)}
+                      className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+                      title="Cancelar"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+          data={filtered}
+          emptyMessage="Nenhum pedido corresponde aos filtros."
+          exportTitle="Pedidos de Venda — Jetro ERP"
+          exportFilename="pedidos-venda-jetro.xlsx"
+        />
       )}
       <SalesOrderDialog
         open={dialogOpen}

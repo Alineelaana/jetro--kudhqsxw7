@@ -15,6 +15,7 @@ import { toast } from '@/hooks/use-toast'
 import { DELIVERY_STATUS, type LogisticsDelivery } from '@/lib/logistics-types'
 import { canUpdateDeliveries } from '@/lib/logistics-permissions'
 import { useAuth } from '@/hooks/use-auth'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Search, Loader2, Package } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -102,78 +103,125 @@ export function LogisticsDeliveries() {
         </Select>
       </div>
       <p className="text-sm text-muted-foreground">{filtered.length} entrega(s)</p>
-      <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-3 py-2 font-bold">Entrega</th>
-                <th className="text-left px-3 py-2 font-bold">Cliente</th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">Rota</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Veículo</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Motorista</th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">Prevista</th>
-                <th className="text-left px-3 py-2 font-bold">Status</th>
-                {canUpdateDeliveries(role) && (
-                  <th className="text-center px-3 py-2 font-bold">Ação</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-3 py-12 text-center text-muted-foreground">
-                    <Package className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                    Nenhuma entrega encontrada
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((r) => (
-                  <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 font-mono text-xs font-bold text-[#C89B3C]">
-                      {r.numero_entrega || '—'}
-                    </td>
-                    <td className="px-3 py-2 font-medium">{r.cliente || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell">{r.rota || '—'}</td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">{r.veiculo || '—'}</td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">{r.motorista || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.data_prevista
-                        ? new Date(r.data_prevista).toLocaleDateString('pt-BR')
-                        : '—'}
-                    </td>
-                    <td className="px-3 py-2">
-                      <span
-                        className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[r.status] || 'bg-gray-100 text-gray-600'}`}
-                      >
-                        {r.status}
-                      </span>
-                    </td>
-                    {canUpdateDeliveries(role) && (
-                      <td className="px-3 py-2">
-                        <div className="flex justify-center">
-                          <Select onValueChange={(v) => handleStatus(r.id, v)}>
-                            <SelectTrigger className="h-7 w-32 text-xs focus-visible:ring-[#005B2E]">
-                              <SelectValue placeholder="Alterar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {DELIVERY_STATUS.map((s) => (
-                                <SelectItem key={s} value={s}>
-                                  {s}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      {records.length === 0 ? (
+        <Card className="border-2 border-dashed">
+          <div className="px-3 py-12 text-center text-muted-foreground">
+            <Package className="w-10 h-10 mx-auto mb-2 opacity-40" />
+            Nenhuma entrega encontrada
+          </div>
+        </Card>
+      ) : (
+        <JetroTable
+          screenId="logistica.entregas"
+          columns={[
+            {
+              id: 'numero_entrega',
+              header: 'Entrega',
+              accessorKey: 'numero_entrega',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="font-mono text-xs font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'cliente',
+              header: 'Cliente',
+              accessorKey: 'cliente',
+              dataType: 'text',
+              defaultWidth: 200,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'rota',
+              header: 'Rota',
+              accessorKey: 'rota',
+              dataType: 'text',
+              defaultWidth: 150,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'veiculo',
+              header: 'Veículo',
+              accessorKey: 'veiculo',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'motorista',
+              header: 'Motorista',
+              accessorKey: 'motorista',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'data_prevista',
+              header: 'Prevista',
+              accessorKey: 'data_prevista',
+              dataType: 'date',
+              defaultWidth: 110,
+              cell: ({ value }) => (
+                <span className="text-xs">
+                  {value ? new Date(String(value)).toLocaleDateString('pt-BR') : '—'}
+                </span>
+              ),
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 130,
+              cell: ({ value }) => (
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[String(value || '')] || 'bg-gray-100 text-gray-600'}`}
+                >
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            ...(canUpdateDeliveries(role)
+              ? [
+                  {
+                    id: 'actions',
+                    header: 'Ação',
+                    align: 'center' as const,
+                    sortable: false,
+                    hideable: false,
+                    resizable: false,
+                    draggable: false,
+                    defaultWidth: 140,
+                    cell: ({ row }: { row: LogisticsDelivery }) => (
+                      <div className="flex justify-center">
+                        <Select onValueChange={(v) => handleStatus(row.id, v)}>
+                          <SelectTrigger className="h-7 w-32 text-xs focus-visible:ring-[#005B2E]">
+                            <SelectValue placeholder="Alterar" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {DELIVERY_STATUS.map((s) => (
+                              <SelectItem key={s} value={s}>
+                                {s}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+          ]}
+          data={filtered}
+          emptyMessage="Nenhuma entrega corresponde aos filtros."
+          exportTitle="Entregas — Jetro ERP"
+          exportFilename="entregas-jetro.xlsx"
+        />
+      )}
     </div>
   )
 }

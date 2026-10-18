@@ -22,6 +22,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 import { FREIGHT_STATUS, FREIGHT_TYPE, type LogisticsFreight } from '@/lib/logistics-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Pencil, Search, Loader2, DollarSign } from 'lucide-react'
 
 const fmtCurrency = (v: string) => {
@@ -131,68 +132,114 @@ export function LogisticsFreights() {
           <Plus className="w-4 h-4 mr-2" /> Novo Frete
         </Button>
       </div>
-      <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-3 py-2 font-bold">Número</th>
-                <th className="text-left px-3 py-2 font-bold">Cliente</th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">
-                  Transportadora
-                </th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">Origem</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Destino</th>
-                <th className="text-right px-3 py-2 font-bold">Valor Total</th>
-                <th className="text-left px-3 py-2 font-bold">Situação</th>
-                <th className="text-center px-3 py-2 font-bold">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-3 py-12 text-center text-muted-foreground">
-                    <DollarSign className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                    Nenhum frete encontrado
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((r) => (
-                  <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 font-mono text-xs font-bold text-[#C89B3C]">
-                      {r.numero_frete}
-                    </td>
-                    <td className="px-3 py-2 font-medium">{r.cliente || '—'}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {r.transportadora || '—'}
-                    </td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">{r.origem || '—'}</td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">{r.destino || '—'}</td>
-                    <td className="px-3 py-2 text-right font-bold">{fmtCurrency(r.valor_total)}</td>
-                    <td className="px-3 py-2">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">
-                        {r.situacao}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex justify-center">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleEdit(r)}
-                          className="text-[#005B2E] h-8 w-8 p-0"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      {records.length === 0 ? (
+        <Card className="border-2 border-dashed">
+          <div className="px-3 py-12 text-center text-muted-foreground">
+            <DollarSign className="w-10 h-10 mx-auto mb-2 opacity-40" />
+            Nenhum frete encontrado
+          </div>
+        </Card>
+      ) : (
+        <JetroTable
+          screenId="logistica.fretes"
+          columns={[
+            {
+              id: 'numero_frete',
+              header: 'Número',
+              accessorKey: 'numero_frete',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="font-mono text-xs font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'cliente',
+              header: 'Cliente',
+              accessorKey: 'cliente',
+              dataType: 'text',
+              defaultWidth: 200,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'transportadora',
+              header: 'Transportadora',
+              accessorKey: 'transportadora',
+              dataType: 'text',
+              defaultWidth: 180,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'origem',
+              header: 'Origem',
+              accessorKey: 'origem',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'destino',
+              header: 'Destino',
+              accessorKey: 'destino',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'valor_total',
+              header: 'Valor Total',
+              accessorKey: 'valor_total',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 130,
+              getSortValue: (row) => parseFloat(String(row.valor_total || '0')),
+              cell: ({ value }) => (
+                <span className="font-bold">{fmtCurrency(String(value || '0'))}</span>
+              ),
+            },
+            {
+              id: 'situacao',
+              header: 'Situação',
+              accessorKey: 'situacao',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 70,
+              cell: ({ row }) => (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleEdit(row)}
+                  className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+                  title="Editar"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+              ),
+            },
+          ]}
+          data={filtered}
+          emptyMessage="Nenhum frete corresponde aos filtros."
+          exportTitle="Controle de Fretes — Jetro ERP"
+          exportFilename="fretes-jetro.xlsx"
+        />
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>

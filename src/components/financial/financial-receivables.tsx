@@ -18,7 +18,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import {
-  FinancialTable,
   FinancialEmptyState,
   FinancialLoading,
   StatusBadge,
@@ -26,7 +25,8 @@ import {
 import { getReceivables, createReceivable, updateReceivable } from '@/services/financial'
 import { useRealtime } from '@/hooks/use-realtime'
 import { RECEIVABLE_STATUS } from '@/lib/financial-types'
-import { Plus, Search, Loader2, Save } from 'lucide-react'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
+import { Plus, Search, Loader2, Save, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 
 const FIELDS = [
@@ -116,6 +116,78 @@ export function FinancialReceivables() {
   const fmtCurrency = (v: string) =>
     v ? parseFloat(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—'
 
+  const columns: JetroColumnDef<any>[] = [
+    {
+      id: 'numero_titulo',
+      header: 'Nº Título',
+      accessorKey: 'numero_titulo',
+      dataType: 'text',
+      defaultWidth: 130,
+      cell: ({ value }) => (
+        <span className="font-mono text-xs font-bold text-[#C89B3C]">{String(value || '—')}</span>
+      ),
+    },
+    {
+      id: 'cliente',
+      header: 'Cliente',
+      accessorKey: 'cliente',
+      dataType: 'text',
+      defaultWidth: 240,
+      cell: ({ value }) => (
+        <span className="font-medium text-foreground">{String(value || '—')}</span>
+      ),
+    },
+    {
+      id: 'data_vencimento',
+      header: 'Vencimento',
+      accessorKey: 'data_vencimento',
+      dataType: 'date',
+      defaultWidth: 120,
+      cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+    },
+    {
+      id: 'valor_original',
+      header: 'Valor',
+      accessorKey: 'valor_original',
+      dataType: 'currency',
+      align: 'right',
+      defaultWidth: 140,
+      getSortValue: (row) => parseFloat(row.valor_original || '0'),
+      cell: ({ value }) => (
+        <span className="font-bold text-foreground">{fmtCurrency(String(value || ''))}</span>
+      ),
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      accessorKey: 'status',
+      dataType: 'text',
+      align: 'center',
+      defaultWidth: 130,
+      cell: ({ value }) => <StatusBadge status={String(value || '')} />,
+    },
+    {
+      id: 'actions',
+      header: 'Ações',
+      align: 'right',
+      sortable: false,
+      hideable: false,
+      resizable: false,
+      draggable: false,
+      defaultWidth: 100,
+      cell: ({ row }) => (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => openEdit(row)}
+          className="text-[#005B2E] border-[#005B2E]/30 hover:bg-[#005B2E]/10 h-7 text-xs"
+        >
+          <Pencil className="w-3 h-3 mr-1" /> Editar
+        </Button>
+      ),
+    },
+  ]
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -135,36 +207,17 @@ export function FinancialReceivables() {
       </div>
       {loading ? (
         <FinancialLoading />
-      ) : filtered.length === 0 ? (
+      ) : records.length === 0 ? (
         <FinancialEmptyState message="Nenhum título a receber encontrado" />
       ) : (
-        <FinancialTable
-          headers={['Nº Título', 'Cliente', 'Vencimento', 'Valor', 'Status', 'Ações']}
-        >
-          {filtered.map((r) => (
-            <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-              <td className="px-3 py-3 font-mono text-xs font-bold text-[#C89B3C]">
-                {r.numero_titulo || '—'}
-              </td>
-              <td className="px-3 py-3 font-medium">{r.cliente || '—'}</td>
-              <td className="px-3 py-3 text-xs">{r.data_vencimento || '—'}</td>
-              <td className="px-3 py-3 font-bold">{fmtCurrency(r.valor_original)}</td>
-              <td className="px-3 py-3">
-                <StatusBadge status={r.status} />
-              </td>
-              <td className="px-3 py-3">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => openEdit(r)}
-                  className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8"
-                >
-                  Editar
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </FinancialTable>
+        <JetroTable
+          screenId="financeiro.contas-a-receber"
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhum título a receber corresponde aos filtros."
+          exportTitle="Contas a Receber — Jetro ERP"
+          exportFilename="contas-a-receber-jetro.xlsx"
+        />
       )}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

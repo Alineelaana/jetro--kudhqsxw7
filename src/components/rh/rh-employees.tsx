@@ -17,10 +17,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { RhTable, RhEmptyState, RhLoading, RhStatusBadge } from '@/components/rh/rh-shared'
+import { RhEmptyState, RhLoading, RhStatusBadge } from '@/components/rh/rh-shared'
 import { getEmployees, createEmployee, updateEmployee } from '@/services/rh'
 import { useRealtime } from '@/hooks/use-realtime'
 import { EMPLOYEE_STATUS, CONTRACT_TYPES } from '@/lib/rh-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Search, Loader2, Save, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -147,32 +148,83 @@ export function RhEmployees() {
       </div>
       {loading ? (
         <RhLoading />
-      ) : filtered.length === 0 ? (
+      ) : records.length === 0 ? (
         <RhEmptyState message="Nenhum colaborador encontrado" />
       ) : (
-        <RhTable headers={['Nome', 'Matrícula', 'Cargo', 'Departamento', 'Situação', 'Ações']}>
-          {filtered.map((r) => (
-            <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-              <td className="px-3 py-3 font-medium">{r.nome_completo || '—'}</td>
-              <td className="px-3 py-3 font-mono text-xs text-[#C89B3C]">{r.matricula || '—'}</td>
-              <td className="px-3 py-3">{r.cargo || '—'}</td>
-              <td className="px-3 py-3">{r.departamento || '—'}</td>
-              <td className="px-3 py-3">
-                <RhStatusBadge status={r.situacao} />
-              </td>
-              <td className="px-3 py-3">
+        <JetroTable
+          screenId="rh.colaboradores"
+          columns={[
+            {
+              id: 'nome_completo',
+              header: 'Nome',
+              accessorKey: 'nome_completo',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'matricula',
+              header: 'Matrícula',
+              accessorKey: 'matricula',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="font-mono text-xs font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'cargo',
+              header: 'Cargo',
+              accessorKey: 'cargo',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'departamento',
+              header: 'Departamento',
+              accessorKey: 'departamento',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'situacao',
+              header: 'Situação',
+              accessorKey: 'situacao',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) => <RhStatusBadge status={String(value || '')} />,
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 90,
+              cell: ({ row }) => (
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => openEdit(r)}
-                  className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8"
+                  onClick={() => openEdit(row)}
+                  className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 text-xs px-2"
                 >
                   <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
                 </Button>
-              </td>
-            </tr>
-          ))}
-        </RhTable>
+              ),
+            },
+          ]}
+          data={filtered}
+          emptyMessage="Nenhum colaborador corresponde aos filtros."
+          exportTitle="Colaboradores — DP & RH"
+          exportFilename="colaboradores-jetro.xlsx"
+        />
       )}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">

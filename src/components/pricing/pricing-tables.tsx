@@ -35,6 +35,7 @@ import {
   canActivatePriceTable,
   canCancelPriceTable,
 } from '@/lib/price-table-permissions'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Loader2, Plus, Eye, Pencil, Copy, CheckCircle, XCircle, Ban, Search } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { PriceTableFormDialog } from '@/components/pricing/price-table-form-dialog'
@@ -189,135 +190,8 @@ export function PricingTables() {
         </CardContent>
       </Card>
 
-      <Card className="border-2 border-[#005B2E]/20 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#01361D] text-white">
-                <th className="text-left px-3 py-2 font-bold">Código</th>
-                <th className="text-left px-3 py-2 font-bold">Nome</th>
-                <th className="text-left px-3 py-2 font-bold hidden md:table-cell">Tipo</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Empresa</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Filial</th>
-                <th className="text-left px-3 py-2 font-bold hidden sm:table-cell">Vigência</th>
-                <th className="text-center px-3 py-2 font-bold">Itens</th>
-                <th className="text-center px-3 py-2 font-bold hidden md:table-cell">Prioridade</th>
-                <th className="text-left px-3 py-2 font-bold">Situação</th>
-                <th className="text-left px-3 py-2 font-bold hidden xl:table-cell">Responsável</th>
-                <th className="text-left px-3 py-2 font-bold hidden lg:table-cell">Alteração</th>
-                <th className="text-center px-3 py-2 font-bold">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((t) => {
-                const itemCount = parseItems(t.items).length
-                return (
-                  <tr key={t.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-2 text-xs">{t.code || '—'}</td>
-                    <td className="px-3 py-2 font-medium">{t.table_name}</td>
-                    <td className="px-3 py-2 hidden md:table-cell text-xs">
-                      {TABLE_TYPE_OPTIONS.find((o) => o.value === t.table_type)?.label ||
-                        t.table_type}
-                    </td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">{t.empresa || '—'}</td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">{t.filial || '—'}</td>
-                    <td className="px-3 py-2 hidden sm:table-cell text-xs">
-                      {formatDate(t.data_inicial)} → {formatDate(t.data_final)}
-                    </td>
-                    <td className="text-center px-3 py-2">{itemCount}</td>
-                    <td className="text-center px-3 py-2 hidden md:table-cell">
-                      {t.prioridade ?? 0}
-                    </td>
-                    <td className="px-3 py-2">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${STATUS_BADGE[t.status] || 'bg-gray-100 text-gray-700'}`}
-                      >
-                        {STATUS_LABEL[t.status] || t.status}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 hidden xl:table-cell text-xs">
-                      {t.responsible_user || '—'}
-                    </td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-xs">
-                      {formatDate(t.updated)}
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center justify-center gap-0.5">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleView(t)}
-                          className="h-7 w-7 p-0"
-                          title="Visualizar"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </Button>
-                        {canEditPriceTable(role) && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(t)}
-                            className="h-7 w-7 p-0"
-                            title="Editar"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                        {canDuplicatePriceTable(role) && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openDuplicate(t)}
-                            className="h-7 w-7 p-0"
-                            title="Duplicar"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                        {canActivatePriceTable(role) &&
-                          t.status !== 'ativa' &&
-                          t.status !== 'cancelada' && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleStatusChange(t.id, 'ativa')}
-                              className="h-7 w-7 p-0 text-emerald-600"
-                              title="Ativar"
-                            >
-                              <CheckCircle className="w-3.5 h-3.5" />
-                            </Button>
-                          )}
-                        {canActivatePriceTable(role) && t.status === 'ativa' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleStatusChange(t.id, 'inativa')}
-                            className="h-7 w-7 p-0 text-gray-500"
-                            title="Inativar"
-                          >
-                            <XCircle className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                        {canCancelPriceTable(role) && t.status !== 'cancelada' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleStatusChange(t.id, 'cancelada')}
-                            className="h-7 w-7 p-0 text-red-600"
-                            title="Cancelar"
-                          >
-                            <Ban className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-        {filtered.length === 0 && (
+      {tables.length === 0 ? (
+        <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <p className="text-lg font-bold">Nenhuma tabela encontrada</p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -326,8 +200,192 @@ export function PricingTables() {
                 : 'Não há tabelas cadastradas.'}
             </p>
           </CardContent>
-        )}
-      </Card>
+        </Card>
+      ) : (
+        <JetroTable
+          screenId="precificacao.tabelas"
+          columns={[
+            {
+              id: 'code',
+              header: 'Código',
+              accessorKey: 'code',
+              dataType: 'text',
+              defaultWidth: 100,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono">{String(value || '—')}</span>
+              ),
+            },
+            {
+              id: 'table_name',
+              header: 'Nome',
+              accessorKey: 'table_name',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'table_type',
+              header: 'Tipo',
+              accessorKey: 'table_type',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => (
+                <span className="text-xs">
+                  {TABLE_TYPE_OPTIONS.find((o) => o.value === value)?.label || String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'empresa',
+              header: 'Empresa',
+              accessorKey: 'empresa',
+              dataType: 'text',
+              defaultWidth: 130,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'filial',
+              header: 'Filial',
+              accessorKey: 'filial',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'vigencia',
+              header: 'Vigência',
+              dataType: 'text',
+              defaultWidth: 180,
+              getSortValue: (row) => row.data_inicial || '',
+              cell: ({ row }) => (
+                <span className="text-xs">
+                  {formatDate(row.data_inicial)} → {formatDate(row.data_final)}
+                </span>
+              ),
+            },
+            {
+              id: 'itens',
+              header: 'Itens',
+              dataType: 'number',
+              align: 'center',
+              defaultWidth: 80,
+              getSortValue: (row) => parseItems(row.items).length,
+              cell: ({ row }) => <span>{parseItems(row.items).length}</span>,
+            },
+            {
+              id: 'prioridade',
+              header: 'Prioridade',
+              accessorKey: 'prioridade',
+              dataType: 'number',
+              align: 'center',
+              defaultWidth: 90,
+              cell: ({ value }) => <span>{String(value ?? 0)}</span>,
+            },
+            {
+              id: 'status',
+              header: 'Situação',
+              accessorKey: 'status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              cell: ({ value }) => {
+                const s = String(value || '')
+                return (
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_BADGE[s] || 'bg-gray-100 text-gray-700'}`}
+                  >
+                    {STATUS_LABEL[s] || s}
+                  </span>
+                )
+              },
+            },
+            {
+              id: 'actions',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 130,
+              cell: ({ row }) => (
+                <div className="flex items-center justify-center gap-0.5">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleView(row)}
+                    className="h-7 w-7 p-0"
+                    title="Visualizar"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </Button>
+                  {canEditPriceTable(role) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEdit(row)}
+                      className="h-7 w-7 p-0 text-[#005B2E]"
+                      title="Editar"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  {canDuplicatePriceTable(role) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => openDuplicate(row)}
+                      className="h-7 w-7 p-0 text-blue-600"
+                      title="Duplicar"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  {canActivatePriceTable(role) &&
+                    row.status !== 'ativa' &&
+                    row.status !== 'cancelada' && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleStatusChange(row.id, 'ativa')}
+                        className="h-7 w-7 p-0 text-emerald-600"
+                        title="Ativar"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  {canActivatePriceTable(role) && row.status === 'ativa' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleStatusChange(row.id, 'inativa')}
+                      className="h-7 w-7 p-0 text-gray-500"
+                      title="Inativar"
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  {canCancelPriceTable(role) && row.status !== 'cancelada' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleStatusChange(row.id, 'cancelada')}
+                      className="h-7 w-7 p-0 text-red-600"
+                      title="Cancelar"
+                    >
+                      <Ban className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+          data={filtered}
+          emptyMessage="Nenhuma tabela corresponde aos filtros."
+          exportTitle="Tabelas de Preços — Central de Preços"
+          exportFilename="tabelas-precos-jetro.xlsx"
+        />
+      )}
 
       <PriceTableFormDialog
         open={formOpen}

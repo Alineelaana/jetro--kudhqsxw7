@@ -14,6 +14,7 @@ import { getNfeRecords, getNfceRecords } from '@/services/sales'
 import { getPurchaseInvoices } from '@/services/purchasing'
 import { STATUS_COLORS } from '@/lib/fiscal-types'
 import { useRealtime } from '@/hooks/use-realtime'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Loader2, Search, FileText, Download, Eye, Mail } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -117,7 +118,7 @@ export function DocumentosFiscais() {
           </Select>
         </CardContent>
       </Card>
-      {filtered.length === 0 ? (
+      {allDocs.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -125,100 +126,171 @@ export function DocumentosFiscais() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">Tipo</th>
-                  <th className="text-left px-3 py-3 font-bold">Número</th>
-                  <th className="text-left px-3 py-3 font-bold">Cliente/Emitente</th>
-                  <th className="text-left px-3 py-3 font-bold">Valor</th>
-                  <th className="text-left px-3 py-3 font-bold">Status</th>
-                  <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Data</th>
-                  <th className="text-center px-3 py-3 font-bold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.slice(0, 100).map((r, i) => {
-                  const num = (r.nfe_number ||
-                    r.nfse_number ||
-                    r.nfce_number ||
-                    r.cte_number ||
-                    r.mdfe_number ||
-                    r.invoice_number ||
-                    r.nota_numero ||
-                    '—') as string
-                  const name = (r.client_name ||
-                    r.tomador ||
-                    r.consumer_name ||
-                    r.emitente ||
-                    r.supplier_name ||
-                    r.nota_cliente ||
-                    '—') as string
-                  const val = (r.total_value || r.valor || r.valor_prestacao || '0,00') as string
-                  return (
-                    <tr key={i} className="border-b border-border hover:bg-[#005B2E]/5">
-                      <td className="px-3 py-3">
-                        <span className="text-xs font-bold px-2 py-1 rounded bg-[#005B2E]/10 text-[#005B2E]">
-                          {r._tipo as string}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="text-xs font-mono font-bold text-[#C89B3C]">{num}</span>
-                      </td>
-                      <td className="px-3 py-3">{name}</td>
-                      <td className="px-3 py-3 font-bold">R$ {val}</td>
-                      <td className="px-3 py-3">
-                        <span
-                          className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[r.status as string] || 'bg-gray-100 text-gray-600'}`}
-                        >
-                          {(r.status as string) || '—'}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 text-xs hidden sm:table-cell">
-                        {r.created
-                          ? new Date(r.created as string).toLocaleDateString('pt-BR')
-                          : '—'}
-                      </td>
-                      <td className="px-3 py-3">
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-blue-600"
-                            title="Visualizar"
-                            onClick={() => toast.info('Visualizando documento')}
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-[#005B2E]"
-                            title="Baixar XML"
-                            onClick={() => toast.info('Download XML')}
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-amber-600"
-                            title="Enviar e-mail"
-                            onClick={() => toast.info('Enviando por e-mail')}
-                          >
-                            <Mail className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <JetroTable
+          screenId="fiscal.documentos-fiscais"
+          columns={[
+            {
+              id: 'tipo',
+              header: 'Tipo',
+              dataType: 'text',
+              defaultWidth: 90,
+              align: 'center',
+              getSortValue: (row) => String(row._tipo || ''),
+              cell: ({ row }) => (
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#005B2E]/10 text-[#005B2E]">
+                  {String(row._tipo || '')}
+                </span>
+              ),
+            },
+            {
+              id: 'numero',
+              header: 'Número',
+              dataType: 'text',
+              defaultWidth: 120,
+              getSortValue: (row) =>
+                (row.nfe_number ||
+                  row.nfse_number ||
+                  row.nfce_number ||
+                  row.cte_number ||
+                  row.mdfe_number ||
+                  row.invoice_number ||
+                  row.nota_numero ||
+                  '') as string,
+              cell: ({ row }) => {
+                const num = (row.nfe_number ||
+                  row.nfse_number ||
+                  row.nfce_number ||
+                  row.cte_number ||
+                  row.mdfe_number ||
+                  row.invoice_number ||
+                  row.nota_numero ||
+                  '—') as string
+                return <span className="text-xs font-mono font-bold text-[#C89B3C]">{num}</span>
+              },
+            },
+            {
+              id: 'cliente_emitente',
+              header: 'Cliente / Emitente',
+              dataType: 'text',
+              defaultWidth: 220,
+              getSortValue: (row) =>
+                (row.client_name ||
+                  row.tomador ||
+                  row.consumer_name ||
+                  row.emitente ||
+                  row.supplier_name ||
+                  row.nota_cliente ||
+                  '') as string,
+              cell: ({ row }) => {
+                const name = (row.client_name ||
+                  row.tomador ||
+                  row.consumer_name ||
+                  row.emitente ||
+                  row.supplier_name ||
+                  row.nota_cliente ||
+                  '—') as string
+                return <span className="font-medium">{name}</span>
+              },
+            },
+            {
+              id: 'valor',
+              header: 'Valor',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 130,
+              getSortValue: (row) => {
+                const raw = (row.total_value || row.valor || row.valor_prestacao || '0') as string
+                return (
+                  parseFloat(
+                    String(raw)
+                      .replace(/[^\d.,]/g, '')
+                      .replace(',', '.'),
+                  ) || 0
+                )
+              },
+              cell: ({ row }) => {
+                const val = (row.total_value ||
+                  row.valor ||
+                  row.valor_prestacao ||
+                  '0,00') as string
+                return <span className="font-bold">R$ {val}</span>
+              },
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 120,
+              getSortValue: (row) => (row.status as string) || '',
+              cell: ({ row }) => (
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[row.status as string] || 'bg-gray-100 text-gray-600'}`}
+                >
+                  {(row.status as string) || '—'}
+                </span>
+              ),
+            },
+            {
+              id: 'data',
+              header: 'Data',
+              dataType: 'date',
+              defaultWidth: 110,
+              getSortValue: (row) => (row.created as string) || '',
+              cell: ({ row }) => (
+                <span className="text-xs">
+                  {row.created ? new Date(row.created as string).toLocaleDateString('pt-BR') : '—'}
+                </span>
+              ),
+            },
+            {
+              id: 'acoes',
+              header: 'Ações',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 120,
+              cell: () => (
+                <div className="flex items-center justify-center gap-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-blue-600 h-7 w-7 p-0"
+                    title="Visualizar"
+                    onClick={() => toast.info('Visualizando documento')}
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-[#005B2E] h-7 w-7 p-0"
+                    title="Baixar XML"
+                    onClick={() => toast.info('Download XML')}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-amber-600 h-7 w-7 p-0"
+                    title="Enviar e-mail"
+                    onClick={() => toast.info('Enviando por e-mail')}
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+          data={filtered}
+          rowKey={(r) => (r.id as string) || String(Math.random())}
+          emptyMessage="Nenhum documento corresponde aos filtros selecionados."
+          exportTitle="Documentos Fiscais — Jetro ERP"
+          exportFilename="documentos-fiscais-jetro.xlsx"
+        />
       )}
     </div>
   )

@@ -18,7 +18,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import {
-  FinancialTable,
   FinancialEmptyState,
   FinancialLoading,
   StatusBadge,
@@ -26,6 +25,7 @@ import {
 import { finGetList, finCreate, finUpdate, finDelete } from '@/services/financial'
 import { useRealtime } from '@/hooks/use-realtime'
 import type { FinancialScreenConfig } from '@/lib/financial-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Search, Pencil, Trash2, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -107,9 +107,75 @@ export function FinancialGenericScreen({ config }: { config: FinancialScreenConf
     }
   }
 
-  const tableHeaders = config.fields.slice(0, 4).map((f) => f.label)
-  if (config.statusField) tableHeaders.push('Status')
-  tableHeaders.push('Ações')
+  const columns: JetroColumnDef<any>[] = config.fields.slice(0, 4).map((f) => {
+    const isCurrency =
+      f.name.toLowerCase().includes('valor') || f.name.toLowerCase().includes('saldo')
+    const isDate = f.type === 'date' || f.name.toLowerCase().includes('data')
+    return {
+      id: f.name,
+      header: f.label,
+      accessorKey: f.name,
+      dataType: isCurrency ? 'currency' : isDate ? 'date' : f.type === 'number' ? 'number' : 'text',
+      align: isCurrency ? 'right' : 'left',
+      getSortValue: isCurrency ? (row: any) => parseFloat(row[f.name] || '0') : undefined,
+      cell: ({ value }: { value: unknown }) => {
+        if (isCurrency) {
+          const num = parseFloat(String(value || '0'))
+          return (
+            <span className="font-medium">
+              {value ? num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—'}
+            </span>
+          )
+        }
+        return <span>{String(value || '—')}</span>
+      },
+    }
+  })
+
+  if (config.statusField) {
+    columns.push({
+      id: config.statusField,
+      header: 'Status',
+      accessorKey: config.statusField,
+      dataType: 'text',
+      align: 'center',
+      defaultWidth: 120,
+      cell: ({ value }) => <StatusBadge status={String(value || '')} />,
+    })
+  }
+
+  columns.push({
+    id: 'actions',
+    header: 'Ações',
+    align: 'right',
+    sortable: false,
+    hideable: false,
+    resizable: false,
+    draggable: false,
+    defaultWidth: 90,
+    cell: ({ row }) => (
+      <div className="flex justify-end gap-1">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => openEdit(row)}
+          className="text-[#005B2E] hover:bg-[#005B2E]/10 h-7 w-7 p-0"
+          title="Editar"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => handleDelete(row.id)}
+          className="text-red-600 hover:bg-red-50 h-7 w-7 p-0"
+          title="Excluir"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </Button>
+      </div>
+    ),
+  })
 
   return (
     <div className="space-y-4">
@@ -130,52 +196,17 @@ export function FinancialGenericScreen({ config }: { config: FinancialScreenConf
       </div>
       {loading ? (
         <FinancialLoading />
-      ) : filtered.length === 0 ? (
+      ) : records.length === 0 ? (
         <FinancialEmptyState message={`Nenhum registro encontrado`} />
       ) : (
-        <FinancialTable headers={tableHeaders}>
-          {filtered.map((r) => (
-            <tr key={r.id} className="border-b border-border hover:bg-[#005B2E]/5">
-              {config.fields.slice(0, 4).map((f) => (
-                <td key={f.name} className="px-3 py-3">
-                  {f.name === 'valor'
-                    ? r[f.name]
-                      ? parseFloat(r[f.name]).toLocaleString('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        })
-                      : '—'
-                    : r[f.name] || '—'}
-                </td>
-              ))}
-              {config.statusField && (
-                <td className="px-3 py-3">
-                  <StatusBadge status={r[config.statusField]} />
-                </td>
-              )}
-              <td className="px-3 py-3">
-                <div className="flex gap-0.5">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => openEdit(r)}
-                    className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8 w-8 p-0"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(r.id)}
-                    className="text-red-600 hover:bg-red-50 h-8 w-8 p-0"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </FinancialTable>
+        <JetroTable
+          screenId={`financeiro.${config.collection}`}
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhum registro corresponde aos filtros."
+          exportTitle={`${config.title} — Jetro ERP`}
+          exportFilename={`${config.collection}-jetro.xlsx`}
+        />
       )}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

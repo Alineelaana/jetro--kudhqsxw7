@@ -27,6 +27,7 @@ import {
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { STATUS_COLORS, type SalesOrder } from '@/lib/sales-types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Search, Loader2, FileText, Check, Truck } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -159,67 +160,107 @@ export function InvoicingPanel() {
           </div>
         </CardContent>
       </Card>
-      {readyOrders.length === 0 ? (
+      {orders.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-bold">Nenhum pedido pronto para faturamento.</p>
+            <p className="text-lg font-bold">Nenhum pedido cadastrado.</p>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#01361D] text-white">
-                  <th className="text-left px-3 py-3 font-bold">Pedido</th>
-                  <th className="text-left px-3 py-3 font-bold">Cliente</th>
-                  <th className="text-left px-3 py-3 font-bold hidden md:table-cell">Vendedor</th>
-                  <th className="text-left px-3 py-3 font-bold">Valor Total</th>
-                  <th className="text-left px-3 py-3 font-bold hidden sm:table-cell">Entrega</th>
-                  <th className="text-left px-3 py-3 font-bold">Status</th>
-                  <th className="text-center px-3 py-3 font-bold">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {readyOrders.map((o) => (
-                  <tr key={o.id} className="border-b border-border hover:bg-[#005B2E]/5">
-                    <td className="px-3 py-3">
-                      <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                        {o.order_number}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 font-medium">{o.client_name}</td>
-                    <td className="px-3 py-3 hidden md:table-cell">{o.salesperson_name || '—'}</td>
-                    <td className="px-3 py-3 font-bold">R$ {o.total_value || '0,00'}</td>
-                    <td className="px-3 py-3 text-xs hidden sm:table-cell">
-                      {o.delivery_date || '—'}
-                    </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${STATUS_COLORS[o.status] || ''}`}
-                      >
-                        {o.status}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setConfirmOrder(o)
-                          setConfirmOpen(true)
-                        }}
-                        className="bg-[#005B2E] hover:bg-[#01361D] text-white"
-                      >
-                        <Check className="w-3.5 h-3.5 mr-1" /> Faturar
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <JetroTable
+          screenId="vendas.fila-faturamento"
+          columns={[
+            {
+              id: 'order_number',
+              header: 'Pedido',
+              accessorKey: 'order_number',
+              dataType: 'text',
+              defaultWidth: 120,
+              cell: ({ value }) => (
+                <span className="text-xs font-mono font-bold text-[#C89B3C]">
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'client_name',
+              header: 'Cliente',
+              accessorKey: 'client_name',
+              dataType: 'text',
+              defaultWidth: 220,
+              cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+            },
+            {
+              id: 'salesperson_name',
+              header: 'Vendedor',
+              accessorKey: 'salesperson_name',
+              dataType: 'text',
+              defaultWidth: 160,
+              cell: ({ value }) => <span>{String(value || '—')}</span>,
+            },
+            {
+              id: 'total_value',
+              header: 'Valor Total',
+              accessorKey: 'total_value',
+              dataType: 'currency',
+              align: 'right',
+              defaultWidth: 130,
+              getSortValue: (row) =>
+                parseFloat(String(row.total_value || '0').replace(',', '.')) || 0,
+              cell: ({ value }) => <span className="font-bold">R$ {String(value || '0,00')}</span>,
+            },
+            {
+              id: 'delivery_date',
+              header: 'Entrega',
+              accessorKey: 'delivery_date',
+              dataType: 'date',
+              defaultWidth: 110,
+              cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
+            },
+            {
+              id: 'status',
+              header: 'Status',
+              accessorKey: 'status',
+              dataType: 'text',
+              align: 'center',
+              defaultWidth: 130,
+              cell: ({ value }) => (
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded ${STATUS_COLORS[String(value || '')] || ''}`}
+                >
+                  {String(value || '—')}
+                </span>
+              ),
+            },
+            {
+              id: 'actions',
+              header: 'Ação',
+              align: 'center',
+              sortable: false,
+              hideable: false,
+              resizable: false,
+              draggable: false,
+              defaultWidth: 110,
+              cell: ({ row }) => (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setConfirmOrder(row)
+                    setConfirmOpen(true)
+                  }}
+                  className="bg-[#005B2E] hover:bg-[#01361D] text-white h-7 text-xs px-2"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1" /> Faturar
+                </Button>
+              ),
+            },
+          ]}
+          data={readyOrders}
+          emptyMessage="Nenhum pedido pronto para faturamento corresponde aos filtros."
+          exportTitle="Fila de Faturamento — Jetro ERP"
+          exportFilename="fila-faturamento-jetro.xlsx"
+        />
       )}
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="max-w-md">
