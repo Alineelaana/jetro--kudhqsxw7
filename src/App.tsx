@@ -133,6 +133,8 @@ import CollectionCenterCertification from './pages/CollectionCenterCertification
 import MeusChamadosScreen from '@/components/chamados/meus-chamados-screen'
 import NovoChamadoScreen from '@/components/chamados/novo-chamado-screen'
 import ChamadoDetalhesScreen from '@/components/chamados/chamado-detalhes-screen'
+import ConfiguracaoSlaScreen from '@/components/chamados/configuracao-sla-screen'
+import PainelChamadosScreen from '@/components/chamados/painel-chamados-screen'
 import { UserPreferencesProvider } from '@/hooks/use-user-preferences'
 
 const App = () => (
@@ -160,7 +162,20 @@ const App = () => (
 
                               {/* Central de Chamados Corporativa */}
                               <Route path="/admin/chamados" element={<MeusChamadosScreen />} />
+                              <Route path="/admin/chamados/meus" element={<MeusChamadosScreen />} />
                               <Route path="/admin/chamados/novo" element={<NovoChamadoScreen />} />
+                              <Route
+                                path="/admin/chamados/painel"
+                                element={<PainelChamadosScreen />}
+                              />
+                              <Route
+                                path="/admin/chamados/sla"
+                                element={<ConfiguracaoSlaScreen />}
+                              />
+                              <Route
+                                path="/admin/configuracoes/sla-chamados"
+                                element={<ConfiguracaoSlaScreen />}
+                              />
                               <Route
                                 path="/admin/chamados/:id"
                                 element={<ChamadoDetalhesScreen />}

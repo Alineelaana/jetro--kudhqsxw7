@@ -232,6 +232,7 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Parâmetros', route: '/admin/configuracoes/parametros' },
           { label: 'Permissões', route: '/admin/configuracoes/permissoes' },
           { label: 'Segurança', route: '/admin/configuracoes/seguranca' },
+          { label: 'SLA Chamados', route: '/admin/configuracoes/sla-chamados' },
         ],
       },
       { label: 'Phase0 Foundation', icon: Layers, route: '/admin/phase0-foundation' },
@@ -258,8 +259,10 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         icon: Inbox,
         route: '/admin/chamados',
         children: [
+          { label: 'Configuração de SLA', route: '/admin/chamados/sla' },
           { label: 'Meus Chamados', route: '/admin/chamados' },
           { label: 'Novo Chamado', route: '/admin/chamados/novo' },
+          { label: 'Painel', route: '/admin/chamados/painel' },
         ],
       },
     ],

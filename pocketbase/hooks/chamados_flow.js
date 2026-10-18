@@ -47,6 +47,80 @@ onRecordCreate((e) => {
     e.record.set('status', 'novo')
   }
 
+  // Preencher prazos de atendimento e resolução automaticamente a partir de chamados_sla_config
+  // se ainda não vierem definidos
+  try {
+    var prioridade = e.record.getString('prioridade') || 'normal'
+    var setor = e.record.getString('setor_responsavel') || ''
+
+    var slaRegra = null
+    // 1. Tentar buscar regra específica para o setor + prioridade
+    if (setor) {
+      try {
+        var regrasSetor = $app.findRecordsByFilter(
+          'chamados_sla_config',
+          'ativo = true && prioridade = "' + prioridade + '" && setor = "' + setor + '"',
+          '-created',
+          1,
+          0,
+        )
+        if (regrasSetor && regrasSetor.length > 0) {
+          slaRegra = regrasSetor[0]
+        }
+      } catch (_) {}
+    }
+
+    // 2. Se não achou regra de setor, buscar regra geral da prioridade (setor vazio ou qualquer)
+    if (!slaRegra) {
+      try {
+        var regrasGerais = $app.findRecordsByFilter(
+          'chamados_sla_config',
+          'ativo = true && prioridade = "' + prioridade + '" && (setor = "" || setor = null)',
+          '-created',
+          1,
+          0,
+        )
+        if (regrasGerais && regrasGerais.length > 0) {
+          slaRegra = regrasGerais[0]
+        }
+      } catch (_) {}
+    }
+
+    var horasResposta = 12
+    var horasResolucao = 48
+    if (slaRegra) {
+      var hResp = slaRegra.getInt('tempo_primeira_resposta_horas')
+      var hRes = slaRegra.getInt('tempo_resolucao_horas')
+      if (hResp > 0) horasResposta = hResp
+      if (hRes > 0) horasResolucao = hRes
+    } else {
+      if (prioridade === 'urgente') {
+        horasResposta = 2
+        horasResolucao = 8
+      } else if (prioridade === 'alta') {
+        horasResposta = 4
+        horasResolucao = 24
+      } else if (prioridade === 'baixa') {
+        horasResposta = 24
+        horasResolucao = 72
+      }
+    }
+
+    var nowMs = Date.now()
+    if (!e.record.getString('prazo_atendimento')) {
+      var dtAtendimento = new Date(nowMs + horasResposta * 3600 * 1000)
+      e.record.set('prazo_atendimento', dtAtendimento.toISOString())
+    }
+    if (!e.record.getString('prazo_resolucao')) {
+      var dtResolucao = new Date(nowMs + horasResolucao * 3600 * 1000)
+      e.record.set('prazo_resolucao', dtResolucao.toISOString())
+    }
+  } catch (errSlaHook) {
+    $app
+      .logger()
+      .warn('Erro ao calcular SLA automático para o chamado', 'error', String(errSlaHook))
+  }
+
   e.next()
 }, 'chamados')
 
@@ -299,6 +373,16 @@ onRecordUpdateRequest((e) => {
         'É obrigatório informar uma justificativa com no mínimo 5 caracteres para cancelar o chamado.',
       )
     }
+  }
+
+  // Preencher data_conclusao automaticamente quando finalizado ou cancelado
+  if (novoStatus === 'finalizado' || novoStatus === 'cancelado') {
+    if (!rec.getString('data_conclusao')) {
+      rec.set('data_conclusao', new Date().toISOString())
+    }
+  } else if (novoStatus === 'novo' || novoStatus === 'andamento' || novoStatus === 'aprovacao') {
+    // Se reaberto ou retornado para outro status, limpar data_conclusao
+    rec.set('data_conclusao', '')
   }
 
   e.next()

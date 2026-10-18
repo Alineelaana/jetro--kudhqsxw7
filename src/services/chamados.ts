@@ -19,17 +19,47 @@ export interface Chamado {
   anexos?: string[]
   prazo_atendimento?: string
   prazo_resolucao?: string
+  data_conclusao?: string
   cancelado_justificativa?: string
   created: string
   updated: string
   expand?: {
     setor_responsavel?: { id: string; name: string; code?: string }
-    solicitante?: { id: string; name: string; email: string; avatar?: string }
-    profissional_responsavel?: { id: string; name: string; email: string; avatar?: string }
+    solicitante?: {
+      id: string
+      name: string
+      email: string
+      avatar?: string
+      departamento?: string
+    }
+    profissional_responsavel?: {
+      id: string
+      name: string
+      email: string
+      avatar?: string
+      departamento?: string
+    }
     aprovador?: { id: string; name: string; email: string; avatar?: string }
     participantes?: Array<{ id: string; name: string; email: string; avatar?: string }>
   }
 }
+
+export interface ChamadoSlaConfig {
+  id: string
+  prioridade: ChamadoPrioridade
+  setor?: string
+  tempo_primeira_resposta_horas: number
+  tempo_resolucao_horas: number
+  ativo: boolean
+  descricao?: string
+  created: string
+  updated: string
+  expand?: {
+    setor?: { id: string; name: string; code?: string }
+  }
+}
+
+export type SituacaoSLA = 'dentro_prazo' | 'proximo_vencimento' | 'atrasado'
 
 export interface ChamadoHistorico {
   id: string
@@ -332,5 +362,174 @@ export const chamadosService = {
     filename: string,
   ) {
     return pb.files.getURL(record, filename)
+  },
+
+  // SLA Configuration CRUD
+  async listarSlaConfigs(): Promise<ChamadoSlaConfig[]> {
+    return pb.collection('chamados_sla_config').getFullList<ChamadoSlaConfig>({
+      sort: '-ativo,prioridade',
+      expand: 'setor',
+    })
+  },
+
+  async criarSlaConfig(data: Partial<ChamadoSlaConfig>): Promise<ChamadoSlaConfig> {
+    return pb.collection('chamados_sla_config').create<ChamadoSlaConfig>(data, {
+      expand: 'setor',
+    })
+  },
+
+  async atualizarSlaConfig(id: string, data: Partial<ChamadoSlaConfig>): Promise<ChamadoSlaConfig> {
+    return pb.collection('chamados_sla_config').update<ChamadoSlaConfig>(id, data, {
+      expand: 'setor',
+    })
+  },
+
+  async excluirSlaConfig(id: string): Promise<boolean> {
+    return pb.collection('chamados_sla_config').delete(id)
+  },
+
+  /**
+   * Determina a situação de SLA de um chamado real:
+   * - Se finalizado: compara data de conclusão (ou updated) com prazo_resolucao.
+   * - Se em andamento/novo/aprovacao: compara Date.now() com prazo_resolucao.
+   *   - Atrasado: extrapolou o prazo
+   *   - Próximo do vencimento: restam menos de 20% do prazo total ou menos de 8 horas
+   *   - Dentro do prazo: tempo regular
+   */
+  calcularSituacaoSla(
+    chamado: Chamado,
+    slaConfigs?: ChamadoSlaConfig[],
+  ): {
+    situacao: SituacaoSLA
+    prazoLimite: Date
+    percentualDecorrido: number
+    estaAtrasado: boolean
+    resolvidoNoPrazo: boolean | null
+  } {
+    const dataCriacao = new Date(chamado.created).getTime()
+    const now = Date.now()
+
+    let prazoLimiteMs: number
+
+    if (chamado.prazo_resolucao) {
+      prazoLimiteMs = new Date(chamado.prazo_resolucao).getTime()
+    } else {
+      // Buscar regra correspondente por prioridade e setor
+      const prioridade = chamado.prioridade || 'normal'
+      const setor = chamado.setor_responsavel
+      let horasResolucao = 48
+
+      if (slaConfigs && slaConfigs.length > 0) {
+        const especifica = slaConfigs.find(
+          (c) => c.ativo && c.prioridade === prioridade && c.setor === setor,
+        )
+        const geral = slaConfigs.find(
+          (c) => c.ativo && c.prioridade === prioridade && (!c.setor || c.setor === ''),
+        )
+        if (especifica) {
+          horasResolucao = especifica.tempo_resolucao_horas
+        } else if (geral) {
+          horasResolucao = geral.tempo_resolucao_horas
+        }
+      } else {
+        if (prioridade === 'urgente') horasResolucao = 8
+        else if (prioridade === 'alta') horasResolucao = 24
+        else if (prioridade === 'baixa') horasResolucao = 72
+      }
+
+      prazoLimiteMs = dataCriacao + horasResolucao * 3600 * 1000
+    }
+
+    const prazoTotal = Math.max(prazoLimiteMs - dataCriacao, 1)
+
+    // Se chamado já finalizado
+    if (chamado.status === 'finalizado') {
+      const dataFim = chamado.data_conclusao
+        ? new Date(chamado.data_conclusao).getTime()
+        : new Date(chamado.updated).getTime()
+
+      const dentro = dataFim <= prazoLimiteMs
+      return {
+        situacao: dentro ? 'dentro_prazo' : 'atrasado',
+        prazoLimite: new Date(prazoLimiteMs),
+        percentualDecorrido: 100,
+        estaAtrasado: !dentro,
+        resolvidoNoPrazo: dentro,
+      }
+    }
+
+    // Se cancelado
+    if (chamado.status === 'cancelado') {
+      return {
+        situacao: 'dentro_prazo',
+        prazoLimite: new Date(prazoLimiteMs),
+        percentualDecorrido: 0,
+        estaAtrasado: false,
+        resolvidoNoPrazo: null,
+      }
+    }
+
+    // Chamado em aberto (novo, andamento, aprovacao)
+    const tempoDecorrido = Math.max(now - dataCriacao, 0)
+    const percentual = Math.min(Math.round((tempoDecorrido / prazoTotal) * 100), 200)
+
+    if (now > prazoLimiteMs) {
+      return {
+        situacao: 'atrasado',
+        prazoLimite: new Date(prazoLimiteMs),
+        percentualDecorrido: percentual,
+        estaAtrasado: true,
+        resolvidoNoPrazo: false,
+      }
+    }
+
+    const tempoRestante = prazoLimiteMs - now
+    // Próximo do vencimento: se resta menos de 20% do prazo total ou menos de 8 horas
+    if (tempoRestante <= prazoTotal * 0.25 || tempoRestante <= 8 * 3600 * 1000) {
+      return {
+        situacao: 'proximo_vencimento',
+        prazoLimite: new Date(prazoLimiteMs),
+        percentualDecorrido: percentual,
+        estaAtrasado: false,
+        resolvidoNoPrazo: null,
+      }
+    }
+
+    return {
+      situacao: 'dentro_prazo',
+      prazoLimite: new Date(prazoLimiteMs),
+      percentualDecorrido: percentual,
+      estaAtrasado: false,
+      resolvidoNoPrazo: null,
+    }
+  },
+
+  /**
+   * Buscar todos os chamados para dashboard gerencial com expansões completas
+   */
+  async listarTodosChamadosParaDashboard(filtroExtra?: string): Promise<Chamado[]> {
+    return pb.collection('chamados').getFullList<Chamado>({
+      filter: filtroExtra,
+      sort: '-created',
+      expand: 'setor_responsavel,solicitante,profissional_responsavel,aprovador',
+    })
+  },
+
+  /**
+   * Buscar contagem e dados de comunicações para detalhamento operacional
+   */
+  async listarTodasComunicacoes(chamadosIds?: string[]): Promise<ChamadoComunicacao[]> {
+    try {
+      let filter = ''
+      if (chamadosIds && chamadosIds.length > 0 && chamadosIds.length <= 50) {
+        filter = chamadosIds.map((id) => `chamado = '${id}'`).join(' || ')
+      }
+      return await pb.collection('chamados_comunicacao').getFullList<ChamadoComunicacao>({
+        filter: filter || undefined,
+        sort: '-created',
+      })
+    } catch (_) {
+      return []
+    }
   },
 }
