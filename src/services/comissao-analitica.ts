@@ -992,24 +992,57 @@ export async function consultarComissaoAnalitica(
 // ----------------------------------------------------
 // Ações de Workflow de Fechamento (Aprovar, Pagar, Reabrir)
 // ----------------------------------------------------
+export interface AtualizarStatusApuracaoPayload {
+  apurationId?: string
+  novoStatus: string
+  justificativa?: string
+  competencia?: string
+  rcaCode?: string
+  rcaName?: string
+  metodoApuracao?: string
+  valorTotal?: number
+  baseCalculo?: number
+}
+
 export async function atualizarStatusApuracao(
-  apurationId: string,
-  novoStatus: string,
-  justificativa?: string,
+  payload: AtualizarStatusApuracaoPayload | string,
+  novoStatusArg?: string,
+  justificativaArg?: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
+    const bodyObj: Record<string, any> = {}
+
+    if (typeof payload === 'string') {
+      bodyObj.apuration_id = payload
+      bodyObj.new_status = novoStatusArg || ''
+      bodyObj.justificativa = justificativaArg || ''
+    } else {
+      bodyObj.apuration_id = payload.apurationId || ''
+      bodyObj.new_status = payload.novoStatus
+      bodyObj.justificativa = payload.justificativa || ''
+      if (payload.competencia) bodyObj.competencia = payload.competencia
+      if (payload.rcaCode) bodyObj.rca_code = payload.rcaCode
+      if (payload.rcaName) bodyObj.rca_name = payload.rcaName
+      if (payload.metodoApuracao) bodyObj.metodo_apuracao = payload.metodoApuracao
+      if (payload.valorTotal != null) bodyObj.valor_total = payload.valorTotal
+      if (payload.baseCalculo != null) bodyObj.base_calculo = payload.baseCalculo
+    }
+
     const res = await pb.send('/backend/v1/comissao-analitica/status-update', {
       method: 'POST',
-      body: JSON.stringify({
-        apuration_id: apurationId,
-        new_status: novoStatus,
-        justificativa: justificativa || '',
-      }),
+      body: JSON.stringify(bodyObj),
       headers: { 'Content-Type': 'application/json' },
     })
     return { success: true, message: res.message || 'Status atualizado com sucesso!' }
   } catch (err: any) {
-    const msg = err?.response?.message || err?.message || 'Falha ao atualizar status da apuração'
+    let msg = err?.response?.message || err?.message || 'Falha ao atualizar status da apuração'
+    // Sanitização para garantir que erros técnicos de SQL nunca vazem para o usuário
+    if (msg.includes('sql: no rows in result set') || msg.includes('no rows in result set')) {
+      msg =
+        'Registro de apuração não localizado para a competência informada. O sistema já efetuou o tratamento automático.'
+    } else if (msg.includes('UNIQUE constraint failed') || msg.includes('constraint failed')) {
+      msg = 'Já existe um registro para esta apuração.'
+    }
     return { success: false, message: msg }
   }
 }

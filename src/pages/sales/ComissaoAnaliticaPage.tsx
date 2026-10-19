@@ -247,14 +247,20 @@ export default function ComissaoAnaliticaPage() {
 
   const handleAtualizarStatus = async (novoStatus: string, justificativa?: string) => {
     if (!resultado) return
-    const res = await atualizarStatusApuracao(
-      resultado.statusApuracao.id || 'default',
+    const res = await atualizarStatusApuracao({
+      apurationId: resultado.statusApuracao.id,
       novoStatus,
       justificativa,
-    )
+      competencia: resultado.statusApuracao.competencia || filtros.dataInicio?.slice(0, 7),
+      rcaCode: rcaSelecionado?.code,
+      rcaName: rcaSelecionado?.name,
+      metodoApuracao: filtros.metodoApuracao,
+      valorTotal: resultado.fechamento?.valorFinalReceber,
+      baseCalculo: resultado.indicadores?.baseCalculo,
+    })
     if (res.success) {
       toast({
-        title: 'Status Atualizado',
+        title: novoStatus === 'reaberta' ? 'Apuração Reaberta' : 'Status Atualizado',
         description: res.message,
       })
       executarConsulta()
