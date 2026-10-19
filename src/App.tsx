@@ -44,7 +44,7 @@ import ComissoesMixPage from './pages/sales/ComissoesMixPage'
 import PremiacoesPage from './pages/sales/PremiacoesPage'
 import DescontosDeducoesPage from './pages/sales/DescontosDeducoesPage'
 import SalesDashboardPage from './pages/sales/SalesDashboardPage'
-import InserirClientesPage from './pages/sales/InserirClientesPage'
+import { InserirClientesScreen } from '@/components/vendas/inserir-clientes-screen'
 import SalesOrdersPage from './pages/sales/SalesOrdersPage'
 import SalesOrdersQueryPage from './pages/sales/SalesOrdersQueryPage'
 import InvoicingPage from './pages/sales/InvoicingPage'
@@ -351,7 +351,7 @@ const App = () => (
                               <Route path="/admin/vendas" element={<SalesDashboardPage />} />
                               <Route
                                 path="/admin/vendas/inserir-clientes"
-                                element={<InserirClientesPage />}
+                                element={<InserirClientesScreen />}
                               />
                               <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
                               <Route

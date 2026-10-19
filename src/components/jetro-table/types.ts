@@ -11,7 +11,8 @@ export interface SortState {
 
 export interface JetroColumnDef<T = any> {
   id: string
-  header: string
+  header?: string
+  title?: string
   accessorKey?: keyof T | string
   /**
    * Tipo semântico de dados para ordenação precisa:

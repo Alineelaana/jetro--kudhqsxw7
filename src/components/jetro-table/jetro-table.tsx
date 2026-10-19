@@ -67,7 +67,7 @@ export interface JetroTableProps<T> {
   renderSubComponent?: (row: T) => React.ReactNode
 }
 
-export function JetroTable<T extends Record<string, any>>({
+export function JetroTable<T extends object = Record<string, any>>({
   screenId,
   columns,
   data,
@@ -428,7 +428,7 @@ export function JetroTable<T extends Record<string, any>>({
                       }}
                       title={
                         isSortable
-                          ? `Clique para ordenar por ${col.header} (1º asc, 2º desc, 3º padrão)`
+                          ? `Clique para ordenar por ${col.header || col.title || col.id} (1º asc, 2º desc, 3º padrão)`
                           : undefined
                       }
                     >
@@ -451,7 +451,7 @@ export function JetroTable<T extends Record<string, any>>({
                           </span>
                         )}
 
-                        <span className="truncate">{col.header}</span>
+                        <span className="truncate">{col.header || col.title || col.id}</span>
 
                         {isSortable && (
                           <span
