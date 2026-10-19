@@ -109,6 +109,11 @@ export interface FechamentoApuracao {
   estornosDevolucoes: number
   ajustes: number
   campanhasPremiacoesElegiveis: number
+  totalPremiacoesAprovadas: number
+  totalDeducoesAprovadas: number
+  totalPremiacoesPendentes: number
+  totalDeducoesPendentes: number
+  totalLiquidoPagar: number
   adiantamentosCompensar: number
   valorFinalReceber: number
 
@@ -166,6 +171,8 @@ export interface ResultadoComissaoAnalitica {
   correcaoArredondamento: number
   resumoPorTipo: ResumoTipoItem[]
   campanhas: CampanhaPremiacaoItem[]
+  premiacoesDetalhadas: any[]
+  deducoesDetalhadas: any[]
   fechamento: FechamentoApuracao
   statusApuracao: StatusApuracaoInfo
 }
@@ -872,8 +879,59 @@ export async function consultarComissaoAnalitica(
   ]
 
   // ----------------------------------------------------
-  // CAMPANHAS E PREMIAÇÕES
+  // 8. CAMPANHAS, PREMIAÇÕES E DESCONTOS/DEDUÇÕES (INTEGRAÇÃO REAL)
   // ----------------------------------------------------
+  const competenciaConsulta = filtros.dataInicio ? filtros.dataInicio.slice(0, 7) : '2026-09'
+
+  // Consulta de Premiações cadastradas da competência e profissional
+  let premiacoesDetalhadas: any[] = []
+  try {
+    const filterAwards = [`competencia = "${competenciaConsulta}"`]
+    if (rcaAtual?.code) {
+      filterAwards.push(`beneficiary_code = "${rcaAtual.code}"`)
+    }
+    premiacoesDetalhadas = await pb.collection('commission_awards').getFullList({
+      filter: filterAwards.join(' && '),
+      sort: '-created',
+      requestKey: null,
+    })
+  } catch (errAwards) {
+    console.warn('Erro ao buscar commission_awards:', errAwards)
+  }
+
+  // Consulta de Descontos e Deduções cadastrados da competência e profissional
+  let deducoesDetalhadas: any[] = []
+  try {
+    const filterDeds = [`competencia = "${competenciaConsulta}"`]
+    if (rcaAtual?.code) {
+      filterDeds.push(`beneficiary_code = "${rcaAtual.code}"`)
+    }
+    deducoesDetalhadas = await pb.collection('commission_deductions').getFullList({
+      filter: filterDeds.join(' && '),
+      sort: '-created',
+      requestKey: null,
+    })
+  } catch (errDeds) {
+    console.warn('Erro ao buscar commission_deductions:', errDeds)
+  }
+
+  // Somatórias: SOMENTE lançamentos APROVADOS compõem o total líquido a pagar
+  const totalPremiacoesAprovadas = premiacoesDetalhadas
+    .filter((a) => a.status === 'Aprovado')
+    .reduce((acc, a) => acc + (Number(a.amount) || 0), 0)
+
+  const totalPremiacoesPendentes = premiacoesDetalhadas
+    .filter((a) => a.status === 'Pendente')
+    .reduce((acc, a) => acc + (Number(a.amount) || 0), 0)
+
+  const totalDeducoesAprovadas = deducoesDetalhadas
+    .filter((d) => d.status === 'Aprovado')
+    .reduce((acc, d) => acc + (Number(d.amount) || 0), 0)
+
+  const totalDeducoesPendentes = deducoesDetalhadas
+    .filter((d) => d.status === 'Pendente')
+    .reduce((acc, d) => acc + (Number(d.amount) || 0), 0)
+
   const campanhas: CampanhaPremiacaoItem[] = [
     {
       id: 'camp-01',
@@ -910,27 +968,36 @@ export async function consultarComissaoAnalitica(
     },
   ]
 
-  // Total Campanhas = 248.15 + 250.00 + 200.74 = 698.89
-  const totalCampanhas = campanhas.filter((c) => c.elegivel).reduce((acc, c) => acc + c.valor, 0)
+  const totalCampanhasElegiveis = campanhas
+    .filter((c) => c.elegivel)
+    .reduce((acc, c) => acc + c.valor, 0)
 
   // ----------------------------------------------------
-  // FECHAMENTO DA APURAÇÃO
-  // 9.669,53 (comissões apuradas) + 698,89 (campanhas) = 10.368,42 (Valor final a receber)
+  // FECHAMENTO DA APURAÇÃO:
+  // Comissões (+ Premiações Aprovadas) (- Deduções Aprovadas) = Total Líquido a Pagar
   // ----------------------------------------------------
-  const valorFinalReceber = Number((comissaoTitulos + totalCampanhas).toFixed(2))
+  const baseComissaoApurada = comissaoTitulos + totalCampanhasElegiveis
+  const totalLiquidoPagar = Number(
+    (baseComissaoApurada + totalPremiacoesAprovadas - totalDeducoesAprovadas).toFixed(2),
+  )
 
   const fechamento: FechamentoApuracao = {
     totalComissoesPositivas: comissaoTitulos,
     estornosDevolucoes: 0.0,
     ajustes: correcaoArredondamento,
-    campanhasPremiacoesElegiveis: totalCampanhas,
+    campanhasPremiacoesElegiveis: totalCampanhasElegiveis,
+    totalPremiacoesAprovadas: Number(totalPremiacoesAprovadas.toFixed(2)),
+    totalDeducoesAprovadas: Number(totalDeducoesAprovadas.toFixed(2)),
+    totalPremiacoesPendentes: Number(totalPremiacoesPendentes.toFixed(2)),
+    totalDeducoesPendentes: Number(totalDeducoesPendentes.toFixed(2)),
+    totalLiquidoPagar: totalLiquidoPagar,
     adiantamentosCompensar: 0.0,
-    valorFinalReceber: valorFinalReceber,
-    valorTotalNFs: valorFinalReceber,
+    valorFinalReceber: totalLiquidoPagar,
+    valorTotalNFs: totalLiquidoPagar,
     valorTotalTitulos: baseTítulos,
     totalRecebimentos: baseTítulos,
     valorJaPago: 0.0,
-    saldoPendente: valorFinalReceber,
+    saldoPendente: totalLiquidoPagar,
   }
 
   // ----------------------------------------------------
@@ -984,6 +1051,8 @@ export async function consultarComissaoAnalitica(
     correcaoArredondamento,
     resumoPorTipo,
     campanhas,
+    premiacoesDetalhadas,
+    deducoesDetalhadas,
     fechamento,
     statusApuracao: statusInfo,
   }

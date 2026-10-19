@@ -346,6 +346,8 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewSales,
         children: [
           { label: 'Comissão Analítica', route: '/admin/comissao-analitica' },
+          { label: 'Descontos e Deduções', route: '/admin/descontos-deducoes' },
+          { label: 'Premiações', route: '/admin/premiacoes' },
           { label: 'Regras de Comissão', route: '/admin/regras-comissao' },
         ],
       },

@@ -24,7 +24,10 @@ import {
   Receipt,
   FileCheck2,
   AlertTriangle,
+  MinusCircle,
+  ExternalLink,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 interface TabelaProps {
   lancamentos: LancamentoComissao[]
@@ -32,6 +35,8 @@ interface TabelaProps {
   correcaoArredondamento: number
   resumoTipo: ResumoTipoItem[]
   campanhas: CampanhaPremiacaoItem[]
+  premiacoesDetalhadas?: any[]
+  deducoesDetalhadas?: any[]
   fechamento: FechamentoApuracao
   mensagemBloqueio?: string
   onAbrirPedido: (pedido: string, id?: string) => void
@@ -64,6 +69,8 @@ export function ComissaoAnaliticaTabela({
   correcaoArredondamento,
   resumoTipo,
   campanhas,
+  premiacoesDetalhadas = [],
+  deducoesDetalhadas = [],
   fechamento,
   mensagemBloqueio,
   onAbrirPedido,
@@ -592,61 +599,230 @@ export function ComissaoAnaliticaTabela({
         </div>
       </div>
 
-      {/* 8. CAMPANHAS E PREMIAÇÕES (Print 2: linhas de Campanhas de Vendas) */}
+      {/* 8. SEÇÃO INTEGRADA: PREMIAÇÕES E PAGAMENTOS EXTRAS */}
       <div className="bg-card border border-border rounded-xl shadow-xs overflow-hidden">
         <div className="bg-[#002817] text-white px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="w-4 h-4 text-[#C9A227]" />
             <h3 className="font-semibold text-xs tracking-wide uppercase">
-              Campanhas e Premiações
+              Premiações e Pagamentos Extras
             </h3>
           </div>
-          <span className="text-[11px] text-white/80">Adicionais e incentivos elegíveis</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-[#E4C46A] font-semibold">
+              Total Aprovado: {formatMoeda(fechamento.totalPremiacoesAprovadas || 0)}
+            </span>
+            <Link
+              to="/admin/premiacoes"
+              className="text-[11px] text-white/80 hover:text-white underline inline-flex items-center gap-1"
+            >
+              <span>Gerenciar</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-[#002817]/15 text-[#002817] dark:text-[#E4C46A] border-b border-border font-bold">
                 <th className="py-2.5 px-4 text-left">Tipo</th>
-                <th className="py-2.5 px-4 text-left">Campanha</th>
-                <th className="py-2.5 px-4 text-left">Período</th>
+                <th className="py-2.5 px-4 text-left">Descrição / Motivo</th>
+                <th className="py-2.5 px-4 text-left">Competência</th>
                 <th className="py-2.5 px-4 text-right">Valor</th>
-                <th className="py-2.5 px-4 text-center">Situação</th>
+                <th className="py-2.5 px-4 text-center">Status</th>
+                <th className="py-2.5 px-4 text-center">Lançamento Original</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {campanhas.length === 0 ? (
+              {premiacoesDetalhadas.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-muted-foreground">
-                    Nenhuma campanha ou premiação no período.
+                  <td colSpan={6} className="py-4 text-center text-muted-foreground">
+                    Nenhuma premiação ou pagamento extra registrado para esta competência e
+                    profissional.
                   </td>
                 </tr>
               ) : (
-                campanhas.map((c) => (
-                  <tr key={c.id} className="hover:bg-muted/30">
-                    <td className="py-2 px-4 font-bold text-muted-foreground">{c.tipo}</td>
-                    <td className="py-2 px-4 font-semibold text-foreground">{c.campanha}</td>
-                    <td className="py-2 px-4 text-muted-foreground">{c.periodo}</td>
-                    <td className="py-2 px-4 text-right font-bold text-emerald-700 dark:text-emerald-400">
-                      {formatMoeda(c.valor)}
-                    </td>
-                    <td className="py-2 px-4 text-center">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-300"
+                premiacoesDetalhadas.map((item: any) => {
+                  const isAprovado = item.status === 'Aprovado'
+                  return (
+                    <tr
+                      key={item.id}
+                      className={`hover:bg-muted/30 ${!isAprovado ? 'bg-amber-500/5' : ''}`}
+                    >
+                      <td className="py-2 px-4 font-bold text-foreground">
+                        {item.award_type || 'Premiação'}
+                      </td>
+                      <td
+                        className="py-2 px-4 text-foreground max-w-[260px] truncate"
+                        title={item.description}
                       >
-                        {c.situacao}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))
+                        {item.description}
+                        {item.campaign_name && (
+                          <span className="block text-[10px] text-muted-foreground">
+                            Campanha: {item.campaign_name}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 px-4 font-mono text-muted-foreground">
+                        {item.competencia}
+                      </td>
+                      <td className="py-2 px-4 text-right font-bold text-emerald-700 dark:text-emerald-400">
+                        {formatMoeda(Number(item.amount) || 0)}
+                      </td>
+                      <td className="py-2 px-4 text-center">
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-semibold ${
+                            isAprovado
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                              : item.status === 'Pendente'
+                                ? 'bg-amber-50 text-amber-700 border-amber-300'
+                                : 'bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          {item.status}
+                        </Badge>
+                        {!isAprovado && (
+                          <span className="block text-[9px] text-amber-700 dark:text-amber-400 mt-0.5">
+                            (Não afeta líquido)
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 px-4 text-center">
+                        <Link
+                          to="/admin/premiacoes"
+                          className="inline-flex items-center gap-1 text-[11px] text-[#002817] dark:text-[#E4C46A] hover:underline font-semibold"
+                          title="Abrir lançamento completo no submenu Premiações"
+                        >
+                          <span>Ver #{item.id?.slice(0, 7)}</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* 9. FECHAMENTO DA APURAÇÃO (Demonstrativo Financeiro Final dos Prints 1 e 2) */}
+      {/* 9. SEÇÃO INTEGRADA: DESCONTOS E DEDUÇÕES */}
+      <div className="bg-card border border-border rounded-xl shadow-xs overflow-hidden">
+        <div className="bg-[#002817] text-white px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MinusCircle className="w-4 h-4 text-rose-400" />
+            <h3 className="font-semibold text-xs tracking-wide uppercase">Descontos e Deduções</h3>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-rose-300 font-semibold">
+              Total Deduzido: - {formatMoeda(fechamento.totalDeducoesAprovadas || 0)}
+            </span>
+            <Link
+              to="/admin/descontos-deducoes"
+              className="text-[11px] text-white/80 hover:text-white underline inline-flex items-center gap-1"
+            >
+              <span>Gerenciar</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-[#002817]/15 text-[#002817] dark:text-[#E4C46A] border-b border-border font-bold">
+                <th className="py-2.5 px-4 text-left">Tipo</th>
+                <th className="py-2.5 px-4 text-left">Motivo / Justificativa</th>
+                <th className="py-2.5 px-4 text-left">Pedido / NF / Cliente</th>
+                <th className="py-2.5 px-4 text-left">Competência</th>
+                <th className="py-2.5 px-4 text-right">Valor</th>
+                <th className="py-2.5 px-4 text-center">Status</th>
+                <th className="py-2.5 px-4 text-center">Lançamento Original</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {deducoesDetalhadas.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-4 text-center text-muted-foreground">
+                    Nenhum desconto ou dedução registrada para esta competência e profissional.
+                  </td>
+                </tr>
+              ) : (
+                deducoesDetalhadas.map((item: any) => {
+                  const isAprovado = item.status === 'Aprovado'
+                  return (
+                    <tr
+                      key={item.id}
+                      className={`hover:bg-muted/30 ${!isAprovado ? 'bg-amber-500/5' : ''}`}
+                    >
+                      <td className="py-2 px-4 font-bold text-foreground">
+                        {item.deduction_type || item.reason || 'Dedução'}
+                      </td>
+                      <td
+                        className="py-2 px-4 text-foreground max-w-[220px] truncate"
+                        title={item.description}
+                      >
+                        {item.description}
+                      </td>
+                      <td className="py-2 px-4 text-muted-foreground">
+                        {item.invoice_number && (
+                          <span className="font-semibold text-foreground">
+                            NF {item.invoice_number}
+                          </span>
+                        )}
+                        {item.order_number && (
+                          <span className="ml-1 text-[11px]">| Ped: {item.order_number}</span>
+                        )}
+                        {item.client_name && (
+                          <div className="text-[10px] truncate">{item.client_name}</div>
+                        )}
+                        {!item.invoice_number && !item.order_number && !item.client_name && '—'}
+                      </td>
+                      <td className="py-2 px-4 font-mono text-muted-foreground">
+                        {item.competencia}
+                      </td>
+                      <td className="py-2 px-4 text-right font-bold text-rose-600 dark:text-rose-400">
+                        - {formatMoeda(Number(item.amount) || 0)}
+                      </td>
+                      <td className="py-2 px-4 text-center">
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-semibold ${
+                            isAprovado
+                              ? 'bg-rose-50 text-rose-700 border-rose-300'
+                              : item.status === 'Pendente'
+                                ? 'bg-amber-50 text-amber-700 border-amber-300'
+                                : 'bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          {item.status}
+                        </Badge>
+                        {!isAprovado && (
+                          <span className="block text-[9px] text-amber-700 dark:text-amber-400 mt-0.5">
+                            (Não afeta líquido)
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 px-4 text-center">
+                        <Link
+                          to="/admin/descontos-deducoes"
+                          className="inline-flex items-center gap-1 text-[11px] text-rose-700 dark:text-rose-400 hover:underline font-semibold"
+                          title="Abrir lançamento completo no submenu Descontos e Deduções"
+                        >
+                          <span>Ver #{item.id?.slice(0, 7)}</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 10. FECHAMENTO DA APURAÇÃO E TOTAL LÍQUIDO A PAGAR */}
       <div className="bg-card border border-border rounded-xl shadow-md overflow-hidden">
         <div className="bg-[#002817] text-white px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -655,24 +831,76 @@ export function ComissaoAnaliticaTabela({
               Demonstrativo Financeiro e Fechamento
             </h3>
           </div>
-          <span className="text-xs text-[#E4C46A] font-semibold">Apuração Final Consolidada</span>
+          <span className="text-xs text-[#E4C46A] font-semibold">
+            Comissões + Premiações − Deduções = Total Líquido a Pagar
+          </span>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-3">
+        <div className="p-4 sm:p-6 space-y-4">
+          {/* Caixa de Composição Clara com Fórmula de Negócio */}
+          <div className="bg-muted/40 border border-border p-3.5 rounded-lg flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-muted-foreground">Composição da Apuração:</span>
+              <span className="font-bold text-foreground">
+                Comissão Apurada (
+                {formatMoeda(
+                  fechamento.totalComissoesPositivas +
+                    (fechamento.campanhasPremiacoesElegiveis || 0),
+                )}
+                )
+              </span>
+              <span className="font-bold text-emerald-600">+</span>
+              <span className="font-bold text-emerald-600">
+                Premiações Aprovadas ({formatMoeda(fechamento.totalPremiacoesAprovadas || 0)})
+              </span>
+              <span className="font-bold text-rose-600">−</span>
+              <span className="font-bold text-rose-600">
+                Deduções Aprovadas ({formatMoeda(fechamento.totalDeducoesAprovadas || 0)})
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-[11px] text-muted-foreground block">
+                Total Líquido a Pagar:
+              </span>
+              <span className="text-sm sm:text-base font-extrabold text-[#002817] dark:text-[#E4C46A]">
+                {formatMoeda(fechamento.totalLiquidoPagar ?? fechamento.valorFinalReceber)}
+              </span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2 border-r border-border/60 pr-0 md:pr-4">
               <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
-                <span className="text-muted-foreground">Total de Comissões Positivas:</span>
+                <span className="text-muted-foreground">Comissão Apurada sobre Vendas:</span>
                 <span className="font-semibold text-foreground">
                   {formatMoeda(fechamento.totalComissoesPositivas)}
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
-                <span className="text-muted-foreground">(-) Estornos de Devoluções:</span>
-                <span className="font-semibold text-red-600">
-                  {formatMoeda(fechamento.estornosDevolucoes)}
+                <span className="text-muted-foreground">(+) Campanhas Comerciais Vigentes:</span>
+                <span className="font-semibold text-emerald-600">
+                  {formatMoeda(fechamento.campanhasPremiacoesElegiveis)}
                 </span>
               </div>
+              <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
+                <span className="text-muted-foreground font-semibold text-emerald-700 dark:text-emerald-400">
+                  (+) Premiações e Pagamentos Extras (Aprovados):
+                </span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                  + {formatMoeda(fechamento.totalPremiacoesAprovadas || 0)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
+                <span className="text-muted-foreground font-semibold text-rose-600 dark:text-rose-400">
+                  (−) Descontos e Deduções (Aprovados):
+                </span>
+                <span className="font-bold text-rose-600 dark:text-rose-400">
+                  - {formatMoeda(fechamento.totalDeducoesAprovadas || 0)}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
                 <span className="text-muted-foreground">(+/-) Correção de Arredondamento:</span>
                 <span className="font-semibold text-foreground">
@@ -680,46 +908,34 @@ export function ComissaoAnaliticaTabela({
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
-                <span className="text-muted-foreground">(+) Campanhas e Premiações Elegíveis:</span>
-                <span className="font-semibold text-emerald-600">
-                  {formatMoeda(fechamento.campanhasPremiacoesElegiveis)}
+                <span className="text-muted-foreground">
+                  Total de Recebimentos Base Considerados:
                 </span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
-                <span className="text-muted-foreground">(-) Adiantamentos a Compensar:</span>
-                <span className="font-semibold text-foreground">
-                  {formatMoeda(fechamento.adiantamentosCompensar)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
-                <span className="text-muted-foreground">Valor Total da Nota Fiscal (Ref.):</span>
-                <span className="font-semibold text-foreground">
-                  {formatMoeda(fechamento.valorTotalNFs)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-xs py-1 border-b border-border/40">
-                <span className="text-muted-foreground">Total de Recebimentos Considerados:</span>
                 <span className="font-semibold text-foreground">
                   {formatMoeda(fechamento.totalRecebimentos)}
                 </span>
               </div>
+              <div className="flex justify-between items-center text-xs py-1 border-b border-border/40 text-[11px] text-amber-700 dark:text-amber-300">
+                <span>Premiações / Deduções Pendentes (em conferência):</span>
+                <span>
+                  {formatMoeda(fechamento.totalPremiacoesPendentes || 0)} / -
+                  {formatMoeda(fechamento.totalDeducoesPendentes || 0)}
+                </span>
+              </div>
 
-              {/* Valor a Receber em Destaque */}
+              {/* Total Líquido a Pagar em Destaque */}
               <div className="flex justify-between items-center text-sm font-extrabold bg-[#002817]/10 dark:bg-[#002817]/30 p-2.5 rounded-lg border border-[#002817]/20 mt-2">
                 <span className="text-[#002817] dark:text-[#E4C46A] uppercase tracking-wide">
-                  Valor a receber:
+                  Total Líquido a Pagar:
                 </span>
                 <span className="text-base sm:text-lg text-[#002817] dark:text-[#E4C46A]">
-                  {formatMoeda(fechamento.valorFinalReceber)}
+                  {formatMoeda(fechamento.totalLiquidoPagar ?? fechamento.valorFinalReceber)}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Banner de Status / Bloqueio (Print 2: "A comissão para esse RCA já foi apurada.") */}
+          {/* Banner de Status / Bloqueio */}
           {mensagemBloqueio && (
             <div className="mt-4 pt-4 border-t border-border flex justify-center">
               <div className="bg-slate-500/90 hover:bg-slate-600 text-white font-medium text-xs py-2 px-6 rounded-md shadow-xs flex items-center gap-2">

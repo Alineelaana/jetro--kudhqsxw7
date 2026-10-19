@@ -188,7 +188,10 @@ export default function ComissaoAnaliticaPage() {
   // Exportações
   const handleExportarExcel = () => {
     if (!resultado) return
-    const linhasCsv = [
+
+    // Seção 1: Lançamentos de Vendas
+    const secaoLancamentos = [
+      ['=== LANÇAMENTOS OPERACIONAIS (VENDAS / DEVOLUÇÕES / TÍTULOS) ==='],
       [
         'Tipo de Operação',
         'Razão Social',
@@ -214,26 +217,108 @@ export default function ComissaoAnaliticaPage() {
         l.dataEmissao,
         l.dataVencimento,
         l.dataPagamento || '',
-        l.totalNota.toFixed(2),
-        l.totalTitulo.toFixed(2),
-        l.baseComissao.toFixed(2),
-        `${l.percentualComissao.toFixed(2)}%`,
-        l.valorComissao.toFixed(2),
+        l.totalNota.toFixed(2).replace('.', ','),
+        l.totalTitulo.toFixed(2).replace('.', ','),
+        l.baseComissao.toFixed(2).replace('.', ','),
+        `${l.percentualComissao.toFixed(2).replace('.', ',')}%`,
+        l.valorComissao.toFixed(2).replace('.', ','),
         l.situacao,
       ]),
     ]
-    const conteudo = linhasCsv.map((r) => r.join(';')).join('\n')
+
+    // Seção 2: Premiações e Pagamentos Extras
+    const secaoPremiacoes = [
+      [],
+      ['=== PREMIAÇÕES E PAGAMENTOS EXTRAS (COMPÕEM (+) QUANDO APROVADOS) ==='],
+      ['Tipo', 'Descrição / Motivo', 'Competência', 'Campanha', 'Valor (R$)', 'Status'],
+      ...(resultado.premiacoesDetalhadas && resultado.premiacoesDetalhadas.length > 0
+        ? resultado.premiacoesDetalhadas.map((a: any) => [
+            `"${a.award_type || ''}"`,
+            `"${(a.description || '').replace(/"/g, '""')}"`,
+            `"${a.competencia || ''}"`,
+            `"${a.campaign_name || ''}"`,
+            Number(a.amount || 0)
+              .toFixed(2)
+              .replace('.', ','),
+            `"${a.status || ''}"`,
+          ])
+        : [['Nenhuma premiação cadastrada no período', '', '', '', '0,00', '']]),
+    ]
+
+    // Seção 3: Descontos e Deduções
+    const secaoDeducoes = [
+      [],
+      ['=== DESCONTOS E DEDUÇÕES (COMPÕEM (−) QUANDO APROVADOS) ==='],
+      [
+        'Tipo / Motivo',
+        'Descrição / Justificativa',
+        'Competência',
+        'NF / Pedido / Cliente',
+        'Valor Descontado (R$)',
+        'Status',
+      ],
+      ...(resultado.deducoesDetalhadas && resultado.deducoesDetalhadas.length > 0
+        ? resultado.deducoesDetalhadas.map((d: any) => [
+            `"${d.reason || d.deduction_type || ''}"`,
+            `"${(d.description || '').replace(/"/g, '""')}"`,
+            `"${d.competencia || ''}"`,
+            `"${d.invoice_number ? 'NF ' + d.invoice_number : ''} ${d.order_number ? 'Ped ' + d.order_number : ''} ${d.client_name || ''}".trim()`,
+            `-${Number(d.amount || 0)
+              .toFixed(2)
+              .replace('.', ',')}`,
+            `"${d.status || ''}"`,
+          ])
+        : [['Nenhum desconto/dedução cadastrada no período', '', '', '', '0,00', '']]),
+    ]
+
+    // Seção 4: Demonstrativo e Fechamento Líquido
+    const fech = resultado.fechamento
+    const secaoFechamento = [
+      [],
+      ['=== DEMONSTRATIVO DE FECHAMENTO (TOTAL LÍQUIDO A PAGAR) ==='],
+      ['Item', 'Valor (R$)'],
+      [
+        'Comissão Apurada sobre Vendas',
+        (fech?.totalComissoesPositivas || 0).toFixed(2).replace('.', ','),
+      ],
+      [
+        '(+) Campanhas Comerciais Vigentes',
+        (fech?.campanhasPremiacoesElegiveis || 0).toFixed(2).replace('.', ','),
+      ],
+      [
+        '(+) Premiações Aprovadas',
+        (fech?.totalPremiacoesAprovadas || 0).toFixed(2).replace('.', ','),
+      ],
+      [
+        '(−) Descontos e Deduções Aprovadas',
+        `-${(fech?.totalDeducoesAprovadas || 0).toFixed(2).replace('.', ',')}`,
+      ],
+      ['(+/-) Correção de Arredondamento', (fech?.ajustes || 0).toFixed(2).replace('.', ',')],
+      [
+        '(=) TOTAL LÍQUIDO A PAGAR',
+        (fech?.totalLiquidoPagar ?? fech?.valorFinalReceber ?? 0).toFixed(2).replace('.', ','),
+      ],
+    ]
+
+    const todasLinhas = [
+      ...secaoLancamentos,
+      ...secaoPremiacoes,
+      ...secaoDeducoes,
+      ...secaoFechamento,
+    ]
+
+    const conteudo = todasLinhas.map((r) => r.join(';')).join('\n')
     const blob = new Blob(['\uFEFF' + conteudo], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `comissao_analitica_${rcaSelecionado?.code || 'rca'}.csv`
+    a.download = `comissao_analitica_completa_${rcaSelecionado?.code || 'rca'}.csv`
     a.click()
     URL.revokeObjectURL(url)
 
     toast({
       title: 'Planilha Exportada com Sucesso',
-      description: 'Download de comissão analítica com demonstrativo detalhado.',
+      description: 'Download de comissão analítica com demonstrativo, premiações e deduções.',
     })
   }
 
@@ -357,6 +442,8 @@ export default function ComissaoAnaliticaPage() {
           correcaoArredondamento={resultado.correcaoArredondamento}
           resumoTipo={resultado.resumoPorTipo}
           campanhas={resultado.campanhas}
+          premiacoesDetalhadas={resultado.premiacoesDetalhadas}
+          deducoesDetalhadas={resultado.deducoesDetalhadas}
           fechamento={resultado.fechamento}
           mensagemBloqueio={resultado.statusApuracao?.mensagemBloqueio}
           onAbrirPedido={handleAbrirPedido}
