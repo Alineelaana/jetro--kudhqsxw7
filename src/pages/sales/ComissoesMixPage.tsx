@@ -17,7 +17,8 @@ import { parseExcelOrCsvFile } from '@/lib/margens-gr-parser'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { JetroTable } from '@/components/jetro-table'
-import type { ColumnDef } from '@/components/jetro-table/types'
+import type { JetroColumnDef } from '@/components/jetro-table/types'
+import { Checkbox } from '@/components/ui/checkbox'
 
 // Shadcn UI primitives
 import { Button } from '@/components/ui/button'
@@ -428,34 +429,65 @@ export default function ComissoesMixPage() {
   }
 
   // Definição das colunas da JetroTable
-  const columns: ColumnDef<CommissionMixItem>[] = useMemo(
+  const columns: JetroColumnDef<CommissionMixItem>[] = useMemo(
     () => [
       {
-        key: 'product_ean',
+        id: 'select',
+        header: '',
+        defaultWidth: 46,
+        minWidth: 46,
+        maxWidth: 46,
+        sortable: false,
+        hideable: false,
+        resizable: false,
+        draggable: false,
+        align: 'center',
+        cell: ({ row }) => {
+          const isSelected = selectedIds.includes(row.id)
+          return (
+            <div className="flex items-center justify-center">
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(checked) => {
+                  setSelectedIds((prev) =>
+                    checked ? [...prev, row.id] : prev.filter((id) => id !== row.id),
+                  )
+                }}
+                aria-label={`Selecionar item ${row.product_code}`}
+              />
+            </div>
+          )
+        },
+      },
+      {
+        id: 'product_ean',
         header: 'EAN',
-        width: 140,
-        sortable: true,
-        render: (row) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.product_ean || '—'}</span>
+        accessorKey: 'product_ean',
+        dataType: 'text',
+        defaultWidth: 140,
+        cell: ({ value }) => (
+          <span className="font-mono text-xs text-muted-foreground">{String(value || '—')}</span>
         ),
       },
       {
-        key: 'product_code',
+        id: 'product_code',
         header: 'Código do Produto',
-        width: 150,
-        sortable: true,
-        render: (row) => (
+        accessorKey: 'product_code',
+        dataType: 'text',
+        defaultWidth: 150,
+        cell: ({ value }) => (
           <span className="font-mono text-xs font-bold text-[#002817] dark:text-[#E4C46A]">
-            {row.product_code}
+            {String(value || '')}
           </span>
         ),
       },
       {
-        key: 'product_name',
+        id: 'product_name',
         header: 'Descrição do Produto',
-        width: 280,
-        sortable: true,
-        render: (row) => (
+        accessorKey: 'product_name',
+        dataType: 'text',
+        defaultWidth: 280,
+        cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="font-semibold text-foreground truncate" title={row.product_name}>
               {row.product_name}
@@ -469,38 +501,44 @@ export default function ComissoesMixPage() {
         ),
       },
       {
-        key: 'brand',
+        id: 'brand',
         header: 'Marca',
-        width: 130,
-        sortable: true,
-        render: (row) => <span className="text-xs">{row.brand || '—'}</span>,
+        accessorKey: 'brand',
+        dataType: 'text',
+        defaultWidth: 130,
+        cell: ({ value }) => <span className="text-xs">{String(value || '—')}</span>,
       },
       {
-        key: 'supplier',
+        id: 'supplier',
         header: 'Fornecedor',
-        width: 150,
-        sortable: true,
-        render: (row) => <span className="text-xs truncate">{row.supplier || '—'}</span>,
+        accessorKey: 'supplier',
+        dataType: 'text',
+        defaultWidth: 150,
+        cell: ({ value }) => <span className="text-xs truncate">{String(value || '—')}</span>,
       },
       {
-        key: 'price',
+        id: 'price',
         header: 'Preço (R$)',
-        width: 120,
+        accessorKey: 'price',
+        dataType: 'currency',
         align: 'right',
-        sortable: true,
-        render: (row) => (
+        defaultWidth: 120,
+        getSortValue: (row) => row.price || 0,
+        cell: ({ value }) => (
           <span className="text-xs font-mono">
-            {row.price ? `R$ ${row.price.toFixed(2)}` : '—'}
+            {value ? `R$ ${Number(value).toFixed(2)}` : '—'}
           </span>
         ),
       },
       {
-        key: 'commission_percentage',
+        id: 'commission_percentage',
         header: '% Comissão',
-        width: 140,
+        accessorKey: 'commission_percentage',
+        dataType: 'percent',
         align: 'right',
-        sortable: true,
-        render: (row) => {
+        defaultWidth: 140,
+        getSortValue: (row) => row.commission_percentage || 0,
+        cell: ({ row }) => {
           const perc = row.commission_percentage || 0
           const hasPerc = perc > 0
           return (
@@ -518,12 +556,13 @@ export default function ComissoesMixPage() {
         },
       },
       {
-        key: 'status',
+        id: 'status',
         header: 'Situação',
-        width: 110,
+        accessorKey: 'status',
+        dataType: 'text',
         align: 'center',
-        sortable: true,
-        render: (row) => {
+        defaultWidth: 110,
+        cell: ({ row }) => {
           const isAtivo = row.status === 'Ativo'
           return (
             <Badge
@@ -540,11 +579,12 @@ export default function ComissoesMixPage() {
         },
       },
       {
-        key: 'vigencia_inicio',
+        id: 'vigencia_inicio',
         header: 'Início da Vigência',
-        width: 140,
-        sortable: true,
-        render: (row) => (
+        accessorKey: 'vigencia_inicio',
+        dataType: 'date',
+        defaultWidth: 140,
+        cell: ({ row }) => (
           <span className="text-xs font-mono text-muted-foreground">
             {row.vigencia_inicio
               ? new Date(`${row.vigencia_inicio}T00:00:00`).toLocaleDateString('pt-BR')
@@ -553,11 +593,12 @@ export default function ComissoesMixPage() {
         ),
       },
       {
-        key: 'updated',
+        id: 'updated',
         header: 'Última Alteração',
-        width: 180,
-        sortable: true,
-        render: (row) => (
+        accessorKey: 'updated',
+        dataType: 'date',
+        defaultWidth: 180,
+        cell: ({ row }) => (
           <div className="flex flex-col text-[11px] text-muted-foreground">
             <span className="truncate">{row.updated_by_user_name || 'Sistema'}</span>
             <span className="font-mono">
@@ -567,11 +608,15 @@ export default function ComissoesMixPage() {
         ),
       },
       {
-        key: 'actions',
+        id: 'actions',
         header: 'Ações',
-        width: 110,
         align: 'center',
-        render: (row) => (
+        sortable: false,
+        hideable: false,
+        resizable: false,
+        draggable: false,
+        defaultWidth: 110,
+        cell: ({ row }) => (
           <div className="flex items-center justify-center gap-1">
             {canEdit && (
               <Button
@@ -597,7 +642,7 @@ export default function ComissoesMixPage() {
         ),
       },
     ],
-    [canEdit],
+    [canEdit, selectedIds],
   )
 
   return (
@@ -927,15 +972,30 @@ export default function ComissoesMixPage() {
       {/* 3. TABELA PADRÃO JETRO (Reorganização, Ordenação, Seleção, Ocultação de Colunas) */}
       <div className="bg-card border border-border rounded-xl p-3 shadow-2xs">
         <JetroTable
+          screenId="comercial.comissoes.mix"
           data={items}
           columns={columns}
           loading={loading}
-          tableName="Comissões MIX de Produtos"
-          selectable
-          selectedRows={selectedIds}
-          onSelectionChange={setSelectedIds}
-          pageSize={25}
+          rowKey="id"
+          exportTitle="Comissões MIX de Produtos — Jetro ERP"
           exportFilename={`comissoes_mix_jetro_${new Date().toISOString().slice(0, 10)}.xlsx`}
+          toolbarExtra={
+            selectedIds.length > 0 ? (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  {selectedIds.length} selecionado(s)
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedIds([])}
+                  className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Limpar seleção
+                </Button>
+              </div>
+            ) : null
+          }
         />
       </div>
 
