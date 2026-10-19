@@ -403,15 +403,20 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/vendas',
         perm: canViewSales,
         children: [
-          { label: 'Contratos', route: '/admin/vendas/contratos' },
           {
             label: 'Consulta de Pedidos',
             route: '/admin/vendas/consulta-pedidos',
             perm: canViewSales,
           },
+          { label: 'Contratos', route: '/admin/vendas/contratos' },
           { label: 'Devoluções', route: '/admin/vendas/devolucoes' },
           { label: 'Faturamento', route: '/admin/vendas/faturamento' },
           { label: 'Histórico', route: '/admin/vendas/historico' },
+          {
+            label: 'Inserir Clientes',
+            route: '/admin/vendas/inserir-clientes',
+            perm: canViewSales,
+          },
           { label: 'NFC-e', route: '/admin/vendas/nfce' },
           { label: 'NF-e', route: '/admin/vendas/nfe' },
           { label: 'Pedidos', route: '/admin/vendas/pedidos' },

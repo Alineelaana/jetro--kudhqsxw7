@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { CadastrosPanel } from '@/components/cadastros/cadastros-panel'
+import { CadastroClientesOficialScreen } from '@/components/cadastros/cadastro-clientes-oficial-screen'
 
 // Mapeamento de segmento de URL para a key de cadastro em CADASTROS
 const ROUTE_TO_CADASTRO_KEY: Record<string, string> = {
@@ -35,6 +36,14 @@ export default function Cadastros({ screen }: CadastrosProps) {
   const params = useParams<{ screen?: string }>()
   const resolvedScreen = screen || params.screen || 'empresas'
   const cadastroKey = ROUTE_TO_CADASTRO_KEY[resolvedScreen] || resolvedScreen
+
+  if (cadastroKey === 'clientes') {
+    return (
+      <div className="p-4 sm:p-6">
+        <CadastroClientesOficialScreen />
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 sm:p-6">

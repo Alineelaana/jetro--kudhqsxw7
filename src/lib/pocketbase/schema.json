@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-19T04:43:40.130Z",
+  "generatedAt": "2026-10-19T05:19:24.587Z",
   "collections": [
     {
       "name": "users",
@@ -994,6 +994,246 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "codigo_oficial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao_credito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "limite_credito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "limite_credito_disponivel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bloqueio_vendas_prazo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_bloqueio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_bloqueio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gerente_comercial_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gerente_comercial_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rca_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rca_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "perfil_cliente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "canal_comercial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "segmento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_loja",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "potencial_compra",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "frequencia_prevista",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rota_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rota_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rota_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tabela_preco_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tabela_preco_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tabelas_adicionais",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "desconto_maximo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pedido_minimo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "forma_atendimento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "regime_tributario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "simples_nacional",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "classificacao_icms",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "consumidor_final",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contribuinte_icms",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produtor_rural",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "email_xml",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contatos_adicionais",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "locais_entrega",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes_comerciais",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes_logisticas",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes_fiscais",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "historico_eventos",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "solicitacao_origem_id",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1005,7 +1245,9 @@
         "CREATE INDEX `idx_partners_rca` ON `partners` (rca_id)",
         "CREATE INDEX `idx_partners_televendas` ON `partners` (televendas_id)",
         "CREATE INDEX `idx_partners_resp_digital` ON `partners` (responsavel_comercial_digital_id)",
-        "CREATE INDEX `idx_partners_network` ON `partners` (network_id)"
+        "CREATE INDEX `idx_partners_network` ON `partners` (network_id)",
+        "CREATE INDEX `idx_partners_codigo_oficial` ON `partners` (codigo_oficial)",
+        "CREATE INDEX `idx_partners_situacao_credito` ON `partners` (situacao_credito)"
       ]
     },
     {
@@ -13848,9 +14090,103 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "categoria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "client_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cnpj_cpf",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rca_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gerente_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "limite_solicitado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "limite_aprovado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "condicoes_autorizadas",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_decisao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validade_revisao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bloquear_prazo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_bloqueio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "historico_analise",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_fin_appr_status ON financial_approvals (status)"]
+      "indexes": [
+        "CREATE INDEX idx_fin_appr_status ON financial_approvals (status)",
+        "CREATE INDEX `idx_fin_appr_categoria` ON `financial_approvals` (categoria)",
+        "CREATE INDEX `idx_fin_appr_client` ON `financial_approvals` (client_id)"
+      ]
     },
     {
       "name": "financial_closings",

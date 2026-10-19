@@ -9,6 +9,7 @@ import { FinancialCashRegister } from '@/components/financial/financial-cash-reg
 import { FinancialReports } from '@/components/financial/financial-reports'
 import { FinancialGenericScreen } from '@/components/financial/financial-generic-screen'
 import { CollectionCenterScreen } from '@/components/collection-center/collection-center-screen'
+import { FinancialApprovalsEvolved } from '@/components/financial/financial-approvals-evolved'
 import { FINANCIAL_SCREEN_CONFIGS } from '@/lib/financial-types'
 
 const TITLES: Record<string, string> = {
@@ -52,6 +53,8 @@ export default function Financial({ screen }: { screen: string }) {
         return <FinancialCashRegister />
       case 'collections':
         return <CollectionCenterScreen />
+      case 'approvals':
+        return <FinancialApprovalsEvolved />
       case 'reports':
         return <FinancialReports />
       default: {
