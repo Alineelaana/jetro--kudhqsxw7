@@ -15,7 +15,7 @@ const GROUPS = ['Ativo', 'Passivo', 'Patrimônio Líquido']
 
 export function ControladoriaBalanco() {
   const { user } = useAuth()
-  const { filter: orgFilter } = useOrgFilter()
+  const { filter: orgFilter, hasMissingOrgBinding, missingOrgMessage } = useOrgFilter()
   const [contas, setContas] = useState<Record<string, unknown>[]>([])
   const [balances, setBalances] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
@@ -58,6 +58,16 @@ export function ControladoriaBalanco() {
         <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
       </div>
     )
+
+  if (hasMissingOrgBinding) {
+    return (
+      <Card className="border-amber-300 bg-amber-50/50 dark:bg-amber-950/20 p-6">
+        <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+          {missingOrgMessage}
+        </p>
+      </Card>
+    )
+  }
 
   const getBalance = (code: string): number => Math.abs(balances[code] || 0)
   const totalAtivo = contas

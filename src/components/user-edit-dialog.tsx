@@ -72,7 +72,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [filialId, setFilialId] = useState('')
   const [cargo, setCargo] = useState('')
   const [departamento, setDepartamento] = useState('')
-  const [inactivityTimeout, setInactivityTimeout] = useState('5')
+  const [inactivityTimeout, setInactivityTimeout] = useState('480')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
   const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
 
@@ -90,9 +90,9 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setCargo(user.cargo || '')
       setDepartamento(user.departamento || '')
       setInactivityTimeout(
-        typeof user.inactivity_timeout_minutes === 'number'
+        user.inactivity_timeout_minutes !== undefined && user.inactivity_timeout_minutes !== null
           ? String(user.inactivity_timeout_minutes)
-          : '5',
+          : '480',
       )
     }
   }, [user])
@@ -291,12 +291,12 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
               max={480}
               value={inactivityTimeout}
               onChange={(e) => setInactivityTimeout(e.target.value)}
-              placeholder="Ex: 5"
+              placeholder="Ex: 480"
               className="focus-visible:ring-[#005B2E]"
             />
             <p className="text-xs text-muted-foreground">
               Define quanto tempo o usuário pode permanecer ocioso antes de ser deslogado
-              automaticamente (1 a 480 min). Padrão: 5.
+              automaticamente (1 a 480 min). Padrão corporativo Jetro: 480 minutos (8 horas).
             </p>
           </div>
           <div className="space-y-1.5">

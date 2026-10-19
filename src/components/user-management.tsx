@@ -11,7 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getUsers, createUser, deleteUser, updateUserActiveStatus } from '@/services/users'
+import {
+  getUsers,
+  createUser,
+  deleteUser,
+  updateUserActiveStatus,
+  getEmpresas,
+  getFiliais,
+} from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { UserEditDialog } from '@/components/user-edit-dialog'
@@ -69,12 +76,16 @@ export function UserManagement() {
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('PADRAO')
   const [cpf, setCpf] = useState('')
-  const [inactivityTimeout, setInactivityTimeout] = useState('5')
+  const [inactivityTimeout, setInactivityTimeout] = useState('480')
   const [avatar, setAvatar] = useState<File | null>(null)
   const [cpfError, setCpfError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [empresaId, setEmpresaId] = useState('')
+  const [filialId, setFilialId] = useState('')
+  const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
+  const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
   const [editUser, setEditUser] = useState<UserRecord | null>(null)
   const [editOpen, setEditOpen] = useState(false)
 
@@ -89,8 +100,21 @@ export function UserManagement() {
 
   useEffect(() => {
     loadUsers()
+    getEmpresas()
+      .then((data) => setEmpresas(data as unknown as { id: string; name: string }[]))
+      .catch(() => {})
   }, [])
   useRealtime('users', () => loadUsers())
+
+  useEffect(() => {
+    if (empresaId) {
+      getFiliais(empresaId)
+        .then((data) => setFiliais(data as unknown as { id: string; name: string }[]))
+        .catch(() => setFiliais([]))
+    } else {
+      setFiliais([])
+    }
+  }, [empresaId])
 
   const handleCpfChange = (v: string) => {
     const formatted = formatCPF(v)
@@ -130,13 +154,17 @@ export function UserManagement() {
         avatar,
         active: true,
         inactivity_timeout_minutes: parsedTimeout,
+        empresa_id: empresaId || undefined,
+        filial_id: filialId || undefined,
       })
       setName('')
       setEmail('')
       setPassword('')
       setRole('PADRAO')
       setCpf('')
-      setInactivityTimeout('5')
+      setInactivityTimeout('480')
+      setEmpresaId('')
+      setFilialId('')
       setAvatar(null)
       setCpfError('')
       toast({
@@ -264,6 +292,54 @@ export function UserManagement() {
               </Select>
             </div>
             <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Empresa Vinculada</Label>
+              <Select
+                value={empresaId}
+                onValueChange={(v) => {
+                  setEmpresaId(v === '_none_' ? '' : v)
+                  setFilialId('')
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      empresas.length ? 'Selecione a empresa' : 'Sem empresas cadastradas (Geral)'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none_">Sem empresa (Acesso geral / Global)</SelectItem>
+                  {empresas.map((em) => (
+                    <SelectItem key={em.id} value={em.id}>
+                      {em.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Filial Vinculada</Label>
+              <Select
+                value={filialId}
+                onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
+                disabled={!empresaId}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={!empresaId ? 'Selecione a empresa primeiro' : 'Todas as filiais'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none_">Todas as filiais da empresa</SelectItem>
+                  {filiais.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-sm font-semibold">
                 Tempo de inatividade para deslogar (minutos)
               </Label>
@@ -273,11 +349,11 @@ export function UserManagement() {
                 max={480}
                 value={inactivityTimeout}
                 onChange={(e) => setInactivityTimeout(e.target.value)}
-                placeholder="Ex: 5"
+                placeholder="Ex: 480"
                 className="focus-visible:ring-[#005B2E]"
               />
               <p className="text-[11px] text-muted-foreground">
-                Padrão: 5 minutos (mínimo 1, máximo 480 min). A sessão encerra após inatividade.
+                Padrão corporativo Jetro: 480 minutos (8 horas). Mínimo 1, máximo 480 min.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -379,7 +455,7 @@ export function UserManagement() {
                             <p className="text-xs text-muted-foreground">Cargo: {u.cargo}</p>
                           )}
                           <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">
-                            Inatividade: {u.inactivity_timeout_minutes ?? 5} min
+                            Inatividade: {u.inactivity_timeout_minutes ?? 480} min
                           </p>
                         </div>
                       </div>

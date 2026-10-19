@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { FileCode2 } from 'lucide-react'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { JetroCustomizationDrawer } from '@/components/personalizacao/jetro-customization-drawer'
+import { ModuleErrorBoundary } from '@/components/module-error-boundary'
 import { cn } from '@/lib/utils'
 
 function isInternalPath(pathname: string): boolean {
@@ -93,7 +94,12 @@ export default function Layout() {
               className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between admin-main-padded pr-12 sm:pr-14"
             >
               <div className="flex-1">
-                <Outlet />
+                <ModuleErrorBoundary
+                  key={pathname}
+                  moduleName={pathname.replace('/admin', '') || 'Início'}
+                >
+                  <Outlet />
+                </ModuleErrorBoundary>
               </div>
               {/* Fixar Rodapé: respeita preferência do usuário */}
               <div
@@ -134,7 +140,9 @@ export default function Layout() {
         className={cn('flex-1 flex flex-col justify-between', isAuthenticated && 'pr-12 sm:pr-14')}
       >
         <div className="flex-1">
-          <Outlet />
+          <ModuleErrorBoundary key={pathname} moduleName={pathname || 'Portal'}>
+            <Outlet />
+          </ModuleErrorBoundary>
         </div>
         {!showFooter && !isRootLogin && (
           <AttributionFooter

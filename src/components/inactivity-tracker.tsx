@@ -15,17 +15,19 @@ import { Clock, AlertTriangle, LogOut } from 'lucide-react'
 // Intervalos de verificação e contagem
 const CHECK_INTERVAL_MS = 1000
 const WARNING_WINDOW_SECONDS = 30
-const DEFAULT_TIMEOUT_MINUTES = 5
+// Padrão corporativo institucional do Jetro: 8 horas (480 minutos)
+const DEFAULT_TIMEOUT_MINUTES = 480
 
 export function InactivityTracker() {
   const { isAuthenticated, user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Tempo de inatividade configurado para o usuário (em minutos)
+  // Tempo de inatividade configurado para o usuário (em minutos) — fallback seguro de 8 horas (480 min)
+  const rawTimeout = user?.inactivity_timeout_minutes
   const timeoutMinutes =
-    typeof user?.inactivity_timeout_minutes === 'number' && user.inactivity_timeout_minutes > 0
-      ? user.inactivity_timeout_minutes
+    typeof rawTimeout === 'number' && !isNaN(rawTimeout) && rawTimeout >= 10
+      ? rawTimeout
       : DEFAULT_TIMEOUT_MINUTES
 
   const totalTimeoutSeconds = timeoutMinutes * 60

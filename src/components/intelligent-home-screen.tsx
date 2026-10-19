@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Sparkles, Calendar as CalendarIcon, MessageSquare } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { JetroCalendar } from '@/components/jetro-agenda/jetro-calendar'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
+import pb from '@/lib/pocketbase/client'
 import {
   getSaudacaoAtual,
   formatarSaudacaoCompleta,
@@ -19,16 +21,91 @@ export function IntelligentHomeScreen() {
   const { setIsFloatingOpen } = useJetroOnline()
   const { preferences } = useUserPreferences()
 
-  // Extrair fuso e nome do usuário (ou das preferências)
+  // Extrair fuso, nome e avatar do usuário autenticado (da mesma fonte de dados do perfil)
   const userRecord = user as
     | {
+        id?: string
         name?: string
         email?: string
+        avatar?: string
         fuso_horario?: string
         timezone?: string
+        updated?: string
       }
     | null
     | undefined
+
+  const currentUserId = userRecord?.id ? String(userRecord.id) : ''
+  const [avatarFileName, setAvatarFileName] = useState<string>(() => userRecord?.avatar || '')
+  const [avatarVersion, setAvatarVersion] = useState<number>(Date.now())
+
+  // Sincroniza quando o objeto user no contexto de autenticação mudar
+  useEffect(() => {
+    if (userRecord?.avatar !== undefined) {
+      setAvatarFileName(userRecord.avatar || '')
+    }
+  }, [userRecord?.avatar])
+
+  // Revalida dados do usuário no PocketBase ao focar a aba ou retornar à tela
+  const revalidarPerfilUsuario = useCallback(async () => {
+    if (!currentUserId) return
+    try {
+      const fresh = await pb.collection('users').getOne(currentUserId, { requestKey: null })
+      if (fresh) {
+        if (fresh.avatar !== avatarFileName) {
+          setAvatarFileName((fresh.avatar as string) || '')
+        }
+        setAvatarVersion(Date.now())
+      }
+    } catch {
+      /* ignore gracefully */
+    }
+  }, [currentUserId, avatarFileName])
+
+  // Reavalia ao focar ou ao visibilidade da página mudar
+  useEffect(() => {
+    const handleFocusOrVisible = () => {
+      if (document.visibilityState === 'visible') {
+        revalidarPerfilUsuario()
+      }
+    }
+    window.addEventListener('focus', handleFocusOrVisible)
+    document.addEventListener('visibilitychange', handleFocusOrVisible)
+    return () => {
+      window.removeEventListener('focus', handleFocusOrVisible)
+      document.removeEventListener('visibilitychange', handleFocusOrVisible)
+    }
+  }, [revalidarPerfilUsuario])
+
+  // URL da foto de perfil: gerada de forma segura pelo cliente PocketBase oficial
+  const avatarUrl = useMemo(() => {
+    if (!currentUserId || !avatarFileName) return ''
+    try {
+      // Usa pb.files.getUrl ou constrói via API padrão do PocketBase
+      const base = pb.files.getUrl(
+        { id: currentUserId, collectionName: 'users' } as any,
+        avatarFileName,
+      )
+      // Adiciona versão de cache para refletir trocas recentes
+      return `${base}?v=${avatarVersion}`
+    } catch {
+      const pbUrl = import.meta.env.VITE_POCKETBASE_URL || ''
+      return `${pbUrl}/api/files/users/${currentUserId}/${avatarFileName}?v=${avatarVersion}`
+    }
+  }, [currentUserId, avatarFileName, avatarVersion])
+
+  // Iniciais do usuário para o fallback elegante
+  const userInitials = useMemo(() => {
+    const fullName = (userRecord?.name || '').trim()
+    if (fullName) {
+      const parts = fullName.split(/\s+/).filter(Boolean)
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase()
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    const email = (userRecord?.email || '').trim()
+    if (email) return email.substring(0, 2).toUpperCase()
+    return 'JT'
+  }, [userRecord?.name, userRecord?.email])
 
   const userTimeZone = userRecord?.fuso_horario || userRecord?.timezone || null
   const safeTimeZone = useMemo(() => resolveSafeTimeZone(userTimeZone), [userTimeZone])
@@ -134,10 +211,32 @@ export function IntelligentHomeScreen() {
                 <span>Jetro Sistema Inteligente</span>
               </div>
 
-              {/* Saudação principal em destaque */}
-              <h1 className="text-2xl sm:text-3xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                {fraseSaudacao}
-              </h1>
+              {/* Saudação principal em destaque integrada com a foto de perfil do usuário */}
+              <div className="flex items-center gap-3 sm:gap-4 pt-1">
+                <Avatar
+                  className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full border-2 border-[#D4AF37]/80 shadow-md ring-2 ring-[#002817]/40 shrink-0 bg-[#002817]"
+                  style={{
+                    boxShadow: '0 0 0 1px rgba(212, 175, 55, 0.35), 0 4px 12px rgba(0, 0, 0, 0.35)',
+                  }}
+                >
+                  {avatarUrl ? (
+                    <AvatarImage
+                      src={avatarUrl}
+                      alt={userRecord?.name || 'Foto de Perfil'}
+                      className="object-cover w-full h-full rounded-full"
+                    />
+                  ) : null}
+                  <AvatarFallback className="bg-gradient-to-br from-[#00381D] to-[#012211] text-[#E4C46A] border border-[#D4AF37]/40 font-bold text-xs sm:text-sm lg:text-base tracking-wider">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                    {fraseSaudacao}
+                  </h1>
+                </div>
+              </div>
 
               {/* Mensagens de boas-vindas e orientações */}
               <div className="space-y-1.5 text-sm sm:text-base text-emerald-100/95 leading-relaxed">

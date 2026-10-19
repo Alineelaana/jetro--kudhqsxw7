@@ -31,7 +31,7 @@ export async function createUser(data: CreateUserData): Promise<void> {
     inactivity_timeout_minutes:
       typeof data.inactivity_timeout_minutes === 'number' && data.inactivity_timeout_minutes > 0
         ? data.inactivity_timeout_minutes
-        : 5,
+        : 480, // Padrão institucional Jetro: 8 horas (480 min)
   }
   if (data.avatar) {
     recordData.avatar = data.avatar
