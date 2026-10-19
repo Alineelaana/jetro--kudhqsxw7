@@ -40,6 +40,7 @@ import Cadastros from './pages/Cadastros'
 import PriceTablesPage from './pages/PriceTablesPage'
 import CommissionRules from './pages/CommissionRules'
 import ComissaoAnaliticaPage from './pages/sales/ComissaoAnaliticaPage'
+import ComissoesMixPage from './pages/sales/ComissoesMixPage'
 import PremiacoesPage from './pages/sales/PremiacoesPage'
 import DescontosDeducoesPage from './pages/sales/DescontosDeducoesPage'
 import SalesDashboardPage from './pages/sales/SalesDashboardPage'
@@ -196,6 +197,7 @@ const App = () => (
                                 path="/admin/comissao-analitica"
                                 element={<ComissaoAnaliticaPage />}
                               />
+                              <Route path="/admin/comissoes-mix" element={<ComissoesMixPage />} />
                               <Route path="/admin/premiacoes" element={<PremiacoesPage />} />
                               <Route
                                 path="/admin/descontos-deducoes"

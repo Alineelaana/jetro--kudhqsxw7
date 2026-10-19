@@ -121,8 +121,12 @@ export function DialogComposicaoCalculo({ lancamento, open, onOpenChange }: Dial
                 <span className="font-bold">{formatMoeda(lancamento.baseComissao)}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block">Alíquota Aplicada:</span>
-                <span className="font-bold">{lancamento.percentualComissao.toFixed(3)}%</span>
+                <span className="text-muted-foreground block">
+                  Alíquota MIX Efetivamente Aplicada:
+                </span>
+                <span className="font-bold text-[#002817] dark:text-[#E4C46A]">
+                  {lancamento.percentualComissao.toFixed(3)}%
+                </span>
               </div>
               <div>
                 <span className="text-muted-foreground block">Comissão Apurada:</span>
@@ -135,6 +139,12 @@ export function DialogComposicaoCalculo({ lancamento, open, onOpenChange }: Dial
                 </span>
               </div>
             </div>
+            {lancamento.observacoes && (
+              <div className="text-[11px] bg-background/60 p-2 rounded border border-border/60">
+                <span className="text-muted-foreground">Produto / Item Faturado: </span>
+                <span className="font-semibold">{lancamento.observacoes}</span>
+              </div>
+            )}
             <p className="text-[11px] text-muted-foreground italic pt-1">
               Origem do evento: <b>{lancamento.origem}</b> | Regra:{' '}
               <b>{lancamento.regraAplicada}</b>

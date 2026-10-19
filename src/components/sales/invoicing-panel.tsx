@@ -26,6 +26,7 @@ import {
 } from '@/services/sales'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
+import pb from '@/lib/pocketbase/client'
 import { STATUS_COLORS, type SalesOrder } from '@/lib/sales-types'
 import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Search, Loader2, FileText, Check, Truck } from 'lucide-react'
