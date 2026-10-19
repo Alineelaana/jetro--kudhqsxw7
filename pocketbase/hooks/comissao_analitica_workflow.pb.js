@@ -130,22 +130,89 @@ routerAdd('POST', '/backend/v1/comissao-analitica/status-update', (e) => {
       oldStatus = 'apurada'
     } else {
       oldStatus = record.getString('situacao') || 'apurada'
+      if (competencia && !record.getString('competencia')) record.set('competencia', competencia)
+      if (rcaCode && !record.getString('rca_code')) record.set('rca_code', rcaCode)
+      if (rcaName && !record.getString('vendedor_name')) record.set('vendedor_name', rcaName)
+      if (rcaCode && !record.getString('vendedor_id')) record.set('vendedor_id', rcaCode)
+      if (metodoApuracao && !record.getString('metodo_apuracao'))
+        record.set('metodo_apuracao', metodoApuracao)
+      if (valorTotal && !record.getString('commission_value'))
+        record.set('commission_value', valorTotal)
+      if (baseCalculo && !record.getString('base_value')) record.set('base_value', baseCalculo)
     }
 
     record.set('situacao', newStatus)
 
-    const historico = record.get('historico') || []
-    const histList = Array.isArray(historico) ? historico : []
+    // Ler histórico anterior de forma segura (pode vir como string JSON, array, objeto ou nulo)
+    let histList = []
+    try {
+      const raw = record.get('historico')
+      if (Array.isArray(raw)) {
+        histList = raw
+      } else if (typeof raw === 'string' && raw.trim()) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          histList = parsed
+        } else if (parsed && typeof parsed === 'object') {
+          histList = [parsed]
+        }
+      } else if (raw && typeof raw === 'object') {
+        histList = Array.isArray(raw) ? raw : Object.values(raw)
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(histList) || histList.length === 0) {
+      try {
+        const rawStr = record.getString('historico')
+        if (rawStr && rawStr.trim()) {
+          const parsedStr = JSON.parse(rawStr)
+          if (Array.isArray(parsedStr)) {
+            histList = parsedStr
+          } else if (parsedStr && typeof parsedStr === 'object') {
+            histList = [parsedStr]
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (!Array.isArray(histList)) {
+      histList = []
+    }
+
+    const acaoLabel =
+      newStatus === 'aprovada'
+        ? 'Aprovação de Apuração'
+        : newStatus === 'paga'
+          ? 'Marcação de Pagamento'
+          : newStatus === 'reaberta'
+            ? 'Reabertura de Apuração'
+            : 'Atualização de Status'
+
+    const rcaIdent = rcaCode
+      ? rcaName
+        ? `${rcaCode} - ${rcaName}`
+        : rcaCode
+      : rcaName || record.getString('vendedor_name') || record.getString('rca_code') || ''
 
     histList.push({
+      acao: acaoLabel,
+      acao_codigo: `STATUS_${newStatus.toUpperCase()}`,
       status_anterior: oldStatus,
       status_novo: newStatus,
+      operador: userName,
       usuario_id: authRecord.id,
       usuario_nome: userName,
+      usuario_role: role,
       data: now,
-      justificativa: justificativa,
+      justificativa: justificativa || '',
+      competencia: competencia || record.getString('competencia') || '',
+      rca: rcaIdent,
+      rca_code: rcaCode || record.getString('rca_code') || '',
+      rca_name: rcaName || record.getString('vendedor_name') || '',
     })
-    record.set('historico', histList)
+
+    // Serializar rigorosamente como JSON string válido para conformidade com PocketBase
+    record.set('historico', JSON.stringify(histList))
 
     if (newStatus === 'aprovada') {
       record.set('aprovado_por', userName)
@@ -165,30 +232,43 @@ routerAdd('POST', '/backend/v1/comissao-analitica/status-update', (e) => {
     try {
       const auditCol = $app.findCollectionByNameOrId('audit_logs')
       if (auditCol) {
-        const auditRec = new Record(auditCol, {
-          user_id: authRecord.id,
-          user_name: userName,
-          user_role: role,
-          action: newStatus === 'reaberta' ? 'REOPEN_COMMISSION' : 'UPDATE_COMMISSION_STATUS',
-          module: 'Comercial',
-          target_collection: 'commission_apurations',
-          target_id: record.id,
-          target_summary:
-            (isNew ? 'Nova apuração criada com status ' : 'Status da comissão alterado para ') +
+        const auditRec = new Record(auditCol)
+        auditRec.set('user_id', authRecord.id)
+        auditRec.set('user_name', userName)
+        auditRec.set('user_role', role)
+        auditRec.set(
+          'action',
+          newStatus === 'reaberta'
+            ? 'REOPEN_COMMISSION'
+            : newStatus === 'aprovada'
+              ? 'APPROVE_COMMISSION'
+              : newStatus === 'paga'
+                ? 'PAY_COMMISSION'
+                : 'UPDATE_COMMISSION_STATUS',
+        )
+        auditRec.set('module', 'Comercial')
+        auditRec.set('target_collection', 'commission_apurations')
+        auditRec.set('target_id', record.id)
+        auditRec.set(
+          'target_summary',
+          (isNew ? 'Nova apuração criada com status ' : 'Status da comissão alterado para ') +
             newStatus +
             (justificativa ? ' - Justificativa: ' + justificativa : ''),
-          previous_value: { situacao: oldStatus },
-          new_value: {
+        )
+        auditRec.set('previous_value', JSON.stringify({ situacao: oldStatus }))
+        auditRec.set(
+          'new_value',
+          JSON.stringify({
             situacao: newStatus,
             justificativa: justificativa,
             competencia: record.getString('competencia'),
             rca_code: record.getString('rca_code'),
             vendedor_name: record.getString('vendedor_name'),
-          },
-          criticidade: newStatus === 'reaberta' ? 'Alta' : 'Média',
-          origem: 'Área da Empresa',
-          justification: justificativa,
-        })
+          }),
+        )
+        auditRec.set('criticidade', newStatus === 'reaberta' ? 'Alta' : 'Média')
+        auditRec.set('origem', 'Área da Empresa')
+        auditRec.set('justification', justificativa)
         $app.save(auditRec)
       }
     } catch (errAudit) {
