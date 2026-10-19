@@ -228,7 +228,7 @@ routerAdd('POST', '/backend/v1/comissao/mix/bulk-update', (e) => {
 // Garante integridade do histórico e vigência
 // ----------------------------------------------------
 onRecordUpdate((e) => {
-  if (e.collection.name !== 'commission_mix') {
+  if (!e.collection || e.collection.name !== 'commission_mix') {
     e.next()
     return
   }

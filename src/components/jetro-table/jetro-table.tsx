@@ -132,9 +132,9 @@ export function JetroTable<T extends object = Record<string, any>>({
       if (col.getSortValue) {
         valA = col.getSortValue(rowA)
         valB = col.getSortValue(rowB)
-      } else if (col.accessorKey) {
-        valA = rowA[col.accessorKey]
-        valB = rowB[col.accessorKey]
+      } else if (col.accessorKey && typeof rowA === 'object' && rowA !== null) {
+        valA = (rowA as Record<string, unknown>)[col.accessorKey as string]
+        valB = (rowB as Record<string, unknown>)[col.accessorKey as string]
       }
 
       return compareValues(valA, valB, col.dataType || 'text', activeSorting.direction)

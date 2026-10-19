@@ -52,7 +52,7 @@ export const useAuth = () => {
   return context
 }
 
-const ADMIN_EMAIL = 'jetrosup@jetro.com.br'
+const ADMIN_EMAIL = 'alineelaana@gmail.com'
 
 function isTokenExpired(token: string | null | undefined): boolean {
   if (!token) return true
@@ -156,7 +156,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } | null,
   ) => {
     const trimmed = username.trim()
-    const email = trimmed === 'Alineelaana' || trimmed === 'jetrosup' ? ADMIN_EMAIL : trimmed
+    const email =
+      trimmed === 'Alineelaana' ||
+      trimmed === 'jetrosup' ||
+      trimmed === 'jetrosup@jetro.com.br' ||
+      trimmed.toLowerCase() === 'alineelaana@gmail.com'
+        ? ADMIN_EMAIL
+        : trimmed
     try {
       const authData = await pb.collection('users').authWithPassword(email, password)
       const record = authData.record as Record<string, unknown> | null
