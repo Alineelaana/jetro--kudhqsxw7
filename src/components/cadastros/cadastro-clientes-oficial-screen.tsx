@@ -59,7 +59,15 @@ import {
   Edit,
   MapPin,
   Lock,
+  Loader2,
+  Info,
 } from 'lucide-react'
+import {
+  consultarCNPJPublico,
+  validarCNPJ,
+  formatarCNPJ,
+  type CnpjParsedData,
+} from '@/services/cnpj-service'
 
 export function CadastroClientesOficialScreen() {
   const { user } = useAuth()
@@ -103,6 +111,9 @@ export function CadastroClientesOficialScreen() {
   const [inscricaoEstadual, setInscricaoEstadual] = useState('')
   const [cnae, setCnae] = useState('')
   const [situacaoCadastral, setSituacaoCadastral] = useState('Ativo')
+  const [consultandoCnpj, setConsultandoCnpj] = useState(false)
+  const [consultaInfo, setConsultaInfo] = useState<string | null>(null)
+  const [avisoDivergencia, setAvisoDivergencia] = useState<string | null>(null)
 
   // 2. Perfil Comercial
   const [perfilCliente, setPerfilCliente] = useState('Farmácia')
@@ -286,6 +297,9 @@ export function CadastroClientesOficialScreen() {
     setEmailXml(solic.email_xml || solic.email || '')
     setCompradorNome(solic.responsavel_estabelecimento || '')
 
+    setConsultaInfo(null)
+    setAvisoDivergencia(null)
+
     // Responsáveis Comerciais (Automáticos do RCA)
     setRca1Id(solic.rca_id || '')
     setRca1Nome(solic.rca_nome || '')
@@ -383,6 +397,176 @@ export function CadastroClientesOficialScreen() {
       loadData()
     } catch (err: any) {
       toast({ title: 'Erro ao rejeitar', description: err.message, variant: 'destructive' })
+    }
+  }
+
+  // Consulta de CNPJ na tela de Cadastro Oficial
+  const handleCnpjLookupOficial = async () => {
+    if (tipoPessoa !== 'PJ') return
+    const clean = cpfCnpj.replace(/\D/g, '')
+
+    if (!validarCNPJ(clean)) {
+      toast({
+        title: 'CNPJ inválido',
+        description: 'Digite um CNPJ válido com 14 dígitos para consultar na Receita.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setConsultandoCnpj(true)
+    setAvisoDivergencia(null)
+
+    try {
+      const data: CnpjParsedData = await consultarCNPJPublico(clean)
+
+      // Atualiza formatação do CNPJ
+      setCpfCnpj(data.cnpjFormatado)
+
+      const divergencias: string[] = []
+
+      // Razão Social
+      if (data.razaoSocial) {
+        if (
+          !razaoSocial.trim() ||
+          razaoSocial.trim().toUpperCase() === data.razaoSocial.toUpperCase()
+        ) {
+          setRazaoSocial(data.razaoSocial)
+        } else {
+          divergencias.push(`Razão Social (mantido "${razaoSocial}")`)
+        }
+      }
+
+      // Nome Fantasia
+      if (data.nomeFantasia) {
+        if (
+          !nomeFantasia.trim() ||
+          nomeFantasia.trim().toUpperCase() === data.nomeFantasia.toUpperCase()
+        ) {
+          setNomeFantasia(data.nomeFantasia)
+        } else {
+          divergencias.push(`Nome Fantasia (mantido "${nomeFantasia}")`)
+        }
+      }
+
+      // CNAE Principal
+      if (data.cnaePrincipal) {
+        if (!cnae.trim() || cnae.trim() === data.cnaePrincipal) {
+          setCnae(data.cnaePrincipal)
+        } else {
+          divergencias.push(`CNAE (mantido "${cnae}")`)
+        }
+      }
+
+      // Inscrição Estadual (se retornada)
+      if (data.inscricaoEstadual) {
+        if (!inscricaoEstadual.trim() || inscricaoEstadual.trim() === data.inscricaoEstadual) {
+          setInscricaoEstadual(data.inscricaoEstadual)
+        } else {
+          divergencias.push(`Inscrição Estadual (mantido "${inscricaoEstadual}")`)
+        }
+      }
+
+      // Situação Cadastral
+      if (data.situacaoCadastral && (!situacaoCadastral.trim() || situacaoCadastral === 'Ativo')) {
+        setSituacaoCadastral(data.situacaoCadastral)
+      }
+
+      // CEP
+      if (data.cep) {
+        if (!cep.trim() || cep.replace(/\D/g, '') === data.cep.replace(/\D/g, '')) {
+          setCep(data.cep)
+        } else {
+          divergencias.push(`CEP (mantido "${cep}")`)
+        }
+      }
+
+      // UF
+      if (data.uf) {
+        if (!uf.trim() || uf.trim().toUpperCase() === data.uf.toUpperCase()) {
+          setUf(data.uf)
+        } else {
+          divergencias.push(`UF (mantido "${uf}")`)
+        }
+      }
+
+      // Município
+      if (data.municipio) {
+        if (!municipio.trim() || municipio.trim().toUpperCase() === data.municipio.toUpperCase()) {
+          setMunicipio(data.municipio)
+        } else {
+          divergencias.push(`Município (mantido "${municipio}")`)
+        }
+      }
+
+      // Bairro
+      if (data.bairro) {
+        if (!bairro.trim() || bairro.trim().toUpperCase() === data.bairro.toUpperCase()) {
+          setBairro(data.bairro)
+        } else {
+          divergencias.push(`Bairro (mantido "${bairro}")`)
+        }
+      }
+
+      // Logradouro
+      if (data.logradouro) {
+        if (
+          !logradouro.trim() ||
+          logradouro.trim().toUpperCase() === data.logradouro.toUpperCase()
+        ) {
+          setLogradouro(data.logradouro)
+        } else {
+          divergencias.push(`Logradouro (mantido "${logradouro}")`)
+        }
+      }
+
+      // Número
+      if (data.numero) {
+        if (!numeroEnd.trim() || numeroEnd.trim() === data.numero) {
+          setNumeroEnd(data.numero)
+        } else {
+          divergencias.push(`Número (mantido "${numeroEnd}")`)
+        }
+      }
+
+      // Complemento
+      if (data.complemento && !complemento.trim()) {
+        setComplemento(data.complemento)
+      }
+
+      // Telefone
+      if (data.telefone && !telefonePrincipal.trim()) {
+        setTelefonePrincipal(data.telefone)
+      }
+
+      // E-mail
+      if (data.email) {
+        if (!emailPrincipal.trim()) setEmailPrincipal(data.email)
+        if (!emailXml.trim()) setEmailXml(data.email)
+      }
+
+      setConsultaInfo(`Consultado na Receita via ${data.origem} em ${data.consultadoEmTexto}`)
+
+      if (divergencias.length > 0) {
+        setAvisoDivergencia(`Campos existentes preservados: ${divergencias.join('; ')}.`)
+        toast({
+          title: 'Dados do CNPJ preenchidos',
+          description: `Campos manuais divergentes foram preservados. (${data.origem})`,
+        })
+      } else {
+        toast({
+          title: 'Dados do CNPJ preenchidos com sucesso',
+          description: `Origem: ${data.provedorDescricao}`,
+        })
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Não foi possível consultar CNPJ',
+        description: err?.message || 'Tente preencher manualmente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setConsultandoCnpj(false)
     }
   }
 
@@ -836,6 +1020,24 @@ export function CadastroClientesOficialScreen() {
           onClick={() => {
             setSolicitacaoVinculada(null)
             setEditingCliente(null)
+            setCpfCnpj('')
+            setRazaoSocial('')
+            setNomeFantasia('')
+            setInscricaoEstadual('')
+            setCnae('')
+            setSituacaoCadastral('Ativo')
+            setCep('')
+            setUf('ES')
+            setMunicipio('')
+            setBairro('')
+            setLogradouro('')
+            setNumeroEnd('')
+            setComplemento('')
+            setTelefonePrincipal('')
+            setEmailPrincipal('')
+            setEmailXml('')
+            setConsultaInfo(null)
+            setAvisoDivergencia(null)
             setClienteFormOpen(true)
           }}
           className="bg-[#005B2E] hover:bg-[#004724] text-white font-bold shadow-sm"
@@ -1083,11 +1285,45 @@ export function CadastroClientesOficialScreen() {
                   <Label className="text-xs font-bold">
                     {tipoPessoa === 'PJ' ? 'CNPJ *' : 'CPF *'}
                   </Label>
-                  <Input
-                    value={cpfCnpj}
-                    onChange={(e) => setCpfCnpj(e.target.value)}
-                    className="h-9 text-xs font-mono"
-                  />
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={cpfCnpj}
+                      onChange={(e) => {
+                        const val =
+                          tipoPessoa === 'PJ' ? formatarCNPJ(e.target.value) : e.target.value
+                        setCpfCnpj(val)
+                      }}
+                      className="h-9 text-xs font-mono"
+                      placeholder={tipoPessoa === 'PJ' ? '00.000.000/0000-00' : '000.000.000-00'}
+                    />
+                    {tipoPessoa === 'PJ' && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCnpjLookupOficial}
+                        disabled={consultandoCnpj || !validarCNPJ(cpfCnpj)}
+                        className="h-9 px-3 text-xs border-[#005B2E]/40 text-[#005B2E] hover:bg-[#005B2E]/10 hover:text-[#005B2E] font-bold whitespace-nowrap shrink-0 shadow-sm transition-all disabled:opacity-50"
+                        title={
+                          !validarCNPJ(cpfCnpj)
+                            ? 'Digite um CNPJ válido com 14 dígitos para buscar na Receita'
+                            : 'Buscar dados cadastrais na Receita Federal'
+                        }
+                      >
+                        {consultandoCnpj ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                            Consultando...
+                          </>
+                        ) : (
+                          <>
+                            <Search className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
+                            Buscar CNPJ
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs font-bold">Status do Cadastro</Label>
