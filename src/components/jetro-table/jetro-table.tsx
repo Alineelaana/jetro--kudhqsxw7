@@ -4,6 +4,7 @@ import {
   type SortState,
   type SortDirection,
   type TableUserPreferences,
+  type JetroTableProps,
 } from './types'
 import { useTablePreferences } from './use-table-preferences'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
@@ -29,47 +30,6 @@ import {
   Printer,
   GripVertical,
 } from 'lucide-react'
-
-export interface JetroTableProps<T> {
-  /** Identificador único da tela no ERP (ex: "comercial.pedidos.consulta", "cadastros.produtos") */
-  screenId?: string
-  /** Alias para screenId utilizado em preferências locais */
-  preferenceKey?: string
-  /** Definições de colunas */
-  columns: JetroColumnDef<T>[]
-  /** Dados a serem exibidos */
-  data: T[]
-  /** Chave única por linha (default: 'id') */
-  rowKey?: keyof T | ((row: T) => string)
-  /** Se os dados estão sendo carregados */
-  loading?: boolean
-  /** Mensagem ou componente quando não há dados */
-  emptyMessage?: React.ReactNode
-  /** Se a ordenação deve ser tratada no cliente (default: true). Se false, chama onSortingChange */
-  clientSorting?: boolean
-  /** Callback para ordenação no backend (para paginação de grandes volumes) */
-  onSortingChange?: (sorting: SortState | null) => void
-  /** Ordenação externa controlada (opcional) */
-  externalSorting?: SortState | null
-  /** Se deve exibir barra de utilitários da tabela (personalizar colunas, exportação) */
-  showToolbar?: boolean
-  /** Botões ou filtros extras na toolbar */
-  toolbarExtra?: React.ReactNode
-  /** Título para exportação */
-  exportTitle?: string
-  /** Nome de arquivo padrão para exportação */
-  exportFilename?: string
-  /** Se deve permitir exportar (default: true) */
-  enableExport?: boolean
-  /** Quantidade de itens por página quando paginado no cliente */
-  pageSize?: number
-  /** Classe CSS extra para o container da tabela */
-  className?: string
-  /** Callback ao clicar na linha */
-  onRowClick?: (row: T) => void
-  /** Renderizador de detalhes expandidos (opcional) */
-  renderSubComponent?: (row: T) => React.ReactNode
-}
 
 export function JetroTable<T extends object = Record<string, any>>({
   screenId,
