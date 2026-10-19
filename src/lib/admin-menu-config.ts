@@ -340,6 +340,16 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         ],
       },
       {
+        label: 'Comissões',
+        icon: Percent,
+        route: '/admin/comissao-analitica',
+        perm: canViewSales,
+        children: [
+          { label: 'Comissão Analítica', route: '/admin/comissao-analitica' },
+          { label: 'Regras de Comissão', route: '/admin/regras-comissao' },
+        ],
+      },
+      {
         label: 'Precificação',
         icon: Calculator,
         route: '/admin/precificacao',

@@ -39,6 +39,7 @@ import Products from './pages/Products'
 import Cadastros from './pages/Cadastros'
 import PriceTablesPage from './pages/PriceTablesPage'
 import CommissionRules from './pages/CommissionRules'
+import ComissaoAnaliticaPage from './pages/sales/ComissaoAnaliticaPage'
 import SalesDashboardPage from './pages/sales/SalesDashboardPage'
 import SalesOrdersPage from './pages/sales/SalesOrdersPage'
 import SalesOrdersQueryPage from './pages/sales/SalesOrdersQueryPage'
@@ -189,6 +190,10 @@ const App = () => (
                               <Route path="/admin/cadastros/:screen" element={<Cadastros />} />
                               <Route path="/admin/tabelas-precos" element={<PriceTablesPage />} />
                               <Route path="/admin/regras-comissao" element={<CommissionRules />} />
+                              <Route
+                                path="/admin/comissao-analitica"
+                                element={<ComissaoAnaliticaPage />}
+                              />
                               <Route
                                 path="/admin/logistica"
                                 element={<Logistics screen="dashboard" />}
