@@ -77,6 +77,25 @@ export function InvoicingPanel() {
     try {
       const userName = (user?.name as string) || 'Sistema'
       const { number } = await getNextSalesNumber('invoice')
+
+      // Consultar Comissões MIX vigentes para gravar no item da nota fiscal
+      // (Garante histórico imutável e cálculo de estorno futuro mesmo se o percentual mudar)
+      let enrichedItems = confirmOrder.items || []
+      try {
+        const mixRes = await pb.send('/backend/v1/comissao/mix/consultar-itens', {
+          method: 'POST',
+          body: JSON.stringify({
+            items: confirmOrder.items || [],
+            data_faturamento: new Date().toISOString().slice(0, 10),
+          }),
+        })
+        if (mixRes?.items && Array.isArray(mixRes.items)) {
+          enrichedItems = mixRes.items
+        }
+      } catch (errMix) {
+        console.warn('Erro ao consultar percentuais MIX no faturamento:', errMix)
+      }
+
       await createSalesInvoice({
         invoice_number: number,
         status: 'Faturada',
@@ -85,7 +104,7 @@ export function InvoicingPanel() {
         client_id: confirmOrder.client_id,
         client_name: confirmOrder.client_name,
         invoice_date: new Date().toISOString(),
-        items: confirmOrder.items,
+        items: enrichedItems,
         total_value: confirmOrder.total_value,
         carrier_name: carrier,
         volumes,

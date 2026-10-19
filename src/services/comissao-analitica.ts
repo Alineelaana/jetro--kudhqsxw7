@@ -291,6 +291,27 @@ export async function consultarComissaoAnalitica(
     console.warn('sales_invoices fetch error:', err)
   }
 
+  // 4.1 Buscar Comissões MIX cadastradas para aplicação nos itens faturados
+  let comissoesMixReais: any[] = []
+  try {
+    comissoesMixReais = await pb.collection('commission_mix').getFullList({
+      filter: 'status = "Ativo"',
+      sort: '-vigencia_inicio',
+      requestKey: null,
+    })
+  } catch (errMix) {
+    console.warn('commission_mix fetch error:', errMix)
+  }
+
+  const mixMapByCode = new Map<string, any>()
+  const mixMapByEan = new Map<string, any>()
+  for (const m of comissoesMixReais) {
+    const c = (m.product_code || '').trim()
+    const e = (m.product_ean || '').trim()
+    if (c && !mixMapByCode.has(c)) mixMapByCode.set(c, m)
+    if (e && !mixMapByEan.has(e)) mixMapByEan.set(e, m)
+  }
+
   // 5. Buscar Devoluções Reais
   let devolucoesReais: any[] = []
   try {
@@ -325,27 +346,131 @@ export async function consultarComissaoAnalitica(
     nfsMap.set(n.id, n)
   }
 
-  // Se existirem títulos reais no banco
+  // Processamento de Notas Fiscais Reais Faturadas (INTEGRAÇÃO COMISSÕES MIX POR ITEM FATURADO)
+  // Regra crítica do Jetro: A comissão é gerada a partir do faturamento efetivo dos itens,
+  // com percentual MIX por produto registrado no item da nota fiscal para histórico perene.
+  const nfsProcessadasIds = new Set<string>()
+
+  for (const nf of nfsReais) {
+    if (nfsProcessadasIds.has(nf.id)) continue
+    nfsProcessadasIds.add(nf.id)
+
+    const dataFaturamento = (nf.invoice_date || nf.created?.slice(0, 10) || '').slice(0, 10)
+    if (filtros.dataInicio && dataFaturamento < filtros.dataInicio) continue
+    if (filtros.dataFim && dataFaturamento > filtros.dataFim) continue
+
+    const ped = pedidosMap.get(nf.order_id) || pedidosMap.get(nf.order_number?.trim())
+    const itensNf = Array.isArray(nf.items) ? nf.items : []
+
+    // Identificar profissional comissionado
+    const rcaNotaCode = ped?.rca_id || ped?.salesperson_id || rcaAtual?.code || '53.215.715'
+    const rcaNotaName =
+      ped?.rca_name || ped?.salesperson_name || rcaAtual?.name || 'Representante Comercial'
+
+    if (itensNf.length > 0) {
+      // Gerar lançamento com rastreabilidade detalhada por item faturado
+      for (let idx = 0; idx < itensNf.length; idx++) {
+        const item = itensNf[idx]
+        const prodCode = (item.code || item.product_code || '').trim()
+        const prodEan = (item.ean || item.product_ean || '').trim()
+        const prodName = item.product || item.product_name || `Produto ${prodCode}`
+        const itemTotal =
+          parseFloat(item.total || item.total_value || item.quantity * item.unit_price || 0) || 0
+        if (itemTotal <= 0) continue
+
+        // Consultar percentual MIX gravado no item ou na coleção commission_mix vigente
+        let percentualAplicado = parseFloat(item.commission_percentage_applied)
+        let vigenciaItem = item.vigencia_aplicada || dataFaturamento
+
+        if (isNaN(percentualAplicado)) {
+          const mixRec = mixMapByCode.get(prodCode) || mixMapByEan.get(prodEan)
+          if (mixRec) {
+            percentualAplicado = parseFloat(mixRec.commission_percentage || '3')
+            vigenciaItem = mixRec.vigencia_inicio || '2026-01-01'
+          } else {
+            percentualAplicado = aliquotaPadraoRca
+          }
+        }
+
+        const comissaoItem = Number(((itemTotal * percentualAplicado) / 100).toFixed(2))
+
+        lancamentos.push({
+          id: `nf-${nf.id}-item-${idx}`,
+          tipoOperacao: 'Venda',
+          razaoSocial: nf.client_name || ped?.client_name || 'Cliente Comercial',
+          clienteId: nf.client_id || ped?.client_id || '',
+          rcaCode: rcaNotaCode,
+          rcaName: rcaNotaName,
+          nf: nf.invoice_number || '—',
+          nfId: nf.id,
+          pedido: nf.order_number || ped?.order_number || '—',
+          pedidoId: ped?.id || nf.order_id,
+          titulo: `FAT-${nf.invoice_number || nf.id.slice(0, 6)}/${idx + 1}`,
+          dataEmissao: dataFaturamento,
+          dataVencimento: dataFaturamento,
+          totalNota: parseFloat(nf.total_value) || itemTotal,
+          totalTitulo: itemTotal,
+          baseComissao: itemTotal,
+          percentualComissao: percentualAplicado,
+          valorComissao: comissaoItem,
+          situacao: nf.status === 'Autorizada' || nf.status === 'Faturada' ? 'Pago' : 'Em Aberto',
+          origem: 'faturamento',
+          formulaCalculo: `Item [${prodCode}] Base (R$ ${itemTotal.toFixed(2)}) × MIX ${percentualAplicado.toFixed(3)}% = R$ ${comissaoItem.toFixed(2)}`,
+          regraAplicada: `Comissões MIX Produto ${prodCode} (Vigência: ${vigenciaItem})`,
+          observacoes: `${prodName} — Qtd: ${item.quantity || 1} un`,
+        })
+      }
+    } else {
+      // Fallback para NF sem array explícito de itens
+      const valTotalNf = parseFloat(nf.total_value || '0') || 0
+      const comissaoNf = Number(((valTotalNf * aliquotaPadraoRca) / 100).toFixed(2))
+      lancamentos.push({
+        id: `nf-${nf.id}`,
+        tipoOperacao: 'Venda',
+        razaoSocial: nf.client_name || ped?.client_name || 'Cliente Comercial',
+        clienteId: nf.client_id || ped?.client_id || '',
+        rcaCode: rcaNotaCode,
+        rcaName: rcaNotaName,
+        nf: nf.invoice_number || '—',
+        nfId: nf.id,
+        pedido: nf.order_number || ped?.order_number || '—',
+        pedidoId: ped?.id || nf.order_id,
+        titulo: `FAT-${nf.invoice_number || nf.id.slice(0, 6)}`,
+        dataEmissao: dataFaturamento,
+        dataVencimento: dataFaturamento,
+        totalNota: valTotalNf,
+        totalTitulo: valTotalNf,
+        baseComissao: valTotalNf,
+        percentualComissao: aliquotaPadraoRca,
+        valorComissao: comissaoNf,
+        situacao: 'Pago',
+        origem: 'faturamento',
+        formulaCalculo: `Base Faturada (R$ ${valTotalNf.toFixed(2)}) × ${aliquotaPadraoRca}% = R$ ${comissaoNf.toFixed(2)}`,
+        regraAplicada: `Comissão Faturamento Global (${aliquotaPadraoRca}%)`,
+      })
+    }
+  }
+
+  // Se existirem títulos financeiros reais no banco não decorrentes das NFs já processadas
   if (titulosReais.length > 0) {
     for (const t of titulosReais) {
+      if (t.numero_nota_fiscal && nfsMap.has(t.numero_nota_fiscal.trim())) {
+        // Já contemplado pelo faturamento da NF para evitar duplicidade rigorosamente
+        continue
+      }
+
       const dataRef =
         filtros.metodoApuracao === 'Adiantamento'
           ? t.data_emissao || t.created?.slice(0, 10)
           : t.data_recebimento || t.data_vencimento || t.data_emissao
 
-      // Filtro de data
       if (filtros.dataInicio && dataRef < filtros.dataInicio) continue
       if (filtros.dataFim && dataRef > filtros.dataFim) continue
 
-      // Vínculo com pedido e NF
       const ped = pedidosMap.get(t.numero_pedido?.trim())
-      const nf = nfsMap.get(t.numero_nota_fiscal?.trim())
-
       const valOriginal = parseFloat(t.valor_original || t.valor_atualizado || '0') || 0
       const valRecebido = parseFloat(t.valor_recebido || '0') || 0
 
-      // No método Adiantamento, a base é o valor original do título faturado
-      // Na Apuração Mensal (comissão sobre títulos/recebimento), a base é o valor efetivamente liquidado
       const baseCalculo =
         filtros.metodoApuracao === 'Adiantamento'
           ? valOriginal
@@ -363,8 +488,7 @@ export async function consultarComissaoAnalitica(
         clienteId: t.client_id || ped?.client_id || '',
         rcaCode: rcaAtual?.code || '53.215.715',
         rcaName: rcaAtual?.name || 'Representante Comercial',
-        nf: t.numero_nota_fiscal || nf?.invoice_number || '—',
-        nfId: nf?.id,
+        nf: t.numero_nota_fiscal || '—',
         pedido: t.numero_pedido || ped?.order_number || '—',
         pedidoId: ped?.id,
         titulo: t.numero_titulo || `TR-${t.id.slice(0, 8)}`,
@@ -373,8 +497,7 @@ export async function consultarComissaoAnalitica(
         dataVencimento: t.data_vencimento || '2026-08-14',
         dataPagamento:
           t.data_recebimento || (t.status === 'Recebido' ? t.data_vencimento : undefined),
-        totalNota:
-          parseFloat(nf?.total_value || ped?.total_value || String(valOriginal)) || valOriginal,
+        totalNota: valOriginal,
         totalTitulo: valOriginal,
         baseComissao: baseCalculo,
         percentualComissao: taxa,
