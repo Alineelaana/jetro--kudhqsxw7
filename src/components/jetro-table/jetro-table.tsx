@@ -32,7 +32,9 @@ import {
 
 export interface JetroTableProps<T> {
   /** Identificador único da tela no ERP (ex: "comercial.pedidos.consulta", "cadastros.produtos") */
-  screenId: string
+  screenId?: string
+  /** Alias para screenId utilizado em preferências locais */
+  preferenceKey?: string
   /** Definições de colunas */
   columns: JetroColumnDef<T>[]
   /** Dados a serem exibidos */
@@ -59,6 +61,8 @@ export interface JetroTableProps<T> {
   exportFilename?: string
   /** Se deve permitir exportar (default: true) */
   enableExport?: boolean
+  /** Quantidade de itens por página quando paginado no cliente */
+  pageSize?: number
   /** Classe CSS extra para o container da tabela */
   className?: string
   /** Callback ao clicar na linha */
@@ -69,6 +73,7 @@ export interface JetroTableProps<T> {
 
 export function JetroTable<T extends object = Record<string, any>>({
   screenId,
+  preferenceKey,
   columns,
   data,
   rowKey = 'id',
@@ -82,10 +87,15 @@ export function JetroTable<T extends object = Record<string, any>>({
   exportTitle = 'Relatório de Dados — Jetro ERP',
   exportFilename,
   enableExport = true,
+  pageSize,
   className = '',
   onRowClick,
 }: JetroTableProps<T>) {
-  const { preferences, savePreferences, restoreDefaults } = useTablePreferences(screenId, columns)
+  const effectiveScreenId = screenId || preferenceKey || 'jetro.table.default'
+  const { preferences, savePreferences, restoreDefaults } = useTablePreferences(
+    effectiveScreenId,
+    columns,
+  )
   const { preferences: globalPrefs } = useUserPreferences()
 
   const [customizerOpen, setCustomizerOpen] = useState(false)
@@ -428,7 +438,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                       }}
                       title={
                         isSortable
-                          ? `Clique para ordenar por ${col.header || col.title || col.id} (1º asc, 2º desc, 3º padrão)`
+                          ? `Clique para ordenar por ${typeof col.header === 'string' ? col.header : col.title || col.id} (1º asc, 2º desc, 3º padrão)`
                           : undefined
                       }
                     >
@@ -531,11 +541,13 @@ export function JetroTable<T extends object = Record<string, any>>({
                           value = (row as any)[col.accessorKey]
                         }
 
-                        const rendered = col.cell
-                          ? col.cell({ row, value, index })
-                          : value === null || value === undefined
-                            ? '—'
-                            : String(value)
+                        const rendered = col.render
+                          ? col.render(row, index)
+                          : col.cell
+                            ? col.cell({ row, value, index })
+                            : value === null || value === undefined
+                              ? '—'
+                              : String(value)
 
                         const width = preferences.columnWidths[col.id] || col.defaultWidth
 

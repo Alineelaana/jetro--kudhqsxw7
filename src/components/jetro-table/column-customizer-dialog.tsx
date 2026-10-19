@@ -210,7 +210,7 @@ export function ColumnCustomizerDialog<T>({
                       isVisible ? 'text-foreground' : 'text-muted-foreground line-through'
                     }`}
                   >
-                    {col.header || col.title || col.id}
+                    {typeof col.header === 'string' ? col.header : col.title || col.id}
                   </Label>
                 </div>
 

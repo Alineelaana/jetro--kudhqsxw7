@@ -373,7 +373,8 @@ export function exportTableToExcel<T>(
 
   const headerCells = visibleColumns.map((col, idx) => {
     const ref = `${columnLetter(idx)}1`
-    return `<c r="${ref}" t="inlineStr" s="1"><is><t xml:space="preserve">${xmlEscape(col.header || col.title || col.id)}</t></is></c>`
+    const headerText = typeof col.header === 'string' ? col.header : col.title || col.id
+    return `<c r="${ref}" t="inlineStr" s="1"><is><t xml:space="preserve">${xmlEscape(headerText)}</t></is></c>`
   })
 
   const bodyRowsXml: string[] = []
@@ -482,10 +483,10 @@ export function exportTableToPdf<T>(
   const now = new Date().toLocaleString('pt-BR')
 
   const thHtml = visibleColumns
-    .map(
-      (col) =>
-        `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: ${col.align || 'left'}; border-bottom: 2px solid #C9A227;">${xmlEscape(col.header || col.title || col.id)}</th>`,
-    )
+    .map((col) => {
+      const headerText = typeof col.header === 'string' ? col.header : col.title || col.id
+      return `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: ${col.align || 'left'}; border-bottom: 2px solid #C9A227;">${xmlEscape(headerText)}</th>`
+    })
     .join('')
 
   const trsHtml = data

@@ -11,7 +11,7 @@ export interface SortState {
 
 export interface JetroColumnDef<T = any> {
   id: string
-  header?: string
+  header?: ReactNode
   title?: string
   accessorKey?: keyof T | string
   /**
@@ -26,6 +26,8 @@ export interface JetroColumnDef<T = any> {
   dataType?: TableDataType
   /** Função de valor customizada para ordenação/exportação */
   getSortValue?: (row: T) => unknown
+  /** Renderizador alternativo ou simplificado */
+  render?: (row: T, index?: number) => ReactNode
   /** Renderizador customizado da célula */
   cell?: (info: { row: T; value: unknown; index: number }) => ReactNode
   /** Largura padrão inicial em pixels (ex: 150) */
