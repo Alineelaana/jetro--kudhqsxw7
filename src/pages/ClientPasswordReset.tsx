@@ -80,10 +80,10 @@ export default function ClientPasswordReset() {
   if (!token) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-          <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
+        <Card className="w-full max-w-md border-2 border-[#C69B45]/40 shadow-2xl bg-white">
+          <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/40 pb-6 rounded-t-lg">
             <CardTitle className="text-xl font-black text-center text-white flex items-center justify-center gap-2">
-              <Lock className="w-6 h-6 text-[#D6A755]" /> Link Inválido
+              <Lock className="w-6 h-6 text-[#C69B45]" /> Link Inválido
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-4 text-center">
@@ -93,7 +93,7 @@ export default function ClientPasswordReset() {
             </p>
             <Button
               asChild
-              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-bold h-12 rounded-xl"
+              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold h-12 rounded-xl"
             >
               <Link to="/cliente/recuperar-senha">Solicitar novo link</Link>
             </Button>
@@ -106,10 +106,10 @@ export default function ClientPasswordReset() {
   if (success) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-          <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
+        <Card className="w-full max-w-md border-2 border-[#C69B45]/40 shadow-2xl bg-white">
+          <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/40 pb-6 rounded-t-lg">
             <CardTitle className="text-xl font-black text-center text-white flex items-center justify-center gap-2">
-              <CheckCircle className="w-6 h-6 text-[#D6A755]" /> Senha Redefinida!
+              <CheckCircle className="w-6 h-6 text-[#C69B45]" /> Senha Redefinida!
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-4 text-center">
@@ -118,7 +118,7 @@ export default function ClientPasswordReset() {
             </p>
             <Button
               asChild
-              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-bold h-12 rounded-xl"
+              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold h-12 rounded-xl"
             >
               <Link to="/cliente/login">Ir para o login</Link>
             </Button>
@@ -130,10 +130,10 @@ export default function ClientPasswordReset() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
+      <Card className="w-full max-w-md border-2 border-[#C69B45]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/40 pb-6 rounded-t-lg">
           <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-6 h-6 text-[#D6A755]" /> Redefinir Senha — HURAM
+            <Lock className="w-6 h-6 text-[#C69B45]" /> Redefinir Senha — HURAM
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -150,7 +150,7 @@ export default function ClientPasswordReset() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Digite a nova senha"
-                  className={`pl-10 pr-10 focus-visible:ring-[#003D30] ${passwordError ? 'border-destructive' : 'border-border'}`}
+                  className={`pl-10 pr-10 focus-visible:ring-[#063D30] ${passwordError ? 'border-destructive' : 'border-border'}`}
                   autoComplete="new-password"
                 />
                 <button
@@ -177,7 +177,7 @@ export default function ClientPasswordReset() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirme a nova senha"
-                  className={`pl-10 pr-10 focus-visible:ring-[#003D30] ${confirmError ? 'border-destructive' : 'border-border'}`}
+                  className={`pl-10 pr-10 focus-visible:ring-[#063D30] ${confirmError ? 'border-destructive' : 'border-border'}`}
                   autoComplete="new-password"
                 />
                 <button
@@ -201,7 +201,7 @@ export default function ClientPasswordReset() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold h-12 rounded-xl"
+              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-extrabold h-12 rounded-xl"
               disabled={submitting}
             >
               {' '}
@@ -215,7 +215,7 @@ export default function ClientPasswordReset() {
             </Button>
             <Link
               to="/cliente/login"
-              className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
+              className="block text-center text-sm text-[#063D30] hover:underline font-bold pt-2"
             >
               Voltar ao login
             </Link>

@@ -215,7 +215,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 onClick={() => handleNavClick('#contato')}
                 variant="outline"
                 size="sm"
-                className="border-[#D6A755]/50 text-white bg-transparent hover:bg-[#D6A755]/15 hover:border-[#D6A755] text-xs font-semibold px-4 cursor-pointer"
+                className="border-[#C69B45]/50 text-white bg-transparent hover:bg-[#C69B45]/15 hover:border-[#C69B45] text-xs font-semibold px-4 cursor-pointer"
               >
                 Demonstração
               </Button>

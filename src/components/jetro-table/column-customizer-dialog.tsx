@@ -124,7 +124,7 @@ export function ColumnCustomizerDialog<T>({
       <DialogContent className="max-w-lg max-h-[85vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-2 border-b">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-[#005B2E]/10 text-[#005B2E]">
+            <div className="p-2 rounded-lg bg-[#063D30]/10 text-[#063D30]">
               <Columns className="w-5 h-5" />
             </div>
             <div>
@@ -150,7 +150,7 @@ export function ColumnCustomizerDialog<T>({
               variant="ghost"
               size="sm"
               onClick={handleShowAll}
-              className="h-7 text-xs text-[#005B2E] hover:bg-[#005B2E]/10"
+              className="h-7 text-xs text-[#063D30] hover:bg-[#063D30]/10"
             >
               <Eye className="w-3.5 h-3.5 mr-1" /> Mostrar Todas
             </Button>
@@ -182,9 +182,9 @@ export function ColumnCustomizerDialog<T>({
                 onDragEnd={handleDragEnd}
                 className={`flex items-center justify-between p-2.5 rounded-lg border transition-all select-none ${
                   draggedIdx === idx
-                    ? 'border-[#005B2E] bg-[#005B2E]/10 shadow-md opacity-70'
+                    ? 'border-[#063D30] bg-[#063D30]/10 shadow-md opacity-70'
                     : isVisible
-                      ? 'border-border bg-card hover:border-[#005B2E]/40'
+                      ? 'border-border bg-card hover:border-[#063D30]/40'
                       : 'border-dashed border-border/60 bg-muted/20 opacity-60'
                 }`}
               >
@@ -202,7 +202,7 @@ export function ColumnCustomizerDialog<T>({
                     onCheckedChange={(checked) =>
                       handleToggleVisibility(columnId, Boolean(checked))
                     }
-                    className="data-[state=checked]:bg-[#005B2E] data-[state=checked]:border-[#005B2E]"
+                    className="data-[state=checked]:bg-[#063D30] data-[state=checked]:border-[#063D30]"
                   />
                   <Label
                     htmlFor={`col-${columnId}`}
@@ -251,7 +251,7 @@ export function ColumnCustomizerDialog<T>({
             type="button"
             size="sm"
             onClick={handleApply}
-            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-semibold"
+            className="bg-[#063D30] hover:bg-[#042820] text-white font-semibold"
           >
             <Check className="w-4 h-4 mr-1.5" /> Aplicar e Salvar
           </Button>

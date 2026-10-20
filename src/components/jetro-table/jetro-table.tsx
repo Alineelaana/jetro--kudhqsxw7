@@ -298,7 +298,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                     variant="outline"
                     size="sm"
                     disabled={sortedData.length === 0}
-                    className="h-8 text-xs font-semibold border-[#005B2E]/30 text-[#005B2E] hover:bg-[#005B2E]/10"
+                    className="h-8 text-xs font-semibold border-[#063D30]/30 text-[#063D30] hover:bg-[#063D30]/10"
                   >
                     <Download className="w-3.5 h-3.5 mr-1.5" /> Exportar
                   </Button>
@@ -324,7 +324,7 @@ export function JetroTable<T extends object = Record<string, any>>({
               className="h-8 text-xs font-semibold border-border hover:bg-muted"
               title="Personalizar colunas visíveis e ordem"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
+              <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5 text-[#063D30]" />
               Personalizar Colunas
             </Button>
 
@@ -353,7 +353,7 @@ export function JetroTable<T extends object = Record<string, any>>({
               data-tour-id="pedidos-tabela-head"
               className={globalPrefs.tableStickyHeader ? 'sticky top-0 z-10' : ''}
             >
-              <tr className="bg-[#005B2E] text-white select-none">
+              <tr className="bg-[#063D30] text-white select-none">
                 {visibleColumns.map((col) => {
                   const isSorted = activeSorting?.columnId === col.id
                   const sortDir = isSorted ? activeSorting.direction : null
@@ -380,14 +380,14 @@ export function JetroTable<T extends object = Record<string, any>>({
                             ? 'text-right'
                             : 'text-left'
                       } ${
-                        isSortable ? 'cursor-pointer hover:bg-[#01361D]' : ''
+                        isSortable ? 'cursor-pointer hover:bg-[#042820]' : ''
                       } ${col.headerClassName || ''} ${
                         isDropTarget && dropPosition === 'before'
-                          ? 'border-l-4 border-[#C9A227]'
+                          ? 'border-l-4 border-[#C69B45]'
                           : ''
                       } ${
                         isDropTarget && dropPosition === 'after'
-                          ? 'border-r-4 border-[#C9A227]'
+                          ? 'border-r-4 border-[#C69B45]'
                           : ''
                       }`}
                       onClick={(e) => {
@@ -427,7 +427,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                           <span
                             className={`inline-flex items-center transition-transform ${
                               isSorted
-                                ? 'text-[#C9A227] font-black scale-110'
+                                ? 'text-[#C69B45] font-black scale-110'
                                 : 'opacity-40 hover:opacity-80'
                             }`}
                           >
@@ -445,7 +445,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                       {/* Resize handle */}
                       {isResizable && (
                         <div
-                          className="table-resize-handle absolute top-0 right-0 w-2 h-full cursor-col-resize select-none hover:bg-[#C9A227] transition-colors opacity-0 hover:opacity-100"
+                          className="table-resize-handle absolute top-0 right-0 w-2 h-full cursor-col-resize select-none hover:bg-[#C69B45] transition-colors opacity-0 hover:opacity-100"
                           onMouseDown={(e) =>
                             handleResizeStart(e, col.id, col.minWidth || 70, col.maxWidth)
                           }
@@ -466,7 +466,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                     className="py-12 text-center text-muted-foreground"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-[#005B2E] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-[#063D30] border-t-transparent rounded-full animate-spin" />
                       <span>Carregando dados...</span>
                     </div>
                   </td>
@@ -488,7 +488,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                       key={key}
                       onClick={() => onRowClick?.(row)}
                       className={`border-b border-border/60 transition-colors ${
-                        onRowClick ? 'cursor-pointer hover:bg-[#005B2E]/5' : 'hover:bg-muted/40'
+                        onRowClick ? 'cursor-pointer hover:bg-[#063D30]/5' : 'hover:bg-muted/40'
                       } ${
                         globalPrefs.tableStripedRows && index % 2 === 1
                           ? 'bg-muted/20 dark:bg-muted/10'

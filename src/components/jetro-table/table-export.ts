@@ -138,7 +138,7 @@ const XLSX_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
   <fills count="3">
     <fill><patternFill patternType="none"/></fill>
     <fill><patternFill patternType="gray125"/></fill>
-    <fill><patternFill patternType="solid"><fgColor rgb="FF005B2E"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF063D30"/><bgColor indexed="64"/></patternFill></fill>
   </fills>
   <borders count="2">
     <border><left/><right/><top/><bottom/><diagonal/></border>
@@ -271,7 +271,7 @@ export function exportToPdf(
   const thHtml = keys
     .map(
       (k) =>
-        `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: left; border-bottom: 2px solid #C9A227;">${xmlEscape(k)}</th>`,
+        `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: left; border-bottom: 2px solid #C69B45;">${xmlEscape(k)}</th>`,
     )
     .join('')
 
@@ -296,15 +296,15 @@ export function exportToPdf(
   <title>${xmlEscape(title)}</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #111827; margin: 24px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #005B2E; padding-bottom: 14px; margin-bottom: 18px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #063D30; padding-bottom: 14px; margin-bottom: 18px; }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { width: 36px; height: 36px; background-color: #005B2E; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
-    .brand-title { font-size: 20px; font-weight: 800; color: #005B2E; margin: 0; }
-    .brand-subtitle { font-size: 12px; color: #6b7280; margin: 0; }
-    .meta { text-align: right; font-size: 11px; color: #6b7280; }
+    .brand-logo { width: 36px; height: 36px; background-color: #063D30; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
+    .brand-title { font-size: 20px; font-weight: 800; color: #063D30; margin: 0; }
+    .brand-subtitle { font-size: 12px; color: #66736D; margin: 0; }
+    .meta { text-align: right; font-size: 11px; color: #66736D; }
     .table-container { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
-    thead { background-color: #005B2E; color: #ffffff; }
+    thead { background-color: #063D30; color: #ffffff; }
     .footer { margin-top: 20px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
     @media print {
       body { margin: 10mm; }
@@ -485,7 +485,7 @@ export function exportTableToPdf<T>(
   const thHtml = visibleColumns
     .map((col) => {
       const headerText = typeof col.header === 'string' ? col.header : col.title || col.id
-      return `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: ${col.align || 'left'}; border-bottom: 2px solid #C9A227;">${xmlEscape(headerText)}</th>`
+      return `<th style="padding: 8px 10px; font-weight: bold; font-size: 11px; text-align: ${col.align || 'left'}; border-bottom: 2px solid #C69B45;">${xmlEscape(headerText)}</th>`
     })
     .join('')
 
@@ -515,15 +515,15 @@ export function exportTableToPdf<T>(
   <title>${xmlEscape(title)}</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #111827; margin: 24px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #005B2E; padding-bottom: 14px; margin-bottom: 18px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #063D30; padding-bottom: 14px; margin-bottom: 18px; }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { width: 36px; height: 36px; background-color: #005B2E; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
-    .brand-title { font-size: 20px; font-weight: 800; color: #005B2E; margin: 0; }
-    .brand-subtitle { font-size: 12px; color: #6b7280; margin: 0; }
-    .meta { text-align: right; font-size: 11px; color: #6b7280; }
+    .brand-logo { width: 36px; height: 36px; background-color: #063D30; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
+    .brand-title { font-size: 20px; font-weight: 800; color: #063D30; margin: 0; }
+    .brand-subtitle { font-size: 12px; color: #66736D; margin: 0; }
+    .meta { text-align: right; font-size: 11px; color: #66736D; }
     .table-container { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
-    thead { background-color: #005B2E; color: #ffffff; }
+    thead { background-color: #063D30; color: #ffffff; }
     .footer { margin-top: 20px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
     @media print {
       body { margin: 10mm; }

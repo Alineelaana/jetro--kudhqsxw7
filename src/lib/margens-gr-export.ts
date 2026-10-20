@@ -199,7 +199,7 @@ export function exportMargensToPdf(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 3px solid #005B2E;
+      border-bottom: 3px solid #063D30;
       padding-bottom: 12px;
       margin-bottom: 16px;
     }
@@ -209,7 +209,7 @@ export function exportMargensToPdf(
       gap: 12px;
     }
     .brand {
-      background: #005B2E;
+      background: #063D30;
       color: #fff;
       font-size: 20px;
       font-weight: bold;
@@ -217,30 +217,30 @@ export function exportMargensToPdf(
       border-radius: 4px;
       letter-spacing: 1px;
     }
-    .brand span { color: #C9A227; }
+    .brand span { color: #C69B45; }
     h1 {
       font-size: 16px;
       margin: 0;
-      color: #005B2E;
+      color: #063D30;
       font-weight: bold;
     }
     .subtitle {
       font-size: 11px;
-      color: #4b5563;
+      color: #66736D;
       margin-top: 2px;
     }
     .meta {
       font-size: 10px;
-      color: #6b7280;
+      color: #66736D;
       text-align: right;
     }
     .notice {
-      background: #F4FBF7;
-      border-left: 4px solid #005B2E;
+      background: #F1F4F2;
+      border-left: 4px solid #063D30;
       padding: 8px 12px;
       font-size: 10px;
       margin-bottom: 14px;
-      color: #14532d;
+      color: #202B28;
     }
     table {
       width: 100%;
@@ -249,19 +249,19 @@ export function exportMargensToPdf(
       margin-top: 10px;
     }
     th {
-      background: #005B2E;
+      background: #063D30;
       color: #fff;
       text-align: right;
       padding: 6px 5px;
-      border: 1px solid #004523;
+      border: 1px solid #042820;
       font-weight: 600;
     }
     th:first-child { text-align: left; }
     td {
       padding: 5px 5px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #E4EAE6;
     }
-    tr:nth-child(even) td { background-color: #f9fafb; }
+    tr:nth-child(even) td { background-color: #F8FAF9; }
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -269,11 +269,11 @@ export function exportMargensToPdf(
       margin-top: 20px;
     }
     .summary-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #F8FAF9;
+      border: 1px solid #E4EAE6;
       border-radius: 6px;
       padding: 10px;
-      border-top: 3px solid #005B2E;
+      border-top: 3px solid #063D30;
     }
     .summary-card.alert {
       border-top-color: #dc2626;
@@ -358,7 +358,7 @@ export function exportMargensToPdf(
     </div>
     <div class="summary-card">
       <div class="label">Margem Média Final</div>
-      <div class="val" style="color: #005B2E;">${formatPercent(resumo.margemMediaFinalPercentual)}</div>
+      <div class="val" style="color: #063D30;">${formatPercent(resumo.margemMediaFinalPercentual)}</div>
       <div class="desc">Média sobre todos os SKUs</div>
     </div>
     <div class="summary-card ${resumo.skusNegativosCount > 0 ? 'alert' : ''}">

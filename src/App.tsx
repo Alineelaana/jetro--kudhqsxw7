@@ -270,7 +270,7 @@ const JetroOnlineRelatoriosScreen = lazy(() =>
 
 const PageFallback = () => (
   <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
-    <div className="w-7 h-7 rounded-full border-2 border-[#003D30] border-t-transparent animate-spin" />
+    <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
   </div>
 )
 

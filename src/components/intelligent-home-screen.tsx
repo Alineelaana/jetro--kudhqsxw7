@@ -264,10 +264,10 @@ export function IntelligentHomeScreen() {
               <Button
                 type="button"
                 onClick={() => setIsFloatingOpen(true)}
-                className="bg-[#003D30] hover:bg-[#002820] text-white border border-[#C9A227]/50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer group"
+                className="bg-[#063D30] hover:bg-[#042820] text-white border border-[#C69B45]/50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer group"
                 title="Abrir painel do HURAM On-line"
               >
-                <MessageSquare className="w-4 h-4 text-[#E4C46A] group-hover:scale-110 transition-transform" />
+                <MessageSquare className="w-4 h-4 text-[#C69B45] group-hover:scale-110 transition-transform" />
                 <span>Chamar HURAM On-line</span>
               </Button>
             </div>{' '}
@@ -281,7 +281,7 @@ export function IntelligentHomeScreen() {
       <section className="w-full" data-tour-id="admin-home-agenda">
         <div className="mb-2 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[#005B2E]" />
+            <CalendarIcon className="w-4 h-4 text-[#063D30]" />
             <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Calendário e Agenda Corporativa
             </h2>

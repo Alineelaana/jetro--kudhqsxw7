@@ -40,10 +40,10 @@ export default function PasswordRecovery() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
+      <Card className="w-full max-w-md border-2 border-[#C69B45]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/40 pb-6 rounded-t-lg">
           <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Mail className="w-6 h-6 text-[#D6A755]" /> Recuperar Senha — HURAM
+            <Mail className="w-6 h-6 text-[#C69B45]" /> Recuperar Senha — HURAM
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -53,7 +53,7 @@ export default function PasswordRecovery() {
               <p className="text-sm text-foreground">
                 Se o e-mail existir, você receberá um link de redefinição de senha.
               </p>
-              <Button asChild variant="outline" className="border-[#003D30] text-[#003D30]">
+              <Button asChild variant="outline" className="border-[#063D30] text-[#063D30]">
                 <Link to="/cliente/login">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar ao login
                 </Link>
@@ -80,7 +80,7 @@ export default function PasswordRecovery() {
                       if (emailError) setEmailError('')
                     }}
                     placeholder="seu@email.com"
-                    className={`pl-10 focus-visible:ring-[#003D30] ${emailError ? 'border-destructive' : 'border-border'}`}
+                    className={`pl-10 focus-visible:ring-[#063D30] ${emailError ? 'border-destructive' : 'border-border'}`}
                     autoComplete="email"
                   />
                 </div>
@@ -89,7 +89,7 @@ export default function PasswordRecovery() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold h-12 rounded-xl"
+                className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-extrabold h-12 rounded-xl"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -102,7 +102,7 @@ export default function PasswordRecovery() {
               </Button>
               <Link
                 to="/cliente/login"
-                className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
+                className="block text-center text-sm text-[#063D30] hover:underline font-bold pt-2"
               >
                 Voltar ao login
               </Link>

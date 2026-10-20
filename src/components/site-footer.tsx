@@ -9,7 +9,7 @@ export function SiteFooter() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <footer className="bg-[#001c10] text-white border-t border-[#D6A755]/30 pt-16 pb-12">
+    <footer className="bg-[#001c10] text-white border-t border-[#C69B45]/30 pt-16 pb-12">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Coluna 1: Marca & Posicionamento */}
@@ -32,7 +32,7 @@ export function SiteFooter() {
                 <span className="text-2xl font-black text-white tracking-tight leading-none">
                   HURAM
                 </span>
-                <span className="text-[10px] font-semibold text-[#D6A755] tracking-wider uppercase mt-0.5">
+                <span className="text-[10px] font-semibold text-[#C69B45] tracking-wider uppercase mt-0.5">
                   Sistema Inteligente de Gestão
                 </span>
               </div>

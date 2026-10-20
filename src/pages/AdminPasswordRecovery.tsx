@@ -32,10 +32,10 @@ export default function AdminPasswordRecovery() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
+      <Card className="w-full max-w-md border-2 border-[#C69B45]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/40 pb-6 rounded-t-lg">
           <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Mail className="w-6 h-6 text-[#D6A755]" /> Recuperar Senha — HURAM
+            <Mail className="w-6 h-6 text-[#C69B45]" /> Recuperar Senha — HURAM
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -46,7 +46,7 @@ export default function AdminPasswordRecovery() {
                 Enviamos um link de recuperação para <strong>{email}</strong>. Verifique sua caixa
                 de entrada.
               </p>
-              <Button asChild variant="outline" className="border-[#003D30] text-[#003D30]">
+              <Button asChild variant="outline" className="border-[#063D30] text-[#063D30]">
                 <Link to="/admin">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar ao login
                 </Link>
@@ -70,7 +70,7 @@ export default function AdminPasswordRecovery() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="pl-10 focus-visible:ring-[#003D30] border-border"
+                    className="pl-10 focus-visible:ring-[#063D30] border-border"
                     autoComplete="email"
                   />
                 </div>
@@ -84,7 +84,7 @@ export default function AdminPasswordRecovery() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
+                className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -97,7 +97,7 @@ export default function AdminPasswordRecovery() {
               </Button>
               <Link
                 to="/admin"
-                className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
+                className="block text-center text-sm text-[#063D30] hover:underline font-bold pt-2"
               >
                 Voltar ao login
               </Link>
