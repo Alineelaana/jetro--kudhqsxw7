@@ -39,7 +39,7 @@ export default function Index() {
   }
 
   return (
-    <main className="min-h-screen bg-[#001c10] text-slate-100 selection:bg-[#C9A227] selection:text-gray-950">
+    <main className="min-h-screen bg-white text-[#202B28] selection:bg-[#C69B45] selection:text-white font-sans">
       {/* 1. SEO & Metadados Otimizados */}
       <SeoHead />
 
@@ -83,18 +83,19 @@ export default function Index() {
       {/* 11. Conversão Comercial & Formulário Estruturado */}
       <section
         id="contato"
-        className="py-20 sm:py-28 bg-[#00140b] relative border-t border-white/5"
+        className="py-20 sm:py-28 bg-[#F8FAF9] relative border-t border-[#E4EAE6]"
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-[#002817] text-white px-6 sm:px-10 py-10 sm:py-12 text-center space-y-3 rounded-t-2xl border border-[#C9A227]/40 border-b-0 shadow-2xl">
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-[#C9A227]/40 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
+          <div className="bg-[#063D30] text-white px-6 sm:px-10 py-10 sm:py-12 text-center space-y-3 rounded-t-2xl border border-[#063D30] shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#C69B45]/10 rounded-full blur-3xl pointer-events-none" />
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-[#C69B45]/50 text-[#C69B45] text-xs font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
               Solicitação de Demonstração Guiada
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-bold font-heading text-white tracking-tight">
               Fale com nossos consultores de solução
             </h2>
-            <p className="text-slate-200 max-w-2xl mx-auto text-xs sm:text-base leading-relaxed">
+            <p className="text-slate-200 max-w-2xl mx-auto text-xs sm:text-base leading-relaxed font-normal">
               Conte-nos brevemente o segmento e os objetivos da sua empresa para que nossa equipe
               demonstre os módulos HURAM mais indicados para sua operação.
             </p>
@@ -103,20 +104,20 @@ export default function Index() {
                 href="https://wa.me/5531991297619"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-[#f6d77c] font-bold hover:underline"
+                className="inline-flex items-center gap-2 text-white font-semibold hover:text-[#C69B45] transition-colors"
               >
-                <PhoneCall className="w-4 h-4 text-[#C9A227]" />
+                <PhoneCall className="w-4 h-4 text-[#C69B45]" />
                 WhatsApp Comercial: +55 (31) 99129-7619
               </a>
               <span className="hidden sm:inline text-white/30">|</span>
               <span className="inline-flex items-center gap-1.5 text-slate-300">
-                <ShieldCheck className="w-4 h-4 text-[#C9A227]" />
+                <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
                 Armazenamento seguro em conformidade com LGPD
               </span>
             </div>
           </div>
 
-          <div className="bg-slate-950 px-6 sm:px-10 pb-10 pt-8 rounded-b-2xl border border-[#C9A227]/40 border-t-0 shadow-2xl">
+          <div className="bg-white px-6 sm:px-10 pb-10 pt-8 rounded-b-2xl border border-[#E4EAE6] border-t-0 shadow-xl">
             <BudgetForm whatsappNumber={safeWhatsapp} selectedService={selectedService} />
           </div>
         </div>

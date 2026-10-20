@@ -3,6 +3,27 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Manrope', 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.025em;
+  }
+
   :root {
     /* Paleta Oficial HURAM */
     --background: 0 0% 100%; /* #FFFFFF Fundo principal */
