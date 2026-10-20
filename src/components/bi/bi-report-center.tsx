@@ -57,14 +57,7 @@ const REPORTS: ReportEntry[] = [
     route: '/admin/bi/custom-dashboards',
     icon: '🎨',
   },
-  {
-    id: 'bi-adapta',
-    category: 'BI / Analytics',
-    label: 'IA ADAPTA',
-    description: 'Assistente de inteligência',
-    route: '/admin/bi/ai-adapta',
-    icon: '🤖',
-  },
+
   {
     id: 'bi-comm',
     category: 'Comercial',

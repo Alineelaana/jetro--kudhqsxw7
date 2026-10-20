@@ -61,7 +61,6 @@ export const SA_TABS = [
   { id: 'consumptions', label: 'Consumo' },
   { id: 'settlements', label: 'Liquidações' },
   { id: 'cockpit', label: 'Cockpit Executivo' },
-  { id: 'adapta', label: 'ADAPTA Verbas' },
   { id: 'reports', label: 'Relatórios' },
   { id: 'configuracoes', label: 'Configurações' },
 ] as const

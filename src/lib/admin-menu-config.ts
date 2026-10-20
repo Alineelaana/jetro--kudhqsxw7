@@ -449,7 +449,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewTradeMarketing,
         children: [
           { label: 'Ações', route: '/admin/trade-marketing/acoes' },
-          { label: 'ADAPTA Marketing', route: '/admin/trade-marketing/adapta' },
           { label: 'Aplicação em Produtos', route: '/admin/trade-marketing/aplicacao-produtos' },
           { label: 'Calendário', route: '/admin/trade-marketing/calendario' },
           { label: 'Conta Corrente', route: '/admin/trade-marketing/conta-corrente' },
@@ -502,7 +501,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewRH,
         children: [
           { label: '13º Salário', route: '/admin/dp/13-salario' },
-          { label: 'ADAPTA DP', route: '/admin/dp/adapta' },
           { label: 'Admissões', route: '/admin/dp/admissions' },
           { label: 'Afastamentos', route: '/admin/dp/afastamentos' },
           { label: 'Alterações Contratuais', route: '/admin/dp/contract-changes' },
@@ -542,7 +540,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/rh',
         perm: canViewRH,
         children: [
-          { label: 'ADAPTA RH', route: '/admin/rh/adapta' },
           { label: 'Aprovações', route: '/admin/rh/aprovacoes' },
           { label: 'Avaliação de Competências', route: '/admin/rh/avaliacao-competencias' },
           { label: 'Benefícios', route: '/admin/rh/beneficios' },
@@ -579,7 +576,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canViewRH,
         children: [
           { label: 'Acidentes', route: '/admin/sst/accidents' },
-          { label: 'ADAPTA SST', route: '/admin/sst/adapta' },
           { label: 'Ambientes', route: '/admin/sst/work-environments' },
           { label: 'APR', route: '/admin/sst/apr' },
           { label: 'ASO', route: '/admin/sst/aso' },
@@ -703,7 +699,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/bi',
         perm: canViewBI,
         children: [
-          { label: 'AI Adapta', route: '/admin/bi/ai-adapta' },
           { label: 'Central de Relatórios', route: '/admin/bi/report-center' },
           { label: 'Commercial', route: '/admin/bi/commercial' },
           { label: 'Cross-Module', route: '/admin/bi/cross-module' },
@@ -735,7 +730,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/controladoria',
         perm: canViewControladoria,
         children: [
-          { label: 'ADAPTA Financeira', route: '/admin/controladoria/adapta' },
           { label: 'Balanço', route: '/admin/controladoria/balanco' },
           { label: 'Centros de Resultado', route: '/admin/controladoria/centros-resultado' },
           { label: 'Cockpit Executivo', route: '/admin/controladoria' },
@@ -774,11 +768,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           },
           { label: 'Configurações', route: '/admin/ia/configuracoes', perm: canChangeAiSettings },
           { label: 'Fluxos', route: '/admin/ia/fluxos', perm: canViewAiModule },
-          {
-            label: 'Governança da ADAPTA',
-            route: '/admin/governanca-adapta',
-            perm: canViewAiModule,
-          },
           { label: 'Histórico', route: '/admin/ia/historico', perm: canViewAiModule },
           { label: 'Treinamento', route: '/admin/ia/treinamento', perm: canManageAiTraining },
         ],
@@ -976,7 +965,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/verbas',
         perm: canViewSA,
         children: [
-          { label: 'ADAPTA Verbas', route: '/admin/verbas/adapta' },
           { label: 'Aplicação em Produtos', route: '/admin/verbas/aplicacao-produtos' },
           { label: 'Apurações', route: '/admin/verbas/apuracoes' },
           { label: 'Auditoria Corporativa', route: '/admin/verbas/auditoria-corporativa' },

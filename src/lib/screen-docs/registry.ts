@@ -842,7 +842,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
-  // 15. INTELIGÊNCIA ARTIFICIAL E AGENTES ADAPTA
+  // 15. INTELIGÊNCIA ARTIFICIAL E AGENTES JETRO
   // -------------------------------------------------------------
   '/admin/ia/dashboard': {
     route: '/admin/ia/dashboard',
@@ -854,7 +854,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     objective: {
       title: 'Objetivo',
       content:
-        'Administrar os agentes de IA, fluxos inteligentes, regras de treinamento, governança de modelos e aprovação de ações autônomas na plataforma ADAPTA do Jetro.',
+        'Administrar os agentes de IA, fluxos inteligentes, regras de treinamento, governança de modelos e aprovação de ações autônomas na plataforma Jetro.',
     },
     features: {
       title: 'Funcionalidades',

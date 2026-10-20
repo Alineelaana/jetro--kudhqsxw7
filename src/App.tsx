@@ -75,7 +75,7 @@ import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
 import Notifications from './pages/Notifications'
 import { BackupScreen } from '@/components/configuracoes/backup-screen'
 import AIModule from './pages/AIModule'
-import AdaptaGovernance from './pages/AdaptaGovernance'
+
 import Industry from './pages/Industry'
 import Phase0Foundation from './pages/Phase0Foundation'
 import PlatformLayer from './pages/PlatformLayer'
@@ -673,6 +673,12 @@ const App = () => (
                                 path="/admin/rh/talent-review"
                                 element={<RH screen="talent_review" />}
                               />
+                              <Route
+                                path="/admin/rh/adapta"
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
+                              />
                               <Route path="/admin/conformidade" element={<Conformidade />} />
                               <Route path="/admin/fiscal" element={<Fiscal screen="dashboard" />} />
                               <Route
@@ -845,7 +851,9 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/governanca-adapta"
-                                element={<AdaptaGovernance />}
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
                               />
                               <Route
                                 path="/admin/industria"
@@ -953,7 +961,9 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/industria/adapta"
-                                element={<Industry screen="adapta" />}
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
                               />
                               <Route
                                 path="/admin/phase0-foundation"
@@ -1079,7 +1089,9 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/bi/ai-adapta"
-                                element={<BI screen="ai-adapta" />}
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
                               />
                               <Route
                                 path="/admin/bi/cross-module"
@@ -1302,7 +1314,12 @@ const App = () => (
                                 path="/admin/dp/relatorios"
                                 element={<DP screen="reports" />}
                               />
-                              <Route path="/admin/dp/adapta" element={<DP screen="adapta" />} />
+                              <Route
+                                path="/admin/dp/adapta"
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
+                              />
                               <Route path="/admin/sst" element={<SST screen="dashboard" />} />
                               <Route path="/admin/sst/cockpit" element={<SST screen="cockpit" />} />
                               <Route
@@ -1317,7 +1334,12 @@ const App = () => (
                                 path="/admin/sst/training-matrix"
                                 element={<SST screen="training_matrix" />}
                               />
-                              <Route path="/admin/sst/adapta" element={<SST screen="adapta" />} />
+                              <Route
+                                path="/admin/sst/adapta"
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
+                              />
                               <Route path="/admin/sst/reports" element={<SST screen="reports" />} />
                               <Route path="/admin/sst/gro" element={<SST screen="gro" />} />
                               <Route
@@ -1535,7 +1557,9 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/trade-marketing/adapta"
-                                element={<TradeMarketing screen="adapta" />}
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
                               />
                               <Route
                                 path="/admin/trade-marketing/cotacoes-externas"
@@ -1719,7 +1743,9 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/controladoria/adapta"
-                                element={<Controladoria screen="adapta" />}
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
                               />
                               <Route
                                 path="/admin/controladoria/balanco"
@@ -1799,7 +1825,9 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/verbas/adapta"
-                                element={<SupplierAllowance screen="adapta-chat" />}
+                                element={
+                                  <Navigate to="/admin/configuracoes/jetro-online" replace />
+                                }
                               />
                               <Route
                                 path="/admin/verbas/versionamento-relatorios"

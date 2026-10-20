@@ -549,8 +549,7 @@ export const JETRO_TOURS_CATALOG: JetroTour[] = [
       },
       {
         titulo: 'Visões Especializadas',
-        texto:
-          'Alterne entre os painéis Comercial, Financeiro, Industrial, Estoque e IA Adapta no submenu.',
+        texto: 'Alterne entre os painéis Comercial, Financeiro, Industrial e Estoque no submenu.',
         seletor: '[data-tour-id="bi-nav-tabs"]',
         posicao: 'bottom',
       },
