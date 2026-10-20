@@ -62,9 +62,10 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 max-w-6xl text-center space-y-8">
         {/* Tag institucional */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs sm:text-sm font-semibold tracking-wide">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAF7F0] border border-[#C69B45]/30 text-[#063D30] text-xs sm:text-sm font-semibold tracking-wide shadow-2xs">
           <Sparkles className="w-4 h-4 text-[#C69B45]" />
           <span>HURAM · Inteligência que conecta sua gestão</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E87517]" />
         </div>
 
         {/* Título Oficial */}
@@ -203,38 +204,50 @@ export function HeroSection({ onOpenBudget }: HeroSectionProps) {
 
         {/* Destaques estruturais */}
         <div className="pt-4 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto text-left">
-          <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] hover:border-[#063D30]/30 transition-colors">
-            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-[#C69B45]" /> Gestão Integrada
+          <div className="p-4 rounded-xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all shadow-2xs hover:shadow-xs group">
+            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-2 group-hover:text-[#116B50] transition-colors">
+              <div className="w-7 h-7 rounded-lg bg-[#EBF3EF] flex items-center justify-center text-[#116B50]">
+                <Zap className="w-4 h-4 text-[#116B50]" />
+              </div>
+              Gestão Integrada
             </div>
-            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed">
+            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed pt-1">
               Vendas, estoque, financeiro e fiscal conectados em tempo real.
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] hover:border-[#063D30]/30 transition-colors">
-            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#C69B45]" /> Controle & Auditoria
+          <div className="p-4 rounded-xl bg-white border border-[#E4EAE6] hover:border-[#C69B45]/40 transition-all shadow-2xs hover:shadow-xs group">
+            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-2 group-hover:text-[#C69B45] transition-colors">
+              <div className="w-7 h-7 rounded-lg bg-[#FAF7F0] flex items-center justify-center text-[#C69B45]">
+                <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
+              </div>
+              Controle & Auditoria
             </div>
-            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed">
+            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed pt-1">
               Logs completos, alçadas de aprovação e matriz por perfil.
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] hover:border-[#063D30]/30 transition-colors">
-            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-1.5">
-              <Bot className="w-3.5 h-3.5 text-[#C69B45]" /> Duas Inteligências
+          <div className="p-4 rounded-xl bg-white border border-[#E4EAE6] hover:border-[#E87517]/40 transition-all shadow-2xs hover:shadow-xs group">
+            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-2 group-hover:text-[#E87517] transition-colors">
+              <div className="w-7 h-7 rounded-lg bg-[#FDF4EC] flex items-center justify-center text-[#E87517]">
+                <Bot className="w-4 h-4 text-[#E87517]" />
+              </div>
+              Duas Inteligências
             </div>
-            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed">
+            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed pt-1">
               Jeh no atendimento ao visitante e HURAM On-line na operação interna.
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] hover:border-[#063D30]/30 transition-colors">
-            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-1.5">
-              <BarChart3 className="w-3.5 h-3.5 text-[#C69B45]" /> Universidade & Tours
+          <div className="p-4 rounded-xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all shadow-2xs hover:shadow-xs group">
+            <div className="text-[#063D30] font-bold text-xs sm:text-sm mb-1 flex items-center gap-2 group-hover:text-[#116B50] transition-colors">
+              <div className="w-7 h-7 rounded-lg bg-[#EBF3EF] flex items-center justify-center text-[#116B50]">
+                <BarChart3 className="w-4 h-4 text-[#116B50]" />
+              </div>
+              Universidade & Tours
             </div>
-            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed">
+            <div className="text-[#66736D] text-[11px] sm:text-xs leading-relaxed pt-1">
               Treinamentos em vídeo, tutoriais e tours interativos na tela.
             </div>
           </div>

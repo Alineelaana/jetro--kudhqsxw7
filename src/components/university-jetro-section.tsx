@@ -1,4 +1,12 @@
-import { Video, BookOpen, Navigation, Search, CheckCircle2, ArrowRight } from 'lucide-react'
+import {
+  Video,
+  BookOpen,
+  Navigation,
+  Search,
+  CheckCircle2,
+  ArrowRight,
+  GraduationCap,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function UniversityJetroSection() {
@@ -57,12 +65,13 @@ export function UniversityJetroSection() {
   return (
     <section
       id="universidade"
-      className="py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6]"
+      className="py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6]"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+            <GraduationCap className="w-3.5 h-3.5 text-[#116B50]" />
             Capacitação Contínua & Adoção
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
@@ -82,14 +91,24 @@ export function UniversityJetroSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           {learningPillars.map((p, idx) => {
             const Icon = p.icon
+            const iconBgStyles = [
+              'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]',
+              'bg-[#FAF7F0] border-[#C69B45]/30 text-[#C69B45]',
+              'bg-[#F1F4F2] border-[#063D30]/15 text-[#063D30]',
+              'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]',
+            ]
+            const chosenStyle = iconBgStyles[idx % iconBgStyles.length]
+
             return (
               <div
                 key={idx}
-                className="rounded-2xl bg-white border border-[#E4EAE6] p-6 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-xs hover:shadow-md"
+                className="rounded-2xl bg-[#F8FAF9]/60 hover:bg-white border border-[#E4EAE6] p-6 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-2xs hover:shadow-md"
               >
                 <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#063D30] group-hover:scale-105 transition-transform">
-                    <Icon className="w-6 h-6 text-[#116B50]" />
+                  <div
+                    className={`w-12 h-12 rounded-xl border flex items-center justify-center group-hover:scale-105 transition-transform ${chosenStyle}`}
+                  >
+                    <Icon className="w-6 h-6" />
                   </div>
 
                   <h3 className="text-base font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors">

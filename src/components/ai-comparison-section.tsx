@@ -46,12 +46,12 @@ export function AiComparisonSection() {
   return (
     <section
       id="comparativo-ia"
-      className="relative bg-white text-[#202B28] py-16 sm:py-20 border-b border-[#E4EAE6] overflow-hidden"
+      className="relative bg-[#F8FAF9] text-[#202B28] py-16 sm:py-20 border-b border-[#E4EAE6] overflow-hidden"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10 space-y-10 sm:space-y-12">
         {/* Cabeçalho da Seção Comparativa */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
             <span>Ecossistema de IA HURAM</span>
           </div>

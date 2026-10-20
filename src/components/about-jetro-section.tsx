@@ -53,10 +53,25 @@ export function AboutJetroSection() {
           {pillars.map((p, idx) => (
             <div
               key={idx}
-              className="rounded-2xl bg-white border border-[#E4EAE6] p-6 sm:p-8 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-sm hover:shadow-md"
+              className="rounded-2xl bg-white border border-[#E4EAE6] p-6 sm:p-8 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-sm hover:shadow-md relative overflow-hidden"
             >
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#063D30] font-semibold font-heading text-sm group-hover:border-[#116B50]/40 transition-colors">
+              {/* Faixa sutil no topo do card com detalhe institucional */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-1 ${
+                  idx === 0 ? 'bg-[#116B50]' : idx === 1 ? 'bg-[#C69B45]' : 'bg-[#063D30]'
+                }`}
+              />
+
+              <div className="space-y-4 pt-1">
+                <div
+                  className={`w-11 h-11 rounded-xl border flex items-center justify-center font-semibold font-heading text-sm transition-colors ${
+                    idx === 0
+                      ? 'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]'
+                      : idx === 1
+                        ? 'bg-[#FAF7F0] border-[#C69B45]/30 text-[#C69B45]'
+                        : 'bg-[#063D30] border-[#063D30] text-white'
+                  }`}
+                >
                   0{idx + 1}
                 </div>
                 <h3 className="text-lg font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors">
@@ -103,34 +118,42 @@ export function AboutJetroSection() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
-                <Database className="w-5 h-5 text-[#116B50]" />
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-2 text-left hover:border-[#116B50]/30 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-[#EBF3EF] flex items-center justify-center text-[#116B50]">
+                  <Database className="w-4 h-4 text-[#116B50]" />
+                </div>
                 <h4 className="text-sm font-semibold font-heading text-[#063D30]">Base Única</h4>
-                <p className="text-xs text-[#66736D] leading-relaxed">
+                <p className="text-xs text-[#66736D] leading-relaxed font-normal">
                   Sem duplicidade de cadastros e com integridade referencial.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
-                <ShieldCheck className="w-5 h-5 text-[#C69B45]" />
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-2 text-left hover:border-[#C69B45]/40 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF7F0] flex items-center justify-center text-[#C69B45]">
+                  <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
+                </div>
                 <h4 className="text-sm font-semibold font-heading text-[#063D30]">Governança</h4>
-                <p className="text-xs text-[#66736D] leading-relaxed">
+                <p className="text-xs text-[#66736D] leading-relaxed font-normal">
                   Trilha de auditoria por criticidade e alçadas de decisão.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
-                <Cpu className="w-5 h-5 text-[#116B50]" />
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-2 text-left hover:border-[#116B50]/30 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-[#EBF3EF] flex items-center justify-center text-[#116B50]">
+                  <Cpu className="w-4 h-4 text-[#116B50]" />
+                </div>
                 <h4 className="text-sm font-semibold font-heading text-[#063D30]">IA Nativa</h4>
-                <p className="text-xs text-[#66736D] leading-relaxed">
+                <p className="text-xs text-[#66736D] leading-relaxed font-normal">
                   Jeh e HURAM On-line operando dentro dos limites de segurança.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
-                <Building2 className="w-5 h-5 text-[#063D30]" />
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-2 text-left hover:border-[#063D30]/30 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-[#063D30] flex items-center justify-center text-white">
+                  <Building2 className="w-4 h-4 text-[#C69B45]" />
+                </div>
                 <h4 className="text-sm font-semibold font-heading text-[#063D30]">Multiempresa</h4>
-                <p className="text-xs text-[#66736D] leading-relaxed">
+                <p className="text-xs text-[#66736D] leading-relaxed font-normal">
                   Estrutura preparada para matrizes, filiais e múltiplos depósitos.
                 </p>
               </div>

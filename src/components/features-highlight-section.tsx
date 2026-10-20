@@ -76,7 +76,7 @@ export function FeaturesHighlightSection() {
   ]
 
   return (
-    <section className="py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6]">
+    <section className="py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6]">
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
@@ -96,13 +96,24 @@ export function FeaturesHighlightSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-left">
           {features.map((f, i) => {
             const Icon = f.icon
+            const iconBgStyles = [
+              'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]',
+              'bg-[#FAF7F0] border-[#C69B45]/30 text-[#C69B45]',
+              'bg-[#FDF4EC] border-[#E87517]/25 text-[#E87517]',
+              'bg-[#F1F4F2] border-[#063D30]/15 text-[#063D30]',
+              'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]',
+            ]
+            const chosenStyle = iconBgStyles[i % iconBgStyles.length]
+
             return (
               <div
                 key={i}
-                className="rounded-xl bg-white border border-[#E4EAE6] p-4 sm:p-5 hover:border-[#116B50]/40 transition-all duration-300 flex flex-col justify-between group shadow-2xs hover:shadow-md"
+                className="rounded-xl bg-[#F8FAF9]/70 hover:bg-white border border-[#E4EAE6] p-4 sm:p-5 hover:border-[#116B50]/40 transition-all duration-300 flex flex-col justify-between group shadow-2xs hover:shadow-md"
               >
                 <div className="space-y-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#116B50] group-hover:scale-105 transition-transform">
+                  <div
+                    className={`w-9 h-9 rounded-lg border flex items-center justify-center group-hover:scale-105 transition-transform ${chosenStyle}`}
+                  >
                     <Icon className="w-4 h-4" />
                   </div>
                   <h3 className="text-xs sm:text-sm font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors leading-snug">

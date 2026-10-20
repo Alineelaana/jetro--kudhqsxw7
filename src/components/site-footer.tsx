@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { logoHuramDark } from '@/lib/brand-assets'
+import { logoHuramLight } from '@/lib/brand-assets'
 import { useAuth } from '@/hooks/use-auth'
 import { AttributionFooter } from '@/components/attribution-footer'
 import { ShieldCheck, Mail, Phone, MapPin, ExternalLink } from 'lucide-react'
@@ -9,8 +9,14 @@ export function SiteFooter() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <footer className="bg-[#F8FAF9] text-[#202B28] border-t border-[#E4EAE6] pt-16 pb-12">
-      <div className="container mx-auto px-4 sm:px-6">
+    <footer className="bg-[#063D30] text-white border-t border-[#042820] pt-16 pb-12 relative overflow-hidden">
+      {/* Linha de acabamento dourado sofisticado no topo do rodapé */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#C69B45] to-transparent opacity-80" />
+
+      {/* Luz ambiente suave de fundo */}
+      <div className="absolute -top-32 right-1/4 w-96 h-96 bg-[#C69B45]/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Coluna 1: Marca & Posicionamento */}
           <div className="space-y-4">
@@ -24,12 +30,12 @@ export function SiteFooter() {
               }
             >
               <img
-                src={logoHuramDark}
+                src={logoHuramLight}
                 alt="HURAM — Sistema Inteligente de Gestão"
-                className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm"
               />
               <div className="flex flex-col">
-                <span className="text-2xl font-bold font-heading text-[#063D30] tracking-tight leading-none">
+                <span className="text-2xl font-bold font-heading text-white tracking-tight leading-none">
                   HURAM
                 </span>
                 <span className="text-[10px] font-semibold text-[#C69B45] tracking-wider uppercase mt-0.5">
@@ -37,73 +43,58 @@ export function SiteFooter() {
                 </span>
               </div>
             </Link>
-            <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-200/80 leading-relaxed font-normal">
               Inteligência que conecta sua gestão. Plataforma desenvolvida para integrar processos,
               organizar informações, acompanhar operações e transformar dados em decisões
               estratégicas.
             </p>
-            <div className="flex items-center gap-2 text-xs text-[#063D30] font-medium">
-              <ShieldCheck className="w-4 h-4 text-[#116B50]" />
+            <div className="flex items-center gap-2 text-xs text-white/90 font-medium">
+              <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
               <span>Ambiente seguro em nuvem na Skip Cloud</span>
             </div>
           </div>
 
           {/* Coluna 2: Navegação Institucional */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#063D30] mb-4 font-heading flex items-center gap-1.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 font-heading flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C69B45]" />
               Navegação
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-[#66736D]">
+            <ul className="space-y-2.5 text-xs sm:text-sm text-slate-200/80">
               <li>
-                <a
-                  href="#inicio"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
-                >
+                <a href="#inicio" className="hover:text-white hover:underline transition-colors">
                   Início
                 </a>
               </li>
               <li>
-                <a
-                  href="#sobre"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
-                >
+                <a href="#sobre" className="hover:text-white hover:underline transition-colors">
                   A HURAM
                 </a>
               </li>
               <li>
-                <a
-                  href="#solucoes"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
-                >
+                <a href="#solucoes" className="hover:text-white hover:underline transition-colors">
                   Soluções & Módulos
                 </a>
               </li>
               <li>
-                <a
-                  href="#telas"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
-                >
+                <a href="#telas" className="hover:text-white hover:underline transition-colors">
                   Por Dentro do ERP (Galeria)
                 </a>
               </li>
               <li>
-                <a
-                  href="#fluxo"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
-                >
+                <a href="#fluxo" className="hover:text-white hover:underline transition-colors">
                   Gestão de Ponta a Ponta
                 </a>
               </li>
               <li>
-                <a href="#ia" className="hover:text-[#063D30] hover:font-medium transition-colors">
+                <a href="#ia" className="hover:text-white hover:underline transition-colors">
                   Inteligência Artificial (Jeh & HURAM On-line)
                 </a>
               </li>
               <li>
                 <a
                   href="#universidade"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Universidade HURAM & Tours
                 </a>
@@ -111,16 +102,13 @@ export function SiteFooter() {
               <li>
                 <a
                   href="#diferenciais"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Diferenciais de Arquitetura
                 </a>
               </li>
               <li>
-                <a
-                  href="#contato"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
-                >
+                <a href="#contato" className="hover:text-white hover:underline transition-colors">
                   Solicitar Demonstração
                 </a>
               </li>
@@ -129,16 +117,16 @@ export function SiteFooter() {
 
           {/* Coluna 3: Políticas & Termos Oficiais */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#063D30] mb-4 font-heading flex items-center gap-1.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 font-heading flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C69B45]" />
               Políticas & Governança
             </h4>
-            <ul className="space-y-2 text-xs text-[#66736D]">
+            <ul className="space-y-2 text-xs text-slate-200/80">
               {!isAuthenticated && (
                 <li>
                   <Link
                     to="/"
-                    className="text-[#063D30] font-semibold hover:text-[#116B50] hover:underline flex items-center gap-1"
+                    className="text-[#C69B45] font-semibold hover:text-white hover:underline flex items-center gap-1"
                   >
                     <span>Acessar o Sistema (Login)</span>
                     <ExternalLink className="w-3 h-3 text-[#C69B45]" />
@@ -149,7 +137,7 @@ export function SiteFooter() {
                 <li>
                   <Link
                     to="/admin"
-                    className="text-[#063D30] font-semibold hover:text-[#116B50] hover:underline flex items-center gap-1"
+                    className="text-[#C69B45] font-semibold hover:text-white hover:underline flex items-center gap-1"
                   >
                     <span>Painel Administrativo</span>
                     <ExternalLink className="w-3 h-3 text-[#C69B45]" />
@@ -159,7 +147,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/politica-de-privacidade"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Política de Privacidade
                 </Link>
@@ -167,7 +155,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/termos-de-uso"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Termos de Uso
                 </Link>
@@ -175,7 +163,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/politica-de-cookies"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Política de Cookies
                 </Link>
@@ -183,7 +171,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/politica-de-sla"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Acordo de Nível de Serviço (SLA)
                 </Link>
@@ -191,7 +179,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/politica-de-backup-continuidade"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Backup e Continuidade Operacional
                 </Link>
@@ -199,7 +187,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/politica-comercial"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Política Comercial
                 </Link>
@@ -207,7 +195,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/politica-de-licenciamento"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Política de Licenciamento
                 </Link>
@@ -215,7 +203,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/central-de-privacidade"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Central de Privacidade
                 </Link>
@@ -223,7 +211,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   to="/canal-de-privacidade"
-                  className="hover:text-[#063D30] hover:font-medium transition-colors"
+                  className="hover:text-white hover:underline transition-colors"
                 >
                   Canal de Privacidade (DPO)
                 </Link>
@@ -233,22 +221,22 @@ export function SiteFooter() {
 
           {/* Coluna 4: Canais Oficiais Cadastrados */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#063D30] mb-4 font-heading flex items-center gap-1.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 font-heading flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C69B45]" />
               Canais Oficiais
             </h4>
-            <div className="space-y-3 text-xs sm:text-sm text-[#66736D]">
+            <div className="space-y-3 text-xs sm:text-sm text-slate-200/80">
               <div className="flex items-start gap-2.5">
-                <Phone className="w-4 h-4 text-[#063D30] shrink-0 mt-0.5" />
+                <Phone className="w-4 h-4 text-[#C69B45] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-[#202B28] block">
+                  <span className="font-semibold text-white block">
                     WhatsApp Comercial Oficial:
                   </span>
                   <a
                     href="https://wa.me/5531991297619"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#063D30] font-semibold hover:underline"
+                    className="text-[#C69B45] font-semibold hover:text-white hover:underline"
                   >
                     +55 (31) 99129-7619
                   </a>
@@ -256,9 +244,9 @@ export function SiteFooter() {
               </div>
 
               <div className="flex items-start gap-2.5">
-                <Mail className="w-4 h-4 text-[#063D30] shrink-0 mt-0.5" />
+                <Mail className="w-4 h-4 text-[#C69B45] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-[#202B28] block">
+                  <span className="font-semibold text-white block">
                     Atendimento & Demonstração:
                   </span>
                   <span>Canal direto via formulário no site</span>
@@ -266,15 +254,15 @@ export function SiteFooter() {
               </div>
 
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#063D30] shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-[#C69B45] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-[#202B28] block">Abrangência:</span>
+                  <span className="font-semibold text-white block">Abrangência:</span>
                   <span>Atendimento em todo território nacional</span>
                 </div>
               </div>
 
               <div className="pt-2">
-                <span className="inline-block px-3 py-1.5 rounded-lg bg-white text-[11px] font-semibold text-[#063D30] border border-[#E4EAE6] shadow-2xs">
+                <span className="inline-block px-3 py-1.5 rounded-lg bg-white/10 text-[11px] font-semibold text-white border border-white/15 shadow-2xs">
                   Suporte & Consultoria Especializada
                 </span>
               </div>
@@ -283,18 +271,18 @@ export function SiteFooter() {
         </div>
 
         {/* Linha Divisória & Copyright */}
-        <div className="pt-8 border-t border-[#E4EAE6] flex flex-col sm:flex-row items-center justify-between text-xs text-[#66736D] gap-4">
+        <div className="pt-8 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-200/70 gap-4">
           <p>
             © {currentYear} HURAM — Sistema Inteligente de Gestão. Todos os direitos reservados.
           </p>
-          <p className="text-center sm:text-right font-medium text-[#202B28]/80">
+          <p className="text-center sm:text-right font-medium text-white/90">
             Governança, Conformidade & Inteligência Empresarial
           </p>
         </div>
 
         {/* Identificação Legal Obrigatória Preservada Verbatim */}
-        <div className="mt-6 pt-4 border-t border-[#E4EAE6]/60 text-center">
-          <AttributionFooter variant="inline" className="text-[#66736D] text-xs" />
+        <div className="mt-6 pt-4 border-t border-white/10 text-center">
+          <AttributionFooter variant="inline" className="text-slate-200/70 text-xs" />
         </div>
       </div>
     </footer>

@@ -434,12 +434,13 @@ export function SystemScreensGallery() {
   return (
     <section
       id="telas"
-      className="py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6]"
+      className="py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6]"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FAF7F0] border border-[#C69B45]/30 text-[#063D30] text-xs font-semibold tracking-wide">
+            <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
             Galeria do Sistema Real
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
@@ -460,7 +461,7 @@ export function SystemScreensGallery() {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   activeCategory === cat
                     ? 'bg-[#063D30] text-white shadow-xs font-medium'
-                    : 'bg-white text-[#66736D] hover:text-[#063D30] hover:bg-[#F1F4F2] border border-[#E4EAE6]'
+                    : 'bg-[#F8FAF9] text-[#66736D] hover:text-[#063D30] hover:bg-white border border-[#E4EAE6]'
                 }`}
               >
                 {cat}
@@ -471,62 +472,68 @@ export function SystemScreensGallery() {
 
         {/* Grid de Telas / Interfaces */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-2xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group shadow-xs hover:shadow-md text-left"
-            >
-              {/* Moldura da Janela do ERP */}
-              <div className="border-b border-[#E4EAE6] bg-[#F8FAF9] px-3.5 py-2.5 flex items-center justify-between text-xs text-[#66736D]">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  <span className="ml-2 font-mono text-[10px] text-[#202B28]/80 font-medium truncate max-w-[170px]">
-                    {item.module}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setActiveItem(item)}
-                  className="text-[#66736D] hover:text-[#063D30] transition-colors p-1 cursor-pointer"
-                  title="Expandir detalhes da tela"
-                  aria-label="Expandir detalhes da tela"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+          {filteredItems.map((item, idx) => {
+            // Faixa de destaque suave na borda superior da janela
+            const accentColors = ['border-t-[#116B50]', 'border-t-[#C69B45]', 'border-t-[#063D30]']
+            const chosenBorder = accentColors[idx % accentColors.length]
 
-              {/* Preview Interativo Demonstrativo */}
-              <div className="p-4 bg-[#F8FAF9]/50 min-h-[190px] flex flex-col justify-center">
-                {renderMockup(item.previewType)}
-              </div>
-
-              {/* Informações Comerciais */}
-              <div className="p-5 sm:p-6 border-t border-[#E4EAE6] space-y-3 bg-white flex-1 flex flex-col justify-between">
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C69B45]">
-                    {item.category}
-                  </span>
-                  <h3 className="text-base font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-[#66736D] leading-relaxed font-normal">
-                    {item.summary}
-                  </p>
+            return (
+              <div
+                key={item.id}
+                className={`rounded-2xl bg-white border border-[#E4EAE6] border-t-2 ${chosenBorder} hover:border-[#116B50]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group shadow-xs hover:shadow-md text-left`}
+              >
+                {/* Moldura da Janela do ERP */}
+                <div className="border-b border-[#E4EAE6] bg-[#F8FAF9] px-3.5 py-2.5 flex items-center justify-between text-xs text-[#66736D]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    <span className="ml-2 font-mono text-[10px] text-[#202B28]/80 font-medium truncate max-w-[170px]">
+                      {item.module}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setActiveItem(item)}
+                    className="text-[#66736D] hover:text-[#063D30] transition-colors p-1 cursor-pointer"
+                    title="Expandir detalhes da tela"
+                    aria-label="Expandir detalhes da tela"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
-                <Button
-                  onClick={() => setActiveItem(item)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full mt-2 border-[#E4EAE6] hover:border-[#063D30]/40 text-[#063D30] hover:text-[#063D30] bg-white hover:bg-[#F8FAF9] text-xs font-semibold cursor-pointer"
-                >
-                  <Maximize2 className="w-3.5 h-3.5 mr-1.5 text-[#116B50]" />
-                  Ver detalhes da interface
-                </Button>
+                {/* Preview Interativo Demonstrativo */}
+                <div className="p-4 bg-[#F8FAF9]/50 min-h-[190px] flex flex-col justify-center">
+                  {renderMockup(item.previewType)}
+                </div>
+
+                {/* Informações Comerciais */}
+                <div className="p-5 sm:p-6 border-t border-[#E4EAE6] space-y-3 bg-white flex-1 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C69B45]">
+                      {item.category}
+                    </span>
+                    <h3 className="text-base font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-[#66736D] leading-relaxed font-normal">
+                      {item.summary}
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={() => setActiveItem(item)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2 border-[#E4EAE6] hover:border-[#063D30]/40 text-[#063D30] hover:text-[#063D30] bg-white hover:bg-[#F8FAF9] text-xs font-semibold cursor-pointer"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 mr-1.5 text-[#116B50]" />
+                    Ver detalhes da interface
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Modal Lightbox com Detalhes da Tela */}

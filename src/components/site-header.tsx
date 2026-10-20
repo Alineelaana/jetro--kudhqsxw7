@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Menu, X, ArrowUpRight, Clock, FileCode2, LogOut } from 'lucide-react'
-import { logoHuramDark } from '@/lib/brand-assets'
+import { logoHuramLight, logoHuramDark } from '@/lib/brand-assets'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { canViewScreenDocs } from '@/lib/permissions'
@@ -113,14 +113,10 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
   }
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-50 w-full transition-all',
-        isAuthenticated
-          ? 'border-b border-[#042820] bg-[#063D30] text-white shadow-md'
-          : 'border-b border-[#E4EAE6] bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(6,61,48,0.04)]',
-      )}
-    >
+    <header className="sticky top-0 z-50 w-full transition-all border-b border-[#042820] bg-[#063D30]/95 backdrop-blur-md text-white shadow-[0_4px_20px_rgba(4,40,32,0.35)]">
+      {/* Linha superior dourada sutil de acabamento sofisticado */}
+      <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#C69B45] to-transparent opacity-70" />
+
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
         <a
           href={isAuthenticated ? '/admin' : '#inicio'}
@@ -130,25 +126,16 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
               handleNavClick('#inicio')
             }
           }}
-          className="flex items-center gap-3 group py-1"
+          className="flex items-center gap-3 group py-1 cursor-pointer"
           title="HURAM — Sistema Inteligente de Gestão"
         >
           <img
-            src={logoHuramDark}
+            src={logoHuramLight}
             alt="HURAM — Sistema Inteligente de Gestão"
-            className={cn(
-              'h-10 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105',
-              isAuthenticated &&
-                'rounded-lg p-0.5 bg-white/10 border border-[#C69B45]/40 shadow-xs',
-            )}
+            className="h-10 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm"
           />
           <div className="hidden sm:flex flex-col">
-            <span
-              className={cn(
-                'text-xl font-bold tracking-tight font-heading leading-none',
-                isAuthenticated ? 'text-white' : 'text-[#063D30]',
-              )}
-            >
+            <span className="text-xl font-bold tracking-tight font-heading leading-none text-white">
               HURAM
             </span>
             <span className="text-[10px] font-semibold tracking-wider text-[#C69B45] uppercase mt-0.5">
@@ -223,7 +210,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                     e.preventDefault()
                     handleNavClick(link.href)
                   }}
-                  className="text-xs 2xl:text-sm font-medium text-[#202B28] hover:text-[#063D30] transition-colors py-1 cursor-pointer hover:font-semibold relative group"
+                  className="text-xs 2xl:text-sm font-medium text-white/85 hover:text-white transition-colors py-1 cursor-pointer hover:font-semibold relative group"
                 >
                   {link.label}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#C69B45] transition-all duration-200 group-hover:w-full" />
@@ -237,7 +224,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 onClick={() => handleNavClick('#contato')}
                 variant="outline"
                 size="sm"
-                className="border-[#063D30]/25 text-[#063D30] bg-white hover:bg-[#F8FAF9] hover:border-[#063D30] text-xs font-semibold px-4.5 h-9.5 rounded-lg cursor-pointer transition-all shadow-2xs"
+                className="border-white/25 text-white bg-white/10 hover:bg-white hover:text-[#063D30] hover:border-white text-xs font-semibold px-4.5 h-9.5 rounded-lg cursor-pointer transition-all shadow-2xs"
               >
                 Demonstração
               </Button>
@@ -245,10 +232,12 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
               <Button
                 asChild
                 size="sm"
-                className="bg-[#063D30] hover:bg-[#042820] text-white font-semibold text-xs px-4.5 h-9.5 rounded-lg shadow-sm hover:shadow transition-all"
+                className="bg-white hover:bg-[#F8FAF9] text-[#063D30] font-semibold text-xs px-4.5 h-9.5 rounded-lg shadow-sm hover:shadow transition-all border border-white"
               >
                 <Link to={isAuthenticated ? '/admin' : '/'} className="flex items-center gap-1.5">
-                  <span>{isAuthenticated ? 'Ir para o ERP' : 'Acessar o sistema'}</span>
+                  <span className="text-[#063D30] font-bold">
+                    {isAuthenticated ? 'Ir para o ERP' : 'Acessar o sistema'}
+                  </span>
                   <ArrowUpRight className="h-3.5 w-3.5 text-[#C69B45]" />
                 </Link>
               </Button>
@@ -257,7 +246,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             {/* Mobile menu trigger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 text-[#063D30] hover:text-[#C69B45] transition-colors focus:outline-none"
+              className="xl:hidden p-2 text-white hover:text-[#C69B45] transition-colors focus:outline-none"
               aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -268,7 +257,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
 
       {/* Mobile Drawer (apenas para visitantes não logados no site institucional) */}
       {!isAuthenticated && mobileMenuOpen && (
-        <div className="xl:hidden border-b border-[#E4EAE6] bg-white px-5 py-6 space-y-4 animate-in fade-in duration-200 shadow-xl">
+        <div className="xl:hidden border-b border-[#042820] bg-[#063D30] text-white px-5 py-6 space-y-4 animate-in fade-in duration-200 shadow-2xl">
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <a
@@ -278,7 +267,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                   e.preventDefault()
                   handleNavClick(link.href)
                 }}
-                className="text-sm font-medium text-[#202B28] py-2.5 border-b border-[#E4EAE6]/60 hover:text-[#063D30] hover:font-semibold transition-colors"
+                className="text-sm font-medium text-white/90 py-2.5 border-b border-white/10 hover:text-[#C69B45] hover:font-semibold transition-colors"
               >
                 {link.label}
               </a>
@@ -289,14 +278,14 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             <Button
               onClick={() => handleNavClick('#contato')}
               variant="outline"
-              className="w-full border-[#063D30]/25 text-[#063D30] hover:bg-[#F8FAF9] py-2.5 text-xs font-semibold rounded-lg"
+              className="w-full border-white/20 text-white bg-white/10 hover:bg-white hover:text-[#063D30] py-2.5 text-xs font-semibold rounded-lg cursor-pointer"
             >
               Solicitar Demonstração
             </Button>
 
             <Button
               asChild
-              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-semibold py-2.5 text-xs rounded-lg shadow-sm"
+              className="w-full bg-white hover:bg-[#F8FAF9] text-[#063D30] font-bold py-2.5 text-xs rounded-lg shadow-sm"
             >
               <Link to={isAuthenticated ? '/admin' : '/'} onClick={() => setMobileMenuOpen(false)}>
                 {isAuthenticated ? 'Ir para o ERP' : 'Acessar o sistema'}

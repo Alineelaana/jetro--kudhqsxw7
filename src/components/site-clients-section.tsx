@@ -34,17 +34,16 @@ export function SiteClientsSection() {
 
   return (
     <section
-      id="nossos-clientes"
+      id="clientes"
       className="relative py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6] overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Cabeçalho da seção com textos EXATOS exigidos */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-[#C69B45]/30 text-[#063D30] text-xs font-semibold tracking-wide shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
             Nossos Clientes
           </div>
-
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-semibold font-heading text-[#063D30] tracking-tight leading-tight">
             Empresas que fazem parte da nossa história
           </h2>
@@ -85,7 +84,7 @@ export function SiteClientsSection() {
                   className="group relative rounded-2xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 p-6 flex flex-col justify-between transition-all duration-300 shadow-xs hover:shadow-md text-left"
                 >
                   {/* Área do Logo */}
-                  <div className="h-32 flex items-center justify-center p-3.5 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] relative overflow-hidden transition-all duration-300 group-hover:border-[#116B50]/30">
+                  <div className="h-32 flex items-center justify-center p-3.5 rounded-xl bg-white border border-[#E4EAE6] relative overflow-hidden transition-all duration-300 group-hover:border-[#116B50]/30 shadow-2xs">
                     {logoUrl ? (
                       <img
                         src={logoUrl}

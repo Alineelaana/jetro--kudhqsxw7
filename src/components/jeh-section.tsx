@@ -192,7 +192,7 @@ export function JehSection() {
   return (
     <section
       id="jeh"
-      className="relative bg-white text-[#202B28] py-16 sm:py-20 lg:py-24 border-b border-[#E4EAE6] overflow-hidden"
+      className="relative bg-[#F8FAF9] text-[#202B28] py-16 sm:py-20 lg:py-24 border-b border-[#E4EAE6] overflow-hidden"
     >
       {/* Âncora alternativa para preservar links legados (#nine-ia) e diretos (#ia) */}
       <span id="nine-ia" className="absolute -top-24 pointer-events-none" />
@@ -207,8 +207,8 @@ export function JehSection() {
           <div className="lg:col-span-4 flex justify-center lg:justify-start">
             <div className="relative flex flex-col items-center text-center">
               <div className="relative">
-                <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full p-1 bg-white border-2 border-[#116B50] shadow-sm">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-[#F8FAF9] relative">
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full p-1.5 bg-white border-2 border-[#C69B45] shadow-md">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-white relative">
                     <img
                       src={JEH_AVATAR_URL}
                       alt="Jeh — Assistente Comercial Jetro"
@@ -220,7 +220,7 @@ export function JehSection() {
 
               {/* Status e Identificação da Assistente */}
               <div className="mt-4 flex flex-col items-center gap-1">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8FAF9] border border-[#E4EAE6]">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#E4EAE6] shadow-2xs">
                   <span className="relative flex h-2 w-2">
                     {assistantStatus === 'ativa' && (
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#116B50] opacity-75" />
@@ -228,7 +228,7 @@ export function JehSection() {
                     <span
                       className={cn(
                         'relative inline-flex rounded-full h-2 w-2',
-                        assistantStatus === 'ativa' ? 'bg-[#116B50]' : 'bg-amber-500',
+                        assistantStatus === 'ativa' ? 'bg-[#116B50]' : 'bg-[#E87517]',
                       )}
                     />
                   </span>
@@ -245,7 +245,7 @@ export function JehSection() {
 
           {/* Coluna Textual */}
           <div className="lg:col-span-8 space-y-5 text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FAF7F0] border border-[#C69B45]/30 text-[#063D30] text-xs font-semibold tracking-wide">
               <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
               <span>Experiência do Visitante & Relacionamento Comercial</span>
             </div>
@@ -313,16 +313,25 @@ export function JehSection() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {JEH_FEATURE_CARDS.map((card) => {
+            {JEH_FEATURE_CARDS.map((card, idx) => {
               const Icon = card.icon
+              const iconStyles = [
+                'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]',
+                'bg-[#FAF7F0] border-[#C69B45]/30 text-[#C69B45]',
+                'bg-[#FDF4EC] border-[#E87517]/25 text-[#E87517]',
+              ]
+              const currentStyle = iconStyles[idx % iconStyles.length]
+
               return (
                 <div
                   key={card.id}
                   className="rounded-2xl p-6 bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 shadow-xs hover:shadow-md flex flex-col justify-between space-y-3 group text-left"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] text-[#063D30] flex items-center justify-center group-hover:scale-105 transition-transform">
-                      <Icon className="w-4 h-4 text-[#116B50]" />
+                    <div
+                      className={`h-10 w-10 rounded-xl border flex items-center justify-center group-hover:scale-105 transition-transform ${currentStyle}`}
+                    >
+                      <Icon className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-mono font-semibold text-[#66736D]">
                       {card.id}

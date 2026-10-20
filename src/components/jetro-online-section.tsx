@@ -145,7 +145,7 @@ export function JetroOnlineSection() {
   return (
     <section
       id="jetro-online"
-      className="relative bg-[#F8FAF9] text-[#202B28] py-16 sm:py-20 lg:py-24 overflow-hidden border-b border-[#E4EAE6]"
+      className="relative bg-white text-[#202B28] py-16 sm:py-20 lg:py-24 overflow-hidden border-b border-[#E4EAE6]"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 space-y-16 sm:space-y-20">
         {/* ============================================================== */}
@@ -156,7 +156,7 @@ export function JetroOnlineSection() {
           <div className="lg:col-span-4 flex justify-center lg:justify-start">
             <div className="relative flex flex-col items-center text-center">
               <div className="relative">
-                <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full p-1 bg-white border-2 border-[#116B50] shadow-sm">
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full p-1.5 bg-white border-2 border-[#063D30] shadow-md">
                   <div className="w-full h-full rounded-full overflow-hidden bg-white relative">
                     <img
                       src={JETRO_ONLINE_AVATAR_URL}
@@ -250,16 +250,25 @@ export function JetroOnlineSection() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {JETRO_ONLINE_CARDS.map((card) => {
+            {JETRO_ONLINE_CARDS.map((card, idx) => {
               const Icon = card.icon
+              const iconStyles = [
+                'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]',
+                'bg-[#FAF7F0] border-[#C69B45]/30 text-[#C69B45]',
+                'bg-[#F1F4F2] border-[#063D30]/15 text-[#063D30]',
+              ]
+              const currentStyle = iconStyles[idx % iconStyles.length]
+
               return (
                 <div
                   key={card.id}
-                  className="rounded-2xl p-6 bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 shadow-xs hover:shadow-md flex flex-col justify-between space-y-3 group text-left"
+                  className="rounded-2xl p-6 bg-[#F8FAF9]/70 hover:bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 shadow-2xs hover:shadow-md flex flex-col justify-between space-y-3 group text-left"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] text-[#063D30] flex items-center justify-center group-hover:scale-105 transition-transform">
-                      <Icon className="w-4 h-4 text-[#116B50]" />
+                    <div
+                      className={`h-10 w-10 rounded-xl border flex items-center justify-center group-hover:scale-105 transition-transform ${currentStyle}`}
+                    >
+                      <Icon className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-mono font-semibold text-[#66736D]">
                       {card.id}

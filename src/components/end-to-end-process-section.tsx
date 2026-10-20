@@ -60,18 +60,23 @@ export function EndToEndProcessSection() {
   return (
     <section
       id="fluxo"
-      className="py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6]"
+      className="py-20 sm:py-28 bg-[#063D30] text-white border-b border-[#042820] relative overflow-hidden"
     >
-      <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
+      {/* Luz ambiente dourada e esmeralda de fundo */}
+      <div className="absolute -top-40 right-10 w-96 h-96 bg-[#C69B45]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 left-10 w-96 h-96 bg-[#116B50]/20 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12 relative z-10">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#C69B45] text-xs font-semibold tracking-wide">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#C69B45]" />
             Processos Corporativos Conectados
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
-            Gestão conectada de <span className="text-[#116B50]">ponta a ponta.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-white tracking-tight">
+            Gestão conectada de <span className="text-[#C69B45]">ponta a ponta.</span>
           </h2>
-          <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
+          <p className="text-slate-200/90 text-sm sm:text-base leading-relaxed font-normal">
             Elimine silos operacionais. Do momento em que um cliente é cadastrado até a análise de
             rentabilidade gerencial, cada evento aciona as etapas seguintes sem necessidade de
             redigitação.
@@ -85,15 +90,15 @@ export function EndToEndProcessSection() {
             return (
               <div
                 key={s.step}
-                className="relative rounded-2xl bg-white border border-[#E4EAE6] p-5 sm:p-6 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-xs hover:shadow-md text-left"
+                className="relative rounded-2xl bg-white/95 text-[#202B28] border border-white/20 p-5 sm:p-6 flex flex-col justify-between hover:bg-white hover:border-[#C69B45] transition-all duration-300 group shadow-lg text-left"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold font-heading text-[#063D30] tracking-tight">
                       {s.step}
                     </span>
-                    <div className="w-9 h-9 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#116B50] group-hover:scale-105 transition-transform">
-                      <Icon className="w-4 h-4" />
+                    <div className="w-9 h-9 rounded-xl bg-[#EBF3EF] border border-[#116B50]/20 flex items-center justify-center text-[#116B50] group-hover:scale-105 transition-transform">
+                      <Icon className="w-4 h-4 text-[#116B50]" />
                     </div>
                   </div>
 
@@ -123,8 +128,8 @@ export function EndToEndProcessSection() {
 
                 {/* Seta indicativa para desktop entre cards (exceto último) */}
                 {idx < steps.length - 1 && (
-                  <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-white border border-[#E4EAE6] items-center justify-center text-[#063D30] shadow-xs pointer-events-none">
-                    <ArrowRight className="w-3 h-3 text-[#116B50]" />
+                  <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-[#042820] border border-[#C69B45]/50 items-center justify-center text-[#C69B45] shadow-md pointer-events-none">
+                    <ArrowRight className="w-3 h-3 text-[#C69B45]" />
                   </div>
                 )}
               </div>
@@ -133,33 +138,39 @@ export function EndToEndProcessSection() {
         </div>
 
         {/* Quadro de Governança do Processo */}
-        <div className="rounded-2xl bg-[#F8FAF9] border border-[#E4EAE6] p-6 sm:p-8 text-left">
+        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-6 sm:p-8 text-left">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
             <div className="space-y-2 lg:col-span-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-[#C69B45]">
                 Segurança em Cada Transição
               </span>
-              <h3 className="text-xl sm:text-2xl font-semibold font-heading text-[#063D30]">
+              <h3 className="text-xl sm:text-2xl font-semibold font-heading text-white">
                 Rastreabilidade integral sem brechas operacionais
               </h3>
-              <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed font-normal">
+              <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed font-normal">
                 Todas as alterações de status, aprovações de desconto, cancelamentos ou emissões
                 geram registros invioláveis na trilha de auditoria do Jetro, com usuário, data, IP,
                 valores anteriores e justificativas.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5">
-              <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
+              <div className="p-3 rounded-xl bg-white text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-[#116B50] shrink-0" />
-                <span className="font-normal">Alçadas de aprovação para regras sensíveis</span>
+                <span className="font-medium text-[#063D30]">
+                  Alçadas de aprovação para regras sensíveis
+                </span>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-[#116B50] shrink-0" />
-                <span className="font-normal">Reserva e baixa automática em estoque</span>
+              <div className="p-3 rounded-xl bg-white text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#C69B45] shrink-0" />
+                <span className="font-medium text-[#063D30]">
+                  Reserva e baixa automática em estoque
+                </span>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
+              <div className="p-3 rounded-xl bg-white text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-[#116B50] shrink-0" />
-                <span className="font-normal">Geração de financeiro vinculada à nota fiscal</span>
+                <span className="font-medium text-[#063D30]">
+                  Geração de financeiro vinculada à nota fiscal
+                </span>
               </div>
             </div>
           </div>

@@ -256,14 +256,14 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-semibold h-12 text-sm sm:text-base shadow-sm hover:shadow transition-all cursor-pointer rounded-xl"
+          className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold h-12 text-sm sm:text-base shadow-md hover:shadow-lg transition-all cursor-pointer rounded-xl"
         >
           {loading ? (
             'Registrando sua solicitação...'
           ) : (
             <span className="flex items-center justify-center gap-2">
               <Send className="h-4 w-4 text-[#C69B45]" />
-              Solicitar Apresentação do Jetro
+              <span>Solicitar Apresentação do Jetro</span>
             </span>
           )}
         </Button>

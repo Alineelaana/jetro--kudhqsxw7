@@ -45,13 +45,13 @@ export function SiteTestimonialsSection() {
   return (
     <section
       id="depoimentos"
-      className="relative py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6] overflow-hidden"
+      className="relative py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6] overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Cabeçalho da seção com os títulos EXATOS solicitados */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 text-left">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-[#C69B45]/30 text-[#063D30] text-xs font-semibold tracking-wide shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
               Experiências reais
             </div>
@@ -122,7 +122,7 @@ export function SiteTestimonialsSection() {
                 return (
                   <div
                     key={item.id}
-                    className="relative rounded-2xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 shadow-xs hover:shadow-md group"
+                    className="relative rounded-2xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 shadow-2xs hover:shadow-md group"
                   >
                     {/* Aspas decorativas */}
                     <div className="absolute top-6 right-6 text-[#116B50]/15 group-hover:text-[#116B50]/25 transition-colors pointer-events-none">

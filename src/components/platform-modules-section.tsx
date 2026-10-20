@@ -277,23 +277,33 @@ export function PlatformModulesSection() {
 
         {/* Grid de Módulos Reais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((m) => {
+          {modules.map((m, idx) => {
             const Icon = m.icon
             const isDev = m.status === 'Em desenvolvimento'
+            // Variação rítmica sutil dos contêineres de ícones na paleta HURAM
+            const iconBgStyles = [
+              'bg-[#EBF3EF] border-[#116B50]/20 text-[#116B50]', // esmeralda
+              'bg-[#FAF7F0] border-[#C69B45]/30 text-[#C69B45]', // dourado suave
+              'bg-[#F1F4F2] border-[#063D30]/15 text-[#063D30]', // verde institucional
+            ]
+            const chosenStyle = iconBgStyles[idx % iconBgStyles.length]
+
             return (
               <div
                 key={m.id}
-                className="group relative rounded-2xl p-6 sm:p-7 bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 flex flex-col justify-between shadow-xs hover:shadow-md text-left"
+                className="group relative rounded-2xl p-6 sm:p-7 bg-[#F8FAF9]/60 hover:bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md text-left"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#063D30] group-hover:scale-105 group-hover:border-[#116B50]/40 transition-all">
-                      <Icon className="w-5 h-5 text-[#116B50]" />
+                    <div
+                      className={`w-11 h-11 rounded-xl border flex items-center justify-center group-hover:scale-105 transition-all ${chosenStyle}`}
+                    >
+                      <Icon className="w-5 h-5" />
                     </div>
                     <span
                       className={`text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full border ${
                         isDev
-                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          ? 'bg-[#FDF4EC] text-[#E87517] border-[#E87517]/30'
                           : 'bg-emerald-50 text-[#063D30] border-emerald-200'
                       }`}
                     >
