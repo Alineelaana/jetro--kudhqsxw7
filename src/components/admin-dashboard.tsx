@@ -12,7 +12,7 @@ export function AdminDashboard() {
         <div>
           <h2 className="text-xl font-bold text-gray-800">Dashboard Operacional</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Indicadores e gráficos de produtividade, orçamentos e atendimentos do ERP Jetro
+            Indicadores e gráficos de produtividade, orçamentos e atendimentos do ERP HURAM
           </p>
         </div>
         <div className="flex items-center gap-3">

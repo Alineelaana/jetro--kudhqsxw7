@@ -208,7 +208,7 @@ export function IntelligentHomeScreen() {
               {/* Badge institucional discreta dourada */}
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#E4C46A] text-[11px] font-bold tracking-wide uppercase">
                 <Sparkles className="w-3 h-3 text-[#E4C46A]" />
-                <span>Jetro Sistema Inteligente</span>
+                <span>HURAM — Sistema Inteligente de Gestão</span>
               </div>
 
               {/* Saudação principal em destaque integrada com a foto de perfil do usuário */}
@@ -249,28 +249,27 @@ export function IntelligentHomeScreen() {
                     type="button"
                     onClick={() => setIsFloatingOpen(true)}
                     className="inline-flex items-center gap-1 font-bold text-[#E4C46A] hover:text-white underline underline-offset-4 decoration-[#C9A227] hover:decoration-white transition-colors cursor-pointer"
-                    title="Abrir assistente Jetro On-line no canto direito"
+                    title="Abrir assistente HURAM On-line no canto direito"
                   >
-                    <span>Jetro On-line</span>
+                    <span>HURAM On-line</span>
                     <MessageSquare className="w-3.5 h-3.5 inline shrink-0" />
                   </button>{' '}
                   estará à sua disposição no canto direito da tela.
                 </p>
               </div>
             </div>
-
-            {/* Ação rápida para abrir o Jetro On-line lateral */}
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
-              <button
+            {/* Ação rápida para abrir o HURAM On-line lateral */}
+            <div className="shrink-0 self-start sm:self-center">
+              <Button
                 type="button"
                 onClick={() => setIsFloatingOpen(true)}
-                className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#C9A227] hover:bg-[#d4ad2d] text-[#002817] font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-transform active:scale-95 cursor-pointer ${animClasses}`}
-                title="Abrir painel do Jetro On-line"
+                className="bg-[#003D30] hover:bg-[#002820] text-white border border-[#C9A227]/50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer group"
+                title="Abrir painel do HURAM On-line"
               >
-                <Sparkles className="w-4 h-4 fill-[#002817]" />
-                <span>Chamar Jetro On-line</span>
-              </button>
-            </div>
+                <MessageSquare className="w-4 h-4 text-[#E4C46A] group-hover:scale-110 transition-transform" />
+                <span>Chamar HURAM On-line</span>
+              </Button>
+            </div>{' '}
           </div>
         </div>
       </section>

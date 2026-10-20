@@ -16,7 +16,7 @@ export function AboutJetroSection() {
     {
       title: 'Inteligência Artificial Integrada',
       description:
-        'Dois assistentes especializados em funções complementares: recepção humanizada e triagem de oportunidades pelo site (Jeh) e análises operacionais em linguagem natural no ERP (Jetro On-line).',
+        'Dois assistentes especializados em funções complementares: recepção humanizada e triagem de oportunidades pelo site (Jeh) e análises operacionais em linguagem natural no ERP (HURAM On-line).',
     },
   ]
 
@@ -83,7 +83,7 @@ export function AboutJetroSection() {
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                 Empresas em expansão enfrentam o desafio da fragmentação de controles: uma planilha
                 para preços, outra para faturamento, anotações de estoque e relatórios defasados. O
-                Jetro centraliza essa engrenagem em uma arquitetura segura, com banco de dados em
+                HURAM centraliza essa engrenagem em uma arquitetura segura, com banco de dados em
                 nuvem, controle de sessões e auditoria contínua.
               </p>
               <div className="pt-2">
@@ -118,7 +118,7 @@ export function AboutJetroSection() {
                 <Cpu className="w-5 h-5 text-[#f6d77c]" />
                 <h4 className="text-sm font-bold text-white">IA Nativa</h4>
                 <p className="text-xs text-slate-400">
-                  Jeh e Jetro On-line operando dentro dos limites de segurança.
+                  Jeh e HURAM On-line operando dentro dos limites de segurança.
                 </p>
               </div>
 

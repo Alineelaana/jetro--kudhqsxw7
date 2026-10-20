@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
@@ -41,6 +41,11 @@ export default function Layout() {
   const isHomePage = pathname === '/admin'
   const isSite = pathname === '/site'
   const showFooter = !isInternalPath(pathname) && (!isAuthenticated || !isSite)
+
+  // Redirecionamento preventivo de nível de layout: se o usuário já estiver autenticado e tentar acessar /site, manda direto para /admin
+  if (isSite && isAuthenticated) {
+    return <Navigate to="/admin" replace />
+  }
 
   useEffect(() => {
     if (!isAdmin) {
@@ -98,7 +103,15 @@ export default function Layout() {
                   key={pathname}
                   moduleName={pathname.replace('/admin', '') || 'Início'}
                 >
-                  <Outlet />
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
+                        <div className="w-7 h-7 rounded-full border-2 border-[#003D30] border-t-transparent animate-spin" />
+                      </div>
+                    }
+                  >
+                    <Outlet />
+                  </Suspense>
                 </ModuleErrorBoundary>
               </div>
               {/* Fixar Rodapé: respeita preferência do usuário */}
@@ -141,7 +154,15 @@ export default function Layout() {
       >
         <div className="flex-1">
           <ModuleErrorBoundary key={pathname} moduleName={pathname || 'Portal'}>
-            <Outlet />
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
+                  <div className="w-7 h-7 rounded-full border-2 border-[#003D30] border-t-transparent animate-spin" />
+                </div>
+              }
+            >
+              <Outlet />
+            </Suspense>
           </ModuleErrorBoundary>
         </div>
         {!showFooter && !isRootLogin && (

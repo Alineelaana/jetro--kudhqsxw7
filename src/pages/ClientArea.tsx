@@ -98,7 +98,7 @@ export default function ClientArea() {
     <div className="min-h-[calc(100vh-6rem)] bg-gray-50">
       <header className="bg-[#01361D] text-white py-4 px-4 shadow-lg">
         <div className="container mx-auto flex items-center justify-between">
-          <h1 className="text-lg sm:text-xl font-black">Área do Cliente — Jetro Logística</h1>
+          <h1 className="text-lg sm:text-xl font-black">Área do Cliente — HURAM Logística</h1>
           <Button
             onClick={handleLogout}
             variant="outline"

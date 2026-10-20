@@ -198,7 +198,7 @@ export function AtendimentoList({ statusFilter }: { statusFilter: string }) {
           screenId="atendimento.central.list"
           columns={columns}
           data={filtered}
-          exportTitle="Central de Atendimentos — Jetro ERP"
+          exportTitle="Central de Atendimentos — HURAM ERP"
           exportFilename="atendimentos-jetro.xlsx"
         />
       )}

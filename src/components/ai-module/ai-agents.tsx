@@ -188,7 +188,7 @@ export function AiAgents() {
                     <div className="w-10 h-10 rounded-full border-2 border-[#C89B3C] overflow-hidden shrink-0 shadow-sm">
                       <img
                         src={nineAvatar}
-                        alt="Jeh - Inteligência Artificial Jetro"
+                        alt="Jeh - Inteligência Artificial HURAM"
                         className="w-full h-full object-cover"
                       />
                     </div>

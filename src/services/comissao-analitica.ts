@@ -1130,7 +1130,7 @@ export async function consultarComissaoAnalitica(
     status: 'apurada',
     statusLabel: 'Apurada',
     competencia: filtros.dataInicio ? filtros.dataInicio.slice(0, 7) : '2026-09',
-    responsavelApuracao: 'Admin / Sistema Jetro',
+    responsavelApuracao: 'Admin / Sistema HURAM',
     dataApuracao: '19/10/2026 09:30',
     responsavelAprovacao: 'Carlos Roberto (Gerente Comercial)',
     dataAprovacao: '19/10/2026 10:15',

@@ -24,13 +24,13 @@ export default function Index() {
   const { isAuthenticated, loading } = useAuth()
   const { whatsappNumber } = useSettings()
   const safeWhatsapp = whatsappNumber || '5531991297619'
-  const [selectedService] = useState<string>('Apresentação Comercial Jetro ERP')
+  const [selectedService] = useState<string>('Apresentação Comercial HURAM ERP')
 
-  // Se o usuário está logado, redireciona para a área interna (/admin) garantindo que nunca fique em /site
-  if (!loading && isAuthenticated) {
+  // Se o usuário está logado (ou se pb.authStore já é válido mesmo antes de loading terminar),
+  // redireciona para a área interna (/admin) garantindo que nunca fique em /site
+  if (isAuthenticated || (!loading && isAuthenticated)) {
     return <Navigate to="/admin" replace />
   }
-
   const scrollToContact = () => {
     const el = document.getElementById('contato')
     if (el) {
@@ -96,7 +96,7 @@ export default function Index() {
             </h2>
             <p className="text-slate-200 max-w-2xl mx-auto text-xs sm:text-base leading-relaxed">
               Conte-nos brevemente o segmento e os objetivos da sua empresa para que nossa equipe
-              demonstre os módulos Jetro mais indicados para sua operação.
+              demonstre os módulos HURAM mais indicados para sua operação.
             </p>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-slate-300">
               <a

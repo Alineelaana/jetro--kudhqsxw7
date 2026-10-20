@@ -241,7 +241,7 @@ export function AdminChatPanel() {
           <div className="w-5 h-5 rounded-full border border-[#C89B3C] overflow-hidden flex-shrink-0">
             <img
               src={nineAvatar}
-              alt="Jeh - Inteligência Artificial Jetro"
+              alt="Jeh - Inteligência Artificial HURAM"
               className="w-full h-full object-cover"
             />
           </div>
@@ -336,7 +336,7 @@ export function AdminChatPanel() {
                       <div className="w-7 h-7 rounded-full border border-[#C89B3C] overflow-hidden shrink-0 shadow-sm mt-0.5">
                         <img
                           src={nineAvatar}
-                          alt="Jeh - Inteligência Artificial Jetro"
+                          alt="Jeh - Inteligência Artificial HURAM"
                           className="w-full h-full object-cover"
                         />
                       </div>

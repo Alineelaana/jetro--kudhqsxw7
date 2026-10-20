@@ -173,7 +173,7 @@ export function AuditTable({ logs, loading, error, onViewDetails, onRetry }: Pro
       data={logs}
       onRowClick={(log) => onViewDetails(log)}
       emptyMessage="Nenhum registro de auditoria encontrado."
-      exportTitle="Logs de Auditoria — Jetro"
+      exportTitle="Logs de Auditoria — HURAM"
       exportFilename="auditoria-logs.xlsx"
     />
   )

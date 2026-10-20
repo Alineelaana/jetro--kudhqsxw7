@@ -27,7 +27,7 @@ class IntelligentHomeErrorBoundary extends Component<
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
           <p className="text-muted-foreground">
-            Erro ao carregar o assistente inteligente Jetro On-line.
+            Erro ao carregar o assistente inteligente HURAM On-line.
           </p>
           <div className="flex gap-2">
             <button

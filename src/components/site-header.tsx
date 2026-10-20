@@ -225,8 +225,8 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 size="sm"
                 className="bg-[#003D30] hover:bg-[#002820] border border-[#D6A755]/50 text-white font-semibold text-xs px-4 shadow-sm hover:shadow-md transition-all"
               >
-                <Link to="/" className="flex items-center gap-1.5">
-                  <span>Acessar o sistema</span>
+                <Link to={isAuthenticated ? '/admin' : '/'} className="flex items-center gap-1.5">
+                  <span>{isAuthenticated ? 'Ir para o ERP' : 'Acessar o sistema'}</span>
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>
@@ -276,8 +276,8 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
               asChild
               className="w-full bg-[#005A36] hover:bg-[#004225] border border-[#C9A227]/40 text-white font-semibold py-2.5 text-xs"
             >
-              <Link to="/" onClick={() => setMobileMenuOpen(false)}>
-                Acessar o sistema
+              <Link to={isAuthenticated ? '/admin' : '/'} onClick={() => setMobileMenuOpen(false)}>
+                {isAuthenticated ? 'Ir para o ERP' : 'Acessar o sistema'}
               </Link>
             </Button>
           </div>

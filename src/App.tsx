@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
@@ -11,79 +12,21 @@ import { ClientAuthProvider } from '@/hooks/use-client-auth'
 import { CmsContentProvider } from '@/hooks/use-cms-content'
 import { JetroOnlineProvider } from '@/hooks/use-jetro-online'
 import { TourProvider } from '@/lib/tours/tour-context'
+import { UserPreferencesProvider } from '@/hooks/use-user-preferences'
+import Layout from './components/Layout'
+
+// Páginas de entrada essenciais
 import Index from './pages/Index'
 import LoginPage from './pages/Login'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
-import DashboardPage from './pages/DashboardPage'
-import AdminRegister from './pages/AdminRegister'
-import AdminPasswordRecovery from './pages/AdminPasswordRecovery'
 
-import ClientLogin from './pages/ClientLogin'
-import ClientRegister from './pages/ClientRegister'
-import PasswordRecovery from './pages/PasswordRecovery'
-import ClientArea from './pages/ClientArea'
-import ClientTracking from './pages/ClientTracking'
-import ClientPasswordReset from './pages/ClientPasswordReset'
-import PoliticaPrivacidade from './pages/PoliticaPrivacidade'
-import PoliticaComercial from './pages/PoliticaComercial'
-import TermosDeUso from './pages/TermosDeUso'
-import PoliticaCookies from './pages/PoliticaCookies'
-import PoliticaSeguranca from './pages/PoliticaSeguranca'
-import CentralDePrivacidade from './pages/CentralDePrivacidade'
-import CanalDePrivacidade from './pages/CanalDePrivacidade'
-import PoliticaLicenciamento from './pages/PoliticaLicenciamento'
-import PoliticaSla from './pages/PoliticaSla'
-import PoliticaBackupContinuidade from './pages/PoliticaBackupContinuidade'
-import Products from './pages/Products'
-import Cadastros from './pages/Cadastros'
-import PriceTablesPage from './pages/PriceTablesPage'
-import CommissionRules from './pages/CommissionRules'
-import ComissaoAnaliticaPage from './pages/sales/ComissaoAnaliticaPage'
-import ComissoesMixPage from './pages/sales/ComissoesMixPage'
-import PremiacoesPage from './pages/sales/PremiacoesPage'
-import DescontosDeducoesPage from './pages/sales/DescontosDeducoesPage'
-import SalesDashboardPage from './pages/sales/SalesDashboardPage'
-import { InserirClientesScreen } from '@/components/vendas/inserir-clientes-screen'
-import SalesOrdersPage from './pages/sales/SalesOrdersPage'
-import SalesOrdersQueryPage from './pages/sales/SalesOrdersQueryPage'
-import InvoicingPage from './pages/sales/InvoicingPage'
-import NfePage from './pages/sales/NfePage'
-import NfcePage from './pages/sales/NfcePage'
-import ContractsPage from './pages/sales/ContractsPage'
-import SalesReturnsPage from './pages/sales/SalesReturnsPage'
-import SalesHistoryPage from './pages/sales/SalesHistoryPage'
-import StockPage from './pages/StockPage'
-import WmsScreen from './pages/WmsScreen'
-import Layout from './components/Layout'
-import Logistics from './pages/Logistics'
-import Transporte from './pages/Transporte'
-import Financial from './pages/Financial'
-import RH from './pages/RH'
-import Conformidade from './pages/Conformidade'
-import Fiscal from './pages/Fiscal'
-import CRM from './pages/CRM'
-import { ConfiguracoesLayout } from '@/components/configuracoes/configuracoes-layout'
-import { EmpresaScreen } from '@/components/configuracoes/empresa-screen'
-import { ParametrosScreen } from '@/components/configuracoes/parametros-screen'
-import { ConfigCrudScreen } from '@/components/configuracoes/config-crud-screen'
-import { LogsScreen } from '@/components/configuracoes/logs-screen'
-import { ApisScreen } from '@/components/configuracoes/apis-screen'
-import { ImportExportScreen } from '@/components/configuracoes/import-export-screen'
-import { PermissionMatrixScreen } from '@/components/configuracoes/permission-matrix-screen'
-import { SegurancaScreen } from '@/components/configuracoes/seguranca-screen'
-import Notifications from './pages/Notifications'
-import { BackupScreen } from '@/components/configuracoes/backup-screen'
-import AIModule from './pages/AIModule'
-
-import Industry from './pages/Industry'
-import Phase0Foundation from './pages/Phase0Foundation'
-import PlatformLayer from './pages/PlatformLayer'
-import Blueprint from './pages/Blueprint'
-import VariableRemuneration from './pages/VariableRemuneration'
-import BI from './pages/BI'
-import Performance from './pages/Performance'
-import ValidityAlerts from './pages/ValidityAlerts'
+// Guards e wrappers estáticos
+import { JehProtectedRoute } from '@/components/jeh'
+import { JetroOnlineProtectedRoute } from '@/components/jetro-online-central/jetro-online-protected-route'
+import { AiAdminProtectedRoute } from '@/components/ai-module/ai-admin-protected-route'
+import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
+import { getMarketingIntelligence } from '@/services/marketing-bi'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
@@ -91,57 +34,245 @@ import {
   NOTIFICATION_CONFIG,
   NUMERATION_CONFIG,
 } from '@/lib/configuracoes-config'
-import { BudgetRequestsPanel } from '@/components/budget-requests-panel'
-import Atendimento from './pages/Atendimento'
-import DP from './pages/DP'
-import SST from './pages/SST'
-import Promotions from './pages/Promotions'
-import Precificacao from './pages/Precificacao'
-import Auditoria from './pages/Auditoria'
-import UsersAdminPage from './pages/UsersAdminPage'
-import SiteClientsAdmin from './components/site-clients-admin'
-import SiteTestimonialsAdmin from './components/site-testimonials-admin'
-import ReportSchedulesPage from './pages/admin/ReportSchedulesPage'
-import CentralDocumentacaoPage from './pages/admin/CentralDocumentacaoPage'
-import {
-  JehOverviewScreen,
-  JehKnowledgeScreen,
-  JehQAScreen,
-  JehTrainingScreen,
-  JehTestScreen,
-  JehUnansweredScreen,
-  JehHistoryScreen,
-  JehSettingsScreen,
-  JehProtectedRoute,
-} from '@/components/jeh'
-import { JetroOnlineLayout } from '@/components/jetro-online-central/jetro-online-layout'
-import { JetroOnlineGeneralSettingsScreen } from '@/components/jetro-online-central/jetro-online-general-settings'
-import { JetroOnlineUniversidadeScreen } from '@/components/jetro-online-central/jetro-online-universidade'
-import { JetroOnlinePerguntasScreen } from '@/components/jetro-online-central/jetro-online-perguntas'
-import { JetroOnlineHistoricoScreen } from '@/components/jetro-online-central/jetro-online-historico'
-import { JetroOnlineSugestoesScreen } from '@/components/jetro-online-central/jetro-online-sugestoes'
-import { JetroOnlineRecursosScreen } from '@/components/jetro-online-central/jetro-online-recursos'
-import { JetroOnlineToursScreen } from '@/components/jetro-online-central/jetro-online-tours'
-import { JetroOnlineRelatoriosScreen } from '@/components/jetro-online-central/jetro-online-relatorios'
-import { JetroOnlineProtectedRoute } from '@/components/jetro-online-central/jetro-online-protected-route'
-import { AiAdminProtectedRoute } from '@/components/ai-module/ai-admin-protected-route'
-import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
-import ComparativoMargensGrPage from './pages/admin/ComparativoMargensGrPage'
-import TabelaMaeGrPage from './pages/admin/TabelaMaeGrPage'
-import Controladoria from './pages/Controladoria'
-import SupplierAllowance from './pages/SupplierAllowance'
-import TradeMarketing from './pages/TradeMarketing'
-import MarketingEnterprise from './pages/MarketingEnterprise'
-import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
-import { getMarketingIntelligence } from '@/services/marketing-bi'
-import CollectionCenterConfig from './pages/CollectionCenterConfig'
-import CollectionCenterCertification from './pages/CollectionCenterCertification'
-import MeusChamadosScreen from '@/components/chamados/meus-chamados-screen'
-import NovoChamadoScreen from '@/components/chamados/novo-chamado-screen'
-import ChamadoDetalhesScreen from '@/components/chamados/chamado-detalhes-screen'
-import ConfiguracaoSlaScreen from '@/components/chamados/configuracao-sla-screen'
-import PainelChamadosScreen from '@/components/chamados/painel-chamados-screen'
-import { UserPreferencesProvider } from '@/hooks/use-user-preferences'
+
+// Lazy loading das telas e módulos do ERP para eliminar OOM durante vite build
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const AdminRegister = lazy(() => import('./pages/AdminRegister'))
+const AdminPasswordRecovery = lazy(() => import('./pages/AdminPasswordRecovery'))
+const ClientLogin = lazy(() => import('./pages/ClientLogin'))
+const ClientRegister = lazy(() => import('./pages/ClientRegister'))
+const PasswordRecovery = lazy(() => import('./pages/PasswordRecovery'))
+const ClientArea = lazy(() => import('./pages/ClientArea'))
+const ClientTracking = lazy(() => import('./pages/ClientTracking'))
+const ClientPasswordReset = lazy(() => import('./pages/ClientPasswordReset'))
+
+// Páginas institucionais / de conformidade
+const PoliticaPrivacidade = lazy(() => import('./pages/PoliticaPrivacidade'))
+const PoliticaComercial = lazy(() => import('./pages/PoliticaComercial'))
+const TermosDeUso = lazy(() => import('./pages/TermosDeUso'))
+const PoliticaCookies = lazy(() => import('./pages/PoliticaCookies'))
+const PoliticaSeguranca = lazy(() => import('./pages/PoliticaSeguranca'))
+const CentralDePrivacidade = lazy(() => import('./pages/CentralDePrivacidade'))
+const CanalDePrivacidade = lazy(() => import('./pages/CanalDePrivacidade'))
+const PoliticaLicenciamento = lazy(() => import('./pages/PoliticaLicenciamento'))
+const PoliticaSla = lazy(() => import('./pages/PoliticaSla'))
+const PoliticaBackupContinuidade = lazy(() => import('./pages/PoliticaBackupContinuidade'))
+
+// Vendas, Comissões, Produtos e Cadastros
+const Products = lazy(() => import('./pages/Products'))
+const Cadastros = lazy(() => import('./pages/Cadastros'))
+const PriceTablesPage = lazy(() => import('./pages/PriceTablesPage'))
+const CommissionRules = lazy(() => import('./pages/CommissionRules'))
+const ComissaoAnaliticaPage = lazy(() => import('./pages/sales/ComissaoAnaliticaPage'))
+const ComissoesMixPage = lazy(() => import('./pages/sales/ComissoesMixPage'))
+const PremiacoesPage = lazy(() => import('./pages/sales/PremiacoesPage'))
+const DescontosDeducoesPage = lazy(() => import('./pages/sales/DescontosDeducoesPage'))
+const SalesDashboardPage = lazy(() => import('./pages/sales/SalesDashboardPage'))
+const InserirClientesScreen = lazy(() =>
+  import('@/components/vendas/inserir-clientes-screen').then((m) => ({
+    default: m.InserirClientesScreen,
+  })),
+)
+const SalesOrdersPage = lazy(() => import('./pages/sales/SalesOrdersPage'))
+const SalesOrdersQueryPage = lazy(() => import('./pages/sales/SalesOrdersQueryPage'))
+const InvoicingPage = lazy(() => import('./pages/sales/InvoicingPage'))
+const NfePage = lazy(() => import('./pages/sales/NfePage'))
+const NfcePage = lazy(() => import('./pages/sales/NfcePage'))
+const ContractsPage = lazy(() => import('./pages/sales/ContractsPage'))
+const SalesReturnsPage = lazy(() => import('./pages/sales/SalesReturnsPage'))
+const SalesHistoryPage = lazy(() => import('./pages/sales/SalesHistoryPage'))
+
+// Estoque e WMS
+const StockPage = lazy(() => import('./pages/StockPage'))
+const WmsScreen = lazy(() => import('./pages/WmsScreen'))
+
+// Logística e Transporte
+const Logistics = lazy(() => import('./pages/Logistics'))
+const Transporte = lazy(() => import('./pages/Transporte'))
+
+// Financeiro
+const Financial = lazy(() => import('./pages/Financial'))
+const CollectionCenterConfig = lazy(() => import('./pages/CollectionCenterConfig'))
+const CollectionCenterCertification = lazy(() => import('./pages/CollectionCenterCertification'))
+
+// RH e Conformidade
+const RH = lazy(() => import('./pages/RH'))
+const Conformidade = lazy(() => import('./pages/Conformidade'))
+
+// Fiscal e CRM
+const Fiscal = lazy(() => import('./pages/Fiscal'))
+const CRM = lazy(() => import('./pages/CRM'))
+
+// Notificações e Módulos Centrais
+const Notifications = lazy(() => import('./pages/Notifications'))
+const AIModule = lazy(() => import('./pages/AIModule'))
+const Industry = lazy(() => import('./pages/Industry'))
+const Phase0Foundation = lazy(() => import('./pages/Phase0Foundation'))
+const PlatformLayer = lazy(() => import('./pages/PlatformLayer'))
+const Blueprint = lazy(() => import('./pages/Blueprint'))
+const VariableRemuneration = lazy(() => import('./pages/VariableRemuneration'))
+const BI = lazy(() => import('./pages/BI'))
+const Performance = lazy(() => import('./pages/Performance'))
+const ValidityAlerts = lazy(() => import('./pages/ValidityAlerts'))
+const BudgetRequestsPanel = lazy(() =>
+  import('@/components/budget-requests-panel').then((m) => ({
+    default: m.BudgetRequestsPanel,
+  })),
+)
+const Atendimento = lazy(() => import('./pages/Atendimento'))
+const DP = lazy(() => import('./pages/DP'))
+const SST = lazy(() => import('./pages/SST'))
+const Promotions = lazy(() => import('./pages/Promotions'))
+const Precificacao = lazy(() => import('./pages/Precificacao'))
+const Auditoria = lazy(() => import('./pages/Auditoria'))
+const UsersAdminPage = lazy(() => import('./pages/UsersAdminPage'))
+const SiteClientsAdmin = lazy(() => import('./components/site-clients-admin'))
+const SiteTestimonialsAdmin = lazy(() => import('./components/site-testimonials-admin'))
+const ReportSchedulesPage = lazy(() => import('./pages/admin/ReportSchedulesPage'))
+const CentralDocumentacaoPage = lazy(() => import('./pages/admin/CentralDocumentacaoPage'))
+const SegundoCerebroPage = lazy(() => import('./pages/admin/SegundoCerebroPage'))
+const ComparativoMargensGrPage = lazy(() => import('./pages/admin/ComparativoMargensGrPage'))
+const TabelaMaeGrPage = lazy(() => import('./pages/admin/TabelaMaeGrPage'))
+const Controladoria = lazy(() => import('./pages/Controladoria'))
+const SupplierAllowance = lazy(() => import('./pages/SupplierAllowance'))
+const TradeMarketing = lazy(() => import('./pages/TradeMarketing'))
+const MarketingEnterprise = lazy(() => import('./pages/MarketingEnterprise'))
+
+// Central de Chamados
+const MeusChamadosScreen = lazy(() => import('@/components/chamados/meus-chamados-screen'))
+const NovoChamadoScreen = lazy(() => import('@/components/chamados/novo-chamado-screen'))
+const ChamadoDetalhesScreen = lazy(() => import('@/components/chamados/chamado-detalhes-screen'))
+const ConfiguracaoSlaScreen = lazy(() => import('@/components/chamados/configuracao-sla-screen'))
+const PainelChamadosScreen = lazy(() => import('@/components/chamados/painel-chamados-screen'))
+
+// Telas de Configurações
+const ConfiguracoesLayout = lazy(() =>
+  import('@/components/configuracoes/configuracoes-layout').then((m) => ({
+    default: m.ConfiguracoesLayout,
+  })),
+)
+const EmpresaScreen = lazy(() =>
+  import('@/components/configuracoes/empresa-screen').then((m) => ({
+    default: m.EmpresaScreen,
+  })),
+)
+const ParametrosScreen = lazy(() =>
+  import('@/components/configuracoes/parametros-screen').then((m) => ({
+    default: m.ParametrosScreen,
+  })),
+)
+const ConfigCrudScreen = lazy(() =>
+  import('@/components/configuracoes/config-crud-screen').then((m) => ({
+    default: m.ConfigCrudScreen,
+  })),
+)
+const LogsScreen = lazy(() =>
+  import('@/components/configuracoes/logs-screen').then((m) => ({
+    default: m.LogsScreen,
+  })),
+)
+const ApisScreen = lazy(() =>
+  import('@/components/configuracoes/apis-screen').then((m) => ({
+    default: m.ApisScreen,
+  })),
+)
+const ImportExportScreen = lazy(() =>
+  import('@/components/configuracoes/import-export-screen').then((m) => ({
+    default: m.ImportExportScreen,
+  })),
+)
+const PermissionMatrixScreen = lazy(() =>
+  import('@/components/configuracoes/permission-matrix-screen').then((m) => ({
+    default: m.PermissionMatrixScreen,
+  })),
+)
+const SegurancaScreen = lazy(() =>
+  import('@/components/configuracoes/seguranca-screen').then((m) => ({
+    default: m.SegurancaScreen,
+  })),
+)
+const BackupScreen = lazy(() =>
+  import('@/components/configuracoes/backup-screen').then((m) => ({
+    default: m.BackupScreen,
+  })),
+)
+
+// Jeh assistente telas
+const JehOverviewScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehOverviewScreen })),
+)
+const JehKnowledgeScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehKnowledgeScreen })),
+)
+const JehQAScreen = lazy(() => import('@/components/jeh').then((m) => ({ default: m.JehQAScreen })))
+const JehTrainingScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehTrainingScreen })),
+)
+const JehTestScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehTestScreen })),
+)
+const JehUnansweredScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehUnansweredScreen })),
+)
+const JehHistoryScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehHistoryScreen })),
+)
+const JehSettingsScreen = lazy(() =>
+  import('@/components/jeh').then((m) => ({ default: m.JehSettingsScreen })),
+)
+
+// Jetro On-line central
+const JetroOnlineLayout = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-layout').then((m) => ({
+    default: m.JetroOnlineLayout,
+  })),
+)
+const JetroOnlineGeneralSettingsScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-general-settings').then((m) => ({
+    default: m.JetroOnlineGeneralSettingsScreen,
+  })),
+)
+const JetroOnlineUniversidadeScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-universidade').then((m) => ({
+    default: m.JetroOnlineUniversidadeScreen,
+  })),
+)
+const JetroOnlinePerguntasScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-perguntas').then((m) => ({
+    default: m.JetroOnlinePerguntasScreen,
+  })),
+)
+const JetroOnlineHistoricoScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-historico').then((m) => ({
+    default: m.JetroOnlineHistoricoScreen,
+  })),
+)
+const JetroOnlineSugestoesScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-sugestoes').then((m) => ({
+    default: m.JetroOnlineSugestoesScreen,
+  })),
+)
+const JetroOnlineRecursosScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-recursos').then((m) => ({
+    default: m.JetroOnlineRecursosScreen,
+  })),
+)
+const JetroOnlineToursScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-tours').then((m) => ({
+    default: m.JetroOnlineToursScreen,
+  })),
+)
+const JetroOnlineRelatoriosScreen = lazy(() =>
+  import('@/components/jetro-online-central/jetro-online-relatorios').then((m) => ({
+    default: m.JetroOnlineRelatoriosScreen,
+  })),
+)
+
+const PageFallback = () => (
+  <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
+    <div className="w-7 h-7 rounded-full border-2 border-[#003D30] border-t-transparent animate-spin" />
+  </div>
+)
 
 const App = () => (
   <BrowserRouter>

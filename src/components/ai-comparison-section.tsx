@@ -56,7 +56,7 @@ export function AiComparisonSection() {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#005B2E]/60 border border-[#C9A227]/50 text-[#FFE28A] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span>Ecossistema de IA Jetro</span>
+            <span>Ecossistema de IA HURAM</span>
           </div>
 
           <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
@@ -105,19 +105,19 @@ export function AiComparisonSection() {
                     </div>
                   </div>
                 </th>
-                {/* Coluna do Jetro On-line */}
+                {/* Coluna do HURAM On-line */}
                 <th className="p-4 lg:p-5 w-[37.5%] border-l border-white/10 bg-[#002B17]/60">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 bg-[#001D0F] shadow-md">
+                    <div className="w-10 h-10 rounded-full border-2 border-[#C9A227] shrink-0 bg-[#001D0F] shadow-md">
                       <img
                         src={JETRO_ONLINE_AVATAR_URL}
-                        alt="Jetro On-line"
+                        alt="HURAM On-line"
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-black text-white">Jetro On-line</span>
+                        <span className="text-base font-black text-white">HURAM On-line</span>
                         <span className="text-[10px] px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-200 font-bold border border-emerald-500/40 uppercase tracking-wider">
                           Operacional
                         </span>
@@ -127,7 +127,7 @@ export function AiComparisonSection() {
                       </span>
                     </div>
                   </div>
-                </th>
+                </th>{' '}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10 text-xs sm:text-sm">
@@ -176,11 +176,11 @@ export function AiComparisonSection() {
               <div className="w-12 h-12 mx-auto rounded-full overflow-hidden border-2 border-[#C9A227] bg-[#001D0F]">
                 <img
                   src={JETRO_ONLINE_AVATAR_URL}
-                  alt="Jetro On-line"
+                  alt="HURAM On-line"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h4 className="text-sm font-bold text-white">Jetro On-line</h4>
+              <h4 className="text-sm font-bold text-white">HURAM On-line</h4>
               <span className="text-[10px] block px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 font-bold">
                 Assistência Operacional
               </span>
@@ -206,7 +206,7 @@ export function AiComparisonSection() {
                   </div>
                   <div className="p-2 rounded-lg bg-[#00180D] border border-white/10 flex items-start gap-2">
                     <span className="text-[10px] font-bold text-emerald-300 uppercase shrink-0 mt-0.5">
-                      Jetro On-line:
+                      HURAM On-line:
                     </span>
                     <span className="text-slate-300 font-medium">{row.jetroOnline}</span>
                   </div>
@@ -220,7 +220,7 @@ export function AiComparisonSection() {
         <div className="text-center max-w-3xl mx-auto pt-2">
           <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#002D18] via-[#003B20] to-[#002D18] border-2 border-[#C9A227]/70 shadow-xl">
             <p className="text-base sm:text-xl font-black text-white leading-relaxed">
-              "A Jeh aproxima novos clientes do Jetro. O Jetro On-line aproxima os usuários das
+              "A Jeh aproxima novos clientes do HURAM. O HURAM On-line aproxima os usuários das
               informações da empresa."
             </p>
           </div>
