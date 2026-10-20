@@ -164,8 +164,8 @@ const XLSX_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
  */
 export function exportToExcel(
   records: Record<string, unknown>[],
-  filename = 'export-jetro.xlsx',
-  sheetTitle = 'Jetro ERP',
+  filename = 'export-huram.xlsx',
+  sheetTitle = 'ERP HURAM',
 ) {
   if (!records || records.length === 0) return
 
@@ -257,8 +257,8 @@ export function exportToExcel(
  */
 export function exportToPdf(
   records: Record<string, unknown>[],
-  _filename = 'export-jetro.pdf',
-  title = 'Relatório de Dados — Jetro ERP',
+  _filename = 'export-huram.pdf',
+  title = 'Relatório de Dados — ERP HURAM',
 ) {
   if (!records || records.length === 0) return
 

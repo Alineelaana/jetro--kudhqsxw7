@@ -236,13 +236,15 @@ export function JetroOnlineUniversidadeScreen() {
                 Vídeos oficiais recomendados de forma inteligente pela IA do HURAM On-line com base
                 na tela e contexto do usuário.
               </p>
-            </div>          <Button
-            onClick={handleOpenCreate}
-            className="bg-[#C9A227] hover:bg-[#b5901f] text-gray-900 font-bold text-xs h-9 px-4 shrink-0 shadow-xs"
-          >
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Cadastrar Novo Vídeo
-          </Button>
+            </div>
+            <Button
+              onClick={handleOpenCreate}
+              className="bg-[#C9A227] hover:bg-[#b5901f] text-gray-900 font-bold text-xs h-9 px-4 shrink-0 shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Cadastrar Novo Vídeo
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

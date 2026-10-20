@@ -889,7 +889,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                         <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-2xs bg-[#002613] mt-0.5">
                           <img
                             src={JETRO_ONLINE_AVATAR_URL}
-                            alt="Jetro On-line"
+                            alt="HURAM On-line"
                             className="w-full h-full object-cover object-center"
                           />
                         </div>
@@ -910,7 +910,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                               isUser ? 'text-emerald-100' : 'text-[#005B2E]',
                             )}
                           >
-                            {isUser ? 'Você' : 'Jetro On-line'}
+                            {isUser ? 'Você' : 'HURAM On-line'}
                           </span>
                           {msg.created && (
                             <span

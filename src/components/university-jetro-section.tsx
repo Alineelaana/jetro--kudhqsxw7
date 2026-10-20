@@ -45,7 +45,7 @@ export function UniversityJetroSection() {
       ],
     },
     {
-      title: 'Orientação pelo Jetro On-line',
+      title: 'Orientação pelo HURAM On-line',
       icon: Search,
       description:
         'O assistente interno indica os treinamentos e tours relevantes diretamente no chat sempre que um usuário pergunta como executar uma tarefa.',
