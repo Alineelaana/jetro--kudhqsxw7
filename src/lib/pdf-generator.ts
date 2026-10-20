@@ -62,7 +62,7 @@ export interface BudgetPdfData {
 }
 
 export function getJetroLogoUrl(): string {
-  return jetroLogoUrl
+  return logoHuramLight
 }
 
 export function generateBudgetPdfHtml(request: BudgetPdfData): string {
@@ -124,13 +124,13 @@ export function generateBudgetPdfHtml(request: BudgetPdfData): string {
 </head>
 <body>
   <div class="header-container">
-    <img src="${jetroLogoUrl}" alt="Jetro Logo" class="logo-img" />
+    <img src="${logoHuramLight}" alt="HURAM Logo" class="logo-img" />
     <div class="company-details">
-      <div class="company-name">Jetro</div>
-      <div class="company-slogan">Inteligência que Conecta. Tecnologia que Evolui.</div>
+      <div class="company-name">HURAM</div>
+      <div class="company-slogan">Sistema Inteligente de Gestão</div>
       <div class="company-info">
-        Operações Logísticas Premium - Espírito Santo<br/>
-        Atendimento: contato@jetrolog.com.br
+        Operações Logísticas e Empresariais de Alta Performance<br/>
+        Atendimento: contato@huram.com.br
       </div>
     </div>
   </div>
@@ -268,7 +268,7 @@ export function generateBudgetPdfHtml(request: BudgetPdfData): string {
   }
 
   <div class="footer">
-    <div class="footer-brand">Jetro - Operações Logísticas e Plataforma de Gestão</div>
+    <div class="footer-brand">HURAM — Sistema Inteligente de Gestão</div>
     <div>Inteligência que Conecta. Tecnologia que Evolui. Resultados que Transformam.</div>
     <div style="margin-top: 6px; font-size: 10px; color: #94a3b8;">Documento gerado eletronicamente em ${new Date().toLocaleString('pt-BR')}. Válido sem assinatura por 30 dias.</div>
   </div>
