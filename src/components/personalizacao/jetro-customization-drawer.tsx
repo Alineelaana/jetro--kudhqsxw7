@@ -60,7 +60,7 @@ export function JetroCustomizationDrawer() {
     'aparencia' | 'layout' | 'textos' | 'tabelas' | 'ia' | 'acessibilidade'
   >('aparencia')
 
-  // Exclusivo para usuários autenticados no ERP Jetro
+  // Exclusivo para usuários autenticados no ERP HURAM
   if (!isAuthenticated) {
     return null
   }
@@ -84,17 +84,17 @@ export function JetroCustomizationDrawer() {
       )}
 
       {/* ============================================================== */}
-      {/* PAINEL LATERAL DE PERSONALIZAÇÃO — IDENTIDADE JETRO            */}
+      {/* PAINEL LATERAL DE PERSONALIZAÇÃO — IDENTIDADE HURAM            */}
       {/* ============================================================== */}
       <aside
-        aria-label="Central de Personalização Jetro"
+        aria-label="Central de Personalização HURAM"
         className={cn(
           'fixed top-0 right-0 bottom-0 z-50 bg-background shadow-2xl border-l border-border flex flex-col transition-transform duration-300 ease-in-out',
           'w-full sm:w-[420px] md:w-[440px]',
           isCustomizerOpen ? 'translate-x-0' : 'translate-x-full',
         )}
       >
-        {/* CABEÇALHO DO PAINEL — PADRÃO JETRO (VERDE-ESCURO + DOURADO) */}
+        {/* CABEÇALHO DO PAINEL — PADRÃO HURAM (VERDE-ESCURO + DOURADO) */}
         <div className="bg-[#002817] text-white p-4 shrink-0 border-b border-[#C9A227]/30 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl bg-[#00140b] border border-[#C9A227]/50 flex items-center justify-center text-[#E4C46A] shadow-inner">
@@ -107,7 +107,7 @@ export function JetroCustomizationDrawer() {
                   Individual
                 </Badge>
               </div>
-              <p className="text-xs text-white/70">Configure o Jetro do seu jeito.</p>
+              <p className="text-xs text-white/70">Configure o HURAM do seu jeito.</p>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export function JetroCustomizationDrawer() {
             )}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Jetro On-line</span>
+            <span>HURAM On-line</span>
           </button>
 
           <button
@@ -599,7 +599,7 @@ export function JetroCustomizationDrawer() {
                   Pré-visualização do texto
                 </span>
                 <p className="text-sm font-bold text-foreground">
-                  JETRO — Plataforma Inteligente de Gestão Empresarial
+                  HURAM — Plataforma Inteligente de Gestão Empresarial
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Demonstração da tipografia com proporções harmônicas preservadas em títulos,
@@ -741,12 +741,12 @@ export function JetroCustomizationDrawer() {
           )}
 
           {/* ============================================================== */}
-          {/* 5. ABA JETRO ON-LINE (EXPERIÊNCIA VISUAL)                      */}
+          {/* 5. ABA HURAM ON-LINE (EXPERIÊNCIA VISUAL)                      */}
           {/* ============================================================== */}
           {activeTab === 'ia' && (
             <div className="space-y-4">
               <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground block">
-                EXPERIÊNCIA DO JETRO ON-LINE
+                EXPERIÊNCIA DO HURAM ON-LINE
               </span>
 
               <div className="space-y-2">
@@ -1010,7 +1010,7 @@ export function JetroCustomizationDrawer() {
             </div>
             <DialogDescription className="text-xs text-muted-foreground mt-2 leading-relaxed">
               Todas as personalizações visuais (tema, tamanhos de texto, cabeçalho fixo, animações e
-              tabelas) serão redefinidas para os padrões de fábrica do ERP Jetro para o seu usuário.
+              tabelas) serão redefinidas para os padrões de fábrica do ERP HURAM para o seu usuário.
             </DialogDescription>
           </DialogHeader>
 

@@ -513,14 +513,14 @@ export default function ChamadoDetalhesScreen() {
                           {c.mensagem}
                         </p>
 
-                        {/* Referência de Vídeo da Universidade Jetro */}
+                        {/* Referência de Vídeo da Universidade HURAM */}
                         {c.video_universidade_url && (
                           <div className="mt-2 p-2 rounded bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 flex items-center justify-between">
                             <div className="flex items-center gap-2 truncate">
                               <Youtube className="w-4 h-4 text-red-600 shrink-0" />
                               <div className="truncate">
                                 <span className="text-[10px] font-bold text-red-900 dark:text-red-300 block">
-                                  Universidade Jetro (Conteúdo Recomendado)
+                                  Universidade HURAM (Conteúdo Recomendado)
                                 </span>
                                 <span className="text-xs font-medium text-foreground truncate block">
                                   {c.video_universidade_titulo || 'Vídeo de Apoio'}
@@ -559,12 +559,12 @@ export default function ChamadoDetalhesScreen() {
                 />
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  {/* Select Universidade Jetro */}
+                  {/* Select Universidade HURAM */}
                   <div className="flex items-center gap-2 min-w-0 max-w-sm">
                     <BookOpen className="w-4 h-4 text-[#005B2E] dark:text-[#E4C46A] shrink-0" />
                     <Select value={videoSelecionadoMsg} onValueChange={setVideoSelecionadoMsg}>
                       <SelectTrigger className="text-[11px] h-7">
-                        <SelectValue placeholder="Vincular vídeo Universidade Jetro" />
+                        <SelectValue placeholder="Vincular vídeo Universidade HURAM" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Nenhum vídeo</SelectItem>
@@ -783,11 +783,11 @@ export default function ChamadoDetalhesScreen() {
               </div>
             )}
 
-            {/* Referência de Vídeo da Universidade Jetro */}
+            {/* Referência de Vídeo da Universidade HURAM */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Youtube className="w-3.5 h-3.5 text-red-600" />
-                <span>Referenciar Vídeo da Universidade Jetro (Opcional)</span>
+                <span>Referenciar Vídeo da Universidade HURAM (Opcional)</span>
               </Label>
               <Select value={videoSelecionadoStatus} onValueChange={setVideoSelecionadoStatus}>
                 <SelectTrigger className="text-xs h-8">

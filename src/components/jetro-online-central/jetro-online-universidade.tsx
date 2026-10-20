@@ -416,7 +416,7 @@ export function JetroOnlineUniversidadeScreen() {
             </div>
             <p className="text-xs text-gray-500 mt-1">
               Aceita apenas links válidos do YouTube. O vídeo poderá ser recomendado pelo assistente
-              Jetro On-line.
+              HURAM On-line.
             </p>
           </DialogHeader>
 

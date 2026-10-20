@@ -35,7 +35,7 @@ export function FeaturesHighlightSection() {
       title: 'Assistência por Inteligência Artificial',
       icon: Bot,
       description:
-        'Consulte indicadores e tire dúvidas em linguagem natural com o Jetro On-line e faça triagem inicial de visitantes com a assistente Jeh.',
+        'Consulte indicadores e tire dúvidas em linguagem natural com o HURAM On-line e faça triagem inicial de visitantes com a assistente Jeh.',
     },
     {
       title: 'Trilha de Auditoria & Histórico de Logs',

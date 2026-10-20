@@ -234,7 +234,7 @@ export function FloatingChat() {
     }
   }, [isDismissed])
 
-  // Somente usuários autenticados no ERP têm acesso ao Jetro On-line
+  // Somente usuários autenticados no ERP têm acesso ao HURAM On-line
   if (!isAuthenticated) {
     return null
   }
@@ -312,10 +312,10 @@ export function FloatingChat() {
       {/* Âncora invisível de compatibilidade */}
       <span id="floating-chat-trigger" className="hidden" aria-hidden="true" />
 
-      {/* PAINEL LATERAL DO JETRO ON-LINE (Abre somente quando acionado pela barra lateral) */}
+      {/* PAINEL LATERAL DO HURAM ON-LINE (Abre somente quando acionado pela barra lateral) */}
       {isFloatingOpen && (
         <aside
-          aria-label="Jetro On-line"
+          aria-label="HURAM On-line"
           className={cn(
             'fixed top-0 right-0 bottom-0 z-50 bg-white shadow-2xl border-l border-gray-200/90 flex flex-col transition-all duration-300 select-text',
             // Dimensões: painel lateral de largura média, ocupando a altura total da tela
@@ -371,7 +371,7 @@ export function FloatingChat() {
                 type="button"
                 onClick={handleOpenVideosModal}
                 className="flex-1 max-w-[130px] h-8 rounded-md bg-[#E85D4E] hover:bg-[#d94d3e] text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-                title="Vídeos da Universidade Jetro relacionados a esta tela ou gerais"
+                title="Vídeos da Universidade HURAM relacionados a esta tela ou gerais"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 <span>Vídeo</span>
@@ -413,24 +413,24 @@ export function FloatingChat() {
                 onClick={() => setShowDrawerMenu(!showDrawerMenu)}
                 className="text-gray-600 hover:text-gray-900 p-1.5 -ml-1 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
                 title="Histórico de conversas e opções"
-                aria-label="Abrir menu do Jetro On-line"
+                aria-label="Abrir menu do HURAM On-line"
               >
                 <Menu className="w-5 h-5 text-gray-700" />
               </button>
 
-              {/* Logotipo e Nome "Jetro On-line" com Avatar Oficial */}
+              {/* Logotipo e Nome "HURAM On-line" com Avatar Oficial */}
               <div className="flex items-center gap-2.5">
                 <div className="h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-md bg-[#002613]">
                   <img
                     src={JETRO_ONLINE_AVATAR_URL}
-                    alt="Jetro On-line"
+                    alt="HURAM On-line"
                     className="h-full w-full object-cover object-center"
                   />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5">
                     <h3 className="text-sm font-black tracking-tight text-gray-900 leading-none">
-                      Jetro <span className="text-[#005B2E]">On-line</span>
+                      HURAM <span className="text-[#005B2E]">On-line</span>
                     </h3>
                   </div>
                   {/* Indicador de status: bolinha verde + "Online · Pronto para responder" */}
@@ -514,7 +514,7 @@ export function FloatingChat() {
                   <h2 className="text-2xl sm:text-[28px] font-extrabold text-gray-900 tracking-tight leading-snug">
                     {userPrefs.jetroOnlineTypingEffect
                       ? typedGreeting
-                      : config?.saudacao_principal || 'Como posso te ajudar hoje no Jetro?'}
+                      : config?.saudacao_principal || 'Como posso te ajudar hoje no HURAM?'}
                     {userPrefs.jetroOnlineTypingEffect && (
                       <span
                         className={cn(
@@ -570,7 +570,7 @@ export function FloatingChat() {
                         <div className="w-7 h-7 rounded-full overflow-hidden border border-[#C9A227] shrink-0 shadow-2xs mt-1 bg-[#002613]">
                           <img
                             src={JETRO_ONLINE_AVATAR_URL}
-                            alt="Jetro On-line"
+                            alt="HURAM On-line"
                             className="w-full h-full object-cover object-center"
                           />
                         </div>
@@ -605,12 +605,12 @@ export function FloatingChat() {
                               )
                             })}
 
-                            {/* Recomendações explícitas de vídeos da Universidade Jetro */}
+                            {/* Recomendações explícitas de vídeos da Universidade HURAM */}
                             {msg.recommended_videos && msg.recommended_videos.length > 0 && (
                               <div className="mt-3 pt-2 border-t border-gray-200/80 space-y-1.5">
                                 <span className="text-[11px] font-bold text-gray-700 flex items-center gap-1">
                                   <BookOpen className="w-3 h-3 text-[#005B2E]" />
-                                  Universidade Jetro (Conteúdo Recomendado):
+                                  Universidade HURAM (Conteúdo Recomendado):
                                 </span>
                                 {msg.recommended_videos.map((vid) => (
                                   <a
@@ -682,7 +682,7 @@ export function FloatingChat() {
                     <div className="w-7 h-7 rounded-full overflow-hidden border border-[#C9A227] shrink-0 shadow-2xs mt-0.5 bg-[#002613]">
                       <img
                         src={JETRO_ONLINE_AVATAR_URL}
-                        alt="Jetro On-line"
+                        alt="HURAM On-line"
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
@@ -747,7 +747,7 @@ export function FloatingChat() {
 
                   {/* Botão de recurso de IA (ícone de brilhos/sparkles com fundo azul destacado, idêntico à imagem) */}
                   <div
-                    title="Inteligência Operacional Jetro On-line"
+                    title="Inteligência Operacional HURAM On-line"
                     className="h-7 w-7 rounded-lg bg-[#2563EB] text-white flex items-center justify-center shadow-xs"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-white" />
@@ -805,11 +805,11 @@ export function FloatingChat() {
                 <Youtube className="w-4 h-4" />
               </div>
               <DialogTitle className="text-base font-bold text-gray-900">
-                Universidade Jetro — Biblioteca de Treinamento em Vídeo
+                Universidade HURAM — Biblioteca de Treinamento em Vídeo
               </DialogTitle>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Vídeos oficiais com orientações práticas de cada módulo do ERP Jetro.
+              Vídeos oficiais com orientações práticas de cada módulo do ERP HURAM.
             </p>
           </DialogHeader>
 

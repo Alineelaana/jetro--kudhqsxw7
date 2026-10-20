@@ -21,7 +21,7 @@ export function JetroOnlineHistoricoScreen() {
     setLoading(true)
     try {
       const records = await pb.collection('audit_logs').getList(1, 50, {
-        filter: 'module = "Jetro On-line"',
+        filter: 'module = "HURAM On-line" || module = "Jetro On-line"',
         sort: '-created',
       })
       setLogs(records.items)

@@ -195,15 +195,15 @@ export function PlatformModulesSection() {
     },
     {
       id: 'ia-dupla',
-      title: 'Arquitetura de Duas IAs (Jeh & Jetro On-line)',
+      title: 'Arquitetura de Duas IAs (Jeh & HURAM On-line)',
       category: 'Inteligência Artificial Nativa',
       icon: BrainCircuit,
       status: 'Funcional',
       description:
-        'Duas inteligências complementares: a assistente Jeh dedicada à recepção comercial, triagem e captação de leads, e o Jetro On-line como copiloto interno para consultas analíticas e navegação no ERP.',
+        'Duas inteligências complementares: a assistente Jeh dedicada à recepção comercial, triagem e captação de leads, e o HURAM On-line como copiloto interno para consultas analíticas e navegação no ERP.',
       highlights: [
         'Jeh: triagem comercial e base de conhecimento no site',
-        'Jetro On-line: copiloto em linguagem natural e gráficos',
+        'HURAM On-line: copiloto em linguagem natural e gráficos',
         'Respeito rigoroso aos perfis e permissões internas',
         'Integração transparente ao fluxo de vendas e CRM',
       ],

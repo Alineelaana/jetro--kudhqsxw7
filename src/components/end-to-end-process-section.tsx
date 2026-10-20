@@ -52,7 +52,7 @@ export function EndToEndProcessSection() {
       subtitle: 'Inteligência Estratégica',
       icon: PieChart,
       description:
-        'Atualização dos indicadores executivos de margem, giro, rentabilidade por produto/cliente e consultas analíticas pelo Jetro On-line.',
+        'Atualização dos indicadores executivos de margem, giro, rentabilidade por produto/cliente e consultas analíticas pelo HURAM On-line.',
       output: 'Decisões embasadas em dados em tempo real',
     },
   ]
