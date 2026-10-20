@@ -258,18 +258,18 @@ export function PlatformModulesSection() {
   return (
     <section
       id="solucoes"
-      className="py-20 sm:py-28 bg-[#001c10] text-white border-t border-white/5"
+      className="py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6]"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho da Seção */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-[#C9A227]/30 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
             Soluções & Módulos Integrados
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Uma plataforma. <span className="text-[#C9A227]">Diferentes áreas da sua empresa.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
+            Uma plataforma. <span className="text-[#116B50]">Diferentes áreas da sua empresa.</span>
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
             O Jetro unifica os departamentos operacionais, administrativos e estratégicos da sua
             organização em um único sistema, eliminando controles isolados e retrabalho.
           </p>
@@ -283,18 +283,18 @@ export function PlatformModulesSection() {
             return (
               <div
                 key={m.id}
-                className="group relative rounded-2xl p-6 bg-slate-950/70 border border-white/10 hover:border-[#C9A227]/50 transition-all duration-300 flex flex-col justify-between shadow-lg hover:shadow-[#C9A227]/10"
+                className="group relative rounded-2xl p-6 sm:p-7 bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 flex flex-col justify-between shadow-xs hover:shadow-md text-left"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-[#C9A227] group-hover:scale-105 transition-transform">
-                      <Icon className="w-5 h-5" />
+                    <div className="w-11 h-11 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#063D30] group-hover:scale-105 group-hover:border-[#116B50]/40 transition-all">
+                      <Icon className="w-5 h-5 text-[#116B50]" />
                     </div>
                     <span
-                      className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border ${
+                      className={`text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full border ${
                         isDev
-                          ? 'bg-amber-950/60 text-amber-300 border-amber-500/30'
-                          : 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30'
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : 'bg-emerald-50 text-[#063D30] border-emerald-200'
                       }`}
                     >
                       {m.status}
@@ -302,27 +302,27 @@ export function PlatformModulesSection() {
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-semibold text-[#C9A227] tracking-wider uppercase block">
+                    <span className="text-[11px] font-semibold text-[#C69B45] tracking-wider uppercase block">
                       {m.category}
                     </span>
-                    <h3 className="text-lg font-bold text-white group-hover:text-[#f6d77c] transition-colors mt-0.5">
+                    <h3 className="text-lg font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors mt-0.5">
                       {m.title}
                     </h3>
                   </div>
 
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-[#66736D] text-xs sm:text-sm leading-relaxed font-normal">
                     {m.description}
                   </p>
                 </div>
 
-                <div className="pt-5 mt-5 border-t border-white/5">
-                  <ul className="space-y-1.5">
+                <div className="pt-5 mt-5 border-t border-[#E4EAE6]">
+                  <ul className="space-y-2">
                     {m.highlights.map((h, i) => (
                       <li
                         key={i}
-                        className="text-[11px] sm:text-xs text-slate-300 flex items-start gap-2"
+                        className="text-[11px] sm:text-xs text-[#202B28]/80 flex items-start gap-2 font-normal"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227] mt-1.5 shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#116B50] mt-1.5 shrink-0" />
                         <span>{h}</span>
                       </li>
                     ))}
@@ -334,11 +334,11 @@ export function PlatformModulesSection() {
         </div>
 
         {/* Nota de transparência técnica */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-white/10 text-center max-w-3xl mx-auto">
-          <p className="text-xs text-slate-400">
-            <strong className="text-slate-200">Compromisso com a realidade:</strong> todos os
-            módulos classificados como funcionais estão ativos na base oficial do Jetro ERP na Skip
-            Cloud, disponíveis para demonstração com dados homologados.
+        <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] text-center max-w-3xl mx-auto">
+          <p className="text-xs text-[#66736D] leading-relaxed">
+            <strong className="text-[#202B28] font-semibold">Compromisso com a realidade:</strong>{' '}
+            todos os módulos classificados como funcionais estão ativos na base oficial do Jetro ERP
+            na Skip Cloud, disponíveis para demonstração com dados homologados.
           </p>
         </div>
       </div>

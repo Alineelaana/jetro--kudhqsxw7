@@ -144,53 +144,67 @@ export function SystemScreensGallery() {
     switch (type) {
       case 'dashboard':
         return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3 bg-slate-900 rounded-lg border border-white/5">
-                <span className="text-[10px] text-slate-400 block uppercase">Receita Bruta</span>
-                <span className="text-base sm:text-lg font-bold text-white">R$ 1.482.350</span>
-                <span className="text-[10px] text-emerald-400 block mt-0.5">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="p-2.5 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[10px] text-[#66736D] block uppercase font-medium">
+                  Receita Bruta
+                </span>
+                <span className="text-sm sm:text-base font-semibold font-heading text-[#063D30]">
+                  R$ 1.482.350
+                </span>
+                <span className="text-[10px] text-[#116B50] block mt-0.5 font-medium">
                   +12,4% vs mês anterior
                 </span>
               </div>
-              <div className="p-3 bg-slate-900 rounded-lg border border-white/5">
-                <span className="text-[10px] text-slate-400 block uppercase">
+              <div className="p-2.5 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[10px] text-[#66736D] block uppercase font-medium">
                   Margem Operacional
                 </span>
-                <span className="text-base sm:text-lg font-bold text-[#f6d77c]">28,6%</span>
-                <span className="text-[10px] text-slate-300 block mt-0.5">Meta atingida</span>
+                <span className="text-sm sm:text-base font-semibold font-heading text-[#063D30]">
+                  28,6%
+                </span>
+                <span className="text-[10px] text-[#C69B45] block mt-0.5 font-medium">
+                  Meta atingida
+                </span>
               </div>
-              <div className="p-3 bg-slate-900 rounded-lg border border-white/5">
-                <span className="text-[10px] text-slate-400 block uppercase">
+              <div className="p-2.5 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[10px] text-[#66736D] block uppercase font-medium">
                   Títulos em Aberto
                 </span>
-                <span className="text-base sm:text-lg font-bold text-white">R$ 318.420</span>
-                <span className="text-[10px] text-emerald-400 block mt-0.5">
+                <span className="text-sm sm:text-base font-semibold font-heading text-[#063D30]">
+                  R$ 318.420
+                </span>
+                <span className="text-[10px] text-[#116B50] block mt-0.5 font-medium">
                   Inadimplência 1,8%
                 </span>
               </div>
-              <div className="p-3 bg-slate-900 rounded-lg border border-white/5">
-                <span className="text-[10px] text-slate-400 block uppercase">
+              <div className="p-2.5 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[10px] text-[#66736D] block uppercase font-medium">
                   Entregas no Prazo
                 </span>
-                <span className="text-base sm:text-lg font-bold text-white">97,8%</span>
-                <span className="text-[10px] text-emerald-400 block mt-0.5">SLA cumprido</span>
+                <span className="text-sm sm:text-base font-semibold font-heading text-[#063D30]">
+                  97,8%
+                </span>
+                <span className="text-[10px] text-[#116B50] block mt-0.5 font-medium">
+                  SLA cumprido
+                </span>
               </div>
             </div>
 
-            <div className="h-28 bg-slate-900/90 rounded-lg border border-white/5 p-3 flex flex-col justify-between">
-              <div className="flex justify-between items-center text-xs text-slate-300">
-                <span className="font-semibold">Curva de Faturamento Semanal</span>
-                <span className="text-[10px] text-slate-400">Dados demonstrativos</span>
+            <div className="h-24 bg-white rounded-lg border border-[#E4EAE6] p-2.5 flex flex-col justify-between">
+              <div className="flex justify-between items-center text-xs text-[#202B28]">
+                <span className="font-semibold text-[11px]">Curva de Faturamento Semanal</span>
+                <span className="text-[10px] text-[#66736D]">Dados demonstrativos</span>
               </div>
-              <div className="flex items-end justify-between gap-2 h-16 pt-2">
+              <div className="flex items-end justify-between gap-2 h-14 pt-1">
                 {[45, 60, 52, 78, 65, 88, 92].map((v, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
                     <div
-                      className="w-full bg-gradient-to-t from-emerald-700 to-[#C9A227] rounded-t-sm"
+                      className="w-full bg-[#063D30] hover:bg-[#116B50] transition-colors rounded-t-sm"
                       style={{ height: `${v}%` }}
                     />
-                    <span className="text-[9px] text-slate-500">D{i + 1}</span>
+                    <span className="text-[9px] text-[#66736D]">D{i + 1}</span>
                   </div>
                 ))}
               </div>
@@ -200,51 +214,59 @@ export function SystemScreensGallery() {
 
       case 'pedidos':
         return (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-slate-300 pb-1 border-b border-white/10">
-              <span className="font-semibold">Grid Jetro Table · Pedidos de Venda</span>
-              <span className="text-[10px] text-[#C9A227]">Colunas personalizáveis</span>
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between text-xs text-[#202B28] pb-1 border-b border-[#E4EAE6]">
+              <span className="font-semibold text-[11px]">Grid Jetro Table · Pedidos de Venda</span>
+              <span className="text-[10px] text-[#C69B45] font-medium">
+                Colunas personalizáveis
+              </span>
             </div>
-            <div className="overflow-x-auto text-xs">
+            <div className="overflow-x-auto text-xs bg-white rounded-lg border border-[#E4EAE6]">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-white/10 text-slate-400 text-[10px] uppercase">
+                  <tr className="border-b border-[#E4EAE6] bg-[#F8FAF9] text-[#66736D] text-[10px] uppercase font-semibold">
                     <th className="py-1.5 px-2">Pedido</th>
                     <th className="py-1.5 px-2">Cliente</th>
                     <th className="py-1.5 px-2">Status</th>
                     <th className="py-1.5 px-2 text-right">Valor</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-slate-200">
+                <tbody className="divide-y divide-[#E4EAE6] text-[#202B28]">
                   <tr>
-                    <td className="py-2 px-2 font-mono text-emerald-400">PED-00482</td>
-                    <td className="py-2 px-2">Comercial Alvorada Ltda</td>
-                    <td className="py-2 px-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                    <td className="py-1.5 px-2 font-mono text-[#063D30] font-semibold text-[11px]">
+                      PED-00482
+                    </td>
+                    <td className="py-1.5 px-2 text-[11px]">Comercial Alvorada Ltda</td>
+                    <td className="py-1.5 px-2">
+                      <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-50 text-[#063D30] border border-emerald-200 font-medium">
                         Faturado
                       </span>
                     </td>
-                    <td className="py-2 px-2 text-right font-medium">R$ 24.580,00</td>
+                    <td className="py-1.5 px-2 text-right font-medium text-[11px]">R$ 24.580,00</td>
                   </tr>
                   <tr>
-                    <td className="py-2 px-2 font-mono text-emerald-400">PED-00483</td>
-                    <td className="py-2 px-2">Distribuidora Serra Azul</td>
-                    <td className="py-2 px-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] bg-blue-950 text-blue-300 border border-blue-500/30">
+                    <td className="py-1.5 px-2 font-mono text-[#063D30] font-semibold text-[11px]">
+                      PED-00483
+                    </td>
+                    <td className="py-1.5 px-2 text-[11px]">Distribuidora Serra Azul</td>
+                    <td className="py-1.5 px-2">
+                      <span className="px-2 py-0.5 rounded text-[10px] bg-blue-50 text-blue-800 border border-blue-200 font-medium">
                         Em Separação
                       </span>
                     </td>
-                    <td className="py-2 px-2 text-right font-medium">R$ 18.210,00</td>
+                    <td className="py-1.5 px-2 text-right font-medium text-[11px]">R$ 18.210,00</td>
                   </tr>
                   <tr>
-                    <td className="py-2 px-2 font-mono text-emerald-400">PED-00484</td>
-                    <td className="py-2 px-2">Supermercado Horizonte</td>
-                    <td className="py-2 px-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] bg-amber-950 text-amber-300 border border-amber-500/30">
+                    <td className="py-1.5 px-2 font-mono text-[#063D30] font-semibold text-[11px]">
+                      PED-00484
+                    </td>
+                    <td className="py-1.5 px-2 text-[11px]">Supermercado Horizonte</td>
+                    <td className="py-1.5 px-2">
+                      <span className="px-2 py-0.5 rounded text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-medium">
                         Aguard. Aprovação
                       </span>
                     </td>
-                    <td className="py-2 px-2 text-right font-medium">R$ 41.900,00</td>
+                    <td className="py-1.5 px-2 text-right font-medium text-[11px]">R$ 41.900,00</td>
                   </tr>
                 </tbody>
               </table>
@@ -254,27 +276,41 @@ export function SystemScreensGallery() {
 
       case 'financeiro':
         return (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2 bg-slate-900 rounded border border-white/5">
-                <span className="text-[9px] text-slate-400 block uppercase">A Receber Hoje</span>
-                <span className="text-xs sm:text-sm font-bold text-emerald-400">R$ 54.200</span>
+              <div className="p-2 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[9px] text-[#66736D] block uppercase font-medium">
+                  A Receber Hoje
+                </span>
+                <span className="text-xs sm:text-sm font-semibold font-heading text-[#116B50]">
+                  R$ 54.200
+                </span>
               </div>
-              <div className="p-2 bg-slate-900 rounded border border-white/5">
-                <span className="text-[9px] text-slate-400 block uppercase">A Pagar Hoje</span>
-                <span className="text-xs sm:text-sm font-bold text-amber-400">R$ 38.150</span>
+              <div className="p-2 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[9px] text-[#66736D] block uppercase font-medium">
+                  A Pagar Hoje
+                </span>
+                <span className="text-xs sm:text-sm font-semibold font-heading text-amber-700">
+                  R$ 38.150
+                </span>
               </div>
-              <div className="p-2 bg-slate-900 rounded border border-white/5">
-                <span className="text-[9px] text-slate-400 block uppercase">Saldo Projetado</span>
-                <span className="text-xs sm:text-sm font-bold text-[#f6d77c]">+ R$ 16.050</span>
+              <div className="p-2 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[9px] text-[#66736D] block uppercase font-medium">
+                  Saldo Projetado
+                </span>
+                <span className="text-xs sm:text-sm font-semibold font-heading text-[#063D30]">
+                  + R$ 16.050
+                </span>
               </div>
             </div>
-            <div className="p-3 bg-slate-900/90 rounded border border-white/5 text-xs space-y-2">
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="font-semibold">Conciliação Bancária Itaú (Conta 2480-1)</span>
-                <span className="text-[10px] text-emerald-400">100% Conciliado</span>
+            <div className="p-2.5 bg-white rounded-lg border border-[#E4EAE6] text-xs space-y-1.5 text-left">
+              <div className="flex justify-between items-center text-[#202B28]">
+                <span className="font-semibold text-[11px]">
+                  Conciliação Bancária Itaú (Conta 2480-1)
+                </span>
+                <span className="text-[10px] text-[#116B50] font-medium">100% Conciliado</span>
               </div>
-              <div className="text-[11px] text-slate-400">
+              <div className="text-[11px] text-[#66736D]">
                 Último lote importado por OFX com 42 transações liquidadas sem divergências.
               </div>
             </div>
@@ -283,34 +319,38 @@ export function SystemScreensGallery() {
 
       case 'fiscal':
         return (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-slate-300 pb-1 border-b border-white/10">
-              <span className="font-semibold">Painel NF-e · Status SEFAZ</span>
-              <span className="flex items-center gap-1 text-[10px] text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between text-xs text-[#202B28] pb-1 border-b border-[#E4EAE6]">
+              <span className="font-semibold text-[11px]">Painel NF-e · Status SEFAZ</span>
+              <span className="flex items-center gap-1 text-[10px] text-[#116B50] font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#116B50] inline-block" />
                 SEFAZ Operacional
               </span>
             </div>
             <div className="space-y-2 text-xs">
-              <div className="p-2 bg-slate-900 rounded flex justify-between items-center border border-white/5">
+              <div className="p-2 bg-white rounded-lg flex justify-between items-center border border-[#E4EAE6] text-left">
                 <div>
-                  <span className="font-mono text-emerald-400">NF-e 001.942 · Série 1</span>
-                  <span className="text-[10px] text-slate-400 block">
+                  <span className="font-mono text-[#063D30] font-semibold text-[11px]">
+                    NF-e 001.942 · Série 1
+                  </span>
+                  <span className="text-[10px] text-[#66736D] block">
                     Chave: 3226 0812 3456 7890 0001
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-50 text-[#063D30] border border-emerald-200 font-medium">
                   Autorizada
                 </span>
               </div>
-              <div className="p-2 bg-slate-900 rounded flex justify-between items-center border border-white/5">
+              <div className="p-2 bg-white rounded-lg flex justify-between items-center border border-[#E4EAE6] text-left">
                 <div>
-                  <span className="font-mono text-emerald-400">MDF-e 000.318 · Série 1</span>
-                  <span className="text-[10px] text-slate-400 block">
+                  <span className="font-mono text-[#063D30] font-semibold text-[11px]">
+                    MDF-e 000.318 · Série 1
+                  </span>
+                  <span className="text-[10px] text-[#66736D] block">
                     Manifesto Eletrônico de Carga
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-50 text-[#063D30] border border-emerald-200 font-medium">
                   Encerrado
                 </span>
               </div>
@@ -320,27 +360,41 @@ export function SystemScreensGallery() {
 
       case 'wms':
         return (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <div className="grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="p-2 bg-slate-900 rounded border border-white/5">
-                <span className="text-[9px] text-slate-400 block uppercase">Doca 01</span>
-                <span className="font-bold text-white">Recebimento</span>
+              <div className="p-2 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[9px] text-[#66736D] block uppercase font-medium">
+                  Doca 01
+                </span>
+                <span className="font-semibold font-heading text-[#063D30] text-xs sm:text-sm">
+                  Recebimento
+                </span>
               </div>
-              <div className="p-2 bg-slate-900 rounded border border-white/5">
-                <span className="text-[9px] text-slate-400 block uppercase">Ondas Ativas</span>
-                <span className="font-bold text-[#f6d77c]">4 em Separação</span>
+              <div className="p-2 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[9px] text-[#66736D] block uppercase font-medium">
+                  Ondas Ativas
+                </span>
+                <span className="font-semibold font-heading text-[#C69B45] text-xs sm:text-sm">
+                  4 em Separação
+                </span>
               </div>
-              <div className="p-2 bg-slate-900 rounded border border-white/5">
-                <span className="text-[9px] text-slate-400 block uppercase">Expedição</span>
-                <span className="font-bold text-emerald-400">3 Romaneios</span>
+              <div className="p-2 bg-white rounded-lg border border-[#E4EAE6]">
+                <span className="text-[9px] text-[#66736D] block uppercase font-medium">
+                  Expedição
+                </span>
+                <span className="font-semibold font-heading text-[#116B50] text-xs sm:text-sm">
+                  3 Romaneios
+                </span>
               </div>
             </div>
-            <div className="p-3 bg-slate-900/90 rounded border border-white/5 text-xs text-slate-300 space-y-1.5">
+            <div className="p-2.5 bg-white rounded-lg border border-[#E4EAE6] text-xs text-[#202B28] space-y-1 text-left">
               <div className="flex justify-between items-center">
-                <span className="font-semibold">Romaneio ROM-2026-089</span>
-                <span className="text-[10px] text-emerald-400 font-mono">14 Entregas</span>
+                <span className="font-semibold text-[11px]">Romaneio ROM-2026-089</span>
+                <span className="text-[10px] text-[#116B50] font-mono font-medium">
+                  14 Entregas
+                </span>
               </div>
-              <div className="text-[11px] text-slate-400">
+              <div className="text-[11px] text-[#66736D]">
                 Rota Grande Vitória · Veículo Placa ABC-4E21 · Motorista alocado com POD mobile
                 ativo.
               </div>
@@ -350,25 +404,25 @@ export function SystemScreensGallery() {
 
       case 'jetro-online':
         return (
-          <div className="space-y-2.5 text-xs">
-            <div className="p-2.5 rounded-lg bg-emerald-950/60 border border-emerald-500/20 text-slate-200">
-              <span className="text-[10px] font-bold text-[#C9A227] uppercase block mb-1">
+          <div className="space-y-2 text-xs text-left">
+            <div className="p-2.5 rounded-lg bg-[#F8FAF9] border border-[#E4EAE6] text-[#202B28]">
+              <span className="text-[10px] font-semibold text-[#C69B45] uppercase block mb-1">
                 Pergunta do Usuário
               </span>
               &ldquo;Jetro, qual o faturamento acumulado do canal Atacado neste mês e a margem
               média?&rdquo;
             </div>
-            <div className="p-2.5 rounded-lg bg-slate-900 border border-white/10 text-slate-200 space-y-1.5">
-              <span className="text-[10px] font-bold text-emerald-400 uppercase block">
+            <div className="p-2.5 rounded-lg bg-white border border-[#E4EAE6] text-[#202B28] space-y-1">
+              <span className="text-[10px] font-semibold text-[#116B50] uppercase block">
                 Resposta do Jetro On-line
               </span>
-              <p className="text-[11px] leading-relaxed">
+              <p className="text-[11px] leading-relaxed text-[#202B28]">
                 No canal <strong>Atacado</strong>, o faturamento acumulado é de{' '}
                 <strong>R$ 842.190,00</strong> com margem bruta média de <strong>29,4%</strong>. Os
                 3 produtos mais representativos são Linha A (38%), Linha B (24%) e Linha C (15%).
               </p>
-              <div className="pt-1 text-[10px] text-slate-400 border-t border-white/5 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-[#C9A227]" />
+              <div className="pt-1 text-[10px] text-[#66736D] border-t border-[#E4EAE6] flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-[#C69B45]" />
                 Resposta baseada nas coleções `sales_orders` e `products` em tempo real.
               </div>
             </div>
@@ -378,17 +432,20 @@ export function SystemScreensGallery() {
   }
 
   return (
-    <section id="telas" className="py-20 sm:py-28 bg-[#00140b] text-white border-t border-white/5">
+    <section
+      id="telas"
+      className="py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6]"
+    >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-[#C9A227]/30 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
             Galeria do Sistema Real
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Conheça o Jetro <span className="text-[#C9A227]">por dentro.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
+            Conheça o Jetro <span className="text-[#116B50]">por dentro.</span>
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
             Navegue pelas interfaces operacionais reais do ERP. Telas organizadas, dados
             estruturados e fluxos projetados para dar produtividade à equipe do primeiro ao último
             clique.
@@ -402,8 +459,8 @@ export function SystemScreensGallery() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   activeCategory === cat
-                    ? 'bg-[#C9A227] text-gray-950 shadow-md shadow-[#C9A227]/20 font-bold'
-                    : 'bg-slate-900/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-white/5'
+                    ? 'bg-[#063D30] text-white shadow-xs font-medium'
+                    : 'bg-white text-[#66736D] hover:text-[#063D30] hover:bg-[#F1F4F2] border border-[#E4EAE6]'
                 }`}
               >
                 {cat}
@@ -417,21 +474,21 @@ export function SystemScreensGallery() {
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className="rounded-2xl bg-slate-950/80 border border-white/10 hover:border-[#C9A227]/50 transition-all duration-300 overflow-hidden flex flex-col justify-between group shadow-xl"
+              className="rounded-2xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group shadow-xs hover:shadow-md text-left"
             >
               {/* Moldura da Janela do ERP */}
-              <div className="border-b border-white/5 bg-slate-900/90 px-3.5 py-2 flex items-center justify-between text-xs text-slate-400">
+              <div className="border-b border-[#E4EAE6] bg-[#F8FAF9] px-3.5 py-2.5 flex items-center justify-between text-xs text-[#66736D]">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-                  <span className="ml-2 font-mono text-[10px] text-slate-300 truncate max-w-[170px]">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                  <span className="ml-2 font-mono text-[10px] text-[#202B28]/80 font-medium truncate max-w-[170px]">
                     {item.module}
                   </span>
                 </div>
                 <button
                   onClick={() => setActiveItem(item)}
-                  className="text-slate-400 hover:text-[#C9A227] transition-colors p-1"
+                  className="text-[#66736D] hover:text-[#063D30] transition-colors p-1 cursor-pointer"
                   title="Expandir detalhes da tela"
                   aria-label="Expandir detalhes da tela"
                 >
@@ -440,29 +497,31 @@ export function SystemScreensGallery() {
               </div>
 
               {/* Preview Interativo Demonstrativo */}
-              <div className="p-4 bg-slate-950 min-h-[190px] flex flex-col justify-center">
+              <div className="p-4 bg-[#F8FAF9]/50 min-h-[190px] flex flex-col justify-center">
                 {renderMockup(item.previewType)}
               </div>
 
               {/* Informações Comerciais */}
-              <div className="p-5 border-t border-white/5 space-y-3 bg-slate-900/30 flex-1 flex flex-col justify-between">
+              <div className="p-5 sm:p-6 border-t border-[#E4EAE6] space-y-3 bg-white flex-1 flex flex-col justify-between">
                 <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#C9A227]">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C69B45]">
                     {item.category}
                   </span>
-                  <h3 className="text-base font-bold text-white group-hover:text-[#f6d77c] transition-colors">
+                  <h3 className="text-base font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed">{item.summary}</p>
+                  <p className="text-xs text-[#66736D] leading-relaxed font-normal">
+                    {item.summary}
+                  </p>
                 </div>
 
                 <Button
                   onClick={() => setActiveItem(item)}
                   variant="outline"
                   size="sm"
-                  className="w-full mt-2 border-white/10 hover:border-[#C9A227] text-slate-200 hover:text-white bg-transparent text-xs font-semibold"
+                  className="w-full mt-2 border-[#E4EAE6] hover:border-[#063D30]/40 text-[#063D30] hover:text-[#063D30] bg-white hover:bg-[#F8FAF9] text-xs font-semibold cursor-pointer"
                 >
-                  <Maximize2 className="w-3.5 h-3.5 mr-1.5 text-[#C9A227]" />
+                  <Maximize2 className="w-3.5 h-3.5 mr-1.5 text-[#116B50]" />
                   Ver detalhes da interface
                 </Button>
               </div>
@@ -472,20 +531,20 @@ export function SystemScreensGallery() {
 
         {/* Modal Lightbox com Detalhes da Tela */}
         {activeItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="relative w-full max-w-3xl rounded-2xl bg-slate-950 border border-[#C9A227]/40 shadow-2xl p-6 sm:p-8 space-y-6 text-left max-h-[90vh] overflow-y-auto">
-              <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#202B28]/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="relative w-full max-w-3xl rounded-2xl bg-white border border-[#E4EAE6] shadow-xl p-6 sm:p-8 space-y-6 text-left max-h-[90vh] overflow-y-auto">
+              <div className="flex items-start justify-between gap-4 border-b border-[#E4EAE6] pb-4">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#C9A227]">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#C69B45]">
                     {activeItem.module} · {activeItem.category}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
+                  <h3 className="text-xl sm:text-2xl font-semibold font-heading text-[#063D30] mt-1">
                     {activeItem.title}
                   </h3>
                 </div>
                 <button
                   onClick={() => setActiveItem(null)}
-                  className="p-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-white/10"
+                  className="p-1.5 rounded-lg bg-[#F8FAF9] text-[#66736D] hover:text-[#202B28] border border-[#E4EAE6] cursor-pointer"
                   aria-label="Fechar visualização"
                 >
                   <X className="w-5 h-5" />
@@ -493,10 +552,10 @@ export function SystemScreensGallery() {
               </div>
 
               {/* Pré-visualização da Interface */}
-              <div className="rounded-xl border border-white/10 bg-slate-900/70 p-4 sm:p-5">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-3 pb-2 border-b border-white/10 font-mono">
+              <div className="rounded-xl border border-[#E4EAE6] bg-[#F8FAF9] p-4 sm:p-5">
+                <div className="flex items-center justify-between text-xs text-[#66736D] mb-3 pb-2 border-b border-[#E4EAE6] font-mono">
                   <span>Demonstração com dados estruturados protegidos</span>
-                  <span className="text-emerald-400 font-sans text-[11px] font-semibold">
+                  <span className="text-[#116B50] font-sans text-[11px] font-semibold">
                     ✓ Ambiente Homologado
                   </span>
                 </div>
@@ -505,20 +564,20 @@ export function SystemScreensGallery() {
 
               {/* Explicação Técnica e Funcional */}
               <div className="space-y-3">
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                <h4 className="text-sm font-semibold font-heading text-[#063D30] uppercase tracking-wider">
                   Recursos em Destaque Nesta Tela
                 </h4>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {activeItem.details.map((d, i) => (
-                    <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-[#C9A227] shrink-0 mt-0.5" />
+                    <li key={i} className="text-xs text-[#202B28]/80 flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#116B50] shrink-0 mt-0.5" />
                       <span>{d}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+              <div className="pt-2 border-t border-[#E4EAE6] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#66736D]">
                 <span>Quer ver essa tela em operação com sua equipe?</span>
                 <Button
                   onClick={() => {
@@ -526,7 +585,7 @@ export function SystemScreensGallery() {
                     const el = document.getElementById('contato')
                     if (el) el.scrollIntoView({ behavior: 'smooth' })
                   }}
-                  className="w-full sm:w-auto bg-[#005A36] hover:bg-[#004225] border border-[#C9A227]/40 text-white font-bold text-xs px-5"
+                  className="w-full sm:w-auto bg-[#063D30] hover:bg-[#042820] text-white font-semibold text-xs px-5 py-2.5 rounded-xl cursor-pointer shadow-sm hover:shadow transition-all"
                 >
                   Solicitar Demonstração Guiada
                 </Button>
@@ -536,11 +595,11 @@ export function SystemScreensGallery() {
         )}
 
         {/* Nota explicativa de segurança */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-white/10 text-center max-w-3xl mx-auto">
-          <p className="text-xs text-slate-400">
-            <strong className="text-slate-200">Privacidade assegurada:</strong> todas as
-            demonstrações visuais utilizam dados fictícios homologados para conformidade com a LGPD
-            e sigilo corporativo. Nenhum dado de clientes em produção é exposto publicamente.
+        <div className="p-4 rounded-xl bg-white border border-[#E4EAE6] text-center max-w-3xl mx-auto shadow-2xs">
+          <p className="text-xs text-[#66736D] leading-relaxed">
+            <strong className="text-[#202B28] font-semibold">Privacidade assegurada:</strong> todas
+            as demonstrações visuais utilizam dados fictícios homologados para conformidade com a
+            LGPD e sigilo corporativo. Nenhum dado de clientes em produção é exposto publicamente.
           </p>
         </div>
       </div>

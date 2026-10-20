@@ -88,29 +88,29 @@ export default function Index() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="bg-[#063D30] text-white px-6 sm:px-10 py-10 sm:py-12 text-center space-y-3 rounded-t-2xl border border-[#063D30] shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#C69B45]/10 rounded-full blur-3xl pointer-events-none" />
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-[#C69B45]/50 text-[#C69B45] text-xs font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#C69B45] text-xs font-semibold tracking-wide">
               <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
               Solicitação de Demonstração Guiada
             </span>
-            <h2 className="text-2xl sm:text-4xl font-bold font-heading text-white tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-semibold font-heading text-white tracking-tight">
               Fale com nossos consultores de solução
             </h2>
-            <p className="text-slate-200 max-w-2xl mx-auto text-xs sm:text-base leading-relaxed font-normal">
+            <p className="text-slate-200/90 max-w-2xl mx-auto text-xs sm:text-base leading-relaxed font-normal">
               Conte-nos brevemente o segmento e os objetivos da sua empresa para que nossa equipe
               demonstre os módulos HURAM mais indicados para sua operação.
             </p>
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-slate-300">
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-slate-200/80">
               <a
                 href="https://wa.me/5531991297619"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-white font-semibold hover:text-[#C69B45] transition-colors"
+                className="inline-flex items-center gap-2 text-white font-medium hover:text-[#C69B45] transition-colors"
               >
                 <PhoneCall className="w-4 h-4 text-[#C69B45]" />
                 WhatsApp Comercial: +55 (31) 99129-7619
               </a>
-              <span className="hidden sm:inline text-white/30">|</span>
-              <span className="inline-flex items-center gap-1.5 text-slate-300">
+              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="inline-flex items-center gap-1.5 text-slate-200/80">
                 <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
                 Armazenamento seguro em conformidade com LGPD
               </span>

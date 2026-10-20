@@ -76,39 +76,41 @@ export function FeaturesHighlightSection() {
   ]
 
   return (
-    <section className="py-20 sm:py-28 bg-[#001c10] text-white border-t border-white/5">
+    <section className="py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6]">
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-[#C9A227]/30 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
             Recursos Operacionais em Destaque
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Tecnologia prática pensada para o <span className="text-[#C9A227]">dia a dia.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
+            Tecnologia prática pensada para o <span className="text-[#116B50]">dia a dia.</span>
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
             Funcionalidades construídas para resolver gargalos reais de operação. Sem excesso de
             cliques, sem complexidade desnecessária.
           </p>
         </div>
 
         {/* Grid de Recursos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-left">
           {features.map((f, i) => {
             const Icon = f.icon
             return (
               <div
                 key={i}
-                className="rounded-xl bg-slate-950/70 border border-white/10 p-4 hover:border-[#C9A227]/40 transition-all duration-300 flex flex-col justify-between group shadow-sm hover:shadow-md"
+                className="rounded-xl bg-white border border-[#E4EAE6] p-4 sm:p-5 hover:border-[#116B50]/40 transition-all duration-300 flex flex-col justify-between group shadow-2xs hover:shadow-md"
               >
                 <div className="space-y-3">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-500/20 flex items-center justify-center text-[#C9A227] group-hover:scale-105 transition-transform">
+                  <div className="w-9 h-9 rounded-lg bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#116B50] group-hover:scale-105 transition-transform">
                     <Icon className="w-4 h-4" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#f6d77c] transition-colors leading-snug">
+                  <h3 className="text-xs sm:text-sm font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors leading-snug">
                     {f.title}
                   </h3>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">{f.description}</p>
+                  <p className="text-[11px] text-[#66736D] leading-relaxed font-normal">
+                    {f.description}
+                  </p>
                 </div>
               </div>
             )

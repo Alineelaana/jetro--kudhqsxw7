@@ -192,81 +192,74 @@ export function JehSection() {
   return (
     <section
       id="jeh"
-      className="relative bg-gradient-to-b from-[#001D0F] via-[#002B17] to-[#002212] text-white py-16 sm:py-20 lg:py-24 border-b border-[#C9A227]/30 overflow-hidden"
+      className="relative bg-white text-[#202B28] py-16 sm:py-20 lg:py-24 border-b border-[#E4EAE6] overflow-hidden"
     >
       {/* Âncora alternativa para preservar links legados (#nine-ia) e diretos (#ia) */}
       <span id="nine-ia" className="absolute -top-24 pointer-events-none" />
       <span id="ia" className="absolute -top-24 pointer-events-none" />
-      {/* Luzes de ambientação sutis */}
-      <div className="absolute -top-32 -left-32 w-80 h-80 bg-[#005B2E]/30 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute top-1/2 -right-32 w-96 h-96 bg-[#C9A227]/15 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 space-y-16 sm:space-y-20">
         {/* ============================================================== */}
         {/* 1. CABEÇALHO E APRESENTAÇÃO INSTITUCIONAL DA JEH                */}
-        {/* Layout equilibrado: foto média/pequena ao lado do título      */}
         {/* ============================================================== */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Coluna Visual de Identificação: foto circular compacta com badge */}
+          {/* Coluna Visual de Identificação */}
           <div className="lg:col-span-4 flex justify-center lg:justify-start">
             <div className="relative flex flex-col items-center text-center">
-              {/* Moldura circular compacta (180px sm / 208px md) */}
-              <div className="relative group">
-                <div className="absolute -inset-2 rounded-full bg-gradient-to-tr from-[#005B2E] via-[#C9A227] to-[#FFE28A] opacity-60 blur-lg group-hover:opacity-85 transition-opacity duration-500" />
-                <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full p-1.5 bg-gradient-to-tr from-[#C9A227] via-[#FFE28A] to-[#8E6E17] shadow-xl">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-[#002613] relative border-2 border-[#00381C]">
+              <div className="relative">
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full p-1 bg-white border-2 border-[#116B50] shadow-sm">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-[#F8FAF9] relative">
                     <img
                       src={JEH_AVATAR_URL}
                       alt="Jeh — Assistente Comercial Jetro"
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover object-center"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Status e Identificação da Assistente */}
-              <div className="mt-4 flex flex-col items-center gap-1.5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#001F12] border border-[#C9A227]/50 shadow-sm">
-                  <span className="relative flex h-2.5 w-2.5">
+              <div className="mt-4 flex flex-col items-center gap-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8FAF9] border border-[#E4EAE6]">
+                  <span className="relative flex h-2 w-2">
                     {assistantStatus === 'ativa' && (
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#116B50] opacity-75" />
                     )}
                     <span
                       className={cn(
-                        'relative inline-flex rounded-full h-2.5 w-2.5',
-                        assistantStatus === 'ativa' ? 'bg-emerald-400' : 'bg-amber-400',
+                        'relative inline-flex rounded-full h-2 w-2',
+                        assistantStatus === 'ativa' ? 'bg-[#116B50]' : 'bg-amber-500',
                       )}
                     />
                   </span>
-                  <span className="text-[11px] font-bold tracking-wider text-[#FFE28A] uppercase">
+                  <span className="text-[11px] font-semibold tracking-wider text-[#063D30] uppercase">
                     {assistantStatus === 'ativa' ? 'Jeh Ativa no Site' : 'Assistente em Ajuste'}
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-300 font-medium">
+                <span className="text-xs text-[#66736D] font-normal">
                   Assistente Virtual Comercial Jetro
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Coluna Textual: Título, Subtítulo e Texto EXATO de apresentação */}
+          {/* Coluna Textual */}
           <div className="lg:col-span-8 space-y-5 text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#005B2E]/60 border border-[#C9A227]/60 text-[#FFE28A] text-xs sm:text-sm font-bold uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-[#C9A227]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+              <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
               <span>Experiência do Visitante & Relacionamento Comercial</span>
             </div>
 
             <div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
                 Conheça a Jeh
               </h2>
-              <p className="text-lg sm:text-xl text-[#FFE28A] font-semibold mt-1">
+              <p className="text-lg sm:text-xl text-[#116B50] font-medium mt-1 font-heading">
                 Sua primeira conexão inteligente com o Jetro.
               </p>
             </div>
 
-            {/* Texto EXATO exigido na especificação (item 2) */}
-            <div className="space-y-3.5 text-slate-200 text-sm sm:text-base leading-relaxed">
+            <div className="space-y-3 text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
               <p>
                 A Jeh é a assistente virtual comercial do Jetro, desenvolvida para transformar o
                 primeiro contato com nossos visitantes em uma experiência acolhedora, informativa e
@@ -277,21 +270,20 @@ export function JehSection() {
                 esclarecer dúvidas, identificar necessidades empresariais e conectar potenciais
                 clientes à nossa equipe comercial.
               </p>
-              <p className="font-medium text-white border-l-2 border-[#C9A227] pl-3">
+              <p className="font-medium text-[#202B28] border-l-2 border-[#116B50] pl-3">
                 Enquanto conversa com os visitantes, a Jeh pode organizar as informações fornecidas,
                 registrar oportunidades de negócio e ajudar a garantir que nenhum contato importante
                 seja perdido.
               </p>
             </div>
 
-            {/* Ações contextuais de atendimento */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               {assistantStatus === 'ativa' && (
                 <Button
                   onClick={handleOpenPublicChat}
-                  className="bg-[#C9A227] hover:bg-[#b58f1f] text-[#002816] font-extrabold text-sm px-6 py-5 rounded-xl shadow-lg transition-all cursor-pointer group"
+                  className="bg-[#063D30] hover:bg-[#042820] text-white font-semibold text-sm px-6 py-5 rounded-xl shadow-xs transition-all cursor-pointer group"
                 >
-                  <MessageSquare className="w-4 h-4 mr-2" />
+                  <MessageSquare className="w-4 h-4 mr-2 text-[#C69B45]" />
                   <span>Conversar com a Jeh Agora</span>
                   <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -299,7 +291,7 @@ export function JehSection() {
               <Button
                 variant="outline"
                 onClick={() => handleScrollToSection('orcamento')}
-                className="border-[#C9A227]/70 text-white hover:bg-white/10 font-bold text-sm px-6 py-5 rounded-xl cursor-pointer"
+                className="border-[#063D30]/25 text-[#063D30] hover:bg-[#F8FAF9] font-semibold text-sm px-6 py-5 rounded-xl cursor-pointer"
               >
                 Solicitar Apresentação Comercial
               </Button>
@@ -308,15 +300,14 @@ export function JehSection() {
         </div>
 
         {/* ============================================================== */}
-        {/* 2. 6 CARDS DE FUNCIONALIDADES DA JEH (TEXTOS EXATOS DO ITEM 3) */}
-        {/* Cards compactos, elegantes, ícones discretos                   */}
+        {/* 2. 6 CARDS DE FUNCIONALIDADES DA JEH                            */}
         {/* ============================================================== */}
         <div className="space-y-6">
           <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#FFE28A]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#C69B45]">
               Recursos de Atendimento Comercial
             </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h3 className="text-2xl sm:text-3xl font-semibold font-heading text-[#063D30]">
               Funcionalidades projetadas para acolher, informar e qualificar
             </h3>
           </div>
@@ -327,21 +318,21 @@ export function JehSection() {
               return (
                 <div
                   key={card.id}
-                  className="rounded-2xl p-5 sm:p-6 bg-[#002613]/85 hover:bg-[#003119] border border-[#C9A227]/30 hover:border-[#C9A227] transition-all duration-300 shadow-md flex flex-col justify-between space-y-3 group"
+                  className="rounded-2xl p-6 bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 transition-all duration-300 shadow-xs hover:shadow-md flex flex-col justify-between space-y-3 group text-left"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="h-9 w-9 rounded-xl bg-[#00190D] border border-[#C9A227]/50 text-[#FFE28A] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
-                      <Icon className="w-4 h-4 text-[#C9A227]" />
+                    <div className="h-10 w-10 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] text-[#063D30] flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <Icon className="w-4 h-4 text-[#116B50]" />
                     </div>
-                    <span className="text-xs font-mono font-bold text-[#C9A227]/70 group-hover:text-[#FFE28A]">
+                    <span className="text-xs font-mono font-semibold text-[#66736D]">
                       {card.id}
                     </span>
                   </div>
                   <div className="space-y-1.5">
-                    <h4 className="text-base font-bold text-white group-hover:text-[#FFE28A] transition-colors leading-snug">
+                    <h4 className="text-base font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors leading-snug">
                       {card.title}
                     </h4>
-                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                    <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed font-normal">
                       {card.description}
                     </p>
                   </div>
@@ -352,31 +343,31 @@ export function JehSection() {
         </div>
 
         {/* ============================================================== */}
-        {/* 3. DEMO INTERATIVA DA JEH (TEXTOS EXATOS DO ITEM 4)            */}
+        {/* 3. DEMO INTERATIVA DA JEH                                      */}
         {/* ============================================================== */}
         <div className="space-y-8">
           <div className="text-center max-w-3xl mx-auto space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#005B2E]/60 text-emerald-200 text-xs font-semibold border border-emerald-500/40">
-              <Bot className="w-3.5 h-3.5 text-[#C9A227]" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F4F2] text-[#063D30] text-xs font-semibold border border-[#063D30]/15">
+              <Bot className="w-3.5 h-3.5 text-[#116B50]" />
               <span>Simulação Interativa de Conversa</span>
             </div>
-            <h3 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h3 className="text-2xl sm:text-4xl font-semibold font-heading text-[#063D30] tracking-tight">
               Do primeiro contato à oportunidade de negócio.
             </h3>
-            <p className="text-sm sm:text-base text-slate-300">
+            <p className="text-sm sm:text-base text-[#66736D] font-normal">
               Acompanhe como a Jeh conduz um atendimento real e converte o interesse do visitante em
               uma oportunidade qualificada para a equipe comercial.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto">
-            {/* Lado Esquerdo: Janela da Conversa Interativa com os turnos exatos */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto text-left">
+            {/* Lado Esquerdo: Janela da Conversa */}
             <div className="lg:col-span-7">
-              <div className="rounded-2xl border-2 border-[#C9A227]/70 bg-[#001A0E] shadow-2xl overflow-hidden flex flex-col h-[520px]">
+              <div className="rounded-2xl border border-[#E4EAE6] bg-white shadow-md overflow-hidden flex flex-col h-[520px]">
                 {/* Topbar da Conversa */}
-                <div className="bg-gradient-to-r from-[#002613] via-[#00381C] to-[#002613] px-4 py-3 border-b border-[#C9A227]/40 flex items-center justify-between shrink-0">
+                <div className="bg-[#F8FAF9] px-4 py-3 border-b border-[#E4EAE6] flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 bg-[#001D0F]">
+                    <div className="h-9 w-9 rounded-full overflow-hidden border border-[#E4EAE6] shrink-0 bg-white">
                       <img
                         src={JEH_AVATAR_URL}
                         alt="Jeh"
@@ -385,24 +376,24 @@ export function JehSection() {
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <h4 className="text-sm font-bold text-white">Jeh</h4>
-                        <span className="text-[10px] px-2 py-0.2 rounded-full bg-[#C9A227]/25 text-[#FFE28A] font-bold border border-[#C9A227]/40 uppercase tracking-wider">
+                        <h4 className="text-sm font-semibold font-heading text-[#063D30]">Jeh</h4>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-[#063D30] font-medium border border-emerald-200 uppercase tracking-wider">
                           Atendimento Comercial
                         </span>
                       </div>
-                      <span className="text-[11px] text-emerald-300 font-medium">
+                      <span className="text-[11px] text-[#66736D] font-normal">
                         Atendimento ilustrativo demonstrativo
                       </span>
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono text-[#FFE28A]/80 hidden sm:inline-block bg-black/40 px-2.5 py-1 rounded border border-white/10">
+                  <span className="text-[10px] font-mono text-[#66736D] hidden sm:inline-block bg-white px-2 py-1 rounded border border-[#E4EAE6]">
                     Demonstração Ilustrativa
                   </span>
                 </div>
 
                 {/* Balões da Conversa */}
-                <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-3.5 bg-gradient-to-b from-[#00160C] to-[#001008] text-xs sm:text-sm">
+                <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-3.5 bg-white text-xs sm:text-sm">
                   {visibleTurns.map((turn) => {
                     const isVisitor = turn.speaker === 'visitor'
                     return (
@@ -414,7 +405,7 @@ export function JehSection() {
                         )}
                       >
                         {!isVisitor && (
-                          <div className="w-7 h-7 rounded-full overflow-hidden border border-[#C9A227] shrink-0 bg-[#002613] mt-1 shadow-2xs">
+                          <div className="w-7 h-7 rounded-full overflow-hidden border border-[#E4EAE6] shrink-0 bg-[#F8FAF9] mt-1 shadow-2xs">
                             <img
                               src={JEH_AVATAR_URL}
                               alt="Jeh"
@@ -425,23 +416,23 @@ export function JehSection() {
 
                         <div
                           className={cn(
-                            'max-w-[85%] rounded-2xl p-3.5 shadow-md space-y-1',
+                            'max-w-[85%] rounded-2xl p-3.5 space-y-1',
                             isVisitor
-                              ? 'bg-[#005B2E] text-white rounded-tr-xs border border-emerald-400/30 font-medium'
-                              : 'bg-[#002D19] text-slate-100 rounded-tl-xs border border-[#C9A227]/50',
+                              ? 'bg-[#063D30] text-white rounded-tr-xs font-normal'
+                              : 'bg-[#F8FAF9] text-[#202B28] rounded-tl-xs border border-[#E4EAE6]',
                           )}
                         >
-                          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1">
+                          <div className="flex items-center justify-between gap-2 border-b border-black/5 pb-1">
                             <span
                               className={cn(
-                                'text-[10px] font-bold uppercase tracking-wider',
-                                isVisitor ? 'text-emerald-200' : 'text-[#FFE28A]',
+                                'text-[10px] font-semibold uppercase tracking-wider',
+                                isVisitor ? 'text-slate-200' : 'text-[#063D30]',
                               )}
                             >
                               {turn.speakerName}
                             </span>
                             {turn.actionHint && (
-                              <span className="text-[10px] text-emerald-300/80 italic hidden sm:inline">
+                              <span className="text-[10px] text-[#66736D] italic hidden sm:inline font-normal">
                                 {turn.actionHint}
                               </span>
                             )}
@@ -455,29 +446,29 @@ export function JehSection() {
                   })}
 
                   {isTyping && (
-                    <div className="flex items-center gap-2 text-slate-300 text-xs pl-2">
-                      <div className="w-6 h-6 rounded-full overflow-hidden border border-[#C9A227] bg-[#002613]">
+                    <div className="flex items-center gap-2 text-[#66736D] text-xs pl-2">
+                      <div className="w-6 h-6 rounded-full overflow-hidden border border-[#E4EAE6] bg-[#F8FAF9]">
                         <img
                           src={JEH_AVATAR_URL}
                           alt="Jeh"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="bg-[#002D19] border border-[#C9A227]/40 px-3 py-1.5 rounded-2xl text-[11px] text-[#FFE28A]">
+                      <div className="bg-[#F8FAF9] border border-[#E4EAE6] px-3 py-1.5 rounded-2xl text-[11px] text-[#063D30]">
                         Avançando diálogo...
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Controles da Simulação Interativa */}
-                <div className="p-3 bg-[#002212] border-t border-emerald-900/60 flex flex-wrap items-center justify-between gap-2 shrink-0">
+                {/* Controles da Simulação */}
+                <div className="p-3 bg-[#F8FAF9] border-t border-[#E4EAE6] flex flex-wrap items-center justify-between gap-2 shrink-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-300">
+                    <span className="text-[11px] text-[#66736D]">
                       Etapa {Math.min(currentStep, DEMO_TURNS.length)} de {DEMO_TURNS.length}
                     </span>
-                    <span className="text-slate-500 text-xs">•</span>
-                    <span className="text-[11px] text-[#FFE28A] font-medium hidden sm:inline">
+                    <span className="text-[#66736D] text-xs">•</span>
+                    <span className="text-[11px] text-[#063D30] font-medium hidden sm:inline">
                       {currentStep < DEMO_TURNS.length
                         ? 'Clique para avançar a conversa'
                         : 'Simulação concluída com sucesso!'}
@@ -490,7 +481,7 @@ export function JehSection() {
                         size="sm"
                         variant="ghost"
                         onClick={handleResetDemo}
-                        className="h-8 text-xs text-slate-300 hover:text-white hover:bg-white/10"
+                        className="h-8 text-xs text-[#66736D] hover:text-[#063D30] hover:bg-white"
                       >
                         <RotateCcw className="w-3.5 h-3.5 mr-1" />
                         Reiniciar
@@ -501,7 +492,7 @@ export function JehSection() {
                         size="sm"
                         onClick={handleNextStep}
                         disabled={isTyping}
-                        className="h-8 bg-[#C9A227] hover:bg-[#b58f1f] text-[#002816] font-bold text-xs shadow-sm cursor-pointer"
+                        className="h-8 bg-[#063D30] hover:bg-[#042820] text-white font-semibold text-xs shadow-xs cursor-pointer"
                       >
                         <Play className="w-3 h-3 mr-1 fill-current" />
                         Avançar Diálogo
@@ -510,7 +501,7 @@ export function JehSection() {
                       <Button
                         size="sm"
                         onClick={handleResetDemo}
-                        className="h-8 bg-[#005B2E] hover:bg-[#004724] text-white font-bold text-xs cursor-pointer"
+                        className="h-8 bg-[#116B50] hover:bg-[#0d533e] text-white font-semibold text-xs cursor-pointer"
                       >
                         <RotateCcw className="w-3 h-3 mr-1" />
                         Ver Novamente
@@ -521,36 +512,36 @@ export function JehSection() {
               </div>
             </div>
 
-            {/* Lado Direito: Fluxo Visual do Atendimento + Mensagem Principal */}
+            {/* Lado Direito: Fluxo Visual */}
             <div className="lg:col-span-5 space-y-5">
-              <div className="p-6 rounded-2xl bg-[#002613]/90 border border-[#C9A227]/40 shadow-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#FFE28A] flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-[#C9A227]" />
+              <div className="p-6 rounded-2xl bg-white border border-[#E4EAE6] shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-[#E4EAE6] pb-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#063D30] flex items-center gap-2 font-heading">
+                    <Layers className="w-4 h-4 text-[#116B50]" />
                     Fluxo do Atendimento Comercial
                   </span>
-                  <span className="text-[10px] text-emerald-300 font-mono">Passo a Passo</span>
+                  <span className="text-[10px] text-[#66736D] font-mono">Passo a Passo</span>
                 </div>
 
                 <div className="space-y-2.5">
                   {JEH_WORKFLOW_STEPS.map((step, idx) => (
                     <div
                       key={step.step}
-                      className="flex items-center gap-3 p-2.5 rounded-xl bg-[#001A0E] border border-white/10 text-xs"
+                      className="flex items-center gap-3 p-2.5 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] text-xs"
                     >
-                      <div className="w-6 h-6 rounded-full bg-[#005B2E] text-[#FFE28A] border border-[#C9A227]/50 flex items-center justify-center font-bold text-[11px] shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-[#063D30] text-white flex items-center justify-center font-semibold text-[11px] shrink-0">
                         {step.step}
                       </div>
-                      <span className="font-semibold text-slate-200">{step.title}</span>
+                      <span className="font-medium text-[#202B28]">{step.title}</span>
                       {idx < JEH_WORKFLOW_STEPS.length - 1 && (
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-500 ml-auto shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-[#66736D] ml-auto shrink-0" />
                       )}
                     </div>
                   ))}
                 </div>
 
-                <div className="pt-2 border-t border-white/10 text-[11px] text-slate-300 flex items-start gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#C9A227] shrink-0 mt-0.5" />
+                <div className="pt-2 border-t border-[#E4EAE6] text-[11px] text-[#66736D] flex items-start gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#116B50] shrink-0 mt-0.5" />
                   <span>
                     Demonstração ilustrativa baseada nos fluxos oficiais configurados na Central da
                     Jeh. Em conformidade com a LGPD e regras de privacidade.
@@ -558,12 +549,12 @@ export function JehSection() {
                 </div>
               </div>
 
-              {/* Mensagem Principal destacada (item 4) */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#003B20] to-[#002414] border-2 border-[#C9A227] shadow-xl text-center space-y-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#FFE28A]">
+              {/* Mensagem Principal destacada */}
+              <div className="p-5 rounded-2xl bg-[#F8FAF9] border border-[#E4EAE6] shadow-2xs text-center space-y-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C69B45]">
                   Proposta Comercial de Valor
                 </span>
-                <p className="text-base sm:text-lg font-black text-white leading-snug">
+                <p className="text-base sm:text-lg font-semibold font-heading text-[#063D30] leading-snug">
                   "A Jeh não apenas conversa. Ela transforma atendimentos em oportunidades
                   comerciais."
                 </p>
@@ -573,15 +564,15 @@ export function JehSection() {
         </div>
 
         {/* ============================================================== */}
-        {/* 4. BENEFÍCIOS COMERCIAIS DA JEH (TEXTOS EXATOS DO ITEM 5)       */}
+        {/* 4. BENEFÍCIOS COMERCIAIS DA JEH                                 */}
         {/* ============================================================== */}
-        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-[#002B17] via-[#00361D] to-[#002414] border border-[#C9A227]/40 shadow-xl space-y-6">
+        <div className="p-8 sm:p-10 rounded-2xl bg-[#F8FAF9] border border-[#E4EAE6] shadow-xs space-y-6 text-left">
           <div className="max-w-2xl space-y-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#FFE28A] flex items-center gap-1.5">
-              <Briefcase className="w-4 h-4 text-[#C9A227]" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#C69B45] flex items-center gap-1.5">
+              <Briefcase className="w-4 h-4 text-[#116B50]" />
               Benefícios para sua Operação Comercial
             </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h3 className="text-2xl sm:text-3xl font-semibold font-heading text-[#063D30]">
               Resultados objetivos no relacionamento com interessados
             </h3>
           </div>
@@ -590,12 +581,12 @@ export function JehSection() {
             {JEH_COMMERCIAL_BENEFITS.map((benefit, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 p-4 rounded-xl bg-[#001D0F]/80 border border-white/10 shadow-xs hover:border-[#C9A227]/50 transition-colors"
+                className="flex items-start gap-3 p-4 rounded-xl bg-white border border-[#E4EAE6] shadow-2xs hover:border-[#116B50]/30 transition-colors"
               >
-                <div className="h-5 w-5 rounded-full bg-[#005B2E] border border-[#C9A227]/60 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFE28A]" />
+                <div className="h-5 w-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#116B50]" />
                 </div>
-                <p className="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#202B28]/85 font-normal leading-relaxed">
                   {benefit}
                 </p>
               </div>

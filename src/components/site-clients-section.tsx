@@ -35,24 +35,21 @@ export function SiteClientsSection() {
   return (
     <section
       id="nossos-clientes"
-      className="relative py-20 sm:py-28 bg-[#00140b] text-white border-t border-white/5 overflow-hidden"
+      className="relative py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6] overflow-hidden"
     >
-      {/* Luz ambiente de fundo verde e dourada */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-5xl h-64 bg-radial from-[#C9A227]/10 via-[#005B2E]/15 to-transparent blur-3xl pointer-events-none" />
-
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Cabeçalho da seção com textos EXATOS exigidos */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-[#C9A227]/40 text-[#f6d77c] text-xs font-bold uppercase tracking-wider shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
+            <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
             Nossos Clientes
           </div>
 
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-semibold font-heading text-[#063D30] tracking-tight leading-tight">
             Empresas que fazem parte da nossa história
           </h2>
 
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
             Conheça algumas das empresas que fazem parte da trajetória do Jetro. Cada parceria
             representa nosso compromisso com a evolução da gestão empresarial, a tecnologia e a
             busca por soluções cada vez mais inteligentes.
@@ -65,14 +62,14 @@ export function SiteClientsSection() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="h-44 rounded-2xl bg-white/[0.03] border border-white/10 animate-pulse"
+                className="h-44 rounded-2xl bg-white border border-[#E4EAE6] animate-pulse"
               />
             ))}
           </div>
         ) : clients.length === 0 ? (
-          <div className="text-center py-12 px-6 rounded-2xl bg-white/[0.02] border border-white/10 max-w-xl mx-auto">
-            <Building2 className="w-10 h-10 text-[#C9A227] mx-auto mb-3 opacity-80" />
-            <p className="text-slate-300 text-sm">
+          <div className="text-center py-12 px-6 rounded-2xl bg-white border border-[#E4EAE6] max-w-xl mx-auto shadow-2xs">
+            <Building2 className="w-10 h-10 text-[#063D30] mx-auto mb-3 opacity-80" />
+            <p className="text-[#66736D] text-sm">
               Nossa história continua sendo construída a cada dia ao lado de grandes empresas.
             </p>
           </div>
@@ -85,13 +82,10 @@ export function SiteClientsSection() {
               return (
                 <div
                   key={client.id}
-                  className="group relative rounded-2xl bg-gradient-to-b from-[#002817]/90 to-[#00140b]/95 border border-[#C9A227]/30 hover:border-[#C9A227] p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#C9A227]/15"
+                  className="group relative rounded-2xl bg-white border border-[#E4EAE6] hover:border-[#116B50]/40 p-6 flex flex-col justify-between transition-all duration-300 shadow-xs hover:shadow-md text-left"
                 >
-                  {/* Brilho dourado no hover */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#C9A227]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-                  {/* Área do Logo com fundo suave/claro harmonioso com a paleta #002817/#00140b e dourado */}
-                  <div className="h-32 flex items-center justify-center p-3.5 rounded-xl bg-white/[0.97] border border-[#C9A227]/40 shadow-inner relative overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[#C9A227]/20 group-hover:border-[#C9A227]">
+                  {/* Área do Logo */}
+                  <div className="h-32 flex items-center justify-center p-3.5 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] relative overflow-hidden transition-all duration-300 group-hover:border-[#116B50]/30">
                     {logoUrl ? (
                       <img
                         src={logoUrl}
@@ -101,10 +95,10 @@ export function SiteClientsSection() {
                       />
                     ) : (
                       <div className="text-center px-3 py-2">
-                        <span className="font-serif tracking-wider font-bold text-base sm:text-lg text-[#002817] block">
+                        <span className="font-heading tracking-wider font-semibold text-base sm:text-lg text-[#063D30] block">
                           {client.nome}
                         </span>
-                        <span className="text-[9px] tracking-widest uppercase text-[#8E6E17] font-semibold mt-0.5 block">
+                        <span className="text-[9px] tracking-widest uppercase text-[#C69B45] font-semibold mt-0.5 block">
                           Parceiro Oficial Jetro
                         </span>
                       </div>
@@ -112,26 +106,26 @@ export function SiteClientsSection() {
                   </div>
 
                   {/* Informações da Empresa */}
-                  <div className="pt-4 mt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                  <div className="pt-4 mt-2 border-t border-[#E4EAE6] flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-white truncate group-hover:text-[#f6d77c] transition-colors">
+                      <h3 className="text-sm font-semibold font-heading text-[#063D30] truncate group-hover:text-[#116B50] transition-colors">
                         {client.nome}
                       </h3>
                       {client.instagram && (
-                        <p className="text-xs text-slate-400 truncate">
+                        <p className="text-xs text-[#66736D] truncate font-normal">
                           @{client.instagram.replace(/^@/, '')}
                         </p>
                       )}
                     </div>
 
-                    {/* Links rápidos (Site / Instagram) */}
+                    {/* Links rápidos */}
                     <div className="flex items-center gap-1.5 shrink-0">
                       {client.site && (
                         <a
                           href={client.site}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#005B2E] border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                          className="w-8 h-8 rounded-lg bg-[#F8FAF9] hover:bg-[#063D30] border border-[#E4EAE6] flex items-center justify-center text-[#66736D] hover:text-white transition-colors"
                           title={`Visitar site oficial de ${client.nome}`}
                         >
                           <ArrowUpRight className="w-4 h-4" />
@@ -142,7 +136,7 @@ export function SiteClientsSection() {
                           href={instaUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg bg-white/5 hover:bg-gradient-to-tr hover:from-amber-600 hover:via-pink-600 hover:to-purple-600 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all"
+                          className="w-8 h-8 rounded-lg bg-[#F8FAF9] hover:bg-[#063D30] border border-[#E4EAE6] flex items-center justify-center text-[#66736D] hover:text-white transition-all"
                           title={`Ver perfil no Instagram de ${client.nome}`}
                         >
                           <Instagram className="w-4 h-4" />

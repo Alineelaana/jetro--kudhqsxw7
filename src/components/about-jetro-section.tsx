@@ -26,19 +26,22 @@ export function AboutJetroSection() {
   }
 
   return (
-    <section id="sobre" className="py-20 sm:py-28 bg-[#00140b] text-white border-t border-white/5">
+    <section
+      id="sobre"
+      className="py-20 sm:py-28 bg-[#F8FAF9] text-[#202B28] border-b border-[#E4EAE6]"
+    >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Posicionamento Principal */}
         <div className="max-w-4xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-[#C9A227]/30 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
             Posicionamento Institucional
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Inteligência que conecta <span className="text-[#C9A227]">sua gestão.</span>
+          <h2 className="text-3xl sm:text-5xl font-semibold font-heading text-[#063D30] tracking-tight leading-tight">
+            Inteligência que conecta <span className="text-[#116B50]">sua gestão.</span>
           </h2>
 
-          <p className="text-slate-200 text-base sm:text-lg lg:text-xl leading-relaxed font-medium">
+          <p className="text-[#66736D] text-base sm:text-lg lg:text-xl leading-relaxed font-normal">
             Uma plataforma de gestão empresarial desenvolvida para integrar processos, organizar
             informações, acompanhar operações e transformar dados em conhecimento para decisões mais
             inteligentes.
@@ -50,20 +53,22 @@ export function AboutJetroSection() {
           {pillars.map((p, idx) => (
             <div
               key={idx}
-              className="rounded-2xl bg-slate-950/70 border border-white/10 p-6 flex flex-col justify-between hover:border-[#C9A227]/50 transition-all duration-300 group shadow-lg"
+              className="rounded-2xl bg-white border border-[#E4EAE6] p-6 sm:p-8 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-sm hover:shadow-md"
             >
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-[#C9A227] font-black text-sm group-hover:scale-105 transition-transform">
+              <div className="space-y-4">
+                <div className="w-11 h-11 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#063D30] font-semibold font-heading text-sm group-hover:border-[#116B50]/40 transition-colors">
                   0{idx + 1}
                 </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-[#f6d77c] transition-colors">
+                <h3 className="text-lg font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors">
                   {p.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{p.description}</p>
+                <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed font-normal">
+                  {p.description}
+                </p>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-white/5 flex items-center gap-1.5 text-xs text-[#f6d77c] font-semibold">
-                <CheckCircle2 className="w-4 h-4 text-[#C9A227]" />
+              <div className="pt-4 mt-6 border-t border-[#E4EAE6] flex items-center gap-2 text-xs text-[#063D30] font-medium">
+                <CheckCircle2 className="w-4 h-4 text-[#116B50]" />
                 <span>Pilar ativo no ERP</span>
               </div>
             </div>
@@ -71,16 +76,16 @@ export function AboutJetroSection() {
         </div>
 
         {/* Quadro Institucional Tecnológico */}
-        <div className="rounded-2xl bg-slate-950 border border-[#C9A227]/30 p-6 sm:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C9A227]">
+        <div className="rounded-2xl bg-white border border-[#E4EAE6] p-6 sm:p-10 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="space-y-4 text-left">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#C69B45]">
                 Arquitetura Corporativa
               </span>
-              <h3 className="text-2xl sm:text-3xl font-black text-white">
+              <h3 className="text-2xl sm:text-3xl font-semibold font-heading text-[#063D30] leading-snug">
                 Desenvolvido para sustentar o crescimento sustentável da sua empresa
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed font-normal">
                 Empresas em expansão enfrentam o desafio da fragmentação de controles: uma planilha
                 para preços, outra para faturamento, anotações de estoque e relatórios defasados. O
                 HURAM centraliza essa engrenagem em uma arquitetura segura, com banco de dados em
@@ -89,43 +94,43 @@ export function AboutJetroSection() {
               <div className="pt-2">
                 <Button
                   onClick={handleCTA}
-                  className="bg-[#005A36] hover:bg-[#004225] border border-[#C9A227]/40 text-white font-bold text-xs sm:text-sm px-6 py-5 rounded-xl cursor-pointer"
+                  className="bg-[#063D30] hover:bg-[#042820] text-white font-semibold text-xs sm:text-sm px-6 py-5 rounded-xl cursor-pointer shadow-sm hover:shadow transition-all"
                 >
                   <span>Converse com um especialista</span>
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ml-2 text-[#C69B45]" />
                 </Button>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5">
-                <Database className="w-5 h-5 text-emerald-400" />
-                <h4 className="text-sm font-bold text-white">Base Única</h4>
-                <p className="text-xs text-slate-400">
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
+                <Database className="w-5 h-5 text-[#116B50]" />
+                <h4 className="text-sm font-semibold font-heading text-[#063D30]">Base Única</h4>
+                <p className="text-xs text-[#66736D] leading-relaxed">
                   Sem duplicidade de cadastros e com integridade referencial.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5">
-                <ShieldCheck className="w-5 h-5 text-[#C9A227]" />
-                <h4 className="text-sm font-bold text-white">Governança</h4>
-                <p className="text-xs text-slate-400">
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
+                <ShieldCheck className="w-5 h-5 text-[#C69B45]" />
+                <h4 className="text-sm font-semibold font-heading text-[#063D30]">Governança</h4>
+                <p className="text-xs text-[#66736D] leading-relaxed">
                   Trilha de auditoria por criticidade e alçadas de decisão.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5">
-                <Cpu className="w-5 h-5 text-[#f6d77c]" />
-                <h4 className="text-sm font-bold text-white">IA Nativa</h4>
-                <p className="text-xs text-slate-400">
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
+                <Cpu className="w-5 h-5 text-[#116B50]" />
+                <h4 className="text-sm font-semibold font-heading text-[#063D30]">IA Nativa</h4>
+                <p className="text-xs text-[#66736D] leading-relaxed">
                   Jeh e HURAM On-line operando dentro dos limites de segurança.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5">
-                <Building2 className="w-5 h-5 text-emerald-400" />
-                <h4 className="text-sm font-bold text-white">Multiempresa</h4>
-                <p className="text-xs text-slate-400">
+              <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] space-y-1.5 text-left">
+                <Building2 className="w-5 h-5 text-[#063D30]" />
+                <h4 className="text-sm font-semibold font-heading text-[#063D30]">Multiempresa</h4>
+                <p className="text-xs text-[#66736D] leading-relaxed">
                   Estrutura preparada para matrizes, filiais e múltiplos depósitos.
                 </p>
               </div>

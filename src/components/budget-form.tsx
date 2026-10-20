@@ -111,12 +111,14 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
 
   if (submitted) {
     return (
-      <div className="bg-emerald-950/60 border border-[#C9A227]/50 rounded-2xl p-8 text-center space-y-4 shadow-xl">
-        <div className="h-16 w-16 bg-[#005A36] text-white rounded-full flex items-center justify-center mx-auto shadow-lg border border-[#C9A227]/40">
-          <CheckCircle2 className="h-8 w-8 text-[#C9A227]" />
+      <div className="bg-white border border-[#E4EAE6] rounded-2xl p-8 text-center space-y-4 shadow-sm">
+        <div className="h-16 w-16 bg-[#F8FAF9] text-[#116B50] rounded-full flex items-center justify-center mx-auto shadow-2xs border border-[#E4EAE6]">
+          <CheckCircle2 className="h-8 w-8 text-[#116B50]" />
         </div>
-        <h3 className="text-2xl font-black text-white">Solicitação Recebida com Sucesso!</h3>
-        <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+        <h3 className="text-2xl font-semibold font-heading text-[#063D30]">
+          Solicitação Recebida com Sucesso!
+        </h3>
+        <p className="text-sm text-[#66736D] max-w-md mx-auto leading-relaxed font-normal">
           Obrigado pelo seu interesse no Jetro. Um consultor especialista entrará em contato para
           agendar a demonstração da plataforma para sua empresa.
         </p>
@@ -127,7 +129,7 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
               setFormData({ name: '', company: '', phone: '', email: '', interest: '' })
             }}
             variant="outline"
-            className="border-[#C9A227]/50 text-white hover:bg-[#C9A227]/10"
+            className="border-[#063D30]/25 text-[#063D30] hover:bg-[#F8FAF9] font-semibold text-xs px-5 py-2 rounded-xl cursor-pointer"
           >
             Enviar Nova Mensagem
           </Button>
@@ -137,9 +139,9 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="p-4 rounded-xl bg-slate-900/80 border border-white/10 text-xs text-slate-300 leading-relaxed flex items-start gap-3">
-        <ShieldCheck className="w-5 h-5 text-[#C9A227] shrink-0 mt-0.5" />
+    <div className="space-y-6 text-left">
+      <div className="p-4 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] text-xs text-[#66736D] leading-relaxed flex items-start gap-3 font-normal">
+        <ShieldCheck className="w-5 h-5 text-[#116B50] shrink-0 mt-0.5" />
         <span>
           Preencha o formulário abaixo para agendar uma apresentação detalhada do ERP. Seus dados
           estão protegidos e serão utilizados exclusivamente para o contato comercial da nossa
@@ -153,9 +155,9 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
           <div className="space-y-1.5">
             <Label
               htmlFor="name"
-              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
+              className="text-xs font-semibold uppercase tracking-wider text-[#063D30] flex items-center gap-1.5 font-heading"
             >
-              <User className="h-3.5 w-3.5 text-[#C9A227]" />
+              <User className="h-3.5 w-3.5 text-[#116B50]" />
               Nome Completo *
             </Label>
             <Input
@@ -165,7 +167,7 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
               value={formData.name}
               onChange={handleChange}
               required
-              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
+              className="h-11 bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[#116B50] focus-visible:border-[#116B50] rounded-xl"
             />
           </div>
 
@@ -173,9 +175,9 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
           <div className="space-y-1.5">
             <Label
               htmlFor="company"
-              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
+              className="text-xs font-semibold uppercase tracking-wider text-[#063D30] flex items-center gap-1.5 font-heading"
             >
-              <Building className="h-3.5 w-3.5 text-[#C9A227]" />
+              <Building className="h-3.5 w-3.5 text-[#116B50]" />
               Empresa *
             </Label>
             <Input
@@ -185,7 +187,7 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
               value={formData.company}
               onChange={handleChange}
               required
-              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
+              className="h-11 bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[#116B50] focus-visible:border-[#116B50] rounded-xl"
             />
           </div>
 
@@ -193,9 +195,9 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
           <div className="space-y-1.5">
             <Label
               htmlFor="phone"
-              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
+              className="text-xs font-semibold uppercase tracking-wider text-[#063D30] flex items-center gap-1.5 font-heading"
             >
-              <Phone className="h-3.5 w-3.5 text-[#C9A227]" />
+              <Phone className="h-3.5 w-3.5 text-[#116B50]" />
               Telefone / WhatsApp *
             </Label>
             <Input
@@ -205,7 +207,7 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
               value={formData.phone}
               onChange={handleChange}
               required
-              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
+              className="h-11 bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[#116B50] focus-visible:border-[#116B50] rounded-xl"
             />
           </div>
 
@@ -213,9 +215,9 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
           <div className="space-y-1.5">
             <Label
               htmlFor="email"
-              className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
+              className="text-xs font-semibold uppercase tracking-wider text-[#063D30] flex items-center gap-1.5 font-heading"
             >
-              <Mail className="h-3.5 w-3.5 text-[#C9A227]" />
+              <Mail className="h-3.5 w-3.5 text-[#116B50]" />
               E-mail Corporativo *
             </Label>
             <Input
@@ -226,7 +228,7 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
               value={formData.email}
               onChange={handleChange}
               required
-              className="h-11 bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
+              className="h-11 bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[#116B50] focus-visible:border-[#116B50] rounded-xl"
             />
           </div>
         </div>
@@ -235,9 +237,9 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
         <div className="space-y-1.5">
           <Label
             htmlFor="interest"
-            className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5"
+            className="text-xs font-semibold uppercase tracking-wider text-[#063D30] flex items-center gap-1.5 font-heading"
           >
-            <MessageSquare className="h-3.5 w-3.5 text-[#C9A227]" />
+            <MessageSquare className="h-3.5 w-3.5 text-[#116B50]" />
             Interesse / Mensagem
           </Label>
           <Textarea
@@ -247,20 +249,20 @@ export function BudgetForm({ selectedService }: BudgetFormProps) {
             rows={4}
             value={formData.interest}
             onChange={handleChange}
-            className="bg-slate-950 border-white/15 text-white placeholder:text-slate-500 focus-visible:ring-[#C9A227]"
+            className="bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[#116B50] focus-visible:border-[#116B50] rounded-xl"
           />
         </div>
 
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-[#C9A227] to-[#a88219] hover:from-[#d8b030] hover:to-[#b88f20] text-gray-950 font-black h-12 text-sm sm:text-base shadow-xl shadow-[#C9A227]/20 transition-all cursor-pointer"
+          className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-semibold h-12 text-sm sm:text-base shadow-sm hover:shadow transition-all cursor-pointer rounded-xl"
         >
           {loading ? (
             'Registrando sua solicitação...'
           ) : (
             <span className="flex items-center justify-center gap-2">
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4 text-[#C69B45]" />
               Solicitar Apresentação do Jetro
             </span>
           )}

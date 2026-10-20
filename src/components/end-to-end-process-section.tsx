@@ -58,17 +58,20 @@ export function EndToEndProcessSection() {
   ]
 
   return (
-    <section id="fluxo" className="py-20 sm:py-28 bg-[#001c10] text-white border-t border-white/5">
+    <section
+      id="fluxo"
+      className="py-20 sm:py-28 bg-white text-[#202B28] border-b border-[#E4EAE6]"
+    >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         {/* Cabeçalho */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-[#C9A227]/30 text-[#f6d77c] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F1F4F2] border border-[#063D30]/15 text-[#063D30] text-xs font-semibold tracking-wide">
             Processos Corporativos Conectados
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Gestão conectada de <span className="text-[#C9A227]">ponta a ponta.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
+            Gestão conectada de <span className="text-[#116B50]">ponta a ponta.</span>
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
             Elimine silos operacionais. Do momento em que um cliente é cadastrado até a análise de
             rentabilidade gerencial, cada evento aciona as etapas seguintes sem necessidade de
             redigitação.
@@ -82,44 +85,46 @@ export function EndToEndProcessSection() {
             return (
               <div
                 key={s.step}
-                className="relative rounded-2xl bg-slate-950/70 border border-white/10 p-5 flex flex-col justify-between hover:border-[#C9A227]/50 transition-all duration-300 group shadow-lg"
+                className="relative rounded-2xl bg-white border border-[#E4EAE6] p-5 sm:p-6 flex flex-col justify-between hover:border-[#116B50]/40 transition-all duration-300 group shadow-xs hover:shadow-md text-left"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black text-[#C9A227] tracking-tight">
+                    <span className="text-2xl font-bold font-heading text-[#063D30] tracking-tight">
                       {s.step}
                     </span>
-                    <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-[#C9A227] group-hover:scale-110 transition-transform">
+                    <div className="w-9 h-9 rounded-xl bg-[#F8FAF9] border border-[#E4EAE6] flex items-center justify-center text-[#116B50] group-hover:scale-105 transition-transform">
                       <Icon className="w-4 h-4" />
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C69B45] block">
                       {s.subtitle}
                     </span>
-                    <h3 className="text-base font-bold text-white group-hover:text-[#f6d77c] transition-colors mt-0.5">
+                    <h3 className="text-base font-semibold font-heading text-[#063D30] group-hover:text-[#116B50] transition-colors mt-0.5">
                       {s.title}
                     </h3>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed">{s.description}</p>
+                  <p className="text-xs text-[#66736D] leading-relaxed font-normal">
+                    {s.description}
+                  </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-white/5 space-y-1">
-                  <span className="text-[9px] uppercase font-bold text-emerald-400 block tracking-wider">
+                <div className="pt-4 mt-4 border-t border-[#E4EAE6] space-y-1">
+                  <span className="text-[9px] uppercase font-semibold text-[#116B50] block tracking-wider">
                     Resultado da etapa:
                   </span>
-                  <div className="text-[11px] text-slate-300 flex items-start gap-1.5 font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C9A227] shrink-0 mt-0.5" />
+                  <div className="text-[11px] text-[#202B28]/80 flex items-start gap-1.5 font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#116B50] shrink-0 mt-0.5" />
                     <span>{s.output}</span>
                   </div>
                 </div>
 
                 {/* Seta indicativa para desktop entre cards (exceto último) */}
                 {idx < steps.length - 1 && (
-                  <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-[#002817] border border-[#C9A227]/60 items-center justify-center text-[#C9A227] shadow-md pointer-events-none">
-                    <ArrowRight className="w-3 h-3" />
+                  <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-white border border-[#E4EAE6] items-center justify-center text-[#063D30] shadow-xs pointer-events-none">
+                    <ArrowRight className="w-3 h-3 text-[#116B50]" />
                   </div>
                 )}
               </div>
@@ -128,33 +133,33 @@ export function EndToEndProcessSection() {
         </div>
 
         {/* Quadro de Governança do Processo */}
-        <div className="rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-950/80 to-emerald-950/40 border border-[#C9A227]/30 p-6 sm:p-8">
+        <div className="rounded-2xl bg-[#F8FAF9] border border-[#E4EAE6] p-6 sm:p-8 text-left">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
             <div className="space-y-2 lg:col-span-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C9A227]">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#C69B45]">
                 Segurança em Cada Transição
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-white">
+              <h3 className="text-xl sm:text-2xl font-semibold font-heading text-[#063D30]">
                 Rastreabilidade integral sem brechas operacionais
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed font-normal">
                 Todas as alterações de status, aprovações de desconto, cancelamentos ou emissões
                 geram registros invioláveis na trilha de auditoria do Jetro, com usuário, data, IP,
                 valores anteriores e justificativas.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5">
-              <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-300 flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                <span>Alçadas de aprovação para regras sensíveis</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#116B50] shrink-0" />
+                <span className="font-normal">Alçadas de aprovação para regras sensíveis</span>
               </div>
-              <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-300 flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                <span>Reserva e baixa automática em estoque</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#116B50] shrink-0" />
+                <span className="font-normal">Reserva e baixa automática em estoque</span>
               </div>
-              <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-300 flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                <span>Geração de financeiro vinculada à nota fiscal</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-xs text-[#202B28] flex items-center gap-2.5 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#116B50] shrink-0" />
+                <span className="font-normal">Geração de financeiro vinculada à nota fiscal</span>
               </div>
             </div>
           </div>
