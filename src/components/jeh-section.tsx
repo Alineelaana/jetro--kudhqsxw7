@@ -418,8 +418,8 @@ export function JehSection() {
                           className={cn(
                             'max-w-[85%] rounded-2xl p-3.5 space-y-1',
                             isVisitor
-                              ? 'bg-[#063D30] text-white rounded-tr-xs font-normal'
-                              : 'bg-[#F8FAF9] text-[#202B28] rounded-tl-xs border border-[#E4EAE6]',
+                              ? 'bg-[#063D30] text-white rounded-tr-sm font-normal'
+                              : 'bg-[#F8FAF9] text-[#202B28] rounded-tl-sm border border-[#E4EAE6]',
                           )}
                         >
                           <div className="flex items-center justify-between gap-2 border-b border-black/5 pb-1">

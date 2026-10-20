@@ -531,7 +531,7 @@ export function SystemScreensGallery() {
 
         {/* Modal Lightbox com Detalhes da Tela */}
         {activeItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#202B28]/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#202B28]/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="relative w-full max-w-3xl rounded-2xl bg-white border border-[#E4EAE6] shadow-xl p-6 sm:p-8 space-y-6 text-left max-h-[90vh] overflow-y-auto">
               <div className="flex items-start justify-between gap-4 border-b border-[#E4EAE6] pb-4">
                 <div>

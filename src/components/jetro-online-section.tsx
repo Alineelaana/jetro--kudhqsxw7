@@ -393,7 +393,7 @@ export function JetroOnlineSection() {
                 <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 bg-white text-xs sm:text-sm">
                   {/* Pergunta do Usuário */}
                   <div className="flex justify-end">
-                    <div className="max-w-[85%] rounded-2xl rounded-tr-xs bg-[#063D30] text-white p-3.5 shadow-2xs">
+                    <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#063D30] text-white p-3.5 shadow-2xs">
                       <span className="block text-[10px] font-semibold text-slate-200 uppercase tracking-wider mb-1">
                         Você perguntou:
                       </span>
@@ -410,7 +410,7 @@ export function JetroOnlineSection() {
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
-                    <div className="max-w-[85%] rounded-2xl rounded-tl-xs bg-[#F8FAF9] border border-[#E4EAE6] text-[#202B28] p-4 shadow-2xs space-y-2">
+                    <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-[#F8FAF9] border border-[#E4EAE6] text-[#202B28] p-4 shadow-2xs space-y-2">
                       <div className="flex items-center justify-between border-b border-black/5 pb-1.5">
                         <span className="text-[11px] font-semibold text-[#063D30] flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />

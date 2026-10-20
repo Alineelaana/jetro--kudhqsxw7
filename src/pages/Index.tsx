@@ -31,6 +31,7 @@ export default function Index() {
   if (isAuthenticated || (!loading && isAuthenticated)) {
     return <Navigate to="/admin" replace />
   }
+
   const scrollToContact = () => {
     const el = document.getElementById('contato')
     if (el) {
