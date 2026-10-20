@@ -169,6 +169,10 @@ export function canManageAiTraining(role: string | undefined): boolean {
   return role === 'SUP'
 }
 
+export function canChangeAiSettings(role: string | undefined): boolean {
+  return role === 'SUP'
+}
+
 /**
  * Permissão específica para a Central de Administração e Treinamento da Assistente Jeh.
  * Exclusivo para administradores e gestores autorizados.
