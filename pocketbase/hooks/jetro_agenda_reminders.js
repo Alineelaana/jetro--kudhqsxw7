@@ -318,8 +318,8 @@ function buildReminderEmailHtml(reminderRecord) {
     '  <div style="background: #005B2E; padding: 22px 26px; border-bottom: 4px solid #C9A227;">' +
     '    <div style="display: table; width: 100%;">' +
     '      <div style="display: table-cell; vertical-align: middle;">' +
-    '        <div style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px;">JETRO<span style="color: #C9A227;">.</span></div>' +
-    '        <div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Integrado ERP — Agenda Corporativa</div>' +
+    '        <div style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #C9A227;">.</span></div>' +
+    '        <div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Inteligente de Gestão — Agenda Corporativa</div>' +
     '      </div>' +
     '      <div style="display: table-cell; vertical-align: middle; text-align: right;">' +
     '        <span style="display: inline-block; background: #C9A227; color: #00381C; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px;">Lembrete</span>' +
@@ -329,7 +329,7 @@ function buildReminderEmailHtml(reminderRecord) {
     '  <div style="padding: 26px;">' +
     '    <p style="font-size: 14px; color: #4b5563; margin: 0 0 16px 0;">Olá, <strong>' +
     xmlEscape(recipientName) +
-    '</strong>. Este é um lembrete da <strong>Agenda Jetro</strong> programado para ' +
+    '</strong>. Este é um lembrete da <strong>Agenda HURAM</strong> programado para ' +
     xmlEscape(offsetLabel) +
     ':</p>' +
     '    <div style="background: #f4faf6; border: 1px solid #d1fae5; border-radius: 8px; padding: 18px 20px; margin-bottom: 20px;">' +
@@ -368,10 +368,10 @@ function buildReminderEmailHtml(reminderRecord) {
     descHtml +
     '    </div>' +
     '    <p style="font-size: 12px; color: #6b7280; margin: 0 0 20px 0; line-height: 1.4;">' +
-    '      Para gerenciar, concluir ou remarcar esta atividade, acesse o painel principal do Jetro no menu da sua <strong>Agenda Inteligente</strong>.' +
+    '      Para gerenciar, concluir ou remarcar esta atividade, acesse o painel principal do HURAM no menu da sua <strong>Agenda Inteligente</strong>.' +
     '    </p>' +
     '    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">' +
-    '      Lembrete automático enviado pela Agenda Jetro ERP.<br/>Você recebeu esta notificação porque configurou um aviso prévio para este compromisso.' +
+    '      Lembrete automático enviado pela Agenda HURAM.<br/>Você recebeu esta notificação porque configurou um aviso prévio para este compromisso.' +
     '    </div>' +
     '  </div>' +
     '</div>' +
@@ -403,7 +403,7 @@ cronAdd('jetro_agenda_reminders_worker', '*/2 * * * *', () => {
   if (!pendingReminders || pendingReminders.length === 0) return
 
   var senderAddress = $app.settings().meta.senderAddress || 'no-reply@jetro.com.br'
-  var senderName = $app.settings().meta.senderName || 'Jetro ERP — Agenda'
+  var senderName = $app.settings().meta.senderName || 'HURAM — Agenda'
 
   for (var i = 0; i < pendingReminders.length; i++) {
     var rem = pendingReminders[i]
@@ -435,7 +435,7 @@ cronAdd('jetro_agenda_reminders_worker', '*/2 * * * *', () => {
     }
 
     var title = rem.getString('appointment_title')
-    var subject = 'Lembrete da Agenda Jetro: ' + title
+    var subject = 'Lembrete da Agenda HURAM: ' + title
 
     try {
       var htmlBody = buildReminderEmailHtml(rem)

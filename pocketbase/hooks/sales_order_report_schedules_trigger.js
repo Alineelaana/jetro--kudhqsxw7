@@ -600,7 +600,7 @@ routerAdd(
       if (isTooLarge) {
         warningBox +=
           '<div style="margin-top: 14px; padding: 10px 14px; background: #fef2f2; border-left: 4px solid #dc2626; font-size: 12px; color: #991b1b;">' +
-          '<strong>Aviso de tamanho:</strong> O arquivo ultrapassou o limite seguro de envio por e-mail (10 MB). Por segurança, o arquivo pesado não foi anexado; consulte o painel Web da Consulta de Pedidos do Jetro para download direto da base completa.' +
+          '<strong>Aviso de tamanho:</strong> O arquivo ultrapassou o limite seguro de envio por e-mail (10 MB). Por segurança, o arquivo pesado não foi anexado; consulte o painel Web da Consulta de Pedidos do HURAM para download direto da base completa.' +
           '</div>'
       }
 
@@ -614,9 +614,9 @@ routerAdd(
         '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
         '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f9fafb; margin: 0; padding: 24px; color: #1f2937;">' +
         '<div style="max-width: 680px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden;">' +
-        '<div style="background: #005B2E; padding: 20px 24px; border-bottom: 4px solid #C9A227;">' +
-        '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">JETRO<span style="color: #C9A227;">.</span></div>' +
-        '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Integrado ERP — Exportação Agendada (Envio Imediato)</div>' +
+        '<div style="background: #003D30; padding: 20px 24px; border-bottom: 4px solid #D6A755;">' +
+        '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #F27616;">.</span></div>' +
+        '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Inteligente de Gestão — Exportação Agendada (Envio Imediato)</div>' +
         '</div>' +
         '<div style="padding: 24px;">' +
         '<h2 style="font-size: 18px; color: #005B2E; margin: 0 0 6px 0;">Relatório: ' +
@@ -648,7 +648,7 @@ routerAdd(
         tablePreviewHtml +
         warningBox +
         '<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">' +
-        'Este é um e-mail do Jetro ERP.<br/>Gerencie em <strong>/admin/vendas/consulta-pedidos</strong>.' +
+        'Este é um e-mail do Sistema HURAM.<br/>Gerencie em <strong>/admin/vendas/consulta-pedidos</strong>.' +
         '</div></div></div></body></html>'
       )
     }
@@ -733,7 +733,7 @@ routerAdd(
       !!xlsxFile,
       isTooLarge,
     )
-    var subject = 'Jetro — Relatório de Pedidos: ' + schedName + ' (' + orders.length + ' pedidos)'
+    var subject = 'HURAM — Relatório de Pedidos: ' + schedName + ' (' + orders.length + ' pedidos)'
 
     var reader = null
     try {
@@ -743,7 +743,7 @@ routerAdd(
       var mailOptions = {
         from: {
           address: $app.settings().meta.senderAddress || 'no-reply@jetro.com.br',
-          name: $app.settings().meta.senderName || 'Jetro ERP',
+          name: $app.settings().meta.senderName || 'Sistema HURAM',
         },
         to: toList,
         subject: subject,

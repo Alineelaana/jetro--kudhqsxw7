@@ -6,7 +6,8 @@ export function SeoHead() {
 
   useEffect(() => {
     // Título institucional alinhado ao reposicionamento solicitado
-    const defaultTitle = 'Jetro | Inteligência que conecta sua gestão — ERP Inteligente'
+    const defaultTitle =
+      'HURAM | Inteligência que conecta sua gestão — Sistema Inteligente de Gestão'
     const defaultDescription =
       'Plataforma de gestão empresarial desenvolvida para integrar processos, organizar informações, acompanhar operações e transformar dados em conhecimento para decisões mais inteligentes. Comercial, financeiro, fiscal, WMS, RH, BI e inteligência artificial.'
 
@@ -34,11 +35,11 @@ export function SeoHead() {
     setOgTag('og:title', defaultTitle)
     setOgTag('og:description', defaultDescription)
     setOgTag('og:type', 'website')
-    setOgTag('og:site_name', 'Jetro ERP')
+    setOgTag('og:site_name', 'Sistema HURAM')
     setOgTag('og:locale', 'pt_BR')
 
     // Schema.org Structured Data (JSON-LD)
-    const jsonLdId = 'jetro-seo-structured-data'
+    const jsonLdId = 'huram-seo-structured-data'
     let scriptTag = document.getElementById(jsonLdId) as HTMLScriptElement | null
     if (!scriptTag) {
       scriptTag = document.createElement('script')
@@ -50,7 +51,7 @@ export function SeoHead() {
     const structuredData = {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'Jetro ERP Inteligente',
+      name: 'HURAM — Sistema Inteligente de Gestão',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web, Cloud',
       description: defaultDescription,

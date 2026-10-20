@@ -233,7 +233,7 @@ onRecordAfterCreateSuccess((e) => {
       return (
         '<div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
         '<div style="background: #002817; padding: 24px; text-align: center; border-bottom: 3px solid #C9A227;">' +
-        '<h2 style="color: #E4C46A; margin: 0; font-size: 20px; letter-spacing: 0.5px;">JETRO ERP — Central de Chamados</h2>' +
+        '<h2 style="color: #E4C46A; margin: 0; font-size: 20px; letter-spacing: 0.5px;">HURAM — Central de Chamados</h2>' +
         '<p style="color: #e2e8f0; font-size: 13px; margin: 6px 0 0;">' +
         tituloIntro +
         '</p>' +
@@ -285,9 +285,9 @@ onRecordAfterCreateSuccess((e) => {
     if (respEmail) {
       try {
         var msgResp = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
           to: [{ address: respEmail }],
-          subject: '[Jetro ERP] Novo Chamado Atribuído a Você: ' + numero + ' — ' + assunto,
+          subject: '[HURAM] Novo Chamado Atribuído a Você: ' + numero + ' — ' + assunto,
           html: buildInternalHtml(
             'Você foi definido como responsável por este chamado',
             respNome,
@@ -313,9 +313,9 @@ onRecordAfterCreateSuccess((e) => {
     if (solicitanteEmail && solicitanteEmail !== respEmail) {
       try {
         var msgSol = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
           to: [{ address: solicitanteEmail }],
-          subject: '[Jetro ERP] Confirmação de Abertura: Chamado ' + numero,
+          subject: '[HURAM] Confirmação de Abertura: Chamado ' + numero,
           html: buildInternalHtml(
             'Seu chamado foi registrado com sucesso',
             solicitanteNome,
@@ -345,7 +345,7 @@ onRecordAfterCreateSuccess((e) => {
         var htmlExterno =
           '<div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
           '<div style="background: #002817; padding: 20px; text-align: center; border-bottom: 2px solid #C9A227;">' +
-          '<h3 style="color: #E4C46A; margin: 0;">JETRO — Notificação de Chamado</h3>' +
+          '<h3 style="color: #E4C46A; margin: 0;">HURAM — Notificação de Chamado</h3>' +
           '</div>' +
           '<div style="padding: 20px; font-size: 14px; line-height: 1.5;">' +
           '<p>Você foi convidado para acompanhar o chamado corporativo <strong>' +
@@ -362,14 +362,14 @@ onRecordAfterCreateSuccess((e) => {
           status +
           '</td></tr>' +
           '</table>' +
-          '<p style="font-size: 12px; color: #64748b;">Esta é uma mensagem automática informativa do sistema Jetro.</p>' +
+          '<p style="font-size: 12px; color: #64748b;">Esta é uma mensagem automática informativa do Sistema HURAM.</p>' +
           '</div>' +
           '</div>'
 
         var msgConv = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
           to: [{ address: convEmail }],
-          subject: '[Jetro ERP] Acompanhamento de Chamado: ' + numero,
+          subject: '[HURAM] Acompanhamento de Chamado: ' + numero,
           html: htmlExterno,
         })
         mailClient.send(msgConv)
@@ -467,11 +467,11 @@ onRecordAfterUpdateSuccess((e) => {
     }
 
     var subject =
-      '[Jetro ERP] Atualização de Status do Chamado ' + numero + ' → ' + status.toUpperCase()
+      '[HURAM] Atualização de Status do Chamado ' + numero + ' → ' + status.toUpperCase()
     var html =
       '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
       '<div style="background: #002817; padding: 20px; text-align: center; border-bottom: 3px solid #C9A227;">' +
-      '<h2 style="color: #E4C46A; margin: 0; font-size: 18px;">JETRO ERP — Atualização de Chamado</h2>' +
+      '<h2 style="color: #E4C46A; margin: 0; font-size: 18px;">HURAM — Atualização de Chamado</h2>' +
       '</div>' +
       '<div style="padding: 24px;">' +
       '<p style="font-size: 15px; margin-top: 0;">O status do chamado <strong>' +
@@ -485,7 +485,7 @@ onRecordAfterUpdateSuccess((e) => {
       '<div style="text-align: center; margin: 24px 0 10px;">' +
       '<a href="' +
       linkChamado +
-      '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Abrir Chamado no Jetro</a>' +
+      '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Abrir Chamado no HURAM</a>' +
       '</div>' +
       '</div>' +
       '</div>'
@@ -493,7 +493,7 @@ onRecordAfterUpdateSuccess((e) => {
     for (var j = 0; j < emailsParaNotificar.length; j++) {
       try {
         var msg = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
           to: [{ address: emailsParaNotificar[j].email }],
           subject: subject,
           html: html,

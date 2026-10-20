@@ -1,6 +1,6 @@
 export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
   header: {
-    logoText: 'Jetro',
+    logoText: 'HURAM',
     logoSize: 'h-16 sm:h-20',
     logoPosition: 'left',
     fixed: true,
@@ -52,8 +52,8 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
       {
         id: 'b1',
         name: 'Banner Principal',
-        title: 'Jetro — Gestão & Operações Logísticas',
-        subtitle: 'Operações Logísticas de Excelência no Espírito Santo',
+        title: 'HURAM — Sistema Inteligente de Gestão',
+        subtitle: 'Operações Corporativas e Gestão de Excelência',
         text: '',
         buttonText: 'Solicitar Orçamento',
         buttonLink: '#orcamento',
@@ -108,13 +108,13 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     ],
   },
   institutional: {
-    aboutTitle: 'Sobre a Jetro',
+    aboutTitle: 'Sobre o HURAM',
     aboutText:
-      'A Jetro é uma empresa especializada em operações logísticas e soluções de gestão empresarial integrada.',
+      'O HURAM é um ecossistema completo e especializado em gestão empresarial integrada e inteligência operacional.',
     mission:
-      'Providenciar soluções logísticas e de gestão de excelência que impulsionam o crescimento dos nossos clientes.',
+      'Providenciar soluções corporativas e de gestão de excelência que impulsionam o crescimento dos nossos clientes.',
     vision:
-      'Ser referência em operações logísticas e gestão integrada no Brasil, reconhecida pela qualidade e inovação.',
+      'Ser referência em governança, gestão integrada e tecnologia inteligente no Brasil, reconhecida pela qualidade e inovação.',
     values: 'Segurança, Eficiência, Inovação, Compromisso, Transparência',
     history: '',
     team: '',
@@ -217,7 +217,7 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     email: '',
     website: '',
     address: 'Atendemos em todo o estado do Espírito Santo',
-    copyrightText: 'Jetro. Todos os direitos reservados.',
+    copyrightText: 'HURAM. Todos os direitos reservados.',
     socialLinks: {},
     backgroundColor: '#01361D',
     textColor: '#FFFFFF',
@@ -234,21 +234,19 @@ export const CMS_DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     ],
   },
   seo: {
-    title: 'Jetro - Gestão Empresarial Inteligente & Operações Logísticas',
+    title: 'HURAM — Sistema Inteligente de Gestão',
     description:
-      'Soluções completas em gestão empresarial inteligente, armazenagem, transporte de cargas e distribuição.',
-    keywords:
-      'jetro, gestão empresarial, erp, logística, armazenagem, transporte, cargas, WMS, distribuição',
+      'Soluções completas em gestão empresarial inteligente e operações corporativas de alta precisão.',
+    keywords: 'huram, gestão empresarial, erp, inteligência operacional, WMS, governança',
     canonicalUrl: '',
-    ogTitle: 'Jetro - Gestão Empresarial e Logística Integrada',
-    ogDescription: 'Excelência em gestão inteligente e soluções logísticas',
+    ogTitle: 'HURAM — Sistema Inteligente de Gestão',
+    ogDescription: 'Excelência em gestão inteligente e operações corporativas',
     indexNoIndex: 'index',
     friendlyUrl: '',
-    defaultTitle: 'Jetro - Gestão Empresarial Inteligente & Operações Logísticas',
+    defaultTitle: 'HURAM — Sistema Inteligente de Gestão',
     defaultDescription:
-      'Soluções completas em gestão empresarial inteligente, armazenagem, transporte de cargas e distribuição.',
-    defaultKeywords:
-      'jetro, gestão empresarial, erp, logística, armazenagem, transporte, cargas, WMS, distribuição',
+      'Soluções completas em gestão empresarial inteligente e operações corporativas.',
+    defaultKeywords: 'huram, gestão empresarial, erp, inteligência operacional, WMS',
     favicon: '',
     searchLogo: '',
     pages: [

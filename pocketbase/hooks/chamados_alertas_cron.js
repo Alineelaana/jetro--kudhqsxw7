@@ -198,7 +198,7 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
         '<div style="background: #002817; padding: 22px; text-align: center; border-bottom: 4px solid ' +
         corAlerta +
         ';">' +
-        '<h2 style="color: #E4C46A; margin: 0; font-size: 19px; letter-spacing: 0.5px;">JETRO ERP — Alerta Automático de Chamado</h2>' +
+        '<h2 style="color: #E4C46A; margin: 0; font-size: 19px; letter-spacing: 0.5px;">HURAM — Alerta Automático de Chamado</h2>' +
         '<p style="color: #ffffff; background: ' +
         corAlerta +
         '; display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; margin: 8px 0 0; text-transform: uppercase;">' +
@@ -207,7 +207,7 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
         '</div>' +
         '<div style="padding: 24px;">' +
         '<p style="font-size: 14px; line-height: 1.5; color: #334155; margin-top: 0;">' +
-        'Este é um aviso automático da Central de Chamados do Jetro ERP sobre a seguinte demanda pendente:' +
+        'Este é um aviso automático da Central de Chamados do Sistema HURAM sobre a seguinte demanda pendente:' +
         '</p>' +
         '<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">' +
         '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; width: 140px; border: 1px solid #e2e8f0;">Número:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; color: #005B2E; font-weight: bold;">' +
@@ -236,10 +236,10 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
         '<div style="text-align: center; margin: 26px 0 10px;">' +
         '<a href="' +
         linkChamado +
-        '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Acessar Chamado no Jetro</a>' +
+        '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Acessar Chamado no HURAM</a>' +
         '</div>' +
         '<p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 20px;">' +
-        'Notificação gerada conforme política corporativa de SLA e governança de chamados do ERP Jetro.' +
+        'Notificação gerada conforme política corporativa de SLA e governança de chamados do Sistema HURAM.' +
         '</p>' +
         '</div>' +
         '</div>'
@@ -250,7 +250,7 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
         var dest = destinatarios[d]
         try {
           var msgAlerta = new MailerMessage({
-            from: { address: 'chamados@jetro.com.br', name: 'Jetro ERP — Central de Chamados' },
+            from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
             to: [{ address: dest.email }],
             subject: subject,
             html: htmlContent,

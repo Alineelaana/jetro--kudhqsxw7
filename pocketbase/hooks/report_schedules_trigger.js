@@ -1116,7 +1116,7 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
     if (isTooLarge) {
       warningBox +=
         '<div style="margin-top: 14px; padding: 10px 14px; background: #fef2f2; border-left: 4px solid #dc2626; font-size: 12px; color: #991b1b;">' +
-        '<strong>Aviso de tamanho:</strong> O arquivo ultrapassou o limite seguro de envio por e-mail (10 MB). Acesse o painel do Jetro para exportação direta.' +
+        '<strong>Aviso de tamanho:</strong> O arquivo ultrapassou o limite seguro de envio por e-mail (10 MB). Acesse o painel do HURAM para exportação direta.' +
         '</div>'
     }
 
@@ -1136,9 +1136,9 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
       '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
       '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f9fafb; margin: 0; padding: 24px; color: #1f2937;">' +
       '<div style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden;">' +
-      '<div style="background: #005B2E; padding: 20px 24px; border-bottom: 4px solid #C9A227;">' +
-      '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">JETRO<span style="color: #C9A227;">.</span></div>' +
-      '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Integrado ERP — ' +
+      '<div style="background: #003D30; padding: 20px 24px; border-bottom: 4px solid #D6A755;">' +
+      '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #F27616;">.</span></div>' +
+      '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Inteligente de Gestão — ' +
       xmlEscape(moduleName) +
       ' / ' +
       xmlEscape(meta.title) +
@@ -1179,7 +1179,7 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
       tablePreviewHtml +
       warningBox +
       '<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">' +
-      'E-mail gerado pelo Jetro ERP a pedido de ' +
+      'E-mail gerado pelo Sistema HURAM a pedido de ' +
       xmlEscape(authUser.getString('name') || authUser.getString('email')) +
       '.<br/>Gerencie seus agendamentos no menu <strong>Administração &gt; Agendamento de Relatórios</strong>.' +
       '</div></div></div></body></html>'
@@ -1379,7 +1379,7 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
   )
 
   var defaultSubject =
-    'Jetro — ' + meta.title + ': ' + schedName + ' (' + records.length + ' registros)'
+    'HURAM — ' + meta.title + ': ' + schedName + ' (' + records.length + ' registros)'
   var finalSubject =
     customSubject && customSubject.trim().length > 0 ? customSubject : defaultSubject
 
@@ -1395,7 +1395,7 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
     var mailOptions = {
       from: {
         address: $app.settings().meta.senderAddress || 'no-reply@jetro.com.br',
-        name: $app.settings().meta.senderName || 'Jetro ERP',
+        name: $app.settings().meta.senderName || 'Sistema HURAM',
       },
       to: toList,
       cc: ccList,

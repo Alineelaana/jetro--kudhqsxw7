@@ -140,15 +140,15 @@ onRecordAfterCreateSuccess((e) => {
     // 2. Disparo de e-mail de notificação para a administração (se houver remetente configurado)
     try {
       var mailClient = $app.newMailClient()
-      var subject = '[Jetro ERP] Novo Depoimento do Site Institucional para Aprovação'
+      var subject = '[HURAM] Novo Depoimento do Site Institucional para Aprovação'
       var html =
         '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">' +
-        '<div style="background: #01361D; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">' +
-        '<h2 style="color: #E4C46A; margin: 0;">JETRO Gestão Empresarial</h2>' +
+        '<div style="background: #003D30; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 3px solid #D6A755;">' +
+        '<h2 style="color: #E4C46A; margin: 0;">HURAM — Sistema Inteligente de Gestão</h2>' +
         '<p style="color: #ffffff; font-size: 13px; margin: 6px 0 0;">Novo depoimento recebido via site institucional</p>' +
         '</div>' +
         '<div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; background: #ffffff; border-radius: 0 0 8px 8px;">' +
-        '<p style="font-size: 15px;">Um novo cliente enviou um depoimento sobre o Jetro e aguarda moderação administrativa antes da publicação.</p>' +
+        '<p style="font-size: 15px;">Um novo cliente enviou um depoimento sobre o HURAM e aguarda moderação administrativa antes da publicação.</p>' +
         '<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">' +
         '<tr><td style="padding: 8px; font-weight: bold; width: 140px; background: #f8fafc;">Autor:</td><td style="padding: 8px; background: #f8fafc;">' +
         nomeAutor +
@@ -161,9 +161,9 @@ onRecordAfterCreateSuccess((e) => {
         ' (não público)</td></tr>' +
         '<tr><td style="padding: 8px; font-weight: bold;">Status:</td><td style="padding: 8px; color: #b45309; font-weight: bold;">Pendente de Aprovação</td></tr>' +
         '</table>' +
-        '<p style="font-size: 13px; color: #64748b; line-height: 1.5;">O depoimento <strong>não</strong> é publicado automaticamente. Acesse a Central Administrativa do Jetro ERP para visualizar o texto na íntegra, a autorização e aprovar ou reprovar.</p>' +
+        '<p style="font-size: 13px; color: #64748b; line-height: 1.5;">O depoimento <strong>não</strong> é publicado automaticamente. Acesse a Central Administrativa do HURAM para visualizar o texto na íntegra, a autorização e aprovar ou reprovar.</p>' +
         '<div style="text-align: center; margin: 24px 0 10px;">' +
-        '<a href="https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev/admin/site-depoimentos" style="background: #005B2E; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Analisar Depoimento no ERP</a>' +
+        '<a href="https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev/admin/site-depoimentos" style="background: #003D30; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Analisar Depoimento no ERP</a>' +
         '</div>' +
         '</div>' +
         '</div>'
@@ -172,7 +172,7 @@ onRecordAfterCreateSuccess((e) => {
       var msg = new MailerMessage({
         from: {
           address: 'sistema@jetro.com.br',
-          name: 'Jetro ERP - Notificações',
+          name: 'HURAM - Notificações',
         },
         to: [{ address: adminDest }],
         subject: subject,
