@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useState, Suspense } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -42,11 +42,6 @@ export default function Layout() {
   const isSite = pathname === '/site'
   const showFooter = !isInternalPath(pathname) && (!isAuthenticated || !isSite)
 
-  // Redirecionamento preventivo de nível de layout: se o usuário já estiver autenticado e tentar acessar /site, manda direto para /admin
-  if (isSite && isAuthenticated) {
-    return <Navigate to="/admin" replace />
-  }
-
   useEffect(() => {
     if (!isAdmin) {
       window.scrollTo(0, 0)
@@ -60,6 +55,11 @@ export default function Layout() {
       }
     }
   }, [pathname, isAdmin])
+
+  // Redirecionamento preventivo de nível de layout: se o usuário já estiver autenticado e tentar acessar /site, manda direto para /admin
+  if (isSite && isAuthenticated) {
+    return <Navigate to="/admin" replace />
+  }
 
   if (showSidebar) {
     return (
