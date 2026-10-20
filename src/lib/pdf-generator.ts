@@ -1,4 +1,4 @@
-import jetroLogoUrl from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-c8e57.jpeg'
+import { logoHuramLight } from '@/lib/brand-assets'
 
 export interface BudgetPdfData {
   id?: string

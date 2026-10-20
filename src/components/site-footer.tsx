@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-64131.jpeg'
+import { logoHuramDark } from '@/lib/brand-assets'
 import { useAuth } from '@/hooks/use-auth'
 import { AttributionFooter } from '@/components/attribution-footer'
 import { ShieldCheck, Mail, Phone, MapPin, ExternalLink } from 'lucide-react'
@@ -9,7 +9,7 @@ export function SiteFooter() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <footer className="bg-[#001c10] text-white border-t border-[#C9A227]/30 pt-16 pb-12">
+    <footer className="bg-[#001c10] text-white border-t border-[#D6A755]/30 pt-16 pb-12">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Coluna 1: Marca & Posicionamento */}
@@ -19,21 +19,21 @@ export function SiteFooter() {
               className="inline-flex items-center gap-3 group transition-opacity hover:opacity-95"
               title={
                 isAuthenticated
-                  ? 'Painel Operacional Jetro'
+                  ? 'Painel Operacional HURAM'
                   : 'Retornar para a tela inicial / login'
               }
             >
               <img
-                src={logoImg}
-                alt="Jetro ERP Inteligente"
-                className="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                src={logoHuramDark}
+                alt="HURAM — Sistema Inteligente de Gestão"
+                className="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-md bg-[#002820] p-1"
               />
               <div className="flex flex-col">
                 <span className="text-2xl font-black text-white tracking-tight leading-none">
-                  JETRO
+                  HURAM
                 </span>
-                <span className="text-[10px] font-semibold text-[#C9A227] tracking-wider uppercase mt-0.5">
-                  ERP Inteligente
+                <span className="text-[10px] font-semibold text-[#D6A755] tracking-wider uppercase mt-0.5">
+                  Sistema Inteligente de Gestão
                 </span>
               </div>
             </Link>
@@ -61,7 +61,7 @@ export function SiteFooter() {
               </li>
               <li>
                 <a href="#sobre" className="hover:text-white transition-colors">
-                  O Jetro
+                  A HURAM
                 </a>
               </li>
               <li>
@@ -81,12 +81,12 @@ export function SiteFooter() {
               </li>
               <li>
                 <a href="#ia" className="hover:text-white transition-colors">
-                  Inteligência Artificial (Jeh & Jetro On-line)
+                  Inteligência Artificial (Jeh & HURAM On-line)
                 </a>
               </li>
               <li>
                 <a href="#universidade" className="hover:text-white transition-colors">
-                  Universidade Jetro & Tours
+                  Universidade HURAM & Tours
                 </a>
               </li>
               <li>
@@ -236,7 +236,9 @@ export function SiteFooter() {
 
         {/* Linha Divisória & Copyright */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-          <p>© {currentYear} Jetro ERP — Todos os direitos reservados.</p>
+          <p>
+            © {currentYear} HURAM — Sistema Inteligente de Gestão. Todos os direitos reservados.
+          </p>
           <p className="text-center sm:text-right">
             Governança, Conformidade & Inteligência Empresarial
           </p>

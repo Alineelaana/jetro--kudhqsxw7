@@ -32,10 +32,10 @@ export default function AdminPasswordRecovery() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
-        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg">
+      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
           <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Mail className="w-6 h-6 text-[#E4C46A]" /> Recuperar Senha
+            <Mail className="w-6 h-6 text-[#D6A755]" /> Recuperar Senha — HURAM
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -46,7 +46,7 @@ export default function AdminPasswordRecovery() {
                 Enviamos um link de recuperação para <strong>{email}</strong>. Verifique sua caixa
                 de entrada.
               </p>
-              <Button asChild variant="outline" className="border-[#005B2E] text-[#005B2E]">
+              <Button asChild variant="outline" className="border-[#003D30] text-[#003D30]">
                 <Link to="/admin">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar ao login
                 </Link>
@@ -55,7 +55,8 @@ export default function AdminPasswordRecovery() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
+                Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha no
+                sistema HURAM.
               </p>
               <div className="space-y-1.5">
                 <Label htmlFor="admin-recovery-email" className="text-sm font-semibold">
@@ -69,7 +70,7 @@ export default function AdminPasswordRecovery() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                    className="pl-10 focus-visible:ring-[#003D30] border-border"
                     autoComplete="email"
                   />
                 </div>
@@ -83,7 +84,7 @@ export default function AdminPasswordRecovery() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
+                className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -96,7 +97,7 @@ export default function AdminPasswordRecovery() {
               </Button>
               <Link
                 to="/admin"
-                className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+                className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
               >
                 Voltar ao login
               </Link>

@@ -1,34 +1,35 @@
-import jetroLogoUrl from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-c8e57.jpeg'
+import { logoHuramLight } from '@/lib/brand-assets'
 
 export const DEFAULT_CORPORATE_IDENTITY = {
-  name: 'Jetro',
-  razaoSocial: 'Jetro - Plataforma Inteligente de Gestão Empresarial',
-  nomeFantasia: 'Jetro',
+  name: 'HURAM',
+  razaoSocial: 'HURAM — Sistema Inteligente de Gestão',
+  nomeFantasia: 'HURAM',
   cnpj: '12.345.678/0001-90',
-  logo: jetroLogoUrl,
-  slogan: 'Inteligência que Conecta. Tecnologia que Evolui. Resultados que Transformam.',
-  address: 'Vitória, ES - Brasil',
+  logo: logoHuramLight,
+  slogan: 'Sistema Inteligente de Gestão',
+  address: 'Centro Corporativo de Operações',
   phone: '(27) 99999-9999',
-  email: 'contato@jetrolog.com.br',
-  website: 'https://jetrolog.com.br',
+  email: 'contato@huram.com.br',
+  website: 'https://huram.com.br',
 }
 
 export const CORPORATE_IDENTITY = {
   ...DEFAULT_CORPORATE_IDENTITY,
-  brandName: 'Jetro',
-  systemName: 'Jetro',
+  brandName: 'HURAM',
+  systemName: 'HURAM — Sistema Inteligente de Gestão',
   fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-  primaryColor: '#005B2E',
-  primaryDarkColor: '#01361D',
-  goldColor: '#C89B3C',
+  primaryColor: '#003D30',
+  primaryDarkColor: '#002820',
+  goldColor: '#D6A755',
+  orangeColor: '#F27616',
   textColor: '#1a1a1a',
   mutedTextColor: '#666666',
   bgColor: '#FFFFFF',
-  altRowColor: '#F5F5F5',
+  altRowColor: '#F8FAFC',
 }
 
 export function getLogoUrl(): string {
-  return CORPORATE_IDENTITY.logo || jetroLogoUrl
+  return CORPORATE_IDENTITY.logo || logoHuramLight
 }
 
 export function getHtmlStyles(): string {

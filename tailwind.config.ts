@@ -49,6 +49,13 @@ export default {
         gold: {
           DEFAULT: 'hsl(var(--gold))',
         },
+        huram: {
+          green: '#003D30',
+          orange: '#F27616',
+          gold: '#D6A755',
+          white: '#FFFFFF',
+          dark: '#002820',
+        },
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',

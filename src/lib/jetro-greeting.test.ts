@@ -64,16 +64,16 @@ export function runGreetingValidationSuite(): {
   }
 
   // 2. CASOS DE TRATAMENTO OBRIGATÓRIOS
-  // - Masculino: "Seja bem-vindo ao Jetro Sistema Inteligente!"
-  // - Feminino: "Seja bem-vinda ao Jetro Sistema Inteligente!"
-  // - Sem preferência/neutro: "Seja bem vindo (a) ao Jetro ,Sistema Inteligente!"
+  // - Masculino: "Seja bem-vindo ao HURAM — Sistema Inteligente de Gestão!"
+  // - Feminino: "Seja bem-vinda ao HURAM — Sistema Inteligente de Gestão!"
+  // - Sem preferência/neutro: "Seja bem vindo (a) ao HURAM — Sistema Inteligente de Gestão!"
   const treatmentCases = [
-    { input: 'masculino', expected: 'Seja bem-vindo ao Jetro Sistema Inteligente!' },
-    { input: 'feminino', expected: 'Seja bem-vinda ao Jetro Sistema Inteligente!' },
-    { input: 'neutro', expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
-    { input: '', expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
-    { input: null, expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
-    { input: undefined, expected: 'Seja bem vindo (a) ao Jetro ,Sistema Inteligente!' },
+    { input: 'masculino', expected: 'Seja bem-vindo ao HURAM — Sistema Inteligente de Gestão!' },
+    { input: 'feminino', expected: 'Seja bem-vinda ao HURAM — Sistema Inteligente de Gestão!' },
+    { input: 'neutro', expected: 'Seja bem vindo (a) ao HURAM — Sistema Inteligente de Gestão!' },
+    { input: '', expected: 'Seja bem vindo (a) ao HURAM — Sistema Inteligente de Gestão!' },
+    { input: null, expected: 'Seja bem vindo (a) ao HURAM — Sistema Inteligente de Gestão!' },
+    { input: undefined, expected: 'Seja bem vindo (a) ao HURAM — Sistema Inteligente de Gestão!' },
   ]
 
   for (const tc of treatmentCases) {
@@ -125,10 +125,10 @@ export function runGreetingValidationSuite(): {
   })
 
   const textoEsperadoTrabalho =
-    'Desejamos a você um excelente dia de trabalho! Sempre que precisar de ajuda, o Jetro On-line estará à sua disposição no canto direito da tela.'
+    'Desejamos a você um excelente dia de trabalho! Sempre que precisar de ajuda, o HURAM On-line estará à sua disposição no canto direito da tela.'
   results.push({
     passed: TEXTO_EXCELENTE_DIA_TRABALHO === textoEsperadoTrabalho,
-    description: 'Texto de votos de excelente dia de trabalho e Jetro On-line à disposição',
+    description: 'Texto de votos de excelente dia de trabalho e HURAM On-line à disposição',
     expected: textoEsperadoTrabalho,
     actual: TEXTO_EXCELENTE_DIA_TRABALHO,
   })

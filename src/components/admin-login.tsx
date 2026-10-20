@@ -9,7 +9,7 @@ import { type FieldErrors } from '@/lib/pocketbase/errors'
 import { Lock, User, AlertCircle, Loader2, MapPin } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import { AttributionFooter } from '@/components/attribution-footer'
-import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import { logoHuramDark } from '@/lib/brand-assets'
 
 export function AdminLogin() {
   const { login, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
@@ -89,20 +89,18 @@ export function AdminLogin() {
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 space-y-4">
-      <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
-        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
+      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
           <img
-            src={logoJetro}
-            alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
-            className="h-20 w-auto object-contain rounded-xl border border-[#C89B3C]/40 mb-3 shadow-lg"
+            src={logoHuramDark}
+            alt="HURAM — Sistema Inteligente de Gestão"
+            className="h-24 w-auto object-contain rounded-xl border border-[#D6A755]/40 mb-3 shadow-lg bg-[#003D30] p-1"
           />
           <CardTitle className="text-lg sm:text-xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-5 h-5 text-[#E4C46A]" />
-            Área Restrita — Jetro
+            <Lock className="w-5 h-5 text-[#D6A755]" />
+            Área Restrita — HURAM
           </CardTitle>
-          <p className="text-xs text-white/70 mt-1 font-medium">
-            Plataforma Inteligente de Gestão Empresarial
-          </p>
+          <p className="text-xs text-white/80 mt-1 font-medium">Sistema Inteligente de Gestão</p>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -118,7 +116,7 @@ export function AdminLogin() {
                   value={username}
                   onChange={handleUsernameChange}
                   placeholder="Digite seu usuário"
-                  className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                  className="pl-10 focus-visible:ring-[#003D30] border-border"
                   autoComplete="username"
                 />
               </div>
@@ -140,7 +138,7 @@ export function AdminLogin() {
                   value={password}
                   onChange={handlePasswordChange}
                   placeholder="Digite sua senha"
-                  className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                  className="pl-10 focus-visible:ring-[#003D30] border-border"
                   autoComplete="current-password"
                 />
               </div>
@@ -161,14 +159,14 @@ export function AdminLogin() {
                 type="checkbox"
                 checked={allowLocation}
                 onChange={(e) => setAllowLocation(e.target.checked)}
-                className="mt-1 rounded border-[#005B2E] text-[#005B2E] focus:ring-[#005B2E] h-4 w-4 cursor-pointer"
+                className="mt-1 rounded border-[#003D30] text-[#003D30] focus:ring-[#003D30] h-4 w-4 cursor-pointer"
               />
               <label
                 htmlFor="allow-location"
                 className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none"
               >
                 <span className="font-semibold text-foreground flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#005B2E]" />
+                  <MapPin className="w-3.5 h-3.5 text-[#003D30]" />
                   Autorizar localização precisa neste acesso
                 </span>
                 <span>
@@ -180,7 +178,7 @@ export function AdminLogin() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
+              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
               disabled={submitting}
             >
               {submitting ? (
@@ -197,7 +195,7 @@ export function AdminLogin() {
             </Button>
             <Link
               to="/admin/recuperar-senha"
-              className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+              className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
             >
               Esqueci minha senha
             </Link>
@@ -206,10 +204,10 @@ export function AdminLogin() {
               <Button
                 asChild
                 variant="outline"
-                className="w-full border-[#C89B3C]/70 hover:bg-[#C89B3C]/10 text-[#002817] font-bold text-sm rounded-xl"
+                className="w-full border-[#D6A755]/70 hover:bg-[#D6A755]/15 text-[#003D30] font-bold text-sm rounded-xl"
               >
                 <Link to="/site" className="flex items-center justify-center gap-2">
-                  Acesse o site do Jetro
+                  Acesse o site da HURAM
                 </Link>
               </Button>
             </div>

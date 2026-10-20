@@ -1,6 +1,6 @@
 export const DEFAULT_WHATSAPP_NUMBER = '5531991297619'
-export const BRAND_NAME = 'Jetro'
-export const BRAND_SLOGAN = 'Plataforma Inteligente de Gestão Empresarial'
+export const BRAND_NAME = 'HURAM'
+export const BRAND_SLOGAN = 'Sistema Inteligente de Gestão'
 
 export const SERVICE_OPTIONS: string[] = [
   'Armazenagem',

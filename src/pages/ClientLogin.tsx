@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useClientAuth } from '@/hooks/use-client-auth'
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
-import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import { logoHuramDark } from '@/lib/brand-assets'
 
 export default function ClientLogin() {
   const navigate = useNavigate()
@@ -34,19 +34,17 @@ export default function ClientLogin() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
-        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
+      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
           <img
-            src={logoJetro}
-            alt="Jetro - Área do Cliente"
-            className="h-20 w-auto object-contain rounded-xl border border-[#C89B3C]/40 mb-3 shadow-lg"
+            src={logoHuramDark}
+            alt="HURAM - Área do Cliente"
+            className="h-24 w-auto object-contain rounded-xl border border-[#D6A755]/40 mb-3 shadow-lg bg-[#003D30] p-1"
           />
           <CardTitle className="text-xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-6 h-6 text-[#E4C46A]" /> Área do Cliente — Jetro
+            <Lock className="w-6 h-6 text-[#D6A755]" /> Área do Cliente — HURAM
           </CardTitle>
-          <p className="text-xs text-white/70 mt-1 font-medium">
-            Plataforma Inteligente de Gestão Empresarial
-          </p>
+          <p className="text-xs text-white/80 mt-1 font-medium">Sistema Inteligente de Gestão</p>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,7 +60,7 @@ export default function ClientLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                  className="pl-10 focus-visible:ring-[#003D30] border-border"
                   autoComplete="email"
                 />
               </div>
@@ -79,7 +77,7 @@ export default function ClientLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Digite sua senha"
-                  className="pl-10 focus-visible:ring-[#005B2E] border-border"
+                  className="pl-10 focus-visible:ring-[#003D30] border-border"
                   autoComplete="current-password"
                 />
               </div>
@@ -93,7 +91,7 @@ export default function ClientLogin() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
+              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
               disabled={submitting}
             >
               {submitting ? (
@@ -110,7 +108,7 @@ export default function ClientLogin() {
             </Button>
             <Link
               to="/cliente/recuperar-senha"
-              className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+              className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
             >
               Esqueci minha senha
             </Link>
@@ -119,9 +117,9 @@ export default function ClientLogin() {
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full border-[#C89B3C]/70 hover:bg-[#C89B3C]/10 text-[#002817] font-bold text-sm rounded-xl"
+                  className="w-full border-[#D6A755]/70 hover:bg-[#D6A755]/15 text-[#003D30] font-bold text-sm rounded-xl"
                 >
-                  <Link to="/site">Acesse o site do Jetro</Link>
+                  <Link to="/site">Acesse o site da HURAM</Link>
                 </Button>
               </div>
             </div>

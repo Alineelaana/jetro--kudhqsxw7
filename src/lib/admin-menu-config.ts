@@ -203,7 +203,7 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         perm: canManageUsers,
       },
       {
-        label: 'Configurações do Jetro On-line',
+        label: 'Configurações do HURAM On-line',
         icon: Sparkles,
         route: '/admin/configuracoes/jetro-online',
         perm: canManageJetroOnline,
@@ -218,7 +218,7 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           },
           { label: 'Sugestões Inteligentes', route: '/admin/configuracoes/jetro-online/sugestoes' },
           { label: 'Tours Guiados', route: '/admin/configuracoes/jetro-online/tours' },
-          { label: 'Universidade Jetro', route: '/admin/configuracoes/jetro-online/universidade' },
+          { label: 'Universidade HURAM', route: '/admin/configuracoes/jetro-online/universidade' },
         ],
       },
       {

@@ -4,69 +4,70 @@
 
 @layer base {
   :root {
-    --background: 152 100% 98%;
-    --foreground: 152 70% 8%;
+    --background: 0 0% 100%; /* Predomínio de Branco #FFFFFF */
+    --foreground: 167 100% 12%; /* #003D30 Verde-escuro institucional */
 
     --card: 0 0% 100%;
-    --card-foreground: 152 70% 8%;
+    --card-foreground: 167 100% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 152 70% 8%;
+    --popover-foreground: 167 100% 12%;
 
-    --primary: 150 100% 18%; /* #005B2E Flag Green */
+    --primary: 167 100% 12%; /* #003D30 Verde-escuro HURAM */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 41 54% 51%; /* #C89B3C Gold Metallic */
-    --secondary-foreground: 150 100% 11%; /* #01361D Dark Institutional */
+    --secondary: 38 61% 59%; /* #D6A755 Dourado HURAM */
+    --secondary-foreground: 167 100% 12%;
 
-    --muted: 150 20% 95%;
-    --muted-foreground: 150 15% 35%;
+    --muted: 210 20% 97%; /* Cinza muito claro corporativo #F8FAFC */
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 41 60% 92%;
-    --accent-foreground: 150 100% 18%;
+    --accent: 38 61% 95%; /* Dourado suave para destaque */
+    --accent-foreground: 167 100% 12%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 150 25% 88%;
-    --input: 150 25% 88%;
-    --ring: 150 100% 18%;
+    --border: 214 32% 91%; /* Cinza muito claro para separação suave */
+    --input: 214 32% 91%;
+    --ring: 167 100% 12%;
 
     --radius: 0.75rem;
 
-    --gold: 41 54% 51%;
-    --gold-light: 42 70% 65%;
-    --dark-institutional: 150 96% 11%; /* #01361D */
+    --gold: 38 61% 59%; /* #D6A755 */
+    --gold-light: 38 75% 70%;
+    --orange-huram: 26 90% 52%; /* #F27616 */
+    --dark-institutional: 167 100% 12%; /* #003D30 */
   }
 
   .dark {
-    --background: 150 96% 11%;
+    --background: 167 100% 10%;
     --foreground: 0 0% 98%;
 
-    --card: 150 80% 13%;
+    --card: 167 85% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 150 80% 13%;
+    --popover: 167 85% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 41 54% 51%;
-    --primary-foreground: 150 96% 11%;
+    --primary: 38 61% 59%;
+    --primary-foreground: 167 100% 10%;
 
-    --secondary: 150 100% 18%;
+    --secondary: 167 100% 12%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 150 40% 16%;
-    --muted-foreground: 150 15% 70%;
+    --muted: 167 40% 16%;
+    --muted-foreground: 167 15% 70%;
 
-    --accent: 150 60% 20%;
+    --accent: 167 60% 20%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 150 40% 20%;
-    --input: 150 40% 20%;
-    --ring: 41 54% 51%;
+    --border: 167 40% 20%;
+    --input: 167 40% 20%;
+    --ring: 38 61% 59%;
   }
 }
 
@@ -77,41 +78,50 @@
   }
 
   .bg-flag-green {
-    background-color: #005b2e;
+    background-color: #003d30;
   }
   .bg-gold-metallic {
-    background-color: #c89b3c;
+    background-color: #d6a755;
   }
   .bg-dark-institutional {
-    background-color: #01361d;
+    background-color: #003d30;
+  }
+  .bg-orange-huram {
+    background-color: #f27616;
   }
   .text-flag-green {
-    color: #005b2e;
+    color: #003d30;
   }
   .text-gold-metallic {
-    color: #c89b3c;
+    color: #d6a755;
+  }
+  .text-orange-huram {
+    color: #f27616;
   }
   .border-gold-metallic {
-    border-color: #c89b3c;
+    border-color: #d6a755;
+  }
+  .border-orange-huram {
+    border-color: #f27616;
   }
 
   .gold-gradient-text {
-    background: linear-gradient(135deg, #f5d77a 0%, #e4c46a 40%, #d4a843 100%);
+    background: linear-gradient(135deg, #f5d77a 0%, #d6a755 50%, #b88636 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .gold-gradient-bg {
-    background: linear-gradient(135deg, #e4c46a 0%, #c89b3c 100%);
+    background: linear-gradient(135deg, #e8c47d 0%, #d6a755 100%);
   }
 
   .dark-hero-overlay {
     background: linear-gradient(
       180deg,
-      rgba(1, 54, 29, 0.88) 0%,
-      rgba(0, 91, 46, 0.82) 60%,
-      rgba(1, 54, 29, 0.95) 100%
+      rgba(0, 40, 32, 0.92) 0%,
+      rgba(0, 61, 48, 0.88) 60%,
+      rgba(0, 40, 32, 0.96) 100%
     );
   }
 

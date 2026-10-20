@@ -19,7 +19,7 @@ import { ADMIN_MENU, type MenuEntry, type MenuChild } from '@/lib/admin-menu-con
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import { logoHuramLight, logoHuramDark } from '@/lib/brand-assets'
 
 interface SearchResult {
   label: string
@@ -241,7 +241,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
         {/* Cabeçalho do Sidebar */}
         <div
           className={cn(
-            'border-b border-[#002817] shrink-0 bg-[#01361D] text-white flex items-center transition-all duration-200',
+            'border-b border-[#002820] shrink-0 bg-[#003D30] text-white flex items-center transition-all duration-200',
             effectiveRail
               ? 'p-2 flex-col gap-2 justify-center py-2.5'
               : 'p-2.5 justify-between gap-2',
@@ -252,12 +252,12 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
               <Link
                 to="/admin"
                 className="flex items-center justify-center p-0.5 rounded hover:opacity-90 transition-opacity"
-                title="JETRO Gestão Empresarial"
+                title="HURAM — Sistema Inteligente de Gestão"
               >
                 <img
-                  src={logoJetro}
-                  alt="Jetro"
-                  className="h-8 w-8 object-cover rounded-md border border-[#C89B3C]/50 bg-black/20 shadow-sm"
+                  src={logoHuramDark}
+                  alt="HURAM"
+                  className="h-8 w-8 object-cover rounded-md border border-[#D6A755]/50 bg-black/20 shadow-sm"
                 />
               </Link>
               <Tooltip>
@@ -267,7 +267,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                     className="p-1.5 rounded-md text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                     aria-label="Expandir menu lateral"
                   >
-                    <PanelLeftOpen className="w-4 h-4 text-[#E4C46A]" />
+                    <PanelLeftOpen className="w-4 h-4 text-[#D6A755]" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Fixar menu expandido</TooltipContent>
@@ -277,15 +277,17 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
             <>
               <Link to="/admin" className="flex items-center gap-2 overflow-hidden min-w-0">
                 <img
-                  src={logoJetro}
-                  alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
-                  className="h-9 w-auto object-contain rounded border border-[#C89B3C]/40 bg-black/20 shadow-sm shrink-0"
+                  src={logoHuramDark}
+                  alt="HURAM — Sistema Inteligente de Gestão"
+                  className="h-9 w-auto object-contain rounded border border-[#D6A755]/40 bg-black/20 shadow-sm shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
-                  <span className="font-black text-xs text-[#E4C46A] tracking-wider truncate">
-                    JETRO
+                  <span className="font-black text-xs text-[#D6A755] tracking-wider truncate">
+                    HURAM
                   </span>
-                  <span className="text-[10px] text-white/80 truncate">Gestão Empresarial</span>
+                  <span className="text-[10px] text-white/80 truncate">
+                    Sistema Inteligente de Gestão
+                  </span>
                 </div>
               </Link>
               <Tooltip>
@@ -350,15 +352,15 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                                 className={cn(
                                   'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group',
                                   active
-                                    ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold shadow-xs'
+                                    ? 'bg-[#003D30]/10 text-[#003D30] font-semibold shadow-xs'
                                     : isFlyoutOpen
-                                      ? 'bg-gray-100 text-[#005B2E]'
-                                      : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                                      ? 'bg-gray-100 text-[#003D30]'
+                                      : 'text-gray-600 hover:bg-gray-100 hover:text-[#003D30]',
                                 )}
                                 aria-label={item.label}
                               >
                                 {active && (
-                                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#005B2E] rounded-r-sm" />
+                                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#003D30] rounded-r-sm" />
                                 )}
                                 <Icon className="w-5 h-5 shrink-0" />
                               </button>
@@ -382,13 +384,13 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                               className={cn(
                                 'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group',
                                 active
-                                  ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold shadow-xs'
-                                  : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                                  ? 'bg-[#003D30]/10 text-[#003D30] font-semibold shadow-xs'
+                                  : 'text-gray-600 hover:bg-gray-100 hover:text-[#003D30]',
                               )}
                               aria-label={item.label}
                             >
                               {active && (
-                                <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#005B2E] rounded-r-sm" />
+                                <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#003D30] rounded-r-sm" />
                               )}
                               <Icon className="w-5 h-5 shrink-0" />
                             </Link>
@@ -448,8 +450,8 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                         className={cn(
                           'block px-3 py-1.5 rounded text-sm transition-colors',
                           pathname === r.route
-                            ? 'bg-[#005B2E] text-white font-semibold'
-                            : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+                            ? 'bg-[#003D30] text-white font-semibold'
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-[#003D30]',
                         )}
                       >
                         <div className="truncate">{r.label}</div>
@@ -535,7 +537,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
               {/* Header do submenu flutuante */}
               <div className="p-3 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-md bg-[#005B2E]/10 text-[#005B2E] flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-md bg-[#003D30]/10 text-[#003D30] flex items-center justify-center shrink-0">
                     <flyoutItem.icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
@@ -564,8 +566,8 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                   className={cn(
                     'flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                     pathname === flyoutItem.route
-                      ? 'bg-[#005B2E] text-white'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-[#005B2E]',
+                      ? 'bg-[#003D30] text-white'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-[#003D30]',
                   )}
                 >
                   <span>Acessar visão geral</span>
@@ -589,12 +591,12 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                       className={cn(
                         'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-colors',
                         isChildActive
-                          ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
-                          : 'text-gray-600 hover:text-[#005B2E] hover:bg-gray-50',
+                          ? 'bg-[#003D30]/10 text-[#003D30] font-semibold'
+                          : 'text-gray-600 hover:text-[#003D30] hover:bg-gray-50',
                       )}
                     >
                       {ChildIcon ? (
-                        <ChildIcon className="w-3.5 h-3.5 shrink-0 text-gray-400 group-hover:text-[#005B2E]" />
+                        <ChildIcon className="w-3.5 h-3.5 shrink-0 text-gray-400 group-hover:text-[#003D30]" />
                       ) : (
                         <span className="w-1.5 h-1.5 rounded-full bg-gray-300 shrink-0" />
                       )}
@@ -608,7 +610,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
               <div className="p-2 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between shrink-0">
                 <button
                   onClick={() => toggleFavorite(flyoutItem.route)}
-                  className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#005B2E] px-2 py-1 rounded hover:bg-white"
+                  className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#003D30] px-2 py-1 rounded hover:bg-white"
                 >
                   <Star
                     className={cn(
@@ -622,7 +624,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 </button>
                 <button
                   onClick={toggleSidebar}
-                  className="text-[11px] text-[#005B2E] hover:underline font-medium px-2 py-1"
+                  className="text-[11px] text-[#003D30] hover:underline font-medium px-2 py-1"
                 >
                   Fixar menu
                 </button>

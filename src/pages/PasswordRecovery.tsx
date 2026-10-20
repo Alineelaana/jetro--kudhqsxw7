@@ -40,10 +40,10 @@ export default function PasswordRecovery() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#005B2E]/30 shadow-2xl">
-        <CardHeader className="bg-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 rounded-t-lg">
+      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
+        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg">
           <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Mail className="w-6 h-6 text-[#E4C46A]" /> Recuperar Senha
+            <Mail className="w-6 h-6 text-[#D6A755]" /> Recuperar Senha — HURAM
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -53,7 +53,7 @@ export default function PasswordRecovery() {
               <p className="text-sm text-foreground">
                 Se o e-mail existir, você receberá um link de redefinição de senha.
               </p>
-              <Button asChild variant="outline" className="border-[#005B2E] text-[#005B2E]">
+              <Button asChild variant="outline" className="border-[#003D30] text-[#003D30]">
                 <Link to="/cliente/login">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar ao login
                 </Link>
@@ -62,7 +62,8 @@ export default function PasswordRecovery() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
+                Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha no portal
+                HURAM.
               </p>
               <div className="space-y-1.5">
                 <Label htmlFor="recovery-email" className="text-sm font-semibold">
@@ -79,7 +80,7 @@ export default function PasswordRecovery() {
                       if (emailError) setEmailError('')
                     }}
                     placeholder="seu@email.com"
-                    className={`pl-10 focus-visible:ring-[#005B2E] ${emailError ? 'border-destructive' : 'border-border'}`}
+                    className={`pl-10 focus-visible:ring-[#003D30] ${emailError ? 'border-destructive' : 'border-border'}`}
                     autoComplete="email"
                   />
                 </div>
@@ -88,7 +89,7 @@ export default function PasswordRecovery() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold h-12 rounded-xl"
+                className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold h-12 rounded-xl"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -101,7 +102,7 @@ export default function PasswordRecovery() {
               </Button>
               <Link
                 to="/cliente/login"
-                className="block text-center text-sm text-[#005B2E] hover:underline font-bold pt-2"
+                className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
               >
                 Voltar ao login
               </Link>

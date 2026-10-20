@@ -44,8 +44,8 @@ export function MenuLink({
   const linkClass = cn(
     'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
     isActive || isChildActive
-      ? 'bg-[#005B2E] text-white font-semibold'
-      : 'text-gray-600 hover:bg-gray-100 hover:text-[#005B2E]',
+      ? 'bg-[#003D30] text-white font-semibold'
+      : 'text-gray-600 hover:bg-gray-100 hover:text-[#003D30]',
   )
 
   if (hasChildren) {
@@ -96,8 +96,8 @@ export function MenuLink({
                   className={cn(
                     'flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors',
                     isChildItemActive
-                      ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
-                      : 'text-gray-500 hover:text-[#005B2E] hover:bg-gray-50',
+                      ? 'bg-[#003D30]/10 text-[#003D30] font-semibold'
+                      : 'text-gray-500 hover:text-[#003D30] hover:bg-gray-50',
                   )}
                 >
                   {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0" />}

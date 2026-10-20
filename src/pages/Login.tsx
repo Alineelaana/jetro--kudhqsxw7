@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import { AttributionFooter } from '@/components/attribution-footer'
-import logoJetro from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-7232a.jpeg'
+import { logoHuramLight, logoHuramDark } from '@/lib/brand-assets'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -108,11 +108,11 @@ export default function LoginPage() {
       <header className="relative z-10 w-full px-4 sm:px-8 py-4 sm:py-6 flex items-center justify-between border-b border-[#C89B3C]/20 bg-[#001c10]/70 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <img
-            src={logoJetro}
-            alt="Jetro"
-            className="h-9 sm:h-11 w-auto object-contain rounded-lg border border-[#C89B3C]/30 shadow-md"
+            src={logoHuramDark}
+            alt="HURAM — Sistema Inteligente de Gestão"
+            className="h-10 sm:h-12 w-auto object-contain rounded-lg border border-[#D6A755]/40 shadow-md"
           />
-          <span className="hidden sm:inline-block text-xs uppercase tracking-widest text-[#E5B85C] font-extrabold">
+          <span className="hidden sm:inline-block text-xs uppercase tracking-widest text-[#D6A755] font-extrabold">
             Acesso ao Sistema
           </span>
         </div>
@@ -120,34 +120,34 @@ export default function LoginPage() {
         <Button
           asChild
           variant="outline"
-          className="border-[#C89B3C] bg-[#002817]/80 hover:bg-[#C89B3C] text-[#E5B85C] hover:text-[#002817] font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 rounded-xl transition-all shadow-md group"
+          className="border-[#D6A755] bg-[#003D30]/90 hover:bg-[#D6A755] text-[#D6A755] hover:text-[#003D30] font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 rounded-xl transition-all shadow-md group"
         >
           <Link to="/site" className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-[#E5B85C] group-hover:text-[#002817] transition-colors" />
-            <span>Acesse o site do Jetro</span>
-            <ChevronRight className="w-4 h-4 text-[#E5B85C] group-hover:text-[#002817] transition-colors" />
+            <Globe className="w-4 h-4 text-[#D6A755] group-hover:text-[#003D30] transition-colors" />
+            <span>Acesse o site da HURAM</span>
+            <ChevronRight className="w-4 h-4 text-[#D6A755] group-hover:text-[#003D30] transition-colors" />
           </Link>
         </Button>
       </header>
 
       {/* Área central com Card de Login */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <Card className="w-full max-w-md border-2 border-[#C89B3C]/40 bg-white/95 backdrop-blur-xl shadow-2xl text-foreground rounded-2xl overflow-hidden animate-fade-in">
-          <CardHeader className="bg-gradient-to-b from-[#002817] to-[#01361D] text-white border-b border-[#C89B3C]/40 pb-6 pt-7 px-6 text-center flex flex-col items-center relative">
+        <Card className="w-full max-w-md border-2 border-[#D6A755]/40 bg-white shadow-2xl text-foreground rounded-2xl overflow-hidden animate-fade-in">
+          <CardHeader className="bg-gradient-to-b from-[#003D30] to-[#002820] text-white border-b border-[#D6A755]/40 pb-6 pt-7 px-6 text-center flex flex-col items-center relative">
             <div className="relative mb-3 group">
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#C89B3C] to-[#E5B85C] opacity-75 blur-sm group-hover:opacity-100 transition duration-500" />
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#D6A755] via-[#F27616] to-[#D6A755] opacity-75 blur-sm group-hover:opacity-100 transition duration-500" />
               <img
-                src={logoJetro}
-                alt="Jetro - Plataforma Inteligente de Gestão Empresarial"
-                className="relative h-20 sm:h-24 w-auto object-contain rounded-2xl border-2 border-[#C89B3C]/60 p-1.5 bg-[#002817] shadow-xl"
+                src={logoHuramDark}
+                alt="HURAM — Sistema Inteligente de Gestão"
+                className="relative h-24 sm:h-28 w-auto object-contain rounded-2xl border-2 border-[#D6A755]/70 p-1.5 bg-[#003D30] shadow-xl"
               />
             </div>
             <CardTitle className="text-xl sm:text-2xl font-black text-center text-white flex items-center justify-center gap-2 mt-1">
-              <Lock className="w-5 h-5 text-[#E4C46A]" />
-              Acesso ao Sistema Jetro
+              <Lock className="w-5 h-5 text-[#D6A755]" />
+              Acesso ao Sistema HURAM
             </CardTitle>
-            <p className="text-xs text-white/80 mt-1.5 font-medium max-w-xs mx-auto">
-              Plataforma Inteligente de Gestão Empresarial
+            <p className="text-xs text-white/85 mt-1.5 font-medium max-w-xs mx-auto">
+              Sistema Inteligente de Gestão
             </p>
           </CardHeader>
 
@@ -165,7 +165,7 @@ export default function LoginPage() {
                     value={username}
                     onChange={handleUsernameChange}
                     placeholder="Digite seu usuário ou e-mail"
-                    className="pl-10 h-11 border-border focus-visible:ring-[#005B2E]"
+                    className="pl-10 h-11 border-border focus-visible:ring-[#003D30]"
                     autoComplete="username"
                   />
                 </div>
@@ -186,7 +186,7 @@ export default function LoginPage() {
                   </Label>
                   <Link
                     to="/admin/recuperar-senha"
-                    className="text-xs text-[#005B2E] hover:underline font-semibold"
+                    className="text-xs text-[#003D30] hover:underline font-semibold"
                   >
                     Esqueceu a senha?
                   </Link>
@@ -199,7 +199,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Digite sua senha"
-                    className="pl-10 pr-10 h-11 border-border focus-visible:ring-[#005B2E]"
+                    className="pl-10 pr-10 h-11 border-border focus-visible:ring-[#003D30]"
                     autoComplete="current-password"
                   />
                   <button
@@ -235,7 +235,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-[#005B2E] hover:bg-[#01361D] text-white font-extrabold text-base shadow-lg h-12 rounded-xl transition-all duration-200 hover:shadow-emerald-900/40"
+                className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl transition-all duration-200"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -263,11 +263,11 @@ export default function LoginPage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full border-[#C89B3C]/60 hover:bg-[#C89B3C]/10 text-[#002817] font-bold text-xs sm:text-sm py-2 rounded-xl"
+                  className="w-full border-[#D6A755]/70 hover:bg-[#D6A755]/15 text-[#003D30] font-bold text-xs sm:text-sm py-2 rounded-xl"
                 >
                   <Link to="/site" className="flex items-center justify-center gap-2">
-                    <Globe className="w-4 h-4 text-[#C89B3C]" />
-                    <span>Acesse o site do Jetro</span>
+                    <Globe className="w-4 h-4 text-[#D6A755]" />
+                    <span>Acesse o site da HURAM</span>
                   </Link>
                 </Button>
               </div>
@@ -279,8 +279,8 @@ export default function LoginPage() {
       {/* Rodapé discreto da tela de login */}
       <footer className="relative z-10 w-full px-4 py-4 text-center text-xs text-white/60 border-t border-white/10 bg-[#001c10]/70 backdrop-blur-sm space-y-1.5">
         <p>
-          © {new Date().getFullYear()} Jetro — Plataforma Inteligente de Gestão Empresarial. Todos
-          os direitos reservados.
+          © {new Date().getFullYear()} HURAM — Sistema Inteligente de Gestão. Todos os direitos
+          reservados.
         </p>
         <AttributionFooter variant="inline" className="text-white/70" />
       </footer>

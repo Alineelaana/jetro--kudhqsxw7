@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Menu, X, ArrowUpRight, Clock, FileCode2, LogOut } from 'lucide-react'
-import logoImg from '@/assets/whatsapp-image-2026-08-09-at-23.25.57-64131.jpeg'
+import { logoHuramDark } from '@/lib/brand-assets'
 import { useAuth } from '@/hooks/use-auth'
 import { canViewScreenDocs } from '@/lib/permissions'
 import { NotificationBell } from '@/components/notification-bell'
@@ -86,12 +86,12 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
 
   const navLinks = [
     { label: 'Início', href: '#inicio' },
-    { label: 'O Jetro', href: '#sobre' },
+    { label: 'A HURAM', href: '#sobre' },
     { label: 'Soluções', href: '#solucoes' },
     { label: 'Por Dentro do ERP', href: '#telas' },
     { label: 'Fluxo Integrado', href: '#fluxo' },
     { label: 'Inteligência Artificial', href: '#ia' },
-    { label: 'Universidade', href: '#universidade' },
+    { label: 'Universidade HURAM', href: '#universidade' },
     { label: 'Diferenciais', href: '#diferenciais' },
     { label: 'Contato', href: '#contato' },
   ]
@@ -112,7 +112,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#C9A227]/25 bg-[#002817]/95 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-50 w-full border-b border-[#D6A755]/30 bg-[#003D30]/95 backdrop-blur-md transition-all">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
         <a
           href="#inicio"
@@ -121,17 +121,17 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             handleNavClick('#inicio')
           }}
           className="flex items-center gap-3 group py-1"
-          title="Jetro — Inteligência que conecta sua gestão"
+          title="HURAM — Sistema Inteligente de Gestão"
         >
           <img
-            src={logoImg}
-            alt="Jetro ERP Inteligente"
-            className="h-10 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            src={logoHuramDark}
+            alt="HURAM — Sistema Inteligente de Gestão"
+            className="h-11 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-md bg-[#002820] p-1"
           />
           <div className="hidden sm:flex flex-col">
-            <span className="text-xl font-black tracking-tight text-white leading-none">JETRO</span>
-            <span className="text-[10px] font-semibold tracking-wider text-[#C9A227] uppercase mt-0.5">
-              ERP Inteligente
+            <span className="text-xl font-black tracking-tight text-white leading-none">HURAM</span>
+            <span className="text-[10px] font-semibold tracking-wider text-[#D6A755] uppercase mt-0.5">
+              Sistema Inteligente de Gestão
             </span>
           </div>
         </a>
@@ -159,7 +159,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 variant="outline"
                 size="sm"
                 onClick={onOpenScreenLogic}
-                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-[#001c10]/80 border-[#C9A227]/40 text-[#f6d77c] hover:bg-[#C9A227] hover:text-[#002817] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
+                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-[#001c10]/80 border-[#D6A755]/40 text-[#D6A755] hover:bg-[#D6A755] hover:text-[#003D30] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
                 title="Abrir especificação técnica e regras de negócio da tela atual"
               >
                 <FileCode2 className="w-3.5 h-3.5" />
@@ -215,7 +215,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 onClick={() => handleNavClick('#contato')}
                 variant="outline"
                 size="sm"
-                className="border-[#C9A227]/50 text-white bg-transparent hover:bg-[#C9A227]/10 hover:border-[#C9A227] text-xs font-semibold px-4 cursor-pointer"
+                className="border-[#D6A755]/50 text-white bg-transparent hover:bg-[#D6A755]/15 hover:border-[#D6A755] text-xs font-semibold px-4 cursor-pointer"
               >
                 Demonstração
               </Button>
@@ -223,7 +223,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
               <Button
                 asChild
                 size="sm"
-                className="bg-[#005A36] hover:bg-[#004225] border border-[#C9A227]/40 text-white font-semibold text-xs px-4 shadow-sm hover:shadow-md transition-all"
+                className="bg-[#003D30] hover:bg-[#002820] border border-[#D6A755]/50 text-white font-semibold text-xs px-4 shadow-sm hover:shadow-md transition-all"
               >
                 <Link to="/" className="flex items-center gap-1.5">
                   <span>Acessar o sistema</span>

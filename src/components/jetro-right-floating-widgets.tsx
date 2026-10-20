@@ -44,13 +44,13 @@ export function JetroRightFloatingWidgets() {
 
   return (
     <aside
-      aria-label="Abas Rápidas do Sistema Jetro"
+      aria-label="Abas Rápidas do Sistema HURAM"
       className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-end gap-2 pointer-events-auto select-none"
     >
       <TooltipProvider delayDuration={120}>
         {/* ============================================================== */}
-        {/* 1. ABA SUPERIOR: JETRO ON-LINE (ASSISTENTE ERP)                */}
-        {/*    Cor: Verde-escuro institucional (#002817)                   */}
+        {/* 1. ABA SUPERIOR: HURAM ON-LINE (ASSISTENTE ERP)               */}
+        {/*    Cor: Verde-escuro institucional (#003D30)                   */}
         {/*    Ícone: Assistente em branco com detalhe sutil               */}
         {/* ============================================================== */}
         <Tooltip>
@@ -58,20 +58,20 @@ export function JetroRightFloatingWidgets() {
             <button
               type="button"
               onClick={() => setIsFloatingOpen(!isFloatingOpen)}
-              aria-label="Jetro On-line"
+              aria-label="HURAM On-line"
               className={cn(
                 'group relative flex flex-col items-center justify-center w-11 sm:w-12 h-20 sm:h-22 rounded-l-xl cursor-pointer border border-r-0 shadow-lg',
-                'bg-gradient-to-b from-[#00381C] via-[#002817] to-[#00170d] text-white',
-                'border-[#C9A227]/40 hover:border-[#E4C46A]/80 shadow-emerald-950/50',
+                'bg-gradient-to-b from-[#004A3A] via-[#003D30] to-[#002820] text-white',
+                'border-[#D6A755]/40 hover:border-[#D6A755]/80 shadow-emerald-950/50',
                 tabTransition,
                 isFloatingOpen &&
-                  'ring-2 ring-emerald-400/60 border-emerald-400 bg-[#001f11] -translate-x-1 shadow-2xl',
+                  'ring-2 ring-emerald-400/60 border-emerald-400 bg-[#002820] -translate-x-1 shadow-2xl',
               )}
             >
               {/* Efeito de destaque na borda esquerda */}
               <span
                 className={cn(
-                  'absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[#E4C46A] transition-opacity',
+                  'absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[#D6A755] transition-opacity',
                   isFloatingOpen ? 'opacity-100' : 'opacity-80 group-hover:opacity-100',
                 )}
               />
@@ -82,23 +82,23 @@ export function JetroRightFloatingWidgets() {
                 {/* Ponto indicador de status ativo (verde esmeralda pulsante) */}
                 <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 border border-[#002817]" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 border border-[#003D30]" />
                 </span>
               </div>
 
               {/* Rótulo / Tag vertical compacta */}
-              <span className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#E4C46A] group-hover:text-white transition-colors">
+              <span className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#D6A755] group-hover:text-white transition-colors">
                 IA
               </span>
 
               {/* Sparkles sutil */}
-              <Sparkles className="absolute bottom-1.5 left-2 w-2.5 h-2.5 text-[#E4C46A]/60 group-hover:text-[#E4C46A] transition-colors" />
+              <Sparkles className="absolute bottom-1.5 left-2 w-2.5 h-2.5 text-[#D6A755]/60 group-hover:text-[#D6A755] transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent
             side="left"
             sideOffset={8}
-            className="bg-[#002817] text-white border border-[#C9A227]/60 shadow-2xl px-3.5 py-2 text-xs font-semibold rounded-lg"
+            className="bg-[#003D30] text-white border border-[#D6A755]/60 shadow-2xl px-3.5 py-2 text-xs font-semibold rounded-lg"
           >
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded bg-white/10 flex items-center justify-center">
@@ -106,8 +106,8 @@ export function JetroRightFloatingWidgets() {
               </div>
               <div className="text-left">
                 <div className="font-bold text-white flex items-center gap-1.5">
-                  <span>Jetro On-line</span>
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-[#C9A227] text-slate-950 font-black">
+                  <span>HURAM On-line</span>
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-[#D6A755] text-slate-950 font-black">
                     ERP
                   </span>
                 </div>
@@ -119,7 +119,7 @@ export function JetroRightFloatingWidgets() {
 
         {/* ============================================================== */}
         {/* 2. ABA INFERIOR: PERSONALIZAR (CENTRAL DE PERSONALIZAÇÃO)      */}
-        {/*    Cor: Dourada (#C9A227 / #E4C46A)                            */}
+        {/*    Cor: Dourada (#D6A755)                                      */}
         {/*    Ícone: Engrenagem escura/branca para alto contraste         */}
         {/* ============================================================== */}
         <Tooltip>
@@ -127,36 +127,36 @@ export function JetroRightFloatingWidgets() {
             <button
               type="button"
               onClick={() => setIsCustomizerOpen(!isCustomizerOpen)}
-              aria-label="Personalizar Jetro"
+              aria-label="Personalizar HURAM"
               className={cn(
                 'group relative flex flex-col items-center justify-center w-11 sm:w-12 h-20 sm:h-22 rounded-l-xl cursor-pointer border border-r-0 shadow-lg',
-                'bg-gradient-to-b from-[#E4C46A] via-[#C9A227] to-[#A98418] text-[#002817]',
-                'border-[#C9A227] hover:border-[#FFF1B8] shadow-amber-950/40',
+                'bg-gradient-to-b from-[#E8C47D] via-[#D6A755] to-[#B88636] text-[#003D30]',
+                'border-[#D6A755] hover:border-[#FFF1B8] shadow-amber-950/40',
                 tabTransition,
                 isCustomizerOpen &&
-                  'ring-2 ring-amber-300 border-white bg-[#D6AE2D] -translate-x-1 shadow-2xl',
+                  'ring-2 ring-amber-300 border-white bg-[#E0B76A] -translate-x-1 shadow-2xl',
               )}
             >
               {/* Efeito de destaque na borda esquerda */}
               <span
                 className={cn(
-                  'absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[#002817] transition-opacity',
+                  'absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[#003D30] transition-opacity',
                   isCustomizerOpen ? 'opacity-100' : 'opacity-80 group-hover:opacity-100',
                 )}
               />
 
               {/* Ícone de engrenagem */}
-              <div className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#002817]/15 group-hover:bg-[#002817]/25 transition-colors">
+              <div className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#003D30]/15 group-hover:bg-[#003D30]/25 transition-colors">
                 <Settings
                   className={cn(
-                    'w-5 h-5 sm:w-5.5 sm:h-5.5 text-[#002817] transition-transform duration-500',
+                    'w-5 h-5 sm:w-5.5 sm:h-5.5 text-[#003D30] transition-transform duration-500',
                     isCustomizerOpen ? 'rotate-90' : 'group-hover:rotate-45',
                   )}
                 />
               </div>
 
               {/* Rótulo / Tag vertical compacta */}
-              <span className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#002817] group-hover:text-black transition-colors">
+              <span className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#003D30] group-hover:text-black transition-colors">
                 Tema
               </span>
             </button>
@@ -164,14 +164,14 @@ export function JetroRightFloatingWidgets() {
           <TooltipContent
             side="left"
             sideOffset={8}
-            className="bg-[#002817] text-white border border-[#C9A227]/60 shadow-2xl px-3.5 py-2 text-xs font-semibold rounded-lg"
+            className="bg-[#003D30] text-white border border-[#D6A755]/60 shadow-2xl px-3.5 py-2 text-xs font-semibold rounded-lg"
           >
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded bg-[#C9A227]/20 flex items-center justify-center">
-                <Settings className="w-3.5 h-3.5 text-[#E4C46A]" />
+              <div className="w-5 h-5 rounded bg-[#D6A755]/20 flex items-center justify-center">
+                <Settings className="w-3.5 h-3.5 text-[#D6A755]" />
               </div>
               <div className="text-left">
-                <div className="font-bold text-[#E4C46A]">Personalizar Jetro</div>
+                <div className="font-bold text-[#D6A755]">Personalizar HURAM</div>
                 <div className="text-[10px] text-white/70">Aparência, layout, textos e tabelas</div>
               </div>
             </div>
