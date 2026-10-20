@@ -630,6 +630,49 @@ const App = () => (
                                 path="/admin/rh/relatorios"
                                 element={<RH screen="reports" />}
                               />
+                              <Route
+                                path="/admin/rh/avaliacao-competencias"
+                                element={<RH screen="avaliacao_competencias" />}
+                              />
+                              <Route
+                                path="/admin/rh/calibracao"
+                                element={<RH screen="calibracao" />}
+                              />
+                              <Route path="/admin/rh/carreira" element={<RH screen="carreira" />} />
+                              <Route path="/admin/rh/cockpit" element={<RH screen="cockpit" />} />
+                              <Route
+                                path="/admin/rh/competencias"
+                                element={<RH screen="competencias" />}
+                              />
+                              <Route
+                                path="/admin/rh/engajamento"
+                                element={<RH screen="engajamento" />}
+                              />
+                              <Route path="/admin/rh/feedback" element={<RH screen="feedback" />} />
+                              <Route path="/admin/rh/nine-box" element={<RH screen="nine_box" />} />
+                              <Route
+                                path="/admin/rh/offboarding"
+                                element={<RH screen="offboarding" />}
+                              />
+                              <Route
+                                path="/admin/rh/onboarding"
+                                element={<RH screen="onboarding" />}
+                              />
+                              <Route
+                                path="/admin/rh/organograma"
+                                element={<RH screen="organograma" />}
+                              />
+                              <Route path="/admin/rh/pdi" element={<RH screen="pdi" />} />
+                              <Route path="/admin/rh/posicoes" element={<RH screen="posicoes" />} />
+                              <Route
+                                path="/admin/rh/reconhecimento"
+                                element={<RH screen="reconhecimento" />}
+                              />
+                              <Route path="/admin/rh/sucessao" element={<RH screen="sucessao" />} />
+                              <Route
+                                path="/admin/rh/talent-review"
+                                element={<RH screen="talent_review" />}
+                              />
                               <Route path="/admin/conformidade" element={<Conformidade />} />
                               <Route path="/admin/fiscal" element={<Fiscal screen="dashboard" />} />
                               <Route
@@ -1385,6 +1428,39 @@ const App = () => (
                                 path="/admin/sst/obligations-calendar"
                                 element={<SST screen="obligations_calendar" />}
                               />
+                              <Route
+                                path="/admin/sst/audit-checklists"
+                                element={<SST screen="audit_checklists" />}
+                              />
+                              <Route
+                                path="/admin/sst/investigations"
+                                element={<SST screen="investigations" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr10-electrical"
+                                element={<SST screen="nr10_electrical" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr11-material-handling"
+                                element={<SST screen="nr11_material_handling" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr12-machines"
+                                element={<SST screen="nr12_machines" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr13-boilers"
+                                element={<SST screen="nr13_boilers" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr15-insalubridade"
+                                element={<SST screen="nr15_insalubridade" />}
+                              />
+                              <Route
+                                path="/admin/sst/nr16-periculosidade"
+                                element={<SST screen="nr16_periculosidade" />}
+                              />
+                              <Route path="/admin/sst/ppp" element={<SST screen="ppp" />} />
                               <Route
                                 path="/admin/promocoes"
                                 element={<Promotions screen="dashboard" />}

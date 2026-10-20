@@ -14,6 +14,7 @@ import { RhCockpit } from '@/components/rh/rh-cockpit'
 import { RhAdapta } from '@/components/rh/rh-adapta'
 import { RH_SCREEN_CONFIGS } from '@/lib/rh-types'
 import { RH_ENTERPRISE_CONFIGS } from '@/lib/rh-enterprise-types'
+import { RH_EXTENDED_CONFIGS } from '@/lib/rh-extended-configs'
 
 const TITLES: Record<string, string> = {
   dashboard: 'Dashboard de RH',
@@ -77,7 +78,11 @@ export default function RH({ screen }: { screen: string }) {
       case 'adapta':
         return <RhAdapta />
       default: {
-        const config = RH_SCREEN_CONFIGS[screen] || RH_ENTERPRISE_CONFIGS[screen]
+        const config =
+          RH_SCREEN_CONFIGS[screen] ||
+          RH_ENTERPRISE_CONFIGS[screen] ||
+          RH_EXTENDED_CONFIGS[screen] ||
+          (screen === 'carreira' ? RH_EXTENDED_CONFIGS['plano_carreira'] : undefined)
         if (config) return <RhGenericScreen config={config} />
         return <RhDashboard />
       }
