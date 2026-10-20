@@ -44,8 +44,8 @@ export function MenuLink({
   const linkClass = cn(
     'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
     isActive || isChildActive
-      ? 'bg-[#116B50] text-[#C69B45] font-semibold shadow-xs'
-      : 'text-white/80 hover:bg-white/10 hover:text-white',
+      ? 'bg-[#063D30] text-white font-semibold shadow-xs'
+      : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[#063D30]',
   )
 
   if (hasChildren) {
@@ -57,12 +57,17 @@ export function MenuLink({
             onClick={() => onToggleExpand(favKey)}
             className={cn(linkClass, 'text-left w-full cursor-pointer select-none')}
           >
-            <Icon className="w-4 h-4 shrink-0" />
+            <Icon
+              className={cn(
+                'w-4 h-4 shrink-0',
+                isActive || isChildActive ? 'text-[#C69B45]' : 'text-[#66736D]',
+              )}
+            />
             <span className="truncate flex-1">{entry.label}</span>
             <ChevronDown
               className={cn(
                 'w-3.5 h-3.5 transition-transform duration-150 shrink-0',
-                isActive || isChildActive ? 'text-[#C69B45]' : 'text-white/50',
+                isActive || isChildActive ? 'text-[#C69B45]' : 'text-[#66736D]',
                 isExpanded && 'rotate-180',
               )}
             />
@@ -73,19 +78,19 @@ export function MenuLink({
               e.stopPropagation()
               onToggleFavorite(favKey)
             }}
-            className="p-1 rounded hover:bg-white/10 shrink-0 cursor-pointer text-white/50 hover:text-[#C69B45]"
+            className="p-1 rounded hover:bg-[#F1F4F2] shrink-0 cursor-pointer text-[#66736D] hover:text-[#063D30]"
             title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           >
             <Star
               className={cn(
                 'w-3 h-3',
-                isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-white/40',
+                isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-[#66736D]/60',
               )}
             />
           </button>
         </div>
         {isExpanded && (
-          <div className="ml-4 mt-0.5 border-l border-white/15 pl-2 space-y-0.5 animate-in fade-in-50 duration-150">
+          <div className="ml-4 mt-0.5 border-l border-[#E4EAE6] pl-2 space-y-0.5 animate-in fade-in-50 duration-150">
             {visibleChildren.map((child) => {
               const ChildIcon = child.icon as ComponentType<{ className?: string }> | undefined
               const isChildItemActive = currentPathname === child.route
@@ -96,11 +101,18 @@ export function MenuLink({
                   className={cn(
                     'flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors',
                     isChildItemActive
-                      ? 'bg-[#116B50] text-[#C69B45] font-semibold border-l-2 border-[#C69B45]'
-                      : 'text-white/70 hover:text-white hover:bg-white/10',
+                      ? 'bg-[#063D30] text-white font-semibold border-l-2 border-[#C69B45]'
+                      : 'text-[#202B28] hover:text-[#063D30] hover:bg-[#F1F4F2]',
                   )}
                 >
-                  {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0 text-white/50" />}
+                  {ChildIcon && (
+                    <ChildIcon
+                      className={cn(
+                        'w-3.5 h-3.5 shrink-0',
+                        isChildItemActive ? 'text-[#C69B45]' : 'text-[#66736D]',
+                      )}
+                    />
+                  )}
                   <span className="truncate">{child.label}</span>
                 </Link>
               )
@@ -114,17 +126,20 @@ export function MenuLink({
   return (
     <div className="flex items-center gap-0.5">
       <Link to={entry.route} className={linkClass}>
-        <Icon className="w-4 h-4 shrink-0" />
+        <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-[#C69B45]' : 'text-[#66736D]')} />
         <span className="truncate flex-1">{entry.label}</span>
       </Link>
       <button
         type="button"
         onClick={() => onToggleFavorite(favKey)}
-        className="p-1 rounded hover:bg-white/10 shrink-0 cursor-pointer text-white/50 hover:text-[#C69B45]"
+        className="p-1 rounded hover:bg-[#F1F4F2] shrink-0 cursor-pointer text-[#66736D] hover:text-[#063D30]"
         title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
       >
         <Star
-          className={cn('w-3 h-3', isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-white/40')}
+          className={cn(
+            'w-3 h-3',
+            isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-[#66736D]/60',
+          )}
         />
       </button>
     </div>

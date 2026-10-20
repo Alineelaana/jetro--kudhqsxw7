@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Menu, X, ArrowUpRight, Clock, FileCode2, LogOut } from 'lucide-react'
 import { logoHuramDark } from '@/lib/brand-assets'
+import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { canViewScreenDocs } from '@/lib/permissions'
 import { NotificationBell } from '@/components/notification-bell'
@@ -112,13 +113,22 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#E4EAE6] bg-white/95 backdrop-blur-md transition-all shadow-[0_2px_12px_rgba(6,61,48,0.04)]">
+    <header
+      className={cn(
+        'sticky top-0 z-50 w-full transition-all',
+        isAuthenticated
+          ? 'border-b border-[#042820] bg-[#063D30] text-white shadow-md'
+          : 'border-b border-[#E4EAE6] bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(6,61,48,0.04)]',
+      )}
+    >
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
         <a
-          href="#inicio"
+          href={isAuthenticated ? '/admin' : '#inicio'}
           onClick={(e) => {
-            e.preventDefault()
-            handleNavClick('#inicio')
+            if (!isAuthenticated) {
+              e.preventDefault()
+              handleNavClick('#inicio')
+            }
           }}
           className="flex items-center gap-3 group py-1"
           title="HURAM — Sistema Inteligente de Gestão"
@@ -126,10 +136,19 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
           <img
             src={logoHuramDark}
             alt="HURAM — Sistema Inteligente de Gestão"
-            className="h-10 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            className={cn(
+              'h-10 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105',
+              isAuthenticated &&
+                'rounded-lg p-0.5 bg-white/10 border border-[#C69B45]/40 shadow-xs',
+            )}
           />
           <div className="hidden sm:flex flex-col">
-            <span className="text-xl font-bold tracking-tight text-[#063D30] font-heading leading-none">
+            <span
+              className={cn(
+                'text-xl font-bold tracking-tight font-heading leading-none',
+                isAuthenticated ? 'text-white' : 'text-[#063D30]',
+              )}
+            >
               HURAM
             </span>
             <span className="text-[10px] font-semibold tracking-wider text-[#C69B45] uppercase mt-0.5">
@@ -138,21 +157,19 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
           </div>
         </a>
 
-        {/* Se usuário autenticado: Cabeçalho unificado e limpo com Horário/Fuso, Lógica da Tela, Notificações e Sair */}
+        {/* Se usuário autenticado: Cabeçalho unificado com fundo verde institucional #063D30, textos e controles claros */}
         {isAuthenticated ? (
           <div className="flex items-center gap-2 sm:gap-3 2xl:gap-4">
             {/* Indicador de Horário e Fuso */}
             <div
-              className="flex items-center gap-2 text-xs text-[#202B28] font-medium bg-[#F8FAF9] border border-[#E4EAE6] px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs shrink-0"
+              className="flex items-center gap-2 text-xs text-white/90 font-medium bg-[#042820]/80 border border-white/15 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs shrink-0"
               title={`Fuso horário do perfil: ${saudacaoInfo.fusoUtilizado}`}
             >
               <Clock className="w-3.5 h-3.5 text-[#C69B45] shrink-0" />
               <span className="tabular-nums">
-                {saudacaoInfo.horaAtualFormatada} <span className="text-[#66736D]/40">•</span>{' '}
-                <span className="text-[#66736D] font-normal">Fuso:</span>{' '}
-                <strong className="text-[#063D30] font-semibold">
-                  {saudacaoInfo.fusoUtilizado}
-                </strong>
+                {saudacaoInfo.horaAtualFormatada} <span className="text-white/40">•</span>{' '}
+                <span className="text-white/70 font-normal">Fuso:</span>{' '}
+                <strong className="text-white font-semibold">{saudacaoInfo.fusoUtilizado}</strong>
               </span>
             </div>
 
@@ -163,10 +180,10 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 variant="outline"
                 size="sm"
                 onClick={onOpenScreenLogic}
-                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-white border-[#063D30]/20 text-[#063D30] hover:bg-[#063D30] hover:text-white shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
+                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-white/10 border-white/20 text-white hover:bg-white hover:text-[#063D30] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
                 title="Abrir especificação técnica e regras de negócio da tela atual"
               >
-                <FileCode2 className="w-3.5 h-3.5" />
+                <FileCode2 className="w-3.5 h-3.5 text-[#C69B45]" />
                 <span className="hidden sm:inline">Lógica da Tela</span>
               </Button>
             )}
@@ -174,8 +191,8 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             {/* Botão de Notificações (sino) */}
             <div className="shrink-0 flex items-center">
               <NotificationBell
-                className="hover:bg-[#F1F4F2] text-[#202B28] rounded-lg h-8 sm:h-9 w-8 sm:w-9"
-                iconClassName="text-[#063D30] w-4 h-4 sm:w-5 sm:h-5"
+                className="hover:bg-white/10 text-white rounded-lg h-8 sm:h-9 w-8 sm:w-9"
+                iconClassName="text-white w-4 h-4 sm:w-5 sm:h-5"
               />
             </div>
 
@@ -183,10 +200,10 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             <button
               type="button"
               onClick={signOut}
-              className={`flex items-center gap-1.5 text-xs font-semibold text-red-700 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-600 hover:border-red-600 cursor-pointer shadow-2xs shrink-0 ${animClasses}`}
+              className={`flex items-center gap-1.5 text-xs font-semibold text-red-200 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-red-400/40 bg-red-950/40 hover:bg-red-600 hover:border-red-600 cursor-pointer shadow-2xs shrink-0 ${animClasses}`}
               title="Encerrar sessão"
             >
-              <LogOut className="w-3.5 h-3.5 text-red-600 group-hover:text-white" />
+              <LogOut className="w-3.5 h-3.5 text-red-300 group-hover:text-white" />
               <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
