@@ -124,6 +124,7 @@ import { JetroOnlineRecursosScreen } from '@/components/jetro-online-central/jet
 import { JetroOnlineToursScreen } from '@/components/jetro-online-central/jetro-online-tours'
 import { JetroOnlineRelatoriosScreen } from '@/components/jetro-online-central/jetro-online-relatorios'
 import { JetroOnlineProtectedRoute } from '@/components/jetro-online-central/jetro-online-protected-route'
+import { AiAdminProtectedRoute } from '@/components/ai-module/ai-admin-protected-route'
 import SegundoCerebroPage from './pages/admin/SegundoCerebroPage'
 import ComparativoMargensGrPage from './pages/admin/ComparativoMargensGrPage'
 import TabelaMaeGrPage from './pages/admin/TabelaMaeGrPage'
@@ -777,7 +778,11 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/ia/treinamento"
-                                element={<AIModule screen="training" />}
+                                element={
+                                  <AiAdminProtectedRoute>
+                                    <AIModule screen="training" />
+                                  </AiAdminProtectedRoute>
+                                }
                               />
                               <Route
                                 path="/admin/ia/historico"
@@ -789,7 +794,11 @@ const App = () => (
                               />
                               <Route
                                 path="/admin/ia/configuracoes"
-                                element={<AIModule screen="settings" />}
+                                element={
+                                  <AiAdminProtectedRoute>
+                                    <AIModule screen="settings" />
+                                  </AiAdminProtectedRoute>
+                                }
                               />
                               <Route
                                 path="/admin/governanca-adapta"

@@ -52,6 +52,8 @@ import {
   ReportFilterFieldDef,
 } from '@/lib/report-schedule-registry'
 import pb from '@/lib/pocketbase/client'
+import { useAuth } from '@/hooks/use-auth'
+import { canUserAccessReportModule } from '@/lib/permissions'
 import { useToast } from '@/hooks/use-toast'
 
 export interface ReportScheduleFormData {

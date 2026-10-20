@@ -29,7 +29,7 @@ export function AiAdminProtectedRoute({ children }: AiAdminProtectedRouteProps) 
           'Área administrativa de Inteligência Artificial restrita exclusivamente a superusuários (SUP).',
         variant: 'destructive',
       })
-      navigate('/admin/ia/dashboard', { replace: true })
+      navigate('/admin', { replace: true })
     }
   }, [loading, isAllowed, navigate, toast])
 
