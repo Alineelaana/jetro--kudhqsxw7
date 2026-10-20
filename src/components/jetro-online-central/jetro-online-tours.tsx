@@ -306,7 +306,7 @@ export function JetroOnlineToursScreen() {
             Central de Tours Guiados das Telas
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Gerencie os tutoriais interativos por rota do Jetro ERP, audite consistência e acompanhe
+            Gerencie os tutoriais interativos por rota do ERP HURAM, audite consistência e acompanhe
             métricas de utilização.
           </p>
         </div>
@@ -641,7 +641,7 @@ export function JetroOnlineToursScreen() {
               <div>
                 <p className="font-bold">Todos os identificadores estáveis estão íntegros!</p>
                 <p className="mt-0.5 text-emerald-800">
-                  Os componentes das principais telas do Jetro utilizam seletores padronizados
+                  Os componentes das principais telas da HURAM utilizam seletores padronizados
                   [data-tour-id] e fallback inteligente com centralização graciosa em caso de
                   elementos dinâmicos.
                 </p>

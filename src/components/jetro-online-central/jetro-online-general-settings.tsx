@@ -34,7 +34,7 @@ export function JetroOnlineGeneralSettingsScreen() {
       const cfg = await getJetroOnlineConfig()
       if (cfg) {
         setConfig(cfg)
-        setTituloAssistente(cfg.titulo_assistente || 'Jetro On-line')
+        setTituloAssistente(cfg.titulo_assistente || 'HURAM On-line')
         setSaudacaoPrincipal(cfg.saudacao_principal || 'Como posso ajudar?')
         setTextoAuxiliar(
           cfg.texto_auxiliar ||
@@ -72,7 +72,7 @@ export function JetroOnlineGeneralSettingsScreen() {
       toast({
         title: 'Configurações salvas com sucesso',
         description:
-          'Os parâmetros visuais e textuais do Jetro On-line foram atualizados no banco de dados.',
+          'Os parâmetros visuais e textuais do HURAM On-line foram atualizados no banco de dados.',
       })
       await loadData()
     } catch (err: any) {
@@ -113,14 +113,14 @@ export function JetroOnlineGeneralSettingsScreen() {
             <div className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-[#C9A227] shadow-md bg-[#002613] shrink-0">
               <img
                 src={JETRO_ONLINE_AVATAR_URL}
-                alt="Foto Oficial do Jetro On-line"
+                alt="Foto Oficial do HURAM On-line"
                 className="w-full h-full object-cover object-center"
               />
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-gray-900">
-                  Foto Oficial do Assistente Jetro On-line
+                  Foto Oficial do Assistente HURAM On-line
                 </span>
                 <span className="text-[10px] font-semibold text-[#005B2E] bg-emerald-100/70 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-[#005B2E]" />
@@ -141,7 +141,7 @@ export function JetroOnlineGeneralSettingsScreen() {
               <Input
                 value={tituloAssistente}
                 onChange={(e) => setTituloAssistente(e.target.value)}
-                placeholder="Jetro On-line"
+                placeholder="HURAM On-line"
                 className="h-9 text-xs"
                 required
               />
@@ -219,7 +219,7 @@ export function JetroOnlineGeneralSettingsScreen() {
               rows={2}
               value={mensagemBoasVindas}
               onChange={(e) => setMensagemBoasVindas(e.target.value)}
-              placeholder="Olá! Sou o Jetro On-line..."
+              placeholder="Olá! Sou o HURAM On-line..."
               className="text-xs leading-relaxed"
             />
           </div>
@@ -232,7 +232,7 @@ export function JetroOnlineGeneralSettingsScreen() {
               rows={2}
               value={mensagemIndisponibilidade}
               onChange={(e) => setMensagemIndisponibilidade(e.target.value)}
-              placeholder="O assistente Jetro On-line está temporariamente indisponível..."
+              placeholder="O assistente HURAM On-line está temporariamente indisponível..."
               className="text-xs leading-relaxed"
             />
           </div>

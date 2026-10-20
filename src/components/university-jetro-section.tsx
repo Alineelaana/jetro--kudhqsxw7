@@ -75,14 +75,14 @@ export function UniversityJetroSection() {
             Capacitação Contínua & Adoção
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
-            Universidade Jetro.{' '}
+            Universidade HURAM.{' '}
             <span className="text-[#116B50]">
               Conhecimento para aproveitar melhor cada funcionalidade.
             </span>
           </h2>
           <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
             Um ERP só gera valor real quando as pessoas sabem utilizá-lo com segurança. A
-            Universidade Jetro combina vídeos, tutoriais e tours interativos integrados diretamente
+            Universidade HURAM combina vídeos, tutoriais e tours interativos integrados diretamente
             à interface.
           </p>
         </div>

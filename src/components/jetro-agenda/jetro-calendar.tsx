@@ -112,8 +112,8 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
   // Usuário padrão de fallback caso não esteja logado
   const activeUser = currentUser || {
     id: 'guest',
-    email: 'admin@jetro.com.br',
-    name: 'Administrador Jetro',
+    email: 'admin@huram.com.br',
+    name: 'Administrador HURAM',
   }
 
   // Carrega compromissos do usuário
@@ -313,7 +313,7 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
     <div className="w-full bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
       <TooltipProvider>
         {/* ==================================================================== */}
-        {/* CABEÇALHO DO CALENDÁRIO / AGENDA JETRO — Padrão Corporativo Refinado */}
+        {/* CABEÇALHO DO CALENDÁRIO / AGENDA HURAM — Padrão Corporativo Refinado */}
         {/* ==================================================================== */}
         <div className="p-4 sm:p-5 border-b border-gray-200/90 bg-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

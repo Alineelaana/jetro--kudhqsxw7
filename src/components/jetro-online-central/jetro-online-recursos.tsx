@@ -77,7 +77,7 @@ export function JetroOnlineRecursosScreen() {
       toast({
         title: 'Recursos atualizados com sucesso',
         description:
-          'As políticas e controles do chat Jetro On-line foram gravados no banco de dados.',
+          'As políticas e controles do chat HURAM On-line foram gravados no banco de dados.',
       })
       await loadData()
     } catch (err: any) {
@@ -109,7 +109,7 @@ export function JetroOnlineRecursosScreen() {
                 Botão "Vídeo" na Barra Superior (Ajudas Disponíveis)
               </Label>
               <p className="text-[11px] text-gray-500">
-                Apresenta a biblioteca de vídeos de treinamento da Universidade Jetro filtrados pela
+                Apresenta a biblioteca de vídeos de treinamento da Universidade HURAM filtrados pela
                 tela atual.
               </p>
             </div>
@@ -163,13 +163,13 @@ export function JetroOnlineRecursosScreen() {
         </CardContent>
       </Card>
 
-      {/* Regras da Universidade Jetro com a IA */}
-      <Card className="border shadow-2xs">
+      {/* Regras da Universidade HURAM com a IA */}
+      <Card className="border-gray-200">
         <CardHeader className="p-5 pb-3">
           <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <GraduationCap className="w-4 h-4 text-[#005B2E]" />
-            Regras de Recomendação da Universidade Jetro pela IA
-          </CardTitle>
+            Regras de Recomendação da Universidade HURAM pela IA
+          </CardTitle>{' '}
           <CardDescription className="text-xs">
             Parâmetros de integridade: a IA nunca inventa vídeos e recomenda apenas registros ativos
             cadastrados.

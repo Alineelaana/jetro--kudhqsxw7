@@ -140,7 +140,7 @@ export function JetroOnlineHistoricoScreen() {
           <DialogHeader className="border-b pb-2">
             <DialogTitle className="text-sm font-bold flex items-center gap-2">
               <FileText className="w-4 h-4 text-[#005B2E]" />
-              Auditoria de Consulta — Jetro On-line
+              Auditoria de Consulta — HURAM On-line
             </DialogTitle>
           </DialogHeader>
 
@@ -175,7 +175,7 @@ export function JetroOnlineHistoricoScreen() {
 
               <div className="p-2.5 bg-blue-50 text-blue-900 rounded border border-blue-200 text-[11px]">
                 Registro mantido em conformidade com o Art. 16 da LGPD e as normas de governança
-                interna do ERP Jetro.
+                interna do ERP HURAM.
               </div>
             </div>
           )}

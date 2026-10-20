@@ -206,7 +206,7 @@ export function AppointmentModal({
         })
         toast({
           title: 'Compromisso atualizado',
-          description: 'Alterações salvas com sucesso na sua Agenda Jetro.',
+          description: 'Alterações salvas com sucesso na sua Agenda HURAM.',
         })
       } else {
         await createAppointment(payload, currentUser)

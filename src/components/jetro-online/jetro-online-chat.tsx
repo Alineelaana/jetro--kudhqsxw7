@@ -803,7 +803,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                     </span>
                   </div>
                   <span className="text-[11px] text-gray-500 font-medium hidden sm:inline">
-                    Regras de faturamento comercial Jetro
+                    Regras de faturamento comercial HURAM
                   </span>
                 </div>
 
@@ -978,14 +978,14 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                     <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#C9A227] shrink-0 shadow-2xs bg-[#002613] animate-pulse">
                       <img
                         src={JETRO_ONLINE_AVATAR_URL}
-                        alt="Jetro On-line"
+                        alt="HURAM On-line"
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
                     <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-none px-4 py-3 text-xs text-gray-600 flex items-center gap-2 shadow-2xs">
                       <Loader2 className="w-4 h-4 text-[#005B2E] animate-spin" />
                       <span>
-                        Jetro On-line está consultando os dados reais e aplicando regras
+                        HURAM On-line está consultando os dados reais e aplicando regras
                         comerciais...
                       </span>
                     </div>
@@ -1032,7 +1032,7 @@ export function JetroOnlineChat({ className }: JetroOnlineChatProps) {
                   onFocus={() => setIsTypingInput(true)}
                   onBlur={() => setIsTypingInput(false)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Pergunte ao Jetro On-line… (ex: Qual o produto mais vendido no mês? Compare o faturamento em gráfico)"
+                  placeholder="Pergunte ao HURAM On-line… (ex: Qual o produto mais vendido no mês? Compare o faturamento em gráfico)"
                   disabled={loading}
                   className="w-full resize-none bg-transparent px-4 pt-3.5 pb-12 sm:pb-3.5 sm:pr-14 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none min-h-[48px] max-h-[160px] leading-relaxed"
                 />

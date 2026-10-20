@@ -316,9 +316,9 @@ export function exportToPdf(
 <body>
   <div class="header">
     <div class="brand">
-      <div class="brand-logo">J</div>
+      <div class="brand-logo">H</div>
       <div>
-        <h1 class="brand-title">JETRO ERP</h1>
+        <h1 class="brand-title">ERP HURAM</h1>
         <p class="brand-subtitle">${xmlEscape(title)}</p>
       </div>
     </div>
@@ -338,7 +338,7 @@ export function exportToPdf(
     </table>
   </div>
   <div class="footer">
-    Documento gerado pelo ERP Jetro
+    Documento gerado pelo ERP HURAM
   </div>
   <script>
     window.onload = function() {
@@ -362,8 +362,8 @@ export function exportTableToExcel<T>(
   data: T[],
   columns: JetroColumnDef<T>[],
   preferences: TableUserPreferences,
-  filename = 'tabela-jetro.xlsx',
-  sheetTitle = 'Jetro ERP',
+  filename = 'tabela-huram.xlsx',
+  sheetTitle = 'ERP HURAM',
 ) {
   const visibleColumns = preferences.columnOrder
     .map((id) => columns.find((c) => c.id === id))
@@ -469,7 +469,7 @@ export function exportTableToPdf<T>(
   data: T[],
   columns: JetroColumnDef<T>[],
   preferences: TableUserPreferences,
-  title = 'Relatório de Dados — Jetro ERP',
+  title = 'Relatório de Dados — ERP HURAM',
 ) {
   const visibleColumns = preferences.columnOrder
     .map((id) => columns.find((c) => c.id === id))
@@ -535,9 +535,9 @@ export function exportTableToPdf<T>(
 <body>
   <div class="header">
     <div class="brand">
-      <div class="brand-logo">J</div>
+      <div class="brand-logo">H</div>
       <div>
-        <h1 class="brand-title">JETRO ERP</h1>
+        <h1 class="brand-title">ERP HURAM</h1>
         <p class="brand-subtitle">${xmlEscape(title)}</p>
       </div>
     </div>
@@ -557,7 +557,7 @@ export function exportTableToPdf<T>(
     </table>
   </div>
   <div class="footer">
-    Documento gerado pelo ERP Jetro • Visualização personalizada de colunas aplicada
+    Documento gerado pelo ERP HURAM • Visualização personalizada de colunas aplicada
   </div>
   <script>
     window.onload = function() {

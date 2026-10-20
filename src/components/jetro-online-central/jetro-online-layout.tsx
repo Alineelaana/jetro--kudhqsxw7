@@ -13,14 +13,14 @@ export function JetroOnlineLayout() {
             <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-[#C9A227] shadow-md bg-[#002613] shrink-0">
               <img
                 src={JETRO_ONLINE_AVATAR_URL}
-                alt="Assistente Jetro On-line"
+                alt="Assistente HURAM On-line"
                 className="w-full h-full object-cover object-center"
               />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold tracking-tight text-gray-900">
-                  Central de Configurações do Jetro On-line
+                  Central de Configurações do HURAM On-line
                 </h1>
                 <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-[#005B2E]/10 text-[#005B2E] border border-[#005B2E]/20 px-2 py-0.5 rounded-full">
                   <Sparkles className="w-3 h-3 text-[#C9A227]" />
@@ -30,7 +30,7 @@ export function JetroOnlineLayout() {
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Gestão operacional, treinamento via Universidade Jetro, auditoria e personalização do
+            Gestão operacional, treinamento via Universidade HURAM, auditoria e personalização do
             assistente interno do ERP.
           </p>
         </div>

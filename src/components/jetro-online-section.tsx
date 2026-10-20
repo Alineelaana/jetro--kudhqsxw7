@@ -52,7 +52,7 @@ const DEMO_DIALOGUES: DemoDialogue[] = [
     id: 'cadastrar-cliente',
     userQuestion: 'Como faço para cadastrar um cliente?',
     assistantAnswer:
-      'Posso orientar você no processo e indicar um vídeo da Universidade Jetro ou iniciar um tour guiado da tela, quando disponível.',
+      'Posso orientar você no processo e indicar um vídeo da Universidade HURAM ou iniciar um tour guiado da tela, quando disponível.',
     category: 'Aprendizado & Operação',
   },
 ]
@@ -79,7 +79,7 @@ const JETRO_ONLINE_CARDS = [
   },
   {
     id: '04',
-    title: 'Universidade Jetro',
+    title: 'Universidade HURAM',
     description: 'Recomendação de vídeos e treinamentos relacionados às dúvidas dos usuários.',
     icon: GraduationCap,
   },
@@ -160,7 +160,7 @@ export function JetroOnlineSection() {
                   <div className="w-full h-full rounded-full overflow-hidden bg-white relative">
                     <img
                       src={JETRO_ONLINE_AVATAR_URL}
-                      alt="Assistente Jetro On-line"
+                      alt="Assistente HURAM On-line"
                       className="w-full h-full object-cover object-center"
                     />
                   </div>
@@ -175,7 +175,7 @@ export function JetroOnlineSection() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#116B50]" />
                   </span>
                   <span className="text-[11px] font-semibold tracking-wider text-[#063D30] uppercase">
-                    Jetro On-line Integrado
+                    HURAM On-line Integrado
                   </span>
                 </div>
                 <span className="text-xs text-[#66736D] font-normal">
@@ -194,7 +194,7 @@ export function JetroOnlineSection() {
 
             <div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-heading text-[#063D30] tracking-tight">
-                Jetro On-line
+                HURAM On-line
               </h2>
               <p className="text-lg sm:text-xl text-[#116B50] font-medium mt-1 font-heading">
                 Seu ERP conversa com você. Seus dados ajudam a encontrar respostas.
@@ -203,7 +203,7 @@ export function JetroOnlineSection() {
 
             <div className="space-y-3 text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
               <p>
-                O Jetro On-line é o assistente inteligente integrado ao ambiente operacional do ERP.
+                O HURAM On-line é o assistente inteligente integrado ao ambiente operacional do ERP.
               </p>
               <p>
                 Ele foi desenvolvido para ajudar os usuários a encontrar informações, interpretar
@@ -298,10 +298,10 @@ export function JetroOnlineSection() {
               <span>Experiência Interativa Demonstrativa</span>
             </div>
             <h3 className="text-2xl sm:text-4xl font-semibold font-heading text-[#063D30] tracking-tight">
-              Você pergunta. O Jetro ajuda a encontrar a resposta.
+              Você pergunta. O HURAM ajuda a encontrar a resposta.
             </h3>
             <p className="text-sm sm:text-base text-[#66736D] font-normal">
-              Clique nas perguntas sugeridas abaixo para experimentar como o Jetro On-line responde
+              Clique nas perguntas sugeridas abaixo para experimentar como o HURAM On-line responde
               em cenários ilustrativos no cotidiano empresarial.
             </p>
           </div>
@@ -353,7 +353,7 @@ export function JetroOnlineSection() {
               <div className="p-3 rounded-xl bg-white border border-[#E4EAE6] text-[11px] text-[#66736D] flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-[#C69B45] shrink-0" />
                 <span>
-                  Ambiente demonstrativo com cenários ilustrativos. Jetro On-line com dados reais é
+                  Ambiente demonstrativo com cenários ilustrativos. HURAM On-line com dados reais é
                   restrito aos usuários autenticados no ERP com perfil autorizado.
                 </span>
               </div>
@@ -368,14 +368,14 @@ export function JetroOnlineSection() {
                     <div className="relative h-9 w-9 rounded-full overflow-hidden border border-[#E4EAE6] shrink-0 shadow-2xs bg-white">
                       <img
                         src={JETRO_ONLINE_AVATAR_URL}
-                        alt="Jetro On-line"
+                        alt="HURAM On-line"
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-sm font-semibold font-heading text-[#063D30]">
-                          Jetro On-line
+                          HURAM On-line
                         </h4>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-[#063D30] font-medium border border-emerald-200 uppercase tracking-wider">
                           Demo
@@ -415,7 +415,7 @@ export function JetroOnlineSection() {
                     <div className="w-8 h-8 rounded-full overflow-hidden border border-[#E4EAE6] shrink-0 bg-[#F8FAF9] mt-1 shadow-2xs">
                       <img
                         src={JETRO_ONLINE_AVATAR_URL}
-                        alt="Jetro On-line"
+                        alt="HURAM On-line"
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
@@ -423,7 +423,7 @@ export function JetroOnlineSection() {
                       <div className="flex items-center justify-between border-b border-black/5 pb-1.5">
                         <span className="text-[11px] font-semibold text-[#063D30] flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-[#C69B45]" />
-                          Jetro On-line
+                          HURAM On-line
                         </span>
                         <span className="text-[10px] text-[#66736D]">Resposta inteligente</span>
                       </div>
@@ -481,7 +481,7 @@ export function JetroOnlineSection() {
               </div>
 
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-semibold font-heading text-[#063D30] leading-tight">
-                Jetro On-line também ensina você a utilizar o sistema.
+                HURAM On-line também ensina você a utilizar o sistema.
               </h3>
 
               <p className="text-[#66736D] text-sm sm:text-base leading-relaxed font-normal">
@@ -498,7 +498,7 @@ export function JetroOnlineSection() {
                       Vídeos de Treinamento
                     </h5>
                     <p className="text-[11px] text-[#66736D] leading-relaxed">
-                      Recomendações pontuais da Universidade Jetro para a tela em que você está.
+                      Recomendações pontuais da Universidade HURAM para a tela em que você está.
                     </p>
                   </div>
                 </div>
@@ -548,7 +548,7 @@ export function JetroOnlineSection() {
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold font-heading text-[#063D30]">
-                    Universidade Jetro
+                    Universidade HURAM
                   </h4>
                   <p className="text-xs text-[#66736D] mt-1 leading-relaxed font-normal">
                     Conteúdos organizados por módulo para capacitar sua equipe com velocidade e
@@ -583,7 +583,7 @@ export function JetroOnlineSection() {
           </h3>
 
           <blockquote className="text-base sm:text-xl text-[#66736D] italic leading-relaxed border-y border-[#E4EAE6] py-6 px-4 font-normal">
-            "O Jetro On-line aproxima as pessoas dos dados e transforma consultas complexas em
+            "O HURAM On-line aproxima as pessoas dos dados e transforma consultas complexas em
             conversas simples, tornando a gestão mais acessível, inteligente e produtiva."
           </blockquote>
 
@@ -593,7 +593,7 @@ export function JetroOnlineSection() {
               size="lg"
               className="w-full sm:w-auto bg-[#063D30] hover:bg-[#042820] text-white font-semibold text-base px-8 py-6 rounded-xl shadow-xs transition-all cursor-pointer group"
             >
-              <span>Conhecer o Jetro</span>
+              <span>Conhecer o HURAM</span>
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform text-[#C69B45]" />
             </Button>
 

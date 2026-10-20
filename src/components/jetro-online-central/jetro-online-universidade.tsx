@@ -179,7 +179,7 @@ export function JetroOnlineUniversidadeScreen() {
           visualizacoes: 0,
           recomendacoes_count: 0,
         })
-        toast({ title: 'Vídeo cadastrado na Universidade Jetro!' })
+        toast({ title: 'Vídeo cadastrado na Universidade HURAM!' })
       }
 
       setModalOpen(false)
@@ -196,7 +196,7 @@ export function JetroOnlineUniversidadeScreen() {
   }
 
   const handleDeleteVideo = async (id: string, nome: string) => {
-    if (!window.confirm(`Deseja realmente remover o vídeo "${nome}" da Universidade Jetro?`)) return
+    if (!window.confirm(`Deseja realmente remover o vídeo "${nome}" da Universidade HURAM?`)) return
     try {
       await pb.collection('jetro_universidade_videos').delete(id)
       toast({ title: 'Vídeo excluído com sucesso' })
@@ -221,23 +221,22 @@ export function JetroOnlineUniversidadeScreen() {
 
   return (
     <div className="space-y-6">
-      {/* Banner da Universidade Jetro */}
-      <Card className="border shadow-2xs bg-gradient-to-r from-emerald-900 to-[#005B2E] text-white">
-        <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-[#C9A227]" />
-              <h2 className="text-base font-bold">
-                Universidade Jetro — Biblioteca de Treinamento
-              </h2>
-            </div>
-            <p className="text-xs text-emerald-100 max-w-2xl leading-relaxed">
-              Vídeos oficiais recomendados de forma inteligente pela IA do Jetro On-line com base
-              nas dúvidas dos usuários. Somente vídeos cadastrados e ativos aqui são indicados pelo
-              assistente interno.
-            </p>
-          </div>
-          <Button
+      {/* Banner da Universidade HURAM */}
+      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-900 to-[#00381C] text-white">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-[#C9A227]" />
+                <h2 className="text-base font-bold">
+                  Universidade HURAM — Biblioteca de Treinamento
+                </h2>
+              </div>
+              <p className="text-xs text-emerald-100 max-w-2xl leading-relaxed">
+                Vídeos oficiais recomendados de forma inteligente pela IA do HURAM On-line com base
+                na tela e contexto do usuário.
+              </p>
+            </div>          <Button
             onClick={handleOpenCreate}
             className="bg-[#C9A227] hover:bg-[#b5901f] text-gray-900 font-bold text-xs h-9 px-4 shrink-0 shadow-xs"
           >
@@ -281,7 +280,7 @@ export function JetroOnlineUniversidadeScreen() {
       {/* Grid de Vídeos */}
       {loading ? (
         <div className="text-center py-12 text-gray-400 text-xs">
-          Carregando vídeos da Universidade Jetro...
+          Carregando vídeos da Universidade HURAM...
         </div>
       ) : filteredVideos.length === 0 ? (
         <div className="bg-white border rounded-xl p-12 text-center text-xs text-gray-400 space-y-2">
@@ -409,7 +408,7 @@ export function JetroOnlineUniversidadeScreen() {
               <Youtube className="w-5 h-5 text-red-600" />
               <DialogTitle className="text-base font-bold text-gray-900">
                 {editingId
-                  ? 'Editar Vídeo da Universidade Jetro'
+                  ? 'Editar Vídeo da Universidade HURAM'
                   : 'Cadastrar Vídeo de Treinamento'}
               </DialogTitle>
             </div>

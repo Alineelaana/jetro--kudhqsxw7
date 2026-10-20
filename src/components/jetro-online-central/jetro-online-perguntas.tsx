@@ -68,7 +68,7 @@ export function JetroOnlinePerguntasScreen() {
         <CardHeader className="p-5 pb-3">
           <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-[#005B2E]" />
-            Perguntas dos Usuários ao Jetro On-line
+            Perguntas dos Usuários ao HURAM On-line
           </CardTitle>
           <CardDescription className="text-xs">
             Registro auditado de dúvidas dos operadores do ERP, identificação de ausência de

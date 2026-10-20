@@ -86,13 +86,13 @@ export function JetroOnlineRelatoriosScreen() {
         <CardHeader className="p-5 pb-3">
           <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-[#005B2E]" />
-            Relatórios e Indicadores de Utilização do Jetro On-line
+            Relatórios e Indicadores de Utilização do HURAM On-line
           </CardTitle>
           <CardDescription className="text-xs">
-            Métricas consolidadas com dados reais de atendimento dos operadores e engajamento da
-            Universidade Jetro.
+            Métricas de engajamento operacional, perguntas resolvidas e aderência aos vídeos da
+            Universidade HURAM.
           </CardDescription>
-        </CardHeader>
+        </CardHeader>{' '}
         <CardContent className="p-5 pt-2 space-y-6">
           {/* Cartões de Indicadores Chave */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -166,7 +166,7 @@ export function JetroOnlineRelatoriosScreen() {
               )}
             </div>
 
-            {/* Vídeos Mais Populares da Universidade Jetro */}
+            {/* Vídeos Mais Populares da Universidade HURAM */}
             <div className="border rounded-xl p-4 bg-white space-y-3">
               <h3 className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
                 <Youtube className="w-3.5 h-3.5 text-red-600" />

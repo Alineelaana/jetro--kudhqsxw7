@@ -22,7 +22,7 @@ export function JetroOnlineProtectedRoute({ children }: JetroOnlineProtectedRout
       toast({
         title: 'Acesso Restrito',
         description:
-          'Você não possui permissão administrativa para acessar as Configurações do Jetro On-line.',
+          'Você não possui permissão administrativa para acessar as Configurações do HURAM On-line.',
         variant: 'destructive',
       })
       navigate('/admin', { replace: true })
@@ -37,7 +37,7 @@ export function JetroOnlineProtectedRoute({ children }: JetroOnlineProtectedRout
         </div>
         <h2 className="text-base font-bold text-gray-900">Acesso Restrito</h2>
         <p className="text-xs text-gray-500 max-w-sm">
-          A Central de Configurações do Jetro On-line é restrita a administradores e supervisores do
+          A Central de Configurações do HURAM On-line é restrita a administradores e supervisores do
           ERP.
         </p>
       </div>
