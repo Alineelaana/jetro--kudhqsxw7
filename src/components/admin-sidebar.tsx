@@ -16,6 +16,7 @@ import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { ADMIN_MENU, type MenuEntry, type MenuChild } from '@/lib/admin-menu-config'
+import { checkProfileScreenAccess, loadProfilesCache } from '@/lib/profile-permissions'
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -92,18 +93,30 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
     return false
   }
 
+  useEffect(() => {
+    loadProfilesCache().catch(() => {})
+  }, [userRole])
+
+  // Checa se usuário tem permissão estática E dinâmica de perfil
+  const canAccessEntry = (item: { route: string; perm?: (r: string) => boolean }): boolean => {
+    if (!userRole) return false
+    if (userRole.toUpperCase() === 'SUP') return true
+    if (item.perm && !item.perm(userRole)) return false
+    return checkProfileScreenAccess(userRole, item.route, 'v')
+  }
+
   const searchResults = useMemo<SearchResult[]>(() => {
     if (!isSearching) return []
     const q = searchQuery.toLowerCase()
     const results: SearchResult[] = []
     for (const group of ADMIN_MENU) {
       for (const item of group.items) {
-        if (item.perm && !item.perm(userRole)) continue
+        if (!canAccessEntry(item)) continue
         if (item.label.toLowerCase().includes(q))
           results.push({ label: item.label, route: item.route, parent: group.title })
         if (item.children) {
           for (const child of item.children) {
-            if (child.perm && !child.perm(userRole)) continue
+            if (!canAccessEntry(child)) continue
             if (child.label.toLowerCase().includes(q))
               results.push({ label: child.label, route: child.route, parent: item.label })
           }
@@ -315,9 +328,16 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
             >
               {ADMIN_MENU.map((group, groupIdx) => {
                 const visibleItems = group.items.filter((item) => {
-                  if (item.perm && !item.perm(userRole)) return false
-                  if (item.children && item.children.length > 0) {
-                    const hasVisibleChild = item.children.some((c) => !c.perm || c.perm(userRole))
+                  if (!canAccessEntry(item)) {
+                    // Se o item pai não foi marcado, mas tem algum filho com permissão concedida (busca pontual), permite
+                    if (item.children && item.children.length > 0) {
+                      const hasChild = item.children.some((c) => canAccessEntry(c))
+                      if (!hasChild) return false
+                    } else {
+                      return false
+                    }
+                  } else if (item.children && item.children.length > 0) {
+                    const hasVisibleChild = item.children.some((c) => canAccessEntry(c))
                     if (!hasVisibleChild) return false
                   }
                   return true
@@ -497,11 +517,15 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                   )}
                   {ADMIN_MENU.map((group) => {
                     const visibleGroupItems = group.items.filter((item) => {
-                      if (item.perm && !item.perm(userRole)) return false
-                      if (item.children && item.children.length > 0) {
-                        const hasVisibleChild = item.children.some(
-                          (c) => !c.perm || c.perm(userRole),
-                        )
+                      if (!canAccessEntry(item)) {
+                        if (item.children && item.children.length > 0) {
+                          const hasChild = item.children.some((c) => canAccessEntry(c))
+                          if (!hasChild) return false
+                        } else {
+                          return false
+                        }
+                      } else if (item.children && item.children.length > 0) {
+                        const hasVisibleChild = item.children.some((c) => canAccessEntry(c))
                         if (!hasVisibleChild) return false
                       }
                       return true
@@ -534,9 +558,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
         flyoutItem &&
         flyoutItem.children &&
         (() => {
-          const visibleFlyoutChildren = flyoutItem.children.filter(
-            (c) => !c.perm || c.perm(userRole),
-          )
+          const visibleFlyoutChildren = flyoutItem.children.filter((c) => canAccessEntry(c))
           if (visibleFlyoutChildren.length === 0) return null
 
           return (

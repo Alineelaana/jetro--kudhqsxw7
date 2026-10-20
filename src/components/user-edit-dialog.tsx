@@ -205,21 +205,30 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
               {cpfError && <p className="text-xs text-destructive">{cpfError}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Função</Label>
+              <Label className="text-sm font-semibold">Setor</Label>
               <Select value={role} onValueChange={setRole}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PADRAO">Gestão</SelectItem>
-                  <SelectItem value="SUP">SUP (Administrador)</SelectItem>
+                  <SelectItem value="PADRAO">Gestão / Administrativo</SelectItem>
+                  <SelectItem value="SUP">SUP (Administrador Geral)</SelectItem>
                   <SelectItem value="FINANCEIRO">Financeiro</SelectItem>
                   <SelectItem value="COMERCIAL">Comercial</SelectItem>
-                  <SelectItem value="SDR">SDR</SelectItem>
-                  <SelectItem value="Vendedor">Vendedor</SelectItem>
+                  <SelectItem value="SDR">SDR / Pré-Vendas</SelectItem>
+                  <SelectItem value="Vendedor">Vendas / Campo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-semibold">Cargo / Função</Label>
+            <Input
+              value={cargo}
+              onChange={(e) => setCargo(e.target.value)}
+              placeholder="Ex.: Analista Financeiro, Gerente de Vendas..."
+              className="focus-visible:ring-[#005B2E]"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -261,25 +270,14 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Cargo</Label>
-              <Input
-                value={cargo}
-                onChange={(e) => setCargo(e.target.value)}
-                placeholder="Cargo do funcionário"
-                className="focus-visible:ring-[#005B2E]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Departamento</Label>
-              <Input
-                value={departamento}
-                onChange={(e) => setDepartamento(e.target.value)}
-                placeholder="Departamento"
-                className="focus-visible:ring-[#005B2E]"
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-semibold">Departamento (opcional)</Label>
+            <Input
+              value={departamento}
+              onChange={(e) => setDepartamento(e.target.value)}
+              placeholder="Departamento / Área interna"
+              className="focus-visible:ring-[#005B2E]"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold">

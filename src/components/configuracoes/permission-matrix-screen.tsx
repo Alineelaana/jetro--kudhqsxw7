@@ -1,110 +1,165 @@
 import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Download, FileText, AlertTriangle, Check, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { exportToCsv } from '@/services/configuracoes'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  PROFILES,
   MATRIX_SCREENS,
+  PROFILES,
   IDENTIFIED_GAPS,
-  type MatrixScreen,
   type PermissionGap,
 } from '@/lib/permission-matrix'
+import { PerfisPermissoesUnifiedScreen } from '@/components/configuracoes/perfis-permissoes-unified-screen'
+import {
+  Download,
+  AlertTriangle,
+  Check,
+  ShieldCheck,
+  SlidersHorizontal,
+  TableProperties,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-function PermCell({ screen, profile }: { screen: MatrixScreen; profile: string }) {
+function PermCell({ screen, profile }: { screen: (typeof MATRIX_SCREENS)[0]; profile: string }) {
   const v = screen.view(profile)
-  const c = screen.create?.(profile)
-  const e = screen.edit?.(profile)
-  const d = screen.delete?.(profile)
-  const Letter = ({ val, char }: { val: boolean | undefined; char: string }) => (
-    <span
-      className={cn(
-        'text-xs font-bold w-4 text-center',
-        val === undefined ? 'text-gray-200' : val ? 'text-emerald-600' : 'text-red-300',
-      )}
-    >
-      {val === undefined ? '—' : char}
-    </span>
-  )
+  const c = screen.create ? screen.create(profile) : false
+  const e = screen.edit ? screen.edit(profile) : false
+  const d = screen.delete ? screen.delete(profile) : false
+
   return (
-    <td className="px-2 py-2 text-center">
-      <div className="flex gap-0.5 justify-center">
-        <Letter val={v} char="V" />
-        <Letter val={c} char="C" />
-        <Letter val={e} char="E" />
-        <Letter val={d} char="D" />
-      </div>
+    <td className="text-center px-2 py-2 font-mono text-xs">
+      <span className={cn('mr-0.5', v ? 'text-emerald-600 font-bold' : 'text-muted-foreground/30')}>
+        V
+      </span>
+      <span className={cn('mr-0.5', c ? 'text-blue-600 font-bold' : 'text-muted-foreground/30')}>
+        C
+      </span>
+      <span className={cn('mr-0.5', e ? 'text-amber-600 font-bold' : 'text-muted-foreground/30')}>
+        E
+      </span>
+      <span className={cn(d ? 'text-rose-600 font-bold' : 'text-muted-foreground/30')}>D</span>
     </td>
   )
 }
 
 const severityColors: Record<string, string> = {
-  Crítica: 'bg-red-100 text-red-700',
-  Alta: 'bg-orange-100 text-orange-700',
-  Média: 'bg-amber-100 text-amber-700',
-  Baixa: 'bg-blue-100 text-blue-700',
+  Alta: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300',
+  Media: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+  Baixa: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
 }
 
 export function PermissionMatrixScreen() {
-  const [tab, setTab] = useState('matrix')
+  const [tab, setTab] = useState<'gestao' | 'matriz' | 'gaps'>('gestao')
 
   const handleExportMatrix = () => {
-    const rows = MATRIX_SCREENS.map((s) => {
-      const row: Record<string, unknown> = { Tela: s.label, Categoria: s.category }
-      for (const p of PROFILES) {
-        row[`${p}_V`] = s.view(p) ? 'Sim' : 'Não'
-        row[`${p}_C`] = s.create?.(p) === undefined ? 'N/A' : s.create(p) ? 'Sim' : 'Não'
-        row[`${p}_E`] = s.edit?.(p) === undefined ? 'N/A' : s.edit(p) ? 'Sim' : 'Não'
-        row[`${p}_D`] = s.delete?.(p) === undefined ? 'N/A' : s.delete(p) ? 'Sim' : 'Não'
-      }
-      return row
-    })
-    exportToCsv(rows, 'matriz_permissoes.csv', {
-      module: 'Configurações > Permissões',
-      format: 'csv',
-      filters: { tab: 'matrix' },
-    })
+    const headers = ['Tela', 'Categoria', ...PROFILES.map((p) => (p === 'PADRAO' ? 'Gestao' : p))]
+    const rows = MATRIX_SCREENS.map((s) => [
+      s.label,
+      s.category,
+      ...PROFILES.map((p) => {
+        const v = s.view(p) ? 'V' : ''
+        const c = s.create && s.create(p) ? 'C' : ''
+        const e = s.edit && s.edit(p) ? 'E' : ''
+        const d = s.delete && s.delete(p) ? 'D' : ''
+        const combined = `${v}${c}${e}${d}`
+        return combined || '-'
+      }),
+    ])
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(';')).join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', 'matriz_permissoes_erp.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   const handleExportGaps = () => {
-    exportToCsv(
-      IDENTIFIED_GAPS as unknown as Record<string, unknown>[],
-      'relatorio_gaps_permissoes.csv',
-      { module: 'Configurações > Permissões', format: 'csv', filters: { tab: 'gaps' } },
-    )
+    const headers = ['Tela', 'Problema', 'Severidade', 'Status', 'Correcao']
+    const rows = IDENTIFIED_GAPS.map((g) => [g.screen, g.issue, g.severity, g.status, g.fix])
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(';')).join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', 'relatorio_gaps_permissoes.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-black text-foreground">Permissões</h2>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
+        <div>
+          <h2 className="text-2xl font-black text-[#063D30] tracking-tight">
+            Gestão de Perfis & Permissões
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Ambiente unificado: cadastre perfis, selecione menus, busque telas individuais (V, C, E,
+            D) e audite matrizes.
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg border border-border">
+          <Button
+            size="sm"
+            variant={tab === 'gestao' ? 'default' : 'ghost'}
+            onClick={() => setTab('gestao')}
+            className={cn(
+              'h-8 text-xs font-bold gap-1.5',
+              tab === 'gestao' && 'bg-[#063D30] text-white hover:bg-[#0A5241]',
+            )}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" /> Edição de Perfis & Telas
+          </Button>
+          <Button
+            size="sm"
+            variant={tab === 'matriz' ? 'default' : 'ghost'}
+            onClick={() => setTab('matriz')}
+            className={cn(
+              'h-8 text-xs font-bold gap-1.5',
+              tab === 'matriz' && 'bg-[#063D30] text-white hover:bg-[#0A5241]',
+            )}
+          >
+            <TableProperties className="w-3.5 h-3.5" /> Matriz Comparativa
+          </Button>
+          <Button
+            size="sm"
+            variant={tab === 'gaps' ? 'default' : 'ghost'}
+            onClick={() => setTab('gaps')}
+            className={cn(
+              'h-8 text-xs font-bold gap-1.5',
+              tab === 'gaps' && 'bg-[#063D30] text-white hover:bg-[#0A5241]',
+            )}
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Relatório de Gaps
+          </Button>
+        </div>
       </div>
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="matrix" className="focus-visible:ring-[#005B2E]">
-            Matriz de Permissões
-          </TabsTrigger>
-          <TabsTrigger value="gaps" className="focus-visible:ring-[#005B2E]">
-            Relatório de Gaps
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="matrix" className="space-y-3">
-          <div className="flex justify-end">
+
+      {tab === 'gestao' && <PerfisPermissoesUnifiedScreen />}
+
+      {tab === 'matriz' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              Visão tabular das permissões por módulo corporativo do ERP Huram.
+            </p>
             <Button
               onClick={handleExportMatrix}
               variant="outline"
-              className="border-[#005B2E] text-[#005B2E]"
+              size="sm"
+              className="border-[#063D30] text-[#063D30] text-xs h-8"
             >
-              <Download className="w-4 h-4 mr-2" /> Exportar CSV
+              <Download className="w-3.5 h-3.5 mr-1.5" /> Exportar CSV
             </Button>
           </div>
-          <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
+          <Card className="border border-border shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#01361D] text-white">
+                  <tr className="bg-[#063D30] text-white">
                     <th className="text-left px-3 py-3 font-bold">Tela</th>
                     <th className="text-left px-3 py-3 font-bold hidden md:table-cell">
                       Categoria
@@ -118,7 +173,10 @@ export function PermissionMatrixScreen() {
                 </thead>
                 <tbody>
                   {MATRIX_SCREENS.map((s) => (
-                    <tr key={s.key} className="border-b border-border hover:bg-[#005B2E]/5">
+                    <tr
+                      key={s.key}
+                      className="border-b border-border hover:bg-[#063D30]/5 transition-colors"
+                    >
                       <td className="px-3 py-2 font-medium">{s.label}</td>
                       <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">
                         {s.category}
@@ -132,30 +190,36 @@ export function PermissionMatrixScreen() {
               </table>
             </div>
           </Card>
-          <p className="text-xs text-muted-foreground flex items-center gap-2">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground p-2 bg-muted/40 rounded border border-border">
             <span className="font-bold text-emerald-600">V</span> Visualizar
-            <span className="font-bold text-emerald-600">C</span> Criar
-            <span className="font-bold text-emerald-600">E</span> Editar
-            <span className="font-bold text-emerald-600">D</span> Excluir
-            <span className="text-red-300">— Negado</span>
-            <span className="text-gray-200">— Não se aplica</span>
-          </p>
-        </TabsContent>
-        <TabsContent value="gaps" className="space-y-3">
-          <div className="flex justify-end">
+            <span className="font-bold text-blue-600">C</span> Criar
+            <span className="font-bold text-amber-600">E</span> Editar
+            <span className="font-bold text-rose-600">D</span> Excluir
+            <span className="text-muted-foreground">— Não concedido</span>
+          </div>
+        </div>
+      )}
+
+      {tab === 'gaps' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              Diagnóstico de cobertura e gaps de permissão cadastrados.
+            </p>
             <Button
               onClick={handleExportGaps}
               variant="outline"
-              className="border-[#005B2E] text-[#005B2E]"
+              size="sm"
+              className="border-[#063D30] text-[#063D30] text-xs h-8"
             >
-              <Download className="w-4 h-4 mr-2" /> Exportar CSV
+              <Download className="w-3.5 h-3.5 mr-1.5" /> Exportar CSV
             </Button>
           </div>
-          <Card className="border-2 border-[#005B2E]/20 shadow-lg overflow-hidden">
+          <Card className="border border-border shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#01361D] text-white">
+                  <tr className="bg-[#063D30] text-white">
                     <th className="text-left px-3 py-3 font-bold">Tela</th>
                     <th className="text-left px-3 py-3 font-bold">Problema</th>
                     <th className="text-left px-3 py-3 font-bold hidden md:table-cell">
@@ -167,7 +231,7 @@ export function PermissionMatrixScreen() {
                 </thead>
                 <tbody>
                   {IDENTIFIED_GAPS.map((g: PermissionGap, i: number) => (
-                    <tr key={i} className="border-b border-border hover:bg-[#005B2E]/5">
+                    <tr key={i} className="border-b border-border hover:bg-[#063D30]/5">
                       <td className="px-3 py-3 font-medium">{g.screen}</td>
                       <td className="px-3 py-3 text-muted-foreground">{g.issue}</td>
                       <td className="px-3 py-3 hidden md:table-cell">
@@ -198,8 +262,10 @@ export function PermissionMatrixScreen() {
               </table>
             </div>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   )
 }
+
+export default PermissionMatrixScreen

@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { CadastrosPanel } from '@/components/cadastros/cadastros-panel'
 import { CadastroClientesOficialScreen } from '@/components/cadastros/cadastro-clientes-oficial-screen'
+import { PerfisPermissoesUnifiedScreen } from '@/components/configuracoes/perfis-permissoes-unified-screen'
 
 // Mapeamento de segmento de URL para a key de cadastro em CADASTROS
 const ROUTE_TO_CADASTRO_KEY: Record<string, string> = {
@@ -41,6 +42,14 @@ export default function Cadastros({ screen }: CadastrosProps) {
     return (
       <div className="p-4 sm:p-6">
         <CadastroClientesOficialScreen />
+      </div>
+    )
+  }
+
+  if (cadastroKey === 'perfis_permissoes') {
+    return (
+      <div className="p-4 sm:p-6">
+        <PerfisPermissoesUnifiedScreen />
       </div>
     )
   }
