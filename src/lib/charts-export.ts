@@ -46,17 +46,17 @@ export function downloadChartsImage(records: BudgetRecord[], userName: string): 
     ctx.globalAlpha = 1.0
 
     const grad = ctx.createLinearGradient(0, 0, canvas.width, 0)
-    grad.addColorStop(0, '#005B2E')
-    grad.addColorStop(1, '#01361D')
+    grad.addColorStop(0, '#063D30')
+    grad.addColorStop(1, '#116B50')
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, canvas.width, 8)
 
-    ctx.fillStyle = '#005B2E'
+    ctx.fillStyle = '#063D30'
     ctx.font = 'bold 26px Segoe UI, Arial, sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText('Relatório de Status das Solicitações', canvas.width / 2, 55)
+    ctx.fillText('Relatório de Status das Solicitações — HURAM', canvas.width / 2, 55)
 
-    ctx.fillStyle = '#666'
+    ctx.fillStyle = '#66736D'
     ctx.font = '14px Segoe UI, Arial, sans-serif'
     ctx.fillText(`Total de registros: ${records.length}`, canvas.width / 2, 80)
 
@@ -92,12 +92,12 @@ export function downloadChartsImage(records: BudgetRecord[], userName: string): 
       const barW = cardW - 30
       const barX = x + 15
       const barY = startY + 95
-      ctx.fillStyle = '#e5e7eb'
+      ctx.fillStyle = '#E4EAE6'
       ctx.fillRect(barX, barY, barW, 8)
       ctx.fillStyle = meta.color
       ctx.fillRect(barX, barY, (barW * pct) / 100, 8)
 
-      ctx.fillStyle = '#666'
+      ctx.fillStyle = '#66736D'
       ctx.font = '12px Segoe UI, Arial, sans-serif'
       ctx.fillText(`${pct}%`, x + cardW / 2, startY + 122)
     })
@@ -110,7 +110,7 @@ export function downloadChartsImage(records: BudgetRecord[], userName: string): 
       hour: '2-digit',
       minute: '2-digit',
     })}`
-    ctx.fillStyle = '#C89B3C'
+    ctx.fillStyle = '#C69B45'
     ctx.font = 'bold 13px Segoe UI, Arial, sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(caption, canvas.width / 2, canvas.height - 25)

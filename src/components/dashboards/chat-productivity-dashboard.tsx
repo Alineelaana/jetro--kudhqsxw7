@@ -16,6 +16,7 @@ import { getUsers } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
 import { formatDuration } from '@/lib/response-time'
 import { MessageSquare, Users, Clock, MessagesSquare, Loader2 } from 'lucide-react'
+import { HURAM_CHART_COLORS } from '@/lib/huram-charts-theme'
 
 interface UserMap {
   [id: string]: { name: string; avatar: string }
@@ -114,14 +115,14 @@ export function ChatProductivityDashboard() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
       </div>
     )
   }
 
   const chartConfig = {
-    convs: { label: 'Conversas', color: '#005B2E' },
-    msgs: { label: 'Mensagens', color: '#C89B3C' },
+    convs: { label: 'Conversas', color: HURAM_CHART_COLORS.primary },
+    msgs: { label: 'Mensagens', color: HURAM_CHART_COLORS.tertiary },
   }
   const exp =
     (label: string, value: string, color: string, title: string) => (fmt: 'png' | 'jpg') =>
@@ -134,32 +135,47 @@ export function ChatProductivityDashboard() {
           icon={Users}
           value={stats.totalConvs}
           label="Conversas"
-          hexColor="#005B2E"
-          onExport={exp('Conversas', String(stats.totalConvs), '#005B2E', 'Total de Conversas')}
+          hexColor={HURAM_CHART_COLORS.primary}
+          onExport={exp(
+            'Conversas',
+            String(stats.totalConvs),
+            HURAM_CHART_COLORS.primary,
+            'Total de Conversas',
+          )}
         />
         <StatCard
           icon={MessageSquare}
           value={stats.totalMsgs}
           label="Mensagens"
-          hexColor="#C89B3C"
-          onExport={exp('Mensagens', String(stats.totalMsgs), '#C89B3C', 'Total de Mensagens')}
+          hexColor={HURAM_CHART_COLORS.tertiary}
+          onExport={exp(
+            'Mensagens',
+            String(stats.totalMsgs),
+            HURAM_CHART_COLORS.tertiary,
+            'Total de Mensagens',
+          )}
         />
         <StatCard
           icon={MessagesSquare}
           value={stats.activeConvs}
           label="Ativas"
-          hexColor="#005B2E"
-          onExport={exp('Ativas', String(stats.activeConvs), '#005B2E', 'Conversas Ativas')}
+          hexColor={HURAM_CHART_COLORS.primary}
+          onExport={exp(
+            'Ativas',
+            String(stats.activeConvs),
+            HURAM_CHART_COLORS.primary,
+            'Conversas Ativas',
+          )}
         />
         <StatCard
           icon={Clock}
           value={stats.avgResponseMs > 0 ? formatDuration(stats.avgResponseMs) : '—'}
           label="Tempo médio resposta"
-          hexColor="#C89B3C"
+          hexColor={HURAM_CHART_COLORS.tertiary}
           onExport={exp(
             'Tempo médio resposta',
             stats.avgResponseMs > 0 ? formatDuration(stats.avgResponseMs) : '—',
-            '#C89B3C',
+            HURAM_CHART_COLORS.tertiary,
             'Tempo Médio de Resposta do Chat',
           )}
         />
@@ -167,11 +183,11 @@ export function ChatProductivityDashboard() {
       {stats.chartData.length > 0 && (
         <ChartCard
           title="Conversas por Atendente"
-          hexColor="#005B2E"
+          hexColor={HURAM_CHART_COLORS.primary}
           onExport={(fmt) =>
             downloadBarChart(
               stats.chartData.map((d) => ({ name: d.name, value: d.convs })),
-              '#005B2E',
+              HURAM_CHART_COLORS.primary,
               'Conversas por Atendente',
               userName,
               fmt,
@@ -181,15 +197,22 @@ export function ChatProductivityDashboard() {
           <ChartContainer config={chartConfig} className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.chartData}>
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                <XAxis
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
+                />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   allowDecimals={false}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="convs" fill="#005B2E" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="convs" fill={HURAM_CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -198,11 +221,11 @@ export function ChatProductivityDashboard() {
       {stats.chartData.length > 0 && (
         <ChartCard
           title="Mensagens por Atendente"
-          hexColor="#C89B3C"
+          hexColor={HURAM_CHART_COLORS.tertiary}
           onExport={(fmt) =>
             downloadBarChart(
               stats.chartData.map((d) => ({ name: d.name, value: d.msgs })),
-              '#C89B3C',
+              HURAM_CHART_COLORS.tertiary,
               'Mensagens por Atendente',
               userName,
               fmt,
@@ -212,15 +235,22 @@ export function ChatProductivityDashboard() {
           <ChartContainer config={chartConfig} className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.chartData}>
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                <XAxis
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
+                />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   allowDecimals={false}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="msgs" fill="#C89B3C" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="msgs" fill={HURAM_CHART_COLORS.tertiary} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>

@@ -24,8 +24,8 @@ export async function downloadBarChart(
       ch = 480
     const barW = Math.min(90, (cw / data.length) * 0.6)
     const gap = (cw - barW * data.length) / (data.length + 1)
-    ctx.strokeStyle = '#e5e7eb'
-    ctx.fillStyle = '#666'
+    ctx.strokeStyle = '#E4EAE6'
+    ctx.fillStyle = '#66736D'
     ctx.font = '12px Segoe UI, Arial'
     ctx.textAlign = 'right'
     for (let i = 0; i <= 5; i++) {
@@ -43,11 +43,11 @@ export async function downloadBarChart(
       ctx.fillStyle = color
       drawRoundedRect(ctx, x, y, barW, bh, 8)
       ctx.fill()
-      ctx.fillStyle = '#333'
+      ctx.fillStyle = '#202B28'
       ctx.font = 'bold 14px Segoe UI, Arial'
       ctx.textAlign = 'center'
       ctx.fillText(String(d.value), x + barW / 2, y - 8)
-      ctx.fillStyle = '#666'
+      ctx.fillStyle = '#66736D'
       ctx.font = '12px Segoe UI, Arial'
       ctx.fillText(
         d.name.length > 12 ? d.name.slice(0, 12) + '…' : d.name,
@@ -167,36 +167,36 @@ export async function downloadTopAttendant(
       ctx.clip()
       ctx.drawImage(avatar, ax - 50, ay - 50, 100, 100)
       ctx.restore()
-      ctx.strokeStyle = '#C89B3C'
+      ctx.strokeStyle = '#C69B45'
       ctx.lineWidth = 4
       ctx.beginPath()
       ctx.arc(ax, ay, 50, 0, Math.PI * 2)
       ctx.stroke()
     } else {
-      ctx.fillStyle = '#C89B3C30'
+      ctx.fillStyle = '#C69B4530'
       ctx.beginPath()
       ctx.arc(ax, ay, 50, 0, Math.PI * 2)
       ctx.fill()
-      ctx.strokeStyle = '#C89B3C'
+      ctx.strokeStyle = '#C69B45'
       ctx.lineWidth = 3
       ctx.beginPath()
       ctx.arc(ax, ay, 50, 0, Math.PI * 2)
       ctx.stroke()
-      ctx.fillStyle = '#C89B3C'
+      ctx.fillStyle = '#C69B45'
       ctx.font = 'bold 36px Segoe UI, Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText('★', ax, ay)
     }
-    ctx.fillStyle = '#C89B3C'
+    ctx.fillStyle = '#C69B45'
     ctx.font = 'bold 16px Segoe UI, Arial'
     ctx.textAlign = 'left'
     ctx.textBaseline = 'alphabetic'
     ctx.fillText('★ Usuário Destaque', ax + 80, ay - 25)
-    ctx.fillStyle = '#333'
+    ctx.fillStyle = '#202B28'
     ctx.font = 'bold 28px Segoe UI, Arial'
     ctx.fillText(name, ax + 80, ay + 5)
-    ctx.fillStyle = '#666'
+    ctx.fillStyle = '#66736D'
     ctx.font = '18px Segoe UI, Arial'
     ctx.fillText(`Média: ${avg}`, ax + 80, ay + 35)
   })
@@ -226,11 +226,11 @@ export async function downloadCommentsReport(
       ctx.textAlign = 'left'
       ctx.fillText(r.author, 80, y + 22)
       for (let i = 0; i < 5; i++) {
-        ctx.fillStyle = i < r.rating ? '#C89B3C' : '#d1d5db'
+        ctx.fillStyle = i < r.rating ? '#C69B45' : '#E4EAE6'
         ctx.font = '14px Segoe UI, Arial'
         ctx.fillText('★', 80 + i * 16, y + 42)
       }
-      ctx.fillStyle = '#666'
+      ctx.fillStyle = '#66736D'
       ctx.font = '13px Segoe UI, Arial'
       const txt = r.comment.length > 80 ? r.comment.slice(0, 80) + '…' : r.comment
       ctx.fillText(txt, 80, y + 58)

@@ -13,6 +13,7 @@ import {
 } from 'recharts'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { BarChart3, TrendingUp } from 'lucide-react'
+import { HURAM_CHART_COLORS, HURAM_CHART_SEQUENCE } from '@/lib/huram-charts-theme'
 
 export interface JetroChartSeries {
   dataKey: string
@@ -33,14 +34,14 @@ interface JetroOnlineChartRendererProps {
   spec: JetroChartSpec
 }
 
-// Paleta oficial Jetro
-const JETRO_COLORS = [
-  '#005B2E', // Verde Jetro escuro primário
-  '#C9A227', // Dourado Jetro
-  '#027A3D', // Verde Médio
-  '#8F7014', // Dourado Escuro
-  '#00381C', // Verde Floresta Profundo
-  '#10B981', // Esmeralda de suporte
+// Paleta oficial de gráficos HURAM
+const HURAM_COLORS = [
+  HURAM_CHART_COLORS.primary, // #063D30
+  HURAM_CHART_COLORS.secondary, // #116B50
+  HURAM_CHART_COLORS.tertiary, // #C69B45
+  HURAM_CHART_COLORS.quaternary, // #E87517
+  HURAM_CHART_COLORS.info, // #3B82F6
+  HURAM_CHART_COLORS.success, // #10B981
 ]
 
 function formatTooltipValue(value: unknown): string {
@@ -69,7 +70,7 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
           .map((k, idx) => ({
             dataKey: k,
             name: k,
-            color: JETRO_COLORS[idx % JETRO_COLORS.length],
+            color: HURAM_COLORS[idx % HURAM_COLORS.length],
           }))
 
   if (chartSeries.length === 0) {
@@ -85,20 +86,20 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
           {title && (
             <CardTitle className="text-xs sm:text-sm font-bold text-gray-900 flex items-center gap-1.5">
               {isBar ? (
-                <BarChart3 className="w-4 h-4 text-[#005B2E]" />
+                <BarChart3 className="w-4 h-4 text-[#063D30]" />
               ) : (
-                <TrendingUp className="w-4 h-4 text-[#C9A227]" />
+                <TrendingUp className="w-4 h-4 text-[#C69B45]" />
               )}
               <span>{title}</span>
             </CardTitle>
           )}
           {description && (
-            <CardDescription className="text-[11px] text-gray-500 mt-0.5">
+            <CardDescription className="text-[11px] text-[#66736D] mt-0.5">
               {description}
             </CardDescription>
           )}
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#005B2E]/10 text-[#005B2E]">
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#063D30]/10 text-[#063D30]">
           {isBar ? 'Comparativo / Ranking' : 'Evolução Temporal'}
         </span>
       </CardHeader>
@@ -107,12 +108,17 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
           <ResponsiveContainer width="100%" height="100%">
             {isBar ? (
               <BarChart data={data} margin={{ top: 10, right: 15, left: -10, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke={HURAM_CHART_COLORS.grid}
+                />
                 <XAxis
                   dataKey={xAxisKey}
                   tickLine={false}
-                  axisLine={{ stroke: '#E5E7EB' }}
-                  tick={{ fontSize: 11, fill: '#4B5563' }}
+                  axisLine={{ stroke: HURAM_CHART_COLORS.grid }}
+                  tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   interval={0}
                   angle={data.length > 5 ? -25 : 0}
                   textAnchor={data.length > 5 ? 'end' : 'middle'}
@@ -121,7 +127,8 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 10, fill: '#6B7280' }}
+                  tick={{ fontSize: 10, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   tickFormatter={(val) => {
                     if (typeof val === 'number') {
                       if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`
@@ -139,14 +146,19 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
                   contentStyle={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '8px',
-                    border: '1px solid #E5E7EB',
+                    border: `1px solid ${HURAM_CHART_COLORS.grid}`,
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     fontSize: '11px',
+                    color: '#202B28',
                   }}
                 />
                 {chartSeries.length > 1 && (
                   <Legend
-                    wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
+                    wrapperStyle={{
+                      fontSize: '11px',
+                      paddingTop: '8px',
+                      color: HURAM_CHART_COLORS.axis,
+                    }}
                     iconType="circle"
                   />
                 )}
@@ -155,7 +167,7 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
                     key={s.dataKey}
                     dataKey={s.dataKey}
                     name={s.name || s.dataKey}
-                    fill={s.color || JETRO_COLORS[idx % JETRO_COLORS.length]}
+                    fill={s.color || HURAM_COLORS[idx % HURAM_COLORS.length]}
                     radius={[4, 4, 0, 0]}
                     maxBarSize={48}
                   />
@@ -163,12 +175,17 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
               </BarChart>
             ) : (
               <LineChart data={data} margin={{ top: 10, right: 15, left: -10, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke={HURAM_CHART_COLORS.grid}
+                />
                 <XAxis
                   dataKey={xAxisKey}
                   tickLine={false}
-                  axisLine={{ stroke: '#E5E7EB' }}
-                  tick={{ fontSize: 11, fill: '#4B5563' }}
+                  axisLine={{ stroke: HURAM_CHART_COLORS.grid }}
+                  tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   interval={0}
                   angle={data.length > 5 ? -25 : 0}
                   textAnchor={data.length > 5 ? 'end' : 'middle'}
@@ -177,7 +194,8 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 10, fill: '#6B7280' }}
+                  tick={{ fontSize: 10, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   tickFormatter={(val) => {
                     if (typeof val === 'number') {
                       if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`
@@ -195,14 +213,19 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
                   contentStyle={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '8px',
-                    border: '1px solid #E5E7EB',
+                    border: `1px solid ${HURAM_CHART_COLORS.grid}`,
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     fontSize: '11px',
+                    color: '#202B28',
                   }}
                 />
                 {chartSeries.length > 1 && (
                   <Legend
-                    wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
+                    wrapperStyle={{
+                      fontSize: '11px',
+                      paddingTop: '8px',
+                      color: HURAM_CHART_COLORS.axis,
+                    }}
                     iconType="circle"
                   />
                 )}
@@ -212,9 +235,9 @@ export const JetroOnlineChartRenderer: React.FC<JetroOnlineChartRendererProps> =
                     type="monotone"
                     dataKey={s.dataKey}
                     name={s.name || s.dataKey}
-                    stroke={s.color || JETRO_COLORS[idx % JETRO_COLORS.length]}
+                    stroke={s.color || HURAM_COLORS[idx % HURAM_COLORS.length]}
                     strokeWidth={2.5}
-                    dot={{ r: 4, fill: s.color || JETRO_COLORS[idx % JETRO_COLORS.length] }}
+                    dot={{ r: 4, fill: s.color || HURAM_COLORS[idx % HURAM_COLORS.length] }}
                     activeDot={{ r: 6 }}
                   />
                 ))}

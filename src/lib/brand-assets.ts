@@ -22,3 +22,9 @@ export const HURAM_PALETTE = {
   border: '#E4EAE6',
   grayBackground: '#F8FAF9',
 }
+
+export {
+  HURAM_CHART_COLORS,
+  HURAM_CHART_SEQUENCE,
+  HURAM_RECHARTS_PROPS,
+} from './huram-charts-theme'

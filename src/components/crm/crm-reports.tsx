@@ -31,16 +31,9 @@ import { toast } from '@/hooks/use-toast'
 import { exportCsv } from '@/lib/csv-export'
 import { generateCrmReportPdf } from '@/lib/crm-report-pdf'
 
-const COLORS = [
-  '#005B2E',
-  '#C89B3C',
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
-  '#8b5cf6',
-  '#ec4899',
-  '#ef4444',
-]
+import { HURAM_CHART_COLORS, HURAM_CHART_SEQUENCE } from '@/lib/huram-charts-theme'
+
+const COLORS = HURAM_CHART_SEQUENCE
 
 const ROLE_LABELS: Record<string, string> = {
   SUP: 'Super Admin (SUP)',
@@ -71,7 +64,7 @@ export function CrmReports() {
   if (!data)
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
       </div>
     )
 
@@ -87,10 +80,15 @@ export function CrmReports() {
   const funnelValue = Number(data.funnelValue || 0)
 
   const summaryCards = [
-    { label: 'Total de Leads', value: totalLeads, icon: Users, color: '#005B2E' },
-    { label: 'Oportunidades', value: opps.length, icon: Briefcase, color: '#3b82f6' },
-    { label: 'Ganhas', value: wonOpps.length, icon: Trophy, color: '#10b981' },
-    { label: 'Conversão', value: `${conversionRate}%`, icon: Percent, color: '#C89B3C' },
+    { label: 'Total de Leads', value: totalLeads, icon: Users, color: HURAM_CHART_COLORS.primary },
+    { label: 'Oportunidades', value: opps.length, icon: Briefcase, color: HURAM_CHART_COLORS.info },
+    { label: 'Ganhas', value: wonOpps.length, icon: Trophy, color: HURAM_CHART_COLORS.success },
+    {
+      label: 'Conversão',
+      value: `${conversionRate}%`,
+      icon: Percent,
+      color: HURAM_CHART_COLORS.tertiary,
+    },
   ]
 
   const handleExportPdf = () => {
@@ -215,9 +213,9 @@ export function CrmReports() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="border-2 border-[#005B2E]/10 shadow-sm">
+        <Card className="border-2 border-[#063D30]/10 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-[#005B2E]">Leads por Origem</CardTitle>
+            <CardTitle className="text-sm font-semibold text-[#063D30]">Leads por Origem</CardTitle>
           </CardHeader>
           <CardContent>
             {leadsBySource.length === 0 ? (
@@ -231,29 +229,34 @@ export function CrmReports() {
                   >
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 9, fill: '#666' }}
+                      tick={{ fontSize: 9, fill: HURAM_CHART_COLORS.axis }}
+                      stroke={HURAM_CHART_COLORS.axis}
                       angle={-20}
                       textAnchor="end"
                       height={55}
                     />
-                    <YAxis tick={{ fontSize: 10, fill: '#666' }} />
+                    <YAxis
+                      tick={{ fontSize: 10, fill: HURAM_CHART_COLORS.axis }}
+                      stroke={HURAM_CHART_COLORS.axis}
+                    />
                     <Tooltip
                       contentStyle={{
                         borderRadius: 8,
-                        border: '1px solid #e0e0e0',
+                        border: `1px solid ${HURAM_CHART_COLORS.grid}`,
                         fontSize: 12,
+                        backgroundColor: '#FFFFFF',
                       }}
                     />
-                    <Bar dataKey="count" fill="#005B2E" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" fill={HURAM_CHART_COLORS.primary} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
             )}
           </CardContent>
         </Card>
-        <Card className="border-2 border-[#005B2E]/10 shadow-sm">
+        <Card className="border-2 border-[#063D30]/10 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-[#005B2E]">
+            <CardTitle className="text-sm font-semibold text-[#063D30]">
               Leads por Situação
             </CardTitle>
           </CardHeader>
@@ -281,8 +284,9 @@ export function CrmReports() {
                     <Tooltip
                       contentStyle={{
                         borderRadius: 8,
-                        border: '1px solid #e0e0e0',
+                        border: `1px solid ${HURAM_CHART_COLORS.grid}`,
                         fontSize: 12,
+                        backgroundColor: '#FFFFFF',
                       }}
                     />
                   </PieChart>
@@ -293,9 +297,9 @@ export function CrmReports() {
         </Card>
       </div>
 
-      <Card className="border-2 border-[#005B2E]/10 shadow-sm">
+      <Card className="border-2 border-[#063D30]/10 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-[#005B2E]">Resumo do Funil</CardTitle>
+          <CardTitle className="text-sm font-semibold text-[#063D30]">Resumo do Funil</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -303,7 +307,7 @@ export function CrmReports() {
               <p className="text-xs text-muted-foreground uppercase tracking-wide">
                 Valor do Funil
               </p>
-              <p className="text-lg font-bold text-[#005B2E]">
+              <p className="text-lg font-bold text-[#063D30]">
                 R$ {funnelValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
@@ -321,7 +325,7 @@ export function CrmReports() {
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground uppercase tracking-wide">Atividades</p>
-              <p className="text-lg font-bold text-[#C89B3C]">{activitiesCount}</p>
+              <p className="text-lg font-bold text-[#C69B45]">{activitiesCount}</p>
             </div>
           </div>
         </CardContent>

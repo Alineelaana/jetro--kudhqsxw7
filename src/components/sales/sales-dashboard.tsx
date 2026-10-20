@@ -17,16 +17,9 @@ import {
   Percent,
 } from 'lucide-react'
 
-const COLORS = [
-  '#005B2E',
-  '#C89B3C',
-  '#3b82f6',
-  '#22c55e',
-  '#f59e0b',
-  '#8b5cf6',
-  '#ec4899',
-  '#06b6d4',
-]
+import { HURAM_CHART_COLORS, HURAM_CHART_SEQUENCE } from '@/lib/huram-charts-theme'
+
+const COLORS = HURAM_CHART_SEQUENCE
 
 export function SalesDashboard() {
   const [orders, setOrders] = useState<SalesOrder[]>([])
@@ -112,35 +105,50 @@ export function SalesDashboard() {
   if (loading)
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
       </div>
     )
 
-  const chartConfig = { value: { label: 'Valor', color: '#005B2E' } }
+  const chartConfig = { value: { label: 'Valor', color: HURAM_CHART_COLORS.primary } }
   const cards = [
     {
       icon: DollarSign,
       label: 'Vendas do Dia',
       value: `R$ ${stats.todayTotal.toFixed(2)}`,
-      color: '#005B2E',
+      color: HURAM_CHART_COLORS.primary,
     },
     {
       icon: TrendingUp,
       label: 'Vendas do Mês',
       value: `R$ ${stats.monthTotal.toFixed(2)}`,
-      color: '#C89B3C',
+      color: HURAM_CHART_COLORS.tertiary,
     },
     {
       icon: CheckCircle,
       label: 'Valor Faturado',
       value: `R$ ${stats.invoicedTotal.toFixed(2)}`,
-      color: '#22c55e',
+      color: HURAM_CHART_COLORS.secondary,
     },
-    { icon: FileText, label: 'Qtd. Pedidos', value: stats.totalOrders, color: '#3b82f6' },
-    { icon: Clock, label: 'Aguard. Aprovação', value: stats.pendingApproval, color: '#f59e0b' },
+    {
+      icon: FileText,
+      label: 'Qtd. Pedidos',
+      value: stats.totalOrders,
+      color: HURAM_CHART_COLORS.quaternary,
+    },
+    {
+      icon: Clock,
+      label: 'Aguard. Aprovação',
+      value: stats.pendingApproval,
+      color: HURAM_CHART_COLORS.warning,
+    },
     { icon: Clock, label: 'Aguard. Faturamento', value: stats.pendingInvoicing, color: '#06b6d4' },
-    { icon: CheckCircle, label: 'Faturados', value: stats.invoicedCount, color: '#10b981' },
-    { icon: XCircle, label: 'Cancelados', value: stats.canceled, color: '#ef4444' },
+    {
+      icon: CheckCircle,
+      label: 'Faturados',
+      value: stats.invoicedCount,
+      color: HURAM_CHART_COLORS.success,
+    },
+    { icon: XCircle, label: 'Cancelados', value: stats.canceled, color: HURAM_CHART_COLORS.danger },
     {
       icon: Percent,
       label: 'Ticket Médio',
@@ -170,26 +178,37 @@ export function SalesDashboard() {
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-2 border-[#005B2E]/30">
+        <Card className="border-2 border-[#063D30]/20">
           <CardHeader>
-            <CardTitle className="text-base">Vendas por Vendedor</CardTitle>
+            <CardTitle className="text-base text-[#063D30]">Vendas por Vendedor</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.salespersonChart}>
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                    stroke={HURAM_CHART_COLORS.axis}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: HURAM_CHART_COLORS.axis }}
+                    stroke={HURAM_CHART_COLORS.axis}
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="#005B2E" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="value" fill={HURAM_CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="border-2 border-[#C89B3C]/30">
+        <Card className="border-2 border-[#C69B45]/20">
           <CardHeader>
-            <CardTitle className="text-base">Clientes que Mais Compraram</CardTitle>
+            <CardTitle className="text-base text-[#063D30]">Clientes que Mais Compraram</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
@@ -215,25 +234,32 @@ export function SalesDashboard() {
           </CardContent>
         </Card>
       </div>
-      <Card className="border-2 border-[#005B2E]/30">
+      <Card className="border-2 border-[#063D30]/20">
         <CardHeader>
-          <CardTitle className="text-base">Produtos Mais Vendidos</CardTitle>
+          <CardTitle className="text-base text-[#063D30]">Produtos Mais Vendidos</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[220px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.productChart} layout="vertical">
-                <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                <XAxis
+                  type="number"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
+                />
                 <YAxis
                   type="category"
                   dataKey="name"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                  stroke={HURAM_CHART_COLORS.axis}
                   width={120}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" fill="#005B2E" radius={[0, 8, 8, 0]} />
+                <Bar dataKey="value" fill={HURAM_CHART_COLORS.secondary} radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>

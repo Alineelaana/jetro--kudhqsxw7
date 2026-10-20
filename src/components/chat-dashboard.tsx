@@ -16,6 +16,7 @@ import { getChatRatings, type ChatRating } from '@/services/chat-ratings'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Star, Trophy, MessageSquare, TrendingUp, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { HURAM_CHART_COLORS } from '@/lib/huram-charts-theme'
 
 const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
 const getAvatarUrl = (id: string, avatar: string) =>
@@ -75,12 +76,12 @@ export function ChatDashboard() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
       </div>
     )
   }
 
-  const chartConfig = { avg: { label: 'Média', color: '#005B2E' } }
+  const chartConfig = { avg: { label: 'Média', color: HURAM_CHART_COLORS.primary } }
   const exp =
     (label: string, value: string, color: string, title: string) => (fmt: 'png' | 'jpg') =>
       downloadStatCard(label, value, color, title, userName, fmt)
@@ -108,11 +109,11 @@ export function ChatDashboard() {
           icon={TrendingUp}
           value={stats.overall}
           label="Média Geral"
-          hexColor="#005B2E"
+          hexColor={HURAM_CHART_COLORS.primary}
           onExport={exp(
             'Média Geral',
             String(stats.overall),
-            '#005B2E',
+            HURAM_CHART_COLORS.primary,
             'Média Geral de Avaliações',
           )}
         />
@@ -120,30 +121,30 @@ export function ChatDashboard() {
           icon={Star}
           value={stats.total}
           label="Avaliações Recebidas"
-          hexColor="#C89B3C"
+          hexColor={HURAM_CHART_COLORS.tertiary}
           onExport={exp(
             'Avaliações Recebidas',
             String(stats.total),
-            '#C89B3C',
+            HURAM_CHART_COLORS.tertiary,
             'Total de Avaliações Recebidas',
           )}
         />
         {stats.top && (
-          <Card className="border-2 border-[#C89B3C]/40 bg-gradient-to-br from-[#C89B3C]/5 to-[#005B2E]/5">
+          <Card className="border-2 border-[#C69B45]/40 bg-gradient-to-br from-[#C69B45]/5 to-[#063D30]/5">
             <CardContent className="py-4 px-6 flex items-center gap-4">
               {stats.top.avatar ? (
                 <img
                   src={getAvatarUrl(stats.top.id, stats.top.avatar)}
                   alt={stats.top.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-[#C89B3C]"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-[#C69B45]"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-[#C89B3C]/20 flex items-center justify-center border-2 border-[#C89B3C]">
-                  <Trophy className="w-6 h-6 text-[#C89B3C]" />
+                <div className="w-12 h-12 rounded-full bg-[#C69B45]/20 flex items-center justify-center border-2 border-[#C69B45]">
+                  <Trophy className="w-6 h-6 text-[#C69B45]" />
                 </div>
               )}
               <div className="min-w-0">
-                <p className="text-xs font-bold text-[#C89B3C]">★ Usuário Destaque</p>
+                <p className="text-xs font-bold text-[#C69B45]">★ Usuário Destaque</p>
                 <p className="font-black text-foreground">{stats.top.name}</p>
                 <p className="text-sm text-muted-foreground">Média: {stats.top.avg}</p>
               </div>
@@ -166,11 +167,11 @@ export function ChatDashboard() {
       </div>
       <ChartCard
         title="Média de Avaliação por Atendente"
-        hexColor="#005B2E"
+        hexColor={HURAM_CHART_COLORS.primary}
         onExport={(fmt) =>
           downloadBarChart(
             stats.chartData.map((d) => ({ name: d.name, value: d.avg })),
-            '#005B2E',
+            HURAM_CHART_COLORS.primary,
             'Média de Avaliação por Atendente',
             userName,
             fmt,
@@ -180,12 +181,31 @@ export function ChatDashboard() {
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={stats.chartData}>
-              <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-              <YAxis domain={[0, 5]} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 12, fill: HURAM_CHART_COLORS.axis }}
+                stroke={HURAM_CHART_COLORS.axis}
+              />
+              <YAxis
+                domain={[0, 5]}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 12, fill: HURAM_CHART_COLORS.axis }}
+                stroke={HURAM_CHART_COLORS.axis}
+              />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Bar dataKey="avg" radius={[8, 8, 0, 0]}>
                 {stats.chartData.map((entry, i) => (
-                  <Cell key={i} fill={entry.id === stats.top?.id ? '#C89B3C' : '#005B2E'} />
+                  <Cell
+                    key={i}
+                    fill={
+                      entry.id === stats.top?.id
+                        ? HURAM_CHART_COLORS.tertiary
+                        : HURAM_CHART_COLORS.primary
+                    }
+                  />
                 ))}
               </Bar>
             </BarChart>
@@ -195,7 +215,7 @@ export function ChatDashboard() {
       {stats.comments.length > 0 && (
         <ChartCard
           title="Comentários e Observações"
-          hexColor="#005B2E"
+          hexColor={HURAM_CHART_COLORS.primary}
           onExport={(fmt) =>
             downloadCommentsReport(
               stats.comments.map((r) => ({
@@ -222,7 +242,7 @@ export function ChatDashboard() {
                         key={i}
                         className={cn(
                           'w-3 h-3',
-                          i < r.rating ? 'fill-[#C89B3C] text-[#C89B3C]' : 'text-muted-foreground',
+                          i < r.rating ? 'fill-[#C69B45] text-[#C69B45]' : 'text-muted-foreground',
                         )}
                       />
                     ))}

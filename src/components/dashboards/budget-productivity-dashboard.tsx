@@ -10,13 +10,14 @@ import { getBudgetRequests, getAverageResponseTime } from '@/services/budget-req
 import { useRealtime } from '@/hooks/use-realtime'
 import { FileText, CheckCircle, Clock, AlertCircle, Loader2, TrendingUp } from 'lucide-react'
 import type { BudgetRecord } from '@/lib/types'
+import { HURAM_CHART_COLORS } from '@/lib/huram-charts-theme'
 
 const STATUS_COLOR_HEX: Record<string, string> = {
-  PENDENTE: '#f59e0b',
-  'EM ANDAMENTO': '#3b82f6',
+  PENDENTE: '#F59E0B',
+  'EM ANDAMENTO': '#3B82F6',
   'EM CONTATO COM O CLIENTE': '#06b6d4',
-  CONCLUÍDO: '#22c55e',
-  CANCELADO: '#ef4444',
+  CONCLUÍDO: '#10B981',
+  CANCELADO: '#EF4444',
 }
 
 export function BudgetProductivityDashboard() {
@@ -70,12 +71,12 @@ export function BudgetProductivityDashboard() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
       </div>
     )
   }
 
-  const chartConfig = { quotes: { label: 'Orçamentos', color: '#005B2E' } }
+  const chartConfig = { quotes: { label: 'Orçamentos', color: HURAM_CHART_COLORS.primary } }
   const exp =
     (label: string, value: string, color: string, title: string) => (fmt: 'png' | 'jpg') =>
       downloadStatCard(label, value, color, title, userName, fmt)
@@ -87,18 +88,23 @@ export function BudgetProductivityDashboard() {
           icon={FileText}
           value={stats.total}
           label="Solicitações"
-          hexColor="#005B2E"
-          onExport={exp('Solicitações', String(stats.total), '#005B2E', 'Total de Solicitações')}
+          hexColor={HURAM_CHART_COLORS.primary}
+          onExport={exp(
+            'Solicitações',
+            String(stats.total),
+            HURAM_CHART_COLORS.primary,
+            'Total de Solicitações',
+          )}
         />
         <StatCard
           icon={CheckCircle}
           value={stats.withQuote}
           label="Orçamentos enviados"
-          hexColor="#C89B3C"
+          hexColor={HURAM_CHART_COLORS.tertiary}
           onExport={exp(
             'Orçamentos enviados',
             String(stats.withQuote),
-            '#C89B3C',
+            HURAM_CHART_COLORS.tertiary,
             'Orçamentos Enviados',
           )}
         />
@@ -106,11 +112,11 @@ export function BudgetProductivityDashboard() {
           icon={Clock}
           value={avgTime.formatted || '—'}
           label="Tempo médio resposta"
-          hexColor="#005B2E"
+          hexColor={HURAM_CHART_COLORS.primary}
           onExport={exp(
             'Tempo médio resposta',
             avgTime.formatted || '—',
-            '#005B2E',
+            HURAM_CHART_COLORS.primary,
             'Tempo Médio de Resposta de Orçamentos',
           )}
         />
@@ -118,11 +124,11 @@ export function BudgetProductivityDashboard() {
           icon={TrendingUp}
           value={`${stats.responseRate}%`}
           label="Taxa de resposta"
-          hexColor="#C89B3C"
+          hexColor={HURAM_CHART_COLORS.tertiary}
           onExport={exp(
             'Taxa de resposta',
             `${stats.responseRate}%`,
-            '#C89B3C',
+            HURAM_CHART_COLORS.tertiary,
             'Taxa de Resposta de Orçamentos',
           )}
         />
@@ -131,7 +137,7 @@ export function BudgetProductivityDashboard() {
         {stats.statusChart.length > 0 && (
           <ChartCard
             title="Distribuição por Status"
-            hexColor="#005B2E"
+            hexColor={HURAM_CHART_COLORS.primary}
             onExport={(fmt) =>
               downloadPieChart(stats.statusChart, 'Distribuição por Status', userName, fmt)
             }
@@ -161,11 +167,11 @@ export function BudgetProductivityDashboard() {
         {stats.attendantChart.length > 0 && (
           <ChartCard
             title="Orçamentos por Atendente"
-            hexColor="#C89B3C"
+            hexColor={HURAM_CHART_COLORS.tertiary}
             onExport={(fmt) =>
               downloadBarChart(
                 stats.attendantChart.map((d) => ({ name: d.name, value: d.quotes })),
-                '#C89B3C',
+                HURAM_CHART_COLORS.tertiary,
                 'Orçamentos por Atendente',
                 userName,
                 fmt,
@@ -175,15 +181,22 @@ export function BudgetProductivityDashboard() {
             <ChartContainer config={chartConfig} className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.attendantChart}>
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 11, fill: HURAM_CHART_COLORS.axis }}
+                    stroke={HURAM_CHART_COLORS.axis}
+                  />
                   <YAxis
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 12, fill: HURAM_CHART_COLORS.axis }}
+                    stroke={HURAM_CHART_COLORS.axis}
                     allowDecimals={false}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="quotes" fill="#C89B3C" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="quotes" fill={HURAM_CHART_COLORS.tertiary} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

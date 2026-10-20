@@ -15,6 +15,7 @@ import {
 import { getCrmDashboardData } from '@/services/crm'
 import { CrmErpIntegrationPanel } from '@/components/crm/crm-erp-integration-panel'
 import { useRealtime } from '@/hooks/use-realtime'
+import { HURAM_CHART_COLORS, HURAM_CHART_SEQUENCE } from '@/lib/huram-charts-theme'
 import {
   Users,
   Target,
@@ -42,7 +43,7 @@ export function CrmDashboard() {
   if (!data)
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-4 border-[#005B2E] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#063D30] border-t-transparent rounded-full animate-spin" />
       </div>
     )
 
@@ -129,9 +130,9 @@ export function CrmDashboard() {
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="border-2 border-[#005B2E]/20">
+        <Card className="border-2 border-[#063D30]/20">
           <CardHeader>
-            <CardTitle className="text-base">Oportunidades por Etapa</CardTitle>
+            <CardTitle className="text-base text-[#063D30]">Oportunidades por Etapa</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={{}} className="h-[300px]">
@@ -139,22 +140,33 @@ export function CrmDashboard() {
                 <BarChart data={oppsByStage}>
                   <XAxis
                     dataKey="stage"
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 10, fill: HURAM_CHART_COLORS.axis }}
+                    stroke={HURAM_CHART_COLORS.axis}
                     angle={-20}
                     textAnchor="end"
                     height={60}
                   />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#005B2E" radius={[4, 4, 0, 0]} />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: HURAM_CHART_COLORS.axis }}
+                    stroke={HURAM_CHART_COLORS.axis}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '8px',
+                      border: `1px solid ${HURAM_CHART_COLORS.grid}`,
+                      fontSize: '11px',
+                    }}
+                  />
+                  <Bar dataKey="count" fill={HURAM_CHART_COLORS.primary} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="border-2 border-[#005B2E]/20">
+        <Card className="border-2 border-[#063D30]/20">
           <CardHeader>
-            <CardTitle className="text-base">Vendas por Responsável</CardTitle>
+            <CardTitle className="text-base text-[#063D30]">Vendas por Responsável</CardTitle>
           </CardHeader>
           <CardContent>
             {salesByResponsible.length === 0 ? (
@@ -175,11 +187,17 @@ export function CrmDashboard() {
                       {salesByResponsible.map((_: Record<string, unknown>, i: number) => (
                         <Cell
                           key={i}
-                          fill={['#005B2E', '#C89B3C', '#3b82f6', '#10b981', '#f59e0b'][i % 5]}
+                          fill={HURAM_CHART_SEQUENCE[i % HURAM_CHART_SEQUENCE.length]}
                         />
                       ))}
                     </Pie>
                     <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '8px',
+                        border: `1px solid ${HURAM_CHART_COLORS.grid}`,
+                        fontSize: '11px',
+                      }}
                       formatter={(v: number) =>
                         `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
                       }
