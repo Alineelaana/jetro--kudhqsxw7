@@ -35,12 +35,12 @@ export default function Layout() {
   const [screenLogicOpen, setScreenLogicOpen] = useState(false)
   const canAccessDocs = canViewScreenDocs(userRole)
   const isAdmin = pathname.startsWith('/admin')
-  // Quando autenticado na rota /site, também exibe o ambiente ERP com sidebar e home inteligente
-  const isSitePath = pathname === '/site'
-  const isAuthSite = isSitePath && isAuthenticated && !loading
-  const showSidebar = (isAdmin || isAuthSite) && isAuthenticated && !loading
-  const isHomePage = pathname === '/admin' || (isSitePath && isAuthenticated)
-  const showFooter = !isInternalPath(pathname) && !(isSitePath && isAuthenticated)
+  // Usuário autenticado na rota /site é redirecionado pelo Index para /admin.
+  // showSidebar exibe sidebar nas rotas administrativas
+  const showSidebar = isAdmin && isAuthenticated && !loading
+  const isHomePage = pathname === '/admin'
+  const isSite = pathname === '/site'
+  const showFooter = !isInternalPath(pathname) && (!isAuthenticated || !isSite)
 
   useEffect(() => {
     if (!isAdmin) {

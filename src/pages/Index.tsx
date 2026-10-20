@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
-import { IntelligentHomeScreen } from '@/components/intelligent-home-screen'
 import { HeroSection } from '@/components/hero-section'
 import { AboutJetroSection } from '@/components/about-jetro-section'
 import { PlatformModulesSection } from '@/components/platform-modules-section'
@@ -26,9 +26,9 @@ export default function Index() {
   const safeWhatsapp = whatsappNumber || '5531991297619'
   const [selectedService] = useState<string>('Apresentação Comercial Jetro ERP')
 
-  // Se o usuário está logado, renderiza a tela inicial inteligente do ERP Jetro
+  // Se o usuário está logado, redireciona para a área interna (/admin) garantindo que nunca fique em /site
   if (!loading && isAuthenticated) {
-    return <IntelligentHomeScreen />
+    return <Navigate to="/admin" replace />
   }
 
   const scrollToContact = () => {
