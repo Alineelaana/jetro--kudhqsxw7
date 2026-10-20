@@ -33,6 +33,14 @@ export function MenuLink({
   const visible = !entry.perm || entry.perm(userRole)
   if (!visible) return null
 
+  // Se o item tem filhos, mas todos os filhos estão restritos por permissão, oculta o grupo inteiro
+  const visibleChildren = hasChildren
+    ? entry.children!.filter((child) => !child.perm || child.perm(userRole))
+    : []
+  if (hasChildren && visibleChildren.length === 0) {
+    return null
+  }
+
   const linkClass = cn(
     'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
     isActive || isChildActive
@@ -78,8 +86,7 @@ export function MenuLink({
         </div>
         {isExpanded && (
           <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5 animate-in fade-in-50 duration-150">
-            {entry.children!.map((child) => {
-              if (child.perm && !child.perm(userRole)) return null
+            {visibleChildren.map((child) => {
               const ChildIcon = child.icon as ComponentType<{ className?: string }> | undefined
               const isChildItemActive = currentPathname === child.route
               return (

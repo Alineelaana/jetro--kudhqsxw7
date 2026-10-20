@@ -64,6 +64,7 @@ import {
   canManageJehAssistant,
   canManageJetroOnline,
   canViewPlatformInfra,
+  canViewReportSchedules,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -142,7 +143,7 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         label: 'Agendamento de Relatórios',
         icon: CalendarClock,
         route: '/admin/agendamento-relatorios',
-        perm: canViewConfiguracoes,
+        perm: canViewReportSchedules,
       },
       {
         label: 'Assistente Jeh',

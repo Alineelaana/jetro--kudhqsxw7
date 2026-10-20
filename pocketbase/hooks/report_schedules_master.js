@@ -771,6 +771,14 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
   function buildFilterQueryForSchedule(reportId, f, userRecord, dateRange) {
     var parts = []
 
+    // Regra 3, 4 e 5: Se o usuário não for SUP, restringe obrigatoriamente a empresa dele na consulta
+    if (userRecord && userRecord.getString('role') !== 'SUP') {
+      var userEmpresa = userRecord.getString('empresa_id') || userRecord.getString('empresa')
+      if (userEmpresa) {
+        parts.push('(empresa = "' + userEmpresa + '" || empresa_id = "' + userEmpresa + '")')
+      }
+    }
+
     if (reportId === 'financeiro-contas-receber') {
       if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
       if (f.cliente && f.cliente !== 'all') parts.push('cliente ~ "' + f.cliente + '"')
@@ -1255,31 +1263,98 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
       } catch (_) {}
     }
 
-    // Regra de segurança: se o usuário foi desativado ou perdeu permissão, sinaliza erro
-    if (userRecord && userRecord.getBool('active') === false) {
-      schedRecord.set('last_run_at', new Date().toISOString())
-      schedRecord.set('last_run_status', 'error')
-      schedRecord.set(
-        'last_run_error',
-        'Usuário criador do agendamento está inativo ou sem permissão',
-      )
-      schedRecord.set('status', 'needs_review')
-      $app.save(schedRecord)
-      logExecution(
-        schedId,
-        schedName,
-        reportId,
-        triggeredBy,
-        schedRecord.getString('user_email'),
-        'error',
-        0,
-        'R$ 0,00',
-        recipients.join(', '),
-        '',
-        'Usuário inativo',
-        0,
-      )
-      return
+    // Regra de segurança obrigatória 5:
+    // O envio automático dos relatórios deverá validar as permissões e o vínculo com a empresa
+    // no momento da execução, inclusive quando houver alterações ou revogações de acesso.
+    if (userRecord) {
+      if (userRecord.getBool('active') === false) {
+        schedRecord.set('last_run_at', new Date().toISOString())
+        schedRecord.set('last_run_status', 'error')
+        schedRecord.set(
+          'last_run_error',
+          'Usuário criador do agendamento está inativo no momento da execução',
+        )
+        schedRecord.set('status', 'needs_review')
+        $app.save(schedRecord)
+        logExecution(
+          schedId,
+          schedName,
+          reportId,
+          triggeredBy,
+          schedRecord.getString('user_email'),
+          'error',
+          0,
+          'R$ 0,00',
+          recipients.join(', '),
+          '',
+          'Usuário inativo na execução',
+          0,
+        )
+        return
+      }
+
+      var currentRole = userRecord.getString('role')
+      var currentEmpresa = userRecord.getString('empresa_id') || userRecord.getString('empresa')
+
+      // Se o usuário não for SUP, valida permissão sobre o módulo no momento da execução
+      if (currentRole !== 'SUP') {
+        var isGestaoOrAllowed = ['PADRAO', 'GESTAO', 'DIRETORIA'].indexOf(currentRole) !== -1
+        if (!isGestaoOrAllowed && currentRole !== 'COMERCIAL' && currentRole !== 'FINANCEIRO') {
+          schedRecord.set('last_run_at', new Date().toISOString())
+          schedRecord.set('last_run_status', 'error')
+          schedRecord.set(
+            'last_run_error',
+            'Acesso revogado: perfil "' +
+              currentRole +
+              '" sem permissão para executar agendamentos de relatórios',
+          )
+          schedRecord.set('status', 'needs_review')
+          $app.save(schedRecord)
+          logExecution(
+            schedId,
+            schedName,
+            reportId,
+            triggeredBy,
+            schedRecord.getString('user_email'),
+            'error',
+            0,
+            'R$ 0,00',
+            recipients.join(', '),
+            '',
+            'Perfil sem permissão para agendamentos',
+            0,
+          )
+          return
+        }
+
+        // Validação de vínculo com empresa: se o usuário perdeu vínculo com a empresa do agendamento
+        var schedEmpresa = schedRecord.getString('empresa')
+        if (schedEmpresa && currentEmpresa && schedEmpresa !== currentEmpresa) {
+          schedRecord.set('last_run_at', new Date().toISOString())
+          schedRecord.set('last_run_status', 'error')
+          schedRecord.set(
+            'last_run_error',
+            'Vínculo com a empresa alterado/revogado. Usuário atualmente pertence a outra empresa',
+          )
+          schedRecord.set('status', 'needs_review')
+          $app.save(schedRecord)
+          logExecution(
+            schedId,
+            schedName,
+            reportId,
+            triggeredBy,
+            schedRecord.getString('user_email'),
+            'error',
+            0,
+            'R$ 0,00',
+            recipients.join(', '),
+            '',
+            'Vínculo com empresa revogado',
+            0,
+          )
+          return
+        }
+      }
     }
 
     var meta = getReportMeta(reportId)

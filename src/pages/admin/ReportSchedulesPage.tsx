@@ -58,6 +58,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import pb from '@/lib/pocketbase/client'
+import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { ReportScheduleDialog, ReportScheduleFormData } from './report-schedule-dialog'
 import { ExecutionHistoryDialog } from './report-schedule-history-dialog'
@@ -66,9 +67,13 @@ import {
   getAllReportModules,
   DYNAMIC_DATE_RANGES,
 } from '@/lib/report-schedule-registry'
+import { canUserAccessReportModule } from '@/lib/permissions'
 
 export default function ReportSchedulesPage() {
   const { toast } = useToast()
+  const { user, userRole } = useAuth()
+  const isSup = userRole === 'SUP'
+  const currentUserId = user?.id || ''
 
   const [schedules, setSchedules] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -86,13 +91,21 @@ export default function ReportSchedulesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [executingId, setExecutingId] = useState<string | null>(null)
 
-  const modules = getAllReportModules()
+  // Lista de módulos aos quais o usuário atual tem permissão de consulta
+  const modules = useMemo(() => {
+    const all = getAllReportModules()
+    if (isSup) return all
+    return all.filter((m) => canUserAccessReportModule(userRole, m))
+  }, [isSup, userRole])
 
   const loadSchedules = async () => {
     setLoading(true)
     try {
+      // Regra 2: Usuários Gestão/outros consultam seus próprios agendamentos; SUP consulta todos
+      const filter = isSup ? '' : `user_id = "${currentUserId}"`
       const res = await pb.collection('report_schedules').getFullList({
         sort: '-created',
+        filter: filter || undefined,
       })
       setSchedules(res)
     } catch (err: any) {
@@ -131,8 +144,17 @@ export default function ReportSchedulesPage() {
     })
   }, [schedules, moduleFilter, statusFilter, searchTerm])
 
-  // Ação: Ativar / Desativar
+  // Ação: Ativar / Desativar (ou cancelar próprio agendamento)
   const handleToggleActive = async (schedule: any, newActive: boolean) => {
+    // Validação de posse para usuários não-SUP
+    if (!isSup && schedule.user_id && schedule.user_id !== currentUserId) {
+      toast({
+        title: 'Acesso Negado',
+        description: 'Você só pode alterar status dos seus próprios agendamentos.',
+        variant: 'destructive',
+      })
+      return
+    }
     try {
       await pb.collection('report_schedules').update(schedule.id, {
         active: newActive,
@@ -211,14 +233,24 @@ export default function ReportSchedulesPage() {
     }
   }
 
-  // Ação: Excluir Agendamento
+  // Ação: Excluir / Cancelar Agendamento
   const handleDeleteConfirm = async () => {
     if (!deleteId) return
+    const target = schedules.find((s) => s.id === deleteId)
+    if (!isSup && target && target.user_id && target.user_id !== currentUserId) {
+      toast({
+        title: 'Acesso Negado',
+        description: 'Você só pode cancelar/excluir seus próprios agendamentos.',
+        variant: 'destructive',
+      })
+      setDeleteId(null)
+      return
+    }
     try {
       await pb.collection('report_schedules').delete(deleteId)
       setSchedules((prev) => prev.filter((s) => s.id !== deleteId))
       toast({
-        title: 'Agendamento excluído',
+        title: 'Agendamento cancelado e excluído',
         description: 'O agendamento foi removido com sucesso.',
       })
     } catch (err: any) {

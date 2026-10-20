@@ -107,6 +107,42 @@ export function canViewConfiguracoes(role: string | undefined): boolean {
   return ['SUP', 'COMERCIAL', 'FINANCEIRO'].includes(role)
 }
 
+/**
+ * Permissão de visualização e gerenciamento de Agendamento de Relatórios.
+ * Liberado para SUP e perfil Gestão (PADRAO), além de outros perfis com permissão específica.
+ */
+export function canViewReportSchedules(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA'].includes(role)
+}
+
+/**
+ * Verifica se o usuário tem autorização para consultar/agendar relatórios de determinado módulo do ERP.
+ */
+export function canUserAccessReportModule(role: string | undefined, moduleName: string): boolean {
+  if (!role) return false
+  if (role === 'SUP') return true
+
+  switch (moduleName) {
+    case 'Comercial':
+      return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+    case 'Financeiro':
+      return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+    case 'Estoque':
+      return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+    case 'Logística':
+      return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+    case 'Fiscal':
+      return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+    case 'DP & RH':
+      return ['SUP', 'PADRAO', 'RH', 'DP'].includes(role)
+    case 'Compras':
+      return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+    default:
+      return ['SUP', 'PADRAO'].includes(role)
+  }
+}
+
 export function canManageConfiguracoes(role: string | undefined): boolean {
   return role === 'SUP'
 }

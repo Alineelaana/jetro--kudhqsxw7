@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -103,9 +103,20 @@ export function ReportScheduleDialog({
   onSuccess,
 }: ReportScheduleDialogProps) {
   const { toast } = useToast()
-  const modules = getAllReportModules()
+  const { user, userRole } = useAuth()
+  const isSup = userRole === 'SUP'
 
-  const defaultModule = initialData?.module || modules[0] || 'Comercial'
+  // Filtrar apenas módulos que o usuário tem permissão para consultar
+  const modules = useMemo(() => {
+    const all = getAllReportModules()
+    if (isSup) return all
+    return all.filter((m) => canUserAccessReportModule(userRole, m))
+  }, [isSup, userRole])
+
+  const defaultModule =
+    initialData?.module && modules.includes(initialData.module)
+      ? initialData.module
+      : modules[0] || 'Comercial'
   const reportsInDefaultModule = getReportsByModule(defaultModule)
   const defaultReportId =
     initialData?.report_id || reportsInDefaultModule[0]?.id || 'comercial-consulta-pedidos'
@@ -345,9 +356,28 @@ export function ReportScheduleDialog({
       return
     }
 
+    // Validação de segurança no client: módulo permitido
+    if (!isSup && !canUserAccessReportModule(userRole, formData.module)) {
+      toast({
+        title: 'Módulo não autorizado',
+        description: 'Você não tem permissão para agendar relatórios deste módulo.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     setIsSaving(true)
     try {
       const authUser = pb.authStore.record
+      // Se não for SUP, injeta obrigatoriamente a empresa/filial do usuário nos filtros para garantir que não acesse dados alheios
+      const effectiveFilters = { ...formData.filters }
+      if (!isSup && authUser?.empresa) {
+        effectiveFilters.empresa = authUser.empresa
+      }
+      if (!isSup && authUser?.filial) {
+        effectiveFilters.filial = authUser.filial
+      }
+
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim(),
@@ -359,6 +389,25 @@ export function ReportScheduleDialog({
         user_role: authUser?.role || '',
         empresa: authUser?.empresa || '',
         filial: authUser?.filial || '',
+        frequency: formData.frequency,
+        days_of_week: formData.days_of_week,
+        day_of_month: Number(formData.day_of_month) || 1,
+        start_date: formData.start_date || '',
+        end_date: formData.end_date || '',
+        time_of_day: formData.time_of_day,
+        timezone: 'America/Sao_Paulo',
+        recipients: formData.recipients.trim(),
+        recipients_cc: formData.recipients_cc.trim(),
+        email_subject: formData.email_subject.trim(),
+        email_message: formData.email_message.trim(),
+        formats: formData.formats,
+        filters: effectiveFilters,
+        filter_labels: formData.filter_labels,
+        dynamic_date_range: formData.dynamic_date_range,
+        skip_if_empty: formData.skip_if_empty,
+        active: formData.active,
+        status: formData.active ? 'active' : 'paused',
+      }
         frequency: formData.frequency,
         days_of_week: formData.days_of_week,
         day_of_month: Number(formData.day_of_month) || 1,

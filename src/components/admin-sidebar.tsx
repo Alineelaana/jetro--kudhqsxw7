@@ -312,7 +312,14 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
               className="flex-1 overflow-y-auto overscroll-contain py-2 px-1 flex flex-col items-center gap-1"
             >
               {ADMIN_MENU.map((group, groupIdx) => {
-                const visibleItems = group.items.filter((item) => !item.perm || item.perm(userRole))
+                const visibleItems = group.items.filter((item) => {
+                  if (item.perm && !item.perm(userRole)) return false
+                  if (item.children && item.children.length > 0) {
+                    const hasVisibleChild = item.children.some((c) => !c.perm || c.perm(userRole))
+                    if (!hasVisibleChild) return false
+                  }
+                  return true
+                })
                 if (visibleItems.length === 0) return null
 
                 return (
@@ -480,6 +487,18 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                     </div>
                   )}
                   {ADMIN_MENU.map((group) => {
+                    const visibleGroupItems = group.items.filter((item) => {
+                      if (item.perm && !item.perm(userRole)) return false
+                      if (item.children && item.children.length > 0) {
+                        const hasVisibleChild = item.children.some(
+                          (c) => !c.perm || c.perm(userRole),
+                        )
+                        if (!hasVisibleChild) return false
+                      }
+                      return true
+                    })
+                    if (visibleGroupItems.length === 0) return null
+
                     return (
                       <div
                         key={group.title}
@@ -489,7 +508,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                           {group.title}
                         </div>
                         <div className="flex flex-col gap-0.5 pb-1">
-                          {group.items.map(renderItem)}
+                          {visibleGroupItems.map(renderItem)}
                         </div>
                       </div>
                     )
@@ -502,103 +521,115 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
       </aside>
 
       {/* PAINEL FLUTUANTE (OVERLAY/POPOVER) QUANDO CLICA EM ÁREA NO MODO RAIL */}
-      {effectiveRail && flyoutItem && flyoutItem.children && (
-        <div className="absolute left-16 top-0 bottom-0 z-40 w-64 bg-white border-r border-gray-200 shadow-xl flex flex-col animate-in fade-in slide-in-from-left-2 duration-150">
-          {/* Header do submenu flutuante */}
-          <div className="p-3 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-md bg-[#005B2E]/10 text-[#005B2E] flex items-center justify-center shrink-0">
-                <flyoutItem.icon className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-semibold text-gray-900 truncate">
-                  {flyoutItem.label}
-                </div>
-                <div className="text-[10px] text-gray-500">
-                  {flyoutItem.children.length} itens disponíveis
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => setRailFlyoutArea(null)}
-              className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-200/60 transition-colors"
-              aria-label="Fechar submenu"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+      {effectiveRail &&
+        flyoutItem &&
+        flyoutItem.children &&
+        (() => {
+          const visibleFlyoutChildren = flyoutItem.children.filter(
+            (c) => !c.perm || c.perm(userRole),
+          )
+          if (visibleFlyoutChildren.length === 0) return null
 
-          {/* Atalho para a rota principal do item caso ela exista diretamente */}
-          <div className="p-2 border-b border-gray-100 bg-white">
-            <Link
-              to={flyoutItem.route}
-              className={cn(
-                'flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
-                pathname === flyoutItem.route
-                  ? 'bg-[#005B2E] text-white'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-[#005B2E]',
-              )}
-            >
-              <span>Acessar visão geral</span>
-              <ExternalLink className="w-3 h-3 opacity-70" />
-            </Link>
-          </div>
+          return (
+            <div className="absolute left-16 top-0 bottom-0 z-40 w-64 bg-white border-r border-gray-200 shadow-xl flex flex-col animate-in fade-in slide-in-from-left-2 duration-150">
+              {/* Header do submenu flutuante */}
+              <div className="p-3 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-md bg-[#005B2E]/10 text-[#005B2E] flex items-center justify-center shrink-0">
+                    <flyoutItem.icon className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-gray-900 truncate">
+                      {flyoutItem.label}
+                    </div>
+                    <div className="text-[10px] text-gray-500">
+                      {visibleFlyoutChildren.length}{' '}
+                      {visibleFlyoutChildren.length === 1 ? 'item disponível' : 'itens disponíveis'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setRailFlyoutArea(null)}
+                  className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-200/60 transition-colors"
+                  aria-label="Fechar submenu"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-          {/* Lista de submenus com scroll interno independente */}
-          <div
-            ref={flyoutNavRef}
-            onScroll={handleFlyoutScroll}
-            className="flex-1 overflow-y-auto overscroll-contain p-2 space-y-0.5"
-          >
-            {flyoutItem.children.map((child: MenuChild) => {
-              if (child.perm && !child.perm(userRole)) return null
-              const ChildIcon = child.icon
-              const isChildActive = pathname === child.route
-              return (
+              {/* Atalho para a rota principal do item caso ela exista diretamente */}
+              <div className="p-2 border-b border-gray-100 bg-white">
                 <Link
-                  key={child.route}
-                  to={child.route}
+                  to={flyoutItem.route}
                   className={cn(
-                    'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-colors',
-                    isChildActive
-                      ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
-                      : 'text-gray-600 hover:text-[#005B2E] hover:bg-gray-50',
+                    'flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+                    pathname === flyoutItem.route
+                      ? 'bg-[#005B2E] text-white'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-[#005B2E]',
                   )}
                 >
-                  {ChildIcon ? (
-                    <ChildIcon className="w-3.5 h-3.5 shrink-0 text-gray-400 group-hover:text-[#005B2E]" />
-                  ) : (
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 shrink-0" />
-                  )}
-                  <span className="truncate flex-1">{child.label}</span>
+                  <span>Acessar visão geral</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
                 </Link>
-              )
-            })}
-          </div>
+              </div>
 
-          {/* Rodapé do painel flutuante */}
-          <div className="p-2 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between shrink-0">
-            <button
-              onClick={() => toggleFavorite(flyoutItem.route)}
-              className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#005B2E] px-2 py-1 rounded hover:bg-white"
-            >
-              <Star
-                className={cn(
-                  'w-3.5 h-3.5',
-                  isFavorite(flyoutItem.route) ? 'fill-amber-400 text-amber-400' : 'text-gray-400',
-                )}
-              />
-              <span>{isFavorite(flyoutItem.route) ? 'Favoritado' : 'Favoritar área'}</span>
-            </button>
-            <button
-              onClick={toggleSidebar}
-              className="text-[11px] text-[#005B2E] hover:underline font-medium px-2 py-1"
-            >
-              Fixar menu
-            </button>
-          </div>
-        </div>
-      )}
+              {/* Lista de submenus com scroll interno independente */}
+              <div
+                ref={flyoutNavRef}
+                onScroll={handleFlyoutScroll}
+                className="flex-1 overflow-y-auto overscroll-contain p-2 space-y-0.5"
+              >
+                {visibleFlyoutChildren.map((child: MenuChild) => {
+                  const ChildIcon = child.icon
+                  const isChildActive = pathname === child.route
+                  return (
+                    <Link
+                      key={child.route}
+                      to={child.route}
+                      className={cn(
+                        'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-colors',
+                        isChildActive
+                          ? 'bg-[#005B2E]/10 text-[#005B2E] font-semibold'
+                          : 'text-gray-600 hover:text-[#005B2E] hover:bg-gray-50',
+                      )}
+                    >
+                      {ChildIcon ? (
+                        <ChildIcon className="w-3.5 h-3.5 shrink-0 text-gray-400 group-hover:text-[#005B2E]" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-300 shrink-0" />
+                      )}
+                      <span className="truncate flex-1">{child.label}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+
+              {/* Rodapé do painel flutuante */}
+              <div className="p-2 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between shrink-0">
+                <button
+                  onClick={() => toggleFavorite(flyoutItem.route)}
+                  className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#005B2E] px-2 py-1 rounded hover:bg-white"
+                >
+                  <Star
+                    className={cn(
+                      'w-3.5 h-3.5',
+                      isFavorite(flyoutItem.route)
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-gray-400',
+                    )}
+                  />
+                  <span>{isFavorite(flyoutItem.route) ? 'Favoritado' : 'Favoritar área'}</span>
+                </button>
+                <button
+                  onClick={toggleSidebar}
+                  className="text-[11px] text-[#005B2E] hover:underline font-medium px-2 py-1"
+                >
+                  Fixar menu
+                </button>
+              </div>
+            </div>
+          )
+        })()}
     </div>
   )
 }

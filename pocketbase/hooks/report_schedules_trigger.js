@@ -777,6 +777,14 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
   function buildFilterQueryForSchedule(reportId, f, userRec, dateRange) {
     var parts = []
 
+    // Regra 3, 4 e 5: Se o usuário não for SUP, restringe obrigatoriamente a empresa dele na consulta
+    if (userRec && userRec.getString('role') !== 'SUP') {
+      var userEmpresa = userRec.getString('empresa_id') || userRec.getString('empresa')
+      if (userEmpresa) {
+        parts.push('(empresa = "' + userEmpresa + '" || empresa_id = "' + userEmpresa + '")')
+      }
+    }
+
     if (reportId === 'financeiro-contas-receber') {
       if (f.status && f.status !== 'all') parts.push('status = "' + f.status + '"')
       if (f.cliente && f.cliente !== 'all') parts.push('cliente ~ "' + f.cliente + '"')
@@ -1239,6 +1247,14 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
     } catch (_) {
       return e.json(404, { error: 'Agendamento não encontrado' })
     }
+    // Validação de segurança no disparo manual: se não for SUP, só pode disparar os seus próprios agendamentos
+    var ownerId = schedRecord.getString('user_id')
+    if (authUser.getString('role') !== 'SUP' && ownerId && ownerId !== authUser.id) {
+      return e.json(403, {
+        error: 'Acesso negado: você só pode executar seus próprios agendamentos',
+      })
+    }
+
     schedName = schedRecord.getString('name')
     reportId = schedRecord.getString('report_id') || 'comercial-consulta-pedidos'
     moduleName = schedRecord.getString('module') || 'Comercial'
