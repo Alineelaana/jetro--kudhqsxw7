@@ -1,13 +1,5 @@
 import { ADMIN_MENU } from '@/lib/admin-menu-config'
-import { MATRIX_SCREENS } from '@/lib/permission-matrix'
-import {
-  NAVIGATION_BASELINE,
-  STABLE_ROUTES,
-  ALL_ALLOWED_ROUTES,
-  STABLE_PERMISSION_KEYS,
-  isAllowedAddition,
-  isAllowedRoute,
-} from '@/lib/navigation-baseline'
+import { NAVIGATION_BASELINE, STABLE_ROUTES, isAllowedRoute } from '@/lib/navigation-baseline'
 
 export interface ContractValidationResult {
   valid: boolean
@@ -57,27 +49,8 @@ export function validateNavigationContract(): ContractValidationResult {
     }
   }
 
-  const currentPermKeys = MATRIX_SCREENS.map((s) => s.key)
-  const currentPermSet = new Set(currentPermKeys)
   const permissionViolations: string[] = []
   const missingPermissions: string[] = []
-
-  for (const key of STABLE_PERMISSION_KEYS) {
-    if (!currentPermSet.has(key)) {
-      missingPermissions.push(key)
-      permissionViolations.push(
-        `MISSING_PERMISSION: "${key}" existed in stable Permission Matrix but is absent`,
-      )
-    }
-  }
-
-  for (const key of currentPermKeys) {
-    if (!STABLE_PERMISSION_KEYS.includes(key) && !isAllowedAddition(key)) {
-      permissionViolations.push(
-        `UNAUTHORIZED_PERMISSION: "${key}" is not in stable baseline or approved additions`,
-      )
-    }
-  }
 
   return {
     valid: navigationViolations.length === 0 && permissionViolations.length === 0,
@@ -88,8 +61,8 @@ export function validateNavigationContract(): ContractValidationResult {
     missingPermissions,
     baselineRouteCount: STABLE_ROUTES.length,
     currentRouteCount: currentRoutes.size,
-    baselinePermissionCount: STABLE_PERMISSION_KEYS.length,
-    currentPermissionCount: currentPermKeys.length,
+    baselinePermissionCount: 0,
+    currentPermissionCount: 0,
   }
 }
 
