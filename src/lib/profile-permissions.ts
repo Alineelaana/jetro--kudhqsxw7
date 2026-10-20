@@ -236,24 +236,38 @@ export function checkProfileScreenAccess(
 
   const perms = (profile.permissions || {}) as ProfilePermissionsData
 
-  // 1. Checar se a tela tem permissão pontual configurada (busca pontual concedida)
-  if (perms.screens && perms.screens[route]) {
-    const screenPerm = perms.screens[route]
-    if (typeof screenPerm[operation] === 'boolean') {
-      return screenPerm[operation]
+  // Mapeamento de rotas equivalentes/legadas (ex: /admin/configuracoes/permissoes -> /admin/cadastros/perfis-permissoes)
+  const equivalentRoutes = [route]
+  if (route === '/admin/cadastros/perfis-permissoes') {
+    equivalentRoutes.push('/admin/configuracoes/permissoes')
+  } else if (route === '/admin/configuracoes/permissoes') {
+    equivalentRoutes.push('/admin/cadastros/perfis-permissoes')
+  }
+
+  // 1. Checar se alguma rota equivalente tem permissão pontual configurada
+  if (perms.screens) {
+    for (const r of equivalentRoutes) {
+      if (perms.screens[r]) {
+        const screenPerm = perms.screens[r]
+        if (typeof screenPerm[operation] === 'boolean') {
+          return screenPerm[operation]
+        }
+      }
     }
   }
 
   // 2. Se a operação for 'v' (visualizar), checar se o menu foi marcado
   if (operation === 'v' && perms.allowedMenus && perms.allowedMenus.length > 0) {
-    if (perms.allowedMenus.includes(route)) {
-      return true
+    for (const r of equivalentRoutes) {
+      if (perms.allowedMenus.includes(r)) {
+        return true
+      }
+      // Checar se rota pai foi permitida
+      const isChildOfAllowed = perms.allowedMenus.some(
+        (m) => r.startsWith(m + '/') || m.startsWith(r + '/'),
+      )
+      if (isChildOfAllowed) return true
     }
-    // Checar se rota pai foi permitida
-    const isChildOfAllowed = perms.allowedMenus.some(
-      (m) => route.startsWith(m + '/') || m.startsWith(route + '/'),
-    )
-    if (isChildOfAllowed) return true
   }
 
   // Se o perfil não tem customização de allowedMenus nem screens, não bloqueia

@@ -29,6 +29,11 @@ import {
   CheckSquare,
   Square,
   RefreshCw,
+  TableProperties,
+  AlertTriangle,
+  HelpCircle,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
@@ -39,6 +44,7 @@ import {
   savePerfilPermissao,
   deletePerfilPermissao,
   loadProfilesCache,
+  checkProfileScreenAccess,
   type PerfilPermissaoRecord,
   type ProfilePermissionsData,
   type ScreenPermission,
@@ -51,10 +57,22 @@ const DEFAULT_PERM: ScreenPermission = { v: true, c: false, e: false, d: false }
 
 export function PerfisPermissoesUnifiedScreen() {
   const { userRole, isAdmin } = useAuth()
+  const [activeTab, setActiveTab] = useState<'gestao' | 'matriz' | 'gaps'>('gestao')
   const [profiles, setProfiles] = useState<PerfilPermissaoRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [filterQuery, setFilterQuery] = useState('')
+
+  // Estados dos filtros da Matriz Comparativa (lendo do banco real)
+  const [matrixSearchQuery, setMatrixSearchQuery] = useState('')
+  const [matrixModuleFilter, setMatrixModuleFilter] = useState('TODOS')
+
+  // Estados dos filtros do Relatório de Gaps (lendo do banco real)
+  const [gapProfileFilter, setGapProfileFilter] = useState('TODOS')
+  const [gapModuleFilter, setGapModuleFilter] = useState('TODOS')
+  const [gapSeverityFilter, setGapSeverityFilter] = useState<'TODOS' | 'alta' | 'media' | 'baixa'>(
+    'TODOS',
+  )
 
   // Modal de criação / edição de perfil
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -358,6 +376,130 @@ export function PerfisPermissoesUnifiedScreen() {
     })
   }, [systemScreens, screenSearchQuery, selectedCategoryFilter])
 
+  // Filtragem das telas para a Matriz Comparativa (calculada em tempo real com base no banco)
+  const filteredMatrixScreens = useMemo(() => {
+    const q = matrixSearchQuery.toLowerCase().trim()
+    return systemScreens.filter((s) => {
+      const matchesMod = matrixModuleFilter === 'TODOS' || s.group === matrixModuleFilter
+      const matchesQ =
+        !q ||
+        s.label.toLowerCase().includes(q) ||
+        s.route.toLowerCase().includes(q) ||
+        (s.parentLabel && s.parentLabel.toLowerCase().includes(q))
+      return matchesMod && matchesQ
+    })
+  }, [systemScreens, matrixSearchQuery, matrixModuleFilter])
+
+  // Gaps calculados dinamicamente a partir dos perfis e dados reais gravados no banco
+  const calculatedGaps = useMemo(() => {
+    // Para cada perfil ativo (exceto SUP, que tem 100%), analisar discrepâncias operacionais
+    const gaps: Array<{
+      id: string
+      profileCode: string
+      profileName: string
+      module: string
+      screenTitle: string
+      route: string
+      severity: 'alta' | 'media' | 'baixa'
+      issue: string
+      recommendation: string
+    }> = []
+
+    profiles.forEach((p) => {
+      const pCode = (p.code || '').toUpperCase()
+      if (pCode === 'SUP') return // SUP é irrestrito por especificação Huram
+
+      systemScreens.forEach((s) => {
+        const canV = checkProfileScreenAccess(pCode, s.route, 'v', profiles)
+        const canC = checkProfileScreenAccess(pCode, s.route, 'c', profiles)
+        const canE = checkProfileScreenAccess(pCode, s.route, 'e', profiles)
+        const canD = checkProfileScreenAccess(pCode, s.route, 'd', profiles)
+
+        // Cenário 1: Pode excluir ou editar mas NÃO pode visualizar a tela
+        if (!canV && (canD || canE || canC)) {
+          gaps.push({
+            id: `${pCode}-${s.route}-inconsistent-ops`,
+            profileCode: pCode,
+            profileName: p.name || pCode,
+            module: s.group,
+            screenTitle: s.label,
+            route: s.route,
+            severity: 'alta',
+            issue:
+              'Inconsistência operacional: perfil possui direito de criar/editar/excluir sem ter visualização permitida da tela.',
+            recommendation:
+              'Conceda o acesso de Visualização (V) ou revogue as permissões pontuais de escrita.',
+          })
+        }
+
+        // Cenário 2: Perfil tático tem acesso a módulos sensíveis (Configurações, Auditoria, Segurança)
+        const isSensitiveRoute =
+          s.route.startsWith('/admin/configuracoes') ||
+          s.route.startsWith('/admin/auditoria') ||
+          s.route.startsWith('/admin/usuarios') ||
+          s.route.includes('/seguranca') ||
+          s.route.includes('/parametros')
+
+        if (isSensitiveRoute && (canD || canE)) {
+          if (pCode !== 'GESTAO' && pCode !== 'PADRAO') {
+            gaps.push({
+              id: `${pCode}-${s.route}-sensitive-access`,
+              profileCode: pCode,
+              profileName: p.name || pCode,
+              module: s.group,
+              screenTitle: s.label,
+              route: s.route,
+              severity: canD ? 'alta' : 'media',
+              issue: `Permissão sensível em módulo crítico: perfil possui autorização de ${canD ? 'Exclusão (D)' : 'Edição (E)'} em área administrativa restrita.`,
+              recommendation:
+                'Reavaliar necessidade de privilégios administrativos neste perfil operacional.',
+            })
+          }
+        }
+
+        // Cenário 3: Exclusão liberada em cadastros-chave ou financeiro para perfil não-gestor
+        const isCriticalFinancial =
+          s.route.startsWith('/admin/financeiro') ||
+          s.route.startsWith('/admin/contabil') ||
+          s.route.startsWith('/admin/fiscal')
+
+        if (
+          isCriticalFinancial &&
+          canD &&
+          pCode !== 'FINANCEIRO' &&
+          pCode !== 'GESTAO' &&
+          pCode !== 'PADRAO'
+        ) {
+          gaps.push({
+            id: `${pCode}-${s.route}-fin-delete`,
+            profileCode: pCode,
+            profileName: p.name || pCode,
+            module: s.group,
+            screenTitle: s.label,
+            route: s.route,
+            severity: 'alta',
+            issue:
+              'Risco de compliance: perfil não-financeiro possui permissão de Exclusão (D) no módulo Financeiro/Fiscal.',
+            recommendation:
+              'Restringir a permissão de exclusão exclusivamente para perfis financeiros/gestores autorizados.',
+          })
+        }
+      })
+    })
+
+    return gaps
+  }, [profiles, systemScreens])
+
+  // Filtragem dos gaps
+  const filteredGaps = useMemo(() => {
+    return calculatedGaps.filter((g) => {
+      const matchProf = gapProfileFilter === 'TODOS' || g.profileCode === gapProfileFilter
+      const matchMod = gapModuleFilter === 'TODOS' || g.module === gapModuleFilter
+      const matchSev = gapSeverityFilter === 'TODOS' || g.severity === gapSeverityFilter
+      return matchProf && matchMod && matchSev
+    })
+  }, [calculatedGaps, gapProfileFilter, gapModuleFilter, gapSeverityFilter])
+
   const isSupEditing = code.trim().toUpperCase() === 'SUP'
 
   return (
@@ -400,157 +542,526 @@ export function PerfisPermissoesUnifiedScreen() {
           </div>
         </CardHeader>
 
+        {/* Barra de Abas Internas da Tela Consolidada */}
+        <div className="flex items-center gap-1 px-5 pt-3 border-b border-border bg-[#F8FAF9] dark:bg-muted/20">
+          <button
+            type="button"
+            onClick={() => setActiveTab('gestao')}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer',
+              activeTab === 'gestao'
+                ? 'border-[#063D30] text-[#063D30] dark:text-emerald-400 dark:border-emerald-400 bg-white dark:bg-card rounded-t-md shadow-xs'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Gestão de Perfis & Edição</span>
+            <Badge
+              variant="secondary"
+              className="text-[10px] h-4 px-1 bg-[#063D30]/10 text-[#063D30]"
+            >
+              {profiles.length}
+            </Badge>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('matriz')}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer',
+              activeTab === 'matriz'
+                ? 'border-[#063D30] text-[#063D30] dark:text-emerald-400 dark:border-emerald-400 bg-white dark:bg-card rounded-t-md shadow-xs'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <TableProperties className="w-4 h-4" />
+            <span>Matriz Comparativa (Banco Real)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('gaps')}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer',
+              activeTab === 'gaps'
+                ? 'border-[#063D30] text-[#063D30] dark:text-emerald-400 dark:border-emerald-400 bg-white dark:bg-card rounded-t-md shadow-xs'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <AlertTriangle className="w-4 h-4 text-[#E87517]" />
+            <span>Relatório de Gaps & Auditoria</span>
+            {calculatedGaps.length > 0 && (
+              <Badge variant="destructive" className="text-[10px] h-4 px-1 bg-[#E87517] text-white">
+                {calculatedGaps.length}
+              </Badge>
+            )}
+          </button>
+        </div>
+
         <CardContent className="p-5 space-y-4">
-          {/* Informação sobre perfil SUP */}
-          <div className="flex items-start gap-3 p-3.5 bg-amber-50 dark:bg-amber-950/20 border border-[#C69B45]/40 rounded-lg text-xs text-amber-900 dark:text-amber-200">
-            <Info className="w-4 h-4 text-[#C69B45] shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold">Regra Institucional Huram:</span> O perfil{' '}
-              <strong className="text-[#063D30] font-black">SUP (Superusuário)</strong> possui
-              acesso pleno e irrestrito a todas as telas do sistema (Visualizar, Criar, Editar e
-              Excluir). A tela de gestão permanece totalmente editável para personalizações
-              necessárias, mantendo a integridade sem divergências.
-            </div>
-          </div>
+          {/* ABA 1: GESTÃO DE PERFIS & EDIÇÃO (FONTE DE VERDADE) */}
+          {activeTab === 'gestao' && (
+            <>
+              {/* Informação sobre perfil SUP */}
+              <div className="flex items-start gap-3 p-3.5 bg-amber-50 dark:bg-amber-950/20 border border-[#C69B45]/40 rounded-lg text-xs text-amber-900 dark:text-amber-200">
+                <Info className="w-4 h-4 text-[#C69B45] shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Regra Institucional Huram:</span> O perfil{' '}
+                  <strong className="text-[#063D30] font-black">SUP (Superusuário)</strong> possui
+                  acesso pleno e irrestrito a todas as telas do sistema (Visualizar, Criar, Editar e
+                  Excluir). A tela de gestão permanece totalmente editável para personalizações
+                  necessárias, mantendo a integridade sem divergências.
+                </div>
+              </div>
 
-          {/* Barra de busca de perfis */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Filtrar perfis por nome, código ou descrição..."
-                value={filterQuery}
-                onChange={(e) => setFilterQuery(e.target.value)}
-                className="pl-9 h-9 text-sm focus-visible:ring-[#063D30]"
-              />
-            </div>
-          </div>
+              {/* Barra de busca de perfis */}
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Filtrar perfis por nome, código ou descrição..."
+                    value={filterQuery}
+                    onChange={(e) => setFilterQuery(e.target.value)}
+                    className="pl-9 h-9 text-sm focus-visible:ring-[#063D30]"
+                  />
+                </div>
+              </div>
 
-          {/* Tabela de Perfis */}
-          <div className="border border-border rounded-lg overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-[#063D30] text-white">
-                <tr>
-                  <th className="text-left px-4 py-3 font-bold">Perfil</th>
-                  <th className="text-left px-4 py-3 font-bold">Código</th>
-                  <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">Descrição</th>
-                  <th className="text-center px-4 py-3 font-bold">Menus Liberados</th>
-                  <th className="text-center px-4 py-3 font-bold">Telas Pontuais</th>
-                  <th className="text-center px-4 py-3 font-bold">Status</th>
-                  <th className="text-right px-4 py-3 font-bold">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin text-[#063D30]" />
-                        Carregando perfis cadastrados...
-                      </div>
-                    </td>
-                  </tr>
-                ) : filteredProfiles.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
-                      Nenhum perfil encontrado com o filtro informado.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredProfiles.map((p) => {
-                    const isSup = p.code.toUpperCase() === 'SUP'
-                    const pData = (p.permissions || {}) as ProfilePermissionsData
-                    const allowedCount = isSup
-                      ? 'Todos (100%)'
-                      : pData.allowedMenus?.length
-                        ? `${pData.allowedMenus.length} menus`
-                        : 'Padrão'
-                    const specificCount = isSup
-                      ? 'Todas'
-                      : pData.screens
-                        ? `${Object.keys(pData.screens).length} telas`
-                        : '0'
-
-                    return (
-                      <tr
-                        key={p.id}
-                        className="border-b border-border/60 hover:bg-[#063D30]/5 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-semibold text-foreground">
-                          <div className="flex items-center gap-2">
-                            {isSup ? (
-                              <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
-                            ) : (
-                              <Shield className="w-4 h-4 text-[#063D30]" />
-                            )}
-                            <span>{p.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            variant="secondary"
-                            className={cn(
-                              'font-mono text-xs font-bold',
-                              isSup
-                                ? 'bg-[#C69B45]/20 text-[#063D30] border border-[#C69B45]/50'
-                                : 'bg-[#063D30]/10 text-[#063D30]',
-                            )}
-                          >
-                            {p.code}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground text-xs max-w-xs truncate">
-                          {p.description || '—'}
-                        </td>
-                        <td className="px-4 py-3 text-center text-xs font-medium text-foreground">
-                          {allowedCount}
-                        </td>
-                        <td className="px-4 py-3 text-center text-xs font-medium text-foreground">
-                          {specificCount}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span
-                            className={cn(
-                              'text-[11px] font-bold px-2 py-0.5 rounded-full',
-                              p.active !== false
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
-                                : 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300',
-                            )}
-                          >
-                            {p.active !== false ? 'Ativo' : 'Inativo'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleOpenEdit(p)}
-                              className="h-8 px-2.5 text-[#063D30] hover:bg-[#063D30]/10"
-                              title="Editar menus e permissões do perfil"
-                            >
-                              <Pencil className="w-4 h-4 mr-1" /> Editar
-                            </Button>
-                            {!isSup && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDelete(p)}
-                                className="h-8 px-2 text-rose-600 hover:bg-rose-50"
-                                title="Excluir perfil"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
+              {/* Tabela de Perfis */}
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-[#063D30] text-white">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-bold">Perfil</th>
+                      <th className="text-left px-4 py-3 font-bold">Código</th>
+                      <th className="text-left px-4 py-3 font-bold hidden sm:table-cell">
+                        Descrição
+                      </th>
+                      <th className="text-center px-4 py-3 font-bold">Menus Liberados</th>
+                      <th className="text-center px-4 py-3 font-bold">Telas Pontuais</th>
+                      <th className="text-center px-4 py-3 font-bold">Status</th>
+                      <th className="text-right px-4 py-3 font-bold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                          <div className="flex items-center justify-center gap-2">
+                            <Loader2 className="w-5 h-5 animate-spin text-[#063D30]" />
+                            Carregando perfis cadastrados...
                           </div>
                         </td>
                       </tr>
-                    )
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                    ) : filteredProfiles.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                          Nenhum perfil encontrado com o filtro informado.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredProfiles.map((p) => {
+                        const isSup = p.code.toUpperCase() === 'SUP'
+                        const pData = (p.permissions || {}) as ProfilePermissionsData
+                        const allowedCount = isSup
+                          ? 'Todos (100%)'
+                          : pData.allowedMenus?.length
+                            ? `${pData.allowedMenus.length} menus`
+                            : 'Padrão'
+                        const specificCount = isSup
+                          ? 'Todas'
+                          : pData.screens
+                            ? `${Object.keys(pData.screens).length} telas`
+                            : '0'
+
+                        return (
+                          <tr
+                            key={p.id}
+                            className="border-b border-border/60 hover:bg-[#063D30]/5 transition-colors"
+                          >
+                            <td className="px-4 py-3 font-semibold text-foreground">
+                              <div className="flex items-center gap-2">
+                                {isSup ? (
+                                  <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
+                                ) : (
+                                  <Shield className="w-4 h-4 text-[#063D30]" />
+                                )}
+                                <span>{p.name}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <Badge
+                                variant="secondary"
+                                className={cn(
+                                  'font-mono text-xs font-bold',
+                                  isSup
+                                    ? 'bg-[#C69B45]/20 text-[#063D30] border border-[#C69B45]/50'
+                                    : 'bg-[#063D30]/10 text-[#063D30]',
+                                )}
+                              >
+                                {p.code}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground text-xs max-w-xs truncate">
+                              {p.description || '—'}
+                            </td>
+                            <td className="px-4 py-3 text-center text-xs font-medium text-foreground">
+                              {allowedCount}
+                            </td>
+                            <td className="px-4 py-3 text-center text-xs font-medium text-foreground">
+                              {specificCount}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span
+                                className={cn(
+                                  'text-[11px] font-bold px-2 py-0.5 rounded-full',
+                                  p.active !== false
+                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300',
+                                )}
+                              >
+                                {p.active !== false ? 'Ativo' : 'Inativo'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleOpenEdit(p)}
+                                  className="h-8 px-2.5 text-[#063D30] hover:bg-[#063D30]/10"
+                                  title="Editar menus e permissões do perfil"
+                                >
+                                  <Pencil className="w-4 h-4 mr-1" /> Editar
+                                </Button>
+                                {!isSup && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDelete(p)}
+                                    className="h-8 px-2 text-rose-600 hover:bg-rose-50"
+                                    title="Excluir perfil"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {/* ABA 2: MATRIZ COMPARATIVA (CONECTADA AO BANCO REAL) */}
+          {activeTab === 'matriz' && (
+            <div className="space-y-4">
+              <div className="p-3.5 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg text-xs text-blue-900 dark:text-blue-200 flex items-start gap-2.5">
+                <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Matriz Dinâmica Baseada no Banco:</span> Esta matriz
+                  reflete com exatidão o estado gravado na coleção{' '}
+                  <code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded font-mono">
+                    perfis_permissoes
+                  </code>
+                  . As colunas mostram cada perfil ativo cadastrado e as linhas correspondem a todas
+                  as telas do sistema.
+                </div>
+              </div>
+
+              {/* Filtros da Matriz */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2 relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Filtrar telas da matriz por nome ou rota..."
+                    value={matrixSearchQuery}
+                    onChange={(e) => setMatrixSearchQuery(e.target.value)}
+                    className="pl-9 h-9 text-xs focus-visible:ring-[#063D30]"
+                  />
+                </div>
+                <div>
+                  <select
+                    value={matrixModuleFilter}
+                    onChange={(e) => setMatrixModuleFilter(e.target.value)}
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs focus-visible:ring-[#063D30]"
+                  >
+                    {screenCategories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat === 'TODOS' ? 'Todos os Módulos' : cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Tabela de Matriz Comparativa */}
+              <div className="border border-border rounded-lg overflow-x-auto max-h-[550px] overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-[#063D30] text-white sticky top-0 z-10">
+                    <tr>
+                      <th className="text-left px-3 py-2.5 font-bold min-w-[220px]">
+                        Tela / Módulo
+                      </th>
+                      {profiles.map((p) => (
+                        <th key={p.id} className="text-center px-2 py-2.5 font-bold min-w-[110px]">
+                          <div className="truncate font-bold">{p.name}</div>
+                          <span className="text-[10px] font-mono text-[#C69B45]">{p.code}</span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredMatrixScreens.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={profiles.length + 1}
+                          className="px-3 py-8 text-center text-muted-foreground"
+                        >
+                          Nenhuma tela encontrada para o filtro selecionado.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredMatrixScreens.map((s) => (
+                        <tr
+                          key={s.route}
+                          className="border-b border-border/50 hover:bg-[#063D30]/5 transition-colors"
+                        >
+                          <td className="px-3 py-2">
+                            <div className="font-semibold text-foreground truncate max-w-xs sm:max-w-md">
+                              {s.parentLabel ? (
+                                <span className="text-muted-foreground font-normal mr-1">
+                                  {s.parentLabel} &gt;
+                                </span>
+                              ) : null}
+                              {s.label}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground font-mono truncate">
+                              {s.route}
+                            </div>
+                          </td>
+
+                          {profiles.map((p) => {
+                            const pCode = (p.code || '').toUpperCase()
+                            const canV = checkProfileScreenAccess(pCode, s.route, 'v', profiles)
+                            const canC = checkProfileScreenAccess(pCode, s.route, 'c', profiles)
+                            const canE = checkProfileScreenAccess(pCode, s.route, 'e', profiles)
+                            const canD = checkProfileScreenAccess(pCode, s.route, 'd', profiles)
+
+                            return (
+                              <td key={p.id} className="px-2 py-2 text-center">
+                                {canV ? (
+                                  <div className="inline-flex items-center justify-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                                    <span className="text-emerald-700 dark:text-emerald-300">
+                                      V
+                                    </span>
+                                    {canC && <span className="text-blue-600">C</span>}
+                                    {canE && <span className="text-amber-600">E</span>}
+                                    {canD && <span className="text-rose-600">D</span>}
+                                  </div>
+                                ) : (
+                                  <span className="text-muted-foreground/50 text-[11px]">—</span>
+                                )}
+                              </td>
+                            )
+                          })}
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between text-xs text-muted-foreground pt-1">
+                <div className="flex items-center gap-3">
+                  <span className="font-bold">Legenda de Permissões:</span>
+                  <span className="text-emerald-700 font-bold">V: Visualizar</span>
+                  <span className="text-blue-600 font-bold">C: Criar</span>
+                  <span className="text-amber-600 font-bold">E: Editar</span>
+                  <span className="text-rose-600 font-bold">D: Excluir</span>
+                </div>
+                <span>
+                  Exibindo {filteredMatrixScreens.length} de {systemScreens.length} telas
+                  cadastradas
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* ABA 3: RELATÓRIO DE GAPS & AUDITORIA (CONECTADO AO BANCO REAL) */}
+          {activeTab === 'gaps' && (
+            <div className="space-y-4">
+              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-900 rounded-lg text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-[#E87517] shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Auditoria Dinâmica de Gaps de Segurança:</span> Este
+                  relatório analisa as regras reais persistidas no banco para detectar
+                  inconsistências operacionais (ex.: permissão de gravação sem leitura) e acessos de
+                  risco a áreas administrativas sensíveis.
+                </div>
+              </div>
+
+              {/* Filtros de Gaps */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground block mb-1">
+                    Filtrar por Perfil
+                  </label>
+                  <select
+                    value={gapProfileFilter}
+                    onChange={(e) => setGapProfileFilter(e.target.value)}
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs focus-visible:ring-[#063D30]"
+                  >
+                    <option value="TODOS">Todos os Perfis</option>
+                    {profiles
+                      .filter((p) => p.code.toUpperCase() !== 'SUP')
+                      .map((p) => (
+                        <option key={p.id} value={p.code}>
+                          {p.name} ({p.code})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground block mb-1">
+                    Filtrar por Módulo
+                  </label>
+                  <select
+                    value={gapModuleFilter}
+                    onChange={(e) => setGapModuleFilter(e.target.value)}
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs focus-visible:ring-[#063D30]"
+                  >
+                    {screenCategories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat === 'TODOS' ? 'Todos os Módulos' : cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground block mb-1">
+                    Severidade
+                  </label>
+                  <select
+                    value={gapSeverityFilter}
+                    onChange={(e) =>
+                      setGapSeverityFilter(e.target.value as 'TODOS' | 'alta' | 'media' | 'baixa')
+                    }
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs focus-visible:ring-[#063D30]"
+                  >
+                    <option value="TODOS">Todas as Severidades</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Média</option>
+                    <option value="baixa">Baixa</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Tabela de Gaps */}
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead className="bg-[#063D30] text-white">
+                    <tr>
+                      <th className="text-left px-3 py-2.5 font-bold">Severidade</th>
+                      <th className="text-left px-3 py-2.5 font-bold">Perfil</th>
+                      <th className="text-left px-3 py-2.5 font-bold">Módulo / Tela</th>
+                      <th className="text-left px-3 py-2.5 font-bold">Inconsistência Detectada</th>
+                      <th className="text-left px-3 py-2.5 font-bold hidden md:table-cell">
+                        Recomendação
+                      </th>
+                      <th className="text-right px-3 py-2.5 font-bold">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredGaps.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center gap-1">
+                            <CheckCircle2 className="w-6 h-6 text-emerald-600 mb-1" />
+                            <span className="font-bold text-foreground">Nenhum gap detectado!</span>
+                            <span className="text-xs">
+                              As permissões gravadas no banco estão consistentes de acordo com os
+                              critérios analisados.
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredGaps.map((g) => {
+                        const targetProfile = profiles.find(
+                          (p) => p.code.toUpperCase() === g.profileCode.toUpperCase(),
+                        )
+
+                        return (
+                          <tr
+                            key={g.id}
+                            className="border-b border-border/60 hover:bg-muted/40 transition-colors"
+                          >
+                            <td className="px-3 py-2.5">
+                              <Badge
+                                variant={
+                                  g.severity === 'alta'
+                                    ? 'destructive'
+                                    : g.severity === 'media'
+                                      ? 'default'
+                                      : 'secondary'
+                                }
+                                className={cn(
+                                  'uppercase text-[10px] font-bold',
+                                  g.severity === 'alta' && 'bg-rose-600 text-white',
+                                  g.severity === 'media' && 'bg-[#E87517] text-white',
+                                  g.severity === 'baixa' && 'bg-amber-100 text-amber-900',
+                                )}
+                              >
+                                {g.severity}
+                              </Badge>
+                            </td>
+                            <td className="px-3 py-2.5 font-semibold">
+                              <div>{g.profileName}</div>
+                              <span className="text-[10px] font-mono text-muted-foreground">
+                                {g.profileCode}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <div className="font-semibold text-foreground">{g.screenTitle}</div>
+                              <span className="text-[10px] text-muted-foreground font-mono truncate block">
+                                {g.module} • {g.route}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 text-foreground max-w-xs">{g.issue}</td>
+                            <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell max-w-xs">
+                              {g.recommendation}
+                            </td>
+                            <td className="px-3 py-2.5 text-right">
+                              {targetProfile && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    handleOpenEdit(targetProfile)
+                                    setScreenSearchQuery(g.screenTitle)
+                                  }}
+                                  className="h-7 px-2 text-xs border-[#063D30] text-[#063D30] hover:bg-[#063D30]/10"
+                                >
+                                  Ajustar Perfil
+                                </Button>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

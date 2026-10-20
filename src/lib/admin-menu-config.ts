@@ -271,11 +271,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             perm: canManageSystemParams,
           },
           {
-            label: 'Permissões',
-            route: '/admin/configuracoes/permissoes',
-            perm: canManagePermissions,
-          },
-          {
             label: 'Segurança',
             route: '/admin/configuracoes/seguranca',
             perm: canManageConfiguracoes,

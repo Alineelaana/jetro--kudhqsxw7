@@ -181,11 +181,7 @@ const ImportExportScreen = lazy(() =>
     default: m.ImportExportScreen,
   })),
 )
-const PermissionMatrixScreen = lazy(() =>
-  import('@/components/configuracoes/permission-matrix-screen').then((m) => ({
-    default: m.PermissionMatrixScreen,
-  })),
-)
+
 const SegurancaScreen = lazy(() =>
   import('@/components/configuracoes/seguranca-screen').then((m) => ({
     default: m.SegurancaScreen,
@@ -619,7 +615,12 @@ const App = () => (
                                 <Route index element={<Navigate to="dados-empresa" replace />} />
                                 <Route path="dados-empresa" element={<EmpresaScreen />} />
                                 <Route path="parametros" element={<ParametrosScreen />} />
-                                <Route path="permissoes" element={<PermissionMatrixScreen />} />
+                                <Route
+                                  path="permissoes"
+                                  element={
+                                    <Navigate to="/admin/cadastros/perfis-permissoes" replace />
+                                  }
+                                />
                                 <Route path="logs" element={<LogsScreen />} />
                                 <Route
                                   path="integracoes"
