@@ -408,25 +408,6 @@ export function ReportScheduleDialog({
         active: formData.active,
         status: formData.active ? 'active' : 'paused',
       }
-        frequency: formData.frequency,
-        days_of_week: formData.days_of_week,
-        day_of_month: Number(formData.day_of_month) || 1,
-        start_date: formData.start_date || '',
-        end_date: formData.end_date || '',
-        time_of_day: formData.time_of_day,
-        timezone: 'America/Sao_Paulo',
-        recipients: formData.recipients.trim(),
-        recipients_cc: formData.recipients_cc.trim(),
-        email_subject: formData.email_subject.trim(),
-        email_message: formData.email_message.trim(),
-        formats: formData.formats,
-        filters: formData.filters,
-        filter_labels: formData.filter_labels,
-        dynamic_date_range: formData.dynamic_date_range,
-        skip_if_empty: formData.skip_if_empty,
-        active: formData.active,
-        status: formData.active ? 'active' : 'paused',
-      }
 
       if (formData.id) {
         await pb.collection('report_schedules').update(formData.id, payload)
