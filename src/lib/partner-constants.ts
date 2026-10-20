@@ -20,10 +20,10 @@ export const DOCUMENT_CATEGORIES = [
 ] as const
 
 export const ROLE_LABELS: Record<string, string> = {
-  SUP: 'Administrador',
+  SUP: 'Administrador (SUP)',
   FINANCEIRO: 'Financeiro',
   COMERCIAL: 'Comercial',
-  PADRAO: 'Padrão',
+  PADRAO: 'Gestão',
   SDR: 'SDR',
   Vendedor: 'Vendedor',
 }

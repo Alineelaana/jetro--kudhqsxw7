@@ -187,6 +187,16 @@ export function canManageJetroOnline(role: string | undefined): boolean {
   return ['SUP', 'ADMIN'].includes(role)
 }
 
+/**
+ * Permissão para telas técnicas de infraestrutura/template da plataforma (Phase0 Foundation e Platform Layer).
+ * Restrito exclusivamente ao perfil SUP (Superusuário / Desenvolvedor).
+ * Oculto para usuários do perfil Gestão (PADRAO) e outros perfis operacionais.
+ */
+export function canViewPlatformInfra(role: string | undefined): boolean {
+  if (!role) return false
+  return role === 'SUP'
+}
+
 export function canViewFiscal(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)

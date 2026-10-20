@@ -57,6 +57,7 @@ import {
   canViewPlanilhasTabelaMaeGr,
   canManageJehAssistant,
   canManageJetroOnline,
+  canViewPlatformInfra,
 } from '@/lib/permissions'
 import { canViewFinancial } from '@/lib/financial-permissions'
 import { canViewLogistics } from '@/lib/logistics-permissions'
@@ -235,8 +236,18 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'SLA Chamados', route: '/admin/configuracoes/sla-chamados' },
         ],
       },
-      { label: 'Phase0 Foundation', icon: Layers, route: '/admin/phase0-foundation' },
-      { label: 'Platform Layer', icon: Layers, route: '/admin/platform-layer' },
+      {
+        label: 'Phase0 Foundation',
+        icon: Layers,
+        route: '/admin/phase0-foundation',
+        perm: canViewPlatformInfra,
+      },
+      {
+        label: 'Platform Layer',
+        icon: Layers,
+        route: '/admin/platform-layer',
+        perm: canViewPlatformInfra,
+      },
       {
         label: 'Validade e Vencimentos',
         icon: CalendarClock,

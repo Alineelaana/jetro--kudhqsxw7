@@ -111,7 +111,7 @@ export function PermissionMatrixScreen() {
                     </th>
                     {PROFILES.map((p) => (
                       <th key={p} className="text-center px-2 py-3 font-bold">
-                        {p}
+                        {p === 'PADRAO' ? 'Gestão' : p}
                       </th>
                     ))}
                   </tr>

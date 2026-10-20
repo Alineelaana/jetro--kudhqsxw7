@@ -282,8 +282,8 @@ export function UserManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PADRAO">PADRÃO (Funcionário)</SelectItem>
-                  <SelectItem value="SUP">SUP (Gestão)</SelectItem>
+                  <SelectItem value="PADRAO">Gestão</SelectItem>
+                  <SelectItem value="SUP">SUP (Administrador)</SelectItem>
                   <SelectItem value="FINANCEIRO">Financeiro</SelectItem>
                   <SelectItem value="COMERCIAL">Comercial</SelectItem>
                   <SelectItem value="SDR">SDR</SelectItem>
@@ -493,10 +493,12 @@ export function UserManagement() {
                         className={`text-xs font-bold px-2.5 py-1 rounded ${
                           u.role === 'SUP'
                             ? 'bg-[#C89B3C]/20 text-[#C89B3C]'
-                            : 'bg-[#005B2E]/10 text-[#005B2E]'
+                            : u.role === 'PADRAO'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
+                              : 'bg-[#005B2E]/10 text-[#005B2E]'
                         }`}
                       >
-                        {u.role}
+                        {u.role === 'PADRAO' ? 'Gestão' : u.role}
                       </span>
 
                       {isAdmin && (

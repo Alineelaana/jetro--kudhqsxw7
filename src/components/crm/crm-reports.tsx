@@ -43,8 +43,8 @@ const COLORS = [
 ]
 
 const ROLE_LABELS: Record<string, string> = {
-  SUP: 'Super Admin',
-  PADRAO: 'Padrão',
+  SUP: 'Super Admin (SUP)',
+  PADRAO: 'Gestão',
   SDR: 'SDR',
   Vendedor: 'Vendedor',
   FINANCEIRO: 'Financeiro',

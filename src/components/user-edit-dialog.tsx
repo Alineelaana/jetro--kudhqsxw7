@@ -211,8 +211,8 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PADRAO">PADRÃO</SelectItem>
-                  <SelectItem value="SUP">SUP (Gestão)</SelectItem>
+                  <SelectItem value="PADRAO">Gestão</SelectItem>
+                  <SelectItem value="SUP">SUP (Administrador)</SelectItem>
                   <SelectItem value="FINANCEIRO">Financeiro</SelectItem>
                   <SelectItem value="COMERCIAL">Comercial</SelectItem>
                   <SelectItem value="SDR">SDR</SelectItem>

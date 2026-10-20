@@ -141,14 +141,19 @@ export function UsersTable({
       accessorKey: 'role',
       dataType: 'text',
       defaultWidth: 130,
-      cell: ({ value }) => (
-        <Badge
-          variant="outline"
-          className="border-[#005B2E]/40 text-[#005B2E] bg-[#005B2E]/5 font-semibold text-[11px]"
-        >
-          {String(value || 'PADRAO')}
-        </Badge>
-      ),
+      cell: ({ value }) => {
+        const roleStr = String(value || 'PADRAO')
+        const displayLabel =
+          roleStr === 'PADRAO' ? 'Gestão' : roleStr === 'SUP' ? 'SUP (Admin)' : roleStr
+        return (
+          <Badge
+            variant="outline"
+            className="border-[#005B2E]/40 text-[#005B2E] bg-[#005B2E]/5 font-semibold text-[11px]"
+          >
+            {displayLabel}
+          </Badge>
+        )
+      },
     },
     {
       id: 'status',
@@ -330,7 +335,7 @@ export function UsersTable({
       Nome: u.name,
       'Nome de Usuário': u.username || 'Informação não registrada',
       'E-mail': u.email,
-      'Perfil de Acesso': u.role,
+      'Perfil de Acesso': u.role === 'PADRAO' ? 'Gestão' : u.role,
       'Status Conta': u.active ? 'Ativo' : 'Inativo',
       'Status Sessão': u.is_online ? 'Online' : 'Offline',
       'Último Login': u.last_login
@@ -455,7 +460,7 @@ export function UsersTable({
                 <SelectItem value="ALL">Todos os Perfis</SelectItem>
                 {uniqueRoles.map((r) => (
                   <SelectItem key={r} value={r}>
-                    {r}
+                    {r === 'PADRAO' ? 'Gestão' : r === 'SUP' ? 'SUP (Admin)' : r}
                   </SelectItem>
                 ))}
               </SelectContent>
