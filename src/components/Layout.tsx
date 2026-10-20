@@ -71,10 +71,10 @@ export default function Layout() {
         </div>
         <div className="flex flex-1 overflow-hidden">
           <AdminSidebar />
-          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
             {/* Ocultar a barra de busca e botão duplicado na página inicial conforme solicitado pelo usuário */}
             {!isHomePage && (
-              <div className="bg-muted/30 border-b px-4 py-2 shrink-0 flex items-center justify-between gap-3 pr-12 sm:pr-14">
+              <div className="bg-[#F8FAF9] border-b border-[#E4EAE6] px-4 py-2 shrink-0 flex items-center justify-between gap-3 pr-12 sm:pr-14">
                 <div className="flex-1 min-w-0">
                   <GlobalSearchBar />
                 </div>
@@ -85,7 +85,7 @@ export default function Layout() {
                     variant="outline"
                     size="sm"
                     onClick={() => setScreenLogicOpen(true)}
-                    className="shrink-0 h-9 px-3 text-xs font-semibold bg-background border-[#005B2E]/30 text-[#005B2E] hover:bg-[#005B2E] hover:text-white transition-colors shadow-2xs flex items-center gap-1.5"
+                    className="shrink-0 h-9 px-3 text-xs font-semibold bg-background border-[#063D30]/30 text-[#063D30] hover:bg-[#063D30] hover:text-white transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
                     title="Abrir especificação técnica e regras de negócio da tela atual"
                   >
                     <FileCode2 className="w-3.5 h-3.5" />
@@ -96,7 +96,7 @@ export default function Layout() {
             )}
             <main
               id="admin-main-content"
-              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between admin-main-padded pr-12 sm:pr-14"
+              className="flex-1 min-w-0 overflow-y-auto overscroll-contain flex flex-col justify-between admin-main-padded pr-12 sm:pr-14 bg-background"
             >
               <div className="flex-1">
                 <ModuleErrorBoundary
@@ -106,7 +106,7 @@ export default function Layout() {
                   <Suspense
                     fallback={
                       <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
-                        <div className="w-7 h-7 rounded-full border-2 border-[#003D30] border-t-transparent animate-spin" />
+                        <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
                       </div>
                     }
                   >
@@ -157,7 +157,7 @@ export default function Layout() {
             <Suspense
               fallback={
                 <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
-                  <div className="w-7 h-7 rounded-full border-2 border-[#003D30] border-t-transparent animate-spin" />
+                  <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
                 </div>
               }
             >

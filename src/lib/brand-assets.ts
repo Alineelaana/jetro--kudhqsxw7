@@ -9,9 +9,16 @@ export const BRAND_TAGLINE = 'Sistema Inteligente de Gestão'
 export const BRAND_ASSISTANT_NAME = 'HURAM On-line'
 
 export const HURAM_PALETTE = {
-  green: '#003D30',
-  orange: '#F27616',
-  gold: '#D6A755',
+  // Paleta Oficial HURAM
+  green: '#063D30',
+  emerald: '#116B50',
+  gold: '#C69B45',
+  orange: '#E87517',
   white: '#FFFFFF',
-  grayBackground: '#F8FAFC',
+  iceWhite: '#F8FAF9',
+  surfaceAlt: '#F1F4F2',
+  graphite: '#202B28',
+  textMuted: '#66736D',
+  border: '#E4EAE6',
+  grayBackground: '#F8FAF9',
 }

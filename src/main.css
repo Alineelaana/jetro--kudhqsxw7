@@ -4,40 +4,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Predomínio de Branco #FFFFFF */
-    --foreground: 167 100% 12%; /* #003D30 Verde-escuro institucional */
+    /* Paleta Oficial HURAM */
+    --background: 0 0% 100%; /* #FFFFFF Fundo principal */
+    --background-secondary: 150 14% 98%; /* #F8FAF9 Branco gelo */
+    --surface-alt: 140 10% 95%; /* #F1F4F2 Superfícies alternativas */
 
-    --card: 0 0% 100%;
-    --card-foreground: 167 100% 12%;
+    --foreground: 162 15% 15%; /* #202B28 Texto principal grafite */
+    --muted-foreground: 157 6% 43%; /* #66736D Texto secundário */
+
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 162 15% 15%; /* #202B28 */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 167 100% 12%;
+    --popover-foreground: 162 15% 15%;
 
-    --primary: 167 100% 12%; /* #003D30 Verde-escuro HURAM */
-    --primary-foreground: 0 0% 100%;
+    --primary: 167 82% 13%; /* #063D30 Verde institucional profundo HURAM */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
 
-    --secondary: 38 61% 59%; /* #D6A755 Dourado HURAM */
-    --secondary-foreground: 167 100% 12%;
+    --primary-highlight: 163 73% 24%; /* #116B50 Verde de destaque (esmeralda) */
+    --primary-highlight-foreground: 0 0% 100%;
 
-    --muted: 210 20% 97%; /* Cinza muito claro corporativo #F8FAFC */
-    --muted-foreground: 215 16% 47%;
+    --secondary: 40 54% 52%; /* #C69B45 Dourado sofisticado */
+    --secondary-foreground: 167 82% 13%;
 
-    --accent: 38 61% 95%; /* Dourado suave para destaque */
-    --accent-foreground: 167 100% 12%;
+    --muted: 150 14% 98%; /* #F8FAF9 Branco gelo */
 
+    --accent: 140 10% 95%; /* #F1F4F2 Superfície alternativa suave */
+    --accent-foreground: 167 82% 13%;
+
+    /* Cores semânticas funcionais preservadas */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 214 32% 91%; /* Cinza muito claro para separação suave */
-    --input: 214 32% 91%;
-    --ring: 167 100% 12%;
+    --border: 140 12% 91%; /* #E4EAE6 Bordas sutis */
+    --input: 140 12% 91%; /* #E4EAE6 */
+    --ring: 167 82% 13%; /* #063D30 Verde institucional */
 
     --radius: 0.75rem;
 
-    --gold: 38 61% 59%; /* #D6A755 */
-    --gold-light: 38 75% 70%;
-    --orange-huram: 26 90% 52%; /* #F27616 */
-    --dark-institutional: 167 100% 12%; /* #003D30 */
+    /* Tokens da marca HURAM */
+    --huram-green: 167 82% 13%; /* #063D30 */
+    --huram-emerald: 163 73% 24%; /* #116B50 */
+    --huram-gold: 40 54% 52%; /* #C69B45 */
+    --huram-orange: 27 83% 50%; /* #E87517 */
+    --huram-graphite: 162 15% 15%; /* #202B28 */
+    --huram-muted-text: 157 6% 43%; /* #66736D */
+    --huram-border: 140 12% 91%; /* #E4EAE6 */
+    --huram-ice-white: 150 14% 98%; /* #F8FAF9 */
+    --huram-surface-alt: 140 10% 95%; /* #F1F4F2 */
+
+    /* Compatibilidade retroativa */
+    --gold: 40 54% 52%; /* #C69B45 */
+    --gold-light: 40 60% 68%;
+    --orange-huram: 27 83% 50%; /* #E87517 */
+    --dark-institutional: 167 82% 13%; /* #063D30 */
+
+    /* Charts padronizados no tema HURAM + semânticos */
+    --chart-1: 167 82% 13%; /* Verde institucional */
+    --chart-2: 163 73% 24%; /* Verde esmeralda */
+    --chart-3: 40 54% 52%; /* Dourado sofisticado */
+    --chart-4: 27 83% 50%; /* Laranja institucional */
+    --chart-5: 217 91% 60%; /* Azul info funcional */
   }
 
   .dark {
@@ -78,50 +105,50 @@
   }
 
   .bg-flag-green {
-    background-color: #003d30;
+    background-color: #063d30;
   }
   .bg-gold-metallic {
-    background-color: #d6a755;
+    background-color: #c69b45;
   }
   .bg-dark-institutional {
-    background-color: #003d30;
+    background-color: #063d30;
   }
   .bg-orange-huram {
-    background-color: #f27616;
+    background-color: #e87517;
   }
   .text-flag-green {
-    color: #003d30;
+    color: #063d30;
   }
   .text-gold-metallic {
-    color: #d6a755;
+    color: #c69b45;
   }
   .text-orange-huram {
-    color: #f27616;
+    color: #e87517;
   }
   .border-gold-metallic {
-    border-color: #d6a755;
+    border-color: #c69b45;
   }
   .border-orange-huram {
-    border-color: #f27616;
+    border-color: #e87517;
   }
 
   .gold-gradient-text {
-    background: linear-gradient(135deg, #f5d77a 0%, #d6a755 50%, #b88636 100%);
+    background: linear-gradient(135deg, #e5bf6d 0%, #c69b45 50%, #a27b2b 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .gold-gradient-bg {
-    background: linear-gradient(135deg, #e8c47d 0%, #d6a755 100%);
+    background: linear-gradient(135deg, #dfb868 0%, #c69b45 100%);
   }
 
   .dark-hero-overlay {
     background: linear-gradient(
       180deg,
-      rgba(0, 40, 32, 0.92) 0%,
-      rgba(0, 61, 48, 0.88) 60%,
-      rgba(0, 40, 32, 0.96) 100%
+      rgba(6, 61, 48, 0.94) 0%,
+      rgba(5, 48, 38, 0.92) 60%,
+      rgba(4, 38, 30, 0.97) 100%
     );
   }
 

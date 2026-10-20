@@ -112,7 +112,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#D6A755]/30 bg-[#003D30]/95 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-50 w-full border-b border-[#C69B45]/30 bg-[#063D30]/95 backdrop-blur-md transition-all">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
         <a
           href="#inicio"
@@ -126,11 +126,11 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
           <img
             src={logoHuramDark}
             alt="HURAM — Sistema Inteligente de Gestão"
-            className="h-11 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-md bg-[#002820] p-1"
+            className="h-11 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-md bg-[#042820] p-1 border border-[#C69B45]/30"
           />
           <div className="hidden sm:flex flex-col">
             <span className="text-xl font-black tracking-tight text-white leading-none">HURAM</span>
-            <span className="text-[10px] font-semibold tracking-wider text-[#D6A755] uppercase mt-0.5">
+            <span className="text-[10px] font-semibold tracking-wider text-[#C69B45] uppercase mt-0.5">
               Sistema Inteligente de Gestão
             </span>
           </div>
@@ -144,7 +144,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
               className="flex items-center gap-2 text-xs text-slate-300 font-medium bg-black/20 border border-white/10 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs shrink-0"
               title={`Fuso horário do perfil: ${saudacaoInfo.fusoUtilizado}`}
             >
-              <Clock className="w-3.5 h-3.5 text-[#E4C46A] shrink-0" />
+              <Clock className="w-3.5 h-3.5 text-[#C69B45] shrink-0" />
               <span className="tabular-nums">
                 {saudacaoInfo.horaAtualFormatada} <span className="text-white/40">•</span>{' '}
                 <span className="text-slate-400 font-normal">Fuso:</span>{' '}
@@ -159,7 +159,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 variant="outline"
                 size="sm"
                 onClick={onOpenScreenLogic}
-                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-[#001c10]/80 border-[#D6A755]/40 text-[#D6A755] hover:bg-[#D6A755] hover:text-[#003D30] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
+                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-[#042820]/80 border-[#C69B45]/40 text-[#C69B45] hover:bg-[#C69B45] hover:text-[#063D30] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
                 title="Abrir especificação técnica e regras de negócio da tela atual"
               >
                 <FileCode2 className="w-3.5 h-3.5" />
@@ -171,7 +171,7 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             <div className="shrink-0 flex items-center">
               <NotificationBell
                 className="hover:bg-white/10 text-white rounded-lg h-8 sm:h-9 w-8 sm:w-9"
-                iconClassName="text-[#E4C46A] w-4 h-4 sm:w-5 sm:h-5"
+                iconClassName="text-[#C69B45] w-4 h-4 sm:w-5 sm:h-5"
               />
             </div>
 
@@ -223,11 +223,11 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
               <Button
                 asChild
                 size="sm"
-                className="bg-[#003D30] hover:bg-[#002820] border border-[#D6A755]/50 text-white font-semibold text-xs px-4 shadow-sm hover:shadow-md transition-all"
+                className="bg-[#063D30] hover:bg-[#042820] border border-[#C69B45]/50 text-white font-semibold text-xs px-4 shadow-sm hover:shadow-md transition-all"
               >
                 <Link to={isAuthenticated ? '/admin' : '/'} className="flex items-center gap-1.5">
                   <span>{isAuthenticated ? 'Ir para o ERP' : 'Acessar o sistema'}</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <ArrowUpRight className="h-3.5 w-3.5 text-[#C69B45]" />
                 </Link>
               </Button>
             </div>

@@ -33,51 +33,51 @@ export default function ClientLogin() {
   }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
+    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 bg-background">
+      <Card className="w-full max-w-md border border-[#E4EAE6] shadow-xl bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/30 pb-6 rounded-t-2xl text-center flex flex-col items-center">
           <img
             src={logoHuramDark}
             alt="HURAM - Área do Cliente"
-            className="h-24 w-auto object-contain rounded-xl border border-[#D6A755]/40 mb-3 shadow-lg bg-[#003D30] p-1"
+            className="h-20 w-auto object-contain rounded-xl border border-[#C69B45]/40 mb-3 shadow-md bg-[#042820] p-1.5"
           />
-          <CardTitle className="text-xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-6 h-6 text-[#D6A755]" /> Área do Cliente — HURAM
+          <CardTitle className="text-xl font-bold text-center text-white flex items-center justify-center gap-2">
+            <Lock className="w-5 h-5 text-[#C69B45]" /> Área do Cliente — HURAM
           </CardTitle>
           <p className="text-xs text-white/80 mt-1 font-medium">Sistema Inteligente de Gestão</p>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 px-6 sm:px-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="client-email" className="text-sm font-semibold">
-                Usuário
+              <Label htmlFor="client-email" className="text-sm font-semibold text-[#202B28]">
+                Usuário / E-mail
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
                 <Input
                   id="client-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="pl-10 focus-visible:ring-[#003D30] border-border"
+                  className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
                   autoComplete="email"
                 />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="client-password" className="text-sm font-semibold">
+              <Label htmlFor="client-password" className="text-sm font-semibold text-[#202B28]">
                 Senha
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
                 <Input
                   id="client-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Digite sua senha"
-                  className="pl-10 focus-visible:ring-[#003D30] border-border"
+                  className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
                   autoComplete="current-password"
                 />
               </div>
@@ -91,7 +91,7 @@ export default function ClientLogin() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
+              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold text-base shadow-md h-11 rounded-xl cursor-pointer"
               disabled={submitting}
             >
               {submitting ? (
@@ -108,16 +108,16 @@ export default function ClientLogin() {
             </Button>
             <Link
               to="/cliente/recuperar-senha"
-              className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
+              className="block text-center text-sm text-[#063D30] hover:underline font-semibold pt-1"
             >
               Esqueci minha senha
             </Link>
-            <div className="border-t border-border pt-4 mt-4 space-y-3">
+            <div className="border-t border-[#E4EAE6] pt-4 mt-4 space-y-3">
               <div className="text-center">
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full border-[#D6A755]/70 hover:bg-[#D6A755]/15 text-[#003D30] font-bold text-sm rounded-xl"
+                  className="w-full border-[#063D30]/30 hover:bg-[#063D30]/5 text-[#063D30] font-semibold text-sm rounded-xl cursor-pointer"
                 >
                   <Link to="/site">Acesse o site da HURAM</Link>
                 </Button>

@@ -49,22 +49,21 @@ export function generateSolicitationsPdf(records: BudgetRecord[], userName: stri
 <title>Relatório de Solicitações</title><style>
 @page{size:A4;margin:0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a}
-.stripe-top{background:linear-gradient(135deg,#005B2E 0%,#01361D 100%);height:10mm}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#202B28}
+.stripe-top{background:linear-gradient(135deg,#063D30 0%,#042820 100%);height:10mm}
 .content{padding:8mm 15mm 28mm}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm}
 .header img{height:45px}
-.header h1{flex:1;text-align:center;color:#005B2E;font-size:22px;letter-spacing:1px}
-.header .meta{font-size:10px;color:#666;text-align:right;min-width:120px}
-.gold-divider{height:2px;background:linear-gradient(90deg,#C89B3C,transparent);margin:0 0 5mm}
+.header h1{flex:1;text-align:center;color:#063D30;font-size:22px;letter-spacing:1px}
+.header .meta{font-size:10px;color:#66736D;text-align:right;min-width:120px}
+.gold-divider{height:2px;background:linear-gradient(90deg,#C69B45,transparent);margin:0 0 5mm}
 table{width:100%;border-collapse:collapse;font-size:10px}
 thead{display:table-header-group}
-th{background:#005B2E;color:#fff;padding:6px 6px;text-align:left;font-weight:bold}
-td{padding:5px 6px;border-bottom:1px solid #e0e0e0}
-tr.even{background:#f7f7f5}
+th{background:#063D30;color:#fff;padding:6px 6px;text-align:left;font-weight:bold}
+td{padding:5px 6px;border-bottom:1px solid #E4EAE6;color:#202B28}
+tr.even{background:#F8FAF9}
 tr{page-break-inside:avoid}
-.footer{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:4mm 15mm;font-size:9px;color:#666;border-top:1px solid #ddd;background:#fff}
-</style></head><body>
+.footer{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:4mm 15mm;font-size:9px;color:#66736D;border-top:1px solid #E4EAE6;background:#fff}</style></head><body>
 <div class="stripe-top"></div>
 <div class="content">
 <div class="header">

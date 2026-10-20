@@ -44,8 +44,8 @@ export function MenuLink({
   const linkClass = cn(
     'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
     isActive || isChildActive
-      ? 'bg-[#003D30] text-white font-semibold'
-      : 'text-gray-600 hover:bg-gray-100 hover:text-[#003D30]',
+      ? 'bg-[#116B50] text-[#C69B45] font-semibold shadow-xs'
+      : 'text-white/80 hover:bg-white/10 hover:text-white',
   )
 
   if (hasChildren) {
@@ -62,7 +62,7 @@ export function MenuLink({
             <ChevronDown
               className={cn(
                 'w-3.5 h-3.5 transition-transform duration-150 shrink-0',
-                isActive || isChildActive ? 'text-white/80' : 'text-gray-400',
+                isActive || isChildActive ? 'text-[#C69B45]' : 'text-white/50',
                 isExpanded && 'rotate-180',
               )}
             />
@@ -73,19 +73,19 @@ export function MenuLink({
               e.stopPropagation()
               onToggleFavorite(favKey)
             }}
-            className="p-1 rounded hover:bg-gray-100 shrink-0"
+            className="p-1 rounded hover:bg-white/10 shrink-0 cursor-pointer text-white/50 hover:text-[#C69B45]"
             title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           >
             <Star
               className={cn(
                 'w-3 h-3',
-                isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300',
+                isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-white/40',
               )}
             />
           </button>
         </div>
         {isExpanded && (
-          <div className="ml-4 mt-0.5 border-l border-gray-200 pl-2 space-y-0.5 animate-in fade-in-50 duration-150">
+          <div className="ml-4 mt-0.5 border-l border-white/15 pl-2 space-y-0.5 animate-in fade-in-50 duration-150">
             {visibleChildren.map((child) => {
               const ChildIcon = child.icon as ComponentType<{ className?: string }> | undefined
               const isChildItemActive = currentPathname === child.route
@@ -96,11 +96,11 @@ export function MenuLink({
                   className={cn(
                     'flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors',
                     isChildItemActive
-                      ? 'bg-[#003D30]/10 text-[#003D30] font-semibold'
-                      : 'text-gray-500 hover:text-[#003D30] hover:bg-gray-50',
+                      ? 'bg-[#116B50] text-[#C69B45] font-semibold border-l-2 border-[#C69B45]'
+                      : 'text-white/70 hover:text-white hover:bg-white/10',
                   )}
                 >
-                  {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0" />}
+                  {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0 text-white/50" />}
                   <span className="truncate">{child.label}</span>
                 </Link>
               )
@@ -120,11 +120,11 @@ export function MenuLink({
       <button
         type="button"
         onClick={() => onToggleFavorite(favKey)}
-        className="p-1 rounded hover:bg-gray-100 shrink-0"
+        className="p-1 rounded hover:bg-white/10 shrink-0 cursor-pointer text-white/50 hover:text-[#C69B45]"
         title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
       >
         <Star
-          className={cn('w-3 h-3', isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-300')}
+          className={cn('w-3 h-3', isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-white/40')}
         />
       </button>
     </div>

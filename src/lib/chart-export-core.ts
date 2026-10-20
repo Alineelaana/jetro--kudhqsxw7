@@ -88,11 +88,11 @@ export async function withBranding(
     ctx.globalAlpha = 1
   }
   const grad = ctx.createLinearGradient(0, 0, width, 0)
-  grad.addColorStop(0, '#005B2E')
-  grad.addColorStop(1, '#01361D')
+  grad.addColorStop(0, '#063D30')
+  grad.addColorStop(1, '#042820')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, width, 8)
-  ctx.fillStyle = '#005B2E'
+  ctx.fillStyle = '#063D30'
   ctx.font = 'bold 26px Segoe UI, Arial, sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -108,7 +108,7 @@ export async function withBranding(
     hour: '2-digit',
     minute: '2-digit',
   })
-  ctx.fillStyle = '#C89B3C'
+  ctx.fillStyle = '#C69B45'
   ctx.font = 'bold 14px Segoe UI, Arial, sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'

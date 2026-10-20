@@ -88,35 +88,35 @@ export function AdminLogin() {
   }
 
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 space-y-4">
-      <Card className="w-full max-w-md border-2 border-[#D6A755]/40 shadow-2xl bg-white">
-        <CardHeader className="bg-[#003D30] text-white border-b border-[#D6A755]/40 pb-6 rounded-t-lg text-center flex flex-col items-center">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 space-y-4 bg-background">
+      <Card className="w-full max-w-md border border-[#E4EAE6] shadow-xl bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/30 pb-6 rounded-t-2xl text-center flex flex-col items-center">
           <img
             src={logoHuramDark}
             alt="HURAM — Sistema Inteligente de Gestão"
-            className="h-24 w-auto object-contain rounded-xl border border-[#D6A755]/40 mb-3 shadow-lg bg-[#003D30] p-1"
+            className="h-20 w-auto object-contain rounded-xl border border-[#C69B45]/40 mb-3 shadow-md bg-[#042820] p-1.5"
           />
-          <CardTitle className="text-lg sm:text-xl font-black text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-5 h-5 text-[#D6A755]" />
+          <CardTitle className="text-lg sm:text-xl font-bold text-center text-white flex items-center justify-center gap-2">
+            <Lock className="w-5 h-5 text-[#C69B45]" />
             Área Restrita — HURAM
           </CardTitle>
           <p className="text-xs text-white/80 mt-1 font-medium">Sistema Inteligente de Gestão</p>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 px-6 sm:px-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="username" className="text-sm font-semibold text-foreground">
+              <Label htmlFor="username" className="text-sm font-semibold text-[#202B28]">
                 Usuário
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
                 <Input
                   id="username"
                   type="text"
                   value={username}
                   onChange={handleUsernameChange}
                   placeholder="Digite seu usuário"
-                  className="pl-10 focus-visible:ring-[#003D30] border-border"
+                  className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
                   autoComplete="username"
                 />
               </div>
@@ -127,18 +127,18 @@ export function AdminLogin() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-semibold text-foreground">
+              <Label htmlFor="password" className="text-sm font-semibold text-[#202B28]">
                 Senha
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={handlePasswordChange}
                   placeholder="Digite sua senha"
-                  className="pl-10 focus-visible:ring-[#003D30] border-border"
+                  className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
                   autoComplete="current-password"
                 />
               </div>
@@ -153,20 +153,20 @@ export function AdminLogin() {
               </div>
             )}
 
-            <div className="flex items-start gap-2.5 p-2.5 rounded-lg border border-border/60 bg-muted/30">
+            <div className="flex items-start gap-2.5 p-2.5 rounded-lg border border-[#E4EAE6] bg-[#F8FAF9]">
               <input
                 id="allow-location"
                 type="checkbox"
                 checked={allowLocation}
                 onChange={(e) => setAllowLocation(e.target.checked)}
-                className="mt-1 rounded border-[#003D30] text-[#003D30] focus:ring-[#003D30] h-4 w-4 cursor-pointer"
+                className="mt-1 rounded border-[#E4EAE6] text-[#063D30] focus:ring-[#063D30] h-4 w-4 cursor-pointer"
               />
               <label
                 htmlFor="allow-location"
-                className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none"
+                className="text-xs text-[#66736D] leading-relaxed cursor-pointer select-none"
               >
-                <span className="font-semibold text-foreground flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#003D30]" />
+                <span className="font-semibold text-[#202B28] flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-[#063D30]" />
                   Autorizar localização precisa neste acesso
                 </span>
                 <span>
@@ -178,7 +178,7 @@ export function AdminLogin() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#003D30] hover:bg-[#002820] text-white font-extrabold text-base shadow-lg h-12 rounded-xl"
+              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold text-base shadow-md h-11 rounded-xl cursor-pointer"
               disabled={submitting}
             >
               {submitting ? (
@@ -195,16 +195,16 @@ export function AdminLogin() {
             </Button>
             <Link
               to="/admin/recuperar-senha"
-              className="block text-center text-sm text-[#003D30] hover:underline font-bold pt-2"
+              className="block text-center text-sm text-[#063D30] hover:underline font-semibold pt-1"
             >
               Esqueci minha senha
             </Link>
 
-            <div className="pt-3 border-t border-border mt-3">
+            <div className="pt-3 border-t border-[#E4EAE6] mt-3">
               <Button
                 asChild
                 variant="outline"
-                className="w-full border-[#D6A755]/70 hover:bg-[#D6A755]/15 text-[#003D30] font-bold text-sm rounded-xl"
+                className="w-full border-[#063D30]/30 hover:bg-[#063D30]/5 text-[#063D30] font-semibold text-sm rounded-xl cursor-pointer"
               >
                 <Link to="/site" className="flex items-center justify-center gap-2">
                   Acesse o site da HURAM

@@ -88,34 +88,34 @@ export function generateBudgetPdfHtml(request: BudgetPdfData): string {
   <title>Solicitação de Orçamento - Jetro #${budgetNum}</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #1e293b; margin: 0; padding: 24px; background: #ffffff; line-height: 1.5; }
-    .header-container { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 16px; margin-bottom: 24px; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #202b28; margin: 0; padding: 24px; background: #ffffff; line-height: 1.5; }
+    .header-container { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #063d30; padding-bottom: 16px; margin-bottom: 24px; }
     .logo-img { height: 68px; max-width: 260px; object-fit: contain; }
     .company-details { text-align: right; }
-    .company-name { font-size: 22px; font-weight: 800; color: #047857; margin: 0; letter-spacing: 0.5px; text-transform: uppercase; }
-    .company-slogan { font-size: 11px; color: #059669; font-weight: 600; margin-top: 2px; }
-    .company-info { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.3; }
-    .document-banner { background: linear-gradient(135deg, #065f46 0%, #047857 100%); color: #ffffff; padding: 14px 20px; border-radius: 8px; text-align: center; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .company-name { font-size: 22px; font-weight: 800; color: #063d30; margin: 0; letter-spacing: 0.5px; text-transform: uppercase; }
+    .company-slogan { font-size: 11px; color: #116b50; font-weight: 600; margin-top: 2px; }
+    .company-info { font-size: 11px; color: #66736d; margin-top: 4px; line-height: 1.3; }
+    .document-banner { background: #063d30; color: #ffffff; padding: 14px 20px; border-radius: 8px; text-align: center; margin-bottom: 24px; border-left: 4px solid #c69b45; }
     .document-title { font-size: 18px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
-    .document-subtitle { font-size: 12px; color: #a7f3d0; margin-top: 4px; }
+    .document-subtitle { font-size: 12px; color: #f8faf9; margin-top: 4px; }
     .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .info-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; }
-    .card-heading { font-size: 12px; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+    .info-card { background: #f8faf9; border: 1px solid #e4eae6; border-radius: 8px; padding: 14px 18px; }
+    .card-heading { font-size: 12px; font-weight: 700; color: #063d30; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; border-bottom: 1px solid #e4eae6; padding-bottom: 4px; }
     .info-row { font-size: 12px; margin-bottom: 6px; display: flex; }
-    .info-label { font-weight: 600; color: #475569; width: 100px; flex-shrink: 0; }
-    .info-value { color: #0f172a; flex-grow: 1; }
-    .status-badge { display: inline-block; background: #d1fae5; color: #065f46; font-weight: 700; font-size: 11px; padding: 2px 10px; border-radius: 12px; text-transform: uppercase; }
-    .table-container { margin-bottom: 24px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+    .info-label { font-weight: 600; color: #66736d; width: 100px; flex-shrink: 0; }
+    .info-value { color: #202b28; flex-grow: 1; }
+    .status-badge { display: inline-block; background: #f1f4f2; color: #063d30; border: 1px solid #c69b45; font-weight: 700; font-size: 11px; padding: 2px 10px; border-radius: 12px; text-transform: uppercase; }
+    .table-container { margin-bottom: 24px; border: 1px solid #e4eae6; border-radius: 8px; overflow: hidden; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th { background: #047857; color: #ffffff; font-weight: 700; text-align: left; padding: 10px 14px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-    td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-    tr:nth-child(even) td { background-color: #f8fafc; }
+    th { background: #063d30; color: #ffffff; font-weight: 700; text-align: left; padding: 10px 14px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+    td { padding: 10px 14px; border-bottom: 1px solid #e4eae6; color: #202b28; }
+    tr:nth-child(even) td { background-color: #f8faf9; }
     tr:last-child td { border-bottom: none; }
-    .notes-box { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
-    .notes-heading { font-size: 12px; font-weight: 700; color: #b45309; text-transform: uppercase; margin-bottom: 6px; }
-    .notes-content { font-size: 12px; color: #78350f; line-height: 1.5; }
-    .footer { text-align: center; border-top: 1px solid #e2e8f0; padding-top: 18px; margin-top: 32px; font-size: 11px; color: #64748b; }
-    .footer-brand { font-weight: 700; color: #047857; margin-bottom: 4px; }
+    .notes-box { background: #f8faf9; border: 1px solid #e4eae6; border-left: 4px solid #c69b45; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
+    .notes-heading { font-size: 12px; font-weight: 700; color: #063d30; text-transform: uppercase; margin-bottom: 6px; }
+    .notes-content { font-size: 12px; color: #202b28; line-height: 1.5; }
+    .footer { text-align: center; border-top: 1px solid #e4eae6; padding-top: 18px; margin-top: 32px; font-size: 11px; color: #66736d; }
+    .footer-brand { font-weight: 700; color: #063d30; margin-bottom: 4px; }
     @media print {
       body { padding: 0; }
       .no-print { display: none; }

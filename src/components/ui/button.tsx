@@ -10,13 +10,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        default:
+          'bg-primary text-primary-foreground hover:bg-[#042820] shadow-xs active:scale-[0.99] transition-all',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-xs',
         outline:
-          'border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'text-foreground hover:bg-accent hover:text-accent-foreground',
-        link: 'text-foreground underline-offset-4 hover:underline',
+          'border border-primary/30 bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs transition-colors',
+        secondary:
+          'bg-background border border-primary/40 text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors',
+        highlight:
+          'bg-[#E87517] text-white hover:bg-[#c96210] shadow-xs active:scale-[0.99] transition-all font-semibold',
+        gold: 'bg-[#C69B45] text-white hover:bg-[#ad8335] shadow-xs transition-all font-semibold',
+        ghost: 'text-foreground hover:bg-accent hover:text-accent-foreground transition-colors',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-4 py-2',
