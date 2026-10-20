@@ -5,7 +5,7 @@ routerAdd(
     const body = e.requestInfo().body || {}
     const requestId = body.request_id
     const recipientEmail = body.recipient_email
-    const subject = body.subject || 'Orçamento Jetro'
+    const subject = body.subject || 'Orçamento HURAM — Sistema Inteligente de Gestão'
     const authorName = body.author_name || 'Atendente'
 
     if (!requestId || !recipientEmail) {
@@ -13,13 +13,16 @@ routerAdd(
     }
 
     const siteUrl = $secrets.get('SITE_URL') || 'https://logistica-premium-es-2cc14.goskip.app'
-    const signatureImageUrl = `${siteUrl.replace(/\/$/, '')}/src/assets/chatgpt-image-1-de-ago.de-2026-155412-d05ee.png`
+    const logoHuramUrl = `${siteUrl.replace(/\/$/, '')}/src/assets/logo-huram-em-verde-e-dourado-1-e173e.png`
 
     const signatureHtml = `
-      <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; font-family: sans-serif;">
-        <p style="margin: 0 0 8px 0; color: #374151; font-size: 14px;">Atenciosamente,</p>
-        <p style="margin: 0 0 12px 0; color: #005B2E; font-weight: bold; font-size: 15px;">${authorName} — Jetro</p>
-        <img src="${signatureImageUrl}" alt="Assinatura Jetro" style="max-width: 580px; width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
+      <div style="margin-top: 30px; padding-top: 15px; border-top: 2px solid #C69B45; font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff;">
+        <p style="margin: 0 0 6px 0; color: #66736D; font-size: 13px;">Atenciosamente,</p>
+        <p style="margin: 0 0 10px 0; color: #063D30; font-weight: bold; font-size: 15px;">${authorName} — HURAM</p>
+        <div style="display: inline-block; padding: 12px 18px; border: 1px solid #E4EAE6; border-radius: 8px; background: #F8FAF9;">
+          <img src="${logoHuramUrl}" alt="HURAM — Sistema Inteligente de Gestão" style="max-height: 48px; width: auto; display: block; margin-bottom: 6px;" />
+          <span style="font-size: 11px; color: #66736D; letter-spacing: 0.5px;">Sistema Inteligente de Gestão Empresarial</span>
+        </div>
       </div>
     `
 

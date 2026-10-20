@@ -10,7 +10,7 @@
 //    - Processa lembretes pendentes cujo scheduled_for <= agora (UTC)
 //    - Evita duplicidade (status = 'sent', sent_at)
 //    - Não envia lembretes cujo horário de início já passou no momento da criação
-//    - E-mail corporativo no padrão Jetro (verde #005B2E, dourado #C9A227)
+//    - E-mail corporativo no padrão HURAM (verde institucional #063D30, dourado #C69B45)
 // ============================================================================
 
 function parseJSON(str, fallback) {
@@ -294,7 +294,7 @@ function buildReminderEmailHtml(reminderRecord) {
   }
 
   // Cor do badge de prioridade
-  var priorityColor = '#005B2E'
+  var priorityColor = '#063D30'
   var priorityBg = '#e6f4ea'
   if (priority === 'Alta') {
     priorityColor = '#b45309'
@@ -305,7 +305,7 @@ function buildReminderEmailHtml(reminderRecord) {
   }
 
   var descHtml = desc
-    ? '<div style="margin-top: 14px; padding: 12px 14px; background: #f9fafb; border-radius: 6px; border-left: 3px solid #C9A227; font-size: 13px; color: #374151; line-height: 1.5;">' +
+    ? '<div style="margin-top: 14px; padding: 12px 14px; background: #F8FAF9; border-radius: 6px; border-left: 3px solid #C69B45; font-size: 13px; color: #202B28; line-height: 1.5;">' +
       xmlEscape(desc).replace(/\n/g, '<br/>') +
       '</div>'
     : ''
@@ -313,30 +313,30 @@ function buildReminderEmailHtml(reminderRecord) {
   return (
     '<!DOCTYPE html>' +
     '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
-    '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f3f4f6; margin: 0; padding: 24px; color: #1f2937;">' +
-    '<div style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">' +
-    '  <div style="background: #005B2E; padding: 22px 26px; border-bottom: 4px solid #C9A227;">' +
+    '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #F8FAF9; margin: 0; padding: 24px; color: #202B28;">' +
+    '<div style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 10px; border: 1px solid #E4EAE6; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">' +
+    '  <div style="background: #063D30; padding: 22px 26px; border-bottom: 3px solid #C69B45;">' +
     '    <div style="display: table; width: 100%;">' +
     '      <div style="display: table-cell; vertical-align: middle;">' +
-    '        <div style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #C9A227;">.</span></div>' +
-    '        <div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Inteligente de Gestão — Agenda Corporativa</div>' +
+    '        <div style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #C69B45;">.</span></div>' +
+    '        <div style="font-size: 12px; color: #E4EAE6; margin-top: 2px;">Sistema Inteligente de Gestão — Agenda Corporativa</div>' +
     '      </div>' +
     '      <div style="display: table-cell; vertical-align: middle; text-align: right;">' +
-    '        <span style="display: inline-block; background: #C9A227; color: #00381C; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px;">Lembrete</span>' +
+    '        <span style="display: inline-block; background: #C69B45; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px;">Lembrete</span>' +
     '      </div>' +
     '    </div>' +
     '  </div>' +
     '  <div style="padding: 26px;">' +
-    '    <p style="font-size: 14px; color: #4b5563; margin: 0 0 16px 0;">Olá, <strong>' +
+    '    <p style="font-size: 14px; color: #202B28; margin: 0 0 16px 0;">Olá, <strong>' +
     xmlEscape(recipientName) +
     '</strong>. Este é um lembrete da <strong>Agenda HURAM</strong> programado para ' +
     xmlEscape(offsetLabel) +
     ':</p>' +
-    '    <div style="background: #f4faf6; border: 1px solid #d1fae5; border-radius: 8px; padding: 18px 20px; margin-bottom: 20px;">' +
-    '      <div style="display: inline-block; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #005B2E; background: #d1fae5; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;">' +
+    '    <div style="background: #F8FAF9; border: 1px solid #E4EAE6; border-radius: 8px; padding: 18px 20px; margin-bottom: 20px;">' +
+    '      <div style="display: inline-block; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #063D30; background: #e6f4ef; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;">' +
     xmlEscape(type) +
     '      </div>' +
-    '      <h2 style="font-size: 20px; font-weight: bold; color: #005B2E; margin: 0 0 12px 0; line-height: 1.3;">' +
+    '      <h2 style="font-size: 20px; font-weight: bold; color: #063D30; margin: 0 0 12px 0; line-height: 1.3;">' +
     xmlEscape(title) +
     '      </h2>' +
     '      <table style="width: 100%; font-size: 13px; color: #374151; border-collapse: collapse;">' +

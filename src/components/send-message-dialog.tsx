@@ -14,7 +14,7 @@ import pb from '@/lib/pocketbase/client'
 import { toast } from '@/hooks/use-toast'
 import { Loader2, Mail, Send } from 'lucide-react'
 import { logBudgetSend } from '@/services/budget-requests'
-import signatureImg from '@/assets/chatgpt-image-1-de-ago.de-2026-155412-d05ee.png'
+import { logoHuramLight } from '@/lib/brand-assets'
 
 interface SendMessageDialogProps {
   open: boolean
@@ -35,9 +35,9 @@ export function SendMessageDialog({
   authorName = 'Atendente',
   onSuccess,
 }: SendMessageDialogProps) {
-  const [subject, setSubject] = useState('Orçamento Jetro Logística — Proposta Comercial')
+  const [subject, setSubject] = useState('Orçamento HURAM — Proposta Comercial')
   const [content, setContent] = useState(
-    `Olá ${clientName},\n\nConforme solicitado, enviamos em anexo/abaixo os detalhes do seu orçamento para a operação logística.\n\nFicamos à disposição para quaisquer dúvidas.`,
+    `Olá ${clientName},\n\nConforme solicitado, enviamos em anexo/abaixo os detalhes do seu orçamento para a operação.\n\nFicamos à disposição para quaisquer dúvidas.`,
   )
   const [sending, setSending] = useState(false)
 
@@ -88,8 +88,8 @@ export function SendMessageDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-[#005B2E]">
-            <Mail className="w-5 h-5 text-[#C89B3C]" /> Enviar Orçamento por E-mail
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-[#063D30]">
+            <Mail className="w-5 h-5 text-[#C69B45]" /> Enviar Orçamento por E-mail
           </DialogTitle>
         </DialogHeader>
 
@@ -119,19 +119,22 @@ export function SendMessageDialog({
           </div>
 
           {/* Email Professional Signature Preview */}
-          <div className="border border-border/80 rounded-xl p-4 bg-muted/20 space-y-3">
-            <Label className="text-xs uppercase font-extrabold tracking-wider text-muted-foreground">
-              Assinatura Profissional Jetro Logística
+          <div className="border border-[#E4EAE6] rounded-xl p-4 bg-[#F8FAF9] space-y-3">
+            <Label className="text-xs uppercase font-extrabold tracking-wider text-[#66736D]">
+              Assinatura Profissional HURAM
             </Label>
             <div className="space-y-2">
-              <p className="text-sm text-foreground">Atenciosamente,</p>
-              <p className="text-sm font-bold text-[#005B2E]">{authorName} — Jetro Logística</p>
-              <div className="rounded-lg overflow-hidden border border-border shadow-sm max-w-[580px]">
+              <p className="text-sm text-[#202B28]">Atenciosamente,</p>
+              <p className="text-sm font-bold text-[#063D30]">{authorName} — HURAM</p>
+              <div className="rounded-lg p-3 bg-white border border-[#E4EAE6] shadow-sm max-w-[320px]">
                 <img
-                  src={signatureImg}
-                  alt="Assinatura Comercial Jetro Logística"
-                  className="w-full h-auto object-contain block"
+                  src={logoHuramLight}
+                  alt="Assinatura Comercial HURAM"
+                  className="h-10 w-auto object-contain block mb-1"
                 />
+                <span className="text-[11px] text-[#66736D]">
+                  HURAM — Sistema Inteligente de Gestão
+                </span>
               </div>
             </div>
           </div>
@@ -144,7 +147,7 @@ export function SendMessageDialog({
           <Button
             onClick={handleSend}
             disabled={sending || !clientEmail}
-            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+            className="bg-[#063D30] hover:bg-[#116B50] text-white font-bold"
           >
             {sending ? (
               <>

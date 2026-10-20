@@ -1086,13 +1086,13 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
 
       tablePreviewHtml =
         '<div style="margin-top: 20px;">' +
-        '<h3 style="font-size: 13px; color: #005B2E; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Prévia dos dados atualizados (' +
+        '<h3 style="font-size: 13px; color: #063D30; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Prévia dos dados atualizados (' +
         previewRows.length +
         ' de ' +
         totalCount +
         '):</h3>' +
-        '<table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #e5e7eb;">' +
-        '<thead><tr style="background: #005B2E; color: #ffffff;">' +
+        '<table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #E4EAE6;">' +
+        '<thead><tr style="background: #063D30; color: #ffffff;">' +
         ths +
         '</tr></thead>' +
         '<tbody>' +
@@ -1109,7 +1109,7 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
     var warningBox = ''
     if (hasPdf) {
       warningBox +=
-        '<div style="margin-top: 14px; padding: 10px 14px; background: #fffbeb; border-left: 4px solid #C9A227; font-size: 12px; color: #92400e;">' +
+        '<div style="margin-top: 14px; padding: 10px 14px; background: #fffbeb; border-left: 4px solid #C69B45; font-size: 12px; color: #92400e;">' +
         '<strong>Nota sobre formato PDF:</strong> A tabela executiva com os dados consolidados foi incluída no corpo deste e-mail. Para dados tabulares e análises detalhadas, utilize o anexo Excel (.xlsx).' +
         '</div>'
     }
@@ -1121,7 +1121,7 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
     }
 
     var customMsgHtml = customMessage
-      ? '<div style="margin-bottom: 16px; padding: 12px 14px; background: #f0fdf4; border-left: 4px solid #005B2E; font-size: 13px; color: #166534;">' +
+      ? '<div style="margin-bottom: 16px; padding: 12px 14px; background: #f0fdf4; border-left: 4px solid #063D30; font-size: 13px; color: #166534;">' +
         xmlEscape(customMessage).replace(/\n/g, '<br/>') +
         '</div>'
       : ''
@@ -1136,8 +1136,8 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
       '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
       '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f9fafb; margin: 0; padding: 24px; color: #1f2937;">' +
       '<div style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden;">' +
-      '<div style="background: #003D30; padding: 20px 24px; border-bottom: 4px solid #D6A755;">' +
-      '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #F27616;">.</span></div>' +
+      '<div style="background: #063D30; padding: 20px 24px; border-bottom: 3px solid #C69B45;">' +
+      '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #C69B45;">.</span></div>' +
       '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Inteligente de Gestão — ' +
       xmlEscape(moduleName) +
       ' / ' +
@@ -1146,33 +1146,33 @@ routerAdd('POST', '/backend/v1/report-schedules/trigger', function (e) {
       '</div>' +
       '<div style="padding: 24px;">' +
       customMsgHtml +
-      '<h2 style="font-size: 18px; color: #005B2E; margin: 0 0 6px 0;">' +
+      '<h2 style="font-size: 18px; color: #063D30; margin: 0 0 6px 0;">' +
       xmlEscape(schedName) +
       '</h2>' +
-      '<p style="font-size: 12px; color: #6b7280; margin: 0 0 16px 0;">Envio disparado manualmente em ' +
+      '<p style="font-size: 12px; color: #66736D; margin: 0 0 16px 0;">Envio disparado manualmente em ' +
       formatDateBR(new Date().toISOString()) +
       ' (Período: ' +
       xmlEscape(dateRangeLabel) +
       ').</p>' +
-      '<div style="display: table; width: 100%; margin: 16px 0; background: #f4faf6; border-radius: 6px; border: 1px solid #d1fae5;">' +
-      '<div style="display: table-cell; padding: 14px 18px; width: 50%; border-right: 1px solid #d1fae5;">' +
-      '<div style="font-size: 11px; text-transform: uppercase; color: #065f46; font-weight: 600;">Total de Registros</div>' +
-      '<div style="font-size: 24px; font-weight: bold; color: #005B2E; margin-top: 4px;">' +
+      '<div style="display: table; width: 100%; margin: 16px 0; background: #F8FAF9; border-radius: 6px; border: 1px solid #E4EAE6;">' +
+      '<div style="display: table-cell; padding: 14px 18px; width: 50%; border-right: 1px solid #E4EAE6;">' +
+      '<div style="font-size: 11px; text-transform: uppercase; color: #063D30; font-weight: 600;">Total de Registros</div>' +
+      '<div style="font-size: 24px; font-weight: bold; color: #063D30; margin-top: 4px;">' +
       totalCount +
       '</div>' +
       '</div>' +
       (meta.amountField
         ? '<div style="display: table-cell; padding: 14px 18px; width: 50%;">' +
-          '<div style="font-size: 11px; text-transform: uppercase; color: #065f46; font-weight: 600;">Valor Total</div>' +
-          '<div style="font-size: 24px; font-weight: bold; color: #005B2E; margin-top: 4px;">' +
+          '<div style="font-size: 11px; text-transform: uppercase; color: #063D30; font-weight: 600;">Valor Total</div>' +
+          '<div style="font-size: 24px; font-weight: bold; color: #063D30; margin-top: 4px;">' +
           formatCurrencyBR(totalSum) +
           '</div>' +
           '</div>'
         : '') +
       '</div>' +
       emptyNotice +
-      '<div style="margin-top: 18px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 18px;">' +
-      '<h4 style="font-size: 12px; text-transform: uppercase; color: #005B2E; margin: 0 0 8px 0;">Filtros Configurados:</h4>' +
+      '<div style="margin-top: 18px; background: #ffffff; border: 1px solid #E4EAE6; border-radius: 6px; padding: 14px 18px;">' +
+      '<h4 style="font-size: 12px; text-transform: uppercase; color: #063D30; margin: 0 0 8px 0;">Filtros Configurados:</h4>' +
       '<ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #374151; line-height: 1.5;">' +
       filterListHtml +
       '</ul></div>' +

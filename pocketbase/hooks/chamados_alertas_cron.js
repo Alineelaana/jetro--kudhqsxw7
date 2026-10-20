@@ -210,24 +210,24 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
         'Este é um aviso automático da Central de Chamados do Sistema HURAM sobre a seguinte demanda pendente:' +
         '</p>' +
         '<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">' +
-        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; width: 140px; border: 1px solid #e2e8f0;">Número:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; color: #005B2E; font-weight: bold;">' +
+        '<tr style="background: #F8FAF9;"><td style="padding: 8px 12px; font-weight: bold; width: 140px; border: 1px solid #E4EAE6;">Número:</td><td style="padding: 8px 12px; border: 1px solid #E4EAE6; color: #063D30; font-weight: bold;">' +
         numero +
         '</td></tr>' +
-        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Assunto:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;">' +
+        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #E4EAE6;">Assunto:</td><td style="padding: 8px 12px; border: 1px solid #E4EAE6;">' +
         assunto +
         '</td></tr>' +
-        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Prioridade:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; text-transform: uppercase; font-weight: bold; color: ' +
+        '<tr style="background: #F8FAF9;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #E4EAE6;">Prioridade:</td><td style="padding: 8px 12px; border: 1px solid #E4EAE6; text-transform: uppercase; font-weight: bold; color: ' +
         corAlerta +
         ';">' +
         prioridade +
         '</td></tr>' +
-        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Status Atual:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; text-transform: uppercase; font-weight: bold;">' +
+        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #E4EAE6;">Status Atual:</td><td style="padding: 8px 12px; border: 1px solid #E4EAE6; text-transform: uppercase; font-weight: bold;">' +
         status +
         '</td></tr>' +
-        '<tr style="background: #f8fafc;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Setor:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;">' +
+        '<tr style="background: #F8FAF9;"><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #E4EAE6;">Setor:</td><td style="padding: 8px 12px; border: 1px solid #E4EAE6;">' +
         nomeSetor +
         '</td></tr>' +
-        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #e2e8f0;">Prazo Limite SLA:</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0; font-weight: bold; color: ' +
+        '<tr><td style="padding: 8px 12px; font-weight: bold; border: 1px solid #E4EAE6;">Prazo Limite SLA:</td><td style="padding: 8px 12px; border: 1px solid #E4EAE6; font-weight: bold; color: ' +
         corAlerta +
         ';">' +
         dtPrazoFormatada +
@@ -236,7 +236,7 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
         '<div style="text-align: center; margin: 26px 0 10px;">' +
         '<a href="' +
         linkChamado +
-        '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Acessar Chamado no HURAM</a>' +
+        '" style="background: #063D30; border: 1px solid #C69B45; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Acessar Chamado no HURAM</a>' +
         '</div>' +
         '<p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 20px;">' +
         'Notificação gerada conforme política corporativa de SLA e governança de chamados do Sistema HURAM.' +

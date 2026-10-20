@@ -541,7 +541,7 @@ routerAdd(
               '<tr style="background: ' +
               bg +
               '; border-bottom: 1px solid #e5e7eb;">' +
-              '<td style="padding: 6px 10px; font-weight: 600; color: #005B2E;">' +
+              '<td style="padding: 6px 10px; font-weight: 600; color: #063D30;">' +
               xmlEscape(r.getString('order_number') || '—') +
               '</td>' +
               '<td style="padding: 6px 10px; color: #374151;">' +
@@ -563,14 +563,14 @@ routerAdd(
 
         tablePreviewHtml =
           '<div style="margin-top: 20px;">' +
-          '<h3 style="font-size: 14px; color: #005B2E; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Prévia dos pedidos mais recentes (' +
+          '<h3 style="font-size: 14px; color: #063D30; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Prévia dos pedidos mais recentes (' +
           previewOrders.length +
           ' de ' +
           totalCount +
           '):</h3>' +
-          '<table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #e5e7eb;">' +
+          '<table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #E4EAE6;">' +
           '<thead>' +
-          '<tr style="background: #005B2E; color: #ffffff;">' +
+          '<tr style="background: #063D30; color: #ffffff;">' +
           '<th style="padding: 8px 10px; text-align: left;">Nº Pedido</th>' +
           '<th style="padding: 8px 10px; text-align: left;">Cliente</th>' +
           '<th style="padding: 8px 10px; text-align: left;">Data</th>' +
@@ -593,7 +593,7 @@ routerAdd(
       var warningBox = ''
       if (hasPdfMarked) {
         warningBox +=
-          '<div style="margin-top: 14px; padding: 10px 14px; background: #fffbeb; border-left: 4px solid #C9A227; font-size: 12px; color: #92400e;">' +
+          '<div style="margin-top: 14px; padding: 10px 14px; background: #fffbeb; border-left: 4px solid #C69B45; font-size: 12px; color: #92400e;">' +
           '<strong>Nota sobre o formato PDF:</strong> O anexo Excel (.xlsx) nativo está incluído com todos os dados tabulares. Como a renderização fiel do layout de impressão do PDF ocorre via navegador, uma tabela-resumo executiva foi incluída diretamente no corpo deste e-mail.' +
           '</div>'
       }
@@ -614,33 +614,33 @@ routerAdd(
         '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
         '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f9fafb; margin: 0; padding: 24px; color: #1f2937;">' +
         '<div style="max-width: 680px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden;">' +
-        '<div style="background: #003D30; padding: 20px 24px; border-bottom: 4px solid #D6A755;">' +
-        '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #F27616;">.</span></div>' +
+        '<div style="background: #063D30; padding: 20px 24px; border-bottom: 3px solid #C69B45;">' +
+        '<div style="font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #C69B45;">.</span></div>' +
         '<div style="font-size: 12px; color: #d1fae5; margin-top: 2px;">Sistema Inteligente de Gestão — Exportação Agendada (Envio Imediato)</div>' +
         '</div>' +
         '<div style="padding: 24px;">' +
-        '<h2 style="font-size: 18px; color: #005B2E; margin: 0 0 6px 0;">Relatório: ' +
+        '<h2 style="font-size: 18px; color: #063D30; margin: 0 0 6px 0;">Relatório: ' +
         xmlEscape(schedName) +
         '</h2>' +
-        '<p style="font-size: 13px; color: #6b7280; margin: 0 0 16px 0;">Disparado manualmente em ' +
+        '<p style="font-size: 13px; color: #66736D; margin: 0 0 16px 0;">Disparado manualmente em ' +
         formatDateBR(new Date().toISOString()) +
         '.</p>' +
-        '<div style="display: table; width: 100%; margin: 16px 0; background: #f4faf6; border-radius: 6px; border: 1px solid #d1fae5;">' +
-        '<div style="display: table-cell; padding: 14px 18px; width: 50%; border-right: 1px solid #d1fae5;">' +
-        '<div style="font-size: 11px; text-transform: uppercase; color: #065f46; font-weight: 600;">Total de Pedidos</div>' +
-        '<div style="font-size: 24px; font-weight: bold; color: #005B2E; margin-top: 4px;">' +
+        '<div style="display: table; width: 100%; margin: 16px 0; background: #F8FAF9; border-radius: 6px; border: 1px solid #E4EAE6;">' +
+        '<div style="display: table-cell; padding: 14px 18px; width: 50%; border-right: 1px solid #E4EAE6;">' +
+        '<div style="font-size: 11px; text-transform: uppercase; color: #063D30; font-weight: 600;">Total de Pedidos</div>' +
+        '<div style="font-size: 24px; font-weight: bold; color: #063D30; margin-top: 4px;">' +
         totalCount +
         '</div>' +
         '</div>' +
         '<div style="display: table-cell; padding: 14px 18px; width: 50%;">' +
-        '<div style="font-size: 11px; text-transform: uppercase; color: #065f46; font-weight: 600;">Valor Total</div>' +
-        '<div style="font-size: 24px; font-weight: bold; color: #005B2E; margin-top: 4px;">' +
+        '<div style="font-size: 11px; text-transform: uppercase; color: #063D30; font-weight: 600;">Valor Total</div>' +
+        '<div style="font-size: 24px; font-weight: bold; color: #063D30; margin-top: 4px;">' +
         formatCurrencyBR(totalValue) +
         '</div>' +
         '</div></div>' +
         emptyNotice +
-        '<div style="margin-top: 18px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 18px;">' +
-        '<h4 style="font-size: 12px; text-transform: uppercase; color: #005B2E; margin: 0 0 8px 0;">Filtros Fixados da Consulta:</h4>' +
+        '<div style="margin-top: 18px; background: #ffffff; border: 1px solid #E4EAE6; border-radius: 6px; padding: 14px 18px;">' +
+        '<h4 style="font-size: 12px; text-transform: uppercase; color: #063D30; margin: 0 0 8px 0;">Filtros Fixados da Consulta:</h4>' +
         '<ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #374151; line-height: 1.5;">' +
         filterListHtml +
         '</ul>' +
