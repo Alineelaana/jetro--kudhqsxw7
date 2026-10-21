@@ -45,13 +45,10 @@ export default function Layout() {
   const isHomePage = pathname === '/admin'
   const showFooter = !isInternalPath(pathname) && !isAuthenticated
 
-  // Passo pós-login bloqueante: se o usuário precisa redefinir a senha, renderiza
-  // exclusivamente a tela de redefinição até a conclusão bem-sucedida.
-  if (isAuthenticated && mustChangePassword) {
-    return <ForcePasswordResetScreen />
-  }
-
   useEffect(() => {
+    if (isAuthenticated && mustChangePassword) {
+      return
+    }
     loadProfilesCache(true)
       .then(() => {
         setProfilesReady(true)
@@ -61,7 +58,7 @@ export default function Layout() {
         setProfilesReady(true)
         setProfilesVersion((v) => v + 1)
       })
-  }, [userRole])
+  }, [userRole, isAuthenticated, mustChangePassword])
 
   // Delimitação do usuário: verificar se o perfil do usuário pode visualizar a rota ativa
   const hasRouteAccess = useMemo(() => {
@@ -117,6 +114,13 @@ export default function Layout() {
       '--huram-emerald': complementarHsl,
     } as unknown as Record<string, string>
   }, [brand.corPrimaria, brand.corSecundaria, brand.corComplementar])
+
+  // Passo pós-login bloqueante: se o usuário precisa redefinir a senha, renderiza
+  // exclusivamente a tela de redefinição até a conclusão bem-sucedida.
+  // Posicionado após todos os hooks para cumprir rigorosamente as rules-of-hooks.
+  if (isAuthenticated && mustChangePassword) {
+    return <ForcePasswordResetScreen />
+  }
 
   if (showSidebar) {
     return (
