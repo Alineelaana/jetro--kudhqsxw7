@@ -22,6 +22,7 @@ import {
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { UserEditDialog } from '@/components/user-edit-dialog'
+import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
 import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle, Upload, Pencil } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -55,6 +56,8 @@ interface UserRecord {
   name: string
   email: string
   role: string
+  perfil_id?: string
+  perfil_acesso?: string
   cpf: string
   avatar: string
   created: string
@@ -65,6 +68,14 @@ interface UserRecord {
   cargo?: string
   departamento?: string
   inactivity_timeout_minutes?: number
+  expand?: {
+    perfil_id?: {
+      id: string
+      code: string
+      name: string
+      active?: boolean
+    }
+  }
 }
 
 export function UserManagement() {
@@ -75,6 +86,7 @@ export function UserManagement() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('PADRAO')
+  const [perfilId, setPerfilId] = useState('')
   const [cargo, setCargo] = useState('')
   const [cpf, setCpf] = useState('')
   const [inactivityTimeout, setInactivityTimeout] = useState('480')
@@ -87,6 +99,8 @@ export function UserManagement() {
   const [filialId, setFilialId] = useState('')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
   const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
+  const [perfis, setPerfis] = useState<PerfilPermissaoRecord[]>([])
+  const [loadingPerfis, setLoadingPerfis] = useState(true)
   const [editUser, setEditUser] = useState<UserRecord | null>(null)
   const [editOpen, setEditOpen] = useState(false)
 
@@ -104,6 +118,19 @@ export function UserManagement() {
     getEmpresas()
       .then((data) => setEmpresas(data as unknown as { id: string; name: string }[]))
       .catch(() => {})
+
+    setLoadingPerfis(true)
+    getPerfisPermissoes()
+      .then((data) => {
+        setPerfis(data)
+        // Se ainda não selecionou perfil, pré-selecionar PADRAO / Gestão
+        const defaultProfile = data.find((p) => p.code?.toUpperCase() === 'PADRAO') || data[0]
+        if (defaultProfile) {
+          setPerfilId(defaultProfile.id)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingPerfis(false))
   }, [])
   useRealtime('users', () => loadUsers())
 
@@ -146,11 +173,26 @@ export function UserManagement() {
     setSubmitting(true)
     setError('')
     try {
+      // Identificar o perfil selecionado
+      const selectedPerfil = perfis.find((p) => p.id === perfilId)
+      const perfilCode = selectedPerfil?.code || role || 'PADRAO'
+
+      // Se perfil for SUP, o papel legado também é SUP.
+      // Se o código for um dos valores do select nativo, replica; senão guarda PADRAO para retrocompatibilidade
+      const validRoles = ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL']
+      const effectiveRole = validRoles.includes(perfilCode)
+        ? perfilCode
+        : validRoles.includes(role)
+          ? role
+          : 'PADRAO'
+
       await createUser({
         name: name.trim(),
         email: email.trim(),
         password,
-        role,
+        role: effectiveRole,
+        perfil_id: selectedPerfil?.id || undefined,
+        perfil_acesso: perfilCode,
         cargo: cargo.trim() || undefined,
         cpf: cpf.replace(/\D/g, ''),
         avatar,
@@ -163,6 +205,10 @@ export function UserManagement() {
       setEmail('')
       setPassword('')
       setRole('PADRAO')
+      const defaultProfile = perfis.find((p) => p.code?.toUpperCase() === 'PADRAO') || perfis[0]
+      if (defaultProfile) {
+        setPerfilId(defaultProfile.id)
+      }
       setCargo('')
       setCpf('')
       setInactivityTimeout('480')
@@ -278,6 +324,63 @@ export function UserManagement() {
               />
               {cpfError && <p className="text-xs text-destructive">{cpfError}</p>}
             </div>
+            {/* Campo Perfil de Acesso (Perfis e Permissões) */}
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold flex items-center justify-between">
+                <span>Perfil de Acesso (Perfis e Permissões)</span>
+                <span className="text-[11px] text-[#C69B45] font-medium">
+                  Delimita telas & menus
+                </span>
+              </Label>
+              <Select
+                value={perfilId}
+                onValueChange={(val) => {
+                  setPerfilId(val)
+                  const chosen = perfis.find((p) => p.id === val)
+                  if (chosen) {
+                    const c = chosen.code?.toUpperCase()
+                    if (
+                      ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL', 'SDR', 'Vendedor'].includes(c)
+                    ) {
+                      setRole(c)
+                    }
+                  }
+                }}
+                disabled={loadingPerfis}
+              >
+                <SelectTrigger className="border-2 border-[#063D30]/30 focus:ring-[#063D30]">
+                  <SelectValue
+                    placeholder={
+                      loadingPerfis ? 'Carregando perfis...' : 'Selecione o perfil de acesso'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {perfis.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-foreground">{p.name || p.code}</span>
+                        <span className="text-xs text-muted-foreground font-mono">({p.code})</span>
+                        {p.active === false && (
+                          <span className="text-[10px] text-destructive bg-destructive/10 px-1 py-0.2 rounded font-medium">
+                            Inativo
+                          </span>
+                        )}
+                        {p.code?.toUpperCase() === 'SUP' && (
+                          <span className="text-[10px] text-[#C69B45] font-bold">
+                            (Acesso Total)
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                Define exatamente quais telas e menus o usuário poderá visualizar e operar no ERP.
+              </p>
+            </div>
+
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">Setor</Label>
               <Select value={role} onValueChange={setRole}>
@@ -501,18 +604,27 @@ export function UserManagement() {
                         )}
                       </div>
 
-                      <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded ${
-                          u.role === 'SUP'
-                            ? 'bg-[#C89B3C]/20 text-[#C89B3C]'
-                            : u.role === 'PADRAO'
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
-                              : 'bg-[#005B2E]/10 text-[#005B2E]'
-                        }`}
-                      >
-                        {u.role === 'PADRAO' ? 'Gestão' : u.role}
-                      </span>
-
+                      {(() => {
+                        const displayPerfil =
+                          u.expand?.perfil_id?.name ||
+                          perfis.find((p) => p.id === u.perfil_id || p.code === u.perfil_acesso)
+                            ?.name ||
+                          u.perfil_acesso ||
+                          (u.role === 'PADRAO' ? 'Gestão' : u.role)
+                        const isSup = (u.perfil_acesso || u.role) === 'SUP'
+                        return (
+                          <span
+                            className={`text-xs font-bold px-2.5 py-1 rounded ${
+                              isSup
+                                ? 'bg-[#C69B45]/20 text-[#063D30] border border-[#C69B45]/40 font-black'
+                                : 'bg-[#063D30]/10 text-[#063D30]'
+                            }`}
+                            title={`Perfil: ${displayPerfil}`}
+                          >
+                            {displayPerfil}
+                          </span>
+                        )
+                      })()}
                       {isAdmin && (
                         <Button
                           size="icon"

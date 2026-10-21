@@ -16,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { updateUser, getEmpresas, getFiliais } from '@/services/users'
-import { Loader2, Upload, KeyRound } from 'lucide-react'
+import { updateUser, getEmpresas, getFiliais, type UpdateUserData } from '@/services/users'
+import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
 import { toast } from '@/hooks/use-toast'
+import { Loader2, Upload } from 'lucide-react'
 
 interface UserEditDialogProps {
   open: boolean
@@ -28,6 +29,8 @@ interface UserEditDialogProps {
     name: string
     email: string
     role: string
+    perfil_id?: string
+    perfil_acesso?: string
     cpf: string
     empresa_id?: string
     filial_id?: string
@@ -62,6 +65,7 @@ function formatCPF(cpf: string): string {
 export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEditDialogProps) {
   const [name, setName] = useState('')
   const [role, setRole] = useState('PADRAO')
+  const [perfilId, setPerfilId] = useState('')
   const [cpf, setCpf] = useState('')
   const [cpfError, setCpfError] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -75,11 +79,22 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [inactivityTimeout, setInactivityTimeout] = useState('480')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
   const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
+  const [perfis, setPerfis] = useState<PerfilPermissaoRecord[]>([])
+  const [loadingPerfis, setLoadingPerfis] = useState(false)
+
+  useEffect(() => {
+    setLoadingPerfis(true)
+    getPerfisPermissoes()
+      .then((data) => setPerfis(data))
+      .catch(() => {})
+      .finally(() => setLoadingPerfis(false))
+  }, [])
 
   useEffect(() => {
     if (user) {
       setName(user.name || '')
-      setRole(user.role || 'PADRAO')
+      const userRoleCode = user.role || 'PADRAO'
+      setRole(userRoleCode)
       setCpf(user.cpf ? formatCPF(user.cpf) : '')
       setCpfError('')
       setNewPassword('')
@@ -94,8 +109,20 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
           ? String(user.inactivity_timeout_minutes)
           : '480',
       )
+
+      if (user.perfil_id) {
+        setPerfilId(user.perfil_id)
+      } else if (perfis.length > 0) {
+        const found = perfis.find(
+          (p) =>
+            p.id === user.perfil_id ||
+            p.code?.toUpperCase() === (user.perfil_acesso || userRoleCode).toUpperCase() ||
+            p.name?.toUpperCase() === (user.perfil_acesso || userRoleCode).toUpperCase(),
+        )
+        if (found) setPerfilId(found.id)
+      }
     }
-  }, [user])
+  }, [user, perfis])
 
   useEffect(() => {
     getEmpresas()
@@ -143,9 +170,21 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
     setSubmitting(true)
     setError('')
     try {
+      const selectedPerfil = perfis.find((p) => p.id === perfilId)
+      const perfilCode = selectedPerfil?.code || role || 'PADRAO'
+
+      const validRoles = ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL']
+      const effectiveRole = validRoles.includes(perfilCode)
+        ? perfilCode
+        : validRoles.includes(role)
+          ? role
+          : 'PADRAO'
+
       await updateUser(user.id, {
         name: name.trim(),
-        role,
+        role: effectiveRole,
+        perfil_id: selectedPerfil?.id || undefined,
+        perfil_acesso: perfilCode,
         cpf: cpf.replace(/\D/g, ''),
         password: newPassword || undefined,
         avatar,
@@ -204,6 +243,61 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
               />
               {cpfError && <p className="text-xs text-destructive">{cpfError}</p>}
             </div>
+            {/* Campo Perfil de Acesso (Perfis e Permissões) */}
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold flex items-center justify-between">
+                <span>Perfil de Acesso (Perfis e Permissões)</span>
+                <span className="text-[11px] text-[#C69B45] font-medium">
+                  Delimita telas & menus
+                </span>
+              </Label>
+              <Select
+                value={perfilId}
+                onValueChange={(val) => {
+                  setPerfilId(val)
+                  const chosen = perfis.find((p) => p.id === val)
+                  if (chosen) {
+                    const c = chosen.code?.toUpperCase()
+                    if (
+                      ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL', 'SDR', 'Vendedor'].includes(c)
+                    ) {
+                      setRole(c)
+                    }
+                  }
+                }}
+                disabled={loadingPerfis}
+              >
+                <SelectTrigger className="border-2 border-[#063D30]/30 focus:ring-[#063D30]">
+                  <SelectValue
+                    placeholder={loadingPerfis ? 'Carregando perfis...' : 'Selecione o perfil'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {perfis.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-foreground">{p.name || p.code}</span>
+                        <span className="text-xs text-muted-foreground font-mono">({p.code})</span>
+                        {p.active === false && (
+                          <span className="text-[10px] text-destructive bg-destructive/10 px-1 py-0.2 rounded font-medium">
+                            Inativo
+                          </span>
+                        )}
+                        {p.code?.toUpperCase() === 'SUP' && (
+                          <span className="text-[10px] text-[#C69B45] font-bold">
+                            (Acesso Total)
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                Define exatamente quais telas e menus o usuário poderá visualizar e operar no ERP.
+              </p>
+            </div>
+
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">Setor</Label>
               <Select value={role} onValueChange={setRole}>

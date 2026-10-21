@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T23:33:53.155Z",
+  "generatedAt": "2026-10-21T00:02:43.028Z",
   "collections": [
     {
       "name": "users",
@@ -130,6 +130,13 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "perfil_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "perfis_permissoes"
         }
       ],
       "indexes": [

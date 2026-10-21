@@ -8,6 +8,8 @@ export interface AuthUser {
   name?: string
   email?: string
   role?: string
+  perfil_acesso?: string
+  perfil_id?: string
   active?: boolean
   mfa_enabled?: boolean
   mfa_secret?: string
@@ -333,8 +335,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setMfaRequired(false)
   }
 
-  const userRole =
-    (user?.role as string) || ((user?.email as string) === ADMIN_EMAIL ? 'SUP' : 'PADRAO')
+  const rawRole =
+    ((user?.perfil_acesso as string) || (user?.role as string) || '').trim() ||
+    ((user?.email as string) === ADMIN_EMAIL ? 'SUP' : 'PADRAO')
+  const userRole = (user?.email as string) === ADMIN_EMAIL ? 'SUP' : rawRole
   const isAdmin = isAuthenticated && userRole === 'SUP'
 
   return (

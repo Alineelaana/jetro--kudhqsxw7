@@ -5,6 +5,8 @@ export interface CreateUserData {
   email: string
   password: string
   role: string
+  perfil_id?: string
+  perfil_acesso?: string
   cpf?: string
   avatar?: File | null
   active?: boolean
@@ -16,7 +18,10 @@ export interface CreateUserData {
 }
 
 export async function getUsers() {
-  return pb.collection('users').getFullList({ sort: 'created' })
+  return pb.collection('users').getFullList({
+    sort: 'created',
+    expand: 'perfil_id',
+  })
 }
 
 export async function createUser(data: CreateUserData): Promise<void> {
@@ -36,6 +41,8 @@ export async function createUser(data: CreateUserData): Promise<void> {
   if (data.avatar) {
     recordData.avatar = data.avatar
   }
+  if (data.perfil_id !== undefined) recordData.perfil_id = data.perfil_id
+  if (data.perfil_acesso !== undefined) recordData.perfil_acesso = data.perfil_acesso
   if (data.empresa_id !== undefined) recordData.empresa_id = data.empresa_id
   if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
   if (data.departamento !== undefined) recordData.departamento = data.departamento
@@ -50,6 +57,8 @@ export async function updateUserActiveStatus(userId: string, active: boolean): P
 export interface UpdateUserData {
   name?: string
   role?: string
+  perfil_id?: string
+  perfil_acesso?: string
   cpf?: string
   password?: string
   avatar?: File | null
@@ -65,6 +74,8 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   const recordData: Record<string, unknown> = {}
   if (data.name !== undefined) recordData.name = data.name
   if (data.role !== undefined) recordData.role = data.role
+  if (data.perfil_id !== undefined) recordData.perfil_id = data.perfil_id
+  if (data.perfil_acesso !== undefined) recordData.perfil_acesso = data.perfil_acesso
   if (data.cpf !== undefined) recordData.cpf = data.cpf
   if (data.active !== undefined) recordData.active = data.active
   if (data.inactivity_timeout_minutes !== undefined) {

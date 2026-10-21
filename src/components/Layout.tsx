@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, useMemo, Suspense } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
@@ -10,11 +10,12 @@ import { GlobalSearchBar } from '@/components/enterprise/global-search-bar'
 import { AdminSidebar } from '@/components/admin-sidebar'
 import { useAuth } from '@/hooks/use-auth'
 import { canViewScreenDocs } from '@/lib/permissions'
+import { checkProfileScreenAccess, loadProfilesCache } from '@/lib/profile-permissions'
 import { ScreenLogicDrawer } from '@/components/screen-docs/screen-logic-drawer'
 import { InactivityTracker } from '@/components/inactivity-tracker'
 import { AttributionFooter } from '@/components/attribution-footer'
 import { Button } from '@/components/ui/button'
-import { FileCode2 } from 'lucide-react'
+import { FileCode2, ShieldAlert } from 'lucide-react'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { JetroCustomizationDrawer } from '@/components/personalizacao/jetro-customization-drawer'
 import { ModuleErrorBoundary } from '@/components/module-error-boundary'
@@ -33,6 +34,7 @@ export default function Layout() {
   const { isAuthenticated, loading, userRole } = useAuth()
   const { preferences } = useUserPreferences()
   const [screenLogicOpen, setScreenLogicOpen] = useState(false)
+  const [profilesReady, setProfilesReady] = useState(false)
   const canAccessDocs = canViewScreenDocs(userRole)
   const isAdmin = pathname.startsWith('/admin')
   // Usuário autenticado na rota /site é redirecionado pelo Index para /admin.
@@ -41,6 +43,20 @@ export default function Layout() {
   const isHomePage = pathname === '/admin'
   const isSite = pathname === '/site'
   const showFooter = !isInternalPath(pathname) && (!isAuthenticated || !isSite)
+
+  useEffect(() => {
+    loadProfilesCache()
+      .then(() => setProfilesReady(true))
+      .catch(() => setProfilesReady(true))
+  }, [userRole])
+
+  // Delimitação do usuário: verificar se o perfil do usuário pode visualizar a rota ativa
+  const hasRouteAccess = useMemo(() => {
+    if (!isAdmin || isHomePage) return true
+    if (!userRole) return false
+    if (userRole.toUpperCase() === 'SUP') return true
+    return checkProfileScreenAccess(userRole, pathname, 'v')
+  }, [isAdmin, isHomePage, userRole, pathname, profilesReady])
 
   useEffect(() => {
     if (!isAdmin) {
@@ -103,15 +119,38 @@ export default function Layout() {
                   key={pathname}
                   moduleName={pathname.replace('/admin', '') || 'Início'}
                 >
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
-                        <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
+                  {!hasRouteAccess ? (
+                    <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center max-w-lg mx-auto">
+                      <div className="w-16 h-16 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-4">
+                        <ShieldAlert className="w-8 h-8" />
                       </div>
-                    }
-                  >
-                    <Outlet />
-                  </Suspense>
+                      <h2 className="text-xl font-bold text-foreground mb-2">
+                        Acesso Restrito pelo Perfil
+                      </h2>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Seu perfil de acesso atual (<strong>{userRole}</strong>) não possui
+                        permissão de visualização para esta tela. Caso precise de acesso, solicite a
+                        alteração do seu perfil a um administrador do sistema.
+                      </p>
+                      <Button
+                        type="button"
+                        onClick={() => window.history.back()}
+                        className="bg-[#063D30] hover:bg-[#063D30]/90 text-white font-semibold"
+                      >
+                        Voltar à tela anterior
+                      </Button>
+                    </div>
+                  ) : (
+                    <Suspense
+                      fallback={
+                        <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
+                          <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
+                        </div>
+                      }
+                    >
+                      <Outlet />
+                    </Suspense>
+                  )}
                 </ModuleErrorBoundary>
               </div>
               {/* Fixar Rodapé: respeita preferência do usuário */}
