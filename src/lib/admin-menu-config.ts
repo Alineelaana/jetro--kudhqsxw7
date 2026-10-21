@@ -32,6 +32,7 @@ import {
   FileSpreadsheet,
   Sparkles,
   Inbox,
+  Bot,
   type LucideIcon,
 } from 'lucide-react'
 import {
