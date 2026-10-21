@@ -5,6 +5,7 @@ import { getPlanoContas } from '@/services/contabil'
 import { useOrgFilter } from '@/hooks/use-org-filter'
 import { useAuth } from '@/hooks/use-auth'
 import { ControladoriaExportBar } from '@/components/controladoria/controladoria-export-bar'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import pb from '@/lib/pocketbase/client'
 
 function fmt(v: number): string {
@@ -60,13 +61,7 @@ export function ControladoriaBalanco() {
     )
 
   if (hasMissingOrgBinding) {
-    return (
-      <Card className="border-amber-300 bg-amber-50/50 dark:bg-amber-950/20 p-6">
-        <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-          {missingOrgMessage}
-        </p>
-      </Card>
-    )
+    return <MissingTenantNotice moduleName="Controladoria / Balanço" />
   }
 
   const getBalance = (code: string): number => Math.abs(balances[code] || 0)

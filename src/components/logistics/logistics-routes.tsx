@@ -20,6 +20,8 @@ import {
 import { getRoutes, createRoute, updateRoute, deleteRoute } from '@/services/logistics'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
+import { useOrgFilter } from '@/hooks/use-org-filter'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import { toast } from '@/hooks/use-toast'
 import { ROUTE_STATUS, type LogisticsRoute } from '@/lib/logistics-types'
 import { canCreateRoutes, canEditRoutes } from '@/lib/logistics-permissions'
@@ -27,6 +29,7 @@ import { Plus, Pencil, Trash2, Copy, Search, Loader2 } from 'lucide-react'
 
 export function LogisticsRoutes() {
   const { user } = useAuth()
+  const { hasMissingOrgBinding } = useOrgFilter()
   const role = user?.role as string
   const [records, setRecords] = useState<LogisticsRoute[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,6 +115,10 @@ export function LogisticsRoutes() {
     } catch {
       toast({ title: 'Erro', variant: 'destructive' })
     }
+  }
+
+  if (hasMissingOrgBinding) {
+    return <MissingTenantNotice moduleName="Logística / Rotas" />
   }
 
   if (loading)

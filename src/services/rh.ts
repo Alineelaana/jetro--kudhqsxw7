@@ -1,4 +1,5 @@
 import pb from '@/lib/pocketbase/client'
+import { mergeTenantFilter, withTenantData } from '@/lib/multitenancy'
 
 export const RH_COLLECTIONS = {
   employees: 'rh_employees',
@@ -19,11 +20,25 @@ export const RH_COLLECTIONS = {
   employeeHistory: 'rh_employee_history',
 } as const
 
-export function rhGetList(collection: string) {
-  return pb.collection(collection).getFullList({ sort: '-created' })
+export function rhGetList(collection: string, filter?: string) {
+  // Aplicar filtro multitenancy para coleções organizadas por empresa
+  const isPerEmpresa =
+    collection === RH_COLLECTIONS.employees ||
+    collection === RH_COLLECTIONS.departments ||
+    collection === RH_COLLECTIONS.payroll
+  const merged = isPerEmpresa ? mergeTenantFilter('empresa', filter) : filter
+  return pb.collection(collection).getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  })
 }
 export function rhCreate(collection: string, data: Record<string, unknown>) {
-  return pb.collection(collection).create(data)
+  const isPerEmpresa =
+    collection === RH_COLLECTIONS.employees ||
+    collection === RH_COLLECTIONS.departments ||
+    collection === RH_COLLECTIONS.payroll
+  const tenantData = isPerEmpresa ? withTenantData(data, 'empresa') : data
+  return pb.collection(collection).create(tenantData)
 }
 export function rhUpdate(collection: string, id: string, data: Record<string, unknown>) {
   return pb.collection(collection).update(id, data)

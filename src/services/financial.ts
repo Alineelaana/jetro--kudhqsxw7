@@ -1,4 +1,5 @@
 import pb from '@/lib/pocketbase/client'
+import { mergeTenantFilter, withTenantData } from '@/lib/multitenancy'
 
 export const FINANCIAL_COLLECTIONS = {
   receivables: 'financial_receivables',
@@ -19,11 +20,16 @@ export const FINANCIAL_COLLECTIONS = {
   bankStatements: 'financial_bank_statements',
 } as const
 
-export function finGetList(collection: string) {
-  return pb.collection(collection).getFullList({ sort: '-created' })
+export function finGetList(collection: string, filter?: string) {
+  const merged = mergeTenantFilter('empresa', filter)
+  return pb.collection(collection).getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  })
 }
 export function finCreate(collection: string, data: Record<string, unknown>) {
-  return pb.collection(collection).create(data)
+  const tenantData = withTenantData(data, 'empresa')
+  return pb.collection(collection).create(tenantData)
 }
 export function finUpdate(collection: string, id: string, data: Record<string, unknown>) {
   return pb.collection(collection).update(id, data)

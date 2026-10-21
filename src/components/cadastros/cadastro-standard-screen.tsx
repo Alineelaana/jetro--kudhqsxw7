@@ -28,6 +28,9 @@ import {
 } from '@/services/cadastros'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
+import { useOrgFilter } from '@/hooks/use-org-filter'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
+import { TENANT_COLLECTIONS } from '@/lib/multitenancy'
 import { CadastroFormDialog } from '@/components/cadastros/cadastro-form-dialog'
 import { type CadastroConfig, type CadastroRecord } from '@/lib/cadastros-types'
 import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
@@ -57,6 +60,7 @@ interface ConfirmState {
 
 export function CadastroStandardScreen({ config }: Props) {
   const { user } = useAuth()
+  const { hasMissingOrgBinding } = useOrgFilter()
   const userName = (user?.name as string) || (user?.email as string) || 'Sistema'
   const [records, setRecords] = useState<CadastroRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -152,6 +156,11 @@ export function CadastroStandardScreen({ config }: Props) {
   }
 
   const fmtDate = (d: string) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—')
+
+  // Se a coleção for isolada por empresa e o usuário não-SUP não tiver empresa vinculada
+  if (TENANT_COLLECTIONS[config.collection] && hasMissingOrgBinding) {
+    return <MissingTenantNotice moduleName={`Cadastros — ${config.label}`} />
+  }
 
   return (
     <div className="space-y-4">

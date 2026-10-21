@@ -1,4 +1,5 @@
 import pb from '@/lib/pocketbase/client'
+import { mergeTenantFilter, withTenantData } from '@/lib/multitenancy'
 import type {
   SalesOrder,
   SalesInvoice,
@@ -7,11 +8,16 @@ import type {
   SalesReturn,
 } from '@/lib/sales-types'
 
-export async function getSalesOrders(): Promise<SalesOrder[]> {
-  return pb.collection('sales_orders').getFullList({ sort: '-created' }) as Promise<SalesOrder[]>
+export async function getSalesOrders(filter?: string): Promise<SalesOrder[]> {
+  const merged = mergeTenantFilter('company', filter)
+  return pb.collection('sales_orders').getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  }) as Promise<SalesOrder[]>
 }
 export async function createSalesOrder(data: Record<string, unknown>): Promise<SalesOrder> {
-  return pb.collection('sales_orders').create(data) as Promise<SalesOrder>
+  const tenantData = withTenantData(data, 'company')
+  return pb.collection('sales_orders').create(tenantData) as Promise<SalesOrder>
 }
 export async function updateSalesOrder(
   id: string,
@@ -23,13 +29,16 @@ export async function deleteSalesOrder(id: string): Promise<void> {
   await pb.collection('sales_orders').delete(id)
 }
 
-export async function getSalesInvoices(): Promise<SalesInvoice[]> {
-  return pb.collection('sales_invoices').getFullList({ sort: '-created' }) as Promise<
-    SalesInvoice[]
-  >
+export async function getSalesInvoices(filter?: string): Promise<SalesInvoice[]> {
+  const merged = mergeTenantFilter('company', filter)
+  return pb.collection('sales_invoices').getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  }) as Promise<SalesInvoice[]>
 }
 export async function createSalesInvoice(data: Record<string, unknown>): Promise<SalesInvoice> {
-  return pb.collection('sales_invoices').create(data) as Promise<SalesInvoice>
+  const tenantData = withTenantData(data, 'company')
+  return pb.collection('sales_invoices').create(tenantData) as Promise<SalesInvoice>
 }
 export async function updateSalesInvoice(
   id: string,
@@ -38,11 +47,16 @@ export async function updateSalesInvoice(
   return pb.collection('sales_invoices').update(id, data) as Promise<SalesInvoice>
 }
 
-export async function getNfeRecords(): Promise<NfeRecord[]> {
-  return pb.collection('nfe_records').getFullList({ sort: '-created' }) as Promise<NfeRecord[]>
+export async function getNfeRecords(filter?: string): Promise<NfeRecord[]> {
+  const merged = mergeTenantFilter('company', filter)
+  return pb.collection('nfe_records').getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  }) as Promise<NfeRecord[]>
 }
 export async function createNfeRecord(data: Record<string, unknown>): Promise<NfeRecord> {
-  return pb.collection('nfe_records').create(data) as Promise<NfeRecord>
+  const tenantData = withTenantData(data, 'company')
+  return pb.collection('nfe_records').create(tenantData) as Promise<NfeRecord>
 }
 export async function updateNfeRecord(
   id: string,
@@ -51,11 +65,16 @@ export async function updateNfeRecord(
   return pb.collection('nfe_records').update(id, data) as Promise<NfeRecord>
 }
 
-export async function getNfceRecords(): Promise<NfceRecord[]> {
-  return pb.collection('nfce_records').getFullList({ sort: '-created' }) as Promise<NfceRecord[]>
+export async function getNfceRecords(filter?: string): Promise<NfceRecord[]> {
+  const merged = mergeTenantFilter('company', filter)
+  return pb.collection('nfce_records').getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  }) as Promise<NfceRecord[]>
 }
 export async function createNfceRecord(data: Record<string, unknown>): Promise<NfceRecord> {
-  return pb.collection('nfce_records').create(data) as Promise<NfceRecord>
+  const tenantData = withTenantData(data, 'company')
+  return pb.collection('nfce_records').create(tenantData) as Promise<NfceRecord>
 }
 export async function updateNfceRecord(
   id: string,
@@ -64,11 +83,16 @@ export async function updateNfceRecord(
   return pb.collection('nfce_records').update(id, data) as Promise<NfceRecord>
 }
 
-export async function getSalesReturns(): Promise<SalesReturn[]> {
-  return pb.collection('sales_returns').getFullList({ sort: '-created' }) as Promise<SalesReturn[]>
+export async function getSalesReturns(filter?: string): Promise<SalesReturn[]> {
+  const merged = mergeTenantFilter('company', filter)
+  return pb.collection('sales_returns').getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  }) as Promise<SalesReturn[]>
 }
 export async function createSalesReturn(data: Record<string, unknown>): Promise<SalesReturn> {
-  return pb.collection('sales_returns').create(data) as Promise<SalesReturn>
+  const tenantData = withTenantData(data, 'company')
+  return pb.collection('sales_returns').create(tenantData) as Promise<SalesReturn>
 }
 export async function updateSalesReturn(
   id: string,

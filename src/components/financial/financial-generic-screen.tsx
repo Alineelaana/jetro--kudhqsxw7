@@ -24,12 +24,15 @@ import {
 } from '@/components/financial/financial-shared'
 import { finGetList, finCreate, finUpdate, finDelete } from '@/services/financial'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useOrgFilter } from '@/hooks/use-org-filter'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import type { FinancialScreenConfig } from '@/lib/financial-types'
 import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Search, Pencil, Trash2, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function FinancialGenericScreen({ config }: { config: FinancialScreenConfig }) {
+  const { hasMissingOrgBinding } = useOrgFilter()
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -176,6 +179,10 @@ export function FinancialGenericScreen({ config }: { config: FinancialScreenConf
       </div>
     ),
   })
+
+  if (hasMissingOrgBinding) {
+    return <MissingTenantNotice moduleName={`Financeiro — ${config.title}`} />
+  }
 
   return (
     <div className="space-y-4">

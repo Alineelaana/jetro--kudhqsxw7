@@ -14,6 +14,8 @@ import {
 import { getWmsReceipts, createWmsReceipt, updateWmsReceipt } from '@/services/wms'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
+import { useOrgFilter } from '@/hooks/use-org-filter'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import { toast } from '@/hooks/use-toast'
 import { type WmsReceipt } from '@/lib/wms-types'
 import { Plus, Loader2, Search } from 'lucide-react'
@@ -29,6 +31,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function WmsReceiving() {
   const { user } = useAuth()
+  const { hasMissingOrgBinding } = useOrgFilter()
   const userName = (user?.name as string) || 'Sistema'
   const [records, setRecords] = useState<WmsReceipt[]>([])
   const [loading, setLoading] = useState(true)
@@ -91,6 +94,10 @@ export function WmsReceiving() {
     } catch {
       toast({ title: 'Erro', variant: 'destructive' })
     }
+  }
+
+  if (hasMissingOrgBinding) {
+    return <MissingTenantNotice moduleName="WMS / Recebimento" />
   }
 
   if (loading)

@@ -20,11 +20,14 @@ import {
 import { DpTable, DpEmptyState, DpLoading, DpStatusBadge } from '@/components/dp/dp-shared'
 import { dpGetList, dpCreate, dpUpdate, dpDelete } from '@/services/dp'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useOrgFilter } from '@/hooks/use-org-filter'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import type { DpScreenConfig } from '@/lib/dp-types'
 import { Plus, Search, Pencil, Trash2, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function DpGenericScreen({ config }: { config: DpScreenConfig }) {
+  const { hasMissingOrgBinding } = useOrgFilter()
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -111,6 +114,10 @@ export function DpGenericScreen({ config }: { config: DpScreenConfig }) {
   const tableHeaders = config.fields.slice(0, 4).map((f) => f.label)
   if (config.statusField) tableHeaders.push('Status')
   tableHeaders.push('Ações')
+
+  if (hasMissingOrgBinding) {
+    return <MissingTenantNotice moduleName={`Departamento Pessoal — ${config.title}`} />
+  }
 
   return (
     <div className="space-y-4">

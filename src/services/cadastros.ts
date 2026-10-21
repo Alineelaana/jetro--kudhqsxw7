@@ -1,15 +1,25 @@
 import pb from '@/lib/pocketbase/client'
+import { mergeCollectionTenantFilter, withTenantData, TENANT_COLLECTIONS } from '@/lib/multitenancy'
 import type { CadastroRecord } from '@/lib/cadastros-types'
 
-export async function listCadastros(collection: string): Promise<CadastroRecord[]> {
-  return pb.collection(collection).getFullList({ sort: '-created' }) as Promise<CadastroRecord[]>
+export async function listCadastros(
+  collection: string,
+  filter?: string,
+): Promise<CadastroRecord[]> {
+  const merged = mergeCollectionTenantFilter(collection, filter)
+  return pb.collection(collection).getFullList({
+    sort: '-created',
+    filter: merged || undefined,
+  }) as Promise<CadastroRecord[]>
 }
 
 export async function createCadastro(
   collection: string,
   data: Record<string, unknown>,
 ): Promise<CadastroRecord> {
-  return pb.collection(collection).create(data) as Promise<CadastroRecord>
+  const fieldName = TENANT_COLLECTIONS[collection]
+  const tenantData = fieldName ? withTenantData(data, fieldName) : data
+  return pb.collection(collection).create(tenantData) as Promise<CadastroRecord>
 }
 
 export async function createCadastroFormData(

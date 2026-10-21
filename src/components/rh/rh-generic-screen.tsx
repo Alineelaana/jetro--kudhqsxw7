@@ -20,11 +20,14 @@ import {
 import { RhTable, RhEmptyState, RhLoading, RhStatusBadge } from '@/components/rh/rh-shared'
 import { rhGetList, rhCreate, rhUpdate, rhDelete } from '@/services/rh'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useOrgFilter } from '@/hooks/use-org-filter'
+import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import type { RhScreenConfig } from '@/lib/rh-types'
 import { Plus, Search, Pencil, Trash2, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
+  const { hasMissingOrgBinding } = useOrgFilter()
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -104,6 +107,10 @@ export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
   const tableHeaders = config.fields.slice(0, 4).map((f) => f.label)
   if (config.statusField) tableHeaders.push('Status')
   tableHeaders.push('Ações')
+
+  if (hasMissingOrgBinding) {
+    return <MissingTenantNotice moduleName={`Recursos Humanos — ${config.title}`} />
+  }
 
   return (
     <div className="space-y-4">

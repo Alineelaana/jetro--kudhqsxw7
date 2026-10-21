@@ -36,22 +36,20 @@ export function useOrgFilter(): OrgFilterResult {
 
   const { empresaId = '', filialId = '', isGlobal = false } = authContext
 
-  // Usuário não-global que não possui nem empresa nem filial vinculada
-  const hasMissingOrgBinding = !isGlobal && !empresaId && !filialId
+  // Usuário não-global que não possui empresa vinculada
+  const hasMissingOrgBinding = !isGlobal && !empresaId
 
   const filter = useMemo<string | undefined>(() => {
     if (isGlobal) return undefined
-    // Escapar aspas duplas por segurança contra injeção de filtro PocketBase
-    if (filialId) {
-      const safeFilial = String(filialId).replace(/"/g, '\\"')
-      return `filial = "${safeFilial}" || filial = ""`
+    if (hasMissingOrgBinding) {
+      return 'id = "__SEM_EMPRESA__"'
     }
     if (empresaId) {
       const safeEmpresa = String(empresaId).replace(/"/g, '\\"')
-      return `empresa = "${safeEmpresa}" || empresa = ""`
+      return `empresa = "${safeEmpresa}"`
     }
     return undefined
-  }, [empresaId, filialId, isGlobal])
+  }, [empresaId, isGlobal, hasMissingOrgBinding])
 
   const mergeFilter = (existing?: string): string | undefined => {
     if (!filter) return existing

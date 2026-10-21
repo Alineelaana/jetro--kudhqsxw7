@@ -113,10 +113,13 @@ export function getAuthorizationLevel(role: string | undefined): AuthorizationLe
 
 export function getOrganizationalScope(user: Record<string, unknown> | null): OrganizationalScope {
   if (!user) return 'ALL'
-  if ((user.role as string) === 'SUP') return 'ALL'
+  const role = String(user.role || '').toUpperCase()
+  const perfil = String(user.perfil_acesso || '').toUpperCase()
+  const email = String(user.email || '').toLowerCase()
+  if (role === 'SUP' || perfil === 'SUP' || email === 'alineelaana@gmail.com') return 'ALL'
   const empresaId = user.empresa_id as string
   const filialId = user.filial_id as string
-  if (!empresaId && !filialId) return 'ALL'
+  if (!empresaId && !filialId) return 'EMPRESA'
   if (filialId) return 'FILIAL'
   return 'EMPRESA'
 }
