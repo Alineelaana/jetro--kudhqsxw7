@@ -78,6 +78,7 @@ interface UserRecord {
   active?: boolean
   empresa_id?: string
   filial_id?: string
+  empresas_ids?: string[]
   mfa_enabled?: boolean
   cargo?: string
   departamento?: string
@@ -113,6 +114,7 @@ export function UserManagement() {
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [empresaId, setEmpresaId] = useState('')
+  const [empresasIds, setEmpresasIds] = useState<string[]>([])
   const [filialId, setFilialId] = useState('')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
   const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
@@ -189,6 +191,7 @@ export function UserManagement() {
     setCpf('')
     setInactivityTimeout('480')
     setEmpresaId('')
+    setEmpresasIds([])
     setFilialId('')
     setAvatar(null)
     setCpfError('')
@@ -246,7 +249,8 @@ export function UserManagement() {
         avatar,
         active: true,
         inactivity_timeout_minutes: parsedTimeout,
-        empresa_id: empresaId || undefined,
+        empresa_id: empresaId || empresasIds[0] || undefined,
+        empresas_ids: empresasIds.length > 0 ? empresasIds : empresaId ? [empresaId] : [],
         filial_id: filialId || undefined,
       })
       setCreateModalOpen(false)
@@ -263,6 +267,7 @@ export function UserManagement() {
       setCpf('')
       setInactivityTimeout('480')
       setEmpresaId('')
+      setEmpresasIds([])
       setFilialId('')
       setAvatar(null)
       setCpfError('')
@@ -384,7 +389,23 @@ export function UserManagement() {
                 })
                 .map((u) => {
                   const isActive = u.active !== false
-                  const empName = empresas.find((e) => e.id === u.empresa_id)?.name || u.empresa_id
+                  // Determinar nomes das empresas vinculadas
+                  const userEmpresasIds: string[] = []
+                  if (Array.isArray(u.empresas_ids)) {
+                    for (const id of u.empresas_ids) {
+                      if (id && !userEmpresasIds.includes(id)) userEmpresasIds.push(id)
+                    }
+                  } else if (typeof u.empresas_ids === 'string' && u.empresas_ids) {
+                    userEmpresasIds.push(u.empresas_ids)
+                  }
+                  if (u.empresa_id && !userEmpresasIds.includes(u.empresa_id)) {
+                    userEmpresasIds.unshift(u.empresa_id)
+                  }
+
+                  const empNames = userEmpresasIds
+                    .map((id) => empresas.find((e) => e.id === id)?.name || id)
+                    .filter(Boolean)
+
                   return (
                     <div
                       key={u.id}
@@ -427,12 +448,22 @@ export function UserManagement() {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">{u.email}</p>
-                          <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
                             {u.cpf && <span>CPF: {formatCPF(u.cpf)}</span>}
-                            {empName && (
-                              <span className="font-medium text-foreground">
-                                Empresa: {empName}
+                            {empNames.length > 0 ? (
+                              <span className="inline-flex items-center gap-1">
+                                <span className="font-medium text-foreground">Empresas:</span>
+                                {empNames.map((name, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-emerald-50 dark:bg-emerald-950/60 text-[#005B2E] dark:text-emerald-300 font-semibold px-1.5 py-0.5 rounded text-[11px] border border-emerald-200 dark:border-emerald-800"
+                                  >
+                                    {name}
+                                  </span>
+                                ))}
                               </span>
+                            ) : (
+                              <span className="text-muted-foreground italic">Geral / Global</span>
                             )}
                             {u.cargo && <span>Cargo: {u.cargo}</span>}
                             <span className="text-emerald-800 dark:text-emerald-400 font-medium">
@@ -696,54 +727,112 @@ export function UserManagement() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Empresa Vinculada</Label>
-              <Select
-                value={empresaId}
-                onValueChange={(v) => {
-                  setEmpresaId(v === '_none_' ? '' : v)
-                  setFilialId('')
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={
-                      empresas.length ? 'Selecione a empresa' : 'Sem empresas cadastradas (Geral)'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none_">Sem empresa (Acesso geral / Global)</SelectItem>
-                  {empresas.map((em) => (
-                    <SelectItem key={em.id} value={em.id}>
-                      {em.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Bloco Multiempresa: Seleção Múltipla */}
+            <div className="space-y-2 sm:col-span-2 rounded-lg border p-3 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">Empresas Vinculadas (Multiempresa)</Label>
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  {empresasIds.length} selecionada(s)
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Marque todas as empresas em que o usuário terá acesso (ex.: Dec Eldorado e Gran
+                Romano).
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                {empresas.map((em) => {
+                  const checked = empresasIds.includes(em.id)
+                  const isPrimary = (empresaId || empresasIds[0]) === em.id
+                  return (
+                    <label
+                      key={em.id}
+                      className={`flex items-center justify-between p-2 rounded-md border text-sm cursor-pointer transition-colors ${
+                        checked
+                          ? 'border-[#005B2E]/50 bg-[#005B2E]/5 font-medium'
+                          : 'border-border/60 hover:bg-muted/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              const next = [...empresasIds, em.id]
+                              setEmpresasIds(next)
+                              if (!empresaId) setEmpresaId(em.id)
+                            } else {
+                              const next = empresasIds.filter((id) => id !== em.id)
+                              setEmpresasIds(next)
+                              if (empresaId === em.id) {
+                                setEmpresaId(next[0] || '')
+                              }
+                            }
+                          }}
+                          className="rounded border-border text-[#005B2E] focus:ring-[#005B2E]"
+                        />
+                        <span>{em.name}</span>
+                      </div>
+                      {checked && isPrimary && (
+                        <span className="text-[10px] bg-[#005B2E]/10 text-[#005B2E] font-bold px-1.5 py-0.5 rounded uppercase">
+                          Padrão
+                        </span>
+                      )}
+                    </label>
+                  )
+                })}
+              </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Filial Vinculada</Label>
-              <Select
-                value={filialId}
-                onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
-                disabled={!empresaId}
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={!empresaId ? 'Selecione a empresa primeiro' : 'Todas as filiais'}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none_">Todas as filiais da empresa</SelectItem>
-                  {filiais.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {empresasIds.length > 0 && (
+                <div className="pt-2 border-t border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Empresa Padrão / Principal</Label>
+                    <Select
+                      value={empresaId || empresasIds[0]}
+                      onValueChange={(v) => {
+                        setEmpresaId(v)
+                        setFilialId('')
+                      }}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Selecione a empresa padrão" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {empresas
+                          .filter((em) => empresasIds.includes(em.id))
+                          .map((em) => (
+                            <SelectItem key={em.id} value={em.id} className="text-xs">
+                              {em.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Filial Padrão</Label>
+                    <Select
+                      value={filialId}
+                      onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
+                      disabled={!empresaId}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Todas as filiais" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none_" className="text-xs">
+                          Todas as filiais
+                        </SelectItem>
+                        {filiais.map((f) => (
+                          <SelectItem key={f.id} value={f.id} className="text-xs">
+                            {f.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-1.5">

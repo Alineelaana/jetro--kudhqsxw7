@@ -36,6 +36,7 @@ interface UserEditDialogProps {
     perfil_acesso?: string
     cpf: string
     empresa_id?: string
+    empresas_ids?: string[]
     filial_id?: string
     cargo?: string
     departamento?: string
@@ -77,6 +78,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [empresaId, setEmpresaId] = useState('')
+  const [empresasIds, setEmpresasIds] = useState<string[]>([])
   const [filialId, setFilialId] = useState('')
   const [cargo, setCargo] = useState('')
   const [departamento, setDepartamento] = useState('')
@@ -105,7 +107,25 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setNewPassword('')
       setAvatar(null)
       setError('')
-      setEmpresaId(user.empresa_id || '')
+      const singleEmpresa = user.empresa_id || ''
+      setEmpresaId(singleEmpresa)
+
+      // Extrair lista de empresasIds do usuário
+      const rawIds = (user.empresas_ids as unknown) || []
+      const initialIds: string[] = []
+      if (Array.isArray(rawIds)) {
+        for (const it of rawIds) {
+          const s = String(it || '').trim()
+          if (s && !initialIds.includes(s)) initialIds.push(s)
+        }
+      } else if (typeof rawIds === 'string' && rawIds.trim()) {
+        initialIds.push(rawIds.trim())
+      }
+      if (singleEmpresa && !initialIds.includes(singleEmpresa)) {
+        initialIds.push(singleEmpresa)
+      }
+      setEmpresasIds(initialIds)
+
       setFilialId(user.filial_id || '')
       setCargo(user.cargo || '')
       setDepartamento(user.departamento || '')
@@ -195,7 +215,8 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
         cpf: cpf.replace(/\D/g, ''),
         password: newPassword || undefined,
         avatar,
-        empresa_id: empresaId,
+        empresa_id: empresaId || empresasIds[0] || undefined,
+        empresas_ids: empresasIds,
         filial_id: filialId,
         cargo: cargo.trim() || undefined,
         departamento: departamento.trim() || undefined,
@@ -367,44 +388,108 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
               className="focus-visible:ring-[#005B2E]"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Empresa</Label>
-              <Select
-                value={empresaId}
-                onValueChange={(v) => {
-                  setEmpresaId(v)
-                  setFilialId('')
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas as empresas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todas as empresas</SelectItem>
-                  {empresas.map((em) => (
-                    <SelectItem key={em.id} value={em.id}>
-                      {em.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Seção Multiempresa */}
+          <div className="space-y-3 rounded-lg border p-3 bg-muted/20">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <span>Empresas Vinculadas (Multiempresa)</span>
+              </Label>
+              <span className="text-[11px] text-muted-foreground font-mono">
+                {empresasIds.length} selecionada(s)
+              </span>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Filial</Label>
-              <Select value={filialId} onValueChange={setFilialId} disabled={!empresaId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas as filiais" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todas as filiais</SelectItem>
-                  {filiais.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.name}
+            <p className="text-[11px] text-muted-foreground">
+              Marque as empresas às quais o usuário terá permissão de acesso simultâneo.
+            </p>
+            <div className="space-y-2">
+              {empresas.map((em) => {
+                const checked = empresasIds.includes(em.id)
+                const isPrimary = (empresaId || empresasIds[0]) === em.id
+                return (
+                  <label
+                    key={em.id}
+                    className={`flex items-center justify-between p-2 rounded-md border text-sm cursor-pointer transition-colors ${
+                      checked
+                        ? 'border-[#005B2E]/40 bg-[#005B2E]/5'
+                        : 'border-border/60 hover:bg-muted/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            const next = [...empresasIds, em.id]
+                            setEmpresasIds(next)
+                            if (!empresaId) setEmpresaId(em.id)
+                          } else {
+                            const next = empresasIds.filter((id) => id !== em.id)
+                            setEmpresasIds(next)
+                            if (empresaId === em.id) {
+                              setEmpresaId(next[0] || '')
+                            }
+                          }
+                        }}
+                        className="rounded border-border text-[#005B2E] focus:ring-[#005B2E]"
+                      />
+                      <span className="font-medium text-foreground">{em.name}</span>
+                    </div>
+                    {checked && isPrimary && (
+                      <span className="text-[10px] bg-[#005B2E]/10 text-[#005B2E] font-bold px-1.5 py-0.5 rounded uppercase">
+                        Primária
+                      </span>
+                    )}
+                  </label>
+                )
+              })}
+            </div>
+
+            <div className="pt-2 border-t border-border/50 grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Empresa Padrão / Principal</Label>
+                <Select
+                  value={empresaId || empresasIds[0] || ''}
+                  onValueChange={(v) => {
+                    setEmpresaId(v)
+                    if (v && !empresasIds.includes(v)) {
+                      setEmpresasIds([...empresasIds, v])
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Selecione a padrão" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {empresas
+                      .filter((em) => empresasIds.includes(em.id))
+                      .map((em) => (
+                        <SelectItem key={em.id} value={em.id} className="text-xs">
+                          {em.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Filial Padrão</Label>
+                <Select value={filialId} onValueChange={setFilialId} disabled={!empresaId}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Todas as filiais" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="" className="text-xs">
+                      Todas as filiais
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {filiais.map((f) => (
+                      <SelectItem key={f.id} value={f.id} className="text-xs">
+                        {f.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           <div className="space-y-1.5">

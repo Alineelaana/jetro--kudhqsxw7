@@ -42,59 +42,60 @@ routerAdd('POST', '/backend/v1/auth/resolve-identity', (e) => {
     // 3. Sanitizar string para busca segura
     const safe = lower.replace(/[^a-z0-9._-]/g, '')
 
-    // 4. Mapeamento explícito de apelidos/logins rápidos
+    // 4. Mapeamento explícito de apelidos/logins rápidos para as contas unificadas multiempresa
     const aliases = {
-      // Aline
+      // Aline (Código 1)
+      aline: 'aline@deceldorado.com.br',
       'aline.dec': 'aline@deceldorado.com.br',
-      'aline.gr': 'aline@granromano.com.br',
+      'aline.gr': 'aline@deceldorado.com.br',
       'aline.eldorado': 'aline@deceldorado.com.br',
-      'aline.granromano': 'aline@granromano.com.br',
+      'aline.granromano': 'aline@deceldorado.com.br',
 
-      // Junão
+      // Junão (Código 2)
       junao: 'junior@deceldorado.com.br',
       'junao.dec': 'junior@deceldorado.com.br',
       'junao.eldorado': 'junior@deceldorado.com.br',
-      'junao.gr': 'junao@granromano.com.br',
-      'junao.granromano': 'junao@granromano.com.br',
+      'junao.gr': 'junior@deceldorado.com.br',
+      'junao.granromano': 'junior@deceldorado.com.br',
       junior: 'junior@deceldorado.com.br',
 
-      // Renata
+      // Renata (Código 3)
       renata: 'renata@deceldorado.com.br',
       'renata.dec': 'renata@deceldorado.com.br',
       'renata.eldorado': 'renata@deceldorado.com.br',
-      'renata.gr': 'renata@granromano.com.br',
-      'renata.granromano': 'renata@granromano.com.br',
+      'renata.gr': 'renata@deceldorado.com.br',
+      'renata.granromano': 'renata@deceldorado.com.br',
 
-      // Alef
+      // Alef (Código 4)
       alef: 'alef@deceldorado.com.br',
       'alef.dec': 'alef@deceldorado.com.br',
       'alef.eldorado': 'alef@deceldorado.com.br',
-      'alef.gr': 'alef@granromano.com.br',
-      'alef.granromano': 'alef@granromano.com.br',
+      'alef.gr': 'alef@deceldorado.com.br',
+      'alef.granromano': 'alef@deceldorado.com.br',
 
-      // Rogério
+      // Rogério (Código 5)
       rogerio: 'rogerio.roque@granfoods.ind.br',
       'rogerio.roque': 'rogerio.roque@granfoods.ind.br',
       'rogerio.gr': 'rogerio.roque@granfoods.ind.br',
       'rogerio.granromano': 'rogerio.roque@granfoods.ind.br',
-      'rogerio.dec': 'rogerio@deceldorado.com.br',
-      'rogerio.eldorado': 'rogerio@deceldorado.com.br',
+      'rogerio.dec': 'rogerio.roque@granfoods.ind.br',
+      'rogerio.eldorado': 'rogerio.roque@granfoods.ind.br',
 
-      // Patrícia
+      // Patrícia (Código 6)
       patricia: 'patricia.brum@deceldorado.com.br',
       'patricia.brum': 'patricia.brum@deceldorado.com.br',
       'patricia.dec': 'patricia.brum@deceldorado.com.br',
       'patricia.eldorado': 'patricia.brum@deceldorado.com.br',
-      'patricia.gr': 'patricia@granromano.com.br',
-      'patricia.granromano': 'patricia@granromano.com.br',
+      'patricia.gr': 'patricia.brum@deceldorado.com.br',
+      'patricia.granromano': 'patricia.brum@deceldorado.com.br',
 
-      // Janaína
+      // Janaína (Código 7)
       janaina: 'janaina.nogueira@deceldorado.com.br',
       'janaina.nogueira': 'janaina.nogueira@deceldorado.com.br',
       'janaina.dec': 'janaina.nogueira@deceldorado.com.br',
       'janaina.eldorado': 'janaina.nogueira@deceldorado.com.br',
-      'janaina.gr': 'janaina@granromano.com.br',
-      'janaina.granromano': 'janaina@granromano.com.br',
+      'janaina.gr': 'janaina.nogueira@deceldorado.com.br',
+      'janaina.granromano': 'janaina.nogueira@deceldorado.com.br',
     }
 
     if (aliases[safe]) {

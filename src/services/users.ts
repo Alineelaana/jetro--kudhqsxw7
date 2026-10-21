@@ -13,6 +13,7 @@ export interface CreateUserData {
   avatar?: File | null
   active?: boolean
   empresa_id?: string
+  empresas_ids?: string[]
   filial_id?: string
   departamento?: string
   cargo?: string
@@ -71,10 +72,32 @@ export async function createUser(data: CreateUserData): Promise<void> {
   if (data.perfil_id !== undefined) recordData.perfil_id = data.perfil_id
   if (data.perfil_acesso !== undefined) recordData.perfil_acesso = data.perfil_acesso
   if (data.empresa_id !== undefined) recordData.empresa_id = data.empresa_id
+  if (data.empresas_ids !== undefined) recordData.empresas_ids = data.empresas_ids
   if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
   if (data.departamento !== undefined) recordData.departamento = data.departamento
   if (data.cargo !== undefined) recordData.cargo = data.cargo
-  await pb.collection('users').create(recordData)
+  const createdRecord = await pb.collection('users').create(recordData)
+
+  // Sincronizar collection 'usuarios_empresas' caso exista
+  const targetEmpresas =
+    data.empresas_ids && data.empresas_ids.length > 0
+      ? data.empresas_ids
+      : data.empresa_id
+        ? [data.empresa_id]
+        : []
+
+  for (const empId of targetEmpresas) {
+    try {
+      await pb.collection('usuarios_empresas').create({
+        usuario: createdRecord.id,
+        empresa: empId,
+        filial_padrao: data.filial_id || '',
+        ativo: true,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+  }
 }
 
 export async function updateUserActiveStatus(userId: string, active: boolean): Promise<void> {
@@ -94,6 +117,7 @@ export interface UpdateUserData {
   avatar?: File | null
   active?: boolean
   empresa_id?: string
+  empresas_ids?: string[]
   filial_id?: string
   departamento?: string
   cargo?: string
@@ -124,10 +148,42 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
     recordData.avatar = data.avatar
   }
   if (data.empresa_id !== undefined) recordData.empresa_id = data.empresa_id
+  if (data.empresas_ids !== undefined) recordData.empresas_ids = data.empresas_ids
   if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
   if (data.departamento !== undefined) recordData.departamento = data.departamento
   if (data.cargo !== undefined) recordData.cargo = data.cargo
   await pb.collection('users').update(userId, recordData)
+
+  // Sincronizar collection 'usuarios_empresas' se empresas_ids foi informado
+  if (data.empresas_ids !== undefined) {
+    try {
+      const existing = await pb.collection('usuarios_empresas').getFullList({
+        filter: `usuario = "${userId}"`,
+      })
+      const existingEmpresas = existing.map((r) => r.empresa as string)
+
+      // Criar novos vínculos
+      for (const empId of data.empresas_ids) {
+        if (!existingEmpresas.includes(empId)) {
+          await pb.collection('usuarios_empresas').create({
+            usuario: userId,
+            empresa: empId,
+            filial_padrao: data.filial_id || '',
+            ativo: true,
+          })
+        }
+      }
+
+      // Desvincular empresas removidas
+      for (const rec of existing) {
+        if (!data.empresas_ids.includes(rec.empresa as string)) {
+          await pb.collection('usuarios_empresas').delete(rec.id)
+        }
+      }
+    } catch {
+      /* intentionally ignored */
+    }
+  }
 }
 
 export async function resetUserPassword(userId: string, newPassword: string): Promise<void> {

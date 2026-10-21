@@ -61,6 +61,7 @@ export const TENANT_COLLECTIONS: Record<string, 'company' | 'empresa'> = {
 export interface TenantContext {
   isSup: boolean
   empresaId: string
+  empresasIds: string[]
   filialId: string
   hasMissingOrgBinding: boolean
   user: Record<string, unknown> | null
@@ -86,19 +87,36 @@ export function isUserSup(user?: Record<string, unknown> | null): boolean {
 }
 
 /**
- * Retorna os dados do vínculo organizacional do usuário autenticado
+ * Retorna os dados do vínculo organizacional do usuário autenticado (incluindo multiempresa)
  */
 export function getCurrentUserTenant(user?: Record<string, unknown> | null): TenantContext {
   const u = user !== undefined ? user : (pb.authStore.record as Record<string, unknown> | null)
   const isSup = isUserSup(u)
   const empresaId = String(u?.empresa_id || '').trim()
   const filialId = String(u?.filial_id || '').trim()
-  // Um usuário não-SUP precisa ter empresa vinculada para acessar dados operacionais
-  const hasMissingOrgBinding = !isSup && !empresaId
+
+  // Extrair todas as empresas vinculadas (empresas_ids array e/ou empresa_id primária)
+  const rawEmpresas = (u?.empresas_ids as unknown) || []
+  const list: string[] = []
+  if (Array.isArray(rawEmpresas)) {
+    for (const item of rawEmpresas) {
+      const clean = String(item || '').trim()
+      if (clean && !list.includes(clean)) list.push(clean)
+    }
+  } else if (typeof rawEmpresas === 'string' && rawEmpresas.trim()) {
+    list.push(rawEmpresas.trim())
+  }
+  if (empresaId && !list.includes(empresaId)) {
+    list.unshift(empresaId)
+  }
+
+  // Um usuário não-SUP precisa ter ao menos uma empresa vinculada para acessar dados operacionais
+  const hasMissingOrgBinding = !isSup && list.length === 0
 
   return {
     isSup,
-    empresaId,
+    empresaId: list[0] || empresaId,
+    empresasIds: list,
     filialId,
     hasMissingOrgBinding,
     user: u,
@@ -109,7 +127,8 @@ export function getCurrentUserTenant(user?: Record<string, unknown> | null): Ten
  * Gera a expressão de filtro PocketBase para isolamento de multitenancy.
  *
  * - Para SUP: retorna undefined (vê tudo irrestrito).
- * - Para usuário não-SUP com vínculo: retorna `${fieldName} = "${empresaId}"`.
+ * - Para usuário não-SUP com vínculo(s): retorna `${fieldName} = "id1" || ${fieldName} = "id2"`
+ *   permitindo que o usuário veja os dados de TODAS as empresas às quais tem vínculo.
  * - Para usuário não-SUP SEM vínculo: retorna filtro que não casa nada ('id = "__SEM_EMPRESA__"'),
  *   garantindo que nenhuma informação operacional vaze na camada de aplicação.
  */
@@ -117,18 +136,24 @@ export function getTenantFilter(
   fieldName: 'company' | 'empresa' = 'company',
   user?: Record<string, unknown> | null,
 ): string | undefined {
-  const { isSup, empresaId, hasMissingOrgBinding } = getCurrentUserTenant(user)
+  const { isSup, empresasIds, hasMissingOrgBinding } = getCurrentUserTenant(user)
 
   if (isSup) {
     return undefined
   }
 
-  if (hasMissingOrgBinding) {
+  if (hasMissingOrgBinding || empresasIds.length === 0) {
     return 'id = "__SEM_EMPRESA__"'
   }
 
-  const safeEmpresaId = empresaId.replace(/"/g, '\\"')
-  return `${fieldName} = "${safeEmpresaId}"`
+  if (empresasIds.length === 1) {
+    const safeEmpresaId = empresasIds[0].replace(/"/g, '\\"')
+    return `${fieldName} = "${safeEmpresaId}"`
+  }
+
+  // Múltiplas empresas vinculadas: compor cláusula OU
+  const clauses = empresasIds.map((id) => `${fieldName} = "${id.replace(/"/g, '\\"')}"`)
+  return `(${clauses.join(' || ')})`
 }
 
 /**
