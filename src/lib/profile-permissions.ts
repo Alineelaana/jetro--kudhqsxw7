@@ -221,30 +221,48 @@ export function checkProfileScreenAccess(
   profilesList?: PerfilPermissaoRecord[],
 ): boolean {
   if (!userRole) return false
-  const upper = userRole.toUpperCase()
+  const trimmed = userRole.trim()
+  const upper = trimmed.toUpperCase()
+
   // SUP sempre tem acesso irrestrito
   if (upper === 'SUP') return true
 
-  const profiles = profilesList || profilesCache
-  if (!profiles || profiles.length === 0) {
-    // Se ainda não carregou o cache, manter comportamento permissivo para o perfil se rota pertencer ao escopo padrão
+  // Home básica (/admin ou /admin/) é permitida para qualquer usuário autenticado com perfil válido
+  const normalizedRoute = route.split('?')[0].replace(/\/+$/, '') || '/'
+  if (normalizedRoute === '/admin' && operation === 'v') {
     return true
   }
 
-  const profile = profiles.find((p) => p.code?.toUpperCase() === upper)
-  if (!profile) return false
+  const profiles = profilesList || profilesCache
+  if (!profiles || profiles.length === 0) {
+    // Comportamento padrão seguro: SEM cache/dados -> NEGAR por segurança
+    return false
+  }
+
+  // Busca o perfil por id, por code ou por name (case-insensitive)
+  const profile = profiles.find((p) => {
+    if (p.id === trimmed) return true
+    const pCode = (p.code || '').trim().toUpperCase()
+    if (pCode === upper) return true
+    const pName = (p.name || '').trim().toUpperCase()
+    if (pName === upper) return true
+    return false
+  })
+
+  // Se o perfil não existe ou não está ativo -> NEGAR
+  if (!profile || profile.active === false) return false
 
   const perms = (profile.permissions || {}) as ProfilePermissionsData
 
-  // Mapeamento de rotas equivalentes/legadas (ex: /admin/configuracoes/permissoes -> /admin/cadastros/perfis-permissoes)
-  const equivalentRoutes = [route]
-  if (route === '/admin/cadastros/perfis-permissoes') {
+  // Mapeamento de rotas equivalentes/legadas
+  const equivalentRoutes = [normalizedRoute]
+  if (normalizedRoute === '/admin/cadastros/perfis-permissoes') {
     equivalentRoutes.push('/admin/configuracoes/permissoes')
-  } else if (route === '/admin/configuracoes/permissoes') {
+  } else if (normalizedRoute === '/admin/configuracoes/permissoes') {
     equivalentRoutes.push('/admin/cadastros/perfis-permissoes')
   }
 
-  // 1. Checar se alguma rota equivalente tem permissão pontual configurada
+  // 1. Checar se alguma rota equivalente tem permissão pontual configurada (screens)
   if (perms.screens) {
     for (const r of equivalentRoutes) {
       if (perms.screens[r]) {
@@ -256,24 +274,36 @@ export function checkProfileScreenAccess(
     }
   }
 
-  // 2. Se a operação for 'v' (visualizar), checar se o menu foi marcado
-  if (operation === 'v' && perms.allowedMenus && perms.allowedMenus.length > 0) {
-    for (const r of equivalentRoutes) {
-      if (perms.allowedMenus.includes(r)) {
-        return true
-      }
-      // Checar se rota pai foi permitida
-      const isChildOfAllowed = perms.allowedMenus.some(
-        (m) => r.startsWith(m + '/') || m.startsWith(r + '/'),
-      )
-      if (isChildOfAllowed) return true
-    }
-  }
-
-  // Se o perfil não tem customização de allowedMenus nem screens, não bloqueia
-  if (!perms.allowedMenus && !perms.screens) {
+  // Se a operação NÃO for visualização e não foi explicitamente concedida em screens:
+  // para 'c', 'e', 'd', se o menu foi autorizado e não há restrição pontual explícita,
+  // conceder apenas se o menu está permitido. Caso contrário, negar.
+  if (operation !== 'v') {
+    // Se a permissão pontual não definiu, checar se a tela é visualizável; se não for, nega.
+    const canView = checkProfileScreenAccess(userRole, route, 'v', profiles)
+    if (!canView) return false
+    // Se a tela é visualizável e não foi negada pontualmente, herda permissão de operação do perfil
     return true
   }
 
+  // 2. Se a operação for 'v' (visualizar), checar se o menu foi marcado
+  if (perms.allowedMenus && Array.isArray(perms.allowedMenus)) {
+    const allowed = perms.allowedMenus.map((m) => m.split('?')[0].replace(/\/+$/, '') || '/')
+
+    for (const r of equivalentRoutes) {
+      // Casamento exato
+      if (allowed.includes(r)) {
+        return true
+      }
+      // Casamento por prefixo seguro de módulo (ex: /admin/rh/colaboradores pertence a /admin/rh).
+      // NUNCA casar /admin como prefixo genérico de tudo — apenas sub-rotas específicas (ex: /admin/rh, /admin/dp, etc.)
+      const isUnderAllowedModule = allowed.some((m) => {
+        if (m === '/admin' || m === '/' || !m) return false
+        return r === m || r.startsWith(m + '/')
+      })
+      if (isUnderAllowedModule) return true
+    }
+  }
+
+  // Comportamento padrão seguro Huram: se não foi explicitamente autorizado em allowedMenus ou screens -> NEGAR
   return false
 }

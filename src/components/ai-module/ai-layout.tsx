@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Loader2, ArrowLeft, Bot } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
-import { canViewAiModule } from '@/lib/ai-permissions'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 
 export function AiLayout({ children, title }: { children: ReactNode; title: string }) {
-  const { isAuthenticated, loading, user } = useAuth()
+  const { isAuthenticated, loading, userRole } = useAuth()
 
   if (loading) {
     return (
@@ -21,7 +21,10 @@ export function AiLayout({ children, title }: { children: ReactNode; title: stri
     return <AdminLogin />
   }
 
-  if (!canViewAiModule(user?.role as string)) {
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const isAllowed = isSup || checkProfileScreenAccess(userRole, '/admin/ia', 'v')
+
+  if (!isAllowed) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />

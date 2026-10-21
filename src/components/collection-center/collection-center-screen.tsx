@@ -25,11 +25,15 @@ import {
   getPixByClient,
 } from '@/services/collection-center-extended'
 import { logSendCollection } from '@/services/collection-center'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 import { toast } from 'sonner'
 
 export function CollectionCenterScreen() {
-  const { user } = useAuth()
-  const role = (user as any)?.role
+  const { userRole } = useAuth()
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const canView = isSup || checkProfileScreenAccess(userRole, '/admin/cobranca', 'v')
+  const canExport = isSup || checkProfileScreenAccess(userRole, '/admin/cobranca', 'e')
+
   const cc = useCollectionCenter()
   const [dialog, setDialog] = useState<string | null>(null)
   const closeDialog = () => setDialog(null)
@@ -38,7 +42,7 @@ export function CollectionCenterScreen() {
     closeDialog()
   }
 
-  if (!canViewCollectionCenter(role))
+  if (!canView)
     return (
       <p className="text-center text-muted-foreground py-8">
         Sem permissão para acessar a Central de Cobrança
@@ -86,7 +90,7 @@ export function CollectionCenterScreen() {
   }
 
   const handleExportCarteira = () => {
-    if (!canExportCollection(role)) {
+    if (!canExport) {
       toast.error('Sem permissão para exportar')
       return
     }
@@ -95,7 +99,7 @@ export function CollectionCenterScreen() {
   }
 
   const handleExportClient = () => {
-    if (!canExportCollection(role) || !client) {
+    if (!canExport || !client) {
       toast.error('Sem permissão ou cliente não selecionado')
       return
     }

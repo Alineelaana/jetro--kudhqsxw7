@@ -62,7 +62,7 @@ export default function Layout() {
     if (!isAdmin || isHomePage) return true
     if (!userRole) return false
     if (userRole.toUpperCase() === 'SUP') return true
-    // Se o cache ainda não terminou de carregar, não bloquear antecipadamente
+    // Enquanto o cache de perfis carrega na inicialização, aguardar (evita falso positivo ou liberação indevida)
     if (!profilesReady) return true
     return checkProfileScreenAccess(userRole, pathname, 'v')
   }, [isAdmin, isHomePage, userRole, pathname, profilesReady, profilesVersion])

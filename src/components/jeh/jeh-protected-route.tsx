@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import pb from '@/lib/pocketbase/client'
-import { canManageJehAssistant } from '@/lib/permissions'
+import { useAuth } from '@/hooks/use-auth'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 import { useToast } from '@/hooks/use-toast'
-import { ShieldAlert } from 'lucide-react'
+import { ShieldAlert, Loader2 } from 'lucide-react'
 
 interface JehProtectedRouteProps {
   children: React.ReactNode
@@ -12,22 +12,29 @@ interface JehProtectedRouteProps {
 export function JehProtectedRoute({ children }: JehProtectedRouteProps) {
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { userRole, loading } = useAuth()
 
-  const user = pb.authStore.record
-  const userRole = (user as any)?.role
-  const isAllowed = canManageJehAssistant(userRole)
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const isAllowed = isSup || checkProfileScreenAccess(userRole, '/admin/jeh', 'v')
 
   useEffect(() => {
-    if (!isAllowed) {
+    if (!loading && !isAllowed) {
       toast({
-        title: 'Acesso Restrito',
-        description:
-          'Você não possui permissão administrativa ou de supervisão para acessar a Central da Jeh.',
+        title: 'Acesso Restrito pelo Perfil',
+        description: 'Seu perfil de acesso não possui permissão para acessar a Central da Jeh.',
         variant: 'destructive',
       })
-      navigate('/admin/dashboard', { replace: true })
+      navigate('/admin', { replace: true })
     }
-  }, [isAllowed, navigate, toast])
+  }, [loading, isAllowed, navigate, toast])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
+      </div>
+    )
+  }
 
   if (!isAllowed) {
     return (

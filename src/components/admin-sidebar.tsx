@@ -102,8 +102,8 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
   }, [userRole])
 
   // Checa se usuário tem permissão para o item de menu ou tela
-  // Regra Huram: SUP é 100% irrestrito. Para demais perfis, a checagem dinâmica de perfis_permissoes é soberana;
-  // se o item possuir função estática perm(), esta só é avaliada se o perfil não tiver regra dinâmica específica.
+  // Regra Huram: SUP é 100% irrestrito. Para todos os demais, APENAS perfis_permissoes define o acesso.
+  // Setor, cargo, função legada ou regras estáticas perm() NÃO podem ampliar acesso.
   const canAccessEntry = (item: { route: string; perm?: (r: string) => boolean }): boolean => {
     if (!userRole) return false
     if (userRole.toUpperCase() === 'SUP') return true

@@ -3,11 +3,14 @@ import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
 import { ModulePageHeader } from '@/components/enterprise/module-page-header'
 import { Loader2, BarChart3 } from 'lucide-react'
-import { canViewBI } from '@/lib/bi-permissions'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 import { BIFilterProvider, BIFilterBar } from './bi-filters'
 
 export function BiLayout({ children, title }: { children: ReactNode; title: string }) {
   const { isAuthenticated, loading, userRole } = useAuth()
+
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const isAllowed = isSup || checkProfileScreenAccess(userRole, '/admin/bi', 'v')
 
   if (loading)
     return (
@@ -15,7 +18,7 @@ export function BiLayout({ children, title }: { children: ReactNode; title: stri
         <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
       </div>
     )
-  if (!isAuthenticated || !canViewBI(userRole)) return <AdminLogin />
+  if (!isAuthenticated || !isAllowed) return <AdminLogin />
 
   return (
     <BIFilterProvider>

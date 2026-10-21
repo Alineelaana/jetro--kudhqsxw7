@@ -377,11 +377,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const rawRole = (user?.role as string) || ''
   const isAlineAdmin = (user?.email as string)?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
 
-  // Se o usuário tem perfil_id expandido ou gravado, priorizamos perfil_acesso
-  const effectiveRole = isAlineAdmin ? 'SUP' : (rawPerfilAcesso || rawRole || 'PADRAO').trim()
+  const rawPerfilId = (user?.perfil_id as string) || ''
+  const isSup =
+    isAlineAdmin || rawPerfilAcesso.toUpperCase() === 'SUP' || rawRole.toUpperCase() === 'SUP'
+
+  // O acesso é determinado EXCLUSIVAMENTE pelo Perfil de Acesso cadastrado em perfis_permissoes.
+  // Setor, cargo, departamento, função legada ou listas fixas NUNCA podem ampliar ou definir acesso.
+  // Usuário sem perfil válido não recebe PADRAO: fica sem perfil (acesso negado por padrão).
+  const effectiveRole = isSup ? 'SUP' : (rawPerfilAcesso || rawPerfilId || '').trim()
 
   const userRole = effectiveRole
-  const isAdmin = isAuthenticated && (userRole === 'SUP' || rawRole === 'SUP' || isAlineAdmin)
+  const isAdmin = isAuthenticated && (isSup || !!effectiveRole)
 
   return (
     <AuthContext.Provider

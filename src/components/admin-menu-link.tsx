@@ -33,18 +33,18 @@ export function MenuLink({
   const favKey = entry.route
   const isSup = userRole?.toUpperCase() === 'SUP'
 
-  const canAccess = (itemRoute: string, itemPerm?: (r: string | undefined) => boolean) => {
+  const canAccess = (itemRoute: string) => {
     if (!userRole) return false
     if (isSup) return true
     return checkProfileScreenAccess(userRole, itemRoute, 'v')
   }
 
-  const visible = canAccess(entry.route, entry.perm)
+  const visible = canAccess(entry.route)
   if (!visible) return null
 
   // Ocultar submenus sem autorização expressa no perfil
   const visibleChildren = hasChildren
-    ? entry.children!.filter((child) => canAccess(child.route, child.perm))
+    ? entry.children!.filter((child) => canAccess(child.route))
     : []
   if (hasChildren && visibleChildren.length === 0) {
     return null

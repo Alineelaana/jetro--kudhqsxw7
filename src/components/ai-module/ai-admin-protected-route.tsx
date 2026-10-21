@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
-import { canChangeAiSettings } from '@/lib/permissions'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 import { useToast } from '@/hooks/use-toast'
 import { ShieldAlert, Loader2 } from 'lucide-react'
 
@@ -11,7 +11,7 @@ interface AiAdminProtectedRouteProps {
 
 /**
  * Guarda de rota para rotas administrativas de Inteligência Artificial.
- * Exclusivo para usuários autorizados com perfil SUP (Superusuário / Administrador técnico).
+ * Permissão avaliada via checkProfileScreenAccess e perfil SUP.
  * Redireciona com mensagem de acesso restrito (sem crash) ao tentar acesso direto por URL.
  */
 export function AiAdminProtectedRoute({ children }: AiAdminProtectedRouteProps) {
@@ -19,14 +19,15 @@ export function AiAdminProtectedRoute({ children }: AiAdminProtectedRouteProps) 
   const { toast } = useToast()
   const { userRole, loading } = useAuth()
 
-  const isAllowed = canChangeAiSettings(userRole)
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const isAllowed = isSup || checkProfileScreenAccess(userRole, '/admin/ia', 'v')
 
   useEffect(() => {
     if (!loading && !isAllowed) {
       toast({
-        title: 'Acesso Restrito',
+        title: 'Acesso Restrito pelo Perfil',
         description:
-          'Área administrativa de Inteligência Artificial restrita exclusivamente a superusuários (SUP).',
+          'Seu perfil de acesso não possui permissão para acessar esta área de Inteligência Artificial.',
         variant: 'destructive',
       })
       navigate('/admin', { replace: true })

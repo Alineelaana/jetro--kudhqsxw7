@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import pb from '@/lib/pocketbase/client'
-import { canManageJetroOnline } from '@/lib/permissions'
+import { useAuth } from '@/hooks/use-auth'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 import { useToast } from '@/hooks/use-toast'
-import { ShieldAlert } from 'lucide-react'
+import { ShieldAlert, Loader2 } from 'lucide-react'
 
 interface JetroOnlineProtectedRouteProps {
   children: React.ReactNode
@@ -12,22 +12,31 @@ interface JetroOnlineProtectedRouteProps {
 export function JetroOnlineProtectedRoute({ children }: JetroOnlineProtectedRouteProps) {
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { userRole, loading } = useAuth()
 
-  const user = pb.authStore.record
-  const userRole = (user as any)?.role
-  const isAllowed = canManageJetroOnline(userRole)
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const isAllowed =
+    isSup || checkProfileScreenAccess(userRole, '/admin/configuracoes/jetro-online', 'v')
 
   useEffect(() => {
-    if (!isAllowed) {
+    if (!loading && !isAllowed) {
       toast({
-        title: 'Acesso Restrito',
+        title: 'Acesso Restrito pelo Perfil',
         description:
-          'Você não possui permissão administrativa para acessar as Configurações do HURAM On-line.',
+          'Seu perfil de acesso não possui permissão para acessar as Configurações do HURAM On-line.',
         variant: 'destructive',
       })
       navigate('/admin', { replace: true })
     }
-  }, [isAllowed, navigate, toast])
+  }, [loading, isAllowed, navigate, toast])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-[#063D30] animate-spin" />
+      </div>
+    )
+  }
 
   if (!isAllowed) {
     return (
