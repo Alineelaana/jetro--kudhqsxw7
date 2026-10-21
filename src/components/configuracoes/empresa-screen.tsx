@@ -62,6 +62,7 @@ export function EmpresaScreen() {
   const [marcaNomeExibicao, setMarcaNomeExibicao] = useState('')
   const [marcaCorPrimaria, setMarcaCorPrimaria] = useState(HURAM_PALETTE.green)
   const [marcaCorSecundaria, setMarcaCorSecundaria] = useState(HURAM_PALETTE.gold)
+  const [marcaCorComplementar, setMarcaCorComplementar] = useState(HURAM_PALETTE.emerald)
   const [marcaPadrao, setMarcaPadrao] = useState(false)
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>('')
@@ -95,12 +96,17 @@ export function EmpresaScreen() {
         setMarcaNomeExibicao(emp.marca_nome_exibicao || emp.nome_fantasia || emp.name || '')
         setMarcaCorPrimaria(emp.marca_cor_primaria || HURAM_PALETTE.green)
         setMarcaCorSecundaria(emp.marca_cor_secundaria || HURAM_PALETTE.gold)
+        setMarcaCorComplementar(emp.marca_cor_complementar || HURAM_PALETTE.emerald)
         setMarcaPadrao(!!emp.padrao)
         setLogoFile(null)
         if (emp.marca_logo) {
           setLogoPreviewUrl(getFileUrl('empresas', emp.id, emp.marca_logo))
         } else if (emp.logo) {
           setLogoPreviewUrl(getFileUrl('empresas', emp.id, emp.logo))
+        } else if (emp.code?.toUpperCase().includes('GRAN-ROMANO')) {
+          setLogoPreviewUrl('/assets/rotulo-vintage-gran-romano-1-42884.png')
+        } else if (emp.code?.toUpperCase().includes('DEC-ELDORADO')) {
+          setLogoPreviewUrl('/assets/logotipo-dourado-deceeldorado-em-azul-royal-917fc.png')
         } else {
           setLogoPreviewUrl('')
         }
@@ -135,6 +141,7 @@ export function EmpresaScreen() {
     setMarcaNomeExibicao(emp?.nome_fantasia || emp?.name || 'HURAM')
     setMarcaCorPrimaria(HURAM_PALETTE.green)
     setMarcaCorSecundaria(HURAM_PALETTE.gold)
+    setMarcaCorComplementar(HURAM_PALETTE.emerald)
     setLogoFile(null)
     setLogoPreviewUrl('')
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -148,6 +155,7 @@ export function EmpresaScreen() {
       fd.append('marca_nome_exibicao', marcaNomeExibicao.trim())
       fd.append('marca_cor_primaria', marcaCorPrimaria.trim())
       fd.append('marca_cor_secundaria', marcaCorSecundaria.trim())
+      fd.append('marca_cor_complementar', marcaCorComplementar.trim())
       fd.append('padrao', String(marcaPadrao))
 
       if (logoFile) {
@@ -412,38 +420,45 @@ export function EmpresaScreen() {
                       <button
                         type="button"
                         onClick={() => {
+                          setMarcaNomeExibicao('Gran Romano')
+                          setMarcaCorPrimaria('#4A2E1B')
+                          setMarcaCorSecundaria('#C69B45')
+                          setMarcaCorComplementar('#8B5A2B')
+                        }}
+                        className="px-2 py-1 text-xs border rounded-md flex items-center gap-1.5 hover:bg-muted font-medium"
+                      >
+                        <span className="w-3 h-3 rounded-full bg-[#4A2E1B]" />
+                        <span className="w-3 h-3 rounded-full bg-[#C69B45]" />
+                        <span>Gran Romano (Marrom & Dourado)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMarcaNomeExibicao('Dec Eldorado')
+                          setMarcaCorPrimaria('#003DA5')
+                          setMarcaCorSecundaria('#D4AF37')
+                          setMarcaCorComplementar('#F5B324')
+                        }}
+                        className="px-2 py-1 text-xs border rounded-md flex items-center gap-1.5 hover:bg-muted font-medium"
+                      >
+                        <span className="w-3 h-3 rounded-full bg-[#003DA5]" />
+                        <span className="w-3 h-3 rounded-full bg-[#D4AF37]" />
+                        <span className="w-3 h-3 rounded-full bg-[#F5B324]" />
+                        <span>Dec Eldorado (Azul, Dourado & Amarelo)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMarcaNomeExibicao('HURAM')
                           setMarcaCorPrimaria('#063D30')
                           setMarcaCorSecundaria('#C69B45')
+                          setMarcaCorComplementar('#116B50')
                         }}
                         className="px-2 py-1 text-xs border rounded-md flex items-center gap-1.5 hover:bg-muted"
                       >
                         <span className="w-3 h-3 rounded-full bg-[#063D30]" />
                         <span className="w-3 h-3 rounded-full bg-[#C69B45]" />
-                        <span>HURAM Oficial</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMarcaCorPrimaria('#0F4C81')
-                          setMarcaCorSecundaria('#F5A623')
-                        }}
-                        className="px-2 py-1 text-xs border rounded-md flex items-center gap-1.5 hover:bg-muted"
-                      >
-                        <span className="w-3 h-3 rounded-full bg-[#0F4C81]" />
-                        <span className="w-3 h-3 rounded-full bg-[#F5A623]" />
-                        <span>Azul Clássico</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMarcaCorPrimaria('#7C2D12')
-                          setMarcaCorSecundaria('#FBBF24')
-                        }}
-                        className="px-2 py-1 text-xs border rounded-md flex items-center gap-1.5 hover:bg-muted"
-                      >
-                        <span className="w-3 h-3 rounded-full bg-[#7C2D12]" />
-                        <span className="w-3 h-3 rounded-full bg-[#FBBF24]" />
-                        <span>Terracota & Ouro</span>
+                        <span>HURAM Oficial (Verde & Dourado)</span>
                       </button>
                       <button
                         type="button"

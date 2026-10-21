@@ -383,7 +383,10 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 align="start"
                 className="w-56 bg-white text-[#202B28] border border-[#E4EAE6] shadow-lg p-1 rounded-lg z-50 text-xs"
               >
-                <DropdownMenuLabel className="text-[11px] font-bold text-[#063D30] px-2 py-1">
+                <DropdownMenuLabel
+                  className="text-[11px] font-bold px-2 py-1"
+                  style={{ color: 'var(--brand-primary, #063D30)' }}
+                >
                   Empresa Ativa
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#E4EAE6]" />

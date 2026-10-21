@@ -78,10 +78,14 @@
     --brand-primary: #063d30;
     --brand-primary-dark: #042820;
     --brand-primary-light: #116b50;
+    --brand-primary-soft: rgba(6, 61, 48, 0.08);
     --brand-secondary: #c69b45;
     --brand-secondary-light: #dfb868;
+    --brand-complementary: #116b50;
+    --brand-complementary-light: #288f6f;
     --brand-primary-hsl: 167 82% 13%;
     --brand-secondary-hsl: 40 54% 52%;
+    --brand-complementary-hsl: 163 73% 24%;
 
     /* Compatibilidade retroativa */
     --gold: 40 54% 52%; /* #C69B45 */
@@ -166,11 +170,26 @@
   .bg-brand-primary {
     background-color: var(--brand-primary, #063d30);
   }
+  .bg-brand-primary-dark {
+    background-color: var(--brand-primary-dark, #042820);
+  }
+  .bg-brand-primary-light {
+    background-color: var(--brand-primary-light, #116b50);
+  }
+  .bg-brand-primary-soft {
+    background-color: var(--brand-primary-soft, rgba(6, 61, 48, 0.08));
+  }
   .text-brand-primary {
     color: var(--brand-primary, #063d30);
   }
+  .text-brand-primary-light {
+    color: var(--brand-primary-light, #116b50);
+  }
   .border-brand-primary {
     border-color: var(--brand-primary, #063d30);
+  }
+  .border-brand-primary-light {
+    border-color: var(--brand-primary-light, #116b50);
   }
   .bg-brand-secondary {
     background-color: var(--brand-secondary, #c69b45);
@@ -180,6 +199,15 @@
   }
   .border-brand-secondary {
     border-color: var(--brand-secondary, #c69b45);
+  }
+  .bg-brand-complementary {
+    background-color: var(--brand-complementary, #116b50);
+  }
+  .text-brand-complementary {
+    color: var(--brand-complementary, #116b50);
+  }
+  .border-brand-complementary {
+    border-color: var(--brand-complementary, #116b50);
   }
 
   .gold-gradient-text {

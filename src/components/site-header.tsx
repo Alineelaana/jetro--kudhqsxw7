@@ -215,10 +215,19 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                   align="end"
                   className="w-64 bg-white text-[#202B28] border border-[#E4EAE6] shadow-xl p-1.5 rounded-xl z-50"
                 >
-                  <DropdownMenuLabel className="text-xs font-bold text-[#063D30] px-2 py-1.5 flex items-center justify-between">
+                  <DropdownMenuLabel
+                    className="text-xs font-bold px-2 py-1.5 flex items-center justify-between"
+                    style={{ color: 'var(--brand-primary, #063D30)' }}
+                  >
                     <span>Selecionar Empresa</span>
                     {isSup && (
-                      <span className="text-[10px] font-semibold bg-[#063D30]/10 text-[#063D30] px-1.5 py-0.5 rounded">
+                      <span
+                        className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+                        style={{
+                          backgroundColor: 'var(--brand-primary-soft, rgba(6, 61, 48, 0.1))',
+                          color: 'var(--brand-primary, #063D30)',
+                        }}
+                      >
                         SUP
                       </span>
                     )}
@@ -243,9 +252,14 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                           className={cn(
                             'flex items-center justify-between px-2.5 py-2 rounded-lg text-xs cursor-pointer transition-colors',
                             isSelected
-                              ? 'bg-[#063D30] text-white font-semibold'
+                              ? 'text-white font-semibold'
                               : 'hover:bg-[#F1F4F2] text-[#202B28]',
                           )}
+                          style={
+                            isSelected
+                              ? { backgroundColor: 'var(--brand-primary, #063D30)' }
+                              : undefined
+                          }
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <span

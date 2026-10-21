@@ -1,6 +1,5 @@
 import pb from '@/lib/pocketbase/client'
-import logoGranRomanoOfficial from '@/assets/whatsapp-image-2026-10-18-at-13.46.16-1-0a268.jpeg'
-import logoDecEldoradoOfficial from '@/assets/whatsapp-image-2026-10-18-at-13.46.16-e400b.jpeg'
+import { logoGranRomanoOfficial, logoDecEldoradoOfficial } from '@/lib/brand-assets'
 
 export interface SiteClient {
   id: string

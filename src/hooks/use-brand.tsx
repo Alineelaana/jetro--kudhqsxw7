@@ -5,6 +5,8 @@ import { getCurrentUserTenant } from '@/lib/multitenancy'
 import {
   logoHuramLight,
   logoHuramDark,
+  logoGranRomanoOfficial,
+  logoDecEldoradoOfficial,
   BRAND_NAME,
   BRAND_TAGLINE,
   HURAM_PALETTE,
@@ -12,12 +14,14 @@ import {
 
 export interface EmpresaBrand {
   id: string
+  code?: string
   name: string
   razao_social?: string
   nome_fantasia?: string
   marca_nome_exibicao?: string
   marca_cor_primaria?: string
   marca_cor_secundaria?: string
+  marca_cor_complementar?: string
   marca_logo?: string
   logo?: string
   padrao?: boolean
@@ -32,6 +36,7 @@ export interface ActiveBrand {
   logoDarkUrl: string
   corPrimaria: string
   corSecundaria: string
+  corComplementar: string
   isCustom: boolean
   empresaPadrao: boolean
 }
@@ -44,6 +49,7 @@ const DEFAULT_BRAND: ActiveBrand = {
   logoDarkUrl: logoHuramDark,
   corPrimaria: HURAM_PALETTE.green, // #063D30
   corSecundaria: HURAM_PALETTE.gold, // #C69B45
+  corComplementar: HURAM_PALETTE.emerald, // #116B50
   isCustom: false,
   empresaPadrao: true,
 }
@@ -73,15 +79,46 @@ export function getFileUrl(
   return `${base}/api/files/${collectionNameOrId}/${recordId}/${fileName}`
 }
 
+export function resolveOfficialLogoFallback(empresa?: EmpresaBrand | null): string | null {
+  if (!empresa) return null
+  const code = (empresa.code || '').toUpperCase()
+  const name = (
+    empresa.name ||
+    empresa.nome_fantasia ||
+    empresa.razao_social ||
+    empresa.marca_nome_exibicao ||
+    ''
+  ).toLowerCase()
+
+  if (code.includes('GRAN-ROMANO') || name.includes('gran romano')) {
+    return logoGranRomanoOfficial
+  }
+  if (code.includes('DEC-ELDORADO') || name.includes('dec eldorado')) {
+    return logoDecEldoradoOfficial
+  }
+  return null
+}
+
 export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBrand {
   if (!empresa) return DEFAULT_BRAND
 
-  const hasCustomLogo = !!(empresa.marca_logo || empresa.logo)
+  const hasUploadedLogo = !!(empresa.marca_logo || empresa.logo)
   const logoFile = empresa.marca_logo || empresa.logo
-  const customLogoUrl = logoFile ? getFileUrl('empresas', empresa.id, logoFile) : ''
+  const uploadedLogoUrl = logoFile ? getFileUrl('empresas', empresa.id, logoFile) : ''
+  const officialFallback = resolveOfficialLogoFallback(empresa)
+  const effectiveLogoUrl = uploadedLogoUrl || officialFallback || logoHuramLight
+  const effectiveLogoDarkUrl = uploadedLogoUrl || officialFallback || logoHuramDark
 
   const corPrimaria = empresa.marca_cor_primaria?.trim() || HURAM_PALETTE.green
   const corSecundaria = empresa.marca_cor_secundaria?.trim() || HURAM_PALETTE.gold
+  const corComplementar =
+    empresa.marca_cor_complementar?.trim() ||
+    (corPrimaria === '#003DA5'
+      ? '#F5B324'
+      : corPrimaria === '#4A2E1B'
+        ? '#8B5A2B'
+        : HURAM_PALETTE.emerald)
+
   const nomeExibicao =
     empresa.marca_nome_exibicao?.trim() ||
     empresa.nome_fantasia?.trim() ||
@@ -92,16 +129,19 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
     !!empresa.marca_nome_exibicao ||
     !!empresa.marca_cor_primaria ||
     !!empresa.marca_cor_secundaria ||
-    hasCustomLogo
+    !!empresa.marca_cor_complementar ||
+    hasUploadedLogo ||
+    !!officialFallback
 
   return {
     empresaId: empresa.id,
     empresaNome: empresa.name || empresa.razao_social || BRAND_NAME,
     nomeExibicao,
-    logoUrl: customLogoUrl || logoHuramLight,
-    logoDarkUrl: customLogoUrl || logoHuramDark,
+    logoUrl: effectiveLogoUrl,
+    logoDarkUrl: effectiveLogoDarkUrl,
     corPrimaria,
     corSecundaria,
+    corComplementar,
     isCustom,
     empresaPadrao: !!empresa.padrao,
   }

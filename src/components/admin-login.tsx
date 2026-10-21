@@ -130,7 +130,8 @@ export function AdminLogin() {
                   value={username}
                   onChange={handleUsernameChange}
                   placeholder="Digite seu login (ex: patricia) ou e-mail"
-                  className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
+                  className="pl-10 border-[#E4EAE6] bg-white text-[#202B28]"
+                  style={{ outlineColor: corPrimaria }}
                   autoComplete="username"
                 />
               </div>
@@ -152,7 +153,8 @@ export function AdminLogin() {
                   value={password}
                   onChange={handlePasswordChange}
                   placeholder="Digite sua senha"
-                  className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
+                  className="pl-10 border-[#E4EAE6] bg-white text-[#202B28]"
+                  style={{ outlineColor: corPrimaria }}
                   autoComplete="current-password"
                 />
               </div>
@@ -173,14 +175,15 @@ export function AdminLogin() {
                 type="checkbox"
                 checked={allowLocation}
                 onChange={(e) => setAllowLocation(e.target.checked)}
-                className="mt-1 rounded border-[#E4EAE6] text-[#063D30] focus:ring-[#063D30] h-4 w-4 cursor-pointer"
+                className="mt-1 rounded border-[#E4EAE6] h-4 w-4 cursor-pointer"
+                style={{ accentColor: corPrimaria }}
               />
               <label
                 htmlFor="allow-location"
                 className="text-xs text-[#66736D] leading-relaxed cursor-pointer select-none"
               >
                 <span className="font-semibold text-[#202B28] flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#063D30]" />
+                  <MapPin className="w-3.5 h-3.5" style={{ color: corPrimaria }} />
                   Autorizar localização precisa neste acesso
                 </span>
                 <span>
@@ -220,7 +223,11 @@ export function AdminLogin() {
               <Button
                 asChild
                 variant="outline"
-                className="w-full border-[#063D30]/30 hover:bg-[#063D30]/5 text-[#063D30] font-semibold text-sm rounded-xl cursor-pointer"
+                className="w-full font-semibold text-sm rounded-xl cursor-pointer"
+                style={{
+                  borderColor: `${corPrimaria}40`,
+                  color: corPrimaria,
+                }}
               >
                 <Link to="/site" className="flex items-center justify-center gap-2">
                   Acesse o site institucional

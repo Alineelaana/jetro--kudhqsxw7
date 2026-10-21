@@ -87,11 +87,14 @@ export default function Layout() {
   const brandStyles = useMemo<Record<string, string>>(() => {
     const corPrimaria = brand.corPrimaria || '#063D30'
     const corSecundaria = brand.corSecundaria || '#C69B45'
+    const corComplementar = brand.corComplementar || '#116B50'
     const primariaHsl = hexToHslString(corPrimaria) || '167 82% 13%'
     const secundariaHsl = hexToHslString(corSecundaria) || '40 54% 52%'
+    const complementarHsl = hexToHslString(corComplementar) || '163 73% 24%'
     const darkShade = shadeHexColor(corPrimaria, -0.3)
     const lightShade = shadeHexColor(corPrimaria, 0.25)
     const secondaryLight = shadeHexColor(corSecundaria, 0.2)
+    const compLight = shadeHexColor(corComplementar, 0.2)
 
     return {
       '--brand-primary': corPrimaria,
@@ -99,10 +102,17 @@ export default function Layout() {
       '--brand-primary-light': lightShade,
       '--brand-secondary': corSecundaria,
       '--brand-secondary-light': secondaryLight,
+      '--brand-complementary': corComplementar,
+      '--brand-complementary-light': compLight,
       '--brand-primary-hsl': primariaHsl,
       '--brand-secondary-hsl': secundariaHsl,
+      '--brand-complementary-hsl': complementarHsl,
+      '--primary': primariaHsl,
+      '--huram-green': primariaHsl,
+      '--huram-gold': secundariaHsl,
+      '--huram-emerald': complementarHsl,
     } as unknown as Record<string, string>
-  }, [brand.corPrimaria, brand.corSecundaria])
+  }, [brand.corPrimaria, brand.corSecundaria, brand.corComplementar])
 
   // Redirecionamento preventivo de nível de layout: se o usuário já estiver autenticado e tentar acessar /site, manda direto para /admin
   if (isSite && isAuthenticated) {
@@ -240,7 +250,13 @@ export default function Layout() {
             <Suspense
               fallback={
                 <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
-                  <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
+                  <div
+                    className="w-7 h-7 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{
+                      borderColor: 'var(--brand-primary, #063D30)',
+                      borderTopColor: 'transparent',
+                    }}
+                  />
                 </div>
               }
             >

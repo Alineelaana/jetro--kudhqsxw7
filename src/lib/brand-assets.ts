@@ -1,7 +1,9 @@
 import logoHuramLight from '@/assets/logo-huram-em-verde-e-dourado-1-e173e.png'
 import logoHuramDark from '@/assets/logotipo-huram-em-verde-esmeralda-9c184.png'
+import logoDecEldoradoOfficial from '@/assets/logotipo-dourado-deceeldorado-em-azul-royal-917fc.png'
+import logoGranRomanoOfficial from '@/assets/rotulo-vintage-gran-romano-1-42884.png'
 
-export { logoHuramLight, logoHuramDark }
+export { logoHuramLight, logoHuramDark, logoDecEldoradoOfficial, logoGranRomanoOfficial }
 
 export const BRAND_NAME = 'HURAM'
 export const BRAND_FULL_NAME = 'HURAM — Sistema Inteligente de Gestão'

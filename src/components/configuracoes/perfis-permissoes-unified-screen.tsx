@@ -505,11 +505,23 @@ export function PerfisPermissoesUnifiedScreen() {
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <Card className="border-2 border-[#063D30]/20 shadow-xs">
-        <CardHeader className="bg-gradient-to-r from-[#063D30] to-[#0A5241] text-white rounded-t-lg p-5">
+      <Card
+        className="border-2 shadow-xs"
+        style={{ borderColor: 'var(--brand-primary-soft, rgba(6, 61, 48, 0.2))' }}
+      >
+        <CardHeader
+          className="text-white rounded-t-lg p-5"
+          style={{
+            background:
+              'linear-gradient(to right, var(--brand-primary, #063D30), var(--brand-primary-light, #116B50))',
+          }}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-white/10 text-[#C69B45] border border-[#C69B45]/30">
+              <div
+                className="p-2.5 rounded-lg bg-white/10 border border-white/20"
+                style={{ color: 'var(--brand-secondary, #C69B45)' }}
+              >
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div>
@@ -534,7 +546,11 @@ export function PerfisPermissoesUnifiedScreen() {
               </Button>
               <Button
                 onClick={handleOpenCreate}
-                className="bg-[#C69B45] hover:bg-[#B38A3A] text-[#063D30] font-bold shadow-sm"
+                className="font-bold shadow-sm"
+                style={{
+                  backgroundColor: 'var(--brand-secondary, #C69B45)',
+                  color: 'var(--brand-primary, #063D30)',
+                }}
               >
                 <Plus className="w-4 h-4 mr-1.5" /> Criar Novo Perfil
               </Button>
@@ -550,15 +566,27 @@ export function PerfisPermissoesUnifiedScreen() {
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer',
               activeTab === 'gestao'
-                ? 'border-[#063D30] text-[#063D30] dark:text-emerald-400 dark:border-emerald-400 bg-white dark:bg-card rounded-t-md shadow-xs'
+                ? 'bg-white dark:bg-card rounded-t-md shadow-xs'
                 : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
+            style={
+              activeTab === 'gestao'
+                ? {
+                    borderColor: 'var(--brand-primary, #063D30)',
+                    color: 'var(--brand-primary, #063D30)',
+                  }
+                : undefined
+            }
           >
             <ShieldCheck className="w-4 h-4" />
             <span>Gestão de Perfis & Edição</span>
             <Badge
               variant="secondary"
-              className="text-[10px] h-4 px-1 bg-[#063D30]/10 text-[#063D30]"
+              className="text-[10px] h-4 px-1"
+              style={{
+                backgroundColor: 'var(--brand-primary-soft, rgba(6, 61, 48, 0.1))',
+                color: 'var(--brand-primary, #063D30)',
+              }}
             >
               {profiles.length}
             </Badge>
@@ -570,9 +598,17 @@ export function PerfisPermissoesUnifiedScreen() {
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer',
               activeTab === 'matriz'
-                ? 'border-[#063D30] text-[#063D30] dark:text-emerald-400 dark:border-emerald-400 bg-white dark:bg-card rounded-t-md shadow-xs'
+                ? 'bg-white dark:bg-card rounded-t-md shadow-xs'
                 : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
+            style={
+              activeTab === 'matriz'
+                ? {
+                    borderColor: 'var(--brand-primary, #063D30)',
+                    color: 'var(--brand-primary, #063D30)',
+                  }
+                : undefined
+            }
           >
             <TableProperties className="w-4 h-4" />
             <span>Matriz Comparativa (Banco Real)</span>
@@ -584,9 +620,17 @@ export function PerfisPermissoesUnifiedScreen() {
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer',
               activeTab === 'gaps'
-                ? 'border-[#063D30] text-[#063D30] dark:text-emerald-400 dark:border-emerald-400 bg-white dark:bg-card rounded-t-md shadow-xs'
+                ? 'bg-white dark:bg-card rounded-t-md shadow-xs'
                 : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
+            style={
+              activeTab === 'gaps'
+                ? {
+                    borderColor: 'var(--brand-primary, #063D30)',
+                    color: 'var(--brand-primary, #063D30)',
+                  }
+                : undefined
+            }
           >
             <AlertTriangle className="w-4 h-4 text-[#E87517]" />
             <span>Relatório de Gaps & Auditoria</span>
@@ -607,10 +651,12 @@ export function PerfisPermissoesUnifiedScreen() {
                 <Info className="w-4 h-4 text-[#C69B45] shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold">Regra Institucional Huram:</span> O perfil{' '}
-                  <strong className="text-[#063D30] font-black">SUP (Superusuário)</strong> possui
-                  acesso pleno e irrestrito a todas as telas do sistema (Visualizar, Criar, Editar e
-                  Excluir). A tela de gestão permanece totalmente editável para personalizações
-                  necessárias, mantendo a integridade sem divergências.
+                  <strong className="font-black" style={{ color: 'var(--brand-primary, #063D30)' }}>
+                    SUP (Superusuário)
+                  </strong>{' '}
+                  possui acesso pleno e irrestrito a todas as telas do sistema (Visualizar, Criar,
+                  Editar e Excluir). A tela de gestão permanece totalmente editável para
+                  personalizações necessárias, mantendo a integridade sem divergências.
                 </div>
               </div>
 
@@ -630,7 +676,10 @@ export function PerfisPermissoesUnifiedScreen() {
               {/* Tabela de Perfis */}
               <div className="border border-border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-[#063D30] text-white">
+                  <thead
+                    className="text-white"
+                    style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
+                  >
                     <tr>
                       <th className="text-left px-4 py-3 font-bold">Perfil</th>
                       <th className="text-left px-4 py-3 font-bold">Código</th>
@@ -682,9 +731,15 @@ export function PerfisPermissoesUnifiedScreen() {
                             <td className="px-4 py-3 font-semibold text-foreground">
                               <div className="flex items-center gap-2">
                                 {isSup ? (
-                                  <ShieldCheck className="w-4 h-4 text-[#C69B45]" />
+                                  <ShieldCheck
+                                    className="w-4 h-4"
+                                    style={{ color: 'var(--brand-secondary, #C69B45)' }}
+                                  />
                                 ) : (
-                                  <Shield className="w-4 h-4 text-[#063D30]" />
+                                  <Shield
+                                    className="w-4 h-4"
+                                    style={{ color: 'var(--brand-primary, #063D30)' }}
+                                  />
                                 )}
                                 <span>{p.name}</span>
                               </div>
@@ -695,8 +750,8 @@ export function PerfisPermissoesUnifiedScreen() {
                                 className={cn(
                                   'font-mono text-xs font-bold',
                                   isSup
-                                    ? 'bg-[#C69B45]/20 text-[#063D30] border border-[#C69B45]/50'
-                                    : 'bg-[#063D30]/10 text-[#063D30]',
+                                    ? 'bg-[var(--brand-secondary,#C69B45)]/20 text-[var(--brand-primary,#063D30)] border border-[var(--brand-secondary,#C69B45)]/50'
+                                    : 'bg-[var(--brand-primary-soft,rgba(6,61,48,0.1))] text-[var(--brand-primary,#063D30)]',
                                 )}
                               >
                                 {p.code}
@@ -729,7 +784,7 @@ export function PerfisPermissoesUnifiedScreen() {
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => handleOpenEdit(p)}
-                                  className="h-8 px-2.5 text-[#063D30] hover:bg-[#063D30]/10"
+                                  className="h-8 px-2.5 text-[var(--brand-primary,#063D30)] hover:bg-[var(--brand-primary,#063D30)]/10"
                                   title="Editar menus e permissões do perfil"
                                 >
                                   <Pencil className="w-4 h-4 mr-1" /> Editar
@@ -802,7 +857,10 @@ export function PerfisPermissoesUnifiedScreen() {
               {/* Tabela de Matriz Comparativa */}
               <div className="border border-border rounded-lg overflow-x-auto max-h-[550px] overflow-y-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-[#063D30] text-white sticky top-0 z-10">
+                  <thead
+                    className="text-white sticky top-0 z-10"
+                    style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
+                  >
                     <tr>
                       <th className="text-left px-3 py-2.5 font-bold min-w-[220px]">
                         Tela / Módulo
@@ -1068,17 +1126,26 @@ export function PerfisPermissoesUnifiedScreen() {
       {/* DIÁLOGO INTEGRADO: CRIAR OU EDITAR PERFIL COM MENUS E BUSCA GLOBAL DE TELAS */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[92vh] flex flex-col p-0 gap-0 overflow-hidden">
-          <DialogHeader className="p-5 bg-gradient-to-r from-[#063D30] to-[#0A5241] text-white shrink-0">
+          <DialogHeader
+            className="p-5 text-white shrink-0"
+            style={{
+              background:
+                'linear-gradient(to right, var(--brand-primary, #063D30), var(--brand-primary-light, #116B50))',
+            }}
+          >
             <DialogTitle className="flex items-center gap-2 text-lg text-white font-black">
               {editingProfileId ? (
                 <>
-                  <Pencil className="w-5 h-5 text-[#C69B45]" /> Editar Perfil & Permissões:{' '}
-                  {name || code}
+                  <Pencil
+                    className="w-5 h-5"
+                    style={{ color: 'var(--brand-secondary, #C69B45)' }}
+                  />{' '}
+                  Editar Perfil & Permissões: {name || code}
                 </>
               ) : (
                 <>
-                  <Plus className="w-5 h-5 text-[#C69B45]" /> Criar Novo Perfil & Configurar
-                  Permissões
+                  <Plus className="w-5 h-5" style={{ color: 'var(--brand-secondary, #C69B45)' }} />{' '}
+                  Criar Novo Perfil & Configurar Permissões
                 </>
               )}
             </DialogTitle>
@@ -1093,33 +1160,48 @@ export function PerfisPermissoesUnifiedScreen() {
               {/* BLOCO 1: DADOS BÁSICOS DO PERFIL */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-[#F8FAF9] dark:bg-card border border-border rounded-lg">
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label className="text-xs font-bold text-[#063D30]">Nome do Perfil *</Label>
+                  <Label
+                    className="text-xs font-bold"
+                    style={{ color: 'var(--brand-primary, #063D30)' }}
+                  >
+                    Nome do Perfil *
+                  </Label>
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex.: Financeiro Júnior, Gestor Comercial, Auditor..."
-                    className="focus-visible:ring-[#063D30] h-9"
+                    className="h-9"
                     required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-[#063D30]">Código Identificador *</Label>
+                  <Label
+                    className="text-xs font-bold"
+                    style={{ color: 'var(--brand-primary, #063D30)' }}
+                  >
+                    Código Identificador *
+                  </Label>
                   <Input
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="Ex.: FIN_JR, COMERCIAL, SUP"
-                    className="focus-visible:ring-[#063D30] font-mono h-9"
+                    className="font-mono h-9"
                     disabled={isSupEditing}
                     required
                   />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label className="text-xs font-bold text-[#063D30]">Descrição do Papel</Label>
+                  <Label
+                    className="text-xs font-bold"
+                    style={{ color: 'var(--brand-primary, #063D30)' }}
+                  >
+                    Descrição do Papel
+                  </Label>
                   <Input
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Finalidade deste perfil no ERP..."
-                    className="focus-visible:ring-[#063D30] h-9"
+                    className="h-9"
                   />
                 </div>
                 <div className="flex items-center justify-between sm:justify-start gap-3 sm:pt-6">
@@ -1128,7 +1210,7 @@ export function PerfisPermissoesUnifiedScreen() {
                     checked={active}
                     onCheckedChange={setActive}
                     disabled={isSupEditing}
-                    className="data-[state=checked]:bg-[#063D30]"
+                    className="data-[state=checked]:bg-[var(--brand-primary,#063D30)]"
                   />
                 </div>
               </div>
@@ -1522,7 +1604,8 @@ export function PerfisPermissoesUnifiedScreen() {
               <Button
                 type="submit"
                 disabled={saving}
-                className="bg-[#063D30] hover:bg-[#0A5241] text-white font-bold"
+                className="text-white font-bold hover:opacity-90"
+                style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
               >
                 {saving ? (
                   <>

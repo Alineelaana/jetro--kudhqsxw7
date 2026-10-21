@@ -298,7 +298,7 @@ export function JetroTable<T extends object = Record<string, any>>({
                     variant="outline"
                     size="sm"
                     disabled={sortedData.length === 0}
-                    className="h-8 text-xs font-semibold border-[#063D30]/30 text-[#063D30] hover:bg-[#063D30]/10"
+                    className="h-8 text-xs font-semibold border-[var(--brand-primary,#063D30)]/30 text-[var(--brand-primary,#063D30)] hover:bg-[var(--brand-primary,#063D30)]/10"
                   >
                     <Download className="w-3.5 h-3.5 mr-1.5" /> Exportar
                   </Button>
@@ -324,7 +324,10 @@ export function JetroTable<T extends object = Record<string, any>>({
               className="h-8 text-xs font-semibold border-border hover:bg-muted"
               title="Personalizar colunas visíveis e ordem"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5 text-[#063D30]" />
+              <SlidersHorizontal
+                className="w-3.5 h-3.5 mr-1.5"
+                style={{ color: 'var(--brand-primary, #063D30)' }}
+              />
               Personalizar Colunas
             </Button>
 
@@ -353,7 +356,10 @@ export function JetroTable<T extends object = Record<string, any>>({
               data-tour-id="pedidos-tabela-head"
               className={globalPrefs.tableStickyHeader ? 'sticky top-0 z-10' : ''}
             >
-              <tr className="bg-[#063D30] text-white select-none">
+              <tr
+                className="text-white select-none"
+                style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
+              >
                 {visibleColumns.map((col) => {
                   const isSorted = activeSorting?.columnId === col.id
                   const sortDir = isSorted ? activeSorting.direction : null
@@ -380,14 +386,14 @@ export function JetroTable<T extends object = Record<string, any>>({
                             ? 'text-right'
                             : 'text-left'
                       } ${
-                        isSortable ? 'cursor-pointer hover:bg-[#042820]' : ''
+                        isSortable ? 'cursor-pointer hover:opacity-90' : ''
                       } ${col.headerClassName || ''} ${
                         isDropTarget && dropPosition === 'before'
-                          ? 'border-l-4 border-[#C69B45]'
+                          ? 'border-l-4 border-[var(--brand-secondary,#C69B45)]'
                           : ''
                       } ${
                         isDropTarget && dropPosition === 'after'
-                          ? 'border-r-4 border-[#C69B45]'
+                          ? 'border-r-4 border-[var(--brand-secondary,#C69B45)]'
                           : ''
                       }`}
                       onClick={(e) => {
@@ -426,10 +432,11 @@ export function JetroTable<T extends object = Record<string, any>>({
                         {isSortable && (
                           <span
                             className={`inline-flex items-center transition-transform ${
-                              isSorted
-                                ? 'text-[#C69B45] font-black scale-110'
-                                : 'opacity-40 hover:opacity-80'
+                              isSorted ? 'font-black scale-110' : 'opacity-40 hover:opacity-80'
                             }`}
+                            style={
+                              isSorted ? { color: 'var(--brand-secondary, #C69B45)' } : undefined
+                            }
                           >
                             {sortDir === 'asc' ? (
                               <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -466,7 +473,10 @@ export function JetroTable<T extends object = Record<string, any>>({
                     className="py-12 text-center text-muted-foreground"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-[#063D30] border-t-transparent rounded-full animate-spin" />
+                      <div
+                        className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
+                        style={{ borderColor: 'var(--brand-primary, #063D30)' }}
+                      />
                       <span>Carregando dados...</span>
                     </div>
                   </td>
@@ -488,7 +498,9 @@ export function JetroTable<T extends object = Record<string, any>>({
                       key={key}
                       onClick={() => onRowClick?.(row)}
                       className={`border-b border-border/60 transition-colors ${
-                        onRowClick ? 'cursor-pointer hover:bg-[#063D30]/5' : 'hover:bg-muted/40'
+                        onRowClick
+                          ? 'cursor-pointer hover:bg-[var(--brand-primary-soft,rgba(6,61,48,0.05))]'
+                          : 'hover:bg-muted/40'
                       } ${
                         globalPrefs.tableStripedRows && index % 2 === 1
                           ? 'bg-muted/20 dark:bg-muted/10'
