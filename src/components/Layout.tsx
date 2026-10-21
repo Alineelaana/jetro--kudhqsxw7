@@ -243,7 +243,11 @@ export default function Layout() {
       <InactivityTracker />
       {!isRootLogin && <SiteHeader onOpenScreenLogic={() => setScreenLogicOpen(true)} />}
       <main
-        className={cn('flex-1 flex flex-col justify-between', isAuthenticated && 'pr-12 sm:pr-14')}
+        className={cn(
+          'flex-1 flex flex-col justify-between',
+          isAuthenticated && 'pr-12 sm:pr-14',
+          isRootLogin && 'p-0',
+        )}
       >
         <div className="flex-1">
           <ModuleErrorBoundary key={pathname} moduleName={pathname || 'Portal'}>
@@ -276,7 +280,7 @@ export default function Layout() {
       {isAuthenticated && <FloatingChat />}
       {isAuthenticated && <JetroCustomizationDrawer />}
       {isAuthenticated && <JetroRightFloatingWidgets />}
-      {!isAuthenticated && <PublicJehChat />}
+      {!isAuthenticated && !isRootLogin && <PublicJehChat />}
 
       {canAccessDocs && (
         <ScreenLogicDrawer

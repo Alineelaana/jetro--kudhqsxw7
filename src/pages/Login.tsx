@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
@@ -11,16 +10,14 @@ import {
   User,
   AlertCircle,
   Loader2,
-  Globe,
   ShieldCheck,
-  ChevronRight,
   Eye,
   EyeOff,
   Clock,
+  Globe,
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
-import { AttributionFooter } from '@/components/attribution-footer'
-import { logoHuramLight, logoHuramDark, HURAM_PALETTE } from '@/lib/brand-assets'
+import { logoDecEldoradoOfficial, logoGranRomanoOfficial } from '@/lib/brand-assets'
 import { useBrand } from '@/hooks/use-brand'
 
 export default function LoginPage() {
@@ -41,7 +38,6 @@ export default function LoginPage() {
     const state = location.state as { inactivityMessage?: string } | null
     if (state?.inactivityMessage) {
       setInactivityNotice(state.inactivityMessage)
-      // Limpa do state do histórico para não reaparecer após refresh
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
@@ -91,229 +87,480 @@ export default function LoginPage() {
 
   if (mfaRequired) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#001c10] via-[#002817] to-[#00140b] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#0a0703] via-[#120d06] to-[#050302] flex items-center justify-center p-4">
         <MfaVerifyScreen onVerify={mfaLoginVerify} onCancel={mfaCancel} />
       </div>
     )
   }
 
-  const corPrimaria = loginBrand.corPrimaria || HURAM_PALETTE.green
-  const corSecundaria = loginBrand.corSecundaria || HURAM_PALETTE.gold
-  const nomeExibicao = loginBrand.nomeExibicao || 'HURAM'
-  const logoSrc = loginBrand.logoDarkUrl || logoHuramDark
+  // Permite verificar se o hook useBrand está ativo (preservando o hook e compatibilidade)
+  void loginBrand
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F8FAF9] via-white to-[#F1F4F2] flex flex-col justify-between relative overflow-hidden text-[#202B28]">
-      {/* Elementos visuais decorativos de fundo suaves */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#0c0905] text-[#241c10] flex flex-col justify-between selection:bg-[#d4a446]/30 select-none">
+      {/* ========================================================
+          CAMADA DE FUNDO PREMIUM ESCURA COM ONDAS E FORMAS METÁLICAS DOURADAS
+          ======================================================== */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {/* Gradiente radial de profundidade e brilhos quentes */}
         <div
-          className="absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-10"
-          style={{ backgroundColor: corPrimaria }}
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at 18% 28%, rgba(220, 168, 62, 0.16) 0%, transparent 45%), ' +
+              'radial-gradient(circle at 85% 75%, rgba(212, 164, 70, 0.14) 0%, transparent 50%), ' +
+              'radial-gradient(circle at 50% 50%, rgba(30, 20, 10, 0.95) 0%, #0c0905 100%)',
+          }}
         />
+
+        {/* Silhueta de fachada corporativa estilizada / vidro moderno ao fundo à esquerda */}
         <div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full blur-3xl opacity-10"
-          style={{ backgroundColor: corSecundaria }}
+          className="absolute -bottom-10 -left-12 w-[340px] sm:w-[460px] lg:w-[540px] h-[580px] sm:h-[680px] opacity-25 mix-blend-screen pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(212,164,70,0.3) 0%, rgba(140,95,20,0.05) 60%, transparent 85%), ' +
+              'repeating-linear-gradient(0deg, rgba(230,180,80,0.18) 0px, rgba(230,180,80,0.18) 2px, transparent 2px, transparent 28px), ' +
+              'repeating-linear-gradient(90deg, rgba(230,180,80,0.22) 0px, rgba(230,180,80,0.22) 2px, transparent 2px, transparent 48px)',
+            transform: 'perspective(600px) rotateY(18deg) rotateX(6deg) skewY(-8deg)',
+            maskImage:
+              'linear-gradient(to top right, black 35%, rgba(0,0,0,0.7) 65%, transparent 95%)',
+            WebkitMaskImage:
+              'linear-gradient(to top right, black 35%, rgba(0,0,0,0.7) 65%, transparent 95%)',
+          }}
         />
+
+        {/* Fachada corporativa iluminada secundária (luzes douradas de escritórios modernos) */}
+        <div
+          className="hidden sm:block absolute bottom-0 left-0 w-[420px] h-[340px] opacity-20 pointer-events-none"
+          style={{
+            background:
+              'repeating-linear-gradient(0deg, rgba(245,210,120,0.35) 0px, rgba(245,210,120,0.35) 4px, transparent 4px, transparent 18px), ' +
+              'repeating-linear-gradient(90deg, rgba(245,210,120,0.25) 0px, rgba(245,210,120,0.25) 3px, transparent 3px, transparent 32px)',
+            transform: 'perspective(450px) rotateY(24deg) skewY(-4deg)',
+            maskImage: 'linear-gradient(to top, black 20%, transparent 90%)',
+            WebkitMaskImage: 'linear-gradient(to top, black 20%, transparent 90%)',
+          }}
+        />
+
+        {/* Grandes Ondas Metálicas Douradas em SVG com gradientes metálicos hiper-refinados */}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          preserveAspectRatio="none"
+          viewBox="0 0 1440 900"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            {/* Gradiente Ouro Metálico Primário */}
+            <linearGradient id="goldMetallicMain" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#6E4D1B" />
+              <stop offset="20%" stopColor="#C49A45" />
+              <stop offset="42%" stopColor="#F5D888" />
+              <stop offset="58%" stopColor="#DFB255" />
+              <stop offset="80%" stopColor="#8C5F1E" />
+              <stop offset="100%" stopColor="#F9E6A5" />
+            </linearGradient>
+
+            {/* Gradiente Ouro Metálico Secundário / Brilho Alto */}
+            <linearGradient id="goldMetallicLight" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8A6020" />
+              <stop offset="25%" stopColor="#D8AC52" />
+              <stop offset="48%" stopColor="#FFF2BF" />
+              <stop offset="70%" stopColor="#B88628" />
+              <stop offset="100%" stopColor="#4A310C" />
+            </linearGradient>
+
+            {/* Gradiente Metálico Suave com Sombras */}
+            <linearGradient id="goldRibbonDark" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#1E1408" stopOpacity="0.8" />
+              <stop offset="35%" stopColor="#6E4A19" stopOpacity="0.9" />
+              <stop offset="60%" stopColor="#BE923D" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#140D05" stopOpacity="0.95" />
+            </linearGradient>
+
+            {/* Filtro de Glow / Brilho Suave */}
+            <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="8" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          {/* Onda Metálica Superior Esquerda (swoop dourado amplo) */}
+          <path
+            d="M-80 -40 C120 180 320 120 460 -60 L-80 -60 Z"
+            fill="url(#goldRibbonDark)"
+            opacity="0.6"
+          />
+          <path
+            d="M-60 -40 C140 160 300 110 440 -60"
+            stroke="url(#goldMetallicLight)"
+            strokeWidth="3.5"
+            opacity="0.75"
+          />
+          <path
+            d="M-50 -30 C130 145 280 100 420 -60"
+            stroke="url(#goldMetallicMain)"
+            strokeWidth="1.5"
+            opacity="0.9"
+          />
+
+          {/* Onda Metálica Superior Direita que abraça o topo do card */}
+          <path
+            d="M1020 -60 C1080 140 1240 220 1520 140 L1520 -60 Z"
+            fill="url(#goldRibbonDark)"
+            opacity="0.7"
+          />
+          <path
+            d="M1020 -60 C1080 140 1240 220 1520 140"
+            stroke="url(#goldMetallicMain)"
+            strokeWidth="4"
+            opacity="0.85"
+            filter="url(#goldGlow)"
+          />
+          <path
+            d="M1035 -60 C1095 130 1250 208 1520 132"
+            stroke="url(#goldMetallicLight)"
+            strokeWidth="1.5"
+            opacity="0.95"
+          />
+
+          {/* Faixa metálica dourada inferior maciça (curva sinuosa que atravessa a base da tela de ponta a ponta) */}
+          <path
+            d="M-60 880 C260 840 480 810 740 850 C1040 896 1260 860 1520 780 L1520 960 L-60 960 Z"
+            fill="url(#goldRibbonDark)"
+            opacity="0.85"
+          />
+          <path
+            d="M-60 880 C260 840 480 810 740 850 C1040 896 1260 860 1520 780"
+            stroke="url(#goldMetallicMain)"
+            strokeWidth="6"
+            opacity="0.9"
+            filter="url(#goldGlow)"
+          />
+          <path
+            d="M-60 872 C260 832 480 802 740 842 C1040 888 1260 852 1520 772"
+            stroke="url(#goldMetallicLight)"
+            strokeWidth="2.5"
+            opacity="0.95"
+          />
+
+          {/* Eixo de luz metálica dourada cruzando a lateral direita */}
+          <path
+            d="M1480 420 C1380 560 1370 700 1520 860"
+            stroke="url(#goldMetallicLight)"
+            strokeWidth="3"
+            opacity="0.6"
+          />
+          <path
+            d="M1495 440 C1400 570 1390 690 1520 840"
+            stroke="url(#goldMetallicMain)"
+            strokeWidth="1.5"
+            opacity="0.8"
+          />
+        </svg>
+
+        {/* Textura sutil de partículas/brilhos dourados */}
+        <div
+          className="absolute inset-0 opacity-20 pointer-events-none mix-blend-color-dodge"
+          style={{
+            backgroundImage:
+              'radial-gradient(1.5px 1.5px at 120px 80px, #FFF0B2, transparent), ' +
+              'radial-gradient(2px 2px at 280px 240px, #E8B953, transparent), ' +
+              'radial-gradient(1px 1px at 450px 140px, #FFFFFF, transparent), ' +
+              'radial-gradient(2px 2px at 620px 320px, #F0C466, transparent), ' +
+              'radial-gradient(1.5px 1.5px at 800px 90px, #FFEB9C, transparent), ' +
+              'radial-gradient(2px 2px at 980px 260px, #E0AC42, transparent), ' +
+              'radial-gradient(1.5px 1.5px at 1150px 180px, #FFF4CE, transparent), ' +
+              'radial-gradient(2px 2px at 1340px 380px, #D89F34, transparent), ' +
+              'radial-gradient(1.5px 1.5px at 200px 600px, #F5CC75, transparent), ' +
+              'radial-gradient(2px 2px at 700px 720px, #E5B247, transparent), ' +
+              'radial-gradient(1px 1px at 1220px 640px, #FFF8DC, transparent)',
+            backgroundRepeat: 'repeat',
+            backgroundSize: '1440px 900px',
+          }}
+        />
+
+        {/* Brilhos estelares / flares dourados pontuais */}
+        <div className="absolute top-[8%] left-[16%] w-2 h-2 rounded-full bg-amber-100 shadow-[0_0_24px_8px_rgba(255,220,130,0.6)] animate-pulse" />
+        <div className="absolute top-[22%] right-[12%] w-1.5 h-1.5 rounded-full bg-amber-50 shadow-[0_0_20px_6px_rgba(255,215,110,0.5)] animate-pulse" />
+        <div className="absolute bottom-[28%] left-[38%] w-1 h-1 rounded-full bg-yellow-100 shadow-[0_0_16px_5px_rgba(240,190,80,0.45)]" />
       </div>
 
-      {/* Topo com botão de acesso institucional */}
-      <header className="relative z-10 w-full px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between border-b border-[#E4EAE6] bg-white/90 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <img
-            src={logoSrc}
-            alt={`${nomeExibicao} — Sistema Inteligente de Gestão`}
-            className="h-10 sm:h-11 w-auto max-w-[140px] object-contain rounded-lg border border-[#C69B45]/40 shadow-xs p-1"
-            style={{ backgroundColor: corPrimaria }}
-          />
-          <div className="hidden sm:flex flex-col">
-            <span
-              className="text-sm font-bold tracking-tight leading-none"
-              style={{ color: corPrimaria }}
-            >
-              {nomeExibicao}
-            </span>
-            <span
-              className="text-[10px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: corSecundaria }}
-            >
-              Acesso ao Sistema
-            </span>
-          </div>
+      {/* ========================================================
+          CABEÇALHO SUPERIOR DISCRETO (COM LINK INSTITUCIONAL)
+          ======================================================== */}
+      <header className="relative z-10 w-full px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] sm:text-xs tracking-widest uppercase font-semibold text-[#c89b3c]/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            DEC Eldorado &bull; Gran Romano
+          </span>
         </div>
 
         <Button
           asChild
           variant="outline"
-          className="border-[#063D30]/30 bg-white hover:bg-[#063D30] text-[#063D30] hover:text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2 rounded-xl transition-all shadow-2xs group cursor-pointer"
+          size="sm"
+          className="border-[#c4983e]/50 bg-black/40 hover:bg-[#c4983e]/20 text-[#edd59a] hover:text-white font-medium text-xs px-3.5 py-1.5 rounded-full transition-all shadow-lg backdrop-blur-md cursor-pointer group"
         >
-          <Link to="/site" className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-[#C69B45] group-hover:text-white transition-colors" />
-            <span>Acesse o site institucional</span>
-            <ChevronRight className="w-4 h-4 text-[#C69B45] group-hover:text-white transition-colors" />
+          <Link to="/site" className="flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-[#d9a845] group-hover:text-white transition-colors" />
+            <span className="hidden sm:inline">Site Institucional</span>
+            <span className="sm:hidden">Site</span>
           </Link>
         </Button>
       </header>
 
-      {/* Área central com Card de Login */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <Card className="w-full max-w-md border border-[#E4EAE6] bg-white shadow-xl text-[#202B28] rounded-2xl overflow-hidden animate-fade-in">
-          <CardHeader
-            className="text-white pb-6 pt-7 px-6 text-center flex flex-col items-center relative transition-colors duration-200"
-            style={{
-              backgroundColor: corPrimaria,
-              borderBottom: `2px solid ${corSecundaria}`,
-            }}
-          >
-            <div className="relative mb-3">
-              <img
-                src={logoSrc}
-                alt={`${nomeExibicao} — Sistema Inteligente de Gestão`}
-                className="h-20 sm:h-24 w-auto max-w-[220px] object-contain rounded-2xl border p-1.5 shadow-lg bg-black/20"
-                style={{ borderColor: `${corSecundaria}80` }}
+      {/* ========================================================
+          CONTEÚDO PRINCIPAL: 2 COLUNAS (LOGOMARCAS À ESQUERDA, CARD À DIREITA)
+          ======================================================== */}
+      <main className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 py-4 sm:py-8">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* ----------------------------------------------------
+              COLUNA ESQUERDA: AS DUAS LOGOMARCAS OFICIAIS EMPILHADAS
+              1) deceldorado (dourado circular em cima)
+              2) Gran Romano (rótulo vintage com selo GRfoods® embaixo)
+              ---------------------------------------------------- */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center text-center space-y-6 sm:space-y-8 py-2 lg:py-6">
+            {/* 1) Logomarca DEC Eldorado */}
+            <div className="relative group transition-transform duration-300 hover:scale-[1.02]">
+              {/* Glow dourado suave ao redor */}
+              <div
+                className="absolute inset-0 rounded-3xl opacity-40 blur-2xl transition-opacity duration-300 group-hover:opacity-70"
+                style={{
+                  background:
+                    'radial-gradient(circle, rgba(230,180,75,0.45) 0%, rgba(180,130,40,0.1) 70%, transparent 100%)',
+                }}
               />
+              <div className="relative p-2 sm:p-3 flex items-center justify-center">
+                <img
+                  src={logoDecEldoradoOfficial}
+                  alt="DEC Eldorado — Logotipo Oficial Dourado"
+                  className="h-28 sm:h-36 md:h-40 lg:h-44 w-auto max-w-[280px] sm:max-w-[340px] md:max-w-[380px] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.85)] filter brightness-[1.08] contrast-[1.05]"
+                  loading="eager"
+                />
+              </div>
             </div>
-            <CardTitle className="text-xl sm:text-2xl font-bold text-center text-white flex items-center justify-center gap-2 mt-1">
-              <Lock className="w-5 h-5" style={{ color: corSecundaria }} />
-              Acesso ao Sistema — {nomeExibicao}
-            </CardTitle>
-            <p className="text-xs text-white/90 mt-1 font-medium max-w-xs mx-auto">
-              Sistema Inteligente de Gestão
-            </p>
-          </CardHeader>
 
-          <CardContent className="pt-6 pb-6 px-6 sm:px-8 space-y-5">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5 text-left">
-                <Label htmlFor="system-username" className="text-sm font-semibold text-[#202B28]">
-                  Usuário ou E-mail
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
-                  <Input
-                    id="system-username"
-                    type="text"
-                    value={username}
-                    onChange={handleUsernameChange}
-                    placeholder="Digite seu usuário ou e-mail"
-                    style={{ '--tw-ring-color': corPrimaria } as React.CSSProperties}
-                    className="pl-10 h-11 border-[#E4EAE6] bg-white text-[#202B28]"
-                    autoComplete="username"
-                  />
-                </div>
-                {(fieldErrors.email || fieldErrors.username) && (
-                  <p className="text-xs text-destructive font-medium">
-                    {fieldErrors.email || fieldErrors.username}
-                  </p>
-                )}
+            {/* Divisor metálico fino entre as marcas */}
+            <div className="w-48 sm:w-64 h-[1px] bg-gradient-to-r from-transparent via-[#d8a848]/60 to-transparent" />
+
+            {/* 2) Logomarca Gran Romano (Rótulo Vintage Oficial + GRfoods®) */}
+            <div className="relative group transition-transform duration-300 hover:scale-[1.02]">
+              {/* Glow dourado suave ao redor */}
+              <div
+                className="absolute inset-0 rounded-3xl opacity-40 blur-2xl transition-opacity duration-300 group-hover:opacity-70"
+                style={{
+                  background:
+                    'radial-gradient(circle, rgba(230,180,75,0.4) 0%, rgba(180,130,40,0.1) 70%, transparent 100%)',
+                }}
+              />
+              <div className="relative p-2 sm:p-3 flex items-center justify-center">
+                <img
+                  src={logoGranRomanoOfficial}
+                  alt="Gran Romano — Rótulo Vintage Oficial com Selo GRfoods®"
+                  className="h-28 sm:h-36 md:h-40 lg:h-44 w-auto max-w-[280px] sm:max-w-[340px] md:max-w-[380px] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.85)] filter brightness-[1.06] contrast-[1.04]"
+                  loading="eager"
+                />
               </div>
+            </div>
+          </div>
 
-              <div className="space-y-1.5 text-left">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="system-password" className="text-sm font-semibold text-[#202B28]">
-                    Senha
-                  </Label>
-                  <Link
-                    to="/admin/recuperar-senha"
-                    className="text-xs hover:underline font-semibold"
-                    style={{ color: corPrimaria }}
-                  >
-                    Esqueceu a senha?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
-                  <Input
-                    id="system-password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={handlePasswordChange}
-                    placeholder="Digite sua senha"
-                    style={{ '--tw-ring-color': corPrimaria } as React.CSSProperties}
-                    className="pl-10 pr-10 h-11 border-[#E4EAE6] bg-white text-[#202B28]"
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#66736D] hover:text-[#202B28] p-0.5 rounded focus:outline-none focus-visible:ring-1 focus-visible:ring-[#063D30] transition-colors cursor-pointer"
-                    aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {fieldErrors.password && (
-                  <p className="text-xs text-destructive font-medium">{fieldErrors.password}</p>
-                )}
-              </div>
-
-              {inactivityNotice && (
-                <div className="flex items-start gap-2.5 text-sm text-amber-800 bg-amber-50 rounded-lg p-3 border border-amber-200">
-                  <Clock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="font-medium text-xs sm:text-sm leading-relaxed">
-                    {inactivityNotice}
-                  </span>
-                </div>
-              )}
-
-              {error && !hasFieldError && (
-                <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-lg p-3 border border-destructive/30">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-medium text-xs sm:text-sm">{error}</span>
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                size="lg"
-                style={{ backgroundColor: corPrimaria }}
-                className="w-full hover:opacity-90 text-white font-bold text-base shadow-md h-11 rounded-xl transition-all duration-200 cursor-pointer"
-                disabled={submitting}
+          {/* ----------------------------------------------------
+              COLUNA DIREITA: CARD CLARO (CREME / OFF-WHITE) COM BORDA DOURADA
+              Fiel à imagem de referência
+              ---------------------------------------------------- */}
+          <div className="lg:col-span-6 flex justify-center lg:justify-end select-text">
+            <div
+              className="relative w-full max-w-[460px] rounded-[28px] p-[2px] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.9),0_0_40px_rgba(212,164,70,0.25)] transition-all duration-300"
+              style={{
+                background:
+                  'linear-gradient(145deg, #FDF7E7 0%, #E6BF68 30%, #C99635 60%, #F5DE9B 85%, #8B611C 100%)',
+              }}
+            >
+              {/* Superfície interna do Card: Creme / Off-white sofisticado */}
+              <div
+                className="relative w-full h-full rounded-[26px] px-6 sm:px-9 py-8 sm:py-9 overflow-hidden flex flex-col justify-between"
+                style={{
+                  background: 'linear-gradient(180deg, #FDFBF5 0%, #F8F4E8 50%, #F3ECDA 100%)',
+                }}
               >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Entrando no sistema...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-5 h-5 mr-2" />
-                    Entrar no Sistema
-                  </>
-                )}
-              </Button>
-            </form>
+                {/* Textura sutil de fundo do card */}
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-30 mix-blend-multiply"
+                  style={{
+                    backgroundImage:
+                      'radial-gradient(circle at 50% 0%, rgba(212,164,70,0.25) 0%, transparent 60%)',
+                  }}
+                />
 
-            <div className="pt-3 border-t border-[#E4EAE6] flex flex-col gap-2.5 text-center text-xs">
-              <div className="flex items-center justify-center gap-1.5 text-[#66736D]">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Ambiente Seguro com Criptografia de Ponta</span>
-              </div>
+                {/* Conteúdo do Card */}
+                <div className="relative z-10 space-y-6">
+                  {/* Cabeçalho do Card */}
+                  <div className="text-center space-y-1">
+                    <p className="text-[#3a3020] text-base sm:text-lg font-normal tracking-tight">
+                      Acesse ao Sistema da
+                    </p>
+                    <h1
+                      className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight uppercase font-serif"
+                      style={{
+                        background:
+                          'linear-gradient(135deg, #5C3D0C 0%, #A6731B 25%, #7C5110 50%, #B88528 75%, #4A2E05 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        textShadow: '0 1px 1px rgba(255,255,255,0.6)',
+                      }}
+                    >
+                      DEC Eldorado
+                      <span className="block text-xl sm:text-2xl font-serif font-extrabold normal-case tracking-normal">
+                        e Gran Romano
+                      </span>
+                    </h1>
+                    <p className="text-[#6d5e46] text-xs sm:text-sm font-medium pt-1 tracking-wide">
+                      Sistema Inteligente de Gestão
+                    </p>
+                  </div>
 
-              {/* Botão secundário de redirecionamento */}
-              <div className="pt-2">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full border-[#063D30]/30 hover:bg-[#063D30]/5 text-[#063D30] font-semibold text-xs sm:text-sm py-2 rounded-xl cursor-pointer"
-                >
-                  <Link to="/site" className="flex items-center justify-center gap-2">
-                    <Globe className="w-4 h-4 text-[#C69B45]" />
-                    <span>Acesse o site institucional</span>
-                  </Link>
-                </Button>
+                  {/* Formulário de Login */}
+                  <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+                    {/* Campo Usuário ou E-mail */}
+                    <div className="space-y-1.5 text-left">
+                      <Label
+                        htmlFor="login-username"
+                        className="text-xs sm:text-sm font-semibold text-[#2f271a]"
+                      >
+                        Usuário ou E-mail
+                      </Label>
+                      <div className="relative group">
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8a7b62] group-focus-within:text-[#a5741b] transition-colors" />
+                        <Input
+                          id="login-username"
+                          type="text"
+                          value={username}
+                          onChange={handleUsernameChange}
+                          placeholder="Digite seu usuário ou e-mail"
+                          className="pl-10 h-12 rounded-xl bg-white/90 border-[#d9cca8] text-[#241c10] placeholder:text-[#9e8f76] focus-visible:border-[#c49635] focus-visible:ring-[#c49635]/30 shadow-inner text-sm transition-all"
+                          autoComplete="username"
+                        />
+                      </div>
+                      {(fieldErrors.email || fieldErrors.username) && (
+                        <p className="text-xs text-red-600 font-medium pl-1">
+                          {fieldErrors.email || fieldErrors.username}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Campo Senha com Link Esqueceu a Senha alinhado à direita */}
+                    <div className="space-y-1.5 text-left">
+                      <div className="flex items-center justify-between">
+                        <Label
+                          htmlFor="login-password"
+                          className="text-xs sm:text-sm font-semibold text-[#2f271a]"
+                        >
+                          Senha
+                        </Label>
+                        <Link
+                          to="/admin/recuperar-senha"
+                          className="text-xs font-semibold text-[#8b6118] hover:text-[#5e410b] hover:underline transition-colors cursor-pointer"
+                        >
+                          Esqueceu a senha?
+                        </Link>
+                      </div>
+                      <div className="relative group">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8a7b62] group-focus-within:text-[#a5741b] transition-colors" />
+                        <Input
+                          id="login-password"
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={handlePasswordChange}
+                          placeholder="Digite sua senha"
+                          className="pl-10 pr-10 h-12 rounded-xl bg-white/90 border-[#d9cca8] text-[#241c10] placeholder:text-[#9e8f76] focus-visible:border-[#c49635] focus-visible:ring-[#c49635]/30 shadow-inner text-sm transition-all"
+                          autoComplete="current-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8a7b62] hover:text-[#2f271a] p-1 rounded-md focus:outline-none focus-visible:ring-1 focus-visible:ring-[#c49635] transition-colors cursor-pointer"
+                          aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      {fieldErrors.password && (
+                        <p className="text-xs text-red-600 font-medium pl-1">
+                          {fieldErrors.password}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Aviso de Inatividade se aplicável */}
+                    {inactivityNotice && (
+                      <div className="flex items-start gap-2.5 text-xs text-amber-900 bg-amber-100/80 rounded-xl p-3 border border-amber-300">
+                        <Clock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                        <span className="leading-relaxed font-medium">{inactivityNotice}</span>
+                      </div>
+                    )}
+
+                    {/* Mensagem de Erro Geral */}
+                    {error && !hasFieldError && (
+                      <div className="flex items-center gap-2 text-xs text-red-700 bg-red-100/90 rounded-xl p-3 border border-red-300">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
+                        <span className="font-medium">{error}</span>
+                      </div>
+                    )}
+
+                    {/* Botão Dourado Grande com Efeito Metálico "Entrar no Sistema" */}
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full h-12 sm:h-13 rounded-xl font-bold text-base text-[#241704] flex items-center justify-center gap-2 transition-all duration-200 shadow-[0_6px_20px_rgba(180,128,32,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] hover:shadow-[0_8px_26px_rgba(180,128,32,0.5),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                        style={{
+                          background:
+                            'linear-gradient(180deg, #FDE69E 0%, #E8B953 35%, #D49D2C 70%, #B88118 100%)',
+                          border: '1px solid #E5BA55',
+                        }}
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin text-[#241704]" />
+                            <span>Entrando...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-5 h-5 text-[#241704]" />
+                            <span>Entrar no Sistema</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* Rodapé do Card com ícone de escudo e texto de segurança */}
+                  <div className="pt-2 flex items-center justify-center gap-2 text-center text-xs text-[#6e5f49]">
+                    <ShieldCheck className="w-4 h-4 text-[#8a6018] shrink-0" />
+                    <span className="font-medium tracking-tight">
+                      Ambiente Seguro com Criptografia de Ponta
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </main>
 
-      {/* Rodapé discreto da tela de login */}
-      <footer className="relative z-10 w-full px-4 py-4 text-center text-xs text-[#66736D] border-t border-[#E4EAE6] bg-white/70 backdrop-blur-sm space-y-1.5">
+      {/* ========================================================
+          RODAPÉ INFERIOR DISCRETO
+          ======================================================== */}
+      <footer className="relative z-10 w-full px-4 py-3 sm:py-4 text-center text-[11px] sm:text-xs text-[#a89066] space-y-1">
         <p>
-          © {new Date().getFullYear()} {nomeExibicao} — Sistema Inteligente de Gestão. Todos os
-          direitos reservados.
+          &copy; {new Date().getFullYear()} DEC Eldorado &bull; Gran Romano &mdash; Sistema
+          Inteligente de Gestão.
         </p>
-        <AttributionFooter variant="inline" className="text-[#66736D]" />
       </footer>
     </div>
   )
