@@ -17,7 +17,11 @@ import {
   Globe,
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
-import { logoDecEldoradoOfficial, logoGranRomanoOfficial } from '@/lib/brand-assets'
+import {
+  logoHuramOfficial,
+  logoDecEldoradoOfficial,
+  logoGranRomanoOfficial,
+} from '@/lib/brand-assets'
 import { useBrand } from '@/hooks/use-brand'
 
 export default function LoginPage() {
@@ -287,11 +291,47 @@ export default function LoginPage() {
       </div>
 
       {/* ========================================================
-          CABEÇALHO SUPERIOR DISCRETO (COM LINK INSTITUCIONAL)
+          CABEÇALHO SUPERIOR ELEGANTE COM ASSINATURA HURAM & LINK INSTITUCIONAL
           ======================================================== */}
-      <header className="relative z-10 w-full px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] sm:text-xs tracking-widest uppercase font-semibold text-[#c89b3c]/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+      <header className="relative z-10 w-full px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between gap-3">
+        {/* Assinatura Oficial HURAM — cápsula refinada em tons creme/dourado harmonizada com a identidade visual */}
+        <div className="flex items-center gap-2.5 sm:gap-3 group">
+          <div
+            className="relative flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full backdrop-blur-md transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.6),0_0_12px_rgba(212,164,70,0.2)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.7),0_0_18px_rgba(212,164,70,0.35)]"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(253, 247, 231, 0.96) 0%, rgba(245, 236, 218, 0.92) 100%)',
+              border: '1px solid #d4a748',
+            }}
+          >
+            <div className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden shrink-0 shadow-sm border border-[#c99b45]/60 bg-[#FDFBF5] flex items-center justify-center p-0.5">
+              <img
+                src={logoHuramOfficial}
+                alt="Logomarca Oficial HURAM"
+                className="w-full h-full object-cover scale-[1.35] transition-transform duration-300 group-hover:scale-[1.45]"
+                loading="eager"
+              />
+            </div>
+            <div className="flex flex-col text-left leading-none pr-1">
+              <span
+                className="text-[11px] sm:text-xs font-black tracking-wider uppercase font-serif"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #063D30 0%, #116B50 40%, #5C3D0C 75%, #A6731B 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                HURAM
+              </span>
+              <span className="text-[8px] sm:text-[9px] font-semibold text-[#6e5f49] tracking-tight hidden xs:inline sm:inline">
+                Sistema Inteligente de Gestão
+              </span>
+            </div>
+          </div>
+
+          <span className="hidden md:inline-block w-1 h-1 rounded-full bg-[#c89b3c]/50" />
+          <span className="hidden md:inline-block text-[11px] tracking-widest uppercase font-medium text-[#c89b3c]/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             DEC Eldorado &bull; Gran Romano
           </span>
         </div>
@@ -300,7 +340,7 @@ export default function LoginPage() {
           asChild
           variant="outline"
           size="sm"
-          className="border-[#c4983e]/50 bg-black/40 hover:bg-[#c4983e]/20 text-[#edd59a] hover:text-white font-medium text-xs px-3.5 py-1.5 rounded-full transition-all shadow-lg backdrop-blur-md cursor-pointer group"
+          className="border-[#c4983e]/50 bg-black/40 hover:bg-[#c4983e]/20 text-[#edd59a] hover:text-white font-medium text-xs px-3.5 py-1.5 rounded-full transition-all shadow-lg backdrop-blur-md cursor-pointer group shrink-0"
         >
           <Link to="/site" className="flex items-center gap-1.5">
             <Globe className="w-3.5 h-3.5 text-[#d9a845] group-hover:text-white transition-colors" />
@@ -539,12 +579,28 @@ export default function LoginPage() {
                     </div>
                   </form>
 
-                  {/* Rodapé do Card com ícone de escudo e texto de segurança */}
-                  <div className="pt-2 flex items-center justify-center gap-2 text-center text-xs text-[#6e5f49]">
-                    <ShieldCheck className="w-4 h-4 text-[#8a6018] shrink-0" />
-                    <span className="font-medium tracking-tight">
-                      Ambiente Seguro com Criptografia de Ponta
-                    </span>
+                  {/* Rodapé do Card com selo HURAM e garantia de ambiente seguro */}
+                  <div className="pt-2 border-t border-[#dfcfb0]/60 flex flex-col items-center gap-2 text-center">
+                    <div className="flex items-center justify-center gap-2 text-xs text-[#6e5f49]">
+                      <ShieldCheck className="w-4 h-4 text-[#8a6018] shrink-0" />
+                      <span className="font-medium tracking-tight">
+                        Ambiente Seguro com Criptografia de Ponta
+                      </span>
+                    </div>
+
+                    {/* Assinatura discreta HURAM dentro do card creme */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-[#dfcfb0] shadow-sm">
+                      <img
+                        src={logoHuramOfficial}
+                        alt="HURAM"
+                        className="w-5 h-5 object-contain rounded-full"
+                        loading="lazy"
+                      />
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-[#5a4c36] tracking-wide">
+                        Powered by <strong className="font-bold text-[#116B50]">HURAM</strong>{' '}
+                        &bull; Gestão Inteligente
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -554,12 +610,16 @@ export default function LoginPage() {
       </main>
 
       {/* ========================================================
-          RODAPÉ INFERIOR DISCRETO
+          RODAPÉ INFERIOR DISCRETO COM MARCA HURAM
           ======================================================== */}
       <footer className="relative z-10 w-full px-4 py-3 sm:py-4 text-center text-[11px] sm:text-xs text-[#a89066] space-y-1">
         <p>
-          &copy; {new Date().getFullYear()} DEC Eldorado &bull; Gran Romano &mdash; Sistema
-          Inteligente de Gestão.
+          &copy; {new Date().getFullYear()} DEC Eldorado &bull; Gran Romano &mdash; Desenvolvido
+          sobre a plataforma{' '}
+          <span className="text-[#dfb255] font-semibold">
+            HURAM &mdash; Sistema Inteligente de Gestão
+          </span>
+          .
         </p>
       </footer>
     </div>
