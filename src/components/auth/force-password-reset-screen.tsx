@@ -78,15 +78,75 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
 
     setSubmitting(true)
     try {
-      // 1. Atualizar a senha e desativar as flags de redefinição obrigatória
-      await pb.collection('users').update(user.id, {
-        password: newPassword,
-        passwordConfirm: confirmPassword,
-        force_password_change: false,
-        must_change_password: false,
-      })
+      // 1. Chamar endpoint autenticado no backend (pb_hooks) com privilégio adequado
+      // para gravar a nova senha com hash nativo e desativar os flags force_password_change / must_change_password
+      let response: { success?: boolean; message?: string; error?: string } | null = null
 
-      // 2. Registrar evento de auditoria: redefinição de senha pelo próprio usuário
+      try {
+        response = await pb.send<{ success?: boolean; message?: string; error?: string }>(
+          '/backend/v1/auth/reset-forced-password',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              newPassword,
+              confirmPassword,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      } catch (endpointErr: any) {
+        console.warn(
+          'Endpoint /backend/v1/auth/reset-forced-password falhou, tentando fallback via API users:',
+          endpointErr,
+        )
+        // Fallback: se o endpoint falhar por algum motivo, tentar update direto
+        try {
+          await pb.collection('users').update(user.id, {
+            password: newPassword,
+            passwordConfirm: confirmPassword,
+            force_password_change: false,
+            must_change_password: false,
+          })
+          response = { success: true }
+        } catch (directErr: any) {
+          // Extrair mensagem de erro amigável em português
+          const status = endpointErr?.status || directErr?.status
+          const serverMsg =
+            endpointErr?.data?.error ||
+            endpointErr?.response?.data?.error ||
+            directErr?.data?.message ||
+            directErr?.message
+
+          if (
+            serverMsg &&
+            typeof serverMsg === 'string' &&
+            !serverMsg.toLowerCase().includes('failed to update')
+          ) {
+            throw new Error(serverMsg)
+          }
+
+          if (status === 400) {
+            throw new Error(
+              'A nova senha informada não é válida. Verifique se possui no mínimo 8 dígitos e se os dois campos são idênticos.',
+            )
+          }
+          if (status === 401 || status === 403) {
+            throw new Error(
+              'Sessão expirada ou sem permissão para esta alteração. Por favor, saia e entre novamente no sistema.',
+            )
+          }
+
+          throw new Error(
+            'Não foi possível salvar a nova senha. Tente novamente em alguns instantes.',
+          )
+        }
+      }
+
+      if (response && response.error) {
+        throw new Error(response.error)
+      }
+
+      // 2. Registrar evento de auditoria local complementar (o hook também já registra no backend)
       try {
         await registerAuditLog({
           action: 'user_password_reset_forced',
@@ -103,10 +163,17 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
         })
       } catch (auditErr) {
         // Log de erro sem quebrar o fluxo de login
-        console.warn('Falha ao gravar auditoria da troca de senha:', auditErr)
+        console.warn('Falha ao gravar auditoria complementar da troca de senha:', auditErr)
       }
 
-      // 3. Atualizar estado local de autenticação
+      // 3. Atualizar token e dados locais da autenticação no PocketBase authStore
+      try {
+        await pb.collection('users').authRefresh()
+      } catch (refreshErr) {
+        console.warn('Aviso ao sincronizar token após alteração de senha:', refreshErr)
+      }
+
+      // 4. Atualizar estado local de autenticação
       clearMustChangePassword()
       setSuccess(true)
 
@@ -118,10 +185,15 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
       }, 900)
     } catch (err: unknown) {
       console.error('Erro ao redefinir nova senha:', err)
-      const message =
-        err instanceof Error
-          ? err.message
-          : 'Não foi possível salvar a nova senha. Verifique se atende aos critérios do sistema e tente novamente.'
+      let message = 'Não foi possível salvar a nova senha. Tente novamente.'
+      if (err instanceof Error && err.message) {
+        const raw = err.message
+        if (raw.toLowerCase().includes('failed to update record')) {
+          message = 'Não foi possível salvar a nova senha no momento. Tente novamente.'
+        } else {
+          message = raw
+        }
+      }
       setError(message)
     } finally {
       setSubmitting(false)
