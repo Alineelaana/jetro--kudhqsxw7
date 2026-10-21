@@ -96,7 +96,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   useEffect(() => {
     if (user) {
       setName(user.name || '')
-      setLoginField(user.login || user.username || '')
+      setLoginField(user.login || user.username || (user.email ? user.email.split('@')[0] : ''))
       const userRoleCode = user.role || 'PADRAO'
       setRole(userRoleCode)
       setCpf(user.cpf ? formatCPF(user.cpf) : '')

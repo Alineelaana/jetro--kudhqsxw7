@@ -3,6 +3,7 @@ import pb from '@/lib/pocketbase/client'
 export interface UserAuditRecord {
   id: string
   name: string
+  login?: string
   username?: string
   email: string
   role: string
@@ -190,10 +191,12 @@ export async function fetchUsersAuditOverview(): Promise<UserAuditRecord[]> {
       const locationOrigin =
         lastEv?.location_origin || (lastSess?.location_origin as any) || undefined
 
+      const userLogin = (u.login as string) || (u.email as string)?.split('@')[0] || ''
       return {
         id: u.id,
         name: (u.name as string) || (u.email as string)?.split('@')[0] || 'Usuário',
-        username: (u.username as string) || (u.email as string)?.split('@')[0],
+        login: userLogin,
+        username: userLogin,
         email: (u.email as string) || '',
         role: (u.role as string) || 'PADRAO',
         perfil_acesso: (u.perfil_acesso as string) || (u.role as string),

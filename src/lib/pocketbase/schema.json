@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T01:44:01.111Z",
+  "generatedAt": "2026-10-21T02:25:51.908Z",
   "collections": [
     {
       "name": "users",
@@ -151,7 +151,8 @@
         "CREATE INDEX `idx_users_role` ON `users` (role)",
         "CREATE UNIQUE INDEX `idx_users_cpf` ON `users` (cpf) WHERE cpf != ''",
         "CREATE INDEX `idx_users_empresa_id` ON `users` (empresa_id)",
-        "CREATE INDEX `idx_users_filial_id` ON `users` (filial_id)"
+        "CREATE INDEX `idx_users_filial_id` ON `users` (filial_id)",
+        "CREATE UNIQUE INDEX `idx_users_login` ON `users` (`login`) WHERE `login` != ''"
       ]
     },
     {

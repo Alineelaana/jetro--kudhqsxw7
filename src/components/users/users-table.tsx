@@ -64,14 +64,16 @@ export function UsersTable({
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
+      const searchLower = search.toLowerCase()
       const matchSearch =
         !search ||
-        u.name.toLowerCase().includes(search.toLowerCase()) ||
-        (u.username && u.username.toLowerCase().includes(search.toLowerCase())) ||
-        u.email.toLowerCase().includes(search.toLowerCase()) ||
-        (u.last_ip && u.last_ip.toLowerCase().includes(search.toLowerCase())) ||
-        (u.last_city && u.last_city.toLowerCase().includes(search.toLowerCase())) ||
-        (u.last_state && u.last_state.toLowerCase().includes(search.toLowerCase()))
+        u.name.toLowerCase().includes(searchLower) ||
+        (u.login && u.login.toLowerCase().includes(searchLower)) ||
+        (u.username && u.username.toLowerCase().includes(searchLower)) ||
+        u.email.toLowerCase().includes(searchLower) ||
+        (u.last_ip && u.last_ip.toLowerCase().includes(searchLower)) ||
+        (u.last_city && u.last_city.toLowerCase().includes(searchLower)) ||
+        (u.last_state && u.last_state.toLowerCase().includes(searchLower))
 
       const matchRole = roleFilter === 'ALL' || u.role === roleFilter
       const matchStatus =
@@ -124,14 +126,14 @@ export function UsersTable({
       ),
     },
     {
-      id: 'username',
-      header: 'Nome de Usuário',
-      accessorKey: 'username',
+      id: 'login',
+      header: 'Login do Usuário',
+      accessorKey: 'login',
       dataType: 'text',
       defaultWidth: 140,
-      cell: ({ value }) => (
-        <span className="text-xs font-mono text-muted-foreground">
-          {String(value || 'Informação não registrada')}
+      cell: ({ row }) => (
+        <span className="text-xs font-mono font-medium text-foreground">
+          {String(row.login || row.username || 'Informação não registrada')}
         </span>
       ),
     },
@@ -333,7 +335,8 @@ export function UsersTable({
   const handleExportFiltered = (type: 'excel' | 'pdf') => {
     const exportData = filteredUsers.map((u) => ({
       Nome: u.name,
-      'Nome de Usuário': u.username || 'Informação não registrada',
+      Login: u.login || u.username || 'Informação não registrada',
+      'Nome de Usuário': u.login || u.username || 'Informação não registrada',
       'E-mail': u.email,
       'Perfil de Acesso': u.role === 'PADRAO' ? 'Gestão' : u.role,
       'Status Conta': u.active ? 'Ativo' : 'Inativo',

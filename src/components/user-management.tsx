@@ -55,6 +55,7 @@ interface UserRecord {
   id: string
   name: string
   email: string
+  login?: string
   role: string
   perfil_id?: string
   perfil_acesso?: string
@@ -104,6 +105,7 @@ export function UserManagement() {
   const [loadingPerfis, setLoadingPerfis] = useState(true)
   const [editUser, setEditUser] = useState<UserRecord | null>(null)
   const [editOpen, setEditOpen] = useState(false)
+  const [userSearchTerm, setUserSearchTerm] = useState('')
 
   const loadUsers = async () => {
     try {
@@ -541,7 +543,17 @@ export function UserManagement() {
 
       <Card className="border-2 border-[#005B2E]/20">
         <CardHeader>
-          <CardTitle className="text-lg">Usuários Cadastrados</CardTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <CardTitle className="text-lg">Usuários Cadastrados</CardTitle>
+            <div className="w-full sm:w-72">
+              <Input
+                value={userSearchTerm}
+                onChange={(e) => setUserSearchTerm(e.target.value)}
+                placeholder="Buscar por login, nome, e-mail..."
+                className="h-8 text-xs focus-visible:ring-[#005B2E]"
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -550,129 +562,148 @@ export function UserManagement() {
             </div>
           ) : (
             <div className="space-y-2">
-              {users.map((u) => {
-                const isActive = u.active !== false
-                return (
-                  <div
-                    key={u.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5 transition-colors gap-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      {u.avatar ? (
-                        <img
-                          src={getAvatarUrl(u.id, u.avatar)}
-                          alt={u.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : u.role === 'SUP' ? (
-                        <Shield className="w-5 h-5 text-[#C89B3C]" />
-                      ) : (
-                        <User className="w-5 h-5 text-[#005B2E]" />
-                      )}
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-foreground">{u.name || '—'}</p>
-                          {u.mfa_enabled && (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
-                              MFA
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">{u.email}</p>
-                        <div className="flex flex-wrap gap-x-3">
-                          {u.cpf && (
-                            <p className="text-xs text-muted-foreground">CPF: {formatCPF(u.cpf)}</p>
-                          )}
-                          {u.empresa_id && (
-                            <p className="text-xs text-muted-foreground">Empresa: {u.empresa_id}</p>
-                          )}
-                          {u.filial_id && (
-                            <p className="text-xs text-muted-foreground">Filial: {u.filial_id}</p>
-                          )}
-                          {u.cargo && (
-                            <p className="text-xs text-muted-foreground">Cargo: {u.cargo}</p>
-                          )}
-                          <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">
-                            Inatividade: {u.inactivity_timeout_minutes ?? 480} min
-                          </p>
+              {users
+                .filter((u) => {
+                  if (!userSearchTerm.trim()) return true
+                  const q = userSearchTerm.toLowerCase().trim()
+                  const matchLogin = (u.login || '').toLowerCase().includes(q)
+                  const matchName = (u.name || '').toLowerCase().includes(q)
+                  const matchEmail = (u.email || '').toLowerCase().includes(q)
+                  const matchCargo = (u.cargo || '').toLowerCase().includes(q)
+                  return matchLogin || matchName || matchEmail || matchCargo
+                })
+                .map((u) => {
+                  const isActive = u.active !== false
+                  return (
+                    <div
+                      key={u.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5 transition-colors gap-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        {u.avatar ? (
+                          <img
+                            src={getAvatarUrl(u.id, u.avatar)}
+                            alt={u.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : u.role === 'SUP' ? (
+                          <Shield className="w-5 h-5 text-[#C89B3C]" />
+                        ) : (
+                          <User className="w-5 h-5 text-[#005B2E]" />
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-foreground">{u.name || '—'}</p>
+                            {u.login && (
+                              <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium">
+                                @{u.login}
+                              </span>
+                            )}
+                            {u.mfa_enabled && (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                                MFA
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{u.email}</p>
+                          <div className="flex flex-wrap gap-x-3">
+                            {u.cpf && (
+                              <p className="text-xs text-muted-foreground">
+                                CPF: {formatCPF(u.cpf)}
+                              </p>
+                            )}
+                            {u.empresa_id && (
+                              <p className="text-xs text-muted-foreground">
+                                Empresa: {u.empresa_id}
+                              </p>
+                            )}
+                            {u.filial_id && (
+                              <p className="text-xs text-muted-foreground">Filial: {u.filial_id}</p>
+                            )}
+                            {u.cargo && (
+                              <p className="text-xs text-muted-foreground">Cargo: {u.cargo}</p>
+                            )}
+                            <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">
+                              Inatividade: {u.inactivity_timeout_minutes ?? 480} min
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/50">
-                      {/* Active / Inactive Status Switch */}
-                      <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-full border border-border">
-                        <span
-                          className={`text-xs font-bold ${
-                            isActive
-                              ? 'text-emerald-700 dark:text-emerald-400'
-                              : 'text-rose-600 dark:text-rose-400'
-                          }`}
-                        >
-                          {isActive ? 'Ativo' : 'Inativo'}
-                        </span>
-                        {isAdmin ? (
-                          <Switch
-                            checked={isActive}
-                            disabled={updatingId === u.id || u.id === (currentUser?.id as string)}
-                            onCheckedChange={() => handleToggleActive(u)}
-                            className="data-[state=checked]:bg-[#005B2E]"
-                          />
-                        ) : (
+                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/50">
+                        {/* Active / Inactive Status Switch */}
+                        <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-full border border-border">
                           <span
-                            className={`w-2 h-2 rounded-full ${
-                              isActive ? 'bg-emerald-500' : 'bg-rose-500'
+                            className={`text-xs font-bold ${
+                              isActive
+                                ? 'text-emerald-700 dark:text-emerald-400'
+                                : 'text-rose-600 dark:text-rose-400'
                             }`}
-                          />
+                          >
+                            {isActive ? 'Ativo' : 'Inativo'}
+                          </span>
+                          {isAdmin ? (
+                            <Switch
+                              checked={isActive}
+                              disabled={updatingId === u.id || u.id === (currentUser?.id as string)}
+                              onCheckedChange={() => handleToggleActive(u)}
+                              className="data-[state=checked]:bg-[#005B2E]"
+                            />
+                          ) : (
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                isActive ? 'bg-emerald-500' : 'bg-rose-500'
+                              }`}
+                            />
+                          )}
+                        </div>
+
+                        {(() => {
+                          const displayPerfil =
+                            u.expand?.perfil_id?.name ||
+                            perfis.find((p) => p.id === u.perfil_id || p.code === u.perfil_acesso)
+                              ?.name ||
+                            u.perfil_acesso ||
+                            (u.role === 'PADRAO' ? 'Gestão' : u.role)
+                          const isSup = (u.perfil_acesso || u.role) === 'SUP'
+                          return (
+                            <span
+                              className={`text-xs font-bold px-2.5 py-1 rounded ${
+                                isSup
+                                  ? 'bg-[#C69B45]/20 text-[#063D30] border border-[#C69B45]/40 font-black'
+                                  : 'bg-[#063D30]/10 text-[#063D30]'
+                              }`}
+                              title={`Perfil: ${displayPerfil}`}
+                            >
+                              {displayPerfil}
+                            </span>
+                          )
+                        })()}
+                        {isAdmin && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-[#005B2E] hover:bg-[#005B2E]/10"
+                            onClick={() => handleEdit(u)}
+                            title="Editar usuário"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {isAdmin && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDelete(u.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         )}
                       </div>
-
-                      {(() => {
-                        const displayPerfil =
-                          u.expand?.perfil_id?.name ||
-                          perfis.find((p) => p.id === u.perfil_id || p.code === u.perfil_acesso)
-                            ?.name ||
-                          u.perfil_acesso ||
-                          (u.role === 'PADRAO' ? 'Gestão' : u.role)
-                        const isSup = (u.perfil_acesso || u.role) === 'SUP'
-                        return (
-                          <span
-                            className={`text-xs font-bold px-2.5 py-1 rounded ${
-                              isSup
-                                ? 'bg-[#C69B45]/20 text-[#063D30] border border-[#C69B45]/40 font-black'
-                                : 'bg-[#063D30]/10 text-[#063D30]'
-                            }`}
-                            title={`Perfil: ${displayPerfil}`}
-                          >
-                            {displayPerfil}
-                          </span>
-                        )
-                      })()}
-                      {isAdmin && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 text-[#005B2E] hover:bg-[#005B2E]/10"
-                          onClick={() => handleEdit(u)}
-                          title="Editar usuário"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {isAdmin && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDelete(u.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
             </div>
           )}
         </CardContent>

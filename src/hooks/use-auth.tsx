@@ -188,8 +188,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         resolvedIdentity = ADMIN_EMAIL
       } else if (!trimmed.includes('@')) {
         try {
+          const safe = lowerTrimmed.replace(/[^a-z0-9._-]/g, '').replace(/["\\]/g, '')
           const found = await pb.collection('users').getList(1, 1, {
-            filter: `login = "${trimmed}" || username = "${trimmed}"`,
+            filter: `login = "${safe}" || email ~ "${safe}"`,
             requestKey: null,
           })
           if (found.items.length > 0 && found.items[0].email) {

@@ -42,7 +42,6 @@ export async function createUser(data: CreateUserData): Promise<void> {
   if (data.login) {
     const cleanLogin = data.login.trim().toLowerCase()
     recordData.login = cleanLogin
-    recordData.username = cleanLogin
   }
   if (data.avatar) {
     recordData.avatar = data.avatar
@@ -85,7 +84,6 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   if (data.login !== undefined) {
     const cleanLogin = data.login.trim().toLowerCase()
     recordData.login = cleanLogin
-    recordData.username = cleanLogin
   }
   if (data.role !== undefined) recordData.role = data.role
   if (data.perfil_id !== undefined) recordData.perfil_id = data.perfil_id
