@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T22:41:21.654Z",
+  "generatedAt": "2026-10-21T23:07:57.153Z",
   "collections": [
     {
       "name": "users",
@@ -156,6 +156,18 @@
           "required": false,
           "system": false,
           "collectionRef": "empresas"
+        },
+        {
+          "name": "force_password_change",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "must_change_password",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

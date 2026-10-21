@@ -24,6 +24,8 @@ import {
   type FilialRecord,
 } from '@/services/users'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
+import { registerAuditLog } from '@/services/audit-logs'
+import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 import { Loader2, Upload, KeyRound } from 'lucide-react'
@@ -48,6 +50,8 @@ interface UserEditDialogProps {
     cargo?: string
     departamento?: string
     inactivity_timeout_minutes?: number
+    force_password_change?: boolean
+    must_change_password?: boolean
   } | null
   onSuccess: () => void
   onError?: (err: Error) => void
@@ -99,6 +103,7 @@ export function UserEditDialog({
   const [cargo, setCargo] = useState('')
   const [departamento, setDepartamento] = useState('')
   const [inactivityTimeout, setInactivityTimeout] = useState('480')
+  const [forcePasswordChange, setForcePasswordChange] = useState(false)
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
   const [filiais, setFiliais] = useState<FilialRecord[]>([])
   const [perfis, setPerfis] = useState<PerfilPermissaoRecord[]>([])
@@ -150,6 +155,9 @@ export function UserEditDialog({
         user.inactivity_timeout_minutes !== undefined && user.inactivity_timeout_minutes !== null
           ? String(user.inactivity_timeout_minutes)
           : '480',
+      )
+      setForcePasswordChange(
+        user.force_password_change === true || user.must_change_password === true,
       )
 
       if (user.perfil_id) {
@@ -248,7 +256,29 @@ export function UserEditDialog({
         cargo: cargo.trim() || undefined,
         departamento: departamento.trim() || undefined,
         inactivity_timeout_minutes: parsedTimeout,
+        force_password_change: forcePasswordChange,
       })
+
+      // Auditoria de alteração na flag de redefinição de senha
+      const previousState =
+        user.force_password_change === true || user.must_change_password === true
+      if (previousState !== forcePasswordChange) {
+        await registerAuditLog({
+          action: forcePasswordChange
+            ? 'user_force_password_enabled'
+            : 'user_force_password_disabled',
+          module: 'usuarios',
+          target_collection: 'users',
+          target_id: user.id,
+          target_summary: `Opção 'Criar nova senha no próximo login' ${
+            forcePasswordChange ? 'ativada' : 'desativada'
+          } para o usuário ${user.name || user.email}`,
+          criticidade: 'Média',
+          previous_value: { force_password_change: previousState },
+          new_value: { force_password_change: forcePasswordChange },
+        })
+      }
+
       toast({
         title: 'Usuário Atualizado',
         description: 'Os dados do usuário foram salvos com sucesso.',
@@ -571,6 +601,31 @@ export function UserEditDialog({
               automaticamente (1 a 480 min). Padrão corporativo Jetro: 480 minutos (8 horas).
             </p>
           </div>
+          {/* Opção: Criar nova senha no próximo login */}
+          <div className="rounded-xl border border-amber-300/80 bg-amber-50/50 dark:bg-amber-950/20 p-3.5 space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <Label
+                  htmlFor="edit-force-password"
+                  className="text-sm font-bold text-foreground flex items-center gap-1.5 cursor-pointer"
+                >
+                  <KeyRound className="w-4 h-4 text-amber-600" />
+                  <span>Criar nova senha no próximo login</span>
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Quando ativado, o usuário deverá obrigatoriamente redefinir sua senha no próximo
+                  acesso. A opção será desativada automaticamente após a alteração.
+                </p>
+              </div>
+              <Switch
+                id="edit-force-password"
+                checked={forcePasswordChange}
+                onCheckedChange={setForcePasswordChange}
+                className="data-[state=checked]:bg-[#005B2E]"
+              />
+            </div>
+          </div>
+
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold">Nova Senha (opcional)</Label>
             <Input

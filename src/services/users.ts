@@ -18,6 +18,7 @@ export interface CreateUserData {
   departamento?: string
   cargo?: string
   inactivity_timeout_minutes?: number
+  force_password_change?: boolean
 }
 
 export async function getUsers() {
@@ -57,6 +58,8 @@ export async function createUser(data: CreateUserData): Promise<void> {
       typeof data.inactivity_timeout_minutes === 'number' && data.inactivity_timeout_minutes > 0
         ? data.inactivity_timeout_minutes
         : 480, // Padrão institucional Jetro: 8 horas (480 min)
+    force_password_change: !!data.force_password_change,
+    must_change_password: !!data.force_password_change,
   }
   if (typeof data.codigo === 'number' && data.codigo > 0) {
     recordData.codigo = data.codigo
@@ -125,6 +128,7 @@ export interface UpdateUserData {
   departamento?: string
   cargo?: string
   inactivity_timeout_minutes?: number
+  force_password_change?: boolean
 }
 
 export class UserUpdateError extends Error {
@@ -154,6 +158,10 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   if (data.perfil_acesso !== undefined) recordData.perfil_acesso = data.perfil_acesso
   if (data.cpf !== undefined) recordData.cpf = data.cpf
   if (data.active !== undefined) recordData.active = data.active
+  if (data.force_password_change !== undefined) {
+    recordData.force_password_change = !!data.force_password_change
+    recordData.must_change_password = !!data.force_password_change
+  }
   if (data.inactivity_timeout_minutes !== undefined) {
     recordData.inactivity_timeout_minutes = data.inactivity_timeout_minutes
   }

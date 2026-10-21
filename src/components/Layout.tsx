@@ -19,6 +19,7 @@ import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { JetroCustomizationDrawer } from '@/components/personalizacao/jetro-customization-drawer'
 import { ModuleErrorBoundary } from '@/components/module-error-boundary'
 import { useBrand, hexToHslString, shadeHexColor } from '@/hooks/use-brand'
+import { ForcePasswordResetScreen } from '@/components/auth/force-password-reset-screen'
 import { cn } from '@/lib/utils'
 
 function isInternalPath(pathname: string): boolean {
@@ -31,7 +32,7 @@ function isInternalPath(pathname: string): boolean {
 
 export default function Layout() {
   const { pathname } = useLocation()
-  const { isAuthenticated, loading, userRole } = useAuth()
+  const { isAuthenticated, loading, userRole, mustChangePassword } = useAuth()
   const { preferences } = useUserPreferences()
   const { brand } = useBrand()
   const [screenLogicOpen, setScreenLogicOpen] = useState(false)
@@ -43,6 +44,12 @@ export default function Layout() {
   const showSidebar = isAdmin && isAuthenticated && !loading
   const isHomePage = pathname === '/admin'
   const showFooter = !isInternalPath(pathname) && !isAuthenticated
+
+  // Passo pós-login bloqueante: se o usuário precisa redefinir a senha, renderiza
+  // exclusivamente a tela de redefinição até a conclusão bem-sucedida.
+  if (isAuthenticated && mustChangePassword) {
+    return <ForcePasswordResetScreen />
+  }
 
   useEffect(() => {
     loadProfilesCache(true)

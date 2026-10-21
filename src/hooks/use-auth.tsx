@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ClientResponseError } from 'pocketbase'
 import pb from '@/lib/pocketbase/client'
 import { extractFieldErrors, getErrorMessage, type FieldErrors } from '@/lib/pocketbase/errors'
@@ -44,6 +44,8 @@ interface AuthContextType {
   ) => Promise<{ error: string | null; fieldErrors: FieldErrors }>
   signOut: () => void
   loading: boolean
+  mustChangePassword: boolean
+  clearMustChangePassword: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -81,6 +83,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   )
   const [mfaRequired, setMfaRequired] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const mustChangePassword = useMemo(() => {
+    if (!isAuthenticated || !user) return false
+    return user.force_password_change === true || user.must_change_password === true
+  }, [isAuthenticated, user])
+
+  const clearMustChangePassword = () => {
+    setUser((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        force_password_change: false,
+        must_change_password: false,
+      }
+    })
+  }
 
   useEffect(() => {
     if (
@@ -404,6 +422,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         signUp,
         signOut,
         loading,
+        mustChangePassword,
+        clearMustChangePassword,
       }}
     >
       {children}

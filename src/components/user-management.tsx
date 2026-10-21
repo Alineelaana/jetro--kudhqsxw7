@@ -26,6 +26,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { UserEditDialog } from '@/components/user-edit-dialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
+import { registerAuditLog } from '@/services/audit-logs'
 import {
   Loader2,
   UserPlus,
@@ -36,6 +37,7 @@ import {
   Upload,
   Pencil,
   Plus,
+  KeyRound,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -84,6 +86,8 @@ interface UserRecord {
   cargo?: string
   departamento?: string
   inactivity_timeout_minutes?: number
+  force_password_change?: boolean
+  must_change_password?: boolean
   expand?: {
     perfil_id?: {
       id: string
@@ -109,6 +113,7 @@ export function UserManagement() {
   const [cargo, setCargo] = useState('')
   const [cpf, setCpf] = useState('')
   const [inactivityTimeout, setInactivityTimeout] = useState('480')
+  const [forcePasswordChange, setForcePasswordChange] = useState(false)
   const [avatar, setAvatar] = useState<File | null>(null)
   const [cpfError, setCpfError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -193,6 +198,7 @@ export function UserManagement() {
     setCargo('')
     setCpf('')
     setInactivityTimeout('480')
+    setForcePasswordChange(false)
     setEmpresaId('')
     setEmpresasIds([])
     setFilialId('')
@@ -255,7 +261,22 @@ export function UserManagement() {
         empresa_id: empresaId || empresasIds[0] || undefined,
         empresas_ids: empresasIds.length > 0 ? empresasIds : empresaId ? [empresaId] : [],
         filial_id: filialId || undefined,
+        force_password_change: forcePasswordChange,
       })
+
+      // Auditoria se a flag de forçar nova senha foi ativada na criação
+      if (forcePasswordChange) {
+        await registerAuditLog({
+          action: 'user_force_password_enabled',
+          module: 'usuarios',
+          target_collection: 'users',
+          target_id: String(nextCodigo),
+          target_summary: `Opção 'Criar nova senha no próximo login' ativada para o usuário ${name.trim()} (login: ${cleanLogin || email.trim()})`,
+          criticidade: 'Média',
+          new_value: { force_password_change: true, user_name: name.trim(), email: email.trim() },
+        })
+      }
+
       setCreateModalOpen(false)
       setName('')
       setLoginField('')
@@ -269,6 +290,7 @@ export function UserManagement() {
       setCargo('')
       setCpf('')
       setInactivityTimeout('480')
+      setForcePasswordChange(false)
       setEmpresaId('')
       setEmpresasIds([])
       setFilialId('')
@@ -472,6 +494,12 @@ export function UserManagement() {
                             <span className="text-emerald-800 dark:text-emerald-400 font-medium">
                               Inatividade: {u.inactivity_timeout_minutes ?? 480} min
                             </span>
+                            {(u.force_password_change || u.must_change_password) && (
+                              <span className="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800">
+                                <KeyRound className="w-3 h-3 text-amber-600" />
+                                Redefinir senha no próximo login
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -858,6 +886,31 @@ export function UserManagement() {
               <p className="text-[11px] text-muted-foreground">
                 Padrão corporativo: 480 min (8 horas).
               </p>
+            </div>
+
+            {/* Opção: Criar nova senha no próximo login */}
+            <div className="sm:col-span-2 rounded-xl border border-amber-300/80 bg-amber-50/50 dark:bg-amber-950/20 p-3.5 space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <Label
+                    htmlFor="create-force-password"
+                    className="text-sm font-bold text-foreground flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <KeyRound className="w-4 h-4 text-amber-600" />
+                    <span>Criar nova senha no próximo login</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Quando ativado, o usuário deverá obrigatoriamente redefinir sua senha no próximo
+                    acesso antes de entrar no sistema.
+                  </p>
+                </div>
+                <Switch
+                  id="create-force-password"
+                  checked={forcePasswordChange}
+                  onCheckedChange={setForcePasswordChange}
+                  className="data-[state=checked]:bg-[#005B2E]"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">

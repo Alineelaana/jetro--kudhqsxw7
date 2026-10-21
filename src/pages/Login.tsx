@@ -50,21 +50,11 @@ export default function LoginPage() {
   // Redirecionamento pós-login respeitando permissões / obrigatoriedade de nova senha
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      const u = user as Record<string, unknown> | null
-      const mustChangePassword =
-        u?.must_change_password === true ||
-        u?.force_password_change === true ||
-        u?.primeiro_acesso === true
-      if (mustChangePassword) {
-        navigate('/admin/recuperar-senha', {
-          replace: true,
-          state: { forcedNewPassword: true },
-        })
-      } else {
-        navigate('/admin', { replace: true })
-      }
+      // Se o usuário precisa redefinir senha no próximo login, o Layout renderizará
+      // imediatamente a tela bloqueante ForcePasswordResetScreen
+      navigate('/admin', { replace: true })
     }
-  }, [isAuthenticated, loading, navigate, user])
+  }, [isAuthenticated, loading, navigate])
 
   const clearErrors = () => {
     if (error) setError('')
