@@ -18,6 +18,7 @@ import {
   updateUserActiveStatus,
   getEmpresas,
   getFiliais,
+  type FilialRecord,
   getNextUserCodigo,
 } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -117,7 +118,7 @@ export function UserManagement() {
   const [empresasIds, setEmpresasIds] = useState<string[]>([])
   const [filialId, setFilialId] = useState('')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
-  const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
+  const [filiais, setFiliais] = useState<FilialRecord[]>([])
   const [perfis, setPerfis] = useState<PerfilPermissaoRecord[]>([])
   const [loadingPerfis, setLoadingPerfis] = useState(true)
   const [editUser, setEditUser] = useState<UserRecord | null>(null)
@@ -155,14 +156,16 @@ export function UserManagement() {
   useRealtime('users', () => loadUsers())
 
   useEffect(() => {
-    if (empresaId) {
-      getFiliais(empresaId)
-        .then((data) => setFiliais(data as unknown as { id: string; name: string }[]))
+    const activeEmpresas = empresasIds.length > 0 ? empresasIds : empresaId ? [empresaId] : []
+
+    if (activeEmpresas.length > 0) {
+      getFiliais(activeEmpresas)
+        .then((data) => setFiliais(data))
         .catch(() => setFiliais([]))
     } else {
       setFiliais([])
     }
-  }, [empresaId])
+  }, [empresaId, empresasIds])
 
   const handleCpfChange = (v: string) => {
     const formatted = formatCPF(v)
@@ -812,9 +815,9 @@ export function UserManagement() {
                   <div className="space-y-1">
                     <Label className="text-xs font-semibold">Filial Padrão</Label>
                     <Select
-                      value={filialId}
+                      value={filialId || '_none_'}
                       onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
-                      disabled={!empresaId}
+                      disabled={!empresaId && empresasIds.length === 0}
                     >
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue placeholder="Todas as filiais" />
@@ -823,11 +826,15 @@ export function UserManagement() {
                         <SelectItem value="_none_" className="text-xs">
                           Todas as filiais
                         </SelectItem>
-                        {filiais.map((f) => (
-                          <SelectItem key={f.id} value={f.id} className="text-xs">
-                            {f.name}
-                          </SelectItem>
-                        ))}
+                        {filiais.map((f) => {
+                          const prefix = f.empresa_name ? `[${f.empresa_name}] ` : ''
+                          return (
+                            <SelectItem key={f.id} value={f.id} className="text-xs">
+                              {prefix}
+                              {f.name}
+                            </SelectItem>
+                          )
+                        })}
                       </SelectContent>
                     </Select>
                   </div>

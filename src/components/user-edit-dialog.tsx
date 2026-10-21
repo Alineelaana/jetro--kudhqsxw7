@@ -16,7 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { updateUser, getEmpresas, getFiliais, UserUpdateError } from '@/services/users'
+import {
+  updateUser,
+  getEmpresas,
+  getFiliais,
+  UserUpdateError,
+  type FilialRecord,
+} from '@/services/users'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
@@ -94,7 +100,7 @@ export function UserEditDialog({
   const [departamento, setDepartamento] = useState('')
   const [inactivityTimeout, setInactivityTimeout] = useState('480')
   const [empresas, setEmpresas] = useState<{ id: string; name: string }[]>([])
-  const [filiais, setFiliais] = useState<{ id: string; name: string }[]>([])
+  const [filiais, setFiliais] = useState<FilialRecord[]>([])
   const [perfis, setPerfis] = useState<PerfilPermissaoRecord[]>([])
   const [loadingPerfis, setLoadingPerfis] = useState(false)
 
@@ -167,14 +173,17 @@ export function UserEditDialog({
   }, [])
 
   useEffect(() => {
-    if (empresaId) {
-      getFiliais(empresaId)
-        .then((data) => setFiliais(data as unknown as { id: string; name: string }[]))
+    // Determinar quais empresas estão selecionadas (multiempresa ou empresa padrão)
+    const activeEmpresas = empresasIds.length > 0 ? empresasIds : empresaId ? [empresaId] : []
+
+    if (activeEmpresas.length > 0) {
+      getFiliais(activeEmpresas)
+        .then((data) => setFiliais(data))
         .catch(() => setFiliais([]))
     } else {
       setFiliais([])
     }
-  }, [empresaId])
+  }, [empresaId, empresasIds])
 
   const handleCpfChange = (v: string) => {
     const formatted = formatCPF(v)
@@ -509,19 +518,27 @@ export function UserEditDialog({
 
               <div className="space-y-1">
                 <Label className="text-xs font-semibold">Filial Padrão</Label>
-                <Select value={filialId} onValueChange={setFilialId} disabled={!empresaId}>
+                <Select
+                  value={filialId || '_none_'}
+                  onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
+                  disabled={!empresaId && empresasIds.length === 0}
+                >
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue placeholder="Todas as filiais" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" className="text-xs">
+                    <SelectItem value="_none_" className="text-xs">
                       Todas as filiais
                     </SelectItem>
-                    {filiais.map((f) => (
-                      <SelectItem key={f.id} value={f.id} className="text-xs">
-                        {f.name}
-                      </SelectItem>
-                    ))}
+                    {filiais.map((f) => {
+                      const prefix = f.empresa_name ? `[${f.empresa_name}] ` : ''
+                      return (
+                        <SelectItem key={f.id} value={f.id} className="text-xs">
+                          {prefix}
+                          {f.name}
+                        </SelectItem>
+                      )
+                    })}
                   </SelectContent>
                 </Select>
               </div>

@@ -274,11 +274,66 @@ export async function deleteUser(id: string): Promise<void> {
   await pb.collection('users').delete(id)
 }
 
+export interface FilialRecord {
+  id: string
+  name: string
+  code?: string
+  empresa_name?: string
+  active?: boolean
+}
+
 export async function getEmpresas() {
   return pb.collection('empresas').getFullList({ sort: 'name' })
 }
 
-export async function getFiliais(empresaId?: string) {
-  const filter = empresaId ? `empresa_id = "${empresaId}"` : undefined
-  return pb.collection('filiais').getFullList({ sort: 'name', filter })
+export async function getFiliais(empresaFilter?: string | string[]): Promise<FilialRecord[]> {
+  try {
+    const list = await pb.collection('filiais').getFullList<FilialRecord>({
+      sort: 'name',
+    })
+
+    if (!empresaFilter) {
+      return list
+    }
+
+    const filters = (Array.isArray(empresaFilter) ? empresaFilter : [empresaFilter])
+      .map((item) => String(item || '').trim())
+      .filter(Boolean)
+
+    if (filters.length === 0) {
+      return list
+    }
+
+    // Mapear IDs de empresas para os respectivos nomes para aceitar filtro tanto por ID quanto por nome
+    const companyNamesMap: Record<string, string> = {}
+    try {
+      const empresas = await pb.collection('empresas').getFullList({ fields: 'id,name' })
+      for (const emp of empresas) {
+        if (emp.id && emp.name) {
+          companyNamesMap[emp.id.toLowerCase()] = String(emp.name).trim().toLowerCase()
+        }
+      }
+    } catch {
+      /* intentionally ignored */
+    }
+
+    const targetNamesLower = new Set<string>()
+    for (const f of filters) {
+      const lower = f.toLowerCase()
+      targetNamesLower.add(lower)
+      if (companyNamesMap[lower]) {
+        targetNamesLower.add(companyNamesMap[lower])
+      }
+    }
+
+    return list.filter((filial) => {
+      const filEmpresaLower = String(filial.empresa_name || '')
+        .trim()
+        .toLowerCase()
+      return targetNamesLower.has(filEmpresaLower)
+    })
+  } catch (err) {
+    console.warn('Erro ao obter filiais:', err)
+    return []
+  }
 }
