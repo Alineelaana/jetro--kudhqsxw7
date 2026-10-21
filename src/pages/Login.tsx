@@ -17,7 +17,6 @@ import {
   Globe,
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
-import referenceBg from '@/assets/login-huram-sistema-inteligente-de-gestao-f7a85.png'
 import { useBrand } from '@/hooks/use-brand'
 
 export default function LoginPage() {
@@ -99,24 +98,107 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden overflow-y-auto bg-[#F7F2EA] text-[#221B13] flex flex-col justify-between selection:bg-[#d4a446]/30">
       {/* ========================================================
-          CAMADA DE FUNDO LUMINOSA PREMIUM — FIDELIDADE ABSOLUTA
-          Creme/marfim suave, curvas esmeralda e douradas, iluminação no topo
+          CAMADA DE FUNDO LUMINOSA PREMIUM — ONDAS METÁLICAS E DECORAÇÃO
+          Creme/marfim luminoso com ondas orgânicas em verde-esmeralda e dourado metálico,
+          sem sobreposição com a imagem de composição/mockup para evitar duplicidade.
           ======================================================== */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        {/* Imagem de referência oficial como camada de fundo estética de altíssima definição */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+        {/* Fundo base em degradê creme / marfim luminoso */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-100"
+          className="absolute inset-0"
           style={{
-            backgroundImage: `url(${referenceBg})`,
+            background:
+              'radial-gradient(ellipse 90% 70% at 50% -10%, #FFFFFF 0%, #FAF4EB 40%, #F5EDE0 75%, #ECE2D0 100%)',
           }}
         />
 
-        {/* Gradiente sutil para harmonização caso tela se expanda em ultra-wide */}
+        {/* SVG de Ondas Metálicas Nobres (Verde-Esmeralda e Dourado) */}
+        <svg
+          className="absolute inset-0 w-full h-full preserve-3d"
+          viewBox="0 0 1440 900"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            {/* Gradiente Dourado Metálico 1 */}
+            <linearGradient id="waveGoldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#DFB255" stopOpacity="0.45" />
+              <stop offset="35%" stopColor="#FFF2BF" stopOpacity="0.6" />
+              <stop offset="65%" stopColor="#C49A45" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#8C5F1E" stopOpacity="0.35" />
+            </linearGradient>
+
+            {/* Gradiente Dourado Brilhante Intenso */}
+            <linearGradient id="waveGoldHighlight" x1="10%" y1="0%" x2="90%" y2="100%">
+              <stop offset="0%" stopColor="#D4A446" stopOpacity="0.5" />
+              <stop offset="50%" stopColor="#FFECA8" stopOpacity="0.75" />
+              <stop offset="100%" stopColor="#A87922" stopOpacity="0.5" />
+            </linearGradient>
+
+            {/* Gradiente Verde-Esmeralda Profundo */}
+            <linearGradient id="waveEmeraldGrad1" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#04271D" stopOpacity="0.3" />
+              <stop offset="45%" stopColor="#094A3A" stopOpacity="0.22" />
+              <stop offset="80%" stopColor="#116B50" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#1E8264" stopOpacity="0.05" />
+            </linearGradient>
+
+            {/* Gradiente Esmeralda com reflexo acetinado */}
+            <linearGradient id="waveEmeraldGrad2" x1="100%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor="#063D30" stopOpacity="0.25" />
+              <stop offset="50%" stopColor="#0B4D3C" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#D4A446" stopOpacity="0.08" />
+            </linearGradient>
+          </defs>
+
+          {/* Onda Orgânica Suave Esmeralda Superior Esquerda */}
+          <path
+            d="M-80 -40 C180 80 320 220 380 440 C440 660 260 840 -60 940 L-100 -40 Z"
+            fill="url(#waveEmeraldGrad1)"
+          />
+
+          {/* Filete Dourado Curvo Acentuando a Onda Esquerda */}
+          <path
+            d="M-50 20 C220 120 350 260 395 470 C435 660 300 810 -30 920"
+            stroke="url(#waveGoldHighlight)"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            opacity="0.65"
+          />
+
+          {/* Onda Esmeralda Inferior Direita */}
+          <path
+            d="M1520 960 C1280 840 1140 700 1100 480 C1060 260 1220 80 1520 -40 L1560 960 Z"
+            fill="url(#waveEmeraldGrad2)"
+          />
+
+          {/* Filete Dourado Curvo na Onda Direita */}
+          <path
+            d="M1500 900 C1240 790 1120 640 1085 450 C1050 250 1180 90 1480 0"
+            stroke="url(#waveGoldGrad1)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.65"
+          />
+
+          {/* Fita Dinâmica Ondulada Flutuante Dourada no Fundo */}
+          <path
+            d="M-40 760 Q380 580 720 720 T1480 640"
+            stroke="url(#waveGoldGrad1)"
+            strokeWidth="2.5"
+            strokeDasharray="8 6"
+            opacity="0.35"
+          />
+        </svg>
+
+        {/* Brilho radial no topo para iluminação cinematográfica */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(circle at 50% 20%, rgba(255,255,255,0.8) 0%, rgba(247,242,234,0) 70%)',
+              'radial-gradient(circle at 50% 15%, rgba(255,255,255,0.75) 0%, rgba(247,242,234,0) 60%)',
           }}
         />
       </div>
