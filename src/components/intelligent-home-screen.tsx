@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { JetroCalendar } from '@/components/jetro-agenda/jetro-calendar'
 import { useJetroOnline } from '@/hooks/use-jetro-online'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
+import { useBrand, shadeHexColor } from '@/hooks/use-brand'
+import { HURAM_PALETTE } from '@/lib/brand-assets'
 import pb from '@/lib/pocketbase/client'
 import {
   getSaudacaoAtual,
@@ -21,6 +23,7 @@ export function IntelligentHomeScreen() {
   const { user } = useAuth()
   const { setIsFloatingOpen } = useJetroOnline()
   const { preferences } = useUserPreferences()
+  const { brand } = useBrand()
 
   // Extrair fuso, nome e avatar do usuário autenticado (da mesma fonte de dados do perfil)
   const userRecord = user as
@@ -168,6 +171,24 @@ export function IntelligentHomeScreen() {
     return formatarSaudacaoCompleta(saudacaoInfo.saudacao, primeiroNome, saudacaoInfo.icone)
   }, [saudacaoInfo, primeiroNome])
 
+  // Cores dinâmicas da marca ativa (mesmas que pintam o cabeçalho/topbar)
+  // Gran Romano -> marrom #4A2E1B + dourado #C69B45
+  // Dec Eldorado -> azul royal #003DA5 + dourado #D4AF37
+  // Padrão HURAM -> verde #063D30 + dourado #C69B45
+  const corPrimaria = brand.corPrimaria || HURAM_PALETTE.green
+  const corSecundaria = brand.corSecundaria || HURAM_PALETTE.gold
+  const corComplementar = brand.corComplementar || HURAM_PALETTE.emerald
+
+  // Variações cromáticas para profundidade do gradiente do banner
+  const bannerDarkShade = useMemo(() => shadeHexColor(corPrimaria, -0.35), [corPrimaria])
+  const bannerMidShade = useMemo(() => shadeHexColor(corPrimaria, 0.12), [corPrimaria])
+  const buttonHoverShade = useMemo(() => shadeHexColor(corPrimaria, -0.2), [corPrimaria])
+
+  // Nome institucional exibido na badge
+  const bannerBrandLabel = brand.nomeExibicao
+    ? `${brand.nomeExibicao} — Sistema Inteligente de Gestão`
+    : 'HURAM — Sistema Inteligente de Gestão'
+
   // Respeita preferência de redução de animações da Central de Personalização
   const animClasses =
     preferences.reducedMotion || !preferences.animationsEnabled ? '' : 'transition-all duration-300'
@@ -178,46 +199,65 @@ export function IntelligentHomeScreen() {
       data-tour-id="admin-home-header"
     >
       {/* ==================================================================== */}
-      {/* FAIXA VERDE-ESMERALDA PROFUNDO INSTITUCIONAL COM DETALHES DOURADOS    */}
-      {/* APRESENTAÇÃO DE BOAS-VINDAS PERSONALIZADA (REPOSICIONADA PARA O TOPO) */}
+      {/* BANNER DE SAUDAÇÃO PERSONALIZADO PELA MARCA DA EMPRESA ATIVA          */}
+      {/* APRESENTAÇÃO DE BOAS-VINDAS INTEGRADA COM A IDENTIDADE DO CABEÇALHO   */}
       {/* ==================================================================== */}
       <section
-        className={`relative overflow-hidden rounded-2xl border border-[#C9A227]/30 shadow-lg text-white ${animClasses}`}
+        className={`relative overflow-hidden rounded-2xl border shadow-lg text-white ${animClasses}`}
         style={{
-          background: 'linear-gradient(135deg, #002817 0%, #004423 55%, #002817 100%)',
+          background: `linear-gradient(135deg, ${bannerDarkShade} 0%, ${corPrimaria} 50%, ${bannerDarkShade} 100%)`,
+          borderColor: `${corSecundaria}4D`, // 30% opacidade
         }}
         data-tour-id="admin-home-welcome"
       >
-        {/* Detalhes dourados discretos de fundo (textura e brilho institucional) */}
+        {/* Detalhes luminosos discretos de fundo baseados na paleta da empresa ativa */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#C9A227]/10 blur-3xl"
+          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full blur-3xl opacity-20"
+          style={{ backgroundColor: corSecundaria }}
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-16 -bottom-16 h-64 w-64 rounded-full bg-[#005B2E]/30 blur-2xl"
+          className="pointer-events-none absolute -left-16 -bottom-16 h-64 w-64 rounded-full blur-2xl opacity-25"
+          style={{ backgroundColor: corComplementar || bannerMidShade }}
         />
+        {/* Linha superior de acabamento com a cor secundária (mesmo acabamento do topbar) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#C9A227]/60 to-transparent"
+          className="pointer-events-none absolute inset-x-0 top-0 h-0.5"
+          style={{
+            background: `linear-gradient(to right, transparent, ${corSecundaria}, transparent)`,
+            opacity: 0.7,
+          }}
         />
 
         <div className="relative px-5 py-5 sm:px-6 sm:py-6 lg:px-7 lg:py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             {/* Bloco de Saudação e Mensagens de Boas-Vindas */}
             <div className="space-y-2.5 max-w-3xl">
-              {/* Badge institucional discreta dourada */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#E4C46A] text-[11px] font-bold tracking-wide uppercase">
-                <Sparkles className="w-3 h-3 text-[#E4C46A]" />
-                <span>HURAM — Sistema Inteligente de Gestão</span>
+              {/* Badge institucional discreta na cor secundária da empresa ativa */}
+              <div
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-colors"
+                style={{
+                  backgroundColor: `${corSecundaria}22`,
+                  borderColor: `${corSecundaria}66`,
+                  color: corSecundaria,
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                }}
+              >
+                <Sparkles className="w-3 h-3" style={{ color: corSecundaria }} />
+                <span>{bannerBrandLabel}</span>
               </div>
 
               {/* Saudação principal em destaque integrada com a foto de perfil do usuário */}
               <div className="flex items-center gap-3 sm:gap-4 pt-1">
                 <Avatar
-                  className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full border-2 border-[#D4AF37]/80 shadow-md ring-2 ring-[#002817]/40 shrink-0 bg-[#002817]"
+                  className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full border-2 shadow-md shrink-0"
                   style={{
-                    boxShadow: '0 0 0 1px rgba(212, 175, 55, 0.35), 0 4px 12px rgba(0, 0, 0, 0.35)',
+                    borderColor: `${corSecundaria}CC`,
+                    backgroundColor: bannerDarkShade,
+                    boxShadow: `0 0 0 1px ${corSecundaria}59, 0 4px 12px rgba(0, 0, 0, 0.35)`,
                   }}
                 >
                   {avatarUrl ? (
@@ -227,7 +267,15 @@ export function IntelligentHomeScreen() {
                       className="object-cover w-full h-full rounded-full"
                     />
                   ) : null}
-                  <AvatarFallback className="bg-gradient-to-br from-[#00381D] to-[#012211] text-[#E4C46A] border border-[#D4AF37]/40 font-bold text-xs sm:text-sm lg:text-base tracking-wider">
+                  <AvatarFallback
+                    className="font-bold text-xs sm:text-sm lg:text-base tracking-wider"
+                    style={{
+                      background: `linear-gradient(135deg, ${corPrimaria} 0%, ${bannerDarkShade} 100%)`,
+                      color: corSecundaria,
+                      borderColor: `${corSecundaria}66`,
+                      borderWidth: '1px',
+                    }}
+                  >
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
@@ -240,16 +288,20 @@ export function IntelligentHomeScreen() {
               </div>
 
               {/* Mensagens de boas-vindas e orientações */}
-              <div className="space-y-1.5 text-sm sm:text-base text-emerald-100/95 leading-relaxed">
-                <p className="text-emerald-50/95 text-xs sm:text-sm font-medium">
+              <div className="space-y-1.5 text-sm sm:text-base text-white/90 leading-relaxed">
+                <p className="text-white/95 text-xs sm:text-sm font-medium">
                   {TEXTO_AGENDA_CONFIRMAÇÃO}
                 </p>
-                <p className="text-emerald-100/85 text-xs sm:text-sm pt-0.5">
+                <p className="text-white/80 text-xs sm:text-sm pt-0.5">
                   Desejamos a você um excelente dia de trabalho! Sempre que precisar de ajuda, o{' '}
                   <button
                     type="button"
                     onClick={() => setIsFloatingOpen(true)}
-                    className="inline-flex items-center gap-1 font-bold text-[#E4C46A] hover:text-white underline underline-offset-4 decoration-[#C9A227] hover:decoration-white transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 font-bold hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
+                    style={{
+                      color: corSecundaria,
+                      textDecorationColor: `${corSecundaria}99`,
+                    }}
                     title="Abrir assistente HURAM On-line no canto direito"
                   >
                     <span>HURAM On-line</span>
@@ -264,10 +316,25 @@ export function IntelligentHomeScreen() {
               <Button
                 type="button"
                 onClick={() => setIsFloatingOpen(true)}
-                className="bg-[#063D30] hover:bg-[#042820] text-white border border-[#C69B45]/50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer group"
+                className="text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer group"
+                style={{
+                  backgroundColor: corPrimaria,
+                  borderColor: `${corSecundaria}80`,
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = buttonHoverShade
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = corPrimaria
+                }}
                 title="Abrir painel do HURAM On-line"
               >
-                <MessageSquare className="w-4 h-4 text-[#C69B45] group-hover:scale-110 transition-transform" />
+                <MessageSquare
+                  className="w-4 h-4 group-hover:scale-110 transition-transform"
+                  style={{ color: corSecundaria }}
+                />
                 <span>Chamar HURAM On-line</span>
               </Button>
             </div>{' '}
@@ -281,7 +348,7 @@ export function IntelligentHomeScreen() {
       <section className="w-full" data-tour-id="admin-home-agenda">
         <div className="mb-2 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[#063D30]" />
+            <CalendarIcon className="w-4 h-4" style={{ color: corPrimaria }} />
             <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Calendário e Agenda Corporativa
             </h2>
