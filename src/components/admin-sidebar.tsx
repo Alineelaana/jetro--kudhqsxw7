@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
+import { useBrand } from '@/hooks/use-brand'
 import { useMenuFavorites } from '@/hooks/use-menu-favorites'
 import { useSidebarMode } from '@/hooks/use-sidebar-mode'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
@@ -20,7 +21,16 @@ import { checkProfileScreenAccess, loadProfilesCache } from '@/lib/profile-permi
 import { MenuLink } from '@/components/admin-menu-link'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { logoHuramLight, logoHuramDark } from '@/lib/brand-assets'
+import { logoHuramDark } from '@/lib/brand-assets'
+import { Building2, ChevronDown, Check } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface SearchResult {
   label: string
@@ -35,6 +45,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
   const { pathname } = useLocation()
   const { user, userRole } = useAuth()
+  const { brand, empresasDoUsuario, empresaAtivaId, setEmpresaAtivaId } = useBrand()
   const isMobile = useIsMobile()
 
   // Accordion centralizado: apenas uma área expandida por vez no modo expandido
@@ -246,6 +257,11 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
   // Em mobile, mantemos a visualização completa ou drawer
   const effectiveRail = isRail && !isMobile
 
+  const sidebarLogoSrc = brand.logoDarkUrl || logoHuramDark
+  const sidebarBrandName = brand.nomeExibicao || 'HURAM'
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const hasMultipleEmpresas = isSup || empresasDoUsuario.length > 1
+
   return (
     <div className="relative flex h-full shrink-0" ref={flyoutRef}>
       <aside
@@ -255,8 +271,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
           effectiveRail ? 'w-16' : preferences.sidebarWidth === 'compact' ? 'w-56' : 'w-64',
         )}
       >
-        {' '}
-        {/* Cabeçalho do Sidebar (Fundo Branco Institucional) */}
+        {/* Cabeçalho do Sidebar (com Logo da Marca Ativa e Nome de Exibição) */}
         <div
           className={cn(
             'border-b border-[#E4EAE6] shrink-0 bg-white text-[#202B28] flex items-center transition-all duration-200',
@@ -267,25 +282,36 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
         >
           {effectiveRail ? (
             <>
-              <Link
-                to="/admin"
-                className="flex items-center justify-center p-0.5 rounded hover:opacity-90 transition-opacity"
-                title="HURAM — Sistema Inteligente de Gestão"
-              >
-                <img
-                  src={logoHuramDark}
-                  alt="HURAM"
-                  className="h-8 w-8 object-contain rounded-md border border-[#E4EAE6] bg-[#F8FAF9] shadow-2xs"
-                />
-              </Link>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/admin"
+                    className="flex items-center justify-center p-0.5 rounded hover:opacity-90 transition-opacity"
+                    title={`${sidebarBrandName} — Sistema Inteligente de Gestão`}
+                  >
+                    <img
+                      src={sidebarLogoSrc}
+                      alt={sidebarBrandName}
+                      className="h-8 w-8 object-contain rounded-md border border-[#E4EAE6] bg-[#F8FAF9] shadow-2xs"
+                    />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <div className="font-semibold">{sidebarBrandName}</div>
+                  <div className="text-[10px] text-muted-foreground">{brand.empresaNome}</div>
+                </TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     onClick={toggleSidebar}
-                    className="p-1.5 rounded-md text-[#66736D] hover:text-[#063D30] hover:bg-[#F1F4F2] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-md text-[#66736D] hover:text-[var(--brand-primary,#063D30)] hover:bg-[#F1F4F2] transition-colors cursor-pointer"
                     aria-label="Expandir menu lateral"
                   >
-                    <PanelLeftOpen className="w-4 h-4 text-[#063D30]" />
+                    <PanelLeftOpen
+                      className="w-4 h-4"
+                      style={{ color: 'var(--brand-primary, #063D30)' }}
+                    />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Fixar menu expandido</TooltipContent>
@@ -293,18 +319,27 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
             </>
           ) : (
             <>
-              <Link to="/admin" className="flex items-center gap-2 overflow-hidden min-w-0">
+              <Link
+                to="/admin"
+                className="flex items-center gap-2 overflow-hidden min-w-0"
+                title={`${sidebarBrandName} — ${brand.empresaNome}`}
+              >
                 <img
-                  src={logoHuramDark}
-                  alt="HURAM — Sistema Inteligente de Gestão"
-                  className="h-9 w-auto object-contain rounded border border-[#E4EAE6] bg-[#F8FAF9] p-0.5 shadow-2xs shrink-0"
+                  src={sidebarLogoSrc}
+                  alt={sidebarBrandName}
+                  className="h-9 w-auto max-w-[80px] object-contain rounded border border-[#E4EAE6] bg-[#F8FAF9] p-0.5 shadow-2xs shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
-                  <span className="font-black text-xs text-[#063D30] tracking-wider truncate">
-                    HURAM
+                  <span
+                    className="font-black text-xs tracking-wider truncate"
+                    style={{ color: 'var(--brand-primary, #063D30)' }}
+                  >
+                    {sidebarBrandName}
                   </span>
                   <span className="text-[10px] text-[#66736D] font-medium truncate">
-                    Sistema Inteligente de Gestão
+                    {brand.empresaNome !== sidebarBrandName
+                      ? brand.empresaNome
+                      : 'Sistema Inteligente de Gestão'}
                   </span>
                 </div>
               </Link>
@@ -312,7 +347,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 <TooltipTrigger asChild>
                   <button
                     onClick={toggleSidebar}
-                    className="p-1 rounded text-[#66736D] hover:text-[#063D30] hover:bg-[#F1F4F2] transition-colors shrink-0 cursor-pointer"
+                    className="p-1 rounded text-[#66736D] hover:text-[var(--brand-primary,#063D30)] hover:bg-[#F1F4F2] transition-colors shrink-0 cursor-pointer"
                     aria-label="Recolher menu lateral (modo rail)"
                   >
                     <PanelLeftClose className="w-4 h-4" />
@@ -323,6 +358,68 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
             </>
           )}
         </div>
+
+        {/* Seletor rápido de empresa na sidebar (quando expandido para multiempresa/SUP) */}
+        {!effectiveRail && hasMultipleEmpresas && empresasDoUsuario.length > 0 && (
+          <div className="px-2 py-1.5 border-b border-[#E4EAE6] bg-[#F8FAF9]/80 shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between gap-1.5 px-2 py-1 rounded-md text-[11px] font-semibold text-[#202B28] hover:bg-white border border-[#E4EAE6] transition-colors cursor-pointer text-left shadow-2xs"
+                  title="Trocar empresa ativa"
+                >
+                  <div className="flex items-center gap-1.5 min-w-0 truncate">
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
+                    />
+                    <span className="truncate">{brand.empresaNome || sidebarBrandName}</span>
+                  </div>
+                  <ChevronDown className="w-3 h-3 text-[#66736D] shrink-0" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-56 bg-white text-[#202B28] border border-[#E4EAE6] shadow-lg p-1 rounded-lg z-50 text-xs"
+              >
+                <DropdownMenuLabel className="text-[11px] font-bold text-[#063D30] px-2 py-1">
+                  Empresa Ativa
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-[#E4EAE6]" />
+                <div className="max-h-52 overflow-y-auto space-y-0.5">
+                  {empresasDoUsuario.map((emp) => {
+                    const isSelected =
+                      brand.empresaId === emp.id ||
+                      (!brand.empresaId && !empresaAtivaId && emp.padrao)
+                    const displayName = emp.marca_nome_exibicao || emp.nome_fantasia || emp.name
+
+                    return (
+                      <DropdownMenuItem
+                        key={`sidebar-emp-${emp.id}`}
+                        onClick={() => setEmpresaAtivaId(emp.id)}
+                        className={cn(
+                          'flex items-center justify-between px-2 py-1.5 rounded text-xs cursor-pointer',
+                          isSelected
+                            ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold'
+                            : 'hover:bg-[#F1F4F2] text-[#202B28]',
+                        )}
+                        style={
+                          isSelected
+                            ? { backgroundColor: 'var(--brand-primary, #063D30)' }
+                            : undefined
+                        }
+                      >
+                        <span className="truncate">{displayName}</span>
+                        {isSelected && <Check className="w-3 h-3 shrink-0 text-white" />}
+                      </DropdownMenuItem>
+                    )
+                  })}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
         {/* MODO RAIL (ÍCONES COMPACTOS - FUNDO BRANCO / GELO) */}
         {effectiveRail ? (
           <>
@@ -377,26 +474,38 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                                 className={cn(
                                   'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group cursor-pointer',
                                   active
-                                    ? 'bg-[#063D30] text-white font-semibold shadow-xs'
+                                    ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold shadow-xs'
                                     : isFlyoutOpen
-                                      ? 'bg-[#E4EAE6] text-[#063D30]'
-                                      : 'text-[#66736D] hover:bg-[#F1F4F2] hover:text-[#063D30]',
+                                      ? 'bg-[#E4EAE6] text-[var(--brand-primary,#063D30)]'
+                                      : 'text-[#66736D] hover:bg-[#F1F4F2] hover:text-[var(--brand-primary,#063D30)]',
                                 )}
+                                style={
+                                  active
+                                    ? { backgroundColor: 'var(--brand-primary, #063D30)' }
+                                    : undefined
+                                }
                                 aria-label={item.label}
                               >
                                 {active && (
-                                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#C69B45] rounded-r-sm" />
+                                  <span
+                                    className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-sm"
+                                    style={{ backgroundColor: 'var(--brand-secondary, #C69B45)' }}
+                                  />
                                 )}
                                 <Icon className="w-5 h-5 shrink-0" />
                               </button>
                             </TooltipTrigger>
                             <TooltipContent
                               side="right"
-                              className="font-medium bg-[#063D30] text-white border-[#C69B45]/40"
+                              className="font-medium bg-[var(--brand-primary,#063D30)] text-white border-[var(--brand-secondary,#C69B45)]/40"
+                              style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>{item.label}</span>
-                                <ChevronRight className="w-3 h-3 text-[#C69B45]" />
+                                <ChevronRight
+                                  className="w-3 h-3"
+                                  style={{ color: 'var(--brand-secondary, #C69B45)' }}
+                                />
                               </div>
                             </TooltipContent>
                           </Tooltip>
@@ -412,20 +521,29 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                               className={cn(
                                 'relative w-11 h-10 rounded-lg flex items-center justify-center transition-all group',
                                 active
-                                  ? 'bg-[#063D30] text-white font-semibold shadow-xs'
-                                  : 'text-[#66736D] hover:bg-[#F1F4F2] hover:text-[#063D30]',
+                                  ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold shadow-xs'
+                                  : 'text-[#66736D] hover:bg-[#F1F4F2] hover:text-[var(--brand-primary,#063D30)]',
                               )}
+                              style={
+                                active
+                                  ? { backgroundColor: 'var(--brand-primary, #063D30)' }
+                                  : undefined
+                              }
                               aria-label={item.label}
                             >
                               {active && (
-                                <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#C69B45] rounded-r-sm" />
+                                <span
+                                  className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-sm"
+                                  style={{ backgroundColor: 'var(--brand-secondary, #C69B45)' }}
+                                />
                               )}
                               <Icon className="w-5 h-5 shrink-0" />
                             </Link>
                           </TooltipTrigger>
                           <TooltipContent
                             side="right"
-                            className="font-medium bg-[#063D30] text-white border-[#C69B45]/40"
+                            className="font-medium bg-[var(--brand-primary,#063D30)] text-white border-[var(--brand-secondary,#C69B45)]/40"
+                            style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
                           >
                             {item.label}
                           </TooltipContent>
@@ -448,7 +566,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                   placeholder="Buscar tela..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-7 pr-7 h-8 text-xs bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[#063D30]"
+                  className="pl-7 pr-7 h-8 text-xs bg-white border-[#E4EAE6] text-[#202B28] placeholder:text-[#66736D]/70 focus-visible:ring-[var(--brand-primary,#063D30)]"
                 />
                 {searchQuery && (
                   <button
@@ -481,9 +599,17 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                         className={cn(
                           'block px-3 py-1.5 rounded text-sm transition-colors',
                           pathname === r.route
-                            ? 'bg-[#063D30] text-white font-semibold border-l-2 border-[#C69B45]'
-                            : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[#063D30]',
+                            ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold border-l-2 border-[var(--brand-secondary,#C69B45)]'
+                            : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[var(--brand-primary,#063D30)]',
                         )}
+                        style={
+                          pathname === r.route
+                            ? {
+                                backgroundColor: 'var(--brand-primary, #063D30)',
+                                borderLeftColor: 'var(--brand-secondary, #C69B45)',
+                              }
+                            : undefined
+                        }
                       >
                         <div className="truncate">{r.label}</div>
                         <div className="text-xs text-[#66736D] truncate">{r.parent}</div>
@@ -495,8 +621,17 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 <>
                   {favItems.length > 0 && (
                     <div className="pb-2 border-b border-[#E4EAE6]">
-                      <div className="px-3 py-1 text-xs font-semibold text-[#063D30] uppercase tracking-wider flex items-center gap-1.5">
-                        <Star className="w-3 h-3 fill-[#C69B45] text-[#C69B45]" />
+                      <div
+                        className="px-3 py-1 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5"
+                        style={{ color: 'var(--brand-primary, #063D30)' }}
+                      >
+                        <Star
+                          className="w-3 h-3"
+                          style={{
+                            fill: 'var(--brand-secondary, #C69B45)',
+                            color: 'var(--brand-secondary, #C69B45)',
+                          }}
+                        />
                         <span>Favoritos</span>
                       </div>
                       {favItems.map((item) => {
@@ -542,7 +677,10 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                         key={group.title}
                         className="border-b border-[#E4EAE6]/80 last:border-b-0 py-1"
                       >
-                        <div className="px-3 py-1 text-[11px] font-semibold text-[#063D30]/80 uppercase tracking-wider">
+                        <div
+                          className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider opacity-85"
+                          style={{ color: 'var(--brand-primary, #063D30)' }}
+                        >
                           {group.title}
                         </div>
                         <div className="flex flex-col gap-0.5 pb-1">
@@ -571,11 +709,17 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
               {/* Header do submenu flutuante */}
               <div className="p-3 border-b border-[#E4EAE6] bg-[#F8FAF9] flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-md bg-[#063D30] text-white flex items-center justify-center shrink-0">
+                  <div
+                    className="w-7 h-7 rounded-md text-white flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: 'var(--brand-primary, #063D30)' }}
+                  >
                     <flyoutItem.icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-semibold text-[#063D30] truncate">
+                    <div
+                      className="text-xs font-semibold truncate"
+                      style={{ color: 'var(--brand-primary, #063D30)' }}
+                    >
                       {flyoutItem.label}
                     </div>
                     <div className="text-[10px] text-[#66736D]">
@@ -586,7 +730,7 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                 </div>
                 <button
                   onClick={() => setRailFlyoutArea(null)}
-                  className="p-1 rounded-md text-[#66736D] hover:text-[#063D30] hover:bg-[#E4EAE6] transition-colors cursor-pointer"
+                  className="p-1 rounded-md text-[#66736D] hover:text-[var(--brand-primary,#063D30)] hover:bg-[#E4EAE6] transition-colors cursor-pointer"
                   aria-label="Fechar submenu"
                 >
                   <X className="w-4 h-4" />
@@ -600,9 +744,14 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                   className={cn(
                     'flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                     pathname === flyoutItem.route
-                      ? 'bg-[#063D30] text-white font-semibold'
-                      : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[#063D30]',
+                      ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold'
+                      : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[var(--brand-primary,#063D30)]',
                   )}
+                  style={
+                    pathname === flyoutItem.route
+                      ? { backgroundColor: 'var(--brand-primary, #063D30)' }
+                      : undefined
+                  }
                 >
                   <span>Acessar visão geral</span>
                   <ExternalLink className="w-3 h-3 text-[#66736D]" />
@@ -625,25 +774,33 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
                       className={cn(
                         'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-colors',
                         isChildActive
-                          ? 'bg-[#063D30] text-white font-semibold border-l-2 border-[#C69B45]'
-                          : 'text-[#202B28] hover:text-[#063D30] hover:bg-[#F1F4F2]',
+                          ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold border-l-2 border-[var(--brand-secondary,#C69B45)]'
+                          : 'text-[#202B28] hover:text-[var(--brand-primary,#063D30)] hover:bg-[#F1F4F2]',
                       )}
+                      style={
+                        isChildActive
+                          ? {
+                              backgroundColor: 'var(--brand-primary, #063D30)',
+                              borderLeftColor: 'var(--brand-secondary, #C69B45)',
+                            }
+                          : undefined
+                      }
                     >
                       {ChildIcon ? (
                         <ChildIcon
-                          className={cn(
-                            'w-3.5 h-3.5 shrink-0',
-                            isChildActive
-                              ? 'text-[#C69B45]'
-                              : 'text-[#66736D] group-hover:text-[#063D30]',
-                          )}
+                          className="w-3.5 h-3.5 shrink-0"
+                          style={
+                            isChildActive ? { color: 'var(--brand-secondary, #C69B45)' } : undefined
+                          }
                         />
                       ) : (
                         <span
-                          className={cn(
-                            'w-1.5 h-1.5 rounded-full shrink-0',
-                            isChildActive ? 'bg-[#C69B45]' : 'bg-[#66736D]/50',
-                          )}
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={
+                            isChildActive
+                              ? { backgroundColor: 'var(--brand-secondary, #C69B45)' }
+                              : undefined
+                          }
                         />
                       )}
                       <span className="truncate flex-1">{child.label}</span>
@@ -656,21 +813,25 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
               <div className="p-2 border-t border-[#E4EAE6] bg-[#F8FAF9] flex items-center justify-between shrink-0">
                 <button
                   onClick={() => toggleFavorite(flyoutItem.route)}
-                  className="flex items-center gap-1.5 text-[11px] text-[#66736D] hover:text-[#063D30] px-2 py-1 rounded hover:bg-[#E4EAE6] cursor-pointer"
+                  className="flex items-center gap-1.5 text-[11px] text-[#66736D] hover:text-[var(--brand-primary,#063D30)] px-2 py-1 rounded hover:bg-[#E4EAE6] cursor-pointer"
                 >
                   <Star
-                    className={cn(
-                      'w-3.5 h-3.5',
+                    className="w-3.5 h-3.5"
+                    style={
                       isFavorite(flyoutItem.route)
-                        ? 'fill-[#C69B45] text-[#C69B45]'
-                        : 'text-[#66736D]',
-                    )}
+                        ? {
+                            fill: 'var(--brand-secondary, #C69B45)',
+                            color: 'var(--brand-secondary, #C69B45)',
+                          }
+                        : undefined
+                    }
                   />
                   <span>{isFavorite(flyoutItem.route) ? 'Favoritado' : 'Favoritar área'}</span>
                 </button>
                 <button
                   onClick={toggleSidebar}
-                  className="text-[11px] text-[#063D30] hover:underline font-semibold px-2 py-1 cursor-pointer"
+                  className="text-[11px] hover:underline font-semibold px-2 py-1 cursor-pointer"
+                  style={{ color: 'var(--brand-primary, #063D30)' }}
                 >
                   Fixar menu
                 </button>

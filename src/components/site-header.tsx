@@ -5,8 +5,18 @@ import { Menu, X, ArrowUpRight, Clock, FileCode2, LogOut } from 'lucide-react'
 import { logoHuramLight, logoHuramDark } from '@/lib/brand-assets'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
+import { useBrand } from '@/hooks/use-brand'
 import { canViewScreenDocs } from '@/lib/permissions'
 import { NotificationBell } from '@/components/notification-bell'
+import { Building2, Check, ChevronDown } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   getSaudacaoAtual,
   resolveSafeTimeZone,
@@ -22,6 +32,7 @@ interface SiteHeaderProps {
 export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isAuthenticated, user, userRole, signOut } = useAuth()
+  const { brand, empresasDoUsuario, empresaAtivaId, setEmpresaAtivaId } = useBrand()
   const { preferences } = useUserPreferences()
   const { pathname } = useLocation()
 
@@ -112,10 +123,36 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
     }
   }
 
+  const isSup = userRole?.toUpperCase() === 'SUP'
+  const hasMultipleEmpresas = isSup || empresasDoUsuario.length > 1
+
+  // Logo e nomes dinâmicos da marca ativa
+  const headerLogoSrc = isAuthenticated && brand.logoUrl ? brand.logoUrl : logoHuramLight
+  const headerBrandName = isAuthenticated && brand.nomeExibicao ? brand.nomeExibicao : 'HURAM'
+
   return (
-    <header className="sticky top-0 z-50 w-full transition-all border-b border-[#042820] bg-[#063D30]/95 backdrop-blur-md text-white shadow-[0_4px_20px_rgba(4,40,32,0.35)]">
-      {/* Linha superior dourada sutil de acabamento sofisticado */}
-      <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#C69B45] to-transparent opacity-70" />
+    <header
+      className="sticky top-0 z-50 w-full transition-all border-b border-[var(--brand-primary-dark,#042820)] bg-[var(--brand-primary,#063D30)]/95 backdrop-blur-md text-white shadow-[0_4px_20px_rgba(4,40,32,0.35)]"
+      style={
+        isAuthenticated
+          ? {
+              backgroundColor: 'var(--brand-primary, #063D30)',
+              borderBottomColor: 'var(--brand-primary-dark, #042820)',
+            }
+          : undefined
+      }
+    >
+      {/* Linha superior de acabamento com a cor secundária (dourado HURAM ou secundária da marca) */}
+      <div
+        className="h-0.5 w-full bg-gradient-to-r from-transparent via-[var(--brand-secondary,#C69B45)] to-transparent opacity-70"
+        style={
+          isAuthenticated
+            ? {
+                background: `linear-gradient(to right, transparent, var(--brand-secondary, #C69B45), transparent)`,
+              }
+            : undefined
+        }
+      />
 
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6">
         <a
@@ -127,32 +164,128 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
             }
           }}
           className="flex items-center gap-3 group py-1 cursor-pointer"
-          title="HURAM — Sistema Inteligente de Gestão"
+          title={`${headerBrandName} — Sistema Inteligente de Gestão`}
         >
           <img
-            src={logoHuramLight}
-            alt="HURAM — Sistema Inteligente de Gestão"
-            className="h-10 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm"
+            src={headerLogoSrc}
+            alt={`${headerBrandName} — Sistema Inteligente de Gestão`}
+            className="h-10 sm:h-11 w-auto max-w-[160px] sm:max-w-[200px] object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm"
           />
           <div className="hidden sm:flex flex-col">
             <span className="text-xl font-bold tracking-tight font-heading leading-none text-white">
-              HURAM
+              {headerBrandName}
             </span>
-            <span className="text-[10px] font-semibold tracking-wider text-[#C69B45] uppercase mt-0.5">
+            <span
+              className="text-[10px] font-semibold tracking-wider text-[var(--brand-secondary,#C69B45)] uppercase mt-0.5"
+              style={isAuthenticated ? { color: 'var(--brand-secondary, #C69B45)' } : undefined}
+            >
               Sistema Inteligente de Gestão
             </span>
           </div>
         </a>
 
-        {/* Se usuário autenticado: Cabeçalho unificado com fundo verde institucional #063D30, textos e controles claros */}
+        {/* Se usuário autenticado: Cabeçalho com cor primária da marca ativa, textos e controles claros */}
         {isAuthenticated ? (
           <div className="flex items-center gap-2 sm:gap-3 2xl:gap-4">
+            {/* Seletor de Empresa Ativa (SUP e Multiempresa) */}
+            {hasMultipleEmpresas && empresasDoUsuario.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 text-xs text-white/95 font-medium bg-[var(--brand-primary-dark,#042820)]/80 hover:bg-white/15 border border-white/20 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs shrink-0 cursor-pointer transition-colors max-w-[220px]"
+                    title="Trocar empresa ativa (troca a marca em tempo real sem recarregar)"
+                  >
+                    <Building2
+                      className="w-3.5 h-3.5 shrink-0"
+                      style={{ color: 'var(--brand-secondary, #C69B45)' }}
+                    />
+                    <span className="truncate max-w-[140px] text-left">
+                      <span className="text-white/60 text-[10px] block leading-none">
+                        Empresa Ativa
+                      </span>
+                      <strong className="font-semibold text-xs leading-tight block truncate">
+                        {brand.empresaNome || headerBrandName}
+                      </strong>
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-white/70 shrink-0" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-64 bg-white text-[#202B28] border border-[#E4EAE6] shadow-xl p-1.5 rounded-xl z-50"
+                >
+                  <DropdownMenuLabel className="text-xs font-bold text-[#063D30] px-2 py-1.5 flex items-center justify-between">
+                    <span>Selecionar Empresa</span>
+                    {isSup && (
+                      <span className="text-[10px] font-semibold bg-[#063D30]/10 text-[#063D30] px-1.5 py-0.5 rounded">
+                        SUP
+                      </span>
+                    )}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#E4EAE6]" />
+                  <div className="max-h-60 overflow-y-auto space-y-0.5">
+                    {empresasDoUsuario.map((emp) => {
+                      const isSelected =
+                        brand.empresaId === emp.id ||
+                        (!brand.empresaId && !empresaAtivaId && emp.padrao)
+                      const displayName = emp.marca_nome_exibicao || emp.nome_fantasia || emp.name
+                      const hasBrand = !!(
+                        emp.marca_cor_primaria ||
+                        emp.marca_nome_exibicao ||
+                        emp.marca_logo
+                      )
+
+                      return (
+                        <DropdownMenuItem
+                          key={emp.id}
+                          onClick={() => setEmpresaAtivaId(emp.id)}
+                          className={cn(
+                            'flex items-center justify-between px-2.5 py-2 rounded-lg text-xs cursor-pointer transition-colors',
+                            isSelected
+                              ? 'bg-[#063D30] text-white font-semibold'
+                              : 'hover:bg-[#F1F4F2] text-[#202B28]',
+                          )}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0 border border-white/40"
+                              style={{
+                                backgroundColor: emp.marca_cor_primaria || '#063D30',
+                              }}
+                            />
+                            <div className="min-w-0">
+                              <div className="truncate font-medium">{displayName}</div>
+                              {hasBrand && (
+                                <div
+                                  className={cn(
+                                    'text-[10px]',
+                                    isSelected ? 'text-white/80' : 'text-muted-foreground',
+                                  )}
+                                >
+                                  Marca personalizada
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-3.5 h-3.5 shrink-0 text-white" />}
+                        </DropdownMenuItem>
+                      )
+                    })}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             {/* Indicador de Horário e Fuso */}
             <div
-              className="flex items-center gap-2 text-xs text-white/90 font-medium bg-[#042820]/80 border border-white/15 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs shrink-0"
+              className="hidden md:flex items-center gap-2 text-xs text-white/90 font-medium bg-[var(--brand-primary-dark,#042820)]/80 border border-white/15 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs shrink-0"
               title={`Fuso horário do perfil: ${saudacaoInfo.fusoUtilizado}`}
             >
-              <Clock className="w-3.5 h-3.5 text-[#C69B45] shrink-0" />
+              <Clock
+                className="w-3.5 h-3.5 shrink-0"
+                style={{ color: 'var(--brand-secondary, #C69B45)' }}
+              />
               <span className="tabular-nums">
                 {saudacaoInfo.horaAtualFormatada} <span className="text-white/40">•</span>{' '}
                 <span className="text-white/70 font-normal">Fuso:</span>{' '}
@@ -167,10 +300,13 @@ export function SiteHeader({ onOpenScreenLogic }: SiteHeaderProps = {}) {
                 variant="outline"
                 size="sm"
                 onClick={onOpenScreenLogic}
-                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-white/10 border-white/20 text-white hover:bg-white hover:text-[#063D30] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
+                className={`h-8 sm:h-9 px-2.5 sm:px-3 text-xs font-semibold bg-white/10 border-white/20 text-white hover:bg-white hover:text-[var(--brand-primary,#063D30)] shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 ${animClasses}`}
                 title="Abrir especificação técnica e regras de negócio da tela atual"
               >
-                <FileCode2 className="w-3.5 h-3.5 text-[#C69B45]" />
+                <FileCode2
+                  className="w-3.5 h-3.5"
+                  style={{ color: 'var(--brand-secondary, #C69B45)' }}
+                />
                 <span className="hidden sm:inline">Lógica da Tela</span>
               </Button>
             )}

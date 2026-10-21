@@ -19,6 +19,7 @@ import { FileCode2, ShieldAlert } from 'lucide-react'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { JetroCustomizationDrawer } from '@/components/personalizacao/jetro-customization-drawer'
 import { ModuleErrorBoundary } from '@/components/module-error-boundary'
+import { useBrand, hexToHslString, shadeHexColor } from '@/hooks/use-brand'
 import { cn } from '@/lib/utils'
 
 function isInternalPath(pathname: string): boolean {
@@ -33,6 +34,7 @@ export default function Layout() {
   const { pathname } = useLocation()
   const { isAuthenticated, loading, userRole } = useAuth()
   const { preferences } = useUserPreferences()
+  const { brand } = useBrand()
   const [screenLogicOpen, setScreenLogicOpen] = useState(false)
   const [profilesReady, setProfilesReady] = useState(false)
   const [profilesVersion, setProfilesVersion] = useState(0)
@@ -81,6 +83,27 @@ export default function Layout() {
     }
   }, [pathname, isAdmin])
 
+  // Injeta tokens de marca nos containers internos autenticados via CSS variables
+  const brandStyles = useMemo<Record<string, string>>(() => {
+    const corPrimaria = brand.corPrimaria || '#063D30'
+    const corSecundaria = brand.corSecundaria || '#C69B45'
+    const primariaHsl = hexToHslString(corPrimaria) || '167 82% 13%'
+    const secundariaHsl = hexToHslString(corSecundaria) || '40 54% 52%'
+    const darkShade = shadeHexColor(corPrimaria, -0.3)
+    const lightShade = shadeHexColor(corPrimaria, 0.25)
+    const secondaryLight = shadeHexColor(corSecundaria, 0.2)
+
+    return {
+      '--brand-primary': corPrimaria,
+      '--brand-primary-dark': darkShade,
+      '--brand-primary-light': lightShade,
+      '--brand-secondary': corSecundaria,
+      '--brand-secondary-light': secondaryLight,
+      '--brand-primary-hsl': primariaHsl,
+      '--brand-secondary-hsl': secundariaHsl,
+    } as unknown as Record<string, string>
+  }, [brand.corPrimaria, brand.corSecundaria])
+
   // Redirecionamento preventivo de nível de layout: se o usuário já estiver autenticado e tentar acessar /site, manda direto para /admin
   if (isSite && isAuthenticated) {
     return <Navigate to="/admin" replace />
@@ -88,7 +111,10 @@ export default function Layout() {
 
   if (showSidebar) {
     return (
-      <div className="flex h-screen flex-col overflow-hidden">
+      <div
+        className="flex h-screen flex-col overflow-hidden"
+        style={brandStyles as React.CSSProperties}
+      >
         <InactivityTracker />
         {/* Fixar Cabeçalho: respeita preferência do usuário */}
         <div className={preferences.fixHeader ? 'sticky top-0 z-30 shrink-0' : 'shrink-0'}>
@@ -110,7 +136,7 @@ export default function Layout() {
                     variant="outline"
                     size="sm"
                     onClick={() => setScreenLogicOpen(true)}
-                    className="shrink-0 h-9 px-3 text-xs font-semibold bg-background border-[#063D30]/30 text-[#063D30] hover:bg-[#063D30] hover:text-white transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                    className="shrink-0 h-9 px-3 text-xs font-semibold bg-background border-[var(--brand-primary)]/30 text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
                     title="Abrir especificação técnica e regras de negócio da tela atual"
                   >
                     <FileCode2 className="w-3.5 h-3.5" />
@@ -144,7 +170,7 @@ export default function Layout() {
                       <Button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="bg-[#063D30] hover:bg-[#063D30]/90 text-white font-semibold"
+                        className="bg-[var(--brand-primary)] hover:opacity-90 text-white font-semibold"
                       >
                         Voltar à tela anterior
                       </Button>
@@ -153,7 +179,13 @@ export default function Layout() {
                     <Suspense
                       fallback={
                         <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
-                          <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
+                          <div
+                            className="w-7 h-7 rounded-full border-2 border-t-transparent animate-spin"
+                            style={{
+                              borderColor: 'var(--brand-primary)',
+                              borderTopColor: 'transparent',
+                            }}
+                          />
                         </div>
                       }
                     >
@@ -194,7 +226,10 @@ export default function Layout() {
   const isRootLogin = pathname === '/'
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div
+      className="flex min-h-screen flex-col"
+      style={isAuthenticated ? (brandStyles as React.CSSProperties) : undefined}
+    >
       <InactivityTracker />
       {!isRootLogin && <SiteHeader onOpenScreenLogic={() => setScreenLogicOpen(true)} />}
       <main

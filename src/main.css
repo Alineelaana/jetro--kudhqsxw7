@@ -74,6 +74,15 @@
     --huram-ice-white: 150 14% 98%; /* #F8FAF9 */
     --huram-surface-alt: 140 10% 95%; /* #F1F4F2 */
 
+    /* Tokens dinâmicos da marca ativa por empresa-cliente (com fallback para a identidade HURAM) */
+    --brand-primary: #063d30;
+    --brand-primary-dark: #042820;
+    --brand-primary-light: #116b50;
+    --brand-secondary: #c69b45;
+    --brand-secondary-light: #dfb868;
+    --brand-primary-hsl: 167 82% 13%;
+    --brand-secondary-hsl: 40 54% 52%;
+
     /* Compatibilidade retroativa */
     --gold: 40 54% 52%; /* #C69B45 */
     --gold-light: 40 60% 68%;
@@ -126,31 +135,51 @@
   }
 
   .bg-flag-green {
-    background-color: #063d30;
+    background-color: var(--brand-primary, #063d30);
   }
   .bg-gold-metallic {
-    background-color: #c69b45;
+    background-color: var(--brand-secondary, #c69b45);
   }
   .bg-dark-institutional {
-    background-color: #063d30;
+    background-color: var(--brand-primary, #063d30);
   }
   .bg-orange-huram {
     background-color: #e87517;
   }
   .text-flag-green {
-    color: #063d30;
+    color: var(--brand-primary, #063d30);
   }
   .text-gold-metallic {
-    color: #c69b45;
+    color: var(--brand-secondary, #c69b45);
   }
   .text-orange-huram {
     color: #e87517;
   }
   .border-gold-metallic {
-    border-color: #c69b45;
+    border-color: var(--brand-secondary, #c69b45);
   }
   .border-orange-huram {
     border-color: #e87517;
+  }
+
+  /* Utilitários dedicados de marca da empresa ativa */
+  .bg-brand-primary {
+    background-color: var(--brand-primary, #063d30);
+  }
+  .text-brand-primary {
+    color: var(--brand-primary, #063d30);
+  }
+  .border-brand-primary {
+    border-color: var(--brand-primary, #063d30);
+  }
+  .bg-brand-secondary {
+    background-color: var(--brand-secondary, #c69b45);
+  }
+  .text-brand-secondary {
+    color: var(--brand-secondary, #c69b45);
+  }
+  .border-brand-secondary {
+    border-color: var(--brand-secondary, #c69b45);
   }
 
   .gold-gradient-text {

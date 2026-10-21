@@ -52,6 +52,7 @@ interface BrandContextType {
   brand: ActiveBrand
   loginBrand: ActiveBrand
   empresasDisponiveis: EmpresaBrand[]
+  empresasDoUsuario: EmpresaBrand[]
   empresaAtivaId: string | null
   setEmpresaAtivaId: (id: string) => void
   loading: boolean
@@ -201,12 +202,26 @@ export function BrandProvider({ children }: { children: ReactNode }) {
     return buildBrandFromEmpresa(padrao)
   }, [isAuthenticated, user, empresas, empresaAtivaId, loginBrand])
 
+  // Lista de empresas às quais o usuário autenticado tem acesso
+  const empresasDoUsuario = useMemo<EmpresaBrand[]>(() => {
+    if (!isAuthenticated) return []
+    const { isSup, empresasIds } = getCurrentUserTenant(user)
+    if (isSup) {
+      return empresas.filter((e) => e.active !== false)
+    }
+    if (empresasIds.length > 0) {
+      return empresas.filter((e) => empresasIds.includes(e.id) && e.active !== false)
+    }
+    return []
+  }, [isAuthenticated, user, empresas])
+
   return (
     <BrandContext.Provider
       value={{
         brand,
         loginBrand,
         empresasDisponiveis: empresas,
+        empresasDoUsuario,
         empresaAtivaId,
         setEmpresaAtivaId,
         loading,
@@ -224,4 +239,75 @@ export function useBrand() {
     throw new Error('useBrand deve ser utilizado dentro de um BrandProvider')
   }
   return ctx
+}
+
+/**
+ * Converte uma cor hexadecimal (#RRGGBB ou #RGB) em componentes HSL no formato
+ * usado pelos tokens do Tailwind ("H S% L%"), para alimentar as CSS variables
+ * de marca consumidas pelos utilitários da identidade visual do shell.
+ */
+export function hexToHslString(hex: string): string {
+  const clean = hex.trim().replace('#', '')
+  const full =
+    clean.length === 3
+      ? clean
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : clean
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) return ''
+  const r = parseInt(full.slice(0, 2), 16) / 255
+  const g = parseInt(full.slice(2, 4), 16) / 255
+  const b = parseInt(full.slice(4, 6), 16) / 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  let h = 0
+  let s = 0
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    if (max === r) {
+      h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+    } else if (max === g) {
+      h = ((b - r) / d + 2) / 6
+    } else {
+      h = ((r - g) / d + 4) / 6
+    }
+  }
+  const hDeg = Math.round(h * 360)
+  const sPct = Math.round(s * 100)
+  const lPct = Math.round(l * 100)
+  return `${hDeg} ${sPct}% ${lPct}%`
+}
+
+/**
+ * Escurece/clareia uma cor hexadecimal para derivar variações (hover, borda de fundo etc.)
+ */
+export function shadeHexColor(hex: string, amount: number): string {
+  const clean = hex.trim().replace('#', '')
+  const full =
+    clean.length === 3
+      ? clean
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : clean
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) return hex
+  let r = parseInt(full.slice(0, 2), 16)
+  let g = parseInt(full.slice(2, 4), 16)
+  let b = parseInt(full.slice(4, 6), 16)
+  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)))
+  if (amount >= 0) {
+    r = r + (255 - r) * amount
+    g = g + (255 - g) * amount
+    b = b + (255 - b) * amount
+  } else {
+    const k = 1 + amount
+    r = r * k
+    g = g * k
+    b = b * k
+  }
+  const toHex = (v: number) => clamp(v).toString(16).padStart(2, '0')
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }

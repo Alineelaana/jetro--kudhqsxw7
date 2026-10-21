@@ -50,11 +50,12 @@ export function MenuLink({
     return null
   }
 
+  const isSelected = isActive || isChildActive
   const linkClass = cn(
     'flex-1 flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors',
-    isActive || isChildActive
-      ? 'bg-[#063D30] text-white font-semibold shadow-xs'
-      : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[#063D30]',
+    isSelected
+      ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold shadow-xs'
+      : 'text-[#202B28] hover:bg-[#F1F4F2] hover:text-[var(--brand-primary,#063D30)]',
   )
 
   if (hasChildren) {
@@ -65,20 +66,25 @@ export function MenuLink({
             type="button"
             onClick={() => onToggleExpand(favKey)}
             className={cn(linkClass, 'text-left w-full cursor-pointer select-none')}
+            style={isSelected ? { backgroundColor: 'var(--brand-primary, #063D30)' } : undefined}
           >
-            <Icon
+            <span
               className={cn(
-                'w-4 h-4 shrink-0',
-                isActive || isChildActive ? 'text-[#C69B45]' : 'text-[#66736D]',
+                'shrink-0 flex items-center',
+                isSelected ? 'text-[var(--brand-secondary,#C69B45)]' : 'text-[#66736D]',
               )}
-            />
+              style={isSelected ? { color: 'var(--brand-secondary, #C69B45)' } : undefined}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+            </span>
             <span className="truncate flex-1">{entry.label}</span>
             <ChevronDown
               className={cn(
                 'w-3.5 h-3.5 transition-transform duration-150 shrink-0',
-                isActive || isChildActive ? 'text-[#C69B45]' : 'text-[#66736D]',
+                isSelected ? 'text-[var(--brand-secondary,#C69B45)]' : 'text-[#66736D]',
                 isExpanded && 'rotate-180',
               )}
+              style={isSelected ? { color: 'var(--brand-secondary, #C69B45)' } : undefined}
             />
           </button>
           <button
@@ -87,14 +93,24 @@ export function MenuLink({
               e.stopPropagation()
               onToggleFavorite(favKey)
             }}
-            className="p-1 rounded hover:bg-[#F1F4F2] shrink-0 cursor-pointer text-[#66736D] hover:text-[#063D30]"
+            className="p-1 rounded hover:bg-[#F1F4F2] shrink-0 cursor-pointer text-[#66736D] hover:text-[var(--brand-primary,#063D30)]"
             title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           >
             <Star
               className={cn(
                 'w-3 h-3',
-                isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-[#66736D]/60',
+                isFavorite
+                  ? 'fill-[var(--brand-secondary,#C69B45)] text-[var(--brand-secondary,#C69B45)]'
+                  : 'text-[#66736D]/60',
               )}
+              style={
+                isFavorite
+                  ? {
+                      fill: 'var(--brand-secondary, #C69B45)',
+                      color: 'var(--brand-secondary, #C69B45)',
+                    }
+                  : undefined
+              }
             />
           </button>
         </div>
@@ -110,17 +126,32 @@ export function MenuLink({
                   className={cn(
                     'flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors',
                     isChildItemActive
-                      ? 'bg-[#063D30] text-white font-semibold border-l-2 border-[#C69B45]'
-                      : 'text-[#202B28] hover:text-[#063D30] hover:bg-[#F1F4F2]',
+                      ? 'bg-[var(--brand-primary,#063D30)] text-white font-semibold border-l-2 border-[var(--brand-secondary,#C69B45)]'
+                      : 'text-[#202B28] hover:text-[var(--brand-primary,#063D30)] hover:bg-[#F1F4F2]',
                   )}
+                  style={
+                    isChildItemActive
+                      ? {
+                          backgroundColor: 'var(--brand-primary, #063D30)',
+                          borderLeftColor: 'var(--brand-secondary, #C69B45)',
+                        }
+                      : undefined
+                  }
                 >
                   {ChildIcon && (
-                    <ChildIcon
+                    <span
                       className={cn(
-                        'w-3.5 h-3.5 shrink-0',
-                        isChildItemActive ? 'text-[#C69B45]' : 'text-[#66736D]',
+                        'shrink-0 flex items-center',
+                        isChildItemActive
+                          ? 'text-[var(--brand-secondary,#C69B45)]'
+                          : 'text-[#66736D]',
                       )}
-                    />
+                      style={
+                        isChildItemActive ? { color: 'var(--brand-secondary, #C69B45)' } : undefined
+                      }
+                    >
+                      <ChildIcon className="w-3.5 h-3.5 shrink-0" />
+                    </span>
                   )}
                   <span className="truncate">{child.label}</span>
                 </Link>
@@ -134,21 +165,43 @@ export function MenuLink({
 
   return (
     <div className="flex items-center gap-0.5">
-      <Link to={entry.route} className={linkClass}>
-        <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-[#C69B45]' : 'text-[#66736D]')} />
+      <Link
+        to={entry.route}
+        className={linkClass}
+        style={isActive ? { backgroundColor: 'var(--brand-primary, #063D30)' } : undefined}
+      >
+        <span
+          className={cn(
+            'shrink-0 flex items-center',
+            isActive ? 'text-[var(--brand-secondary,#C69B45)]' : 'text-[#66736D]',
+          )}
+          style={isActive ? { color: 'var(--brand-secondary, #C69B45)' } : undefined}
+        >
+          <Icon className="w-4 h-4 shrink-0" />
+        </span>
         <span className="truncate flex-1">{entry.label}</span>
       </Link>
       <button
         type="button"
         onClick={() => onToggleFavorite(favKey)}
-        className="p-1 rounded hover:bg-[#F1F4F2] shrink-0 cursor-pointer text-[#66736D] hover:text-[#063D30]"
+        className="p-1 rounded hover:bg-[#F1F4F2] shrink-0 cursor-pointer text-[#66736D] hover:text-[var(--brand-primary,#063D30)]"
         title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
       >
         <Star
           className={cn(
             'w-3 h-3',
-            isFavorite ? 'fill-[#C69B45] text-[#C69B45]' : 'text-[#66736D]/60',
+            isFavorite
+              ? 'fill-[var(--brand-secondary,#C69B45)] text-[var(--brand-secondary,#C69B45)]'
+              : 'text-[#66736D]/60',
           )}
+          style={
+            isFavorite
+              ? {
+                  fill: 'var(--brand-secondary, #C69B45)',
+                  color: 'var(--brand-secondary, #C69B45)',
+                }
+              : undefined
+          }
         />
       </button>
     </div>
