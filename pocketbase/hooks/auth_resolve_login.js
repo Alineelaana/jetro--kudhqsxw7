@@ -45,11 +45,12 @@ routerAdd('POST', '/backend/v1/auth/resolve-identity', (e) => {
     // 4. Mapeamento explícito de apelidos/logins rápidos para as contas unificadas multiempresa
     const aliases = {
       // Aline (Código 1)
-      aline: 'aline@deceldorado.com.br',
-      'aline.dec': 'aline@deceldorado.com.br',
-      'aline.gr': 'aline@deceldorado.com.br',
-      'aline.eldorado': 'aline@deceldorado.com.br',
-      'aline.granromano': 'aline@deceldorado.com.br',
+      aline: 'aline.lana@deceldorado.com.br',
+      'aline.dec': 'aline.lana@deceldorado.com.br',
+      'aline.gr': 'aline.lana@deceldorado.com.br',
+      'aline.eldorado': 'aline.lana@deceldorado.com.br',
+      'aline.granromano': 'aline.lana@deceldorado.com.br',
+      'aline.lana': 'aline.lana@deceldorado.com.br',
 
       // Junão (Código 2)
       junao: 'junior@deceldorado.com.br',
