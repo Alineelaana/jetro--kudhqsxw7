@@ -52,6 +52,7 @@ export async function createUser(data: CreateUserData): Promise<void> {
     role: data.role,
     cpf: data.cpf || '',
     active: data.active !== undefined ? data.active : true,
+    verified: true, // Usuários criados pelo gestor já nascem verificados
     inactivity_timeout_minutes:
       typeof data.inactivity_timeout_minutes === 'number' && data.inactivity_timeout_minutes > 0
         ? data.inactivity_timeout_minutes
