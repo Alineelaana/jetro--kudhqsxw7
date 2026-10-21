@@ -218,6 +218,7 @@ export function TasksListViewModal({
                 <SelectItem value="Em andamento">Em andamento</SelectItem>
                 <SelectItem value="Concluido">Concluído</SelectItem>
                 <SelectItem value="Cancelado">Cancelado</SelectItem>
+                <SelectItem value="Reagendado">Reagendado</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -308,17 +309,21 @@ export function TasksListViewModal({
                   </div>
                 </div>
 
-                {/* Status Badge */}
+                {/* Status Badge com cores verde/vermelho/azul */}
                 <div className="shrink-0 flex items-center gap-2">
                   <Badge
                     variant="outline"
-                    className={`text-[10px] ${
+                    className={`text-[10px] font-bold ${
                       isDone
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                        : 'bg-gray-50 text-gray-600'
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        : appt.status === 'Cancelado' || appt.invitation_status === 'recusado'
+                          ? 'bg-red-100 text-red-800 border-red-300'
+                          : appt.status === 'Reagendado'
+                            ? 'bg-blue-100 text-blue-800 border-blue-300'
+                            : 'bg-gray-50 text-gray-600 border-gray-200'
                     }`}
                   >
-                    {appt.status}
+                    {appt.invitation_status === 'recusado' ? 'Convite Recusado' : appt.status}
                   </Badge>
                 </div>
               </div>

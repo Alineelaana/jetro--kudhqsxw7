@@ -28,18 +28,28 @@ import { concludeTask, cancelTask, rescheduleTask } from '@/services/jetro-agend
 
 interface DayTasksChecklistProps {
   selectedDate: string
-  appointments: AgendaAppointment[]
-  onRefresh: () => void
-  onOpenAppointmentModal: (dateStr: string) => void
-  onEditAppointment: (appt: AgendaAppointment) => void
+  appointments?: AgendaAppointment[]
+  currentUser?: {
+    id: string
+    email: string
+    name?: string
+  }
+  onRefresh?: () => void
+  onOpenAppointmentModal?: (dateStr: string) => void
+  onEditAppointment?: (appt: AgendaAppointment) => void
+  onAddNewTask?: () => void
+  onOpenRejectedInvitations?: () => void
 }
 
 export function DayTasksChecklist({
   selectedDate,
-  appointments,
+  appointments = [],
+  currentUser,
   onRefresh,
   onOpenAppointmentModal,
   onEditAppointment,
+  onAddNewTask,
+  onOpenRejectedInvitations,
 }: DayTasksChecklistProps) {
   // Filtra as tarefas e compromissos agendados para o dia selecionado
   const dayTasks = appointments.filter((a) => a.date === selectedDate)
@@ -83,7 +93,7 @@ export function DayTasksChecklist({
         title: 'Tarefa concluída com sucesso',
         description: `"${task.title}" finalizada e identificada na cor verde.`,
       })
-      onRefresh()
+      onRefresh?.()
     } catch (err) {
       console.error('Erro ao concluir tarefa:', err)
       toast({
@@ -107,7 +117,7 @@ export function DayTasksChecklist({
         description: `"${task.title}" finalizada e identificada na cor vermelha.`,
         variant: 'destructive',
       })
-      onRefresh()
+      onRefresh?.()
     } catch (err) {
       console.error('Erro ao cancelar tarefa:', err)
       toast({
@@ -150,7 +160,7 @@ export function DayTasksChecklist({
       })
       setRescheduleModalOpen(false)
       setTaskToReschedule(null)
-      onRefresh()
+      onRefresh?.()
     } catch (err) {
       console.error('Erro ao reagendar tarefa:', err)
       toast({
@@ -233,15 +243,35 @@ export function DayTasksChecklist({
           </p>
         </div>
 
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => onOpenAppointmentModal(selectedDate)}
-          className="h-8 text-xs font-bold bg-[#005B2E] hover:bg-[#01361D] text-white shadow-2xs self-start sm:self-auto"
-        >
-          <Sparkles className="w-3.5 h-3.5 mr-1" />
-          Agendar Tarefa neste Dia
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {onOpenRejectedInvitations && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onOpenRejectedInvitations}
+              className="h-8 text-xs font-bold border-red-200 text-red-700 hover:bg-red-50 hover:text-red-900 shadow-2xs"
+            >
+              <X className="w-3.5 h-3.5 mr-1" />
+              Convites Recusados
+            </Button>
+          )}
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              if (onAddNewTask) {
+                onAddNewTask()
+              } else if (onOpenAppointmentModal) {
+                onOpenAppointmentModal(selectedDate)
+              }
+            }}
+            className="h-8 text-xs font-bold bg-[#005B2E] hover:bg-[#01361D] text-white shadow-2xs"
+          >
+            <Sparkles className="w-3.5 h-3.5 mr-1" />
+            Agendar Tarefa neste Dia
+          </Button>
+        </div>
       </div>
 
       {/* Lista de tarefas ou estado vazio */}
@@ -263,7 +293,7 @@ export function DayTasksChecklist({
             return (
               <div
                 key={task.id}
-                onClick={() => onEditAppointment(task)}
+                onClick={() => onEditAppointment?.(task)}
                 className={`p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer shadow-2xs flex flex-col md:flex-row md:items-center md:justify-between gap-3 ${visual.cardBg}`}
               >
                 {/* Informações da Tarefa */}

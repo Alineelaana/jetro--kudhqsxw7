@@ -179,6 +179,9 @@ export const DEVICE_OPTIONS = [
 export const ENTITY_OPTIONS = [
   { value: '', label: 'Todos os tipos' },
   { value: 'usuario', label: 'Usuário' },
+  { value: 'agenda', label: 'Agenda / Compromisso' },
+  { value: 'tarefa', label: 'Tarefa' },
+  { value: 'convite', label: 'Convite de Agenda' },
   { value: 'cliente', label: 'Cliente' },
   { value: 'fornecedor', label: 'Fornecedor' },
   { value: 'produto', label: 'Produto' },
@@ -204,4 +207,6 @@ export const COLLECTION_ROUTE_MAP: Record<string, string> = {
   vitrine_items: '/admin',
   settings: '/admin',
   chat_conversations: '/admin',
+  jetro_agenda_appointments: '/admin',
+  jetro_agenda_invitations: '/admin',
 }

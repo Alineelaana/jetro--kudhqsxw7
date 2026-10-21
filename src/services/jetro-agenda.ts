@@ -2,6 +2,7 @@ import pb from '@/lib/pocketbase/client'
 import type {
   AgendaAppointment,
   AgendaFilterOptions,
+  AppointmentStatus,
   CreateAppointmentInput,
   UpdateAppointmentInput,
   AppointmentRecurrence,

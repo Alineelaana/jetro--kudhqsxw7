@@ -33,19 +33,30 @@ import {
 interface InvitationsManagementDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  userId: string
-  initialTab?: 'rejected' | 'pending'
-  onRefreshCalendar: () => void
+  userId?: string
+  currentUser?: {
+    id: string
+    email: string
+    name?: string
+  }
+  initialTab?: 'rejected' | 'pending' | 'accepted'
+  onChanged?: () => void
+  onRefreshCalendar?: () => void
 }
 
 export function InvitationsManagementDialog({
   open,
   onOpenChange,
-  userId,
+  userId: propUserId,
+  currentUser,
   initialTab = 'rejected',
+  onChanged,
   onRefreshCalendar,
 }: InvitationsManagementDialogProps) {
-  const [activeTab, setActiveTab] = useState<'rejected' | 'pending'>(initialTab)
+  const effectiveUserId = propUserId || currentUser?.id || ''
+  const [activeTab, setActiveTab] = useState<'rejected' | 'pending'>(
+    initialTab === 'rejected' ? 'rejected' : 'pending',
+  )
   const [rejectedList, setRejectedList] = useState<AgendaInvitation[]>([])
   const [pendingList, setPendingList] = useState<AgendaInvitation[]>([])
   const [loading, setLoading] = useState(false)
@@ -57,16 +68,16 @@ export function InvitationsManagementDialog({
   const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
-    setActiveTab(initialTab)
+    setActiveTab(initialTab === 'rejected' ? 'rejected' : 'pending')
   }, [initialTab])
 
   const loadData = async () => {
-    if (!userId) return
+    if (!effectiveUserId) return
     setLoading(true)
     try {
       const [rejected, pending] = await Promise.all([
-        fetchRejectedInvitations(userId),
-        fetchPendingInvitations(userId),
+        fetchRejectedInvitations(effectiveUserId),
+        fetchPendingInvitations(effectiveUserId),
       ])
       setRejectedList(rejected)
       setPendingList(pending)
@@ -81,7 +92,7 @@ export function InvitationsManagementDialog({
     if (open) {
       loadData()
     }
-  }, [open, userId])
+  }, [open, effectiveUserId])
 
   // Ação de Aceitar convite
   const handleAccept = async (inv: AgendaInvitation) => {
@@ -93,7 +104,8 @@ export function InvitationsManagementDialog({
         description: 'O compromisso permanecerá na sua agenda como confirmado.',
       })
       await loadData()
-      onRefreshCalendar()
+      onChanged?.()
+      onRefreshCalendar?.()
     } catch (err) {
       console.error('Erro ao aceitar convite:', err)
       toast({
@@ -129,7 +141,8 @@ export function InvitationsManagementDialog({
       setRejectModalOpen(false)
       setInvitationToReject(null)
       await loadData()
-      onRefreshCalendar()
+      onChanged?.()
+      onRefreshCalendar?.()
     } catch (err) {
       console.error('Erro ao recusar convite:', err)
       toast({

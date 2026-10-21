@@ -13,6 +13,8 @@ import {
   Bell,
   MapPin,
   Flag,
+  UserCheck,
+  UserX,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -42,6 +44,8 @@ import {
 import { fetchUserAppointments, toggleAppointmentStatus } from '@/services/jetro-agenda'
 import { AppointmentModal } from './appointment-modal'
 import { TasksListViewModal } from './tasks-list-view-modal'
+import { DayTasksChecklist } from './day-tasks-checklist'
+import { InvitationsManagementDialog } from './invitations-management-dialog'
 import { toast } from '@/hooks/use-toast'
 
 interface JetroCalendarProps {
@@ -105,9 +109,16 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
   // Modal de visualização "Ver mais" de um dia específico
   const [dayDetailsDate, setDayDetailsDate] = useState<string | null>(null)
 
-  // Data atual de Brasília formatada YYYY-MM-DD
+  // Data selecionada para o Checklist abaixo do calendário (padrão: hoje)
   const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`)
   const todayDateStr = `${brasiliaCurrent.year}-${pad(brasiliaCurrent.month + 1)}-${pad(brasiliaCurrent.day)}`
+  const [selectedChecklistDate, setSelectedChecklistDate] = useState<string>(todayDateStr)
+
+  // Modal de Convites Recusados / Gerenciamento de Convites
+  const [isInvitationsDialogOpen, setIsInvitationsDialogOpen] = useState(false)
+  const [invitationsDialogTab, setInvitationsDialogTab] = useState<
+    'pending' | 'rejected' | 'accepted'
+  >('pending')
 
   // Usuário padrão de fallback caso não esteja logado
   const activeUser = currentUser || {
@@ -374,6 +385,34 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                 </Button>
               </div>
 
+              {/* Botão Convites / Convites Recusados */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setInvitationsDialogTab('pending')
+                  setIsInvitationsDialogOpen(true)
+                }}
+                className="h-8 text-xs font-semibold border-gray-200 bg-white text-gray-700 hover:text-[#005B2E] hover:border-[#005B2E] hover:bg-emerald-50/30 transition-colors shadow-2xs"
+              >
+                <UserCheck className="w-3.5 h-3.5 mr-1.5 text-[#005B2E]" />
+                Convites
+              </Button>
+
+              {/* Botão Acesso Rápido a Convites Recusados */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setInvitationsDialogTab('rejected')
+                  setIsInvitationsDialogOpen(true)
+                }}
+                className="h-8 text-xs font-semibold border-red-200 bg-white text-red-700 hover:text-red-900 hover:border-red-400 hover:bg-red-50/40 transition-colors shadow-2xs"
+              >
+                <UserX className="w-3.5 h-3.5 mr-1.5 text-red-600" />
+                Convites Recusados
+              </Button>
+
               {/* Botão Minhas Tarefas / Visões */}
               <Button
                 variant="outline"
@@ -475,7 +514,8 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                   <SelectItem value="Em andamento">Em andamento</SelectItem>
                   <SelectItem value="Concluido">Concluído</SelectItem>
                   <SelectItem value="Cancelado">Cancelado</SelectItem>
-                </SelectContent>
+                  <SelectItem value="Reagendado">Reagendado</SelectItem>
+                </SelectContent>{' '}
               </Select>
 
               <Button
@@ -517,14 +557,22 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
               const visibleAppts = cell.appointments.slice(0, maxVisible)
               const remainingCount = cell.appointments.length - maxVisible
 
+              const isSelectedDay = cell.dateStr === selectedChecklistDate
+
               return (
                 <div
                   key={cell.dateStr}
-                  onClick={() => handleOpenNewAppointment(cell.dateStr)}
+                  onClick={() => {
+                    setSelectedChecklistDate(cell.dateStr)
+                  }}
                   className={`min-h-[105px] sm:min-h-[125px] p-1.5 sm:p-2 bg-white flex flex-col justify-between transition-all cursor-pointer group hover:bg-emerald-50/20 ${
                     !cell.isCurrentMonth ? 'bg-gray-50/80 text-gray-400' : ''
                   } ${cell.isWeekend && cell.isCurrentMonth ? 'bg-slate-50/60' : ''} ${
-                    cell.isToday ? 'ring-2 ring-inset ring-[#005B2E] bg-emerald-50/30' : ''
+                    isSelectedDay ? 'ring-2 ring-inset ring-[#005B2E] bg-emerald-50/30' : ''
+                  } ${
+                    cell.isToday && !isSelectedDay
+                      ? 'border-2 border-emerald-500/60 bg-emerald-50/15'
+                      : ''
                   }`}
                 >
                   {/* Cabeçalho da Célula: Número do Dia + Indicador discreto */}
@@ -589,20 +637,34 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
                     {visibleAppts.map((appt) => {
                       const typeConfig = TYPE_COLORS[appt.type] || TYPE_COLORS.Outros
                       const isDone = appt.status === 'Concluido'
+                      const isCancelled = appt.status === 'Cancelado'
+                      const isRescheduled = appt.status === 'Reagendado'
                       const isUrgent = appt.priority === 'Urgente'
+
+                      // Estilo de cores conforme requisito:
+                      // Concluído -> Verde | Cancelado -> Vermelho | Reagendado -> Azul | Convite Recusado -> Vermelho
+                      const isInvitationRejected = appt.invitation_status === 'recusado'
+                      let statusBadgeClasses = `${typeConfig.bg} ${typeConfig.border} font-medium`
+
+                      if (isDone) {
+                        statusBadgeClasses =
+                          'bg-emerald-50 text-emerald-800 border-emerald-300 line-through opacity-90'
+                      } else if (isCancelled || isInvitationRejected) {
+                        statusBadgeClasses = 'bg-red-50 text-red-800 border-red-300 font-semibold'
+                      } else if (isRescheduled) {
+                        statusBadgeClasses =
+                          'bg-blue-50 text-blue-800 border-blue-300 font-semibold'
+                      } else if (isUrgent) {
+                        statusBadgeClasses =
+                          'bg-red-50 text-red-950 border-red-300 font-bold hover:bg-red-100/70'
+                      }
 
                       return (
                         <div
                           key={appt.id}
                           onClick={(e) => handleEditAppointment(appt, e)}
-                          title={`${appt.start_time ? appt.start_time + ' - ' : ''}${appt.title}`}
-                          className={`text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded border transition-all flex items-center justify-between gap-1 shadow-2xs cursor-pointer ${
-                            isDone
-                              ? 'bg-gray-100 text-gray-500 border-gray-200 line-through opacity-75'
-                              : isUrgent
-                                ? 'bg-red-50 text-red-950 border-red-300 font-bold hover:bg-red-100/70'
-                                : `${typeConfig.bg} ${typeConfig.border} font-medium`
-                          }`}
+                          title={`${appt.start_time ? appt.start_time + ' - ' : ''}${appt.title}${isInvitationRejected ? ' (Convite Recusado)' : ''}`}
+                          className={`text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded border transition-all flex items-center justify-between gap-1 shadow-2xs cursor-pointer ${statusBadgeClasses}`}
                         >
                           <div className="flex items-center gap-1 truncate min-w-0">
                             <span
@@ -668,7 +730,39 @@ export function JetroCalendar({ currentUser }: JetroCalendarProps) {
             ))}
           </div>
         )}
+
+        {/* ==================================================================== */}
+        {/* CHECKLIST DE TAREFAS ABAIXO DO CALENDÁRIO (DIA SELECIONADO) */}
+        {/* ==================================================================== */}
+        <div className="p-4 sm:p-6 bg-slate-50/60 border-t border-gray-200">
+          <DayTasksChecklist
+            selectedDate={selectedChecklistDate}
+            appointments={appointments}
+            currentUser={activeUser}
+            onRefresh={loadAppointments}
+            onAddNewTask={() => handleOpenNewAppointment(selectedChecklistDate)}
+            onOpenAppointmentModal={(d) => handleOpenNewAppointment(d)}
+            onEditAppointment={(appt) => handleEditAppointment(appt)}
+            onOpenRejectedInvitations={() => {
+              setInvitationsDialogTab('rejected')
+              setIsInvitationsDialogOpen(true)
+            }}
+          />
+        </div>
       </TooltipProvider>
+
+      {/* ==================================================================== */}
+      {/* MODAL DE GERENCIAMENTO DE CONVITES & ÁREA DE CONVITES RECUSADOS */}
+      {/* ==================================================================== */}
+      <InvitationsManagementDialog
+        open={isInvitationsDialogOpen}
+        onOpenChange={setIsInvitationsDialogOpen}
+        currentUser={activeUser}
+        initialTab={invitationsDialogTab}
+        onChanged={() => {
+          loadAppointments()
+        }}
+      />
 
       {/* ==================================================================== */}
       {/* MODAL DE CADASTRO / EDIÇÃO DE COMPROMISSO */}
