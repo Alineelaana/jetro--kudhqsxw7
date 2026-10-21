@@ -6,6 +6,7 @@ export interface CreateUserData {
   login?: string
   password: string
   role: string
+  codigo?: number
   perfil_id?: string
   perfil_acesso?: string
   cpf?: string
@@ -20,9 +21,25 @@ export interface CreateUserData {
 
 export async function getUsers() {
   return pb.collection('users').getFullList({
-    sort: 'created',
+    sort: 'codigo,created',
     expand: 'perfil_id',
   })
+}
+
+export async function getNextUserCodigo(): Promise<number> {
+  try {
+    const list = await pb.collection('users').getList(1, 1, {
+      sort: '-codigo',
+      filter: 'codigo > 0',
+      fields: 'codigo',
+    })
+    if (list.items.length > 0 && typeof list.items[0].codigo === 'number') {
+      return list.items[0].codigo + 1
+    }
+  } catch (err) {
+    console.warn('Erro ao obter próximo código de usuário:', err)
+  }
+  return 8
 }
 
 export async function createUser(data: CreateUserData): Promise<void> {
@@ -38,6 +55,11 @@ export async function createUser(data: CreateUserData): Promise<void> {
       typeof data.inactivity_timeout_minutes === 'number' && data.inactivity_timeout_minutes > 0
         ? data.inactivity_timeout_minutes
         : 480, // Padrão institucional Jetro: 8 horas (480 min)
+  }
+  if (typeof data.codigo === 'number' && data.codigo > 0) {
+    recordData.codigo = data.codigo
+  } else {
+    recordData.codigo = await getNextUserCodigo()
   }
   if (data.login) {
     const cleanLogin = data.login.trim().toLowerCase()
@@ -64,6 +86,7 @@ export interface UpdateUserData {
   email?: string
   login?: string
   role?: string
+  codigo?: number
   perfil_id?: string
   perfil_acesso?: string
   cpf?: string

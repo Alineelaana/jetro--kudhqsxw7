@@ -113,6 +113,18 @@ export function UsersTable({
 
   const columns: JetroColumnDef<UserAuditRecord>[] = [
     {
+      id: 'codigo',
+      header: 'Código',
+      accessorKey: 'codigo',
+      dataType: 'number',
+      defaultWidth: 90,
+      cell: ({ row }) => (
+        <span className="text-xs font-mono font-bold text-[#005B2E] bg-[#C89B3C]/10 border border-[#C89B3C]/20 px-2 py-0.5 rounded">
+          {row.codigo !== undefined && row.codigo !== null ? row.codigo : '—'}
+        </span>
+      ),
+    },
+    {
       id: 'name',
       header: 'Nome Completo',
       accessorKey: 'name',
@@ -334,6 +346,7 @@ export function UsersTable({
 
   const handleExportFiltered = (type: 'excel' | 'pdf') => {
     const exportData = filteredUsers.map((u) => ({
+      Código: u.codigo !== undefined ? u.codigo : '—',
       Nome: u.name,
       Login: u.login || u.username || 'Informação não registrada',
       'Nome de Usuário': u.login || u.username || 'Informação não registrada',

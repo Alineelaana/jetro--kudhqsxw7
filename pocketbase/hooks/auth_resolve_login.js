@@ -1,108 +1,162 @@
+// Router hook para resolver login ou e-mail de usuários sem ambiguidade
 routerAdd('POST', '/backend/v1/auth/resolve-identity', (e) => {
   try {
-    var body = e.requestInfo().body || {}
-    var rawIdentity = (body.identity || '').toString().trim()
-    if (!rawIdentity) {
-      return e.json(400, { error: 'identity is required' })
+    const data = e.requestInfo().body || {}
+    let identity = (data.identity || '').trim()
+    if (!identity) {
+      return e.json(400, { error: 'Identidade não informada' })
     }
 
-    var lower = rawIdentity.toLowerCase()
+    const lower = identity.toLowerCase()
 
-    // Aliases do Administrador Master (SUP)
+    // 1. Caso especial: Aline (Admin global / SUP)
     if (
       lower === 'alineelaana' ||
       lower === 'jetrosup' ||
       lower === 'jetrosup@jetro.com.br' ||
-      lower === 'alineelaana@gmail.com' ||
-      lower === 'aline'
+      lower === 'alineelaana@gmail.com'
     ) {
-      return e.json(200, { email: 'alineelaana@gmail.com', resolved: true })
+      return e.json(200, {
+        resolved: true,
+        email: 'alineelaana@gmail.com',
+        user_id: 'ixt73p3a017u157',
+        name: 'Aline Lana',
+      })
     }
 
-    // Se já contém @, autentica diretamente pelo próprio e-mail
-    if (rawIdentity.indexOf('@') !== -1) {
-      return e.json(200, { email: rawIdentity, resolved: false })
-    }
-
-    // Normalização: minúsculas, trim, aceita letras, números, pontos, traços e underscores
-    var normalized = lower.replace(/[^a-z0-9._-]/g, '')
-    var safe = normalized.replace(/["\\]/g, '')
-
-    // 1. Tentar busca direta no campo 'login'
-    if (safe) {
+    // 2. Se já é um e-mail válido, buscar diretamente por e-mail
+    if (lower.indexOf('@') !== -1) {
       try {
-        var records = $app.findRecordsByFilter('users', 'login = "' + safe + '"', '', 1, 0)
-
-        if (records && records.length > 0) {
-          var userRec = records[0]
-          var email = userRec.get('email') || ''
-          if (email) {
-            return e.json(200, { email: email, resolved: true, user_id: userRec.id })
-          }
+        const u = $app.findAuthRecordByEmail('users', lower)
+        if (u) {
+          return e.json(200, {
+            resolved: true,
+            email: u.email(),
+            user_id: u.id,
+            name: u.get('name') || '',
+          })
         }
-      } catch (errFind) {
-        // Ignora erro 400/parse da query e cai para a busca em memória
-        console.log('resolve-identity findRecordsByFilter notice:', errFind)
-      }
+      } catch (_) {}
     }
 
-    // 2. Busca flexível / case-insensitive / prefixo em memória (ex.: "patricia" encontra "patricia.brum")
-    try {
-      var allMatches = $app.findRecordsByFilter('users', 'id != ""', '', 0, 0)
-      var candidate = null
+    // 3. Sanitizar string para busca segura
+    const safe = lower.replace(/[^a-z0-9._-]/g, '')
 
-      for (var i = 0; i < allMatches.length; i++) {
-        var u = allMatches[i]
-        var uLogin = (u.get('login') || '').toString().trim().toLowerCase()
-        var uEmail = (u.get('email') || '').toString().trim().toLowerCase()
+    // 4. Mapeamento explícito de apelidos/logins rápidos
+    const aliases = {
+      // Aline
+      'aline.dec': 'aline@deceldorado.com.br',
+      'aline.gr': 'aline@granromano.com.br',
+      'aline.eldorado': 'aline@deceldorado.com.br',
+      'aline.granromano': 'aline@granromano.com.br',
 
-        // Match exato com login
-        if (uLogin && (uLogin === lower || uLogin === normalized)) {
-          candidate = u
-          break
-        }
+      // Junão
+      junao: 'junior@deceldorado.com.br',
+      'junao.dec': 'junior@deceldorado.com.br',
+      'junao.eldorado': 'junior@deceldorado.com.br',
+      'junao.gr': 'junao@granromano.com.br',
+      'junao.granromano': 'junao@granromano.com.br',
+      junior: 'junior@deceldorado.com.br',
 
-        // Match com prefixo de login (ex: digitou "patricia", uLogin é "patricia.brum" ou vice-versa)
-        if (!candidate && uLogin) {
-          if (uLogin.indexOf(normalized + '.') === 0 || normalized.indexOf(uLogin + '.') === 0) {
-            candidate = u
-          }
-        }
+      // Renata
+      renata: 'renata@deceldorado.com.br',
+      'renata.dec': 'renata@deceldorado.com.br',
+      'renata.eldorado': 'renata@deceldorado.com.br',
+      'renata.gr': 'renata@granromano.com.br',
+      'renata.granromano': 'renata@granromano.com.br',
 
-        // Match com a parte antes do @ do e-mail
-        if (!candidate && uEmail) {
-          var emailPrefix = uEmail.split('@')[0]
-          if (emailPrefix === lower || emailPrefix === normalized) {
-            candidate = u
-          } else if (
-            emailPrefix.indexOf(normalized + '.') === 0 ||
-            normalized.indexOf(emailPrefix + '.') === 0
-          ) {
-            candidate = u
-          }
-        }
-      }
+      // Alef
+      alef: 'alef@deceldorado.com.br',
+      'alef.dec': 'alef@deceldorado.com.br',
+      'alef.eldorado': 'alef@deceldorado.com.br',
+      'alef.gr': 'alef@granromano.com.br',
+      'alef.granromano': 'alef@granromano.com.br',
 
-      if (candidate) {
-        var candidateEmail = candidate.get('email') || ''
-        if (candidateEmail) {
-          return e.json(200, { email: candidateEmail, resolved: true, user_id: candidate.id })
-        }
-      }
-    } catch (errMem) {
-      console.log('resolve-identity memory search notice:', errMem)
+      // Rogério
+      rogerio: 'rogerio.roque@granfoods.ind.br',
+      'rogerio.roque': 'rogerio.roque@granfoods.ind.br',
+      'rogerio.gr': 'rogerio.roque@granfoods.ind.br',
+      'rogerio.granromano': 'rogerio.roque@granfoods.ind.br',
+      'rogerio.dec': 'rogerio@deceldorado.com.br',
+      'rogerio.eldorado': 'rogerio@deceldorado.com.br',
+
+      // Patrícia
+      patricia: 'patricia.brum@deceldorado.com.br',
+      'patricia.brum': 'patricia.brum@deceldorado.com.br',
+      'patricia.dec': 'patricia.brum@deceldorado.com.br',
+      'patricia.eldorado': 'patricia.brum@deceldorado.com.br',
+      'patricia.gr': 'patricia@granromano.com.br',
+      'patricia.granromano': 'patricia@granromano.com.br',
+
+      // Janaína
+      janaina: 'janaina.nogueira@deceldorado.com.br',
+      'janaina.nogueira': 'janaina.nogueira@deceldorado.com.br',
+      'janaina.dec': 'janaina.nogueira@deceldorado.com.br',
+      'janaina.eldorado': 'janaina.nogueira@deceldorado.com.br',
+      'janaina.gr': 'janaina@granromano.com.br',
+      'janaina.granromano': 'janaina@granromano.com.br',
     }
 
-    // Fallback gracioso: retorna o valor original sem erro para tentar autenticar direto
-    return e.json(200, { email: rawIdentity, resolved: false })
-  } catch (err) {
-    // Nunca derrubar o fluxo de login com status 500 — responde 200 com fallback
-    console.log('resolve-identity unhandled error:', err)
-    var fallbackIdentity = ''
+    if (aliases[safe]) {
+      const targetEmail = aliases[safe]
+      try {
+        const u = $app.findAuthRecordByEmail('users', targetEmail)
+        if (u) {
+          return e.json(200, {
+            resolved: true,
+            email: u.email(),
+            user_id: u.id,
+            name: u.get('name') || '',
+          })
+        }
+      } catch (_) {}
+    }
+
+    // 5. Busca no banco por campo login exato
     try {
-      var b = e.requestInfo().body || {}
-      fallbackIdentity = (b.identity || '').toString().trim()
+      const records = $app.findRecordsByFilter(
+        'users',
+        'login = {:login} || username = {:login}',
+        '-created',
+        5,
+        0,
+        { login: safe },
+      )
+
+      if (records && records.length > 0) {
+        const u = records[0]
+        return e.json(200, {
+          resolved: true,
+          email: u.email(),
+          user_id: u.id,
+          name: u.get('name') || '',
+        })
+      }
     } catch (_) {}
-    return e.json(200, { email: fallbackIdentity, resolved: false })
+
+    // 6. Busca por prefixo no email (ex.: patricia@...)
+    try {
+      const records = $app.findRecordsByFilter('users', 'email ~ {:prefix}', '-created', 5, 0, {
+        prefix: safe,
+      })
+
+      if (records && records.length > 0) {
+        const u = records[0]
+        return e.json(200, {
+          resolved: true,
+          email: u.email(),
+          user_id: u.id,
+          name: u.get('name') || '',
+        })
+      }
+    } catch (_) {}
+
+    return e.json(404, {
+      resolved: false,
+      error: 'Usuário não encontrado',
+    })
+  } catch (err) {
+    console.log('auth_resolve_login error:', err)
+    return e.json(500, { error: 'Erro ao resolver login' })
   }
 })

@@ -2,6 +2,7 @@ import pb from '@/lib/pocketbase/client'
 
 export interface UserAuditRecord {
   id: string
+  codigo?: number
   name: string
   login?: string
   username?: string
@@ -194,6 +195,7 @@ export async function fetchUsersAuditOverview(): Promise<UserAuditRecord[]> {
       const userLogin = (u.login as string) || (u.email as string)?.split('@')[0] || ''
       return {
         id: u.id,
+        codigo: typeof u.codigo === 'number' ? u.codigo : undefined,
         name: (u.name as string) || (u.email as string)?.split('@')[0] || 'Usuário',
         login: userLogin,
         username: userLogin,

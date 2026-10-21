@@ -18,12 +18,24 @@ import {
   updateUserActiveStatus,
   getEmpresas,
   getFiliais,
+  getNextUserCodigo,
 } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { UserEditDialog } from '@/components/user-edit-dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
-import { Loader2, UserPlus, Trash2, Shield, User, AlertCircle, Upload, Pencil } from 'lucide-react'
+import {
+  Loader2,
+  UserPlus,
+  Trash2,
+  Shield,
+  User,
+  AlertCircle,
+  Upload,
+  Pencil,
+  Plus,
+} from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 const PB_URL = import.meta.env.VITE_POCKETBASE_URL || ''
@@ -57,6 +69,7 @@ interface UserRecord {
   email: string
   login?: string
   role: string
+  codigo?: number
   perfil_id?: string
   perfil_acesso?: string
   cpf: string
@@ -83,6 +96,8 @@ export function UserManagement() {
   const { isAdmin, user: currentUser } = useAuth()
   const [users, setUsers] = useState<UserRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [nextCodigo, setNextCodigo] = useState<number>(1)
   const [name, setName] = useState('')
   const [loginField, setLoginField] = useState('')
   const [email, setEmail] = useState('')
@@ -154,6 +169,33 @@ export function UserManagement() {
     else setCpfError('')
   }
 
+  const handleOpenNewUser = async () => {
+    try {
+      const code = await getNextUserCodigo()
+      setNextCodigo(code)
+    } catch {
+      setNextCodigo(8)
+    }
+    setName('')
+    setLoginField('')
+    setEmail('')
+    setPassword('')
+    setRole('PADRAO')
+    const defaultProfile = perfis.find((p) => p.code?.toUpperCase() === 'PADRAO') || perfis[0]
+    if (defaultProfile) {
+      setPerfilId(defaultProfile.id)
+    }
+    setCargo('')
+    setCpf('')
+    setInactivityTimeout('480')
+    setEmpresaId('')
+    setFilialId('')
+    setAvatar(null)
+    setCpfError('')
+    setError('')
+    setCreateModalOpen(true)
+  }
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -196,6 +238,7 @@ export function UserManagement() {
         login: cleanLogin || undefined,
         password,
         role: effectiveRole,
+        codigo: nextCodigo,
         perfil_id: selectedPerfil?.id || undefined,
         perfil_acesso: perfilCode,
         cargo: cargo.trim() || undefined,
@@ -206,6 +249,7 @@ export function UserManagement() {
         empresa_id: empresaId || undefined,
         filial_id: filialId || undefined,
       })
+      setCreateModalOpen(false)
       setName('')
       setLoginField('')
       setEmail('')
@@ -224,8 +268,9 @@ export function UserManagement() {
       setCpfError('')
       toast({
         title: 'Usuário Criado',
-        description: 'Novo usuário cadastrado com sucesso como Ativo.',
+        description: `Novo usuário (Código ${nextCodigo}) cadastrado com sucesso.`,
       })
+      await loadUsers()
     } catch (err: any) {
       if (err?.response?.data?.cpf) setError('CPF já cadastrado.')
       else if (err?.response?.data?.email) setError('E-mail já cadastrado.')
@@ -283,273 +328,37 @@ export function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-2 border-[#C89B3C]/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <UserPlus className="w-5 h-5 text-[#005B2E]" /> Criar Novo Usuário
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Nome (Saudação)</Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nome do funcionário (ex.: Patrícia Brum)"
-                className="focus-visible:ring-[#005B2E]"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Usado exclusivamente para a saudação da página inicial (&quot;Bom dia,
-                [Nome]&quot;).
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Login do Usuário</Label>
-              <Input
-                value={loginField}
-                onChange={(e) =>
-                  setLoginField(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))
-                }
-                placeholder="login (ex.: patricia ou patricia.brum)"
-                className="focus-visible:ring-[#005B2E]"
-                autoCapitalize="none"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Identificador único de acesso (sem espaços, aceita pontos para sobrenomes).
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">E-mail</Label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@empresa.com"
-                className="focus-visible:ring-[#005B2E]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Senha</Label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
-                className="focus-visible:ring-[#005B2E]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">CPF</Label>
-              <Input
-                value={cpf}
-                onChange={(e) => handleCpfChange(e.target.value)}
-                placeholder="000.000.000-00"
-                className="focus-visible:ring-[#005B2E]"
-              />
-              {cpfError && <p className="text-xs text-destructive">{cpfError}</p>}
-            </div>
-            {/* Campo Perfil de Acesso (Perfis e Permissões) */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold flex items-center justify-between">
-                <span>Perfil de Acesso (Perfis e Permissões)</span>
-                <span className="text-[11px] text-[#C69B45] font-medium">
-                  Delimita telas & menus
-                </span>
-              </Label>
-              <Select
-                value={perfilId}
-                onValueChange={(val) => {
-                  setPerfilId(val)
-                  const chosen = perfis.find((p) => p.id === val)
-                  if (chosen) {
-                    const c = chosen.code?.toUpperCase()
-                    if (
-                      ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL', 'SDR', 'Vendedor'].includes(c)
-                    ) {
-                      setRole(c)
-                    }
-                  }
-                }}
-                disabled={loadingPerfis}
-              >
-                <SelectTrigger className="border-2 border-[#063D30]/30 focus:ring-[#063D30]">
-                  <SelectValue
-                    placeholder={
-                      loadingPerfis ? 'Carregando perfis...' : 'Selecione o perfil de acesso'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {perfis.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{p.name || p.code}</span>
-                        <span className="text-xs text-muted-foreground font-mono">({p.code})</span>
-                        {p.active === false && (
-                          <span className="text-[10px] text-destructive bg-destructive/10 px-1 py-0.2 rounded font-medium">
-                            Inativo
-                          </span>
-                        )}
-                        {p.code?.toUpperCase() === 'SUP' && (
-                          <span className="text-[10px] text-[#C69B45] font-bold">
-                            (Acesso Total)
-                          </span>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-[11px] text-muted-foreground">
-                Define exatamente quais telas e menus o usuário poderá visualizar e operar no ERP.
-              </p>
-            </div>
+      {/* Top Header com Botão + Novo Cadastro */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Gestão de Usuários</h2>
+          <p className="text-xs text-muted-foreground">
+            Gerencie os usuários do sistema, perfis de acesso, credenciais e empresas vinculadas.
+          </p>
+        </div>
+        <Button
+          onClick={handleOpenNewUser}
+          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-sm"
+        >
+          <Plus className="w-4 h-4 mr-2" /> Novo Cadastro
+        </Button>
+      </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Setor</Label>
-              <Select value={role} onValueChange={setRole}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PADRAO">Gestão / Administrativo</SelectItem>
-                  <SelectItem value="SUP">SUP (Administrador Geral)</SelectItem>
-                  <SelectItem value="FINANCEIRO">Financeiro</SelectItem>
-                  <SelectItem value="COMERCIAL">Comercial</SelectItem>
-                  <SelectItem value="SDR">SDR / Pré-Vendas</SelectItem>
-                  <SelectItem value="Vendedor">Vendas / Campo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Cargo / Função</Label>
-              <Input
-                value={cargo}
-                onChange={(e) => setCargo(e.target.value)}
-                placeholder="Ex.: Analista Financeiro, Gerente de Vendas..."
-                className="focus-visible:ring-[#005B2E]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Empresa Vinculada</Label>
-              <Select
-                value={empresaId}
-                onValueChange={(v) => {
-                  setEmpresaId(v === '_none_' ? '' : v)
-                  setFilialId('')
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={
-                      empresas.length ? 'Selecione a empresa' : 'Sem empresas cadastradas (Geral)'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none_">Sem empresa (Acesso geral / Global)</SelectItem>
-                  {empresas.map((em) => (
-                    <SelectItem key={em.id} value={em.id}>
-                      {em.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Filial Vinculada</Label>
-              <Select
-                value={filialId}
-                onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
-                disabled={!empresaId}
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={!empresaId ? 'Selecione a empresa primeiro' : 'Todas as filiais'}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none_">Todas as filiais da empresa</SelectItem>
-                  {filiais.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">
-                Tempo de inatividade para deslogar (minutos)
-              </Label>
-              <Input
-                type="number"
-                min={1}
-                max={480}
-                value={inactivityTimeout}
-                onChange={(e) => setInactivityTimeout(e.target.value)}
-                placeholder="Ex: 480"
-                className="focus-visible:ring-[#005B2E]"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Padrão corporativo Jetro: 480 minutos (8 horas). Mínimo 1, máximo 480 min.
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Foto de Perfil</Label>
-              <div className="flex items-center gap-3">
-                <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors text-sm">
-                  <Upload className="w-4 h-4" />
-                  {avatar ? avatar.name : 'Escolher arquivo'}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => setAvatar(e.target.files?.[0] || null)}
-                  />
-                </label>
-                {avatar && (
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setAvatar(null)}>
-                    Remover
-                  </Button>
-                )}
-              </div>
-            </div>
-            {error && (
-              <p className="text-sm text-destructive col-span-full flex items-center gap-1">
-                <AlertCircle className="w-4 h-4" />
-                {error}
-              </p>
-            )}
-            <div className="col-span-full">
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Criando...
-                  </>
-                ) : (
-                  'Criar Usuário'
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
+      {/* Lista de Usuários Cadastrados (Aparece aberta como solicitado no Pedido 3) */}
       <Card className="border-2 border-[#005B2E]/20">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <CardTitle className="text-lg">Usuários Cadastrados</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span>Usuários Cadastrados</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                ({users.length} usuário{users.length !== 1 ? 's' : ''})
+              </span>
+            </CardTitle>
             <div className="w-full sm:w-72">
               <Input
                 value={userSearchTerm}
                 onChange={(e) => setUserSearchTerm(e.target.value)}
-                placeholder="Buscar por login, nome, e-mail..."
+                placeholder="Buscar por código, login, nome, e-mail..."
                 className="h-8 text-xs focus-visible:ring-[#005B2E]"
               />
             </div>
@@ -566,20 +375,32 @@ export function UserManagement() {
                 .filter((u) => {
                   if (!userSearchTerm.trim()) return true
                   const q = userSearchTerm.toLowerCase().trim()
+                  const matchCode = u.codigo !== undefined && String(u.codigo).includes(q)
                   const matchLogin = (u.login || '').toLowerCase().includes(q)
                   const matchName = (u.name || '').toLowerCase().includes(q)
                   const matchEmail = (u.email || '').toLowerCase().includes(q)
                   const matchCargo = (u.cargo || '').toLowerCase().includes(q)
-                  return matchLogin || matchName || matchEmail || matchCargo
+                  return matchCode || matchLogin || matchName || matchEmail || matchCargo
                 })
                 .map((u) => {
                   const isActive = u.active !== false
+                  const empName = empresas.find((e) => e.id === u.empresa_id)?.name || u.empresa_id
                   return (
                     <div
                       key={u.id}
                       className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-border hover:bg-[#005B2E]/5 transition-colors gap-3"
                     >
                       <div className="flex items-center gap-3">
+                        {/* Coluna / Badge de Código */}
+                        <div className="flex flex-col items-center justify-center min-w-[50px] px-2 py-1 bg-[#C89B3C]/10 border border-[#C89B3C]/30 rounded-md">
+                          <span className="text-[10px] uppercase font-bold text-[#8a681c] dark:text-[#E4C46A]">
+                            Cód.
+                          </span>
+                          <span className="text-sm font-mono font-bold text-[#005B2E]">
+                            {u.codigo !== undefined && u.codigo !== null ? u.codigo : '—'}
+                          </span>
+                        </div>
+
                         {u.avatar ? (
                           <img
                             src={getAvatarUrl(u.id, u.avatar)}
@@ -606,26 +427,17 @@ export function UserManagement() {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">{u.email}</p>
-                          <div className="flex flex-wrap gap-x-3">
-                            {u.cpf && (
-                              <p className="text-xs text-muted-foreground">
-                                CPF: {formatCPF(u.cpf)}
-                              </p>
+                          <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                            {u.cpf && <span>CPF: {formatCPF(u.cpf)}</span>}
+                            {empName && (
+                              <span className="font-medium text-foreground">
+                                Empresa: {empName}
+                              </span>
                             )}
-                            {u.empresa_id && (
-                              <p className="text-xs text-muted-foreground">
-                                Empresa: {u.empresa_id}
-                              </p>
-                            )}
-                            {u.filial_id && (
-                              <p className="text-xs text-muted-foreground">Filial: {u.filial_id}</p>
-                            )}
-                            {u.cargo && (
-                              <p className="text-xs text-muted-foreground">Cargo: {u.cargo}</p>
-                            )}
-                            <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">
+                            {u.cargo && <span>Cargo: {u.cargo}</span>}
+                            <span className="text-emerald-800 dark:text-emerald-400 font-medium">
                               Inatividade: {u.inactivity_timeout_minutes ?? 480} min
-                            </p>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -708,6 +520,299 @@ export function UserManagement() {
           )}
         </CardContent>
       </Card>
+
+      {/* Diálogo / Modal de Criação de Usuário (Pedido 1 e 3) */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <UserPlus className="w-5 h-5 text-[#005B2E]" /> Criar Novo Usuário
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            {/* Campo CÓDIGO: Numérico, automático e sequencial, NÃO editável (somente leitura) */}
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold flex items-center justify-between">
+                <span>Código</span>
+                <span className="text-[11px] text-[#C89B3C] font-semibold">
+                  Automático e Sequencial
+                </span>
+              </Label>
+              <Input
+                value={nextCodigo}
+                readOnly
+                disabled
+                className="bg-muted/70 font-mono font-bold text-[#005B2E] cursor-not-allowed select-none"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Identificador numérico do usuário (somente leitura).
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Nome (Saudação)</Label>
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nome do funcionário (ex.: Patrícia Brum)"
+                className="focus-visible:ring-[#005B2E]"
+                required
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Usado para a saudação da página inicial (&quot;Bom dia, [Nome]&quot;).
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Login do Usuário</Label>
+              <Input
+                value={loginField}
+                onChange={(e) =>
+                  setLoginField(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))
+                }
+                placeholder="login (ex.: patricia ou patricia.dec)"
+                className="focus-visible:ring-[#005B2E]"
+                autoCapitalize="none"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Identificador de acesso (sem espaços, aceita pontos para sobrenomes/empresa).
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">E-mail</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="email@empresa.com"
+                className="focus-visible:ring-[#005B2E]"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Senha</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 8 caracteres"
+                className="focus-visible:ring-[#005B2E]"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">CPF</Label>
+              <Input
+                value={cpf}
+                onChange={(e) => handleCpfChange(e.target.value)}
+                placeholder="000.000.000-00"
+                className="focus-visible:ring-[#005B2E]"
+              />
+              {cpfError && <p className="text-xs text-destructive">{cpfError}</p>}
+            </div>
+
+            {/* Perfil de Acesso */}
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label className="text-sm font-semibold flex items-center justify-between">
+                <span>Perfil de Acesso (Perfis e Permissões)</span>
+                <span className="text-[11px] text-[#C69B45] font-medium">
+                  Delimita telas & menus
+                </span>
+              </Label>
+              <Select
+                value={perfilId}
+                onValueChange={(val) => {
+                  setPerfilId(val)
+                  const chosen = perfis.find((p) => p.id === val)
+                  if (chosen) {
+                    const c = chosen.code?.toUpperCase()
+                    if (
+                      ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL', 'SDR', 'Vendedor'].includes(c)
+                    ) {
+                      setRole(c)
+                    }
+                  }
+                }}
+                disabled={loadingPerfis}
+              >
+                <SelectTrigger className="border-2 border-[#063D30]/30 focus:ring-[#063D30]">
+                  <SelectValue
+                    placeholder={
+                      loadingPerfis ? 'Carregando perfis...' : 'Selecione o perfil de acesso'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {perfis.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-foreground">{p.name || p.code}</span>
+                        <span className="text-xs text-muted-foreground font-mono">({p.code})</span>
+                        {p.active === false && (
+                          <span className="text-[10px] text-destructive bg-destructive/10 px-1 py-0.2 rounded font-medium">
+                            Inativo
+                          </span>
+                        )}
+                        {p.code?.toUpperCase() === 'SUP' && (
+                          <span className="text-[10px] text-[#C69B45] font-bold">
+                            (Acesso Total)
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Setor</Label>
+              <Select value={role} onValueChange={setRole}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PADRAO">Gestão / Administrativo</SelectItem>
+                  <SelectItem value="SUP">SUP (Administrador Geral)</SelectItem>
+                  <SelectItem value="FINANCEIRO">Financeiro</SelectItem>
+                  <SelectItem value="COMERCIAL">Comercial</SelectItem>
+                  <SelectItem value="SDR">SDR / Pré-Vendas</SelectItem>
+                  <SelectItem value="Vendedor">Vendas / Campo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Cargo / Função</Label>
+              <Input
+                value={cargo}
+                onChange={(e) => setCargo(e.target.value)}
+                placeholder="Ex.: Analista Financeiro, Gerente de Vendas..."
+                className="focus-visible:ring-[#005B2E]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Empresa Vinculada</Label>
+              <Select
+                value={empresaId}
+                onValueChange={(v) => {
+                  setEmpresaId(v === '_none_' ? '' : v)
+                  setFilialId('')
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      empresas.length ? 'Selecione a empresa' : 'Sem empresas cadastradas (Geral)'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none_">Sem empresa (Acesso geral / Global)</SelectItem>
+                  {empresas.map((em) => (
+                    <SelectItem key={em.id} value={em.id}>
+                      {em.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Filial Vinculada</Label>
+              <Select
+                value={filialId}
+                onValueChange={(v) => setFilialId(v === '_none_' ? '' : v)}
+                disabled={!empresaId}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={!empresaId ? 'Selecione a empresa primeiro' : 'Todas as filiais'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none_">Todas as filiais da empresa</SelectItem>
+                  {filiais.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">
+                Tempo de inatividade para deslogar (minutos)
+              </Label>
+              <Input
+                type="number"
+                min={1}
+                max={480}
+                value={inactivityTimeout}
+                onChange={(e) => setInactivityTimeout(e.target.value)}
+                placeholder="Ex: 480"
+                className="focus-visible:ring-[#005B2E]"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Padrão corporativo: 480 min (8 horas).
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Foto de Perfil</Label>
+              <div className="flex items-center gap-3">
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors text-sm">
+                  <Upload className="w-4 h-4" />
+                  {avatar ? avatar.name : 'Escolher arquivo'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => setAvatar(e.target.files?.[0] || null)}
+                  />
+                </label>
+                {avatar && (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setAvatar(null)}>
+                    Remover
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {error && (
+              <p className="text-sm text-destructive col-span-full flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </p>
+            )}
+
+            <div className="col-span-full flex items-center justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setCreateModalOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Criando...
+                  </>
+                ) : (
+                  'Salvar Usuário'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <UserEditDialog
         open={editOpen}

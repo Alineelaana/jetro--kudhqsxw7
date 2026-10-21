@@ -28,6 +28,7 @@ interface UserEditDialogProps {
     id: string
     name: string
     email: string
+    codigo?: number
     login?: string
     username?: string
     role: string
@@ -223,6 +224,23 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Campo CÓDIGO - Somente Leitura (Pedido 1) */}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-semibold flex items-center justify-between">
+              <span>Código do Usuário</span>
+              <span className="text-[11px] text-[#C89B3C] font-semibold">Somente Leitura</span>
+            </Label>
+            <Input
+              value={user?.codigo !== undefined && user?.codigo !== null ? user.codigo : '—'}
+              readOnly
+              disabled
+              className="bg-muted/70 font-mono font-bold text-[#005B2E] cursor-not-allowed select-none"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Identificador numérico do usuário no sistema.
+            </p>
+          </div>
+
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold">Nome (Saudação)</Label>
             <Input
