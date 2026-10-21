@@ -1,6 +1,11 @@
 export type AppointmentType = 'Tarefa' | 'Reuniao' | 'Compromisso' | 'Lembrete' | 'Outros'
 export type AppointmentPriority = 'Baixa' | 'Media' | 'Alta' | 'Urgente'
-export type AppointmentStatus = 'Pendente' | 'Em andamento' | 'Concluido' | 'Cancelado'
+export type AppointmentStatus =
+  | 'Pendente'
+  | 'Em andamento'
+  | 'Concluido'
+  | 'Cancelado'
+  | 'Reagendado'
 export type AppointmentRecurrence = 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly'
 
 export interface AgendaAppointment {
@@ -25,8 +30,44 @@ export interface AgendaAppointment {
   is_completed?: boolean
   completed_at?: string
   reference_time_for_reminder?: string
+  empresa_id?: string
+  rescheduled_from_id?: string
+  rescheduled_at?: string
+  // Dados de convite (se visualizado como participante convidado)
+  invitation_id?: string
+  invitation_status?: 'pendente' | 'aceito' | 'recusado'
+  invited_by_name?: string
+  is_invited_participant?: boolean
   created?: string
   updated?: string
+}
+
+export type InvitationStatus = 'pendente' | 'aceito' | 'recusado'
+
+export interface AgendaInvitation {
+  id: string
+  appointment_id: string
+  user_id: string
+  user_name?: string
+  user_email?: string
+  invited_by_id?: string
+  invited_by_name?: string
+  empresa_id?: string
+  status: InvitationStatus
+  responded_at?: string
+  rejection_reason?: string
+  created?: string
+  updated?: string
+  appointment?: AgendaAppointment
+}
+
+export interface CompanyUserOption {
+  id: string
+  name: string
+  email: string
+  role?: string
+  empresa_id?: string
+  cargo?: string
 }
 
 export interface AgendaFilterOptions {
@@ -53,12 +94,16 @@ export interface CreateAppointmentInput {
   recurrence?: AppointmentRecurrence
   recurrence_end_date?: string
   reference_time_for_reminder?: string
+  invited_user_ids?: string[]
+  empresa_id?: string
+  rescheduled_from_id?: string
 }
 
 export interface UpdateAppointmentInput extends Partial<CreateAppointmentInput> {
   id: string
   is_completed?: boolean
   completed_at?: string
+  rescheduled_at?: string
 }
 
 export const REMINDER_PRESET_OPTIONS = [

@@ -32,3 +32,26 @@ export async function getUnreadCount(): Promise<number> {
 export async function markNotificationAsRead(id: string): Promise<void> {
   await pb.collection('notifications').update(id, { read: true })
 }
+
+export interface CreateInAppNotificationInput {
+  title: string
+  message: string
+  recipient: string // user id
+  link?: string
+  type?: string
+}
+
+export async function createInAppNotification(input: CreateInAppNotificationInput): Promise<void> {
+  try {
+    await pb.collection('notifications').create({
+      title: input.title,
+      message: input.message,
+      recipient: input.recipient,
+      read: false,
+      link: input.link || '/admin',
+      type: input.type || 'agenda_reminder',
+    })
+  } catch (err) {
+    console.warn('Erro ao criar notificação in-app:', err)
+  }
+}

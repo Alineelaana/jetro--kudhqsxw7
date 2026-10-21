@@ -30,6 +30,9 @@ import {
   Trash2,
   CheckCircle2,
   Loader2,
+  Users,
+  Search,
+  UserCheck,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import type {
@@ -39,6 +42,7 @@ import type {
   AppointmentStatus,
   AppointmentRecurrence,
   CreateAppointmentInput,
+  CompanyUserOption,
 } from '@/types/jetro-agenda'
 import { REMINDER_PRESET_OPTIONS } from '@/types/jetro-agenda'
 import {
@@ -46,6 +50,8 @@ import {
   updateAppointment,
   deleteAppointment,
   isAppointmentInThePast,
+  fetchCompanyUsersForInvite,
+  fetchAppointmentInvitations,
 } from '@/services/jetro-agenda'
 
 interface AppointmentModalProps {
@@ -82,16 +88,46 @@ export function AppointmentModal({
   const [recurrenceEndDate, setRecurrenceEndDate] = useState('')
   const [referenceTime, setReferenceTime] = useState('09:00')
 
+  // Participantes / Convites
+  const [enableInvite, setEnableInvite] = useState(false)
+  const [companyUsers, setCompanyUsers] = useState<CompanyUserOption[]>([])
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
+  const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [loadingUsers, setLoadingUsers] = useState(false)
+  const [existingInvitedIds, setExistingInvitedIds] = useState<string[]>([])
+
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const isEditing = !!appointmentToEdit
 
+  // Carrega lista de usuários da empresa ao abrir o modal
+  useEffect(() => {
+    if (!open) return
+    setLoadingUsers(true)
+    fetchCompanyUsersForInvite()
+      .then((users) => {
+        // Exclui o próprio usuário logado da lista selecionável
+        const filtered = users.filter((u) => u.id !== currentUser.id)
+        setCompanyUsers(filtered)
+      })
+      .catch((err) => {
+        console.warn('Erro ao carregar usuários:', err)
+      })
+      .finally(() => {
+        setLoadingUsers(false)
+      })
+  }, [open, currentUser.id])
+
   // Sincroniza formulário ao abrir
   useEffect(() => {
     if (!open) {
       setConfirmDelete(false)
+      setSelectedUserIds([])
+      setUserSearchQuery('')
+      setEnableInvite(false)
+      setExistingInvitedIds([])
       return
     }
 
@@ -110,6 +146,16 @@ export function AppointmentModal({
       setRecurrence(appointmentToEdit.recurrence || 'none')
       setRecurrenceEndDate(appointmentToEdit.recurrence_end_date || '')
       setReferenceTime(appointmentToEdit.reference_time_for_reminder || '09:00')
+
+      // Carrega convites existentes se houver
+      fetchAppointmentInvitations(appointmentToEdit.id).then((invs) => {
+        const ids = invs.map((i) => i.user_id)
+        setExistingInvitedIds(ids)
+        if (ids.length > 0) {
+          setEnableInvite(true)
+          setSelectedUserIds(ids)
+        }
+      })
     } else {
       setTitle('')
       setDescription('')
@@ -125,6 +171,9 @@ export function AppointmentModal({
       setRecurrence('none')
       setRecurrenceEndDate('')
       setReferenceTime('09:00')
+      setEnableInvite(false)
+      setSelectedUserIds([])
+      setExistingInvitedIds([])
     }
   }, [open, appointmentToEdit, initialDate, currentUser])
 
@@ -149,6 +198,24 @@ export function AppointmentModal({
   const removeReminder = (keyToRemove: string) => {
     setSelectedReminders(selectedReminders.filter((k) => k !== keyToRemove))
   }
+
+  const toggleSelectUser = (userId: string) => {
+    if (selectedUserIds.includes(userId)) {
+      setSelectedUserIds(selectedUserIds.filter((id) => id !== userId))
+    } else {
+      setSelectedUserIds([...selectedUserIds, userId])
+    }
+  }
+
+  const filteredCompanyUsers = companyUsers.filter((u) => {
+    if (!userSearchQuery.trim()) return true
+    const q = userSearchQuery.toLowerCase()
+    return (
+      (u.name || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.cargo || '').toLowerCase().includes(q)
+    )
+  })
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -182,6 +249,9 @@ export function AppointmentModal({
 
     setSaving(true)
     try {
+      // Participantes adicionados (se a opção estiver marcada)
+      const invitedIds = enableInvite ? selectedUserIds : []
+
       const payload: CreateAppointmentInput = {
         title: title.trim(),
         description: description.trim(),
@@ -197,22 +267,32 @@ export function AppointmentModal({
         recurrence,
         recurrence_end_date: recurrence !== 'none' ? recurrenceEndDate || undefined : undefined,
         reference_time_for_reminder: !startTime ? referenceTime : undefined,
+        invited_user_ids: invitedIds,
       }
 
       if (isEditing && appointmentToEdit) {
+        // Envia apenas os novos que ainda não tinham sido convidados
+        const newInvited = invitedIds.filter((id) => !existingInvitedIds.includes(id))
         await updateAppointment({
           id: appointmentToEdit.id,
           ...payload,
+          invited_user_ids: newInvited,
         })
         toast({
           title: 'Compromisso atualizado',
-          description: 'Alterações salvas com sucesso na sua Agenda HURAM.',
+          description:
+            newInvited.length > 0
+              ? `Alterações salvas e ${newInvited.length} participante(s) notificado(s).`
+              : 'Alterações salvas com sucesso na sua Agenda HURAM.',
         })
       } else {
         await createAppointment(payload, currentUser)
         toast({
           title: 'Compromisso criado',
-          description: 'A atividade já está disponível no seu calendário.',
+          description:
+            invitedIds.length > 0
+              ? `Compromisso agendado com sucesso e ${invitedIds.length} participante(s) notificado(s).`
+              : 'A atividade já está disponível no seu calendário.',
         })
       }
 
@@ -438,9 +518,145 @@ export function AppointmentModal({
                   <SelectItem value="Em andamento">Em andamento</SelectItem>
                   <SelectItem value="Concluido">Concluído</SelectItem>
                   <SelectItem value="Cancelado">Cancelado</SelectItem>
+                  <SelectItem value="Reagendado">Reagendado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* CONVIDAR PARTICIPANTES */}
+          <div className="p-3.5 rounded-xl bg-sky-50/70 border border-sky-200/90 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="chk-invite-participants"
+                  checked={enableInvite}
+                  onCheckedChange={(c) => setEnableInvite(!!c)}
+                  className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                />
+                <label
+                  htmlFor="chk-invite-participants"
+                  className="text-xs font-bold text-sky-950 uppercase tracking-wider cursor-pointer flex items-center gap-1.5"
+                >
+                  <Users className="w-3.5 h-3.5 text-sky-600" />
+                  Convidar Participantes
+                </label>
+              </div>
+              <Badge
+                variant="outline"
+                className="bg-white text-sky-800 border-sky-300 text-[11px] font-semibold"
+              >
+                {selectedUserIds.length} selecionado(s)
+              </Badge>
+            </div>
+
+            {enableInvite && (
+              <div className="space-y-2.5 pt-1 border-t border-sky-200/60">
+                <p className="text-[11px] text-sky-900 leading-relaxed">
+                  Selecione quantos participantes desejar. Cada participante receberá uma
+                  notificação no sistema, o compromisso aparecerá em sua agenda e poderá ser{' '}
+                  <strong>Aceito</strong> ou <strong>Recusado</strong>.
+                </p>
+
+                {/* Campo de pesquisa por nome */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400" />
+                  <Input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    placeholder="Pesquisar participante por nome, e-mail ou cargo..."
+                    className="text-xs pl-8 h-8 bg-white border-sky-200 focus-visible:ring-sky-500"
+                  />
+                </div>
+
+                {/* Lista com todos os usuários cadastrados na empresa */}
+                <div className="max-h-44 overflow-y-auto rounded-lg border border-sky-200 bg-white divide-y divide-gray-100 p-1">
+                  {loadingUsers ? (
+                    <div className="p-4 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-600" />
+                      Carregando usuários da empresa...
+                    </div>
+                  ) : filteredCompanyUsers.length === 0 ? (
+                    <div className="p-3 text-center text-xs text-gray-400">
+                      Nenhum usuário encontrado na empresa para o termo pesquisado.
+                    </div>
+                  ) : (
+                    filteredCompanyUsers.map((user) => {
+                      const isSelected = selectedUserIds.includes(user.id)
+                      const wasAlreadyInvited = existingInvitedIds.includes(user.id)
+
+                      return (
+                        <div
+                          key={user.id}
+                          onClick={() => toggleSelectUser(user.id)}
+                          className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors text-xs ${
+                            isSelected
+                              ? 'bg-sky-50/90 text-sky-950 font-medium'
+                              : 'hover:bg-gray-50 text-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0 pr-2">
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelectUser(user.id)}
+                              className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                            />
+                            <div className="min-w-0">
+                              <div className="truncate font-medium flex items-center gap-1.5">
+                                <span>{user.name}</span>
+                                {wasAlreadyInvited && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-[9px] px-1 py-0 bg-emerald-50 text-emerald-700 border-emerald-300"
+                                  >
+                                    Já convidado
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-gray-500 truncate">{user.email}</div>
+                            </div>
+                          </div>
+                          {user.cargo && (
+                            <span className="text-[10px] text-gray-400 shrink-0 bg-gray-100 px-1.5 py-0.5 rounded">
+                              {user.cargo}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+
+                {/* Resumo dos participantes selecionados em badges */}
+                {selectedUserIds.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1 pt-1">
+                    {selectedUserIds.map((uid) => {
+                      const u = companyUsers.find((cu) => cu.id === uid)
+                      return (
+                        <span
+                          key={uid}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-sky-100 text-sky-800 border border-sky-200"
+                        >
+                          <UserCheck className="w-2.5 h-2.5" />
+                          <span className="max-w-[140px] truncate">{u?.name || uid}</span>
+                          <button
+                            type="button"
+                            onClick={(ev) => {
+                              ev.stopPropagation()
+                              toggleSelectUser(uid)
+                            }}
+                            className="hover:text-red-600 ml-0.5 font-bold cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Recorrência */}

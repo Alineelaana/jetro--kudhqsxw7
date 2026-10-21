@@ -142,6 +142,9 @@ export async function searchAuditByEntity(
 ): Promise<AuditLog[]> {
   const ENTITY_MAP: Record<string, string> = {
     usuario: 'users',
+    agenda: 'jetro_agenda_appointments',
+    tarefa: 'jetro_agenda_appointments',
+    convite: 'jetro_agenda_invitations',
     cliente: 'partners',
     fornecedor: 'partners',
     produto: 'products',
@@ -170,4 +173,55 @@ export async function searchAuditByEntity(
 
 export async function archiveAuditLog(id: string) {
   await pb.send(`/backend/v1/audit/archive/${id}`, { method: 'POST' })
+}
+
+export interface RegisterAuditLogInput {
+  action: string
+  module?: string
+  target_collection?: string
+  target_id?: string
+  target_summary?: string
+  previous_value?: Record<string, unknown> | null
+  new_value?: Record<string, unknown> | null
+  criticidade?: 'Baixa' | 'Média' | 'Alta' | 'Crítica'
+  justification?: string
+}
+
+export async function registerAuditLog(input: RegisterAuditLogInput): Promise<void> {
+  try {
+    const authRecord = pb.authStore.record as {
+      id?: string
+      name?: string
+      email?: string
+      role?: string
+      perfil_acesso?: string
+      empresa_id?: string
+      filial_id?: string
+    } | null
+
+    const userName = authRecord?.name || authRecord?.email || 'Sistema'
+    const userRole = authRecord?.role || authRecord?.perfil_acesso || 'PADRAO'
+
+    await pb.collection('audit_logs').create({
+      user_id: authRecord?.id || '',
+      user_name: userName,
+      user_role: userRole,
+      action: input.action,
+      module: input.module || 'agenda',
+      target_collection: input.target_collection || 'jetro_agenda_appointments',
+      target_id: input.target_id || '',
+      target_summary: input.target_summary || '',
+      previous_value: input.previous_value || null,
+      new_value: input.new_value || null,
+      criticidade: input.criticidade || 'Baixa',
+      origem: 'Área da Empresa',
+      empresa: authRecord?.empresa_id || '',
+      filial: authRecord?.filial_id || '',
+      justification: input.justification || '',
+      archived: false,
+      is_suspicious: false,
+    })
+  } catch (err) {
+    console.warn('Erro ao registrar log de auditoria:', err)
+  }
 }
