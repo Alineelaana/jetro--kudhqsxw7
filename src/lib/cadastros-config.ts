@@ -20,6 +20,11 @@ export const CADASTROS: CadastroConfig[] = [
       f('phone', 'Telefone', 'tel'),
       f('email', 'E-mail', 'email'),
       f('logo', 'Logo', 'file'),
+      f('marca_nome_exibicao', 'Nome da Marca (Exibição)', 'text', false, 1),
+      f('marca_cor_primaria', 'Cor Primária da Marca', 'text', false, 1),
+      f('marca_cor_secundaria', 'Cor Secundária da Marca', 'text', false, 1),
+      f('marca_logo', 'Logo Oficial da Marca', 'file', false, 1),
+      f('padrao', 'Empresa Padrão do Sistema', 'switch', false, 1),
     ],
   },
   {

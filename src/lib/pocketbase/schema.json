@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T11:50:47.507Z",
+  "generatedAt": "2026-10-21T12:10:14.950Z",
   "collections": [
     {
       "name": "users",
@@ -4612,8 +4612,8 @@
       "name": "empresas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "",
+        "view": "",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.role = 'SUP'"
@@ -4768,6 +4768,36 @@
         {
           "name": "formato_data",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marca_logo",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marca_cor_primaria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marca_cor_secundaria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marca_nome_exibicao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "padrao",
+          "type": "bool",
           "required": false,
           "system": false
         }

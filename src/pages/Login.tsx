@@ -20,12 +20,14 @@ import {
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import { AttributionFooter } from '@/components/attribution-footer'
-import { logoHuramLight, logoHuramDark } from '@/lib/brand-assets'
+import { logoHuramLight, logoHuramDark, HURAM_PALETTE } from '@/lib/brand-assets'
+import { useBrand } from '@/hooks/use-brand'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login, isAuthenticated, loading, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
+  const { loginBrand } = useBrand()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -95,27 +97,45 @@ export default function LoginPage() {
     )
   }
 
+  const corPrimaria = loginBrand.corPrimaria || HURAM_PALETTE.green
+  const corSecundaria = loginBrand.corSecundaria || HURAM_PALETTE.gold
+  const nomeExibicao = loginBrand.nomeExibicao || 'HURAM'
+  const logoSrc = loginBrand.logoDarkUrl || logoHuramDark
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F8FAF9] via-white to-[#F1F4F2] flex flex-col justify-between relative overflow-hidden text-[#202B28]">
       {/* Elementos visuais decorativos de fundo suaves */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-[#116B50]/5 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-[#C69B45]/5 blur-3xl" />
+        <div
+          className="absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-10"
+          style={{ backgroundColor: corPrimaria }}
+        />
+        <div
+          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full blur-3xl opacity-10"
+          style={{ backgroundColor: corSecundaria }}
+        />
       </div>
 
       {/* Topo com botão de acesso institucional */}
       <header className="relative z-10 w-full px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between border-b border-[#E4EAE6] bg-white/90 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <img
-            src={logoHuramDark}
-            alt="HURAM — Sistema Inteligente de Gestão"
-            className="h-10 sm:h-11 w-auto object-contain rounded-lg border border-[#C69B45]/40 shadow-xs bg-[#063D30] p-1"
+            src={logoSrc}
+            alt={`${nomeExibicao} — Sistema Inteligente de Gestão`}
+            className="h-10 sm:h-11 w-auto max-w-[140px] object-contain rounded-lg border border-[#C69B45]/40 shadow-xs p-1"
+            style={{ backgroundColor: corPrimaria }}
           />
           <div className="hidden sm:flex flex-col">
-            <span className="text-sm font-bold tracking-tight text-[#063D30] leading-none">
-              HURAM
+            <span
+              className="text-sm font-bold tracking-tight leading-none"
+              style={{ color: corPrimaria }}
+            >
+              {nomeExibicao}
             </span>
-            <span className="text-[10px] font-semibold text-[#C69B45] uppercase tracking-wider mt-0.5">
+            <span
+              className="text-[10px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: corSecundaria }}
+            >
               Acesso ao Sistema
             </span>
           </div>
@@ -128,7 +148,7 @@ export default function LoginPage() {
         >
           <Link to="/site" className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-[#C69B45] group-hover:text-white transition-colors" />
-            <span>Acesse o site da HURAM</span>
+            <span>Acesse o site institucional</span>
             <ChevronRight className="w-4 h-4 text-[#C69B45] group-hover:text-white transition-colors" />
           </Link>
         </Button>
@@ -137,19 +157,26 @@ export default function LoginPage() {
       {/* Área central com Card de Login */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
         <Card className="w-full max-w-md border border-[#E4EAE6] bg-white shadow-xl text-[#202B28] rounded-2xl overflow-hidden animate-fade-in">
-          <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/30 pb-6 pt-7 px-6 text-center flex flex-col items-center relative">
+          <CardHeader
+            className="text-white pb-6 pt-7 px-6 text-center flex flex-col items-center relative transition-colors duration-200"
+            style={{
+              backgroundColor: corPrimaria,
+              borderBottom: `2px solid ${corSecundaria}`,
+            }}
+          >
             <div className="relative mb-3">
               <img
-                src={logoHuramDark}
-                alt="HURAM — Sistema Inteligente de Gestão"
-                className="h-20 sm:h-24 w-auto object-contain rounded-2xl border border-[#C69B45]/50 p-1.5 bg-[#042820] shadow-lg"
+                src={logoSrc}
+                alt={`${nomeExibicao} — Sistema Inteligente de Gestão`}
+                className="h-20 sm:h-24 w-auto max-w-[220px] object-contain rounded-2xl border p-1.5 shadow-lg bg-black/20"
+                style={{ borderColor: `${corSecundaria}80` }}
               />
             </div>
             <CardTitle className="text-xl sm:text-2xl font-bold text-center text-white flex items-center justify-center gap-2 mt-1">
-              <Lock className="w-5 h-5 text-[#C69B45]" />
-              Acesso ao Sistema HURAM
+              <Lock className="w-5 h-5" style={{ color: corSecundaria }} />
+              Acesso ao Sistema — {nomeExibicao}
             </CardTitle>
-            <p className="text-xs text-white/80 mt-1 font-medium max-w-xs mx-auto">
+            <p className="text-xs text-white/90 mt-1 font-medium max-w-xs mx-auto">
               Sistema Inteligente de Gestão
             </p>
           </CardHeader>
@@ -168,7 +195,8 @@ export default function LoginPage() {
                     value={username}
                     onChange={handleUsernameChange}
                     placeholder="Digite seu usuário ou e-mail"
-                    className="pl-10 h-11 border-[#E4EAE6] bg-white text-[#202B28] focus-visible:ring-[#063D30]"
+                    style={{ '--tw-ring-color': corPrimaria } as React.CSSProperties}
+                    className="pl-10 h-11 border-[#E4EAE6] bg-white text-[#202B28]"
                     autoComplete="username"
                   />
                 </div>
@@ -186,7 +214,8 @@ export default function LoginPage() {
                   </Label>
                   <Link
                     to="/admin/recuperar-senha"
-                    className="text-xs text-[#063D30] hover:underline font-semibold"
+                    className="text-xs hover:underline font-semibold"
+                    style={{ color: corPrimaria }}
                   >
                     Esqueceu a senha?
                   </Link>
@@ -199,7 +228,8 @@ export default function LoginPage() {
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Digite sua senha"
-                    className="pl-10 pr-10 h-11 border-[#E4EAE6] bg-white text-[#202B28] focus-visible:ring-[#063D30]"
+                    style={{ '--tw-ring-color': corPrimaria } as React.CSSProperties}
+                    className="pl-10 pr-10 h-11 border-[#E4EAE6] bg-white text-[#202B28]"
                     autoComplete="current-password"
                   />
                   <button
@@ -235,7 +265,8 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold text-base shadow-md h-11 rounded-xl transition-all duration-200 cursor-pointer"
+                style={{ backgroundColor: corPrimaria }}
+                className="w-full hover:opacity-90 text-white font-bold text-base shadow-md h-11 rounded-xl transition-all duration-200 cursor-pointer"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -267,7 +298,7 @@ export default function LoginPage() {
                 >
                   <Link to="/site" className="flex items-center justify-center gap-2">
                     <Globe className="w-4 h-4 text-[#C69B45]" />
-                    <span>Acesse o site da HURAM</span>
+                    <span>Acesse o site institucional</span>
                   </Link>
                 </Button>
               </div>
@@ -279,8 +310,8 @@ export default function LoginPage() {
       {/* Rodapé discreto da tela de login */}
       <footer className="relative z-10 w-full px-4 py-4 text-center text-xs text-[#66736D] border-t border-[#E4EAE6] bg-white/70 backdrop-blur-sm space-y-1.5">
         <p>
-          © {new Date().getFullYear()} HURAM — Sistema Inteligente de Gestão. Todos os direitos
-          reservados.
+          © {new Date().getFullYear()} {nomeExibicao} — Sistema Inteligente de Gestão. Todos os
+          direitos reservados.
         </p>
         <AttributionFooter variant="inline" className="text-[#66736D]" />
       </footer>

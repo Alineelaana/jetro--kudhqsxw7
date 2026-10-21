@@ -9,10 +9,12 @@ import { type FieldErrors } from '@/lib/pocketbase/errors'
 import { Lock, User, AlertCircle, Loader2, MapPin } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import { AttributionFooter } from '@/components/attribution-footer'
-import { logoHuramDark } from '@/lib/brand-assets'
+import { logoHuramDark, HURAM_PALETTE } from '@/lib/brand-assets'
+import { useBrand } from '@/hooks/use-brand'
 
 export function AdminLogin() {
   const { login, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
+  const { loginBrand } = useBrand()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [allowLocation, setAllowLocation] = useState(false)
@@ -87,18 +89,30 @@ export function AdminLogin() {
     return <MfaVerifyScreen onVerify={mfaLoginVerify} onCancel={mfaCancel} />
   }
 
+  const corPrimaria = loginBrand.corPrimaria || HURAM_PALETTE.green
+  const corSecundaria = loginBrand.corSecundaria || HURAM_PALETTE.gold
+  const nomeExibicao = loginBrand.nomeExibicao || 'HURAM'
+  const logoSrc = loginBrand.logoDarkUrl || logoHuramDark
+
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 space-y-4 bg-background">
       <Card className="w-full max-w-md border border-[#E4EAE6] shadow-xl bg-white rounded-2xl overflow-hidden">
-        <CardHeader className="bg-[#063D30] text-white border-b border-[#C69B45]/30 pb-6 rounded-t-2xl text-center flex flex-col items-center">
+        <CardHeader
+          className="text-white pb-6 rounded-t-2xl text-center flex flex-col items-center transition-colors duration-200"
+          style={{
+            backgroundColor: corPrimaria,
+            borderBottom: `2px solid ${corSecundaria}`,
+          }}
+        >
           <img
-            src={logoHuramDark}
-            alt="HURAM — Sistema Inteligente de Gestão"
-            className="h-20 w-auto object-contain rounded-xl border border-[#C69B45]/40 mb-3 shadow-md bg-[#042820] p-1.5"
+            src={logoSrc}
+            alt={`${nomeExibicao} — Sistema Inteligente de Gestão`}
+            className="h-20 w-auto max-w-[200px] object-contain rounded-xl border mb-3 shadow-md bg-black/20 p-1.5"
+            style={{ borderColor: `${corSecundaria}80` }}
           />
           <CardTitle className="text-lg sm:text-xl font-bold text-center text-white flex items-center justify-center gap-2">
-            <Lock className="w-5 h-5 text-[#C69B45]" />
-            Área Restrita — HURAM
+            <Lock className="w-5 h-5" style={{ color: corSecundaria }} />
+            Área Restrita — {nomeExibicao}
           </CardTitle>
           <p className="text-xs text-white/80 mt-1 font-medium">Sistema Inteligente de Gestão</p>
         </CardHeader>
@@ -178,7 +192,8 @@ export function AdminLogin() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-[#063D30] hover:bg-[#042820] text-white font-bold text-base shadow-md h-11 rounded-xl cursor-pointer"
+              style={{ backgroundColor: corPrimaria }}
+              className="w-full hover:opacity-90 text-white font-bold text-base shadow-md h-11 rounded-xl cursor-pointer"
               disabled={submitting}
             >
               {submitting ? (
@@ -195,7 +210,8 @@ export function AdminLogin() {
             </Button>
             <Link
               to="/admin/recuperar-senha"
-              className="block text-center text-sm text-[#063D30] hover:underline font-semibold pt-1"
+              style={{ color: corPrimaria }}
+              className="block text-center text-sm hover:underline font-semibold pt-1"
             >
               Esqueci minha senha
             </Link>
@@ -207,7 +223,7 @@ export function AdminLogin() {
                 className="w-full border-[#063D30]/30 hover:bg-[#063D30]/5 text-[#063D30] font-semibold text-sm rounded-xl cursor-pointer"
               >
                 <Link to="/site" className="flex items-center justify-center gap-2">
-                  Acesse o site da HURAM
+                  Acesse o site institucional
                 </Link>
               </Button>
             </div>
