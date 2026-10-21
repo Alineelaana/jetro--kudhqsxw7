@@ -16,8 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { updateUser, getEmpresas, getFiliais, type UpdateUserData } from '@/services/users'
+import { updateUser, getEmpresas, getFiliais, UserUpdateError } from '@/services/users'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
+import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 import { Loader2, Upload, KeyRound } from 'lucide-react'
 
@@ -43,6 +44,7 @@ interface UserEditDialogProps {
     inactivity_timeout_minutes?: number
   } | null
   onSuccess: () => void
+  onError?: (err: Error) => void
 }
 
 function validateCPF(cpf: string): boolean {
@@ -66,7 +68,14 @@ function formatCPF(cpf: string): string {
   return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
 }
 
-export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEditDialogProps) {
+export function UserEditDialog({
+  open,
+  onOpenChange,
+  user,
+  onSuccess,
+  onError,
+}: UserEditDialogProps) {
+  const { user: currentUser } = useAuth()
   const [name, setName] = useState('')
   const [loginField, setLoginField] = useState('')
   const [role, setRole] = useState('PADRAO')
@@ -74,6 +83,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [cpf, setCpf] = useState('')
   const [cpfError, setCpfError] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [oldPassword, setOldPassword] = useState('')
   const [avatar, setAvatar] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -105,6 +115,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setCpf(user.cpf ? formatCPF(user.cpf) : '')
       setCpfError('')
       setNewPassword('')
+      setOldPassword('')
       setAvatar(null)
       setError('')
       const singleEmpresa = user.empresa_id || ''
@@ -187,6 +198,11 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setError('A nova senha deve ter no mínimo 8 caracteres.')
       return
     }
+    const isSelfEdit = !!(user && currentUser?.id && user.id === currentUser.id)
+    if (isSelfEdit && newPassword && !oldPassword) {
+      setError('Informe a senha atual para confirmar a alteração de senha.')
+      return
+    }
     const parsedTimeout = parseInt(inactivityTimeout, 10)
     if (isNaN(parsedTimeout) || parsedTimeout < 1 || parsedTimeout > 480) {
       setError('O tempo de inatividade deve ser um número inteiro entre 1 e 480 minutos.')
@@ -214,6 +230,8 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
         perfil_acesso: perfilCode,
         cpf: cpf.replace(/\D/g, ''),
         password: newPassword || undefined,
+        passwordConfirm: newPassword || undefined,
+        oldPassword: isSelfEdit && newPassword && oldPassword ? oldPassword : undefined,
         avatar,
         empresa_id: empresaId || empresasIds[0] || undefined,
         empresas_ids: empresasIds,
@@ -229,9 +247,26 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       onOpenChange(false)
       onSuccess()
     } catch (err: any) {
-      if (err?.response?.data?.cpf) setError('CPF já cadastrado.')
-      else if (err?.response?.data?.email) setError('E-mail já cadastrado.')
-      else setError('Erro ao atualizar usuário. Tente novamente.')
+      let finalMessage = 'Erro ao atualizar usuário. Tente novamente.'
+      if (err instanceof UserUpdateError) {
+        finalMessage = err.message
+      } else if (err?.response?.data?.cpf) {
+        finalMessage = 'CPF já cadastrado.'
+      } else if (err?.response?.data?.email) {
+        finalMessage = 'E-mail já cadastrado.'
+      } else if (err?.message) {
+        finalMessage = err.message
+      }
+      setError(finalMessage)
+      if (onError && err instanceof Error) {
+        onError(err)
+      } else {
+        toast({
+          title: 'Erro ao atualizar usuário',
+          description: finalMessage,
+          variant: 'destructive',
+        })
+      }
     }
     setSubmitting(false)
   }
@@ -530,6 +565,22 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
             />
             <p className="text-xs text-muted-foreground">Mínimo 8 caracteres</p>
           </div>
+          {/* Campo Senha Atual: aparece APENAS quando o usuário sendo editado é o próprio usuário logado E o campo "Nova senha (opcional)" estiver preenchido */}
+          {user && currentUser?.id && user.id === currentUser.id && newPassword.length > 0 && (
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Senha Atual (confirmação)</Label>
+              <Input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="Digite sua senha atual"
+                className="focus-visible:ring-[#005B2E]"
+              />
+              <p className="text-xs text-muted-foreground">
+                Exigida pelo sistema de segurança para confirmar a alteração da sua própria senha.
+              </p>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold">Foto de Perfil</Label>
             <div className="flex items-center gap-3">

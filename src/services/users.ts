@@ -115,6 +115,8 @@ export interface UpdateUserData {
   perfil_acesso?: string
   cpf?: string
   password?: string
+  passwordConfirm?: string
+  oldPassword?: string
   avatar?: File | null
   active?: boolean
   empresa_id?: string
@@ -123,6 +125,20 @@ export interface UpdateUserData {
   departamento?: string
   cargo?: string
   inactivity_timeout_minutes?: number
+}
+
+export class UserUpdateError extends Error {
+  code?: string
+  field?: string
+  response?: unknown
+
+  constructor(message: string, options?: { code?: string; field?: string; response?: unknown }) {
+    super(message)
+    this.name = 'UserUpdateError'
+    this.code = options?.code
+    this.field = options?.field
+    this.response = options?.response
+  }
 }
 
 export async function updateUser(userId: string, data: UpdateUserData): Promise<void> {
@@ -143,7 +159,10 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   }
   if (data.password) {
     recordData.password = data.password
-    recordData.passwordConfirm = data.password
+    recordData.passwordConfirm = data.passwordConfirm || data.password
+  }
+  if (data.oldPassword) {
+    recordData.oldPassword = data.oldPassword
   }
   if (data.avatar) {
     recordData.avatar = data.avatar
@@ -153,7 +172,60 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
   if (data.departamento !== undefined) recordData.departamento = data.departamento
   if (data.cargo !== undefined) recordData.cargo = data.cargo
-  await pb.collection('users').update(userId, recordData)
+
+  try {
+    await pb.collection('users').update(userId, recordData)
+  } catch (err: any) {
+    // Tratamento e propagação tipada sem tocar na sessão
+    const responseData = err?.response?.data || {}
+    const errMessage = String(err?.message || '').toLowerCase()
+    const rawDataStr = JSON.stringify(responseData).toLowerCase()
+
+    // 1. Senha atual inválida/incorreta
+    if (
+      responseData.oldPassword ||
+      responseData.old_password ||
+      rawDataStr.includes('oldpassword') ||
+      rawDataStr.includes('old_password') ||
+      errMessage.includes('oldpassword') ||
+      errMessage.includes('old_password')
+    ) {
+      throw new UserUpdateError('Senha atual incorreta.', {
+        field: 'oldPassword',
+        response: err?.response,
+      })
+    }
+
+    // 2. Duplicidade de login
+    if (responseData.login || rawDataStr.includes('"login"') || errMessage.includes('login')) {
+      throw new UserUpdateError('Login já em uso.', {
+        field: 'login',
+        response: err?.response,
+      })
+    }
+
+    // 3. Duplicidade de CPF
+    if (responseData.cpf || rawDataStr.includes('"cpf"') || errMessage.includes('cpf')) {
+      throw new UserUpdateError('CPF já cadastrado.', {
+        field: 'cpf',
+        response: err?.response,
+      })
+    }
+
+    // 4. E-mail já cadastrado
+    if (responseData.email || rawDataStr.includes('"email"') || errMessage.includes('email')) {
+      throw new UserUpdateError('E-mail já cadastrado.', {
+        field: 'email',
+        response: err?.response,
+      })
+    }
+
+    // Propaga erro com mensagem amigável ou o erro original
+    const fallbackMsg = err?.message || 'Erro ao atualizar usuário. Tente novamente.'
+    throw new UserUpdateError(fallbackMsg, {
+      response: err?.response,
+    })
+  }
 
   // Sincronizar collection 'usuarios_empresas' se empresas_ids foi informado
   if (data.empresas_ids !== undefined) {

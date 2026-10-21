@@ -908,6 +908,13 @@ export function UserManagement() {
         onOpenChange={setEditOpen}
         user={editUser}
         onSuccess={loadUsers}
+        onError={(err) => {
+          toast({
+            title: 'Erro ao atualizar usuário',
+            description: err.message || 'Erro ao atualizar usuário. Tente novamente.',
+            variant: 'destructive',
+          })
+        }}
       />
     </div>
   )
