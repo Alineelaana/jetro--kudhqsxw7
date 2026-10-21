@@ -3,6 +3,7 @@ import pb from '@/lib/pocketbase/client'
 export interface CreateUserData {
   name: string
   email: string
+  login?: string
   password: string
   role: string
   perfil_id?: string
@@ -38,6 +39,11 @@ export async function createUser(data: CreateUserData): Promise<void> {
         ? data.inactivity_timeout_minutes
         : 480, // Padrão institucional Jetro: 8 horas (480 min)
   }
+  if (data.login) {
+    const cleanLogin = data.login.trim().toLowerCase()
+    recordData.login = cleanLogin
+    recordData.username = cleanLogin
+  }
   if (data.avatar) {
     recordData.avatar = data.avatar
   }
@@ -56,6 +62,8 @@ export async function updateUserActiveStatus(userId: string, active: boolean): P
 
 export interface UpdateUserData {
   name?: string
+  email?: string
+  login?: string
   role?: string
   perfil_id?: string
   perfil_acesso?: string
@@ -73,6 +81,12 @@ export interface UpdateUserData {
 export async function updateUser(userId: string, data: UpdateUserData): Promise<void> {
   const recordData: Record<string, unknown> = {}
   if (data.name !== undefined) recordData.name = data.name
+  if (data.email !== undefined) recordData.email = data.email
+  if (data.login !== undefined) {
+    const cleanLogin = data.login.trim().toLowerCase()
+    recordData.login = cleanLogin
+    recordData.username = cleanLogin
+  }
   if (data.role !== undefined) recordData.role = data.role
   if (data.perfil_id !== undefined) recordData.perfil_id = data.perfil_id
   if (data.perfil_acesso !== undefined) recordData.perfil_acesso = data.perfil_acesso

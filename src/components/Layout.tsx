@@ -35,6 +35,7 @@ export default function Layout() {
   const { preferences } = useUserPreferences()
   const [screenLogicOpen, setScreenLogicOpen] = useState(false)
   const [profilesReady, setProfilesReady] = useState(false)
+  const [profilesVersion, setProfilesVersion] = useState(0)
   const canAccessDocs = canViewScreenDocs(userRole)
   const isAdmin = pathname.startsWith('/admin')
   // Usuário autenticado na rota /site é redirecionado pelo Index para /admin.
@@ -45,9 +46,15 @@ export default function Layout() {
   const showFooter = !isInternalPath(pathname) && (!isAuthenticated || !isSite)
 
   useEffect(() => {
-    loadProfilesCache()
-      .then(() => setProfilesReady(true))
-      .catch(() => setProfilesReady(true))
+    loadProfilesCache(true)
+      .then(() => {
+        setProfilesReady(true)
+        setProfilesVersion((v) => v + 1)
+      })
+      .catch(() => {
+        setProfilesReady(true)
+        setProfilesVersion((v) => v + 1)
+      })
   }, [userRole])
 
   // Delimitação do usuário: verificar se o perfil do usuário pode visualizar a rota ativa
@@ -55,8 +62,10 @@ export default function Layout() {
     if (!isAdmin || isHomePage) return true
     if (!userRole) return false
     if (userRole.toUpperCase() === 'SUP') return true
+    // Se o cache ainda não terminou de carregar, não bloquear antecipadamente
+    if (!profilesReady) return true
     return checkProfileScreenAccess(userRole, pathname, 'v')
-  }, [isAdmin, isHomePage, userRole, pathname, profilesReady])
+  }, [isAdmin, isHomePage, userRole, pathname, profilesReady, profilesVersion])
 
   useEffect(() => {
     if (!isAdmin) {

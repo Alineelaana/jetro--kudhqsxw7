@@ -160,28 +160,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const trimmed = username.trim()
     const lowerTrimmed = trimmed.toLowerCase()
 
-    // Resolução de identidade: se for alias master do SUP
+    // Resolução de identidade: aceita tanto login (ex.: 'patricia', 'patricia.brum', 'aline') quanto e-mail completo
     let resolvedIdentity = trimmed
-    if (
-      lowerTrimmed === 'alineelaana' ||
-      lowerTrimmed === 'jetrosup' ||
-      lowerTrimmed === 'jetrosup@jetro.com.br' ||
-      lowerTrimmed === 'alineelaana@gmail.com' ||
-      lowerTrimmed === 'aline'
-    ) {
-      resolvedIdentity = ADMIN_EMAIL
-    } else if (!trimmed.includes('@')) {
-      // Se o usuário digitou apenas o login/identificador (sem @), resolvemos no banco buscando pelo campo `login` ou `username`
-      try {
-        const found = await pb.collection('users').getList(1, 1, {
-          filter: `login = "${trimmed}" || username = "${trimmed}"`,
-          requestKey: null,
-        })
-        if (found.items.length > 0 && found.items[0].email) {
-          resolvedIdentity = found.items[0].email
+
+    // 1. Chamar endpoint do backend para resolver login -> e-mail de forma segura
+    try {
+      const res = await pb.send<{ email?: string; resolved?: boolean }>(
+        '/backend/v1/auth/resolve-identity',
+        {
+          method: 'POST',
+          body: JSON.stringify({ identity: trimmed }),
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+      if (res && res.email) {
+        resolvedIdentity = res.email
+      }
+    } catch (_) {
+      // Fallback local se o hook estiver temporariamente indisponível
+      if (
+        lowerTrimmed === 'alineelaana' ||
+        lowerTrimmed === 'jetrosup' ||
+        lowerTrimmed === 'jetrosup@jetro.com.br' ||
+        lowerTrimmed === 'alineelaana@gmail.com' ||
+        lowerTrimmed === 'aline'
+      ) {
+        resolvedIdentity = ADMIN_EMAIL
+      } else if (!trimmed.includes('@')) {
+        try {
+          const found = await pb.collection('users').getList(1, 1, {
+            filter: `login = "${trimmed}" || username = "${trimmed}"`,
+            requestKey: null,
+          })
+          if (found.items.length > 0 && found.items[0].email) {
+            resolvedIdentity = found.items[0].email
+          }
+        } catch (_) {
+          // Mantém o informado
         }
-      } catch (err) {
-        // Se a busca falhar (ex: regra pública restrita), tenta o próprio identity informado
       }
     }
 

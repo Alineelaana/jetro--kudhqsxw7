@@ -93,8 +93,12 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
     return false
   }
 
+  const [, setProfilesVersion] = useState(0)
+
   useEffect(() => {
-    loadProfilesCache().catch(() => {})
+    loadProfilesCache(true)
+      .then(() => setProfilesVersion((v) => v + 1))
+      .catch(() => {})
   }, [userRole])
 
   // Checa se usuário tem permissão para o item de menu ou tela

@@ -28,6 +28,8 @@ interface UserEditDialogProps {
     id: string
     name: string
     email: string
+    login?: string
+    username?: string
     role: string
     perfil_id?: string
     perfil_acesso?: string
@@ -64,6 +66,7 @@ function formatCPF(cpf: string): string {
 
 export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEditDialogProps) {
   const [name, setName] = useState('')
+  const [loginField, setLoginField] = useState('')
   const [role, setRole] = useState('PADRAO')
   const [perfilId, setPerfilId] = useState('')
   const [cpf, setCpf] = useState('')
@@ -93,6 +96,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   useEffect(() => {
     if (user) {
       setName(user.name || '')
+      setLoginField(user.login || user.username || '')
       const userRoleCode = user.role || 'PADRAO'
       setRole(userRoleCode)
       setCpf(user.cpf ? formatCPF(user.cpf) : '')
@@ -180,8 +184,10 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
           ? role
           : 'PADRAO'
 
+      const cleanLogin = loginField.trim().toLowerCase()
       await updateUser(user.id, {
         name: name.trim(),
+        login: cleanLogin || undefined,
         role: effectiveRole,
         perfil_id: selectedPerfil?.id || undefined,
         perfil_acesso: perfilCode,
@@ -218,13 +224,32 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-sm font-semibold">Nome</Label>
+            <Label className="text-sm font-semibold">Nome (Saudação)</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nome do funcionário"
+              placeholder="Nome do funcionário (ex.: Patrícia Brum)"
               className="focus-visible:ring-[#005B2E]"
             />
+            <p className="text-[11px] text-muted-foreground">
+              Usado exclusivamente para a saudação da página inicial (&quot;Bom dia, [Nome]&quot;).
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-semibold">Login do Usuário</Label>
+            <Input
+              value={loginField}
+              onChange={(e) =>
+                setLoginField(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))
+              }
+              placeholder="login (ex.: patricia ou patricia.brum)"
+              className="focus-visible:ring-[#005B2E]"
+              autoCapitalize="none"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Identificador único para entrar no sistema (sem espaços, aceita pontos para
+              sobrenomes).
+            </p>
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold text-muted-foreground">

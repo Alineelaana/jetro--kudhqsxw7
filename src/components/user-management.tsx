@@ -83,6 +83,7 @@ export function UserManagement() {
   const [users, setUsers] = useState<UserRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
+  const [loginField, setLoginField] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('PADRAO')
@@ -186,9 +187,11 @@ export function UserManagement() {
           ? role
           : 'PADRAO'
 
+      const cleanLogin = loginField.trim().toLowerCase()
       await createUser({
         name: name.trim(),
         email: email.trim(),
+        login: cleanLogin || undefined,
         password,
         role: effectiveRole,
         perfil_id: selectedPerfil?.id || undefined,
@@ -202,6 +205,7 @@ export function UserManagement() {
         filial_id: filialId || undefined,
       })
       setName('')
+      setLoginField('')
       setEmail('')
       setPassword('')
       setRole('PADRAO')
@@ -286,13 +290,32 @@ export function UserManagement() {
         <CardContent>
           <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Nome</Label>
+              <Label className="text-sm font-semibold">Nome (Saudação)</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nome do funcionário"
+                placeholder="Nome do funcionário (ex.: Patrícia Brum)"
                 className="focus-visible:ring-[#005B2E]"
               />
+              <p className="text-[11px] text-muted-foreground">
+                Usado exclusivamente para a saudação da página inicial (&quot;Bom dia,
+                [Nome]&quot;).
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">Login do Usuário</Label>
+              <Input
+                value={loginField}
+                onChange={(e) =>
+                  setLoginField(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))
+                }
+                placeholder="login (ex.: patricia ou patricia.brum)"
+                className="focus-visible:ring-[#005B2E]"
+                autoCapitalize="none"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Identificador único de acesso (sem espaços, aceita pontos para sobrenomes).
+              </p>
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">E-mail</Label>

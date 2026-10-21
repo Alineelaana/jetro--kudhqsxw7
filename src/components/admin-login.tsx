@@ -106,7 +106,7 @@ export function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="username" className="text-sm font-semibold text-[#202B28]">
-                Usuário
+                Login ou E-mail
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#66736D]" />
@@ -115,7 +115,7 @@ export function AdminLogin() {
                   type="text"
                   value={username}
                   onChange={handleUsernameChange}
-                  placeholder="Digite seu usuário"
+                  placeholder="Digite seu login (ex: patricia) ou e-mail"
                   className="pl-10 focus-visible:ring-[#063D30] border-[#E4EAE6] bg-white text-[#202B28]"
                   autoComplete="username"
                 />
