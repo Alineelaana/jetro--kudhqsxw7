@@ -218,22 +218,6 @@ export function AdminLogin() {
             >
               Esqueci minha senha
             </Link>
-
-            <div className="pt-3 border-t border-[#E4EAE6] mt-3">
-              <Button
-                asChild
-                variant="outline"
-                className="w-full font-semibold text-sm rounded-xl cursor-pointer"
-                style={{
-                  borderColor: `${corPrimaria}40`,
-                  color: corPrimaria,
-                }}
-              >
-                <Link to="/site" className="flex items-center justify-center gap-2">
-                  Acesse o site institucional
-                </Link>
-              </Button>
-            </div>
           </form>
         </CardContent>
       </Card>

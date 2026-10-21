@@ -231,7 +231,7 @@ export function CrmLeadDialog({
           <TabsList className="grid grid-cols-3">
             <TabsTrigger value="dados">Dados do Lead</TabsTrigger>
             <TabsTrigger value="qualif">Qualificação</TabsTrigger>
-            <TabsTrigger value="jeh">Atendimento Jeh</TabsTrigger>
+            <TabsTrigger value="atendimento-ia">Atendimento IA</TabsTrigger>
           </TabsList>
           <TabsContent value="dados" className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -426,11 +426,11 @@ export function CrmLeadDialog({
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="jeh" className="space-y-4">
+          <TabsContent value="atendimento-ia" className="space-y-4">
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[#005B2E] uppercase tracking-wider">
-                  Resumo Comercial Automático da Jeh
+                  Resumo Comercial Automático do Atendimento
                 </span>
                 {form.fill_status && (
                   <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
@@ -439,7 +439,8 @@ export function CrmLeadDialog({
                 )}
               </div>
               <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed font-mono bg-white p-2.5 rounded border border-slate-200">
-                {form.commercial_summary || 'Nenhum resumo comercial gerado ainda pela Jeh.'}
+                {form.commercial_summary ||
+                  'Nenhum resumo comercial gerado ainda pelo atendimento virtual.'}
               </p>
             </div>
 
@@ -491,7 +492,7 @@ export function CrmLeadDialog({
               form.chat_history.length > 0 && (
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-[#005B2E]">
-                    Histórico da Conversa com a Jeh
+                    Histórico da Conversa com o Atendente Virtual
                   </Label>
                   <div className="max-h-60 overflow-y-auto space-y-2 border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-xs">
                     {form.chat_history.map((h, idx) => (
@@ -505,7 +506,7 @@ export function CrmLeadDialog({
                       >
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
                           <span className="font-bold text-slate-800">
-                            {h.sender === 'visitante' ? 'Visitante' : 'Jeh (Assistente)'}
+                            {h.sender === 'visitante' ? 'Visitante' : 'Assistente'}
                           </span>
                           <span>{h.time ? new Date(h.time).toLocaleTimeString('pt-BR') : ''}</span>
                         </div>

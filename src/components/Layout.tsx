@@ -3,7 +3,6 @@ import { useEffect, useState, useMemo, Suspense } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { FloatingChat } from '@/components/floating-chat'
-import { PublicJehChat } from '@/components/public-jeh-chat'
 import { JetroRightFloatingWidgets } from '@/components/jetro-right-floating-widgets'
 import { JetroTourOverlay } from '@/components/jetro-tours/tour-overlay'
 import { GlobalSearchBar } from '@/components/enterprise/global-search-bar'
@@ -40,12 +39,10 @@ export default function Layout() {
   const [profilesVersion, setProfilesVersion] = useState(0)
   const canAccessDocs = canViewScreenDocs(userRole)
   const isAdmin = pathname.startsWith('/admin')
-  // Usuário autenticado na rota /site é redirecionado pelo Index para /admin.
   // showSidebar exibe sidebar nas rotas administrativas
   const showSidebar = isAdmin && isAuthenticated && !loading
   const isHomePage = pathname === '/admin'
-  const isSite = pathname === '/site'
-  const showFooter = !isInternalPath(pathname) && (!isAuthenticated || !isSite)
+  const showFooter = !isInternalPath(pathname) && !isAuthenticated
 
   useEffect(() => {
     loadProfilesCache(true)
@@ -113,11 +110,6 @@ export default function Layout() {
       '--huram-emerald': complementarHsl,
     } as unknown as Record<string, string>
   }, [brand.corPrimaria, brand.corSecundaria, brand.corComplementar])
-
-  // Redirecionamento preventivo de nível de layout: se o usuário já estiver autenticado e tentar acessar /site, manda direto para /admin
-  if (isSite && isAuthenticated) {
-    return <Navigate to="/admin" replace />
-  }
 
   if (showSidebar) {
     return (
@@ -280,7 +272,6 @@ export default function Layout() {
       {isAuthenticated && <FloatingChat />}
       {isAuthenticated && <JetroCustomizationDrawer />}
       {isAuthenticated && <JetroRightFloatingWidgets />}
-      {!isAuthenticated && !isRootLogin && <PublicJehChat />}
 
       {canAccessDocs && (
         <ScreenLogicDrawer

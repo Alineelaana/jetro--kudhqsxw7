@@ -18,9 +18,6 @@ export default function NotFound() {
           <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
             <Link to="/">Acessar o sistema</Link>
           </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link to="/site">Acessar o site</Link>
-          </Button>
         </div>
       </div>
     </div>

@@ -159,18 +159,6 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Topo / Header com Acesso ao Site Institucional */}
-      <header className="relative z-30 w-full px-4 sm:px-8 py-3 flex items-center justify-end">
-        <Link
-          to="/site"
-          className="inline-flex items-center gap-2 border border-[#D4A537]/75 bg-white/95 hover:bg-white text-[#0B3D2E] hover:text-[#051C15] font-semibold text-xs px-4 py-1.5 rounded-full shadow-[0_4px_14px_rgba(11,61,46,0.10)] hover:shadow-[0_6px_20px_rgba(212,165,55,0.30)] transition-all backdrop-blur-md cursor-pointer group shrink-0"
-        >
-          <Globe className="w-3.5 h-3.5 text-[#D4A537] group-hover:text-[#E87A16] transition-colors" />
-          <span className="hidden sm:inline">Acessar Site Institucional</span>
-          <span className="sm:hidden">Site</span>
-        </Link>
-      </header>
-
       {/* Conteúdo Central Principal */}
       <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 sm:px-8 md:px-12 lg:px-16 py-2 sm:py-3">
         <div className="w-full max-w-6xl mx-auto flex flex-col items-center">

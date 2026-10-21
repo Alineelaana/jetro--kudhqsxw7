@@ -210,15 +210,6 @@ export function canChangeAiSettings(role: string | undefined): boolean {
 }
 
 /**
- * Permissão específica para a Central de Administração e Treinamento da Assistente Jeh.
- * Exclusivo para administradores e gestores autorizados.
- */
-export function canManageJehAssistant(role: string | undefined): boolean {
-  if (!role) return false
-  return ['SUP', 'ADMIN'].includes(role)
-}
-
-/**
  * Permissão específica para a Central de Configurações do Jetro On-line
  * Apenas administradores e supervisores autorizados.
  */

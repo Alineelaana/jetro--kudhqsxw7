@@ -88,7 +88,7 @@ export function SiteFooter() {
               </li>
               <li>
                 <a href="#ia" className="hover:text-white hover:underline transition-colors">
-                  Inteligência Artificial (Jeh & HURAM On-line)
+                  Inteligência Artificial (HURAM On-line)
                 </a>
               </li>
               <li>

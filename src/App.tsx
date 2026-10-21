@@ -17,13 +17,11 @@ import { BrandProvider } from '@/hooks/use-brand'
 import Layout from './components/Layout'
 
 // Páginas de entrada essenciais
-import Index from './pages/Index'
 import LoginPage from './pages/Login'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
 
 // Guards e wrappers estáticos
-import { JehProtectedRoute } from '@/components/jeh'
 import { JetroOnlineProtectedRoute } from '@/components/jetro-online-central/jetro-online-protected-route'
 import { AiAdminProtectedRoute } from '@/components/ai-module/ai-admin-protected-route'
 import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
@@ -127,8 +125,6 @@ const Promotions = lazy(() => import('./pages/Promotions'))
 const Precificacao = lazy(() => import('./pages/Precificacao'))
 const Auditoria = lazy(() => import('./pages/Auditoria'))
 const UsersAdminPage = lazy(() => import('./pages/UsersAdminPage'))
-const SiteClientsAdmin = lazy(() => import('./components/site-clients-admin'))
-const SiteTestimonialsAdmin = lazy(() => import('./components/site-testimonials-admin'))
 const ReportSchedulesPage = lazy(() => import('./pages/admin/ReportSchedulesPage'))
 const CentralDocumentacaoPage = lazy(() => import('./pages/admin/CentralDocumentacaoPage'))
 const SegundoCerebroPage = lazy(() => import('./pages/admin/SegundoCerebroPage'))
@@ -192,30 +188,6 @@ const BackupScreen = lazy(() =>
   import('@/components/configuracoes/backup-screen').then((m) => ({
     default: m.BackupScreen,
   })),
-)
-
-// Jeh assistente telas
-const JehOverviewScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehOverviewScreen })),
-)
-const JehKnowledgeScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehKnowledgeScreen })),
-)
-const JehQAScreen = lazy(() => import('@/components/jeh').then((m) => ({ default: m.JehQAScreen })))
-const JehTrainingScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehTrainingScreen })),
-)
-const JehTestScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehTestScreen })),
-)
-const JehUnansweredScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehUnansweredScreen })),
-)
-const JehHistoryScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehHistoryScreen })),
-)
-const JehSettingsScreen = lazy(() =>
-  import('@/components/jeh').then((m) => ({ default: m.JehSettingsScreen })),
 )
 
 // Jetro On-line central
@@ -290,7 +262,6 @@ const App = () => (
                             <Routes>
                               <Route element={<Layout />}>
                                 <Route path="/" element={<LoginPage />} />
-                                <Route path="/site" element={<Index />} />
                                 <Route path="/admin" element={<Admin />} />
                                 <Route path="/admin/dashboard" element={<DashboardPage />} />
                                 <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
@@ -1822,75 +1793,6 @@ const App = () => (
                                   path="/admin/central-documentacao"
                                   element={<CentralDocumentacaoPage />}
                                 />
-                                {/* Central de Administração e Treinamento da Assistente Jeh */}
-                                <Route
-                                  path="/admin/jeh"
-                                  element={<Navigate to="/admin/jeh/visao-geral" replace />}
-                                />
-                                <Route
-                                  path="/admin/jeh/visao-geral"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehOverviewScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/conhecimento"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehKnowledgeScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/perguntas-respostas"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehQAScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/treinamento"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehTrainingScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/testar"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehTestScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/sem-resposta"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehUnansweredScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/historico"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehHistoryScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
-                                <Route
-                                  path="/admin/jeh/configuracoes"
-                                  element={
-                                    <JehProtectedRoute>
-                                      <JehSettingsScreen />
-                                    </JehProtectedRoute>
-                                  }
-                                />
                                 <Route
                                   path="/admin/segundo-cerebro"
                                   element={<SegundoCerebroPage />}
@@ -1904,11 +1806,6 @@ const App = () => (
                                   element={<TabelaMaeGrPage />}
                                 />
                                 <Route path="/admin/usuarios" element={<UsersAdminPage />} />
-                                <Route path="/admin/site-clientes" element={<SiteClientsAdmin />} />
-                                <Route
-                                  path="/admin/site-depoimentos"
-                                  element={<SiteTestimonialsAdmin />}
-                                />
                                 <Route path="/admin/auditoria" element={<Auditoria />} />
                                 <Route
                                   path="/admin/controladoria"

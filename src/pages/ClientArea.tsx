@@ -190,10 +190,6 @@ export default function ClientArea() {
           </Card>
         )}
         <div className="text-center pt-4 flex items-center justify-center gap-4">
-          <Link to="/site" className="text-sm text-[#005B2E] hover:underline font-bold">
-            Voltar ao site
-          </Link>
-          <span className="text-muted-foreground">•</span>
           <Link
             to={client ? '/cliente' : '/cliente/login'}
             className="text-sm text-muted-foreground hover:text-[#005B2E] hover:underline"

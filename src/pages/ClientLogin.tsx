@@ -112,17 +112,6 @@ export default function ClientLogin() {
             >
               Esqueci minha senha
             </Link>
-            <div className="border-t border-[#E4EAE6] pt-4 mt-4 space-y-3">
-              <div className="text-center">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full border-[#063D30]/30 hover:bg-[#063D30]/5 text-[#063D30] font-semibold text-sm rounded-xl cursor-pointer"
-                >
-                  <Link to="/site">Acesse o site da HURAM</Link>
-                </Button>
-              </div>
-            </div>
           </form>
         </CardContent>
       </Card>

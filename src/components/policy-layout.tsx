@@ -37,11 +37,11 @@ export function PolicyLayout({
 
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
           <Link
-            to="/site"
+            to="/"
             className="inline-flex items-center gap-2 text-[#E4C46A] hover:text-white transition-colors text-sm font-bold mb-6 group"
           >
             <ArrowLeft className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" />
-            Voltar ao site
+            Voltar ao início
           </Link>
 
           {heroImage ? (
