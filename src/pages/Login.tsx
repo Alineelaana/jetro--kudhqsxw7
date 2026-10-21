@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
@@ -15,14 +14,21 @@ import {
   EyeOff,
   Clock,
   Globe,
+  Sparkles,
 } from 'lucide-react'
 import { MfaVerifyScreen } from '@/components/mfa-verify-screen'
 import { useBrand } from '@/hooks/use-brand'
 
+// Logos ORIGINAIS anexadas pelo usuário:
+import logoDecEldorado from '@/assets/logotipo-dourado-deceeldorado-em-azul-royal-8cf58.png'
+import logoHuram from '@/assets/imagem-do-chatgpt-21-de-out.de-2026-124755-b4d4e.png'
+import logoGranRomano from '@/assets/rotulo-vintage-gran-romano-5bdf7.png'
+
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login, isAuthenticated, loading, mfaRequired, mfaLoginVerify, mfaCancel } = useAuth()
+  const { login, isAuthenticated, loading, mfaRequired, mfaLoginVerify, mfaCancel, user } =
+    useAuth()
   const { loginBrand } = useBrand()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -41,11 +47,24 @@ export default function LoginPage() {
     }
   }, [location.state])
 
+  // Redirecionamento pós-login respeitando permissões / obrigatoriedade de nova senha
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      navigate('/admin', { replace: true })
+      const u = user as Record<string, unknown> | null
+      const mustChangePassword =
+        u?.must_change_password === true ||
+        u?.force_password_change === true ||
+        u?.primeiro_acesso === true
+      if (mustChangePassword) {
+        navigate('/admin/recuperar-senha', {
+          replace: true,
+          state: { forcedNewPassword: true },
+        })
+      } else {
+        navigate('/admin', { replace: true })
+      }
     }
-  }, [isAuthenticated, loading, navigate])
+  }, [isAuthenticated, loading, navigate, user])
 
   const clearErrors = () => {
     if (error) setError('')
@@ -78,6 +97,7 @@ export default function LoginPage() {
       setError(loginError)
       setFieldErrors(fErrors || {})
     } else {
+      // O useEffect cuidará do redirecionamento com base no estado de autenticação e no usuário autenticado
       navigate('/admin')
     }
   }
@@ -98,37 +118,42 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden overflow-y-auto bg-[#FAF6EE] text-[#1D1B16] flex flex-col justify-between selection:bg-[#E8B84B]/30">
       {/* ========================================================
-          CAMADA DE FUNDO PREMIUM MARFIM/CREME + ONDAS METÁLICAS
-          Predominantemente marfim/creme luminoso, com ondas sinuosas
-          em verde-esmeralda acetinado e fitas com gradientes dourados
-          metálicos e reflexos especulares conforme a imagem de referência.
+          CAMADA DE FUNDO LUMINOSA MARFIM / CREME COM ONDAS
+          CURVAS DECORATIVAS VETORIAIS EM VERDE-ESMERALDA E DOURADO METÁLICO
+          (Nunca utiliza a imagem estática de fundo inteiro)
           ======================================================== */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
-        {/* Fundo base marfim/creme acetinado com iluminação difusa */}
+        {/* Iluminação de base suave perolada */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse 95% 85% at 50% 25%, #FFFFFF 0%, #FDFBF7 35%, #F7F1E4 70%, #EFE5D3 100%)',
+              'radial-gradient(ellipse 100% 90% at 50% 20%, #FFFFFF 0%, #FDFBF7 35%, #F7F1E3 70%, #EEE4CF 100%)',
           }}
         />
 
-        {/* Hotspots de luz e brilho perolado */}
+        {/* Glows de luz e reflexos dourados difusos */}
         <div
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] rounded-full blur-[100px] opacity-70 pointer-events-none"
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] rounded-full blur-[110px] opacity-75"
           style={{
             background:
-              'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(254,249,235,0.7) 45%, rgba(245,230,195,0) 80%)',
+              'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(254,247,230,0.8) 40%, rgba(243,225,180,0) 80%)',
           }}
         />
         <div
-          className="absolute top-1/4 -left-40 w-[600px] h-[600px] rounded-full blur-[90px] opacity-35 pointer-events-none"
+          className="absolute top-1/3 -left-32 w-[650px] h-[650px] rounded-full blur-[100px] opacity-30"
           style={{
-            background: 'radial-gradient(circle, #FBE09A 0%, rgba(251,224,154,0) 70%)',
+            background: 'radial-gradient(circle, #F7DB91 0%, rgba(247,219,145,0) 70%)',
+          }}
+        />
+        <div
+          className="absolute bottom-10 -right-28 w-[600px] h-[600px] rounded-full blur-[120px] opacity-25"
+          style={{
+            background: 'radial-gradient(circle, #0F634A 0%, rgba(15,99,74,0) 70%)',
           }}
         />
 
-        {/* SVG de Ondas Sinuosas: Verde-Esmeralda Nobre e Dourado Metálico 3D */}
+        {/* Curvas decorativas SVG (verde-esmeralda acetinado e fitas metálicas douradas 3D) */}
         <svg
           className="absolute inset-0 w-full h-full"
           viewBox="0 0 1600 1000"
@@ -138,152 +163,121 @@ export default function LoginPage() {
           aria-hidden="true"
         >
           <defs>
-            {/* Gradiente Dourado Metálico Brilhante 1 */}
-            <linearGradient id="goldRibbonTopLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="goldRibbon1" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C99834" />
-              <stop offset="22%" stopColor="#F9DF92" />
-              <stop offset="48%" stopColor="#FFF7D1" />
-              <stop offset="68%" stopColor="#DCA842" />
-              <stop offset="88%" stopColor="#F5D47C" />
+              <stop offset="22%" stopColor="#FDE69E" />
+              <stop offset="48%" stopColor="#FFF9DF" />
+              <stop offset="70%" stopColor="#D8A23B" />
+              <stop offset="88%" stopColor="#F8DA84" />
               <stop offset="100%" stopColor="#8C5C12" />
             </linearGradient>
 
-            {/* Gradiente Dourado Metálico Brilhante 2 (Curva Inferior) */}
             <linearGradient id="goldRibbonBottom" x1="0%" y1="100%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#7E520E" />
-              <stop offset="25%" stopColor="#E2B148" />
-              <stop offset="50%" stopColor="#FFF8D6" />
-              <stop offset="75%" stopColor="#C89632" />
-              <stop offset="100%" stopColor="#FCE39E" />
+              <stop offset="25%" stopColor="#E5B54E" />
+              <stop offset="50%" stopColor="#FFF9DE" />
+              <stop offset="75%" stopColor="#CD9C36" />
+              <stop offset="100%" stopColor="#FDE4A3" />
             </linearGradient>
 
-            {/* Gradiente Dourado Metálico 3 (Onda Superior Direita) */}
-            <linearGradient id="goldRibbonTopRight" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#E8B84B" />
-              <stop offset="35%" stopColor="#FFF6CE" />
-              <stop offset="65%" stopColor="#B38020" />
-              <stop offset="100%" stopColor="#6C430B" />
+            <linearGradient id="emeraldRibbonTopRight" x1="100%" y1="0%" x2="30%" y2="100%">
+              <stop offset="0%" stopColor="#04271C" />
+              <stop offset="30%" stopColor="#083E2F" />
+              <stop offset="70%" stopColor="#0D5340" />
+              <stop offset="100%" stopColor="#052D21" />
             </linearGradient>
 
-            {/* Fita Esmeralda Profunda e Rica Superior Direita */}
-            <linearGradient id="emeraldRibbonRight" x1="100%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%" stopColor="#04261C" />
-              <stop offset="30%" stopColor="#093F30" />
-              <stop offset="70%" stopColor="#0E5441" />
-              <stop offset="100%" stopColor="#052E22" />
-            </linearGradient>
-
-            {/* Fita Esmeralda Inferior Esquerda com textura acetinada */}
-            <linearGradient id="emeraldRibbonBottom" x1="0%" y1="100%" x2="80%" y2="30%">
+            <linearGradient id="emeraldRibbonBottom" x1="0%" y1="100%" x2="80%" y2="20%">
               <stop offset="0%" stopColor="#031E16" />
-              <stop offset="35%" stopColor="#073B2D" />
-              <stop offset="70%" stopColor="#0B4D3C" />
-              <stop offset="100%" stopColor="#126851" />
+              <stop offset="35%" stopColor="#073B2C" />
+              <stop offset="70%" stopColor="#0C4F3D" />
+              <stop offset="100%" stopColor="#146E56" />
             </linearGradient>
 
-            {/* Filtro de sombra suave para as fitas 3D */}
-            <filter id="softRibbonShadow" x="-10%" y="-10%" width="130%" height="130%">
+            <filter id="ribbonShadow" x="-10%" y="-10%" width="130%" height="130%">
               <feDropShadow
                 dx="0"
                 dy="12"
                 stdDeviation="16"
                 floodColor="#3A2807"
-                floodOpacity="0.28"
+                floodOpacity="0.25"
               />
             </filter>
             <filter id="emeraldShadow" x="-10%" y="-10%" width="130%" height="130%">
               <feDropShadow
                 dx="-4"
                 dy="14"
-                stdDeviation="18"
+                stdDeviation="20"
                 floodColor="#011610"
-                floodOpacity="0.32"
+                floodOpacity="0.30"
               />
             </filter>
           </defs>
 
-          {/* ================= ONDAS CANTO SUPERIOR ESQUERDO ================= */}
-          {/* Fita curva dourada superior esquerda esvoaçante */}
+          {/* Canto superior esquerdo: fios dourados finos */}
           <path
-            d="M-60 260 C80 220 180 150 240 60 C270 15 285 -40 290 -80"
-            stroke="url(#goldRibbonTopLeft)"
-            strokeWidth="12"
+            d="M-60 240 C90 200 190 130 250 50 C275 10 288 -30 292 -70"
+            stroke="url(#goldRibbon1)"
+            strokeWidth="10"
             strokeLinecap="round"
-            filter="url(#softRibbonShadow)"
-            opacity="0.85"
-          />
-          <path
-            d="M-80 320 C120 280 240 180 320 60 C360 0 375 -50 380 -90"
-            stroke="url(#goldRibbonTopLeft)"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            opacity="0.9"
-          />
-
-          {/* ================= ONDAS CANTO SUPERIOR DIREITO ================= */}
-          {/* Fita Esmeralda larga do canto superior direito entrando na tela */}
-          <path
-            d="M1360 -60 C1380 90 1440 210 1540 290 C1600 340 1660 360 1720 370 L1720 -60 Z"
-            fill="url(#emeraldRibbonRight)"
-            filter="url(#emeraldShadow)"
-          />
-          {/* Filete Dourado contornando a fita esmeralda superior direita */}
-          <path
-            d="M1350 -60 C1370 100 1435 225 1540 305 C1605 355 1665 375 1725 385"
-            stroke="url(#goldRibbonTopRight)"
-            strokeWidth="8"
-            strokeLinecap="round"
-            filter="url(#softRibbonShadow)"
-          />
-          {/* Fio dourado secundário paralelo com brilho */}
-          <path
-            d="M1320 -60 C1340 115 1410 245 1520 330 C1590 385 1660 410 1720 420"
-            stroke="url(#goldRibbonTopRight)"
-            strokeWidth="3"
-            strokeLinecap="round"
+            filter="url(#ribbonShadow)"
             opacity="0.8"
           />
-
-          {/* ================= ONDAS CANTO INFERIOR (ESMERALDA + DOURADO) ================= */}
-          {/* Grande onda esmeralda inferior contínua e suave */}
           <path
-            d="M-80 1060 L-80 840 C140 820 320 840 500 900 C680 960 880 990 1100 940 C1300 895 1480 800 1680 660 L1680 1060 Z"
-            fill="url(#emeraldRibbonBottom)"
+            d="M-80 300 C110 260 230 170 310 50 C345 0 360 -40 365 -80"
+            stroke="url(#goldRibbon1)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.85"
+          />
+
+          {/* Canto superior direito: fita esmeralda acetinada com borda dourada */}
+          <path
+            d="M1380 -60 C1400 80 1460 195 1550 270 C1610 320 1670 340 1730 350 L1730 -60 Z"
+            fill="url(#emeraldRibbonTopRight)"
             filter="url(#emeraldShadow)"
-            opacity="0.92"
           />
-
-          {/* Fita dourada grossa e proeminente cruzando o rodapé como na referência */}
           <path
-            d="M-60 850 C180 810 360 840 520 895 C700 955 900 980 1100 935 C1300 885 1480 790 1660 655"
-            stroke="url(#goldRibbonBottom)"
-            strokeWidth="14"
+            d="M1370 -60 C1390 90 1455 210 1550 285 C1615 335 1675 355 1735 365"
+            stroke="url(#goldRibbon1)"
+            strokeWidth="7"
             strokeLinecap="round"
-            filter="url(#softRibbonShadow)"
+            filter="url(#ribbonShadow)"
           />
-
-          {/* Fio dourado duplo com reflexo cintilante */}
           <path
-            d="M-60 875 C190 835 370 865 530 918 C710 978 910 998 1100 955 C1295 910 1475 815 1650 685"
-            stroke="url(#goldRibbonBottom)"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            opacity="0.95"
-          />
-
-          {/* Traço dourado superior de acabamento para a onda esmeralda */}
-          <path
-            d="M-60 830 C170 790 350 820 510 875 C690 935 890 960 1100 915 C1300 865 1480 770 1670 630"
-            stroke="url(#goldRibbonTopLeft)"
+            d="M1340 -60 C1360 105 1430 230 1530 310 C1600 360 1670 385 1730 395"
+            stroke="url(#goldRibbon1)"
             strokeWidth="2.5"
             strokeLinecap="round"
             opacity="0.75"
           />
+
+          {/* Rodapé: grande curva esmeralda e fita dourada transversal */}
+          <path
+            d="M-80 1060 L-80 850 C140 830 320 850 500 905 C680 960 880 990 1100 945 C1300 900 1480 810 1680 670 L1680 1060 Z"
+            fill="url(#emeraldRibbonBottom)"
+            filter="url(#emeraldShadow)"
+            opacity="0.92"
+          />
+          <path
+            d="M-60 860 C180 820 360 850 520 900 C700 955 900 980 1100 940 C1300 890 1480 800 1660 665"
+            stroke="url(#goldRibbonBottom)"
+            strokeWidth="12"
+            strokeLinecap="round"
+            filter="url(#ribbonShadow)"
+          />
+          <path
+            d="M-60 882 C190 842 370 870 530 922 C710 978 910 998 1100 958 C1295 912 1475 820 1650 690"
+            stroke="url(#goldRibbonBottom)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.9"
+          />
         </svg>
 
-        {/* Reflexo radial de chão de mármore claro / espelho suave na base do card */}
+        {/* Reflexo radial na base da tela */}
         <div
-          className="absolute bottom-0 inset-x-0 h-48 pointer-events-none opacity-45"
+          className="absolute bottom-0 inset-x-0 h-40 pointer-events-none opacity-40"
           style={{
             background:
               'linear-gradient(to top, rgba(255,255,255,0.7) 0%, rgba(247,241,228,0.2) 60%, transparent 100%)',
@@ -291,482 +285,168 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Botão Superior Discreto para Site Institucional */}
-      <header className="relative z-30 w-full px-4 sm:px-8 py-3.5 flex items-center justify-end">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="border-[#D8B467]/60 bg-white/85 hover:bg-white text-[#4A3410] hover:text-[#211603] font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all shadow-sm backdrop-blur-md cursor-pointer group shrink-0"
+      {/* Topo / Header com Acesso ao Site Institucional */}
+      <header className="relative z-30 w-full px-4 sm:px-8 py-3 flex items-center justify-end">
+        <Link
+          to="/site"
+          className="inline-flex items-center gap-2 border border-[#D8B467]/70 bg-white/90 hover:bg-white text-[#4A3410] hover:text-[#1A1203] font-semibold text-xs px-4 py-1.5 rounded-full shadow-sm hover:shadow transition-all backdrop-blur-md cursor-pointer group shrink-0"
         >
-          <Link to="/site" className="flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-[#B88528] group-hover:text-[#805713] transition-colors" />
-            <span className="hidden sm:inline">Site Institucional</span>
-            <span className="sm:hidden">Site</span>
-          </Link>
-        </Button>
+          <Globe className="w-3.5 h-3.5 text-[#B88528] group-hover:text-[#805713] transition-colors" />
+          <span className="hidden sm:inline">Acessar Site Institucional</span>
+          <span className="sm:hidden">Site</span>
+        </Link>
       </header>
 
-      {/* ========================================================
-          CONTEÚDO PRINCIPAL (EXATAMENTE PROPORCIONADO CONFORME A REFERÊNCIA):
-          1) TOPO: Logomarca HURAM Nobre Tridimensional
-             - Símbolo H esculpido em dourado metálico, fita esmeralda acetinada
-               e dobra âmbar/laranja luminosa
-             - Nome "HURAM" com tipografia encorpada verde-esmeralda e detalhe
-               triangular laranja no "A"
-             - Linha dourada com o subtítulo "SISTEMA INTELIGENTE DE GESTÃO"
-          2) MEIO / GRID:
-             - ESQUERDA: Logomarcas DEC ELDORADO e GRAN ROMANO
-               com o divisor dourado vertical no centro
-             - DIREITA: Card de Login Premium com moldura dourada metálica
-               e cantos arredondados generosos
-          ======================================================== */}
-      <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 sm:px-8 md:px-12 lg:px-16 py-2 sm:py-5">
+      {/* Conteúdo Central Principal */}
+      <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 sm:px-8 md:px-12 lg:px-16 py-2 sm:py-4">
         <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
-          {/* ----------------------------------------------------
-              1. LOGOMARCA HURAM NO TOPO (CENTRALIZADA)
-              ---------------------------------------------------- */}
+          {/* ===================================================
+              1. LOGO HURAM ORIGINAL NO TOPO (CENTRALIZADA E EM DESTAQUE)
+              Utiliza a imagem real enviada pelo usuário
+              =================================================== */}
           <div className="w-full flex flex-col items-center justify-center text-center mb-6 sm:mb-8 lg:mb-10">
-            <div className="inline-flex items-center justify-center gap-3 sm:gap-4 md:gap-5">
-              {/* Símbolo "H" 3D em Dourado Metálico, Fita Verde-Esmeralda e Dobra Laranja */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 drop-shadow-[0_10px_22px_rgba(50,35,10,0.22)]">
-                <svg
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-full h-full"
-                >
-                  <defs>
-                    {/* Haste Dourada Esquerda com Chanfro e Brilho 3D */}
-                    <linearGradient id="huramGoldLeft3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#DFB255" />
-                      <stop offset="26%" stopColor="#FFF4D0" />
-                      <stop offset="58%" stopColor="#C69B45" />
-                      <stop offset="85%" stopColor="#8C5C12" />
-                      <stop offset="100%" stopColor="#5E3E0B" />
-                    </linearGradient>
-
-                    {/* Haste Dourada Direita com Iluminação */}
-                    <linearGradient id="huramGoldRight3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#F5D076" />
-                      <stop offset="30%" stopColor="#FFF9E6" />
-                      <stop offset="65%" stopColor="#B88A30" />
-                      <stop offset="100%" stopColor="#6C450C" />
-                    </linearGradient>
-
-                    {/* Fita Esmeralda Tridimensional cruzando o H */}
-                    <linearGradient id="huramEmeraldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#0E5844" />
-                      <stop offset="35%" stopColor="#04271D" />
-                      <stop offset="70%" stopColor="#094A38" />
-                      <stop offset="100%" stopColor="#042017" />
-                    </linearGradient>
-
-                    {/* Fita de Reflexo Verde-Esmeralda Claro */}
-                    <linearGradient id="huramEmeraldGloss" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#0B4D3C" />
-                      <stop offset="50%" stopColor="#198263" />
-                      <stop offset="100%" stopColor="#0B4D3C" />
-                    </linearGradient>
-
-                    {/* Dobra Interna Âmbar / Laranja Luminosa */}
-                    <linearGradient id="huramAmberFold" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#FFB347" />
-                      <stop offset="45%" stopColor="#F57C00" />
-                      <stop offset="80%" stopColor="#D85A00" />
-                      <stop offset="100%" stopColor="#8F3500" />
-                    </linearGradient>
-
-                    {/* Sombra interna do H */}
-                    <filter id="hShadow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feDropShadow
-                        dx="1"
-                        dy="3"
-                        stdDeviation="2.5"
-                        floodColor="#1A1203"
-                        floodOpacity="0.4"
-                      />
-                    </filter>
-                  </defs>
-
-                  {/* Haste Esquerda com chanfro */}
-                  <path
-                    d="M16 10 L38 10 L38 90 L16 90 Z"
-                    fill="url(#huramGoldLeft3D)"
-                    filter="url(#hShadow)"
-                  />
-                  {/* Chanfro de brilho vertical na haste esquerda */}
-                  <path d="M18 10 L22 10 L22 90 L18 90 Z" fill="#FFF9E6" opacity="0.65" />
-
-                  {/* Haste Direita com chanfro */}
-                  <path
-                    d="M62 10 L84 10 L84 90 L62 90 Z"
-                    fill="url(#huramGoldRight3D)"
-                    filter="url(#hShadow)"
-                  />
-                  <path d="M64 10 L68 10 L68 90 L64 90 Z" fill="#FFF9E6" opacity="0.75" />
-
-                  {/* Fita Curva Tridimensional Esmeralda cruzando a diagonal */}
-                  <path
-                    d="M16 14 C36 18 52 42 82 88 L84 84 C56 36 40 14 18 10 Z"
-                    fill="url(#huramEmeraldRibbon)"
-                    filter="url(#hShadow)"
-                  />
-                  <path
-                    d="M22 14 C40 26 54 52 82 86 L76 90 C50 54 38 28 18 16 Z"
-                    fill="url(#huramEmeraldGloss)"
-                    opacity="0.9"
-                  />
-
-                  {/* Fita Âmbar/Laranja da dobra curva inferior */}
-                  <path
-                    d="M34 52 C44 60 56 72 68 86 C58 83 48 74 36 62 Z"
-                    fill="url(#huramAmberFold)"
-                    filter="url(#hShadow)"
-                  />
-                  {/* Brilho da borda da fita âmbar */}
-                  <path
-                    d="M35 52 C45 61 57 73 68 86"
-                    stroke="#FFE082"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    opacity="0.8"
-                  />
-                </svg>
-              </div>
-
-              {/* Nome HURAM com A estilizado e Subtítulo Nobre */}
-              <div className="flex flex-col text-left">
-                <div className="flex items-center tracking-tight leading-none">
-                  <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-sans tracking-[0.05em] text-[#053226] drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
-                    HUR
-                    {/* Letra A com detalhe geométrico em triângulo laranja na abertura */}
-                    <span className="relative inline-block">
-                      A
-                      <span
-                        className="absolute bottom-[27%] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] sm:border-l-[6px] md:border-l-[7px] lg:border-l-[8px] border-l-transparent border-r-[4px] sm:border-r-[6px] md:border-r-[7px] lg:border-r-[8px] border-r-transparent border-b-[6px] sm:border-b-[10px] md:border-b-[12px] lg:border-b-[14px] border-b-[#E87517]"
-                        style={{
-                          filter: 'drop-shadow(0 1px 2px rgba(232,117,23,0.5))',
-                        }}
-                      />
-                    </span>
-                    M
-                  </h1>
-                </div>
-
-                {/* Subtítulo: SISTEMA INTELIGENTE DE GESTÃO com linha dourada refinada */}
-                <div className="w-full pt-1 sm:pt-1.5">
-                  <p className="text-[9px] sm:text-[11px] md:text-xs lg:text-[13px] font-semibold tracking-[0.24em] sm:tracking-[0.3em] text-[#142620] uppercase whitespace-nowrap">
-                    SISTEMA INTELIGENTE DE GESTÃO
-                  </p>
-                  <div
-                    className="w-full h-[1.5px] mt-1 sm:mt-1.5"
-                    style={{
-                      background:
-                        'linear-gradient(90deg, rgba(201,152,52,0) 0%, rgba(201,152,52,0.85) 25%, rgba(245,212,124,1) 50%, rgba(201,152,52,0.85) 75%, rgba(201,152,52,0) 100%)',
-                    }}
-                  />
-                </div>
-              </div>
+            <div className="relative inline-block group">
+              {/* Brilho halo sutil sob a logo HURAM */}
+              <div
+                className="absolute -inset-4 rounded-3xl blur-2xl opacity-60 pointer-events-none transition-opacity duration-500 group-hover:opacity-90"
+                style={{
+                  background:
+                    'radial-gradient(ellipse at center, rgba(245,212,124,0.45) 0%, rgba(14,88,68,0.15) 55%, transparent 75%)',
+                }}
+              />
+              <img
+                src={logoHuram}
+                alt="HURAM — Sistema Inteligente de Gestão"
+                className="relative z-10 w-auto h-28 sm:h-36 md:h-44 lg:h-48 max-w-[92vw] sm:max-w-[460px] md:max-w-[540px] object-contain rounded-2xl shadow-[0_12px_32px_rgba(40,28,8,0.14)] ring-1 ring-[#D8B467]/35 transition-transform duration-300 hover:scale-[1.01]"
+                loading="eager"
+              />
+            </div>
+            {/* Faixa decorativa sutil dourada abaixo da logo HURAM */}
+            <div className="w-48 sm:w-64 md:w-80 h-[2px] mt-3 rounded-full overflow-hidden">
+              <div
+                className="w-full h-full"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(201,152,52,0) 0%, rgba(201,152,52,0.85) 25%, rgba(254,233,165,1) 50%, rgba(201,152,52,0.85) 75%, rgba(201,152,52,0) 100%)',
+                }}
+              />
             </div>
           </div>
 
-          {/* ----------------------------------------------------
+          {/* ===================================================
               2. GRID DE CONTEÚDO:
-              ESQUERDA: DEC Eldorado | Divisor Dourado | Gran Romano
-              DIREITA: Card de Login Premium com Moldura Dourada
-              ---------------------------------------------------- */}
-          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            {/* ===================================================
-                COLUNA ESQUERDA: AS DUAS LOGOMARCAS COM DETALHES 3D
-                E O DIVISOR DOURADO VERTICAL
-                =================================================== */}
-            <div className="lg:col-span-6 flex items-center justify-center py-2 sm:py-6">
-              <div className="flex items-center justify-center gap-6 sm:gap-8 md:gap-10 w-full max-w-xl">
-                {/* 1) DEC ELDORADO — Símbolo Dourado Metálico 3D e Nome */}
-                <div className="flex-1 flex flex-col items-center justify-center text-center group transition-transform duration-300 hover:scale-[1.02]">
-                  {/* Símbolo circular metálico 3D esculpido com camadas concêntricas e letra 'e' */}
-                  <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 flex items-center justify-center drop-shadow-[0_12px_24px_rgba(180,128,32,0.38)]">
-                    <svg
-                      viewBox="0 0 160 160"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-full h-full"
-                    >
-                      <defs>
-                        {/* Gradiente Dourado Metálico Rico com Brilho Especular */}
-                        <linearGradient id="decGoldMetal1" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#DFB255" />
-                          <stop offset="18%" stopColor="#FFF6DA" />
-                          <stop offset="42%" stopColor="#C89737" />
-                          <stop offset="68%" stopColor="#F9E29D" />
-                          <stop offset="88%" stopColor="#9E6D1C" />
-                          <stop offset="100%" stopColor="#5E3D0A" />
-                        </linearGradient>
-
-                        {/* Gradiente de Destaque para o miolo */}
-                        <linearGradient id="decGoldMetal2" x1="10%" y1="0%" x2="90%" y2="100%">
-                          <stop offset="0%" stopColor="#FCE4A2" />
-                          <stop offset="35%" stopColor="#FFFBF0" />
-                          <stop offset="60%" stopColor="#D5A542" />
-                          <stop offset="100%" stopColor="#7F5311" />
-                        </linearGradient>
-
-                        <filter id="decGlow" x="-20%" y="-20%" width="140%" height="140%">
-                          <feDropShadow
-                            dx="0"
-                            dy="4"
-                            stdDeviation="4"
-                            floodColor="#8B5B12"
-                            floodOpacity="0.45"
-                          />
-                        </filter>
-                      </defs>
-
-                      {/* Brilho de fundo perolado */}
-                      <circle cx="80" cy="80" r="70" fill="#FFF9ED" opacity="0.4" />
-
-                      {/* Anel Externo Dourado com Chanfro */}
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="66"
-                        stroke="url(#decGoldMetal1)"
-                        strokeWidth="7"
-                        strokeDasharray="320 30"
-                        strokeLinecap="round"
-                        filter="url(#decGlow)"
-                      />
-                      {/* Nó superior do anel externo */}
-                      <circle cx="128" cy="38" r="4.5" fill="url(#decGoldMetal2)" />
-                      {/* Nó inferior do anel externo */}
-                      <circle cx="32" cy="122" r="4.5" fill="url(#decGoldMetal2)" />
-
-                      {/* Anel Intermediário Dourado */}
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="52"
-                        stroke="url(#decGoldMetal1)"
-                        strokeWidth="7"
-                        strokeDasharray="230 40"
-                        strokeLinecap="round"
-                        filter="url(#decGlow)"
-                      />
-                      <circle cx="44" cy="48" r="4" fill="url(#decGoldMetal2)" />
-
-                      {/* Núcleo Central: O 'e' tridimensional estilizado */}
-                      {/* Corpo circular do 'e' */}
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="34"
-                        fill="url(#decGoldMetal1)"
-                        filter="url(#decGlow)"
-                      />
-                      {/* Furo superior do 'e' */}
-                      <ellipse cx="80" cy="73" rx="19" ry="14" fill="#FAF5EB" />
-                      {/* Barra horizontal do 'e' */}
-                      <rect
-                        x="58"
-                        y="76"
-                        width="44"
-                        height="8.5"
-                        rx="4"
-                        fill="url(#decGoldMetal2)"
-                      />
-                      {/* Abertura inferior direita do 'e' */}
-                      <path d="M80 84 L106 84 L106 104 L80 104 Z" fill="#FAF5EB" />
-                      {/* Arco inferior arredondado do 'e' */}
-                      <path
-                        d="M60 81 C60 93 69 103 81 103 C90 103 97 97 101 90"
-                        stroke="url(#decGoldMetal1)"
-                        strokeWidth="8.5"
-                        strokeLinecap="round"
-                        fill="none"
-                      />
-                    </svg>
+                 À ESQUERDA: Logos de empresa (deceldorado e Gran Romano)
+                             equilibradas e separadas por divisor dourado
+                 À DIREITA:  Cartão de Login Premium refinado
+              =================================================== */}
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* --------------------------------------------------
+                COLUNA ESQUERDA: AS DUAS LOGOS ORIGINAIS DE CLIENTE
+                -------------------------------------------------- */}
+            <div className="lg:col-span-6 flex items-center justify-center py-2 sm:py-4">
+              <div className="flex items-center justify-center gap-5 sm:gap-8 md:gap-10 w-full max-w-xl">
+                {/* 1) DEC ELDORADO — Logo Real Original com moldura elegante */}
+                <div className="flex-1 flex flex-col items-center justify-center text-center group">
+                  <div className="relative p-1.5 sm:p-2 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#FFFDF8] via-[#FBF5E8] to-[#EFE2C6] shadow-[0_12px_28px_rgba(20,40,90,0.18)] ring-1 ring-[#DEC180]/60 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_16px_36px_rgba(20,40,90,0.26)]">
+                    <img
+                      src={logoDecEldorado}
+                      alt="deceldorado"
+                      className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover rounded-xl sm:rounded-2xl shadow-inner"
+                      loading="eager"
+                    />
                   </div>
-
-                  {/* Nome deceldorado em tipografia serifada nobre com gradiente dourado */}
                   <span
-                    className="mt-2.5 text-xl sm:text-2xl md:text-3xl font-serif font-bold tracking-tight lowercase"
+                    className="mt-3 text-sm sm:text-base md:text-lg font-serif font-bold tracking-tight"
                     style={{
                       background:
-                        'linear-gradient(135deg, #7A5216 0%, #D4A23B 30%, #FFF2BE 50%, #B88528 75%, #5E3C0B 100%)',
+                        'linear-gradient(135deg, #7A5216 0%, #C49635 35%, #F7DF94 50%, #B88528 75%, #5E3C0B 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                      filter: 'drop-shadow(0 1px 2px rgba(255,255,255,0.8))',
                     }}
                   >
                     deceldorado
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-medium text-[#73634B]">
+                    Distribuição & Logística
                   </span>
                 </div>
 
                 {/* DIVISOR VERTICAL DOURADO ELEGANTE */}
                 <div
-                  className="h-36 sm:h-44 md:h-52 w-[2px] rounded-full self-center shrink-0"
+                  className="h-36 sm:h-48 md:h-56 w-[2px] rounded-full self-center shrink-0"
                   style={{
                     background:
                       'linear-gradient(180deg, rgba(201,152,52,0) 0%, rgba(201,152,52,0.85) 20%, rgba(255,237,163,1) 50%, rgba(201,152,52,0.85) 80%, rgba(201,152,52,0) 100%)',
-                    boxShadow: '0 0 8px rgba(223,178,85,0.45)',
+                    boxShadow: '0 0 10px rgba(223,178,85,0.5)',
                   }}
                 />
 
-                {/* 2) GRAN ROMANO & GRfoods® — Rótulo Tridimensional com Chapéu e Moldura Dourada */}
-                <div className="flex-1 flex flex-col items-center justify-center text-center group transition-transform duration-300 hover:scale-[1.02]">
-                  {/* Bloco Gran Romano 3D */}
-                  <div className="relative flex flex-col items-center drop-shadow-[0_12px_24px_rgba(30,20,5,0.22)]">
-                    {/* Chapéu de Chef no Topo com Contorno Dourado 3D */}
-                    <div className="relative -mb-1 w-14 h-10 sm:w-16 sm:h-11 md:w-20 md:h-13">
-                      <svg
-                        viewBox="0 0 100 70"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-full h-full"
-                      >
-                        <defs>
-                          <linearGradient id="chefHatGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#DFB255" />
-                            <stop offset="35%" stopColor="#FFF6D8" />
-                            <stop offset="70%" stopColor="#C69B45" />
-                            <stop offset="100%" stopColor="#805612" />
-                          </linearGradient>
-                        </defs>
-                        {/* Corpo do Chapéu de Chef */}
-                        <path
-                          d="M20 54 C12 48 8 36 14 26 C20 16 32 16 38 22 C44 10 60 8 70 18 C78 14 88 20 90 30 C92 40 86 50 78 54 Z"
-                          fill="#FFFDF7"
-                          stroke="url(#chefHatGold)"
-                          strokeWidth="4"
-                        />
-                        {/* Linhas de dobra do chapéu */}
-                        <path
-                          d="M38 23 C42 34 45 44 48 54"
-                          stroke="url(#chefHatGold)"
-                          strokeWidth="2.5"
-                          opacity="0.8"
-                        />
-                        <path
-                          d="M62 18 C64 30 66 42 68 54"
-                          stroke="url(#chefHatGold)"
-                          strokeWidth="2.5"
-                          opacity="0.8"
-                        />
-                        {/* Faixa da Base do Chapéu */}
-                        <rect x="22" y="54" width="56" height="8" rx="2" fill="url(#chefHatGold)" />
-                      </svg>
-                    </div>
-
-                    {/* Moldura Preta com Duplo Filete Dourado Metálico */}
-                    <div
-                      className="relative px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border-2 flex items-center justify-center"
-                      style={{
-                        background: 'linear-gradient(180deg, #1A1612 0%, #0D0A08 100%)',
-                        borderColor: '#E2B148',
-                        boxShadow:
-                          'inset 0 0 0 2px #FCE4A2, inset 0 0 0 3.5px #7E520E, 0 8px 18px rgba(0,0,0,0.35)',
-                      }}
-                    >
-                      <span
-                        className="text-lg sm:text-2xl md:text-3xl font-serif font-extrabold tracking-wide text-white whitespace-nowrap"
-                        style={{
-                          textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 2px rgba(255,255,255,0.4)',
-                        }}
-                      >
-                        Gran Romano
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] font-sans text-[#FCE4A2] font-bold ml-1 self-start">
-                        &reg;
-                      </span>
-                    </div>
-
-                    {/* Base Dourada com Acabamento 3D */}
-                    <div
-                      className="w-[88%] h-2 -mt-0.5 rounded-b-md shadow-sm"
-                      style={{
-                        background:
-                          'linear-gradient(90deg, #7A5216 0%, #E8B953 25%, #FFF6D8 50%, #C49A45 75%, #5E3C0B 100%)',
-                      }}
+                {/* 2) GRAN ROMANO & GRfoods® — Logo Real Original com moldura elegante */}
+                <div className="flex-1 flex flex-col items-center justify-center text-center group">
+                  <div className="relative p-1.5 sm:p-2 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#FFFDF8] via-[#FBF5E8] to-[#EFE2C6] shadow-[0_12px_28px_rgba(30,20,5,0.20)] ring-1 ring-[#DEC180]/60 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_16px_36px_rgba(30,20,5,0.28)]">
+                    <img
+                      src={logoGranRomano}
+                      alt="Gran Romano — GRfoods"
+                      className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover rounded-xl sm:rounded-2xl shadow-inner"
+                      loading="eager"
                     />
                   </div>
-
-                  {/* Identificação GRfoods® com Chapéu Dourado ao lado */}
-                  <div className="mt-3.5 sm:mt-4 flex items-center justify-center gap-2">
-                    <div className="w-7 h-5 sm:w-8 sm:h-6 shrink-0">
-                      <svg
-                        viewBox="0 0 100 70"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-full h-full"
-                      >
-                        <path
-                          d="M20 54 C12 48 8 36 14 26 C20 16 32 16 38 22 C44 10 60 8 70 18 C78 14 88 20 90 30 C92 40 86 50 78 54 Z"
-                          fill="none"
-                          stroke="#7A5216"
-                          strokeWidth="6"
-                        />
-                        <rect x="22" y="54" width="56" height="8" rx="2" fill="#7A5216" />
-                      </svg>
-                    </div>
-
-                    <span
-                      className="text-xl sm:text-2xl font-sans font-black tracking-tight"
-                      style={{
-                        background:
-                          'linear-gradient(135deg, #7A5216 0%, #B88528 35%, #5E3C0B 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }}
-                    >
-                      GR<span className="font-semibold">foods</span>
-                    </span>
-                    <span className="text-[10px] sm:text-xs font-bold text-[#7A5216] -mt-2">
-                      &reg;
-                    </span>
-                  </div>
+                  <span
+                    className="mt-3 text-sm sm:text-base md:text-lg font-serif font-bold tracking-tight"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #7A5216 0%, #C49635 35%, #F7DF94 50%, #B88528 75%, #5E3C0B 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    Gran Romano
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-medium text-[#73634B]">
+                    GRfoods&reg; &bull; Indústria
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* ===================================================
+            {/* --------------------------------------------------
                 COLUNA DIREITA: CARTÃO DE LOGIN PREMIUM
-                Fundo marfim/creme, moldura dourada metálica arredondada,
-                sombras suaves e botão dourado 3D com cadeado
-                =================================================== */}
+                Fundo creme/marfim, bordas arredondadas, contorno
+                dourado metálico, acabamento sofisticado e títulos exigidos
+                -------------------------------------------------- */}
             <div className="lg:col-span-6 flex justify-center lg:justify-end">
               <div
                 className="relative w-full max-w-[440px] rounded-[34px] p-[2.5px] transition-all duration-300"
                 style={{
                   background:
-                    'linear-gradient(145deg, #FFF6D8 0%, #DFB255 20%, #C49A45 50%, #FFEBA6 78%, #7E520E 100%)',
+                    'linear-gradient(145deg, #FFF6D8 0%, #DFB255 22%, #C49A45 52%, #FFEBA6 78%, #7E520E 100%)',
                   boxShadow:
-                    '0 24px 60px rgba(100,68,14,0.18), 0 6px 20px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.9)',
+                    '0 24px 64px rgba(95,65,12,0.18), 0 8px 24px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.95)',
                 }}
               >
-                {/* Superfície interna marfim / creme luminoso */}
+                {/* Superfície interna marfim luminoso */}
                 <div
                   className="relative w-full h-full rounded-[31.5px] px-6 sm:px-8 py-7 sm:py-8 overflow-hidden flex flex-col justify-between"
                   style={{
                     background:
-                      'linear-gradient(180deg, #FFFFFF 0%, #FCF9F3 40%, #F8F2E6 85%, #F4ECE0 100%)',
+                      'linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 40%, #F8F3E8 85%, #F4ECE0 100%)',
                   }}
                 >
-                  {/* Iluminação suave superior do card */}
+                  {/* Iluminação suave superior */}
                   <div
-                    className="pointer-events-none absolute inset-x-0 top-0 h-36 opacity-60"
+                    className="pointer-events-none absolute inset-x-0 top-0 h-36 opacity-70"
                     style={{
                       background:
                         'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 80%)',
                     }}
                   />
 
-                  {/* Conteúdo do Card */}
                   <div className="relative z-10 space-y-5">
-                    {/* Topo do Card: Hierarquia visual da referência */}
+                    {/* Títulos do Cartão conforme especificação estrita */}
                     <div className="text-center space-y-1">
-                      <p className="text-[#3E3424] text-sm sm:text-base font-medium tracking-tight">
-                        Acesse ao Sistema da
+                      <p className="text-[#3E3424] text-sm sm:text-base font-medium tracking-tight flex items-center justify-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#B88528]" />
+                        <span>Acesse ao Sistema da</span>
                       </p>
                       <h2
                         className="text-2xl sm:text-3xl font-serif font-extrabold tracking-tight leading-snug"
@@ -788,9 +468,9 @@ export default function LoginPage() {
                       </p>
                     </div>
 
-                    {/* Formulário de Login */}
+                    {/* Formulário de Autenticação */}
                     <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-                      {/* Campo Usuário ou E-mail */}
+                      {/* Campo: Usuário ou E-mail */}
                       <div className="space-y-1.5 text-left">
                         <Label
                           htmlFor="login-username"
@@ -817,7 +497,7 @@ export default function LoginPage() {
                         )}
                       </div>
 
-                      {/* Campo Senha com link Esqueceu a senha? no cabeçalho */}
+                      {/* Campo: Senha com link Esqueceu a senha? */}
                       <div className="space-y-1.5 text-left">
                         <div className="flex items-center justify-between">
                           <Label
@@ -864,7 +544,7 @@ export default function LoginPage() {
                         )}
                       </div>
 
-                      {/* Aviso de Inatividade */}
+                      {/* Aviso de Inatividade da Sessão */}
                       {inactivityNotice && (
                         <div className="flex items-start gap-2.5 text-xs text-amber-900 bg-amber-100/90 rounded-xl p-3 border border-amber-300">
                           <Clock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
@@ -872,7 +552,7 @@ export default function LoginPage() {
                         </div>
                       )}
 
-                      {/* Erro geral */}
+                      {/* Mensagem de Erro Geral */}
                       {error && !hasFieldError && (
                         <div className="flex items-center gap-2 text-xs text-red-700 bg-red-100/90 rounded-xl p-3 border border-red-300">
                           <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
@@ -880,12 +560,12 @@ export default function LoginPage() {
                         </div>
                       )}
 
-                      {/* Botão "Entrar no Sistema" Dourado com Acabamento 3D Metálico e Ícone de Cadeado */}
+                      {/* Botão Dourado com Ícone de Cadeado: "Entrar no Sistema" */}
                       <div className="pt-2">
                         <button
                           type="submit"
                           disabled={submitting}
-                          className="w-full h-11 sm:h-12 rounded-xl font-bold text-sm sm:text-base text-[#1E1403] flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-[0_8px_22px_rgba(180,128,32,0.36),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:shadow-[0_10px_28px_rgba(180,128,32,0.48),inset_0_1px_1px_rgba(255,255,255,0.95)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="w-full h-11 sm:h-12 rounded-xl font-bold text-sm sm:text-base text-[#1E1403] flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-[0_8px_22px_rgba(180,128,32,0.36),inset_0_1px_1px_rgba(255,255,255,0.85)] hover:shadow-[0_10px_28px_rgba(180,128,32,0.48),inset_0_1px_1px_rgba(255,255,255,0.95)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
                           style={{
                             background:
                               'linear-gradient(180deg, #FDE8A5 0%, #E8B953 28%, #D49D2C 70%, #B37D15 100%)',
@@ -895,7 +575,7 @@ export default function LoginPage() {
                           {submitting ? (
                             <>
                               <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-[#1E1403]" />
-                              <span>Entrando...</span>
+                              <span>Entrando no Sistema...</span>
                             </>
                           ) : (
                             <>
@@ -907,7 +587,7 @@ export default function LoginPage() {
                       </div>
                     </form>
 
-                    {/* Rodapé do cartão com ícone de segurança */}
+                    {/* Rodapé do Cartão com Ícone de Escudo */}
                     <div className="pt-3 border-t border-[#DFD1B6]/70 flex items-center justify-center gap-2 text-center">
                       <ShieldCheck className="w-4 h-4 text-[#7A5216] shrink-0" />
                       <span className="text-[11px] sm:text-xs font-medium text-[#564832] tracking-tight">
@@ -922,9 +602,7 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* ========================================================
-          RODAPÉ INFERIOR DISCRETO COM ASSINATURA DA PLATAFORMA HURAM
-          ======================================================== */}
+      {/* Rodapé Inferior Discreto com Assinatura da Plataforma HURAM */}
       <footer className="relative z-20 w-full px-4 py-2.5 sm:py-3.5 text-center text-[10px] sm:text-[11px] text-[#6E604A]/80 space-y-0.5">
         <p>
           &copy; {new Date().getFullYear()} DEC Eldorado &bull; Gran Romano &mdash; Desenvolvido
