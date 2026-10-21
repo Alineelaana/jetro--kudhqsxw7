@@ -19,7 +19,7 @@ import {
 import { updateUser, getEmpresas, getFiliais, type UpdateUserData } from '@/services/users'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
 import { toast } from '@/hooks/use-toast'
-import { Loader2, Upload } from 'lucide-react'
+import { Loader2, Upload, KeyRound } from 'lucide-react'
 
 interface UserEditDialogProps {
   open: boolean
