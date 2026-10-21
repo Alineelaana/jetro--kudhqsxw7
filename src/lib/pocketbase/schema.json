@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T00:02:43.028Z",
+  "generatedAt": "2026-10-21T00:21:32.989Z",
   "collections": [
     {
       "name": "users",
@@ -2771,10 +2771,10 @@
       "name": "purchase_requests",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
-        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -2984,10 +2984,10 @@
       "name": "purchase_orders",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
-        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -6117,10 +6117,10 @@
       "name": "sales_orders",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
-        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.empresa_id = '' || company = '' || company = @request.auth.empresa_id)",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
         "delete": "@request.auth.id != ''"
       },
       "fields": [
@@ -6471,10 +6471,10 @@
       "name": "sales_invoices",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
         "delete": "@request.auth.id != ''"
       },
       "fields": [
@@ -6616,10 +6616,10 @@
       "name": "nfe_records",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || (company = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '')",
         "delete": "@request.auth.id != ''"
       },
       "fields": [
@@ -8946,10 +8946,10 @@
       "name": "wms_receipts",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -9049,10 +9049,10 @@
       "name": "wms_putaway_tasks",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -9176,10 +9176,10 @@
       "name": "wms_waves",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -9285,10 +9285,10 @@
       "name": "wms_replenishments",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -10689,10 +10689,10 @@
       "name": "logistics_routes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -10858,10 +10858,10 @@
       "name": "logistics_deliveries",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -11425,10 +11425,10 @@
       "name": "logistics_freights",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -12159,10 +12159,10 @@
       "name": "logistics_costs",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -12389,10 +12389,10 @@
       "name": "financial_receivables",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -12600,10 +12600,10 @@
       "name": "financial_payables",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -12805,10 +12805,10 @@
       "name": "financial_movements",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -13156,10 +13156,10 @@
       "name": "financial_cards",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -13356,10 +13356,10 @@
       "name": "financial_boletos",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -13450,10 +13450,10 @@
       "name": "financial_pix",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -13550,10 +13550,10 @@
       "name": "financial_collections",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || empresa = @request.auth.empresa_id || filial = @request.auth.filial_id || empresa = '')",
-        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || empresa = @request.auth.empresa_id || filial = @request.auth.filial_id || empresa = '')",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.id != '' && @request.auth.role = 'SUP'"
       },
       "fields": [
@@ -13811,10 +13811,10 @@
       "name": "financial_cash_registers",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -14005,10 +14005,10 @@
       "name": "financial_approvals",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -14199,10 +14199,10 @@
       "name": "financial_closings",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -14457,10 +14457,10 @@
       "name": "rh_employees",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -14870,10 +14870,10 @@
       "name": "rh_departments",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -15562,10 +15562,10 @@
       "name": "rh_payroll",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -16774,10 +16774,10 @@
       "name": "dp_admissions",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -16892,10 +16892,10 @@
       "name": "dp_work_contracts",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
@@ -17295,10 +17295,10 @@
       "name": "dp_labor_charges",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || (empresa = '' && @request.auth.empresa_id = ''))",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || empresa = @request.auth.empresa_id || empresa = '')",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [
