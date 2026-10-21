@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -102,9 +102,16 @@ export function AppointmentModal({
 
   const isEditing = !!appointmentToEdit
 
-  // Carrega lista de usuários da empresa ao abrir o modal
+  // Carrega lista de usuários da empresa ao abrir o modal (apenas 1 vez por abertura)
+  const usersLoadedForOpenRef = useRef(false)
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      usersLoadedForOpenRef.current = false
+      return
+    }
+    if (usersLoadedForOpenRef.current) return
+    usersLoadedForOpenRef.current = true
+
     setLoadingUsers(true)
     fetchCompanyUsersForInvite()
       .then((users) => {
@@ -120,9 +127,18 @@ export function AppointmentModal({
       })
   }, [open, currentUser.id])
 
-  // Sincroniza formulário ao abrir
+  // Controla quando o formulário deve ser inicializado:
+  // Somente quando o modal acaba de abrir (transição false -> true)
+  // ou quando o compromisso em edição é alterado especificamente.
+  // Garante que o que o usuário digita (título, descrição, data, hora, etc.)
+  // permaneça 100% intacto mesmo em re-renders do componente ou do pai.
+  const prevOpenRef = useRef(false)
+  const prevEditIdRef = useRef<string | null | undefined>(undefined)
+
   useEffect(() => {
     if (!open) {
+      prevOpenRef.current = false
+      prevEditIdRef.current = undefined
       setConfirmDelete(false)
       setSelectedUserIds([])
       setUserSearchQuery('')
@@ -131,51 +147,69 @@ export function AppointmentModal({
       return
     }
 
-    if (appointmentToEdit) {
-      setTitle(appointmentToEdit.title || '')
-      setDescription(appointmentToEdit.description || '')
-      setDate(appointmentToEdit.date || '')
-      setStartTime(appointmentToEdit.start_time || '')
-      setEndTime(appointmentToEdit.end_time || '')
-      setType(appointmentToEdit.type || 'Compromisso')
-      setPriority(appointmentToEdit.priority || 'Media')
-      setStatus(appointmentToEdit.status || 'Pendente')
-      setHasReminder(!!appointmentToEdit.has_reminder)
-      setSelectedReminders(appointmentToEdit.reminder_configs || [])
-      setTargetEmail(appointmentToEdit.reminder_target_email || currentUser.email)
-      setRecurrence(appointmentToEdit.recurrence || 'none')
-      setRecurrenceEndDate(appointmentToEdit.recurrence_end_date || '')
-      setReferenceTime(appointmentToEdit.reference_time_for_reminder || '09:00')
+    const currentEditId = appointmentToEdit ? appointmentToEdit.id : null
+    const justOpened = !prevOpenRef.current && open
+    const changedAppointment = prevOpenRef.current && currentEditId !== prevEditIdRef.current
 
-      // Carrega convites existentes se houver
-      fetchAppointmentInvitations(appointmentToEdit.id).then((invs) => {
-        const ids = invs.map((i) => i.user_id)
-        setExistingInvitedIds(ids)
-        if (ids.length > 0) {
-          setEnableInvite(true)
-          setSelectedUserIds(ids)
-        }
-      })
-    } else {
-      setTitle('')
-      setDescription('')
-      setDate(initialDate || new Date().toISOString().substring(0, 10))
-      setStartTime('09:00')
-      setEndTime('10:00')
-      setType('Compromisso')
-      setPriority('Media')
-      setStatus('Pendente')
-      setHasReminder(false)
-      setSelectedReminders(['30m', '1h'])
-      setTargetEmail(currentUser.email)
-      setRecurrence('none')
-      setRecurrenceEndDate('')
-      setReferenceTime('09:00')
-      setEnableInvite(false)
-      setSelectedUserIds([])
-      setExistingInvitedIds([])
+    if (justOpened || changedAppointment) {
+      prevOpenRef.current = true
+      prevEditIdRef.current = currentEditId
+      setConfirmDelete(false)
+      setUserSearchQuery('')
+
+      if (appointmentToEdit) {
+        setTitle(appointmentToEdit.title || '')
+        setDescription(appointmentToEdit.description || '')
+        setDate(appointmentToEdit.date || '')
+        setStartTime(appointmentToEdit.start_time || '')
+        setEndTime(appointmentToEdit.end_time || '')
+        setType(appointmentToEdit.type || 'Compromisso')
+        setPriority(appointmentToEdit.priority || 'Media')
+        setStatus(appointmentToEdit.status || 'Pendente')
+        setHasReminder(!!appointmentToEdit.has_reminder)
+        setSelectedReminders(appointmentToEdit.reminder_configs || [])
+        setTargetEmail(appointmentToEdit.reminder_target_email || currentUser.email)
+        setRecurrence(appointmentToEdit.recurrence || 'none')
+        setRecurrenceEndDate(appointmentToEdit.recurrence_end_date || '')
+        setReferenceTime(appointmentToEdit.reference_time_for_reminder || '09:00')
+
+        // Carrega convites existentes se houver
+        fetchAppointmentInvitations(appointmentToEdit.id)
+          .then((invs) => {
+            const ids = invs.map((i) => i.user_id)
+            setExistingInvitedIds(ids)
+            if (ids.length > 0) {
+              setEnableInvite(true)
+              setSelectedUserIds(ids)
+            } else {
+              setEnableInvite(false)
+              setSelectedUserIds([])
+            }
+          })
+          .catch((err) => {
+            console.warn('Erro ao carregar convites do compromisso:', err)
+          })
+      } else {
+        setTitle('')
+        setDescription('')
+        setDate(initialDate || new Date().toISOString().substring(0, 10))
+        setStartTime('09:00')
+        setEndTime('10:00')
+        setType('Compromisso')
+        setPriority('Media')
+        setStatus('Pendente')
+        setHasReminder(false)
+        setSelectedReminders(['30m', '1h'])
+        setTargetEmail(currentUser.email)
+        setRecurrence('none')
+        setRecurrenceEndDate('')
+        setReferenceTime('09:00')
+        setEnableInvite(false)
+        setSelectedUserIds([])
+        setExistingInvitedIds([])
+      }
     }
-  }, [open, appointmentToEdit, initialDate, currentUser])
+  }, [open, appointmentToEdit, initialDate, currentUser.email])
 
   const toggleReminderPreset = (val: string) => {
     if (selectedReminders.includes(val)) {
