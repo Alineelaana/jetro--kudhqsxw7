@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { type MenuEntry } from '@/lib/admin-menu-config'
+import { checkProfileScreenAccess } from '@/lib/profile-permissions'
 
 export interface MenuLinkProps {
   entry: MenuEntry
@@ -30,12 +31,20 @@ export function MenuLink({
   const Icon = entry.icon as ComponentType<{ className?: string }>
   const hasChildren = !!entry.children?.length
   const favKey = entry.route
-  const visible = !entry.perm || entry.perm(userRole)
+  const isSup = userRole?.toUpperCase() === 'SUP'
+
+  const canAccess = (itemRoute: string, itemPerm?: (r: string | undefined) => boolean) => {
+    if (!userRole) return false
+    if (isSup) return true
+    return checkProfileScreenAccess(userRole, itemRoute, 'v')
+  }
+
+  const visible = canAccess(entry.route, entry.perm)
   if (!visible) return null
 
-  // Se o item tem filhos, mas todos os filhos estão restritos por permissão, oculta o grupo inteiro
+  // Ocultar submenus sem autorização expressa no perfil
   const visibleChildren = hasChildren
-    ? entry.children!.filter((child) => !child.perm || child.perm(userRole))
+    ? entry.children!.filter((child) => canAccess(child.route, child.perm))
     : []
   if (hasChildren && visibleChildren.length === 0) {
     return null

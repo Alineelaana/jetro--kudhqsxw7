@@ -158,13 +158,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } | null,
   ) => {
     const trimmed = username.trim()
-    const email =
-      trimmed === 'Alineelaana' ||
-      trimmed === 'jetrosup' ||
-      trimmed === 'jetrosup@jetro.com.br' ||
-      trimmed.toLowerCase() === 'alineelaana@gmail.com'
-        ? ADMIN_EMAIL
-        : trimmed
+    const lowerTrimmed = trimmed.toLowerCase()
+
+    // Resolução de identidade: se for alias master do SUP
+    let resolvedIdentity = trimmed
+    if (
+      lowerTrimmed === 'alineelaana' ||
+      lowerTrimmed === 'jetrosup' ||
+      lowerTrimmed === 'jetrosup@jetro.com.br' ||
+      lowerTrimmed === 'alineelaana@gmail.com' ||
+      lowerTrimmed === 'aline'
+    ) {
+      resolvedIdentity = ADMIN_EMAIL
+    } else if (!trimmed.includes('@')) {
+      // Se o usuário digitou apenas o login/identificador (sem @), resolvemos no banco buscando pelo campo `login` ou `username`
+      try {
+        const found = await pb.collection('users').getList(1, 1, {
+          filter: `login = "${trimmed}" || username = "${trimmed}"`,
+          requestKey: null,
+        })
+        if (found.items.length > 0 && found.items[0].email) {
+          resolvedIdentity = found.items[0].email
+        }
+      } catch (err) {
+        // Se a busca falhar (ex: regra pública restrita), tenta o próprio identity informado
+      }
+    }
+
+    const email = resolvedIdentity
     try {
       const authData = await pb.collection('users').authWithPassword(email, password)
       const record = authData.record as Record<string, unknown> | null
@@ -335,11 +356,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setMfaRequired(false)
   }
 
-  const rawRole =
-    ((user?.perfil_acesso as string) || (user?.role as string) || '').trim() ||
-    ((user?.email as string) === ADMIN_EMAIL ? 'SUP' : 'PADRAO')
-  const userRole = (user?.email as string) === ADMIN_EMAIL ? 'SUP' : rawRole
-  const isAdmin = isAuthenticated && userRole === 'SUP'
+  const rawPerfilAcesso = (user?.perfil_acesso as string) || ''
+  const rawRole = (user?.role as string) || ''
+  const isAlineAdmin = (user?.email as string)?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+
+  // Se o usuário tem perfil_id expandido ou gravado, priorizamos perfil_acesso
+  const effectiveRole = isAlineAdmin ? 'SUP' : (rawPerfilAcesso || rawRole || 'PADRAO').trim()
+
+  const userRole = effectiveRole
+  const isAdmin = isAuthenticated && (userRole === 'SUP' || rawRole === 'SUP' || isAlineAdmin)
 
   return (
     <AuthContext.Provider

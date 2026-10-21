@@ -97,11 +97,12 @@ export function AdminSidebar({ onMobileClose }: AdminSidebarProps = {}) {
     loadProfilesCache().catch(() => {})
   }, [userRole])
 
-  // Checa se usuário tem permissão estática E dinâmica de perfil
+  // Checa se usuário tem permissão para o item de menu ou tela
+  // Regra Huram: SUP é 100% irrestrito. Para demais perfis, a checagem dinâmica de perfis_permissoes é soberana;
+  // se o item possuir função estática perm(), esta só é avaliada se o perfil não tiver regra dinâmica específica.
   const canAccessEntry = (item: { route: string; perm?: (r: string) => boolean }): boolean => {
     if (!userRole) return false
     if (userRole.toUpperCase() === 'SUP') return true
-    if (item.perm && !item.perm(userRole)) return false
     return checkProfileScreenAccess(userRole, item.route, 'v')
   }
 
