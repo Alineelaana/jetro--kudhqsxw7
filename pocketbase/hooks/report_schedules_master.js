@@ -744,6 +744,455 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
         ],
       }
     }
+    // Controladoria
+    if (reportId === 'controladoria-kpis') {
+      return {
+        collection: 'controladoria_kpis',
+        dateField: 'created',
+        amountField: 'realized',
+        title: 'Cockpit & Indicadores (KPIs)',
+        columns: [
+          { key: 'code', label: 'Código', width: 14, type: 'text' },
+          { key: 'name', label: 'Indicador (KPI)', width: 32, type: 'text' },
+          { key: 'category', label: 'Categoria', width: 16, type: 'text' },
+          { key: 'unit', label: 'Unidade', width: 10, type: 'text' },
+          { key: 'target', label: 'Meta', width: 14, type: 'number' },
+          { key: 'realized', label: 'Realizado', width: 14, type: 'number' },
+          { key: 'variance', label: 'Desvio', width: 14, type: 'number' },
+          { key: 'status', label: 'Status', width: 12, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'controladoria-dre') {
+      return {
+        collection: 'controladoria_dre_structure',
+        dateField: 'created',
+        title: 'Demonstração do Resultado (DRE)',
+        columns: [
+          { key: 'order', label: 'Ordem', width: 10, type: 'number' },
+          { key: 'code', label: 'Código', width: 14, type: 'text' },
+          { key: 'name', label: 'Linha DRE', width: 36, type: 'text' },
+          { key: 'level', label: 'Nível', width: 10, type: 'number' },
+          { key: 'calc_rule', label: 'Regra de Cálculo', width: 22, type: 'text' },
+          { key: 'is_total', label: 'Totalizador', width: 12, type: 'boolean' },
+        ],
+      }
+    }
+    if (reportId === 'controladoria-budgets') {
+      return {
+        collection: 'controladoria_budgets',
+        dateField: 'created',
+        amountField: 'budget_value',
+        title: 'Orçamento Corporativo (Budget)',
+        columns: [
+          { key: 'period', label: 'Período', width: 14, type: 'text' },
+          { key: 'account_code', label: 'Conta Contábil', width: 18, type: 'text' },
+          { key: 'budget_value', label: 'Valor Orçado', width: 16, type: 'currency' },
+          { key: 'actual_value', label: 'Valor Realizado', width: 16, type: 'currency' },
+          { key: 'variance_value', label: 'Desvio (R$)', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+          { key: 'version', label: 'Versão', width: 10, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'controladoria-forecasts') {
+      return {
+        collection: 'controladoria_forecasts',
+        dateField: 'created',
+        amountField: 'forecast_value',
+        title: 'Projeções Financeiras (Forecast)',
+        columns: [
+          { key: 'period', label: 'Período', width: 14, type: 'text' },
+          { key: 'account_code', label: 'Conta Contábil', width: 18, type: 'text' },
+          { key: 'forecast_value', label: 'Valor Projetado', width: 18, type: 'currency' },
+          { key: 'version', label: 'Versão', width: 14, type: 'text' },
+          { key: 'created', label: 'Data Registro', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'controladoria-closing') {
+      return {
+        collection: 'controladoria_closing',
+        dateField: 'created',
+        title: 'Fechamento Contábil & Períodos',
+        columns: [
+          { key: 'period', label: 'Competência', width: 14, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+          { key: 'closed_by', label: 'Fechado Por', width: 22, type: 'text' },
+          { key: 'closed_at', label: 'Data Fechamento', width: 18, type: 'date' },
+          { key: 'notes', label: 'Observações', width: 34, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'controladoria-drivers') {
+      return {
+        collection: 'controladoria_drivers',
+        dateField: 'created',
+        title: 'Direcionadores de Rateio (Drivers)',
+        columns: [
+          { key: 'name', label: 'Direcionador', width: 28, type: 'text' },
+          { key: 'type', label: 'Tipo', width: 18, type: 'text' },
+          { key: 'unit', label: 'Unidade de Medida', width: 16, type: 'text' },
+          { key: 'description', label: 'Descrição / Critério', width: 36, type: 'text' },
+        ],
+      }
+    }
+
+    // BI & Analytics
+    if (reportId === 'bi-comercial-consolidado') {
+      return {
+        collection: 'sales_orders',
+        dateField: 'created',
+        amountField: 'total_value',
+        title: 'BI Comercial & Faturamento',
+        columns: [
+          { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+          { key: 'client_name', label: 'Cliente', width: 32, type: 'text' },
+          { key: 'team', label: 'Equipe', width: 16, type: 'text' },
+          { key: 'sales_channel', label: 'Canal', width: 16, type: 'text' },
+          { key: 'rca_name', label: 'Vendedor/RCA', width: 18, type: 'text' },
+          { key: 'total_value', label: 'Valor Faturado', width: 16, type: 'currency' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+          { key: 'created', label: 'Data', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'bi-executivo-projecoes') {
+      return {
+        collection: 'sales_orders',
+        dateField: 'created',
+        amountField: 'total_value',
+        title: 'BI Executivo & Painel Estratégico',
+        columns: [
+          { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+          { key: 'client_name', label: 'Cliente', width: 34, type: 'text' },
+          { key: 'team', label: 'Equipe', width: 16, type: 'text' },
+          { key: 'sales_channel', label: 'Canal', width: 14, type: 'text' },
+          { key: 'total_value', label: 'Volume (R$)', width: 18, type: 'currency' },
+          { key: 'status', label: 'Status', width: 16, type: 'text' },
+          { key: 'created', label: 'Data', width: 18, type: 'date' },
+        ],
+      }
+    }
+
+    // Indústria (PCP)
+    if (reportId === 'industria-ordens-producao') {
+      return {
+        collection: 'production_orders',
+        dateField: 'created',
+        amountField: 'quantity',
+        title: 'Ordens de Produção (OPs)',
+        columns: [
+          { key: 'order_number', label: 'Nº da OP', width: 14, type: 'text' },
+          { key: 'product_id', label: 'Produto', width: 28, type: 'text' },
+          { key: 'quantity', label: 'Qtd Planejada', width: 14, type: 'number' },
+          { key: 'unit', label: 'Unidade', width: 10, type: 'text' },
+          { key: 'start_date', label: 'Início', width: 14, type: 'date' },
+          { key: 'end_date', label: 'Término', width: 14, type: 'date' },
+          { key: 'responsible', label: 'Responsável', width: 18, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'industria-capacidade-turnos') {
+      return {
+        collection: 'industrial_shifts',
+        dateField: 'created',
+        title: 'Capacidade & Turnos Industriais',
+        columns: [
+          { key: 'name', label: 'Turno', width: 22, type: 'text' },
+          { key: 'start_time', label: 'Hora Início', width: 14, type: 'text' },
+          { key: 'end_time', label: 'Hora Término', width: 14, type: 'text' },
+          { key: 'net_working_minutes', label: 'Minutos Líquidos', width: 18, type: 'number' },
+          { key: 'efficiency_pct', label: 'Eficiência %', width: 14, type: 'number' },
+        ],
+      }
+    }
+    if (reportId === 'industria-manutencao') {
+      return {
+        collection: 'maintenance_schedules',
+        dateField: 'next_maintenance',
+        title: 'Manutenção de Recursos & Máquinas',
+        columns: [
+          { key: 'title', label: 'Título / Descrição', width: 30, type: 'text' },
+          { key: 'resource_id', label: 'Recurso / Máquina', width: 22, type: 'text' },
+          { key: 'type', label: 'Tipo', width: 14, type: 'text' },
+          { key: 'next_maintenance', label: 'Data Prevista', width: 16, type: 'date' },
+          { key: 'technician', label: 'Técnico', width: 18, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'industria-fases') {
+      return {
+        collection: 'industrial_phases',
+        dateField: 'created',
+        title: 'Fases & Operações Produtivas',
+        columns: [
+          { key: 'sequence', label: 'Seq.', width: 8, type: 'number' },
+          { key: 'operation_name', label: 'Operação / Fase', width: 28, type: 'text' },
+          { key: 'work_center', label: 'Centro de Trabalho', width: 20, type: 'text' },
+          {
+            key: 'expected_time_minutes',
+            label: 'Tempo Previsto (min)',
+            width: 18,
+            type: 'number',
+          },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'industria-rastreabilidade') {
+      return {
+        collection: 'industrial_traceability',
+        dateField: 'created',
+        amountField: 'quantity',
+        title: 'Rastreabilidade de Lotes Industriais',
+        columns: [
+          { key: 'lot_number', label: 'Lote', width: 16, type: 'text' },
+          { key: 'product_id', label: 'Produto', width: 26, type: 'text' },
+          { key: 'stage', label: 'Estágio', width: 18, type: 'text' },
+          { key: 'quantity', label: 'Quantidade', width: 14, type: 'number' },
+          { key: 'created', label: 'Data Registro', width: 18, type: 'date' },
+        ],
+      }
+    }
+
+    // Logística
+    if (reportId === 'logistica-ocorrencias') {
+      return {
+        collection: 'logistics_occurrences',
+        dateField: 'created',
+        title: 'Ocorrências de Transporte',
+        columns: [
+          { key: 'entrega', label: 'Nº Entrega', width: 14, type: 'text' },
+          { key: 'cliente', label: 'Cliente', width: 30, type: 'text' },
+          { key: 'tipo_ocorrencia', label: 'Tipo', width: 18, type: 'text' },
+          { key: 'descricao', label: 'Descrição da Ocorrência', width: 34, type: 'text' },
+          { key: 'situacao', label: 'Situação', width: 14, type: 'text' },
+          { key: 'created', label: 'Data Registro', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'logistica-custos') {
+      return {
+        collection: 'logistics_costs',
+        dateField: 'created',
+        amountField: 'valor',
+        title: 'Custos de Frete & Operação Logística',
+        columns: [
+          { key: 'descricao', label: 'Descrição', width: 30, type: 'text' },
+          { key: 'tipo_custo', label: 'Tipo Custo', width: 18, type: 'text' },
+          { key: 'transportadora', label: 'Transportadora', width: 22, type: 'text' },
+          { key: 'rota', label: 'Rota', width: 16, type: 'text' },
+          { key: 'valor', label: 'Valor Custo', width: 16, type: 'currency' },
+          { key: 'created', label: 'Data', width: 18, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'logistica-rotas') {
+      return {
+        collection: 'logistics_routes',
+        dateField: 'created',
+        title: 'Cadastro de Rotas de Entrega',
+        columns: [
+          { key: 'codigo_rota', label: 'Código', width: 14, type: 'text' },
+          { key: 'nome_rota', label: 'Nome da Rota', width: 28, type: 'text' },
+          { key: 'cidade_origem', label: 'Origem', width: 18, type: 'text' },
+          { key: 'cidade_destino', label: 'Destino Principal', width: 18, type: 'text' },
+          { key: 'distancia_km', label: 'Distância (km)', width: 16, type: 'number' },
+          { key: 'situacao', label: 'Situação', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'logistica-veiculos') {
+      return {
+        collection: 'logistics_vehicles',
+        dateField: 'created',
+        title: 'Frota & Veículos',
+        columns: [
+          { key: 'placa', label: 'Placa', width: 14, type: 'text' },
+          { key: 'modelo', label: 'Modelo', width: 24, type: 'text' },
+          { key: 'tipo_veiculo', label: 'Tipo', width: 18, type: 'text' },
+          { key: 'capacidade_peso', label: 'Capacidade (kg)', width: 18, type: 'number' },
+          { key: 'situacao', label: 'Situação', width: 16, type: 'text' },
+        ],
+      }
+    }
+
+    // Chamados
+    if (reportId === 'chamados-painel') {
+      return {
+        collection: 'chamados',
+        dateField: 'created',
+        title: 'Painel Central de Chamados',
+        columns: [
+          { key: 'numero', label: 'Nº Chamado', width: 14, type: 'text' },
+          { key: 'assunto', label: 'Assunto', width: 32, type: 'text' },
+          { key: 'solicitante', label: 'Solicitante', width: 22, type: 'text' },
+          { key: 'setor_responsavel', label: 'Setor', width: 18, type: 'text' },
+          { key: 'profissional_responsavel', label: 'Responsável', width: 20, type: 'text' },
+          { key: 'prioridade', label: 'Prioridade', width: 14, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+          { key: 'prazo_atendimento', label: 'Prazo Resp.', width: 16, type: 'date' },
+          { key: 'prazo_resolucao', label: 'Prazo Resol.', width: 16, type: 'date' },
+        ],
+      }
+    }
+    if (reportId === 'chamados-historico') {
+      return {
+        collection: 'chamados_historico',
+        dateField: 'created',
+        title: 'Linha do Tempo / Histórico de Interações',
+        columns: [
+          { key: 'chamado', label: 'ID Chamado', width: 18, type: 'text' },
+          { key: 'acao', label: 'Ação', width: 22, type: 'text' },
+          { key: 'usuario', label: 'Usuário', width: 20, type: 'text' },
+          { key: 'descricao', label: 'Detalhes da Ação', width: 38, type: 'text' },
+          { key: 'created', label: 'Data/Hora', width: 18, type: 'date' },
+        ],
+      }
+    }
+
+    // CRM
+    if (reportId === 'crm-leads') {
+      return {
+        collection: 'crm_leads',
+        dateField: 'created',
+        title: 'Leads & Prospecção',
+        columns: [
+          { key: 'lead_number', label: 'Nº Lead', width: 14, type: 'text' },
+          { key: 'name', label: 'Nome / Razão', width: 30, type: 'text' },
+          { key: 'person_type', label: 'Tipo', width: 10, type: 'text' },
+          { key: 'cpf_cnpj', label: 'CPF / CNPJ', width: 18, type: 'text' },
+          { key: 'segment', label: 'Segmento', width: 16, type: 'text' },
+          { key: 'temperature', label: 'Temperatura', width: 14, type: 'text' },
+          { key: 'qualification_score', label: 'Score', width: 10, type: 'number' },
+          { key: 'city', label: 'Cidade', width: 16, type: 'text' },
+          { key: 'state', label: 'UF', width: 8, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'crm-oportunidades') {
+      return {
+        collection: 'crm_opportunities',
+        dateField: 'open_date',
+        amountField: 'estimated_value',
+        title: 'Oportunidades de Negócio (Pipeline)',
+        columns: [
+          { key: 'opportunity_number', label: 'Nº Oportunidade', width: 16, type: 'text' },
+          { key: 'title', label: 'Título da Negociação', width: 28, type: 'text' },
+          { key: 'client_name', label: 'Cliente', width: 28, type: 'text' },
+          { key: 'estimated_value', label: 'Valor Estimado', width: 16, type: 'currency' },
+          { key: 'probability', label: 'Prob. (%)', width: 12, type: 'number' },
+          { key: 'open_date', label: 'Abertura', width: 14, type: 'date' },
+          { key: 'expected_close_date', label: 'Previsão Fech.', width: 14, type: 'date' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'crm-propostas') {
+      return {
+        collection: 'crm_proposals',
+        dateField: 'created',
+        amountField: 'total',
+        title: 'Propostas Comerciais (Cotações)',
+        columns: [
+          { key: 'proposal_number', label: 'Nº Proposta', width: 16, type: 'text' },
+          { key: 'title', label: 'Título', width: 28, type: 'text' },
+          { key: 'client_name', label: 'Cliente', width: 28, type: 'text' },
+          { key: 'subtotal', label: 'Subtotal', width: 14, type: 'currency' },
+          { key: 'total', label: 'Total Proposta', width: 16, type: 'currency' },
+          { key: 'validity_date', label: 'Validade', width: 14, type: 'date' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+    if (reportId === 'crm-atividades') {
+      return {
+        collection: 'crm_activities',
+        dateField: 'scheduled_date',
+        title: 'Atividades Comerciais (Agenda)',
+        columns: [
+          { key: 'type', label: 'Tipo', width: 14, type: 'text' },
+          { key: 'title', label: 'Título da Atividade', width: 34, type: 'text' },
+          { key: 'scheduled_date', label: 'Data Agendada', width: 14, type: 'date' },
+          { key: 'scheduled_time', label: 'Horário', width: 10, type: 'text' },
+          { key: 'priority', label: 'Prioridade', width: 12, type: 'text' },
+          { key: 'status', label: 'Status', width: 14, type: 'text' },
+        ],
+      }
+    }
+
+    // Governança & Auditoria
+    if (reportId === 'governanca-auditoria') {
+      return {
+        collection: 'audit_logs',
+        dateField: 'created',
+        title: 'Trilha de Auditoria do Sistema (Audit Logs)',
+        columns: [
+          { key: 'created', label: 'Data/Hora', width: 18, type: 'date' },
+          { key: 'action', label: 'Ação', width: 14, type: 'text' },
+          { key: 'user_name', label: 'Usuário', width: 22, type: 'text' },
+          { key: 'user_role', label: 'Perfil', width: 14, type: 'text' },
+          { key: 'target_collection', label: 'Entidade Afetada', width: 20, type: 'text' },
+          { key: 'details', label: 'Detalhes da Operação', width: 40, type: 'text' },
+        ],
+      }
+    }
+
+    // Cadastros Oficiais
+    if (reportId === 'cadastros-clientes') {
+      return {
+        collection: 'partners',
+        dateField: 'created',
+        title: 'Cadastro Oficial de Clientes',
+        columns: [
+          { key: 'company_name', label: 'Razão Social', width: 34, type: 'text' },
+          { key: 'trade_name', label: 'Nome Fantasia', width: 26, type: 'text' },
+          { key: 'cnpj', label: 'CNPJ', width: 18, type: 'text' },
+          { key: 'cpf', label: 'CPF', width: 16, type: 'text' },
+          { key: 'email', label: 'E-mail', width: 24, type: 'text' },
+          { key: 'phone', label: 'Telefone', width: 16, type: 'text' },
+          { key: 'active', label: 'Ativo', width: 10, type: 'boolean' },
+        ],
+      }
+    }
+    if (reportId === 'cadastros-fornecedores') {
+      return {
+        collection: 'partners',
+        dateField: 'created',
+        title: 'Cadastro de Fornecedores',
+        columns: [
+          { key: 'company_name', label: 'Razão Social', width: 34, type: 'text' },
+          { key: 'trade_name', label: 'Nome Fantasia', width: 26, type: 'text' },
+          { key: 'cnpj', label: 'CNPJ', width: 18, type: 'text' },
+          { key: 'email', label: 'E-mail', width: 24, type: 'text' },
+          { key: 'phone', label: 'Telefone', width: 16, type: 'text' },
+          { key: 'active', label: 'Ativo', width: 10, type: 'boolean' },
+        ],
+      }
+    }
+    if (reportId === 'cadastros-produtos') {
+      return {
+        collection: 'products',
+        dateField: 'created',
+        amountField: 'stock',
+        title: 'Catálogo de Produtos & Preços',
+        columns: [
+          { key: 'code', label: 'Código', width: 14, type: 'text' },
+          { key: 'name', label: 'Produto', width: 34, type: 'text' },
+          { key: 'category', label: 'Categoria', width: 18, type: 'text' },
+          { key: 'brand', label: 'Marca', width: 16, type: 'text' },
+          { key: 'stock', label: 'Estoque Atual', width: 14, type: 'number' },
+          { key: 'cost_price', label: 'Preço de Custo', width: 16, type: 'currency' },
+          { key: 'price', label: 'Preço de Venda', width: 16, type: 'currency' },
+          { key: 'active', label: 'Ativo', width: 10, type: 'boolean' },
+        ],
+      }
+    }
+
     // Default: Consulta de Pedidos
     return {
       collection: 'sales_orders',
@@ -961,11 +1410,62 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
     return parts.join(' && ')
   }
 
-  function fetchRecords(collectionName, filter) {
+  function introspectAndSanitizeCollection(collectionName, meta) {
+    var collectionObj = null
+    try {
+      collectionObj = $app.findCollectionByNameOrId(collectionName)
+    } catch (_) {
+      collectionObj = null
+    }
+
+    var validFieldsMap = { id: true, created: true, updated: true }
+    if (collectionObj && collectionObj.fields) {
+      try {
+        var fieldsList = collectionObj.fields.slice ? collectionObj.fields.slice() : []
+        for (var fIdx = 0; fIdx < fieldsList.length; fIdx++) {
+          var fld = fieldsList[fIdx]
+          if (fld && fld.name) {
+            validFieldsMap[fld.name] = true
+          }
+        }
+      } catch (_) {}
+    }
+
+    var sanitizedColumns = []
+    if (meta && meta.columns && meta.columns.length > 0) {
+      for (var cIdx = 0; cIdx < meta.columns.length; cIdx++) {
+        var col = meta.columns[cIdx]
+        if (col && col.key) {
+          sanitizedColumns.push({
+            key: col.key,
+            label: col.label || col.key,
+            width: col.width || 20,
+            type: col.type || 'text',
+            existsInSchema: !collectionObj || !!validFieldsMap[col.key],
+          })
+        }
+      }
+    }
+
+    return {
+      collectionObj: collectionObj,
+      validFieldsMap: validFieldsMap,
+      columns: sanitizedColumns,
+    }
+  }
+
+  function fetchRecords(collectionName, filter, validFieldsMap) {
     var all = []
     var pageSize = 200
     var maxLimit = 10000
     var page = 1
+
+    var sortExpr = ''
+    if (!validFieldsMap || validFieldsMap['created']) {
+      sortExpr = '-created'
+    } else if (validFieldsMap && validFieldsMap['id']) {
+      sortExpr = '-id'
+    }
 
     while (all.length < maxLimit) {
       var list = []
@@ -973,12 +1473,20 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
         list = $app.findRecordsByFilter(
           collectionName,
           filter,
-          '-created',
+          sortExpr,
           pageSize,
           (page - 1) * pageSize,
         )
-      } catch (_) {
-        break
+      } catch (err) {
+        try {
+          if (page === 1) {
+            list = $app.findRecordsByFilter(collectionName, '', sortExpr, pageSize, 0) || []
+          } else {
+            break
+          }
+        } catch (_) {
+          break
+        }
       }
       if (!list || list.length === 0) break
       for (var i = 0; i < list.length; i++) {
@@ -1358,6 +1866,15 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
     }
 
     var meta = getReportMeta(reportId)
+    var schemaMeta = introspectAndSanitizeCollection(meta.collection, meta)
+    meta.columns = schemaMeta.columns
+
+    // Escopo de empresa do agendamento (multitenancy)
+    var schedEmpresa = schedRecord.getString('empresa') || ''
+    if (!schedEmpresa && userRecord && userRecord.getString('role') !== 'SUP') {
+      schedEmpresa = userRecord.getString('empresa_id') || userRecord.getString('empresa') || ''
+    }
+
     var dateRange = resolveDynamicDateRangeServer(
       dynamicRange,
       filters.date_from,
@@ -1366,9 +1883,14 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
     )
     var queryFilter = buildFilterQueryForSchedule(reportId, filters, userRecord, dateRange)
 
+    if (schedEmpresa && schemaMeta.validFieldsMap['empresa']) {
+      var empPart = 'empresa = "' + schedEmpresa + '"'
+      queryFilter = queryFilter ? queryFilter + ' && ' + empPart : empPart
+    }
+
     var records = []
     try {
-      records = fetchRecords(meta.collection, queryFilter)
+      records = fetchRecords(meta.collection, queryFilter, schemaMeta.validFieldsMap)
     } catch (eQuery) {
       schedRecord.set('last_run_at', new Date().toISOString())
       schedRecord.set('last_run_status', 'error')
@@ -1467,12 +1989,56 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
     var finalSubject =
       customSubject && customSubject.trim().length > 0 ? customSubject : defaultSubject
 
+    // (b) Busca usuários SUP ativos ("role = 'SUP' && active = true"), monta a lista de e-mails em minúsculas,
+    // mescla com recipients_bcc, elimina duplicidade com recipients e aplica no BCC do MailerMessage
+    var recipientsBccStr = ''
+    try {
+      recipientsBccStr = schedRecord.getString('recipients_bcc') || ''
+    } catch (_) {}
+    var recipientsBcc = parseRecipientEmails(recipientsBccStr)
+
+    var supEmails = []
+    try {
+      var supUsers =
+        $app.findRecordsByFilter('users', 'role = "SUP" && active = true', '', 100, 0) || []
+      for (var suIdx = 0; suIdx < supUsers.length; suIdx++) {
+        var sEmail = (supUsers[suIdx].getString('email') || '').trim().toLowerCase()
+        if (sEmail && sEmail.indexOf('@') !== -1) {
+          supEmails.push(sEmail)
+        }
+      }
+    } catch (supErr) {
+      $app.logger().warn('Aviso ao buscar usuários SUP para BCC cron', 'error', String(supErr))
+    }
+
+    var toAndCcMap = {}
+    for (var rToIdx = 0; rToIdx < recipients.length; rToIdx++) {
+      toAndCcMap[recipients[rToIdx].toLowerCase()] = true
+    }
+    for (var rCcIdx = 0; rCcIdx < recipientsCc.length; rCcIdx++) {
+      toAndCcMap[recipientsCc[rCcIdx].toLowerCase()] = true
+    }
+
+    var finalBccList = []
+    var bccUniqueMap = {}
+    var combinedBcc = recipientsBcc.concat(supEmails)
+    for (var bIdx = 0; bIdx < combinedBcc.length; bIdx++) {
+      var bMail = combinedBcc[bIdx].toLowerCase().trim()
+      if (bMail && bMail.indexOf('@') !== -1 && !toAndCcMap[bMail] && !bccUniqueMap[bMail]) {
+        bccUniqueMap[bMail] = true
+        finalBccList.push(bMail)
+      }
+    }
+
     var reader = null
     try {
       var toList = recipients.map(function (email) {
         return { address: email }
       })
       var ccList = recipientsCc.map(function (email) {
+        return { address: email }
+      })
+      var bccList = finalBccList.map(function (email) {
         return { address: email }
       })
 
@@ -1483,6 +2049,7 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
         },
         to: toList,
         cc: ccList,
+        bcc: bccList,
         subject: finalSubject,
         html: htmlBody,
       }
@@ -1521,6 +2088,20 @@ cronAdd('report_schedules_master', '*/10 * * * *', () => {
         '',
         Date.now() - startTime,
       )
+
+      try {
+        var lastExecs = $app.findRecordsByFilter(
+          'report_schedule_executions',
+          'schedule_id = "' + schedId + '"',
+          '-executed_at',
+          1,
+          0,
+        )
+        if (lastExecs && lastExecs.length > 0) {
+          lastExecs[0].set('recipients_bcc', finalBccList.join(', '))
+          $app.save(lastExecs[0])
+        }
+      } catch (_) {}
     } catch (err) {
       $app
         .logger()

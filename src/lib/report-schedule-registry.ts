@@ -1687,6 +1687,1627 @@ export const REPORT_SOURCES_REGISTRY: Record<string, ReportSourceDefinition> = {
       return parts.join(' && ')
     },
   },
+
+  // ============================================================================
+  // MÓDULO CONTROLADORIA
+  // ============================================================================
+
+  // 18. Controladoria — Cockpit / KPIs
+  'controladoria-kpis': {
+    id: 'controladoria-kpis',
+    module: 'Controladoria',
+    name: 'Cockpit & Indicadores (KPIs)',
+    description: 'Metas, realizados, desvios e status dos KPIs da controladoria.',
+    route: '/admin/controladoria/cockpit',
+    collectionName: 'controladoria_kpis',
+    defaultSort: 'code',
+    dateField: 'created',
+    amountField: 'realized',
+    filters: [
+      {
+        key: 'category',
+        label: 'Categoria do KPI',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Categorias' },
+          { value: 'Financeiro', label: 'Financeiro' },
+          { value: 'Operacional', label: 'Operacional' },
+          { value: 'Comercial', label: 'Comercial' },
+          { value: 'Industrial', label: 'Industrial' },
+          { value: 'Estratégico', label: 'Estratégico' },
+        ],
+      },
+      {
+        key: 'status',
+        label: 'Status do Indicador',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'ok', label: 'Na Meta (OK)' },
+          { value: 'warning', label: 'Atenção (Warning)' },
+          { value: 'critical', label: 'Crítico' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Código ou Nome do KPI',
+        type: 'text',
+        placeholder: 'Buscar por código ou nome...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'code', label: 'Código', width: 14, type: 'text' },
+      { key: 'name', label: 'Indicador (KPI)', width: 32, type: 'text' },
+      { key: 'category', label: 'Categoria', width: 16, type: 'text' },
+      { key: 'unit', label: 'Unidade', width: 10, type: 'text' },
+      { key: 'target', label: 'Meta', width: 14, align: 'right', type: 'number' },
+      { key: 'realized', label: 'Realizado', width: 14, align: 'right', type: 'number' },
+      { key: 'variance', label: 'Desvio', width: 14, align: 'right', type: 'number' },
+      { key: 'status', label: 'Status', width: 12, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.category && f.category !== 'all') parts.push(`category = "${f.category}"`)
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.search && f.search !== 'all') {
+        parts.push(`(name ~ "${f.search}" || code ~ "${f.search}")`)
+      }
+      return parts.join(' && ')
+    },
+  },
+
+  // 19. Controladoria — Estrutura DRE
+  'controladoria-dre': {
+    id: 'controladoria-dre',
+    module: 'Controladoria',
+    name: 'Demonstração do Resultado (DRE)',
+    description: 'Linhas analíticas e sintéticas da estrutura da DRE corporativa.',
+    route: '/admin/controladoria/dre',
+    collectionName: 'controladoria_dre_structure',
+    defaultSort: 'order',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'level',
+        label: 'Nível da Conta',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Níveis' },
+          { value: '1', label: 'Nível 1 (Sintético)' },
+          { value: '2', label: 'Nível 2 (Grupo)' },
+          { value: '3', label: 'Nível 3 (Subgrupo)' },
+          { value: '4', label: 'Nível 4 (Analítico)' },
+        ],
+      },
+      {
+        key: 'is_total',
+        label: 'Tipo de Linha',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Linhas' },
+          { value: 'yes', label: 'Apenas Totais / Subtotais' },
+          { value: 'no', label: 'Apenas Contas Operacionais' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Descrição ou Código da Linha',
+        type: 'text',
+        placeholder: 'Filtrar por nome ou código contábil...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'order', label: 'Ordem', width: 10, align: 'right', type: 'number' },
+      { key: 'code', label: 'Código', width: 14, type: 'text' },
+      { key: 'name', label: 'Linha DRE', width: 36, type: 'text' },
+      { key: 'level', label: 'Nível', width: 10, align: 'center', type: 'number' },
+      { key: 'calc_rule', label: 'Regra de Cálculo', width: 22, type: 'text' },
+      { key: 'is_total', label: 'Totalizador', width: 12, type: 'boolean' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.level && f.level !== 'all') parts.push(`level = ${f.level}`)
+      if (f.is_total && f.is_total !== 'all') parts.push(`is_total = ${f.is_total === 'yes'}`)
+      if (f.search && f.search !== 'all') {
+        parts.push(`(name ~ "${f.search}" || code ~ "${f.search}")`)
+      }
+      return parts.join(' && ')
+    },
+  },
+
+  // 20. Controladoria — Orçamentos (Budget)
+  'controladoria-budgets': {
+    id: 'controladoria-budgets',
+    module: 'Controladoria',
+    name: 'Orçamento Corporativo (Budget)',
+    description: 'Valores orçados vs. realizados, desvios e situação orçamentária por período.',
+    route: '/admin/controladoria/budget',
+    collectionName: 'controladoria_budgets',
+    defaultSort: '-period',
+    dateField: 'created',
+    amountField: 'budget_value',
+    filters: [
+      {
+        key: 'period',
+        label: 'Período Orçamentário (AAAA-MM ou AAAA)',
+        type: 'text',
+        placeholder: 'Ex: 2025 ou 2025-03',
+        gridSpan: 6,
+      },
+      {
+        key: 'status',
+        label: 'Status do Orçamento',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'draft', label: 'Rascunho' },
+          { value: 'approved', label: 'Aprovado' },
+          { value: 'revised', label: 'Revisado' },
+          { value: 'closed', label: 'Fechado' },
+        ],
+      },
+      {
+        key: 'account_code',
+        label: 'Conta Contábil / Centro de Custo',
+        type: 'text',
+        placeholder: 'Código da conta...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'period', label: 'Período', width: 14, type: 'text' },
+      { key: 'account_code', label: 'Conta Contábil', width: 18, type: 'text' },
+      { key: 'budget_value', label: 'Valor Orçado', width: 16, align: 'right', type: 'currency' },
+      {
+        key: 'actual_value',
+        label: 'Valor Realizado',
+        width: 16,
+        align: 'right',
+        type: 'currency',
+      },
+      { key: 'variance_value', label: 'Desvio (R$)', width: 16, align: 'right', type: 'currency' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+      { key: 'version', label: 'Versão', width: 10, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.period && f.period !== 'all') parts.push(`period ~ "${f.period}"`)
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.account_code && f.account_code !== 'all')
+        parts.push(`account_code ~ "${f.account_code}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 21. Controladoria — Forecast
+  'controladoria-forecasts': {
+    id: 'controladoria-forecasts',
+    module: 'Controladoria',
+    name: 'Projeções Financeiras (Forecast)',
+    description: 'Projeções e revisões periódicas de receitas e despesas por conta e versão.',
+    route: '/admin/controladoria/forecast',
+    collectionName: 'controladoria_forecasts',
+    defaultSort: '-period',
+    dateField: 'created',
+    amountField: 'forecast_value',
+    filters: [
+      {
+        key: 'period',
+        label: 'Período Projetado',
+        type: 'text',
+        placeholder: 'Ex: 2025-06',
+        gridSpan: 6,
+      },
+      {
+        key: 'version',
+        label: 'Versão do Forecast',
+        type: 'text',
+        placeholder: 'Ex: V1, Q1_Rev, Oficial...',
+        gridSpan: 6,
+      },
+      {
+        key: 'account_code',
+        label: 'Conta Contábil',
+        type: 'text',
+        placeholder: 'Código da conta...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'period', label: 'Período', width: 14, type: 'text' },
+      { key: 'account_code', label: 'Conta Contábil', width: 18, type: 'text' },
+      {
+        key: 'forecast_value',
+        label: 'Valor Projetado',
+        width: 18,
+        align: 'right',
+        type: 'currency',
+      },
+      { key: 'version', label: 'Versão', width: 14, type: 'text' },
+      { key: 'created', label: 'Data Registro', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.period && f.period !== 'all') parts.push(`period ~ "${f.period}"`)
+      if (f.version && f.version !== 'all') parts.push(`version ~ "${f.version}"`)
+      if (f.account_code && f.account_code !== 'all')
+        parts.push(`account_code ~ "${f.account_code}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 22. Controladoria — Fechamento Contábil
+  'controladoria-closing': {
+    id: 'controladoria-closing',
+    module: 'Controladoria',
+    name: 'Fechamento Contábil & Períodos',
+    description: 'Status do fechamento contábil e fiscal de competências por empresa.',
+    route: '/admin/controladoria/fechamento',
+    collectionName: 'controladoria_closing',
+    defaultSort: '-period',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'period',
+        label: 'Competência (AAAA-MM)',
+        type: 'text',
+        placeholder: 'Ex: 2025-02',
+        gridSpan: 6,
+      },
+      {
+        key: 'status',
+        label: 'Status do Fechamento',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'open', label: 'Aberto' },
+          { value: 'in_review', label: 'Em Revisão' },
+          { value: 'closed', label: 'Fechado / Encerrado' },
+        ],
+      },
+    ],
+    columns: [
+      { key: 'period', label: 'Competência', width: 14, type: 'text' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+      { key: 'closed_by', label: 'Fechado Por', width: 22, type: 'text' },
+      { key: 'closed_at', label: 'Data Fechamento', width: 18, type: 'date' },
+      { key: 'notes', label: 'Observações', width: 34, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.period && f.period !== 'all') parts.push(`period ~ "${f.period}"`)
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 23. Controladoria — Drivers de Rateio
+  'controladoria-drivers': {
+    id: 'controladoria-drivers',
+    module: 'Controladoria',
+    name: 'Direcionadores de Rateio (Drivers)',
+    description: 'Direcionadores de custos e critérios de rateio da controladoria.',
+    route: '/admin/controladoria/drivers',
+    collectionName: 'controladoria_drivers',
+    defaultSort: 'name',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'type',
+        label: 'Tipo de Driver',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Tipos' },
+          { value: 'headcount', label: 'Quadro de Pessoal (Headcount)' },
+          { value: 'area', label: 'Área Ocupada (m²)' },
+          { value: 'machine_hours', label: 'Horas-Máquina' },
+          { value: 'revenue', label: 'Faturamento Bruto' },
+          { value: 'volume', label: 'Volume Produzido' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Nome do Driver',
+        type: 'text',
+        placeholder: 'Filtrar por nome...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'name', label: 'Direcionador', width: 28, type: 'text' },
+      { key: 'type', label: 'Tipo', width: 18, type: 'text' },
+      { key: 'unit', label: 'Unidade de Medida', width: 16, type: 'text' },
+      { key: 'description', label: 'Descrição / Critério', width: 36, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.type && f.type !== 'all') parts.push(`type = "${f.type}"`)
+      if (f.search && f.search !== 'all') parts.push(`name ~ "${f.search}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO BI & ANALYTICS
+  // ============================================================================
+
+  // 24. BI — Visão Comercial Consolidada
+  'bi-comercial-consolidado': {
+    id: 'bi-comercial-consolidado',
+    module: 'BI & Analytics',
+    name: 'BI Comercial & Faturamento',
+    description:
+      'Agregações e inteligência comercial sobre pedidos de vendas por canal, equipe e status.',
+    route: '/admin/bi/commercial',
+    collectionName: 'sales_orders',
+    defaultSort: '-created',
+    dateField: 'created',
+    amountField: 'total_value',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período das Vendas',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'channel',
+        label: 'Canal de Venda',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Canais' },
+          { value: 'Presencial', label: 'Presencial' },
+          { value: 'Telefonia', label: 'Telefonia' },
+          { value: 'E-commerce B2B', label: 'E-commerce B2B' },
+          { value: 'WhatsApp', label: 'WhatsApp' },
+          { value: 'Representante', label: 'Representante' },
+        ],
+      },
+      {
+        key: 'team',
+        label: 'Equipe Comercial',
+        type: 'text',
+        placeholder: 'Equipe de vendas...',
+        gridSpan: 6,
+      },
+      {
+        key: 'status',
+        label: 'Status da Venda',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'Faturado', label: 'Apenas Faturados' },
+          { value: 'Entregue', label: 'Entregues' },
+          { value: 'Aguardando Faturamento', label: 'Aguardando Faturamento' },
+        ],
+      },
+    ],
+    columns: [
+      { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+      { key: 'client_name', label: 'Cliente', width: 32, type: 'text' },
+      { key: 'team', label: 'Equipe', width: 16, type: 'text' },
+      { key: 'sales_channel', label: 'Canal', width: 16, type: 'text' },
+      { key: 'rca_name', label: 'Vendedor/RCA', width: 18, type: 'text' },
+      { key: 'total_value', label: 'Valor Faturado', width: 16, align: 'right', type: 'currency' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+      { key: 'created', label: 'Data', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.channel && f.channel !== 'all') parts.push(`sales_channel = "${f.channel}"`)
+      if (f.team && f.team !== 'all') parts.push(`team ~ "${f.team}"`)
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 25. BI — Visão Executiva & Projeções
+  'bi-executivo-projecoes': {
+    id: 'bi-executivo-projecoes',
+    module: 'BI & Analytics',
+    name: 'BI Executivo & Painel Estratégico',
+    description: 'Visão executiva com pedidos, volumes e projeções consolidadas.',
+    route: '/admin/bi/executive',
+    collectionName: 'sales_orders',
+    defaultSort: '-total_value',
+    dateField: 'created',
+    amountField: 'total_value',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período de Análise',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'min_value',
+        label: 'Valor Mínimo do Pedido (R$)',
+        type: 'number',
+        placeholder: 'Ex: 1000',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'order_number', label: 'Nº Pedido', width: 14, type: 'text' },
+      { key: 'client_name', label: 'Cliente', width: 34, type: 'text' },
+      { key: 'team', label: 'Equipe', width: 16, type: 'text' },
+      { key: 'sales_channel', label: 'Canal', width: 14, type: 'text' },
+      { key: 'total_value', label: 'Volume (R$)', width: 18, align: 'right', type: 'currency' },
+      { key: 'status', label: 'Status', width: 16, type: 'text' },
+      { key: 'created', label: 'Data', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = ['status != "Cancelado"']
+      if (f.min_value) parts.push(`total_value >= ${f.min_value}`)
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO INDÚSTRIA (PCP)
+  // ============================================================================
+
+  // 26. Indústria — Ordens de Produção (OPs)
+  'industria-ordens-producao': {
+    id: 'industria-ordens-producao',
+    module: 'Indústria (PCP)',
+    name: 'Ordens de Produção (OPs)',
+    description: 'Controle de ordens de produção, produto fabricado, quantidade e prazos.',
+    route: '/admin/industria/ordens',
+    collectionName: 'production_orders',
+    defaultSort: '-created',
+    dateField: 'created',
+    amountField: 'quantity',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período da OP',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'status',
+        label: 'Status da Ordem',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'planejada', label: 'Planejada' },
+          { value: 'liberada', label: 'Liberada' },
+          { value: 'em_producao', label: 'Em Produção' },
+          { value: 'concluida', label: 'Concluída' },
+          { value: 'cancelada', label: 'Cancelada' },
+        ],
+      },
+      {
+        key: 'responsible',
+        label: 'Responsável',
+        type: 'text',
+        placeholder: 'Filtrar por responsável...',
+        gridSpan: 6,
+      },
+      {
+        key: 'search',
+        label: 'Número da OP ou Produto',
+        type: 'text',
+        placeholder: 'Buscar por OP ou produto...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'order_number', label: 'Nº da OP', width: 14, type: 'text' },
+      { key: 'product_id', label: 'Produto', width: 28, type: 'text' },
+      { key: 'quantity', label: 'Qtd Planejada', width: 14, align: 'right', type: 'number' },
+      { key: 'unit', label: 'Unidade', width: 10, type: 'text' },
+      { key: 'start_date', label: 'Início', width: 14, type: 'date' },
+      { key: 'end_date', label: 'Término', width: 14, type: 'date' },
+      { key: 'responsible', label: 'Responsável', width: 18, type: 'text' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.responsible && f.responsible !== 'all') parts.push(`responsible ~ "${f.responsible}"`)
+      if (f.search && f.search !== 'all') {
+        parts.push(`(order_number ~ "${f.search}" || product_id ~ "${f.search}")`)
+      }
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 27. Indústria — Capacidade & Turnos
+  'industria-capacidade-turnos': {
+    id: 'industria-capacidade-turnos',
+    module: 'Indústria (PCP)',
+    name: 'Capacidade & Turnos Industriais',
+    description: 'Turnos produtivos, horários, capacidade instalada e calendários de fábrica.',
+    route: '/admin/industria/capacidade',
+    collectionName: 'industrial_shifts',
+    defaultSort: 'name',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'search',
+        label: 'Nome do Turno',
+        type: 'text',
+        placeholder: 'Filtrar por turno...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'name', label: 'Turno', width: 22, type: 'text' },
+      { key: 'start_time', label: 'Hora Início', width: 14, type: 'text' },
+      { key: 'end_time', label: 'Hora Término', width: 14, type: 'text' },
+      {
+        key: 'net_working_minutes',
+        label: 'Minutos Líquidos',
+        width: 18,
+        align: 'right',
+        type: 'number',
+      },
+      { key: 'efficiency_pct', label: 'Eficiência %', width: 14, align: 'right', type: 'number' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.search && f.search !== 'all') parts.push(`name ~ "${f.search}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 28. Indústria — Manutenção Industrial
+  'industria-manutencao': {
+    id: 'industria-manutencao',
+    module: 'Indústria (PCP)',
+    name: 'Manutenção de Recursos & Máquinas',
+    description: 'Programação de manutenções preventivas e corretivas de maquinários.',
+    route: '/admin/industria/manutencao',
+    collectionName: 'maintenance_schedules',
+    defaultSort: 'next_maintenance',
+    dateField: 'next_maintenance',
+    filters: [
+      {
+        key: 'status',
+        label: 'Status da Manutenção',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'agendada', label: 'Agendada' },
+          { value: 'em_andamento', label: 'Em Andamento' },
+          { value: 'concluida', label: 'Concluída' },
+          { value: 'atrasada', label: 'Atrasada' },
+        ],
+      },
+      {
+        key: 'type',
+        label: 'Tipo de Manutenção',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Tipos' },
+          { value: 'preventiva', label: 'Preventiva' },
+          { value: 'corretiva', label: 'Corretiva' },
+          { value: 'preditiva', label: 'Preditiva' },
+        ],
+      },
+    ],
+    columns: [
+      { key: 'title', label: 'Título / Descrição', width: 30, type: 'text' },
+      { key: 'resource_id', label: 'Recurso / Máquina', width: 22, type: 'text' },
+      { key: 'type', label: 'Tipo', width: 14, type: 'text' },
+      { key: 'next_maintenance', label: 'Data Prevista', width: 16, type: 'date' },
+      { key: 'technician', label: 'Técnico', width: 18, type: 'text' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.type && f.type !== 'all') parts.push(`type = "${f.type}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 29. Indústria — Fases de Produção
+  'industria-fases': {
+    id: 'industria-fases',
+    module: 'Indústria (PCP)',
+    name: 'Fases & Operações Produtivas',
+    description: 'Etapas de fabricação, centros de trabalho, tempos padrão e status de execução.',
+    route: '/admin/industria/fases',
+    collectionName: 'industrial_phases',
+    defaultSort: 'sequence',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'status',
+        label: 'Status da Fase',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'pendente', label: 'Pendente' },
+          { value: 'em_execucao', label: 'Em Execução' },
+          { value: 'concluida', label: 'Concluída' },
+          { value: 'interrompida', label: 'Interrompida' },
+        ],
+      },
+      {
+        key: 'work_center',
+        label: 'Centro de Trabalho',
+        type: 'text',
+        placeholder: 'Filtrar por centro...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'sequence', label: 'Seq.', width: 8, align: 'center', type: 'number' },
+      { key: 'operation_name', label: 'Operação / Fase', width: 28, type: 'text' },
+      { key: 'work_center', label: 'Centro de Trabalho', width: 20, type: 'text' },
+      {
+        key: 'expected_time_minutes',
+        label: 'Tempo Previsto (min)',
+        width: 18,
+        align: 'right',
+        type: 'number',
+      },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.work_center && f.work_center !== 'all') parts.push(`work_center ~ "${f.work_center}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 30. Indústria — Rastreabilidade de Lotes
+  'industria-rastreabilidade': {
+    id: 'industria-rastreabilidade',
+    module: 'Indústria (PCP)',
+    name: 'Rastreabilidade de Lotes Industriais',
+    description: 'Histórico de rastreabilidade de matéria-prima a produto acabado por lote.',
+    route: '/admin/industria/rastreabilidade',
+    collectionName: 'industrial_traceability',
+    defaultSort: '-created',
+    dateField: 'created',
+    amountField: 'quantity',
+    filters: [
+      {
+        key: 'lot_number',
+        label: 'Número do Lote',
+        type: 'text',
+        placeholder: 'Buscar código do lote...',
+        gridSpan: 6,
+      },
+      {
+        key: 'stage',
+        label: 'Etapa / Estágio',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Etapas' },
+          { value: 'recebimento', label: 'Recebimento Matéria-Prima' },
+          { value: 'pesagem', label: 'Pesagem' },
+          { value: 'fabricacao', label: 'Fabricação' },
+          { value: 'envase', label: 'Envase / Acabamento' },
+          { value: 'expedicao', label: 'Expedição' },
+        ],
+      },
+    ],
+    columns: [
+      { key: 'lot_number', label: 'Lote', width: 16, type: 'text' },
+      { key: 'product_id', label: 'Produto', width: 26, type: 'text' },
+      { key: 'stage', label: 'Estágio', width: 18, type: 'text' },
+      { key: 'quantity', label: 'Quantidade', width: 14, align: 'right', type: 'number' },
+      { key: 'created', label: 'Data Registro', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.lot_number && f.lot_number !== 'all') parts.push(`lot_number ~ "${f.lot_number}"`)
+      if (f.stage && f.stage !== 'all') parts.push(`stage = "${f.stage}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO LOGÍSTICA (EXPANDIDO)
+  // ============================================================================
+
+  // 31. Logística — Ocorrências
+  'logistica-ocorrencias': {
+    id: 'logistica-ocorrencias',
+    module: 'Logística',
+    name: 'Ocorrências de Transporte',
+    description: 'Registro e tratativa de sinistros, avarias, atrasos e devoluções na entrega.',
+    route: '/admin/logistica/ocorrencias',
+    collectionName: 'logistics_occurrences',
+    defaultSort: '-created',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período da Ocorrência',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'situacao',
+        label: 'Situação da Ocorrência',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Situações' },
+          { value: 'Aberta', label: 'Aberta' },
+          { value: 'Em Análise', label: 'Em Análise' },
+          { value: 'Resolvida', label: 'Resolvida' },
+          { value: 'Cancelada', label: 'Cancelada' },
+        ],
+      },
+      {
+        key: 'tipo_ocorrencia',
+        label: 'Tipo de Ocorrência',
+        type: 'text',
+        placeholder: 'Ex: Avaria, Atraso, Recusa...',
+        gridSpan: 6,
+      },
+      {
+        key: 'cliente',
+        label: 'Cliente',
+        type: 'text',
+        placeholder: 'Razão social ou CNPJ...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'entrega', label: 'Nº Entrega', width: 14, type: 'text' },
+      { key: 'cliente', label: 'Cliente', width: 30, type: 'text' },
+      { key: 'tipo_ocorrencia', label: 'Tipo', width: 18, type: 'text' },
+      { key: 'descricao', label: 'Descrição da Ocorrência', width: 34, type: 'text' },
+      { key: 'situacao', label: 'Situação', width: 14, type: 'text' },
+      { key: 'created', label: 'Data Registro', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.situacao && f.situacao !== 'all') parts.push(`situacao = "${f.situacao}"`)
+      if (f.tipo_ocorrencia && f.tipo_ocorrencia !== 'all')
+        parts.push(`tipo_ocorrencia ~ "${f.tipo_ocorrencia}"`)
+      if (f.cliente && f.cliente !== 'all') parts.push(`cliente ~ "${f.cliente}"`)
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 32. Logística — Custos Operacionais
+  'logistica-custos': {
+    id: 'logistica-custos',
+    module: 'Logística',
+    name: 'Custos de Frete & Operação Logística',
+    description: 'Valores de frete, diárias, combustíveis, pedágios e despesas de transporte.',
+    route: '/admin/logistica/custos',
+    collectionName: 'logistics_costs',
+    defaultSort: '-created',
+    dateField: 'created',
+    amountField: 'valor',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'tipo_custo',
+        label: 'Tipo de Custo',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Custos' },
+          { value: 'Frete Terceiro', label: 'Frete Terceiro' },
+          { value: 'Combustível', label: 'Combustível' },
+          { value: 'Pedágio', label: 'Pedágio' },
+          { value: 'Diária Motorista', label: 'Diária Motorista' },
+          { value: 'Manutenção Frota', label: 'Manutenção Frota' },
+        ],
+      },
+      {
+        key: 'transportadora',
+        label: 'Transportadora',
+        type: 'text',
+        placeholder: 'Nome da transportadora...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'descricao', label: 'Descrição', width: 30, type: 'text' },
+      { key: 'tipo_custo', label: 'Tipo Custo', width: 18, type: 'text' },
+      { key: 'transportadora', label: 'Transportadora', width: 22, type: 'text' },
+      { key: 'rota', label: 'Rota', width: 16, type: 'text' },
+      { key: 'valor', label: 'Valor Custo', width: 16, align: 'right', type: 'currency' },
+      { key: 'created', label: 'Data', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.tipo_custo && f.tipo_custo !== 'all') parts.push(`tipo_custo = "${f.tipo_custo}"`)
+      if (f.transportadora && f.transportadora !== 'all')
+        parts.push(`transportadora ~ "${f.transportadora}"`)
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 33. Logística — Rotas Cadastradas
+  'logistica-rotas': {
+    id: 'logistica-rotas',
+    module: 'Logística',
+    name: 'Cadastro de Rotas de Entrega',
+    description:
+      'Rotas de distribuição, cidades atendidas, distância estimada e situação operacional.',
+    route: '/admin/logistica/rotas',
+    collectionName: 'logistics_routes',
+    defaultSort: 'nome_rota',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'situacao',
+        label: 'Situação da Rota',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Situações' },
+          { value: 'Ativa', label: 'Ativa' },
+          { value: 'Inativa', label: 'Inativa' },
+          { value: 'Em Manutenção', label: 'Em Manutenção' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Código ou Nome da Rota',
+        type: 'text',
+        placeholder: 'Filtrar por nome ou código...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'codigo_rota', label: 'Código', width: 14, type: 'text' },
+      { key: 'nome_rota', label: 'Nome da Rota', width: 28, type: 'text' },
+      { key: 'cidade_origem', label: 'Origem', width: 18, type: 'text' },
+      { key: 'cidade_destino', label: 'Destino Principal', width: 18, type: 'text' },
+      { key: 'distancia_km', label: 'Distância (km)', width: 16, align: 'right', type: 'number' },
+      { key: 'situacao', label: 'Situação', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.situacao && f.situacao !== 'all') parts.push(`situacao = "${f.situacao}"`)
+      if (f.search && f.search !== 'all') {
+        parts.push(`(codigo_rota ~ "${f.search}" || nome_rota ~ "${f.search}")`)
+      }
+      return parts.join(' && ')
+    },
+  },
+
+  // 34. Logística — Veículos e Frota
+  'logistica-veiculos': {
+    id: 'logistica-veiculos',
+    module: 'Logística',
+    name: 'Frota & Veículos',
+    description: 'Veículos cadastrados, placa, modelo, capacidade de carga e situação.',
+    route: '/admin/logistica/veiculos',
+    collectionName: 'logistics_vehicles',
+    defaultSort: 'placa',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'situacao',
+        label: 'Situação do Veículo',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas' },
+          { value: 'Disponível', label: 'Disponível' },
+          { value: 'Em Rota', label: 'Em Rota' },
+          { value: 'Manutenção', label: 'Em Manutenção' },
+          { value: 'Inativo', label: 'Inativo' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Placa ou Modelo',
+        type: 'text',
+        placeholder: 'Buscar placa ou modelo...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'placa', label: 'Placa', width: 14, type: 'text' },
+      { key: 'modelo', label: 'Modelo', width: 24, type: 'text' },
+      { key: 'tipo_veiculo', label: 'Tipo', width: 18, type: 'text' },
+      {
+        key: 'capacidade_peso',
+        label: 'Capacidade (kg)',
+        width: 18,
+        align: 'right',
+        type: 'number',
+      },
+      { key: 'situacao', label: 'Situação', width: 16, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.situacao && f.situacao !== 'all') parts.push(`situacao = "${f.situacao}"`)
+      if (f.search && f.search !== 'all') {
+        parts.push(`(placa ~ "${f.search}" || modelo ~ "${f.search}")`)
+      }
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO ATENDIMENTO & CHAMADOS
+  // ============================================================================
+
+  // 35. Atendimento — Painel de Chamados
+  'chamados-painel': {
+    id: 'chamados-painel',
+    module: 'Atendimento & Chamados',
+    name: 'Painel Central de Chamados',
+    description:
+      'Tickets de suporte e solicitações de atendimento com prazos de SLA e responsável.',
+    route: '/admin/chamados',
+    collectionName: 'chamados',
+    defaultSort: '-created',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período de Abertura',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'status',
+        label: 'Status do Chamado',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'novo', label: 'Novo / Aberto' },
+          { value: 'em_andamento', label: 'Em Andamento' },
+          { value: 'aguardando_cliente', label: 'Aguardando Solicitante' },
+          { value: 'resolvido', label: 'Resolvido' },
+          { value: 'fechado', label: 'Fechado' },
+          { value: 'cancelado', label: 'Cancelado' },
+        ],
+      },
+      {
+        key: 'prioridade',
+        label: 'Prioridade',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Prioridades' },
+          { value: 'baixa', label: 'Baixa' },
+          { value: 'media', label: 'Média' },
+          { value: 'alta', label: 'Alta' },
+          { value: 'urgente', label: 'Urgente' },
+        ],
+      },
+      {
+        key: 'setor_responsavel',
+        label: 'Setor Responsável',
+        type: 'text',
+        placeholder: 'Filtrar por setor...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'numero', label: 'Nº Chamado', width: 14, type: 'text' },
+      { key: 'assunto', label: 'Assunto', width: 32, type: 'text' },
+      { key: 'solicitante', label: 'Solicitante', width: 22, type: 'text' },
+      { key: 'setor_responsavel', label: 'Setor', width: 18, type: 'text' },
+      { key: 'profissional_responsavel', label: 'Responsável', width: 20, type: 'text' },
+      { key: 'prioridade', label: 'Prioridade', width: 14, type: 'text' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+      { key: 'prazo_atendimento', label: 'Prazo Resp.', width: 16, type: 'date' },
+      { key: 'prazo_resolucao', label: 'Prazo Resol.', width: 16, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.prioridade && f.prioridade !== 'all') parts.push(`prioridade = "${f.prioridade}"`)
+      if (f.setor_responsavel && f.setor_responsavel !== 'all') {
+        parts.push(`setor_responsavel ~ "${f.setor_responsavel}"`)
+      }
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 36. Atendimento — Histórico de Chamados
+  'chamados-historico': {
+    id: 'chamados-historico',
+    module: 'Atendimento & Chamados',
+    name: 'Linha do Tempo / Histórico de Interações',
+    description: 'Histórico auditado de tramitações, mensagens e ações em chamados.',
+    route: '/admin/chamados',
+    collectionName: 'chamados_historico',
+    defaultSort: '-created',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período',
+        type: 'dynamic-date-range',
+        defaultValue: 'current_month',
+        gridSpan: 6,
+      },
+      {
+        key: 'acao',
+        label: 'Ação Realizada',
+        type: 'text',
+        placeholder: 'Ex: Resposta, Transferência, Status...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'chamado', label: 'ID Chamado', width: 18, type: 'text' },
+      { key: 'acao', label: 'Ação', width: 22, type: 'text' },
+      { key: 'usuario', label: 'Usuário', width: 20, type: 'text' },
+      { key: 'descricao', label: 'Detalhes da Ação', width: 38, type: 'text' },
+      { key: 'created', label: 'Data/Hora', width: 18, type: 'date' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.acao && f.acao !== 'all') parts.push(`acao ~ "${f.acao}"`)
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'current_month',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO CRM (GESTÃO DE CLIENTES & FUNIL)
+  // ============================================================================
+
+  // 37. CRM — Leads Cadastrados
+  'crm-leads': {
+    id: 'crm-leads',
+    module: 'CRM',
+    name: 'Leads & Prospecção',
+    description: 'Contatos e empresas prospectadas, pontuação de qualificação e temperatura.',
+    route: '/admin/crm/leads',
+    collectionName: 'crm_leads',
+    defaultSort: '-created',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'status',
+        label: 'Status do Lead',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'new', label: 'Novo Lead' },
+          { value: 'contacted', label: 'Contatado' },
+          { value: 'qualified', label: 'Qualificado' },
+          { value: 'unqualified', label: 'Não Qualificado' },
+          { value: 'converted', label: 'Convertido' },
+        ],
+      },
+      {
+        key: 'temperature',
+        label: 'Temperatura do Lead',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Temperaturas' },
+          { value: 'frio', label: 'Frio' },
+          { value: 'morno', label: 'Morno' },
+          { value: 'quente', label: 'Quente' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Nome ou Razão do Lead',
+        type: 'text',
+        placeholder: 'Filtrar por nome...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'lead_number', label: 'Nº Lead', width: 14, type: 'text' },
+      { key: 'name', label: 'Nome / Razão', width: 30, type: 'text' },
+      { key: 'person_type', label: 'Tipo', width: 10, type: 'text' },
+      { key: 'cpf_cnpj', label: 'CPF / CNPJ', width: 18, type: 'text' },
+      { key: 'segment', label: 'Segmento', width: 16, type: 'text' },
+      { key: 'temperature', label: 'Temperatura', width: 14, type: 'text' },
+      { key: 'qualification_score', label: 'Score', width: 10, align: 'center', type: 'number' },
+      { key: 'city', label: 'Cidade', width: 16, type: 'text' },
+      { key: 'state', label: 'UF', width: 8, align: 'center', type: 'text' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.temperature && f.temperature !== 'all') parts.push(`temperature = "${f.temperature}"`)
+      if (f.search && f.search !== 'all') parts.push(`name ~ "${f.search}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 38. CRM — Oportunidades do Funil
+  'crm-oportunidades': {
+    id: 'crm-oportunidades',
+    module: 'CRM',
+    name: 'Oportunidades de Negócio (Pipeline)',
+    description: 'Pipeline comercial com valor estimado, probabilidade de fechamento e previsão.',
+    route: '/admin/crm/oportunidades',
+    collectionName: 'crm_opportunities',
+    defaultSort: '-created',
+    dateField: 'open_date',
+    amountField: 'estimated_value',
+    filters: [
+      {
+        key: 'status',
+        label: 'Status da Oportunidade',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'open', label: 'Em Aberto / Negociação' },
+          { value: 'won', label: 'Ganha / Conquistada' },
+          { value: 'lost', label: 'Perdida' },
+        ],
+      },
+      {
+        key: 'client_name',
+        label: 'Cliente',
+        type: 'text',
+        placeholder: 'Razão social do cliente...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'opportunity_number', label: 'Nº Oportunidade', width: 16, type: 'text' },
+      { key: 'title', label: 'Título da Negociação', width: 28, type: 'text' },
+      { key: 'client_name', label: 'Cliente', width: 28, type: 'text' },
+      {
+        key: 'estimated_value',
+        label: 'Valor Estimado',
+        width: 16,
+        align: 'right',
+        type: 'currency',
+      },
+      { key: 'probability', label: 'Prob. (%)', width: 12, align: 'center', type: 'number' },
+      { key: 'open_date', label: 'Abertura', width: 14, type: 'date' },
+      { key: 'expected_close_date', label: 'Previsão Fech.', width: 14, type: 'date' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.client_name && f.client_name !== 'all') parts.push(`client_name ~ "${f.client_name}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 39. CRM — Propostas Comerciais
+  'crm-propostas': {
+    id: 'crm-propostas',
+    module: 'CRM',
+    name: 'Propostas Comerciais (Cotações)',
+    description: 'Propostas emitidas para clientes com itens, valores totais e validade.',
+    route: '/admin/crm/propostas',
+    collectionName: 'crm_proposals',
+    defaultSort: '-created',
+    dateField: 'created',
+    amountField: 'total',
+    filters: [
+      {
+        key: 'status',
+        label: 'Status da Proposta',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'draft', label: 'Rascunho' },
+          { value: 'sent', label: 'Enviada ao Cliente' },
+          { value: 'accepted', label: 'Aceita' },
+          { value: 'rejected', label: 'Recusada' },
+          { value: 'expired', label: 'Expirada' },
+        ],
+      },
+      {
+        key: 'client_name',
+        label: 'Cliente',
+        type: 'text',
+        placeholder: 'Razão social do cliente...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'proposal_number', label: 'Nº Proposta', width: 16, type: 'text' },
+      { key: 'title', label: 'Título', width: 28, type: 'text' },
+      { key: 'client_name', label: 'Cliente', width: 28, type: 'text' },
+      { key: 'subtotal', label: 'Subtotal', width: 14, align: 'right', type: 'currency' },
+      { key: 'total', label: 'Total Proposta', width: 16, align: 'right', type: 'currency' },
+      { key: 'validity_date', label: 'Validade', width: 14, type: 'date' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      if (f.client_name && f.client_name !== 'all') parts.push(`client_name ~ "${f.client_name}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // 40. CRM — Atividades Comerciais
+  'crm-atividades': {
+    id: 'crm-atividades',
+    module: 'CRM',
+    name: 'Atividades Comerciais (Agenda)',
+    description: 'Reuniões, visitas, ligações e tarefas agendadas da equipe comercial.',
+    route: '/admin/crm/atividades',
+    collectionName: 'crm_activities',
+    defaultSort: '-scheduled_date',
+    dateField: 'scheduled_date',
+    filters: [
+      {
+        key: 'type',
+        label: 'Tipo de Atividade',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Tipos' },
+          { value: 'call', label: 'Ligação Telefônica' },
+          { value: 'meeting', label: 'Reunião Presencial/Online' },
+          { value: 'email', label: 'E-mail Comercial' },
+          { value: 'visit', label: 'Visita ao Cliente' },
+          { value: 'task', label: 'Tarefa Interna' },
+        ],
+      },
+      {
+        key: 'status',
+        label: 'Status da Tarefa',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Status' },
+          { value: 'pending', label: 'Pendente' },
+          { value: 'completed', label: 'Concluída' },
+          { value: 'cancelled', label: 'Cancelada' },
+        ],
+      },
+    ],
+    columns: [
+      { key: 'type', label: 'Tipo', width: 14, type: 'text' },
+      { key: 'title', label: 'Título da Atividade', width: 34, type: 'text' },
+      { key: 'scheduled_date', label: 'Data Agendada', width: 14, type: 'date' },
+      { key: 'scheduled_time', label: 'Horário', width: 10, type: 'text' },
+      { key: 'priority', label: 'Prioridade', width: 12, type: 'text' },
+      { key: 'status', label: 'Status', width: 14, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.type && f.type !== 'all') parts.push(`type = "${f.type}"`)
+      if (f.status && f.status !== 'all') parts.push(`status = "${f.status}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO GOVERNANÇA & AUDITORIA
+  // ============================================================================
+
+  // 41. Governança — Logs de Auditoria
+  'governanca-auditoria': {
+    id: 'governanca-auditoria',
+    module: 'Governança & Auditoria',
+    name: 'Trilha de Auditoria do Sistema (Audit Logs)',
+    description:
+      'Trilha rigorosa de auditoria de acessos, alterações, exclusões e login de usuários.',
+    route: '/admin/configuracoes/logs',
+    collectionName: 'audit_logs',
+    defaultSort: '-created',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'dynamic_date_range',
+        label: 'Período do Registro',
+        type: 'dynamic-date-range',
+        defaultValue: 'today',
+        gridSpan: 6,
+      },
+      {
+        key: 'action',
+        label: 'Ação Realizada',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todas as Ações' },
+          { value: 'create', label: 'Criação (Insert)' },
+          { value: 'update', label: 'Alteração (Update)' },
+          { value: 'delete', label: 'Exclusão (Delete)' },
+          { value: 'login', label: 'Autenticação (Login)' },
+          { value: 'export', label: 'Exportação de Dados' },
+        ],
+      },
+      {
+        key: 'user_name',
+        label: 'Usuário',
+        type: 'text',
+        placeholder: 'Nome do usuário...',
+        gridSpan: 6,
+      },
+      {
+        key: 'target_collection',
+        label: 'Coleção / Entidade Alvo',
+        type: 'text',
+        placeholder: 'Nome da tabela...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'created', label: 'Data/Hora', width: 18, type: 'date' },
+      { key: 'action', label: 'Ação', width: 14, type: 'text' },
+      { key: 'user_name', label: 'Usuário', width: 22, type: 'text' },
+      { key: 'user_role', label: 'Perfil', width: 14, type: 'text' },
+      { key: 'target_collection', label: 'Entidade Afetada', width: 20, type: 'text' },
+      { key: 'details', label: 'Detalhes da Operação', width: 40, type: 'text' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.action && f.action !== 'all') parts.push(`action = "${f.action}"`)
+      if (f.user_name && f.user_name !== 'all') parts.push(`user_name ~ "${f.user_name}"`)
+      if (f.target_collection && f.target_collection !== 'all') {
+        parts.push(`target_collection ~ "${f.target_collection}"`)
+      }
+      const resolved = resolveDynamicDateRange(
+        (f.dynamic_date_range as DynamicDateRangeKey) || 'today',
+        f.date_from as string,
+        f.date_to as string,
+      )
+      if (resolved.dateFrom) parts.push(`created >= "${resolved.dateFrom}"`)
+      if (resolved.dateTo) parts.push(`created <= "${resolved.dateTo}"`)
+      return parts.join(' && ')
+    },
+  },
+
+  // ============================================================================
+  // MÓDULO CADASTROS OFICIAIS
+  // ============================================================================
+
+  // 42. Cadastros — Clientes Oficiais
+  'cadastros-clientes': {
+    id: 'cadastros-clientes',
+    module: 'Cadastros Oficiais',
+    name: 'Cadastro Oficial de Clientes',
+    description:
+      'Carteira cadastral de clientes com CNPJ, Razão Social, contato e situação cadastral.',
+    route: '/admin/cadastros/clientes',
+    collectionName: 'partners',
+    defaultSort: 'company_name',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'active',
+        label: 'Situação Cadastral',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Clientes' },
+          { value: 'active', label: 'Apenas Ativos' },
+          { value: 'inactive', label: 'Apenas Inativos' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Razão Social, Nome Fantasia ou CNPJ',
+        type: 'text',
+        placeholder: 'Buscar por nome ou CNPJ...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'company_name', label: 'Razão Social', width: 34, type: 'text' },
+      { key: 'trade_name', label: 'Nome Fantasia', width: 26, type: 'text' },
+      { key: 'cnpj', label: 'CNPJ', width: 18, type: 'text' },
+      { key: 'cpf', label: 'CPF', width: 16, type: 'text' },
+      { key: 'email', label: 'E-mail', width: 24, type: 'text' },
+      { key: 'phone', label: 'Telefone', width: 16, type: 'text' },
+      { key: 'active', label: 'Ativo', width: 10, align: 'center', type: 'boolean' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = ['partner_type = "Cliente"']
+      if (f.active === 'active') parts.push('active = true')
+      if (f.active === 'inactive') parts.push('active = false')
+      if (f.search && f.search !== 'all') {
+        parts.push(
+          `(company_name ~ "${f.search}" || trade_name ~ "${f.search}" || cnpj ~ "${f.search}")`,
+        )
+      }
+      return parts.join(' && ')
+    },
+  },
+
+  // 43. Cadastros — Fornecedores
+  'cadastros-fornecedores': {
+    id: 'cadastros-fornecedores',
+    module: 'Cadastros Oficiais',
+    name: 'Cadastro de Fornecedores',
+    description: 'Fornecedores homologados de mercadorias, insumos e serviços.',
+    route: '/admin/cadastros',
+    collectionName: 'partners',
+    defaultSort: 'company_name',
+    dateField: 'created',
+    filters: [
+      {
+        key: 'active',
+        label: 'Situação Cadastral',
+        type: 'select',
+        gridSpan: 6,
+        options: [
+          { value: 'all', label: 'Todos os Fornecedores' },
+          { value: 'active', label: 'Apenas Ativos' },
+          { value: 'inactive', label: 'Apenas Inativos' },
+        ],
+      },
+      {
+        key: 'search',
+        label: 'Razão Social, Nome Fantasia ou CNPJ',
+        type: 'text',
+        placeholder: 'Buscar por nome ou CNPJ...',
+        gridSpan: 6,
+      },
+    ],
+    columns: [
+      { key: 'company_name', label: 'Razão Social', width: 34, type: 'text' },
+      { key: 'trade_name', label: 'Nome Fantasia', width: 26, type: 'text' },
+      { key: 'cnpj', label: 'CNPJ', width: 18, type: 'text' },
+      { key: 'email', label: 'E-mail', width: 24, type: 'text' },
+      { key: 'phone', label: 'Telefone', width: 16, type: 'text' },
+      { key: 'active', label: 'Ativo', width: 10, align: 'center', type: 'boolean' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = ['partner_type = "Fornecedor"']
+      if (f.active === 'active') parts.push('active = true')
+      if (f.active === 'inactive') parts.push('active = false')
+      if (f.search && f.search !== 'all') {
+        parts.push(
+          `(company_name ~ "${f.search}" || trade_name ~ "${f.search}" || cnpj ~ "${f.search}")`,
+        )
+      }
+      return parts.join(' && ')
+    },
+  },
+
+  // 44. Cadastros — Catálogo de Produtos
+  'cadastros-produtos': {
+    id: 'cadastros-produtos',
+    module: 'Cadastros Oficiais',
+    name: 'Catálogo de Produtos & Preços',
+    description: 'Cadastro mestre de itens, custos, estoques, marcas e preços de tabela.',
+    route: '/admin/produtos',
+    collectionName: 'products',
+    defaultSort: 'name',
+    dateField: 'created',
+    amountField: 'stock',
+    filters: [
+      {
+        key: 'active',
+        label: 'Situação',
+        type: 'select',
+        gridSpan: 4,
+        options: [
+          { value: 'all', label: 'Todos' },
+          { value: 'active', label: 'Apenas Ativos' },
+          { value: 'inactive', label: 'Apenas Inativos' },
+        ],
+      },
+      {
+        key: 'category',
+        label: 'Categoria',
+        type: 'text',
+        placeholder: 'Filtrar por categoria...',
+        gridSpan: 4,
+      },
+      {
+        key: 'brand',
+        label: 'Marca',
+        type: 'text',
+        placeholder: 'Filtrar por marca...',
+        gridSpan: 4,
+      },
+      {
+        key: 'search',
+        label: 'Código, Nome ou EAN',
+        type: 'text',
+        placeholder: 'Buscar código ou nome do produto...',
+        gridSpan: 12,
+      },
+    ],
+    columns: [
+      { key: 'code', label: 'Código', width: 14, type: 'text' },
+      { key: 'name', label: 'Produto', width: 34, type: 'text' },
+      { key: 'category', label: 'Categoria', width: 18, type: 'text' },
+      { key: 'brand', label: 'Marca', width: 16, type: 'text' },
+      { key: 'stock', label: 'Estoque Atual', width: 14, align: 'right', type: 'number' },
+      { key: 'cost_price', label: 'Preço de Custo', width: 16, align: 'right', type: 'currency' },
+      { key: 'price', label: 'Preço de Venda', width: 16, align: 'right', type: 'currency' },
+      { key: 'active', label: 'Ativo', width: 10, align: 'center', type: 'boolean' },
+    ],
+    buildFilterString: (f) => {
+      const parts: string[] = []
+      if (f.active === 'active') parts.push('active = true')
+      if (f.active === 'inactive') parts.push('active = false')
+      if (f.category && f.category !== 'all') parts.push(`category ~ "${f.category}"`)
+      if (f.brand && f.brand !== 'all') parts.push(`brand ~ "${f.brand}"`)
+      if (f.search && f.search !== 'all') {
+        parts.push(`(name ~ "${f.search}" || code ~ "${f.search}" || ean ~ "${f.search}")`)
+      }
+      return parts.join(' && ')
+    },
+  },
 }
 
 export function getAllReportModules(): string[] {
