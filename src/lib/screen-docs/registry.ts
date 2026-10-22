@@ -532,18 +532,18 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/produtos',
     title: 'Cadastro Mestre e Fiscal de Produtos (NF-e mod 55)',
     moduleGroup: 'Comercial / Fiscal',
-    docVersion: '2.0.0',
-    lastUpdated: '2026-04-14',
-    author: 'Engenharia de Software Huram',
+    docVersion: '1.1.0',
+    lastUpdated: '2025-05-19',
+    author: 'Engenharia de Software Jetro & HURAM ERP',
     objective: {
       title: 'Objetivo',
       content:
-        'Gerenciar o catálogo mestre de produtos e suas parametrizações fiscais para DEC Eldorado e Gran Romano, permitindo operações de entrada de mercadorias, conversão de embalagens e emissão de NF-e modelo 55 em operações internas e interestaduais, com isolamento fiscal estrito por estabelecimento e suporte a fabricação própria.',
+        'Gerenciar o catálogo mestre de produtos e suas parametrizações fiscais para DEC Eldorado e Gran Romano, permitindo operações de entrada de mercadorias, conversão de embalagens, simulação fiscal auditável no servidor e emissão de NF-e modelo 55 em operações internas e interestaduais, com isolamento fiscal estrito por estabelecimento e suporte a fabricação própria.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Cadastro Mestre Compartilhado: código único gerado automaticamente, descrição completa e resumida, marca, categoria, subcategoria, grupo de produtos, referência externa/legado (Sankhya), unidade base e status ativo.\n- Classificação de Tipo/Finalidade Fiscal: distinção explícita entre revenda, fabricação própria (industrialização), matéria-prima, embalagem, insumo, ativo imobilizado e uso/consumo.\n- Configuração Fiscal por Empresa (product_company_fiscal): aba dedicada com seleção de estabelecimento ativo (DEC Eldorado vs Gran Romano), definição de CFOP interno (5101/5102) e interestadual (6101/6102), CST/CSOSN, CEST, cBenef, overrides anuláveis de alíquotas (ICMS, FCP, IPI, PIS, COFINS, IBS/CBS), cClassTrib da Reforma e exigência de controle por lote.\n- Apresentações e Unidades de Conversão (product_units): cadastro de caixas (CX), fardos (FD) e múltiplos com fator estritamente positivo (> 0), operador (multiplica/divide), identificação de unidade tributável e suporte a GTIN próprio da embalagem ou "SEM GTIN".\n- Referências de Fornecedor / De-Para de XML (supplier_product_refs): mapeamento de CNPJ do fornecedor, código externo (cProd), unidade de nota (uCom), fator de conversão validado e GTIN do fornecedor, eliminando associações ambíguas na entrada de NF-e.\n- Status Fiscal Auditável: indicador explícito entre "Pronto para NF-e" (validado) e "Rascunho Incompleto" (permitido no ERP, mas bloqueado para operações fiscais até validação completa).\n- Tratamento Estrito de GTIN/EAN: validação do algoritmo GS1 (dígito verificador de 8, 12, 13 e 14 dígitos) com chave explícita para produto sem código de barras ("SEM GTIN"). Nunca inventa código.\n- NCM Textual Preservado: validação de 8 dígitos preservando zeros à esquerda e formatação sem conversão para inteiro.\n- Filtros e KPIs Executivos: contadores de itens ativos, prontos para NF-e, produtos de fabricação própria e pendentes.',
+        '- Cadastro Mestre Compartilhado: código único gerado automaticamente, descrição completa e resumida, marca, categoria, subcategoria, grupo de produtos, referência externa/legado (Sankhya), unidade base e status ativo.\n- Classificação de Tipo/Finalidade Fiscal: distinção explícita entre revenda, fabricação própria (industrialização), matéria-prima, embalagem, insumo, ativo imobilizado e uso/consumo.\n- Configuração Fiscal por Empresa (product_company_fiscal): aba dedicada com seleção de estabelecimento ativo (DEC Eldorado vs Gran Romano), definição de CFOP interno (5101/5102) e interestadual (6101/6102), CST/CSOSN, CEST, cBenef, overrides anuláveis de alíquotas (ICMS, FCP, IPI, PIS, COFINS, IBS/CBS), cClassTrib da Reforma e exigência de controle por lote.\n- Simulador Fiscal Auditável no Backend (`/backend/v1/huram/fiscal/simulate`): motor server-side que calcula ICMS, ST com MVA, FCP, DIFAL, PIS, COFINS e Reforma (IBS/CBS), gerando registro imutável em `fiscal_simulations` com regras aplicadas, memória de cálculo passo a passo e operador responsável.\n- Apresentações e Unidades de Conversão (product_units): cadastro de caixas (CX), fardos (FD) e múltiplos com fator estritamente positivo (> 0), operador (multiplica/divide), identificação de unidade tributável e suporte a GTIN próprio da embalagem ou "SEM GTIN".\n- Referências de Fornecedor / De-Para de XML (supplier_product_refs): mapeamento de CNPJ do fornecedor, código externo (cProd), unidade de nota (uCom), fator de conversão validado e GTIN do fornecedor, eliminando associações ambíguas na entrada de NF-e.\n- Status Fiscal Auditável: indicador explícito entre "Pronto para NF-e" (validado) e "Rascunho Incompleto" (permitido no ERP, mas bloqueado para operações fiscais até validação completa).\n- Tratamento Estrito de GTIN/EAN: validação do algoritmo GS1 (dígito verificador de 8, 12, 13 e 14 dígitos) com chave explícita para produto sem código de barras ("SEM GTIN"). Nunca inventa código.\n- NCM Textual Preservado: validação de 8 dígitos preservando zeros à esquerda e formatação sem conversão para inteiro.\n- Filtros e KPIs Executivos: contadores de itens ativos, prontos para NF-e, produtos de fabricação própria e pendentes.',
     },
     businessRules: {
       title: 'Regras de Negócio',
@@ -1026,39 +1026,40 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   // -------------------------------------------------------------
   '/admin/fiscal': {
     route: '/admin/fiscal',
-    title: 'Gestão Fiscal e Documentos Eletrônicos',
+    title: 'Gestão Fiscal e Documentos Eletrônicos (HURAM ERP)',
     moduleGroup: 'Fiscal',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
+    docVersion: '1.1.0',
+    lastUpdated: '2025-05-19',
+    author: 'Engenharia de Software Jetro & HURAM ERP',
     objective: {
       title: 'Objetivo',
       content:
-        'Gerenciar a emissão, validação, transmissão e escrituração de documentos fiscais eletrônicos (NF-e, NFC-e, NFS-e, CT-e, MDF-e), apuração tributária e geração de arquivos SPED.',
+        'Gerenciar a emissão, validação, transmissão e escrituração de documentos fiscais eletrônicos (NF-e mod 55, NFC-e, NFS-e, CT-e, MDF-e), entrada idempotente via XML, simulador auditável de tributos e homologação SEFAZ, com isolamento multitenant entre Dec Eldorado e Gran Romano.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Emissão e cancelamento de notas fiscais com envio direto à SEFAZ.\n- Carta de correção eletrônica (CC-e) e manifestação do destinatário.\n- Apuração de tributos (ICMS, IPI, PIS, COFINS, ISS) e simulador da Reforma Tributária.\n- Armazenamento e exportação de arquivos XML e DANFE em PDF.',
+        '- Simulador Fiscal Auditável no Backend (`/backend/v1/huram/fiscal/simulate`): motor server-side que cruza produto, empresa ativa (Dec Eldorado × Gran Romano) e operação (venda interna 5101/5102, interestadual 6101/6102, compras 1101/2101), apurando ICMS, ICMS-ST com MVA, FCP, DIFAL, PIS, COFINS e Reforma Tributária (IBS/CBS com cClassTrib), gravando cada cálculo em `fiscal_simulations` com memória de cálculo passo a passo.\n- Entrada de Mercadorias via XML com Idempotência Estrita (`/backend/v1/huram/fiscal/xml-entry`): upload de XML modelo 55, extração da chave de 44 dígitos (chNFe), bloqueio de reimportação duplicada, matching automático de itens com `supplier_product_refs` (cProd, uCom, fator de conversão) e GTIN/código interno; itens sem de-para permanecem pendentes sem dados inventados; integração com movimentações de estoque em `stock_movements`.\n- Emissão de NF-e em Ambiente de Homologação (`/backend/v1/huram/fiscal/nfe-generate` e `/backend/v1/huram/fiscal/nfe-transmit`): montagem e validação do XML modelo 55 layout PL_009_V400, geração de chave de 44 dígitos com dígito verificador módulo 11, cálculo dos tributos coerente com a configuração da empresa, armazenamento do artefato em `fiscal_document_artifacts` e exportação do XML.\n- Carta de correção eletrônica (CC-e) e manifestação do destinatário.\n- Apuração de tributos e visualização da Reforma Tributária.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Toda emissão exige certificado digital modelo A1 válido e ativo.\n- Cancelamento somente permitido dentro do prazo regulamentar estipulado pela SEFAZ do estado emissor.\n- Rejeições fiscais impedem a movimentação de saída no faturamento.',
+        '- Idempotência Estrita por Chave de Acesso: toda NF-e de entrada ou saída possui chave única de 44 dígitos. Tentativa de reimportar o mesmo XML é barrada pelo sistema, informando data e número do lançamento original sem gerar duplicidade de estoque ou financeiro.\n- De-Para de Produtos Fiel: itens de XML que não possuem correspondência exata em `supplier_product_refs`, GTIN ou código interno são classificados como "Pendente De-Para" e nunca geram produtos inventados no estoque.\n- Isolamento Multitenant: cada empresa (Dec Eldorado vs Gran Romano) calcula tributos e emite documentos exclusivamente com seus próprios dados cadastrais e fiscais.\n- PENDÊNCIA EXTERNA DECLARADA (Certificado Digital A1): A geração do XML, cálculos e validação do layout SEFAZ funcionam integralmente no sistema. Contudo, a assinatura digital (XML-DSig RSA-SHA1) e a transmissão via WebService SEFAZ em tempo real requerem a contratação e injeção do Certificado Digital A1 (.pfx) da empresa e o credenciamento de emissor junto à SEFAZ de origem (ES ou SP). Conforme a regra do projeto, nenhuma credencial é inventada.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O pedido de venda ou remessa solicita faturamento.\n2. O motor fiscal monta o XML com cálculo de impostos, assina digitalmente e transmite à SEFAZ.\n3. Recebida a autorização de uso, o DANFE é gerado e o estoque é atualizado.',
+        '1. Entrada: o usuário faz upload do XML na tela de Entrada de Notas; o backend valida a chave de 44 dígitos, aplica o de-para de fornecedor e alimenta compras e estoque.\n2. Simulação: o operador simula cenários na aba Fiscal por Empresa do produto, recebendo memória de cálculo detalhada e ID de auditoria.\n3. Emissão em Homologação: o operador gera a NF-e de teste em Homologação, valida as tags SEFAZ v4.00, baixa o XML e aciona a transmissão de teste (que valida a presença do Certificado A1).',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções: `fiscal_documents`, `tax_rules`, `fiscal_certificates`, `cfop_catalog`.',
+        '- Coleções: `fiscal_simulations` (auditoria imutável), `fiscal_document_artifacts` (XMLs e protocolos), `purchase_invoices` (entradas fiscais), `nfe_records` (saídas), `product_company_fiscal`, `supplier_product_refs`, `stock_movements` e `empresas`.',
     },
     integrations: {
       title: 'Integrações',
-      content: 'Webservices SEFAZ de autorização e consulta em lote.',
+      content:
+        'Endpoints backend customizados no Skip Cloud (`/backend/v1/huram/fiscal/*`) e WebServices SEFAZ em homologação/produção.',
     },
     permissions: {
       title: 'Permissões',

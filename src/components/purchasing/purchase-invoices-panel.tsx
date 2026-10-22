@@ -7,7 +7,8 @@ import { getProducts } from '@/services/products'
 import { useRealtime } from '@/hooks/use-realtime'
 import { STATUS_COLORS, type PurchaseInvoice, type PurchaseOrder } from '@/lib/purchasing-types'
 import { PurchaseInvoiceDialog } from '@/components/purchasing/purchase-invoice-dialog'
-import { Plus, Search, Pencil, Loader2, FileText } from 'lucide-react'
+import { Plus, Search, Pencil, Loader2, FileText, Upload } from 'lucide-react'
+import { XmlImportDialog } from '@/components/fiscal/xml-import-dialog'
 
 export function PurchaseInvoicesPanel() {
   const [records, setRecords] = useState<PurchaseInvoice[]>([])
@@ -17,6 +18,7 @@ export function PurchaseInvoicesPanel() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
+  const [xmlImportOpen, setXmlImportOpen] = useState(false)
   const [editing, setEditing] = useState<PurchaseInvoice | null>(null)
 
   const load = async () => {
@@ -59,13 +61,27 @@ export function PurchaseInvoicesPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-lg font-bold">Entrada de Notas Fiscais</h3>
-        <Button
-          onClick={handleNew}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Nova Nota Fiscal
-        </Button>
+        <div>
+          <h3 className="text-lg font-bold">Entrada de Notas Fiscais</h3>
+          <p className="text-xs text-muted-foreground">
+            Lançamento por upload XML com idempotência de 44 dígitos e De-Para de fornecedores
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setXmlImportOpen(true)}
+            variant="outline"
+            className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Importar XML da NF-e
+          </Button>
+          <Button
+            onClick={handleNew}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Nova Nota Manual
+          </Button>
+        </div>
       </div>
       <Card className="border-2 border-[#005B2E]/20">
         <CardContent className="py-4">
@@ -156,6 +172,9 @@ export function PurchaseInvoicesPanel() {
         products={products}
         onSaved={load}
       />
+
+      {/* DIÁLOGO DE IMPORTAÇÃO DE XML DE ENTRADA IDEMPOTENTE (FASE B) */}
+      <XmlImportDialog open={xmlImportOpen} onOpenChange={setXmlImportOpen} onSuccess={load} />
     </div>
   )
 }

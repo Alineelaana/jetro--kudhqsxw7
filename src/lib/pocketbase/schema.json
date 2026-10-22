@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T23:19:05.540Z",
+  "generatedAt": "2026-10-22T23:36:13.978Z",
   "collections": [
     {
       "name": "users",
@@ -3350,6 +3350,114 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "empresa_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "chave_acesso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "protocolo_sefaz",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_emissao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_produtos",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_frete",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_seguro",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_desconto",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_outras_despesas",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_icms",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_icms_st",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_ipi",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_pis",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_cofins",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "import_source",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "import_pending_refs",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -6884,6 +6992,42 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "chave_acesso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ambiente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "serie",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "xml_conteudo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "homologacao_pendencia",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

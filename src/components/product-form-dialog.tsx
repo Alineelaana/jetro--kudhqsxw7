@@ -381,6 +381,8 @@ export function ProductFormDialog({
             <TabsContent value="company_fiscal" className="m-0 focus-visible:outline-none">
               <ProductTabCompanyFiscal
                 productId={currentProductId}
+                productCode={form.code}
+                productName={form.name}
                 baseNcm={form.ncm}
                 baseOrigin={form.origin}
                 baseTipoFinalidade={form.tipo_finalidade}

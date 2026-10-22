@@ -27,9 +27,12 @@ import { getProductCompanyFiscals, saveProductCompanyFiscal } from '@/services/p
 import type { ProductCompanyFiscal } from '@/lib/product-types'
 import { useBrand, type EmpresaBrand } from '@/hooks/use-brand'
 import { toast } from '@/hooks/use-toast'
+import { FiscalAuditSimulator } from '@/components/fiscal/fiscal-audit-simulator'
 
 interface Props {
   productId: string | null
+  productCode?: string
+  productName?: string
   baseNcm?: string
   baseOrigin?: string
   baseTipoFinalidade?: string
@@ -37,6 +40,8 @@ interface Props {
 
 export function ProductTabCompanyFiscal({
   productId,
+  productCode = '',
+  productName = '',
   baseNcm = '',
   baseOrigin = '0',
   baseTipoFinalidade = 'revenda',
@@ -462,6 +467,17 @@ export function ProductTabCompanyFiscal({
           </CardContent>
         </Card>
       </div>
+
+      {/* SIMULADOR FISCAL AUDITÁVEL NO BACKEND (FASE A) */}
+      {productId && selectedEmpresaId && (
+        <FiscalAuditSimulator
+          productId={productId}
+          productCode={productCode || 'PROD'}
+          productName={productName || 'Produto'}
+          empresaId={selectedEmpresaId}
+          empresaName={selectedEmpresa?.nome_fantasia || selectedEmpresa?.name || 'Empresa'}
+        />
+      )}
 
       <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-md text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />

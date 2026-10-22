@@ -24,13 +24,16 @@ import {
   X,
   Edit,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { NfeHomologationDialog } from '@/components/fiscal/nfe-homologation-dialog'
 
 export function NfePanel() {
   const { user } = useAuth()
   const [records, setRecords] = useState<NfeRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const [homologationOpen, setHomologationOpen] = useState(false)
   const [correctionOpen, setCorrectionOpen] = useState(false)
   const [correctionRecord, setCorrectionRecord] = useState<NfeRecord | null>(null)
   const [correctionText, setCorrectionText] = useState('')
@@ -100,7 +103,20 @@ export function NfePanel() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-bold">Emissão de NF-e</h3>
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <h3 className="text-lg font-bold">Emissão de NF-e</h3>
+          <p className="text-xs text-muted-foreground">
+            Gestão de notas fiscais eletrônicas com suporte a testes em ambiente de homologação
+          </p>
+        </div>
+        <Button
+          onClick={() => setHomologationOpen(true)}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs h-9 gap-1.5"
+        >
+          <Sparkles className="w-4 h-4" /> Emitir em Homologação
+        </Button>
+      </div>
       {records.length === 0 ? (
         <Card className="border-2 border-dashed">
           <CardContent className="py-16 text-center">
@@ -265,6 +281,13 @@ export function NfePanel() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* DIÁLOGO DE EMISSÃO EM HOMOLOGAÇÃO SEFAZ (FASE C) */}
+      <NfeHomologationDialog
+        open={homologationOpen}
+        onOpenChange={setHomologationOpen}
+        onSuccess={load}
+      />
     </div>
   )
 }
