@@ -528,6 +528,114 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   // -------------------------------------------------------------
   // 9. CADASTRO DE PARCEIROS E PRODUTOS (COMERCIAL)
   // -------------------------------------------------------------
+  '/admin/produtos': {
+    route: '/admin/produtos',
+    title: 'Cadastro Mestre e Fiscal de Produtos (NF-e mod 55)',
+    moduleGroup: 'Comercial / Fiscal',
+    docVersion: '2.0.0',
+    lastUpdated: '2026-04-14',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar o catálogo mestre de produtos e suas parametrizações fiscais para DEC Eldorado e Gran Romano, permitindo operações de entrada de mercadorias, conversão de embalagens e emissão de NF-e modelo 55 em operações internas e interestaduais, com isolamento fiscal estrito por estabelecimento e suporte a fabricação própria.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Cadastro Mestre Compartilhado: código único gerado automaticamente, descrição completa e resumida, marca, categoria, subcategoria, grupo de produtos, referência externa/legado (Sankhya), unidade base e status ativo.\n- Classificação de Tipo/Finalidade Fiscal: distinção explícita entre revenda, fabricação própria (industrialização), matéria-prima, embalagem, insumo, ativo imobilizado e uso/consumo.\n- Configuração Fiscal por Empresa (product_company_fiscal): aba dedicada com seleção de estabelecimento ativo (DEC Eldorado vs Gran Romano), definição de CFOP interno (5101/5102) e interestadual (6101/6102), CST/CSOSN, CEST, cBenef, overrides anuláveis de alíquotas (ICMS, FCP, IPI, PIS, COFINS, IBS/CBS), cClassTrib da Reforma e exigência de controle por lote.\n- Apresentações e Unidades de Conversão (product_units): cadastro de caixas (CX), fardos (FD) e múltiplos com fator estritamente positivo (> 0), operador (multiplica/divide), identificação de unidade tributável e suporte a GTIN próprio da embalagem ou "SEM GTIN".\n- Referências de Fornecedor / De-Para de XML (supplier_product_refs): mapeamento de CNPJ do fornecedor, código externo (cProd), unidade de nota (uCom), fator de conversão validado e GTIN do fornecedor, eliminando associações ambíguas na entrada de NF-e.\n- Status Fiscal Auditável: indicador explícito entre "Pronto para NF-e" (validado) e "Rascunho Incompleto" (permitido no ERP, mas bloqueado para operações fiscais até validação completa).\n- Tratamento Estrito de GTIN/EAN: validação do algoritmo GS1 (dígito verificador de 8, 12, 13 e 14 dígitos) com chave explícita para produto sem código de barras ("SEM GTIN"). Nunca inventa código.\n- NCM Textual Preservado: validação de 8 dígitos preservando zeros à esquerda e formatação sem conversão para inteiro.\n- Filtros e KPIs Executivos: contadores de itens ativos, prontos para NF-e, produtos de fabricação própria e pendentes.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Multitenancy e Isolamento Fiscal: as regras fiscais, CFOPs e alíquotas da Gran Romano (SP/ES) e DEC Eldorado (ES) são gravadas independentemente na coleção `product_company_fiscal`. Uma alteração em uma unidade nunca herda nem sobrescreve indevidamente a outra.\n- Fabricação Própria vs Revenda: produtos categorizados como fabricação própria recebem sugestão automática de CFOP 5101 (interno) e 6101 (interestadual), enquanto revenda utiliza 5102 e 6102.\n- Fator de Conversão Estritamente Positivo: todo fator em `product_units` ou `supplier_product_refs` deve ser estritamente maior que zero (> 0), rejeitando valores nulos, zerados ou negativos.\n- CEST e IPI Não-Universal: o CEST não é exigido para toda mercadoria, assim como IPI não é universal para toda saída; campos são opcionais e anuláveis.\n- Precisão Decimal Exata: fatores de conversão e alíquotas são armazenados como strings decimais formatadas (4 casas), sem dependência de arredondamento por ponto flutuante binário de tela.\n- Rascunhos Permitidos: o ERP aceita gravação de produtos incompletos em modo "Rascunho", porém o sistema bloqueia sua utilização em notas fiscais até que passe na avaliação fiscal completa.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O operador acessa Cadastros → Produtos (`/admin/produtos` ou `/admin/cadastros/produtos`) pelo menu lateral.\n2. Clica em "Novo Produto" e informa a descrição, unidade base e tipo/finalidade (revenda, fabricação própria, etc.).\n3. Preenche o NCM (8 dígitos) e GTIN (ou marca "Produto Sem GTIN").\n4. Salva o produto para gerar o código interno sequencial.\n5. Com o produto gerado, acessa a aba "Fiscal por Empresa" e parametriza a regra específica para DEC Eldorado e Gran Romano.\n6. Caso o produto seja comprado em caixas ou fardos, cadastra as apresentações na aba "Apresentações (Unidades)" ou associa o de-para de fornecedor na aba "De-Para Fornecedor".\n7. Clica em "Validar e Liberar para Fiscal" quando todos os parâmetros fiscais estiverem conformes.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `products` (cadastro mestre), `product_company_fiscal` (regras por empresa), `product_units` (conversão e apresentações), `supplier_product_refs` (de-para fornecedores), `fiscal_catalogs` (catálogos de CFOP, NCM, CST, Origem) e `empresas`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo de Faturamento e NF-e mod 55 (regras consultadas por empresa+UF no momento da emissão).\n- Importador de XML de Entrada (busca automática de de-para em `supplier_product_refs` e fator de conversão).\n- Módulo de Estoque (movimentação baseada na unidade padrão do produto e conversão de apresentações).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização: `canViewCadastros(role)` ou operadores comerciais e fiscais autenticados.\n- Criação e Edição: operadores cadastrais e fiscais autorizados.\n- Validação Fiscal: restrita ao responsável fiscal da empresa.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `src/components/products-panel.tsx`, `src/components/product-form-dialog.tsx`, `src/components/product-tab-company-fiscal.tsx`, `src/components/product-tab-units.tsx`, `src/components/product-tab-supplier-refs.tsx`.\n- Serviços: `src/services/products.ts`.\n- Validações: `src/lib/fiscal-validations.ts`.\n- Migração backend: `0287_products_fiscal_architecture.js`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros e Pendências Futuras',
+      content:
+        '- Validação em tempo real de NCM (8 dígitos) e GTIN com algoritmo GS1.\n- Rejeição com alerta visual de fatores de conversão menores ou iguais a zero.\n- Bloqueio informativo com toast descritivo ao tentar liberar para fiscal com pendências de dados obrigatórios.\n\n[PENDÊNCIAS / ETAPAS SEGUINTES DO ROTEIRO TÉCNICO]:\n- Motor completo de simulação fiscal em backend para ICMS-ST, MVA, FCP, DIFAL e Reforma Tributária (IBS/CBS).\n- Importação automatizada e idempotente de XML de entrada de fornecedores.\n- Emissão de NF-e mod 55 em ambiente de homologação da SEFAZ para cenários de revenda e fabricação própria da Gran Romano e DEC Eldorado.\n- Estas funcionalidades pertencem às fases seguintes da especificação técnica e não estão ativas nesta versão.',
+    },
+  },
+
+  '/admin/cadastros/produtos': {
+    route: '/admin/cadastros/produtos',
+    title: 'Cadastro Mestre e Fiscal de Produtos (NF-e mod 55)',
+    moduleGroup: 'Comercial / Fiscal',
+    docVersion: '2.0.0',
+    lastUpdated: '2026-04-14',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar o catálogo mestre de produtos e suas parametrizações fiscais para DEC Eldorado e Gran Romano, permitindo operações de entrada de mercadorias, conversão de embalagens e emissão de NF-e modelo 55 em operações internas e interestaduais, com isolamento fiscal estrito por estabelecimento e suporte a fabricação própria.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Cadastro Mestre Compartilhado: código único gerado automaticamente, descrição completa e resumida, marca, categoria, subcategoria, grupo de produtos, referência externa/legado (Sankhya), unidade base e status ativo.\n- Classificação de Tipo/Finalidade Fiscal: distinção explícita entre revenda, fabricação própria (industrialização), matéria-prima, embalagem, insumo, ativo imobilizado e uso/consumo.\n- Configuração Fiscal por Empresa (product_company_fiscal): aba dedicada com seleção de estabelecimento ativo (DEC Eldorado vs Gran Romano), definição de CFOP interno (5101/5102) e interestadual (6101/6102), CST/CSOSN, CEST, cBenef, overrides anuláveis de alíquotas (ICMS, FCP, IPI, PIS, COFINS, IBS/CBS), cClassTrib da Reforma e exigência de controle por lote.\n- Apresentações e Unidades de Conversão (product_units): cadastro de caixas (CX), fardos (FD) e múltiplos com fator estritamente positivo (> 0), operador (multiplica/divide), identificação de unidade tributável e suporte a GTIN próprio da embalagem ou "SEM GTIN".\n- Referências de Fornecedor / De-Para de XML (supplier_product_refs): mapeamento de CNPJ do fornecedor, código externo (cProd), unidade de nota (uCom), fator de conversão validado e GTIN do fornecedor, eliminando associações ambíguas na entrada de NF-e.\n- Status Fiscal Auditável: indicador explícito entre "Pronto para NF-e" (validado) e "Rascunho Incompleto" (permitido no ERP, mas bloqueado para operações fiscais até validação completa).\n- Tratamento Estrito de GTIN/EAN: validação do algoritmo GS1 (dígito verificador de 8, 12, 13 e 14 dígitos) com chave explícita para produto sem código de barras ("SEM GTIN"). Nunca inventa código.\n- NCM Textual Preservado: validação de 8 dígitos preservando zeros à esquerda e formatação sem conversão para inteiro.\n- Filtros e KPIs Executivos: contadores de itens ativos, prontos para NF-e, produtos de fabricação própria e pendentes.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Multitenancy e Isolamento Fiscal: as regras fiscais, CFOPs e alíquotas da Gran Romano (SP/ES) e DEC Eldorado (ES) são gravadas independentemente na coleção `product_company_fiscal`. Uma alteração em uma unidade nunca herda nem sobrescreve indevidamente a outra.\n- Fabricação Própria vs Revenda: produtos categorizados como fabricação própria recebem sugestão automática de CFOP 5101 (interno) e 6101 (interestadual), enquanto revenda utiliza 5102 e 6102.\n- Fator de Conversão Estritamente Positivo: todo fator em `product_units` ou `supplier_product_refs` deve ser estritamente maior que zero (> 0), rejeitando valores nulos, zerados ou negativos.\n- CEST e IPI Não-Universal: o CEST não é exigido para toda mercadoria, assim como IPI não é universal para toda saída; campos são opcionais e anuláveis.\n- Precisão Decimal Exata: fatores de conversão e alíquotas são armazenados como strings decimais formatadas (4 casas), sem dependência de arredondamento por ponto flutuante binário de tela.\n- Rascunhos Permitidos: o ERP aceita gravação de produtos incompletos em modo "Rascunho", porém o sistema bloqueia sua utilização em notas fiscais até que passe na avaliação fiscal completa.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O operador acessa Cadastros → Produtos (`/admin/cadastros/produtos`) pelo menu lateral.\n2. Clica em "Novo Produto" e informa a descrição, unidade base e tipo/finalidade (revenda, fabricação própria, etc.).\n3. Preenche o NCM (8 dígitos) e GTIN (ou marca "Produto Sem GTIN").\n4. Salva o produto para gerar o código interno sequencial.\n5. Com o produto gerado, acessa a aba "Fiscal por Empresa" e parametriza a regra específica para DEC Eldorado e Gran Romano.\n6. Caso o produto seja comprado em caixas ou fardos, cadastra as apresentações na aba "Apresentações (Unidades)" ou associa o de-para de fornecedor na aba "De-Para Fornecedor".\n7. Clica em "Validar e Liberar para Fiscal" quando todos os parâmetros fiscais estiverem conformes.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `products` (cadastro mestre), `product_company_fiscal` (regras por empresa), `product_units` (conversão e apresentações), `supplier_product_refs` (de-para fornecedores), `fiscal_catalogs` (catálogos de CFOP, NCM, CST, Origem) e `empresas`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo de Faturamento e NF-e mod 55 (regras consultadas por empresa+UF no momento da emissão).\n- Importador de XML de Entrada (busca automática de de-para em `supplier_product_refs` e fator de conversão).\n- Módulo de Estoque (movimentação baseada na unidade padrão do produto e conversão de apresentações).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização: `canViewCadastros(role)` ou operadores comerciais e fiscais autenticados.\n- Criação e Edição: operadores cadastrais e fiscais autorizados.\n- Validação Fiscal: restrita ao responsável fiscal da empresa.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `src/components/products-panel.tsx`, `src/components/product-form-dialog.tsx`, `src/components/product-tab-company-fiscal.tsx`, `src/components/product-tab-units.tsx`, `src/components/product-tab-supplier-refs.tsx`.\n- Serviços: `src/services/products.ts`.\n- Validações: `src/lib/fiscal-validations.ts`.\n- Migração backend: `0287_products_fiscal_architecture.js`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros e Pendências Futuras',
+      content:
+        '- Validação em tempo real de NCM (8 dígitos) e GTIN com algoritmo GS1.\n- Rejeição com alerta visual de fatores de conversão menores ou iguais a zero.\n- Bloqueio informativo com toast descritivo ao tentar liberar para fiscal com pendências de dados obrigatórios.\n\n[PENDÊNCIAS / ETAPAS SEGUINTES DO ROTEIRO TÉCNICO]:\n- Motor completo de simulação fiscal em backend para ICMS-ST, MVA, FCP, DIFAL e Reforma Tributária (IBS/CBS).\n- Importação automatizada e idempotente de XML de entrada de fornecedores.\n- Emissão de NF-e mod 55 em ambiente de homologação da SEFAZ para cenários de revenda e fabricação própria da Gran Romano e DEC Eldorado.\n- Estas funcionalidades pertencem às fases seguintes da especificação técnica e não estão ativas nesta versão.',
+    },
+  },
+
   '/admin/cadastros': {
     route: '/admin/cadastros',
     title: 'Central de Cadastros Gerais',

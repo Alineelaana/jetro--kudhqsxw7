@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T22:42:05.634Z",
+  "generatedAt": "2026-10-22T23:19:05.540Z",
   "collections": [
     {
       "name": "users",
@@ -2788,6 +2788,47 @@
         {
           "name": "is_industrial",
           "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_finalidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "revenda",
+            "fabricacao_propria",
+            "materia_prima",
+            "embalagem",
+            "insumo",
+            "ativo_imobilizado",
+            "uso_consumo",
+            "outro"
+          ]
+        },
+        {
+          "name": "fiscal_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["rascunho", "validado_fiscal"]
+        },
+        {
+          "name": "external_reference",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "product_group",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fiscal_validation_notes",
+          "type": "text",
           "required": false,
           "system": false
         }

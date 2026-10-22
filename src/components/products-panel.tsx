@@ -1,7 +1,9 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -10,518 +12,521 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Package,
+  Layers,
+  FileSpreadsheet,
+  FileText,
+  AlertTriangle,
+  Building2,
+  CheckCircle2,
+  ShieldCheck,
+  ShieldAlert,
+  Loader2,
+  Boxes,
+} from 'lucide-react'
+import { ProductFormDialog } from '@/components/product-form-dialog'
 import {
   getProducts,
   deleteProduct,
   toggleProductActive,
-  updateProduct,
   getProductPhotoUrl,
 } from '@/services/products'
-import { useRealtime } from '@/hooks/use-realtime'
-import { ProductFormDialog } from '@/components/product-form-dialog'
-import { exportProductsExcel, exportProductsPdf } from '@/lib/product-export'
-import { type Product } from '@/lib/product-types'
-import {
-  Plus,
-  Search,
-  Pencil,
-  Trash2,
-  Power,
-  Loader2,
-  Package,
-  ImageIcon,
-  FileSpreadsheet,
-  FileText,
-} from 'lucide-react'
+import type { Product } from '@/lib/product-types'
+import { evaluateProductFiscalReadiness } from '@/lib/fiscal-validations'
+import { useBrand } from '@/hooks/use-brand'
 import { toast } from '@/hooks/use-toast'
-import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
-
-interface ConfirmState {
-  type: 'delete' | 'activate' | 'inactivate'
-  product: Product
-}
-
-function StockCell({
-  product,
-  onUpdate,
-}: {
-  product: Product
-  onUpdate: (id: string, stock: number) => void
-}) {
-  const [value, setValue] = useState(String(product.stock ?? 0))
-
-  useEffect(() => {
-    setValue(String(product.stock ?? 0))
-  }, [product.stock])
-
-  const handleBlur = () => {
-    const num = parseInt(value, 10) || 0
-    if (num !== (product.stock ?? 0)) {
-      onUpdate(product.id, num)
-    }
-  }
-
-  return (
-    <Input
-      type="number"
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={handleBlur}
-      placeholder="0"
-      min="0"
-      className="w-20 h-8 text-center focus-visible:ring-[#005B2E]"
-    />
-  )
-}
 
 export function ProductsPanel() {
+  const { brand, empresasDisponiveis } = useBrand()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [search, setSearch] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [formOpen, setFormOpen] = useState(false)
-  const [editing, setEditing] = useState<Product | null>(null)
-  const [confirm, setConfirm] = useState<ConfirmState | null>(null)
-  const [actionLoading, setActionLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterFinalidade, setFilterFinalidade] = useState<string>('all')
+  const [filterFiscalStatus, setFilterFiscalStatus] = useState<string>('all')
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
-  const load = async () => {
+  const loadData = async () => {
     setLoading(true)
-    setError('')
     try {
       const data = await getProducts()
-      setProducts(Array.isArray(data) ? (data as unknown as Product[]) : [])
+      setProducts(data)
     } catch {
-      setError('Não foi possível carregar os produtos.')
-      setProducts([])
+      toast({
+        title: 'Erro ao carregar lista de produtos.',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
-    load()
+    loadData()
   }, [])
-  useRealtime('products', () => load())
 
-  const categories = useMemo(() => {
-    const cats = (products || []).map((p) => p?.category).filter(Boolean)
-    return [...new Set(cats)].sort()
-  }, [products])
-
-  const filtered = useMemo(() => {
-    const term = search.toLowerCase().trim()
-    return (products || []).filter(Boolean).filter((p) => {
-      const matchesSearch =
-        !term ||
-        p?.name?.toLowerCase()?.includes(term) ||
-        p?.code?.toLowerCase()?.includes(term) ||
-        p?.ean?.toLowerCase()?.includes(term) ||
-        p?.ncm?.toLowerCase()?.includes(term)
-      const matchesCategory = categoryFilter === 'all' || p?.category === categoryFilter
-      const matchesStatus =
-        statusFilter === 'all' ||
-        (statusFilter === 'active' && p?.active !== false) ||
-        (statusFilter === 'inactive' && p?.active === false)
-      return matchesSearch && matchesCategory && matchesStatus
-    })
-  }, [products, search, categoryFilter, statusFilter])
-
-  const handleNew = () => {
-    setEditing(null)
-    setFormOpen(true)
-  }
-  const handleEdit = (p: Product) => {
-    setEditing(p)
-    setFormOpen(true)
+  const handleEdit = (prod: Product) => {
+    setSelectedProduct(prod)
+    setIsFormOpen(true)
   }
 
-  const handleStockUpdate = async (id: string, stock: number) => {
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o produto "${name}"?`)) return
     try {
-      await updateProduct(id, { stock } as Record<string, unknown>)
-      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stock } : p)))
-      toast({ title: 'Estoque atualizado' })
+      await deleteProduct(id)
+      toast({ title: 'Produto excluído com sucesso.' })
+      await loadData()
     } catch {
-      toast({ title: 'Erro ao atualizar estoque', variant: 'destructive' })
+      toast({ title: 'Erro ao excluir produto.', variant: 'destructive' })
     }
   }
 
-  const handleConfirm = async () => {
-    if (!confirm) return
-    setActionLoading(true)
+  const handleToggleActive = async (id: string, current: boolean) => {
     try {
-      if (confirm.type === 'delete') {
-        await deleteProduct(confirm.product.id)
-        toast({ title: 'Produto excluído' })
-      } else {
-        const active = confirm.type === 'activate'
-        await toggleProductActive(confirm.product.id, active)
-        toast({ title: active ? 'Produto ativado' : 'Produto inativado' })
-      }
-      load()
-    } catch (err: unknown) {
-      const e = err as { response?: { message?: string }; message?: string }
-      toast({
-        title: e?.response?.message || e?.message || 'Erro.',
-        variant: 'destructive',
-      })
+      await toggleProductActive(id, !current)
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, active: !current } : p)))
+    } catch {
+      toast({ title: 'Erro ao alterar status do produto.', variant: 'destructive' })
     }
-    setActionLoading(false)
-    setConfirm(null)
   }
 
-  const isEmpty = !loading && !error && (products || []).length === 0
-  const confirmTitle = !confirm
-    ? ''
-    : confirm.type === 'delete'
-      ? 'Excluir Produto'
-      : confirm.type === 'activate'
-        ? 'Ativar Produto'
-        : 'Inativar Produto'
-  const confirmDesc = !confirm
-    ? ''
-    : confirm.type === 'delete'
-      ? `Excluir "${confirm.product?.name || '—'}"? Esta ação não pode ser desfeita.`
-      : confirm.type === 'activate'
-        ? `Ativar "${confirm.product?.name || '—'}"?`
-        : `Inativar "${confirm.product?.name || '—'}"? Produtos inativos não aparecerão em novos orçamentos.`
+  // Categorias únicas
+  const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)))
+
+  // Filtros combinados
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch =
+      searchTerm === '' ||
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.ncm?.includes(searchTerm) ||
+      p.ean?.includes(searchTerm) ||
+      p.brand?.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesCategory = filterCategory === 'all' || p.category === filterCategory
+
+    const matchesFinalidade =
+      filterFinalidade === 'all' || (p.tipo_finalidade || 'revenda') === filterFinalidade
+
+    const fiscalCheck = evaluateProductFiscalReadiness({
+      name: p.name,
+      ncm: p.ncm,
+      unit: p.unit,
+      tipo_finalidade: p.tipo_finalidade,
+      origin: p.origin,
+      ean: p.ean,
+      cest: p.cest,
+      cfop: p.cfop,
+      cst_csosn: p.cst_csosn,
+    })
+
+    const isFiscalReady = p.fiscal_status === 'validado_fiscal' || fiscalCheck.isReadyForFiscal
+
+    const matchesFiscalStatus =
+      filterFiscalStatus === 'all' ||
+      (filterFiscalStatus === 'pronto' && isFiscalReady) ||
+      (filterFiscalStatus === 'rascunho' && !isFiscalReady)
+
+    return matchesSearch && matchesCategory && matchesFinalidade && matchesFiscalStatus
+  })
+
+  // Contadores para os cartões executivos
+  const totalProducts = products.length
+  const totalActive = products.filter((p) => p.active !== false).length
+  const totalFabricacaoPropria = products.filter(
+    (p) => p.tipo_finalidade === 'fabricacao_propria',
+  ).length
+  const totalFiscalReady = products.filter((p) => {
+    return (
+      p.fiscal_status === 'validado_fiscal' ||
+      evaluateProductFiscalReadiness({
+        name: p.name,
+        ncm: p.ncm,
+        unit: p.unit,
+        origin: p.origin,
+        ean: p.ean,
+      }).isReadyForFiscal
+    )
+  }).length
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-xl font-black text-foreground">Cadastro de Produtos</h2>
-        <Button
-          onClick={handleNew}
-          className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Cadastrar novo produto
-        </Button>
-      </div>
+    <div className="space-y-5">
+      {/* Banner de Contexto de Estabelecimento */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gradient-to-r from-emerald-950/10 via-emerald-900/5 to-transparent border border-[#005B2E]/20 rounded-lg">
+        <div>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-[#005B2E] text-white hover:bg-[#005B2E] font-bold text-xs uppercase tracking-wide">
+              {brand.nomeExibicao || brand.empresaNome || 'DEC Eldorado'}
+            </Badge>
+            <span className="text-xs text-muted-foreground">Unidade Ativa</span>
+          </div>
+          <h2 className="text-xl font-bold text-foreground mt-1">
+            Catálogo e Cadastro de Produtos (NF-e mod 55)
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Cadastro mestre compartilhado com parametrização fiscal e de estoque independente por
+            estabelecimento (DEC Eldorado e Gran Romano).
+          </p>
+        </div>
 
-      {isEmpty ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Package className="w-16 h-16 text-[#005B2E]/30 mb-6" />
-          <p className="text-lg font-bold text-foreground mb-6">Nenhum produto cadastrado</p>
+        <div className="flex items-center gap-2">
           <Button
-            onClick={handleNew}
-            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold text-base h-14 px-8 rounded-xl shadow-lg"
+            onClick={() => {
+              setSelectedProduct(null)
+              setIsFormOpen(true)
+            }}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold shadow-sm"
           >
-            <Plus className="w-5 h-5 mr-2" /> Cadastrar produto
+            <Plus className="w-4 h-4 mr-1.5" /> Novo Produto
           </Button>
         </div>
-      ) : (
-        <>
-          <Card className="border-2 border-[#005B2E]/20">
-            <CardContent className="py-4 space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Pesquisar por nome, código ou EAN"
-                  className="pl-10 focus-visible:ring-[#005B2E]"
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-full sm:w-48 focus-visible:ring-[#005B2E]">
+      </div>
+
+      {/* Cartões Executivos de Resumo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="border border-border">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Total de Itens
+              </p>
+              <h3 className="text-2xl font-bold text-foreground mt-1">{totalProducts}</h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {totalActive} ativos no ERP
+              </p>
+            </div>
+            <div className="p-2.5 bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 rounded-lg">
+              <Package className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Prontos p/ NF-e
+              </p>
+              <h3 className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1">
+                {totalFiscalReady}
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                NCM e parâmetros fiscais validados
+              </p>
+            </div>
+            <div className="p-2.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded-lg">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Fabricação Própria
+              </p>
+              <h3 className="text-2xl font-bold text-[#C89B3C] mt-1">{totalFabricacaoPropria}</h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                CFOP 5101/6101 (Gran Romano)
+              </p>
+            </div>
+            <div className="p-2.5 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 rounded-lg">
+              <Boxes className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Rascunhos / Pendentes
+              </p>
+              <h3 className="text-2xl font-bold text-amber-600 mt-1">
+                {totalProducts - totalFiscalReady}
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Permitidos, bloqueados p/ emissão
+              </p>
+            </div>
+            <div className="p-2.5 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 rounded-lg">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Barra de Filtros e Busca */}
+      <Card className="border border-border">
+        <CardContent className="p-4">
+          <div className="flex flex-col lg:flex-row items-center gap-3">
+            <div className="relative flex-1 w-full">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar por descrição, código interno, NCM, GTIN/EAN ou marca..."
+                className="pl-9 h-9 text-xs focus-visible:ring-[#005B2E]"
+              />
+            </div>
+
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
+              <Select value={filterFinalidade} onValueChange={setFilterFinalidade}>
+                <SelectTrigger className="h-9 text-xs w-44">
+                  <SelectValue placeholder="Tipo / Finalidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Finalidades</SelectItem>
+                  <SelectItem value="revenda">Revenda</SelectItem>
+                  <SelectItem value="fabricacao_propria">Fabricação Própria</SelectItem>
+                  <SelectItem value="materia_prima">Matéria-Prima (Gran)</SelectItem>
+                  <SelectItem value="embalagem">Embalagem</SelectItem>
+                  <SelectItem value="ativo_imobilizado">Ativo Imobilizado</SelectItem>
+                  <SelectItem value="uso_consumo">Uso / Consumo</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={filterFiscalStatus} onValueChange={setFilterFiscalStatus}>
+                <SelectTrigger className="h-9 text-xs w-44">
+                  <SelectValue placeholder="Status Fiscal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="pronto">Pronto p/ NF-e</SelectItem>
+                  <SelectItem value="rascunho">Rascunho Pendente</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {categories.length > 0 && (
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger className="h-9 text-xs w-36">
                     <SelectValue placeholder="Categoria" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todas as categorias</SelectItem>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+                    <SelectItem value="all">Todas Categorias</SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-40 focus-visible:ring-[#005B2E]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os status</SelectItem>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="flex gap-2 sm:ml-auto">
-                  <Button
-                    variant="outline"
-                    onClick={() => exportProductsExcel(filtered)}
-                    disabled={filtered.length === 0}
-                    className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/5"
-                  >
-                    <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => exportProductsPdf(filtered)}
-                    disabled={filtered.length === 0}
-                    className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/5"
-                  >
-                    <FileText className="w-4 h-4 mr-2" /> PDF
-                  </Button>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {filtered.length} produto(s) encontrado(s)
-              </p>
-            </CardContent>
-          </Card>
-
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+              )}
             </div>
-          ) : error ? (
-            <Card className="border-2 border-dashed border-destructive/30">
-              <CardContent className="py-16 text-center">
-                <Package className="w-12 h-12 text-destructive mx-auto mb-4" />
-                <p className="text-lg font-bold mb-1">{error}</p>
-                <Button
-                  onClick={load}
-                  variant="outline"
-                  className="mt-3 border-[#005B2E] text-[#005B2E]"
-                >
-                  Tentar novamente
-                </Button>
-              </CardContent>
-            </Card>
-          ) : filtered.length === 0 ? (
-            <Card className="border-2 border-dashed border-border">
-              <CardContent className="py-16 text-center">
-                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-bold mb-1">Nenhum produto encontrado.</p>
-                <p className="text-sm text-muted-foreground">
-                  Ajuste a busca ou cadastre um novo produto.
-                </p>
-              </CardContent>
-            </Card>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tabela de Produtos */}
+      <Card className="border border-border">
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="p-12 text-center text-sm text-muted-foreground">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#005B2E]" />
+              Carregando catálogo de produtos...
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="p-12 text-center text-sm text-muted-foreground space-y-2">
+              <Package className="w-10 h-10 text-muted-foreground mx-auto" />
+              <p className="font-semibold text-foreground">Nenhum produto encontrado</p>
+              <p className="text-xs">
+                {searchTerm
+                  ? 'Tente ajustar os termos da busca ou filtros.'
+                  : 'Clique em "Novo Produto" para iniciar um cadastro mestre.'}
+              </p>
+            </div>
           ) : (
-            (() => {
-              const columns: JetroColumnDef<Product>[] = [
-                {
-                  id: 'code',
-                  header: 'Código',
-                  accessorKey: 'code',
-                  dataType: 'text',
-                  defaultWidth: 120,
-                  cell: ({ row }) => (
-                    <span className="text-xs font-mono font-bold text-[#C89B3C]">
-                      {row?.code || '—'}
-                    </span>
-                  ),
-                },
-                {
-                  id: 'name',
-                  header: 'Nome',
-                  accessorKey: 'name',
-                  dataType: 'text',
-                  defaultWidth: 260,
-                  cell: ({ row }) => (
-                    <div>
-                      <div className="font-semibold text-foreground">{row?.name || '—'}</div>
-                      {row?.description && (
-                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                          {row.description}
-                        </p>
-                      )}
-                    </div>
-                  ),
-                },
-                {
-                  id: 'ean',
-                  header: 'EAN',
-                  accessorKey: 'ean',
-                  dataType: 'text',
-                  defaultWidth: 130,
-                  cell: ({ row }) => <span className="font-mono text-xs">{row?.ean || '—'}</span>,
-                },
-                {
-                  id: 'ncm',
-                  header: 'NCM',
-                  accessorKey: 'ncm',
-                  dataType: 'text',
-                  defaultWidth: 110,
-                  cell: ({ row }) => <span className="font-mono text-xs">{row?.ncm || '—'}</span>,
-                },
-                {
-                  id: 'price',
-                  header: 'Preço',
-                  accessorKey: 'price',
-                  dataType: 'currency',
-                  align: 'right',
-                  defaultWidth: 120,
-                  cell: ({ row }) => (
-                    <span className="font-semibold">{row?.price ? `R$ ${row.price}` : '—'}</span>
-                  ),
-                },
-                {
-                  id: 'stock',
-                  header: 'Estoque',
-                  accessorKey: 'stock',
-                  dataType: 'number',
-                  defaultWidth: 140,
-                  cell: ({ row }) => (
-                    <div>
-                      <StockCell product={row} onUpdate={handleStockUpdate} />
-                      {(row?.stock ?? 0) <= (row?.min_stock ?? 0) && (
-                        <span className="inline-block mt-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
-                          Estoque baixo
-                        </span>
-                      )}
-                    </div>
-                  ),
-                },
-                {
-                  id: 'photos',
-                  header: 'Fotos',
-                  sortable: false,
-                  defaultWidth: 100,
-                  cell: ({ row }) => (
-                    <div className="flex items-center gap-1">
-                      {(row?.photos || []).length > 0 && (
-                        <img
-                          src={getProductPhotoUrl(row.id, row.photos[0], '100x100')}
-                          alt={row.name}
-                          className="w-7 h-7 rounded object-cover border border-border"
-                        />
-                      )}
-                      <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                        <ImageIcon className="w-3 h-3" />
-                        {(row?.photos || []).length}
-                      </span>
-                    </div>
-                  ),
-                },
-                {
-                  id: 'active',
-                  header: 'Status',
-                  accessorKey: 'active',
-                  dataType: 'boolean',
-                  defaultWidth: 110,
-                  cell: ({ row }) => (
-                    <span
-                      className={`text-xs font-bold px-2 py-1 rounded inline-block ${
-                        row?.active !== false
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {row?.active !== false ? 'Ativo' : 'Inativo'}
-                    </span>
-                  ),
-                },
-                {
-                  id: 'actions',
-                  header: 'Ações',
-                  align: 'center',
-                  sortable: false,
-                  hideable: false,
-                  resizable: false,
-                  draggable: false,
-                  defaultWidth: 120,
-                  cell: ({ row }) => (
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(row)}
-                        className="h-7 w-7 p-0 text-[#005B2E] hover:bg-[#005B2E]/10"
-                        title="Editar"
-                        disabled={!row}
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                      {row?.active !== false ? (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirm({ type: 'inactivate', product: row })}
-                          className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-50"
-                          title="Inativar"
-                          disabled={!row}
-                        >
-                          <Power className="w-3.5 h-3.5" />
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirm({ type: 'activate', product: row })}
-                          className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
-                          title="Ativar"
-                          disabled={!row}
-                        >
-                          <Power className="w-3.5 h-3.5" />
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setConfirm({ type: 'delete', product: row })}
-                        className="h-7 w-7 p-0 text-red-600 hover:bg-red-50"
-                        title="Excluir"
-                        disabled={!row}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  ),
-                },
-              ]
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/60 text-muted-foreground uppercase text-[10px] font-bold border-b">
+                  <tr>
+                    <th className="py-3 px-4 text-left w-12">Foto</th>
+                    <th className="py-3 px-4 text-left">Código / Descrição</th>
+                    <th className="py-3 px-4 text-left">Tipo / Finalidade</th>
+                    <th className="py-3 px-4 text-left">NCM / Origem</th>
+                    <th className="py-3 px-4 text-left">Unidade Base</th>
+                    <th className="py-3 px-4 text-right">Preço de Venda</th>
+                    <th className="py-3 px-4 text-center">Status Fiscal</th>
+                    <th className="py-3 px-4 text-center">Ativo</th>
+                    <th className="py-3 px-4 text-center w-16">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredProducts.map((p) => {
+                    const fiscalCheck = evaluateProductFiscalReadiness({
+                      name: p.name,
+                      ncm: p.ncm,
+                      unit: p.unit,
+                      tipo_finalidade: p.tipo_finalidade,
+                      origin: p.origin,
+                      ean: p.ean,
+                      cest: p.cest,
+                      cfop: p.cfop,
+                      cst_csosn: p.cst_csosn,
+                    })
 
-              return (
-                <JetroTable
-                  screenId="cadastros.produtos.list"
-                  columns={columns}
-                  data={filtered}
-                  exportTitle="Cadastro de Produtos — Jetro ERP"
-                  exportFilename="produtos-jetro.xlsx"
-                />
-              )
-            })()
+                    const isFiscalReady =
+                      p.fiscal_status === 'validado_fiscal' || fiscalCheck.isReadyForFiscal
+
+                    return (
+                      <tr key={p.id} className="hover:bg-muted/20 transition-colors">
+                        {/* Foto */}
+                        <td className="py-2.5 px-4">
+                          {p.main_photo ? (
+                            <img
+                              src={getProductPhotoUrl(p.id, p.main_photo, '100x100')}
+                              alt={p.name}
+                              className="w-8 h-8 rounded object-cover border border-border"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded bg-muted flex items-center justify-center text-muted-foreground border border-border">
+                              <Package className="w-4 h-4" />
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Código e Descrição */}
+                        <td className="py-2.5 px-4">
+                          <div className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                            {p.name}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                            <span className="font-mono text-[#005B2E] font-bold">{p.code}</span>
+                            {p.brand && <span>• {p.brand}</span>}
+                            {p.ean && p.ean !== 'SEM GTIN' && (
+                              <span className="font-mono">• EAN: {p.ean}</span>
+                            )}
+                            {p.ean === 'SEM GTIN' && (
+                              <span className="text-[10px] text-muted-foreground">
+                                • (Sem GTIN)
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Tipo / Finalidade */}
+                        <td className="py-2.5 px-4">
+                          <Badge
+                            variant="outline"
+                            className={`text-[10px] py-0 font-medium ${
+                              p.tipo_finalidade === 'fabricacao_propria'
+                                ? 'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300'
+                                : 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/40 dark:text-slate-300'
+                            }`}
+                          >
+                            {p.tipo_finalidade === 'fabricacao_propria'
+                              ? 'Fabricação Própria'
+                              : p.tipo_finalidade === 'materia_prima'
+                                ? 'Matéria-Prima'
+                                : p.tipo_finalidade === 'embalagem'
+                                  ? 'Embalagem'
+                                  : 'Revenda'}
+                          </Badge>
+                        </td>
+
+                        {/* NCM e Origem */}
+                        <td className="py-2.5 px-4 font-mono">
+                          <div className="font-bold text-foreground">{p.ncm || '—'}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            Origem {p.origin ?? '0'}
+                          </div>
+                        </td>
+
+                        {/* Unidade */}
+                        <td className="py-2.5 px-4 font-mono font-bold text-[#005B2E]">
+                          {p.unit || 'UN'}
+                        </td>
+
+                        {/* Preço de Venda */}
+                        <td className="py-2.5 px-4 text-right font-mono font-bold">
+                          {p.price
+                            ? `R$ ${parseFloat(p.price).toLocaleString('pt-BR', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`
+                            : '—'}
+                        </td>
+
+                        {/* Status Fiscal */}
+                        <td className="py-2.5 px-4 text-center">
+                          {isFiscalReady ? (
+                            <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-emerald-300 text-[10px] py-0.5">
+                              <CheckCircle2 className="w-3 h-3 mr-1" /> Pronto p/ NF-e
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-300 text-[10px] py-0.5">
+                              <AlertTriangle className="w-3 h-3 mr-1" /> Rascunho
+                            </Badge>
+                          )}
+                        </td>
+
+                        {/* Ativo */}
+                        <td className="py-2.5 px-4 text-center">
+                          <Switch
+                            checked={p.active !== false}
+                            onCheckedChange={() => handleToggleActive(p.id, p.active !== false)}
+                            className="scale-75"
+                          />
+                        </td>
+
+                        {/* Ações */}
+                        <td className="py-2.5 px-4 text-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40 text-xs">
+                              <DropdownMenuItem
+                                onClick={() => handleEdit(p)}
+                                className="cursor-pointer"
+                              >
+                                <Edit className="w-3.5 h-3.5 mr-2 text-[#005B2E]" /> Editar / Fiscal
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(p.id, p.name)}
+                                className="cursor-pointer text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 mr-2" /> Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
-        </>
-      )}
+        </CardContent>
+      </Card>
 
+      {/* Dialog de Cadastro / Edição Mestre e Fiscal */}
       <ProductFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        product={editing}
-        onSuccess={load}
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        product={selectedProduct}
+        onSuccess={() => {
+          loadData()
+          setIsFormOpen(false)
+        }}
       />
-
-      <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{confirmDesc}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirm}
-              disabled={actionLoading}
-              className="bg-[#005B2E] hover:bg-[#01361D]"
-            >
-              {actionLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Confirmar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   )
 }
