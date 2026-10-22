@@ -1,4 +1,7 @@
 import type { ScreenDocEntry } from './types'
+import { DP_SCREEN_DOCS } from './dp-screens'
+import { RH_SCREEN_DOCS } from './rh-screens'
+import { SST_SCREEN_DOCS } from './sst-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1110,163 +1113,19 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
-  // 20. DEPARTAMENTO PESSOAL (DP)
+  // DEPARTAMENTO PESSOAL (DP) — 6 TELAS UNIFICADAS
   // -------------------------------------------------------------
-  '/admin/dp': {
-    route: '/admin/dp',
-    title: 'Departamento Pessoal e Folha de Pagamento',
-    moduleGroup: 'DP & RH',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Gerenciar as rotinas de admissões, rescisões, controle de jornada e ponto eletrônico, folha de pagamento, 13º salário, férias, benefícios e eventos do eSocial.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Gestão completa de folha mensal com cálculo de proventos, descontos, INSS e IRRF.\n- Espelho de ponto com banco de horas e apuração de horas extras.\n- Monitor de transmissão de eventos do eSocial com status de protocolo.\n- Gestão de férias com alertas de período concessivo e dobro legal.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Cálculos seguem rigorosamente a legislação trabalhista brasileira (CLT) e convenções sindicais vigentes.\n- Admissões exigem envio do evento S-2200 do eSocial antes do início efetivo das atividades.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. O colaborador registra o ponto eletrônico ao longo do mês.\n2. Ao final do período, o DP valida as ocorrências, calcula a folha e gera as guias de recolhimento (FGTS Digital, DARF DCTFWeb).\n3. Os contracheques são disponibilizados e os eventos transmitidos ao eSocial.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `dp_collaborators`, `dp_payroll`, `dp_time_records`, `dp_esocial_events`, `dp_benefits`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Webservice eSocial e Conectividade Social / FGTS Digital.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewRH(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/dp/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Identificação e notificação de rejeições nos layouts de envio do eSocial.',
-    },
-  },
+  ...DP_SCREEN_DOCS,
 
   // -------------------------------------------------------------
-  // 21. RECURSOS HUMANOS (RH ESTRATÉGICO)
+  // RECURSOS HUMANOS (RH ESTRATÉGICO) — 7 TELAS UNIFICADAS
   // -------------------------------------------------------------
-  '/admin/rh': {
-    route: '/admin/rh',
-    title: 'Recursos Humanos Estratégico',
-    moduleGroup: 'DP & RH',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Conduzir os processos de gestão de pessoas: avaliação de desempenho por competências, Matriz 9 Box (Talent Review), planos de desenvolvimento individual (PDI), plano de carreira e sucessão.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Organograma dinâmico por cargos, níveis e departamentos.\n- Avaliações 360º de competências comportamentais e técnicas.\n- Matriz 9 Box visual com arrasto de colaboradores entre quadrantes de potencial × desempenho.\n- Painel de calibração de notas com comitê de pessoas.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Avaliações concluídas são congeladas para a sessão de calibração gerencial.\n- O feedback formal deve ser registrado após a homologação das notas pelo comitê.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. O RH lança o ciclo de avaliação com prazos estabelecidos.\n2. Colaboradores realizam autoavaliação e líderes avaliam seus liderados.\n3. O comitê de calibração define o mapa 9-box e orienta os PDIs.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `rh_employees`, `rh_evaluations`, `rh_competencies`, `rh_nine_box`, `rh_pdi`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Integração direta com o cadastro de colaboradores do DP.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewRH(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/rh/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Controle de preenchimento incompleto de formulários avaliativos.',
-    },
-  },
+  ...RH_SCREEN_DOCS,
 
   // -------------------------------------------------------------
-  // 22. SAÚDE E SEGURANÇA DO TRABALHO (SST)
+  // SAÚDE E SEGURANÇA DO TRABALHO (SST) — 8 TELAS UNIFICADAS
   // -------------------------------------------------------------
-  '/admin/sst': {
-    route: '/admin/sst',
-    title: 'Saúde e Segurança do Trabalho (SST)',
-    moduleGroup: 'DP & RH',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Gerenciar as exigências de segurança ocupacional, normas regulamentadoras (NR-1 a NR-35), emissão de CAT, controle de exames ASO (PCMSO), gestão de riscos (GRO/PGR) e envio do eSocial SST.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Inventário de riscos por ambiente de trabalho e grupos de exposição.\n- Controle de entrega, validade e CA de EPIs e EPCs.\n- Calendário de vencimento de exames médicos ocupacionais e laudos (LTCAT, PCMSO).\n- Módulo de investigação de acidentes e emissão de Comunicado de Acidente de Trabalho (CAT).',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Colaboradores com ASO vencido são sinalizados e impedidos de realizar atividades de risco.\n- O evento S-2210 (CAT) deve ser emitido dentro de 24 horas após o acidente de trabalho.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. O técnico de segurança cadastra os riscos ambientais e medidas preventivas.\n2. A área médica registra os ASOs e dados clínicos de aptidão.\n3. O sistema despacha os eventos SST para o eSocial.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `sst_accidents`, `sst_exams`, `sst_risks`, `sst_epis`, `sst_esocial_events`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Integração de eventos de SST com o eSocial do Governo Federal.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewRH(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/sst/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Validação rígida de campos exigidos pelos leiautes do eSocial SST.',
-    },
-  },
+  ...SST_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 23. VERBAS DE FORNECEDORES (TRADE MARKETING)
@@ -1714,7 +1573,103 @@ export function getScreenDocByRoute(route: string): ScreenDocEntry {
     return SCREEN_DOCS_REGISTRY[cleanRoute]
   }
 
-  // 3. Fallback rigoroso sem invenções (respeita a regra do usuário)
+  // 3. Mapeamento de rotas legadas para telas unificadas (redirecionamentos)
+  const LEGACY_ROUTE_MAP: Record<string, string> = {
+    // DP legadas -> telas unificadas
+    '/admin/dp/colaboradores': '/admin/dp/colaboradores-contratos',
+    '/admin/dp/contratos': '/admin/dp/colaboradores-contratos',
+    '/admin/dp/admissao': '/admin/dp/colaboradores-contratos',
+    '/admin/dp/salarios': '/admin/dp/colaboradores-contratos',
+    '/admin/dp/historico-salarial': '/admin/dp/colaboradores-contratos',
+    '/admin/dp/ponto': '/admin/dp/jornada-ponto',
+    '/admin/dp/espelho-ponto': '/admin/dp/jornada-ponto',
+    '/admin/dp/banco-horas': '/admin/dp/jornada-ponto',
+    '/admin/dp/horas-extras': '/admin/dp/jornada-ponto',
+    '/admin/dp/escalas': '/admin/dp/jornada-ponto',
+    '/admin/dp/turnos': '/admin/dp/jornada-ponto',
+    '/admin/dp/ocorrencias-ponto': '/admin/dp/jornada-ponto',
+    '/admin/dp/folha': '/admin/dp/folha-beneficios',
+    '/admin/dp/folha-pagamento': '/admin/dp/folha-beneficios',
+    '/admin/dp/holerites': '/admin/dp/folha-beneficios',
+    '/admin/dp/contracheques': '/admin/dp/folha-beneficios',
+    '/admin/dp/adiantamento': '/admin/dp/folha-beneficios',
+    '/admin/dp/decimo-terceiro': '/admin/dp/folha-beneficios',
+    '/admin/dp/rescisao': '/admin/dp/folha-beneficios',
+    '/admin/dp/reintegracao': '/admin/dp/folha-beneficios',
+    '/admin/dp/beneficios': '/admin/dp/folha-beneficios',
+    '/admin/dp/ferias': '/admin/dp/ferias-afastamentos',
+    '/admin/dp/afastamentos': '/admin/dp/ferias-afastamentos',
+    '/admin/dp/retorno-trabalho': '/admin/dp/ferias-afastamentos',
+    '/admin/dp/esocial': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/esocial-monitor': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/fgts-digital': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/dctfweb': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/dirf': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/impostos': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/encargos': '/admin/dp/obrigacoes-esocial',
+    '/admin/dp/cockpit': '/admin/dp',
+
+    // RH legadas -> telas unificadas
+    '/admin/rh/colaboradores': '/admin/rh/gestao-talentos',
+    '/admin/rh/avaliacao-competencias': '/admin/rh/gestao-talentos',
+    '/admin/rh/competencias': '/admin/rh/gestao-talentos',
+    '/admin/rh/nine-box': '/admin/rh/gestao-talentos',
+    '/admin/rh/talent-review': '/admin/rh/gestao-talentos',
+    '/admin/rh/calibracao': '/admin/rh/gestao-talentos',
+    '/admin/rh/feedback': '/admin/rh/clima-engajamento',
+    '/admin/rh/cargos': '/admin/rh/estrutura-organizacional',
+    '/admin/rh/departamentos': '/admin/rh/estrutura-organizacional',
+    '/admin/rh/organograma': '/admin/rh/estrutura-organizacional',
+    '/admin/rh/posicoes': '/admin/rh/estrutura-organizacional',
+    '/admin/rh/carreira': '/admin/rh/carreira-desenvolvimento',
+    '/admin/rh/treinamentos': '/admin/rh/carreira-desenvolvimento',
+    '/admin/rh/pdi': '/admin/rh/carreira-desenvolvimento',
+    '/admin/rh/sucessao': '/admin/rh/carreira-desenvolvimento',
+    '/admin/rh/clima': '/admin/rh/clima-engajamento',
+    '/admin/rh/engajamento': '/admin/rh/clima-engajamento',
+    '/admin/rh/reconhecimento': '/admin/rh/clima-engajamento',
+    '/admin/rh/onboarding': '/admin/rh/jornada-colaborador',
+    '/admin/rh/offboarding': '/admin/rh/jornada-colaborador',
+    '/admin/rh/documentos': '/admin/rh/jornada-colaborador',
+    '/admin/rh/cockpit': '/admin/rh',
+    '/admin/rh/ponto': '/admin/dp/jornada-ponto',
+    '/admin/rh/ferias': '/admin/dp/ferias-afastamentos',
+    '/admin/rh/folha': '/admin/dp/folha-beneficios',
+    '/admin/rh/beneficios': '/admin/dp/folha-beneficios',
+    '/admin/rh/relatorios': '/admin/rh',
+
+    // SST legadas -> telas unificadas
+    '/admin/sst/cockpit': '/admin/sst',
+    '/admin/sst/riscos': '/admin/sst/gestao-riscos-pgr',
+    '/admin/sst/pgr': '/admin/sst/gestao-riscos-pgr',
+    '/admin/sst/gro': '/admin/sst/gestao-riscos-pgr',
+    '/admin/sst/aso': '/admin/sst/saude-ocupacional',
+    '/admin/sst/exames': '/admin/sst/saude-ocupacional',
+    '/admin/sst/pcmso': '/admin/sst/saude-ocupacional',
+    '/admin/sst/prontuario': '/admin/sst/saude-ocupacional',
+    '/admin/sst/acidentes': '/admin/sst/seguranca-prevencao',
+    '/admin/sst/cat': '/admin/sst/seguranca-prevencao',
+    '/admin/sst/incidentes': '/admin/sst/seguranca-prevencao',
+    '/admin/sst/cipa': '/admin/sst/seguranca-prevencao',
+    '/admin/sst/inspecoes': '/admin/sst/seguranca-prevencao',
+    '/admin/sst/epis': '/admin/sst/epis-treinamentos',
+    '/admin/sst/treinamentos': '/admin/sst/epis-treinamentos',
+    '/admin/sst/conformidade': '/admin/sst/central-conformidade',
+    '/admin/sst/nrs': '/admin/sst/central-conformidade',
+    '/admin/sst/nao-conformidades': '/admin/sst/central-conformidade',
+    '/admin/sst/laudos': '/admin/sst/documentos-obrigacoes',
+    '/admin/sst/ltcat': '/admin/sst/documentos-obrigacoes',
+    '/admin/sst/ppp': '/admin/sst/documentos-obrigacoes',
+    '/admin/sst/esocial': '/admin/sst/documentos-obrigacoes',
+    '/admin/sst/esocial-sst': '/admin/sst/documentos-obrigacoes',
+  }
+
+  const mappedRoute = LEGACY_ROUTE_MAP[cleanRoute]
+  if (mappedRoute && SCREEN_DOCS_REGISTRY[mappedRoute]) {
+    return SCREEN_DOCS_REGISTRY[mappedRoute]
+  }
+
+  // 4. Fallback rigoroso sem invenções (respeita a regra do usuário)
   return {
     route: cleanRoute,
     title: `Tela: ${cleanRoute}`,

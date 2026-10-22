@@ -431,12 +431,26 @@ export default function CentralDocumentacaoPage() {
                 <div className="border border-border rounded-lg p-4 bg-muted/10 space-y-2">
                   <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     <Database className="w-3.5 h-3.5 text-[#005B2E]" />
-                    DP &rarr; SST &rarr; eSocial Governamental
+                    DP (6 Telas) &rarr; SST (8 Telas) &rarr; eSocial Governamental
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Os dados cadastrais de colaboradores em <code>/admin/dp</code> sincronizam com
-                    os laudos médicos (ASO) e riscos ocupacionais de <code>/admin/sst</code> para
-                    transmissão síncrona dos eventos S-2200, S-2210, S-2220 e S-2240 ao eSocial.
+                    A nova arquitetura unificada de DP (Colaboradores, Ponto, Férias, Folha e
+                    Obrigações) sincroniza em tempo real com os módulos de SST (Riscos/PGR, Saúde
+                    Ocupacional sob sigilo médico, Prevenção, EPIs e Documentos) para transmissão
+                    síncrona dos eventos S-2200, S-2210, S-2220 e S-2240 ao eSocial.
+                  </p>
+                </div>
+
+                <div className="border border-border rounded-lg p-4 bg-muted/10 space-y-2">
+                  <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-[#005B2E]" />
+                    RH Estratégico (7 Telas) &rarr; DP &rarr; Governança
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Os ciclos de Desempenho (Nine-Box, Calibração e PDI), Clima Organizacional (eNPS
+                    anônimo), Estrutura Organizacional e a Jornada do Colaborador culminam na
+                    Central de Aprovações RH, refletindo movimentações salariais e contratuais
+                    auditadas no Departamento Pessoal.
                   </p>
                 </div>
               </div>
