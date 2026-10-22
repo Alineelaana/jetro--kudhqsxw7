@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { logCriticalAction } from './financial-advanced-service'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 
 interface CriticalJustificationDialogProps {
