@@ -419,6 +419,21 @@ export default function CentralDocumentacaoPage() {
                 <div className="border border-border rounded-lg p-4 bg-muted/10 space-y-2">
                   <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     <Database className="w-3.5 h-3.5 text-[#005B2E]" />
+                    Indústria (7 Telas) &rarr; Estoque/WMS &rarr; Qualidade &rarr; Custos
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    A arquitetura unificada de Indústria e Produção (Central Industrial,
+                    Planejamento e Ordens, Ordem de Produção com 7 abas, Fichas Técnicas/BOM,
+                    Qualidade e Rastreabilidade bidirecional, Custos e Eficiência e Manutenção de
+                    Recursos) sincroniza em tempo real a explosão MRP, empenho e baixa de
+                    matérias-primas no WMS, controle metrológico de peso líquido/drenado, quarentena
+                    de laudos e apuração de CPV na Controladoria.
+                  </p>
+                </div>
+
+                <div className="border border-border rounded-lg p-4 bg-muted/10 space-y-2">
+                  <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-[#005B2E]" />
                     Verbas de Fornecedores &rarr; Precificação &rarr; Contas a Receber
                   </h4>
                   <p className="text-xs text-muted-foreground">

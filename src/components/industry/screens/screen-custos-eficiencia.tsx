@@ -143,20 +143,15 @@ export function ScreenCustosEficiencia() {
             Atualizar
           </Button>
           <ExportActions
-            filename="eficiencia-custos-industrial"
+            filenamePrefix="eficiencia-custos-industrial"
             title="Relatório de Custos e Eficiência Industrial"
-            data={orders.map((o) => ({
-              Ordem: o.order_number,
-              Produto: o.expand?.product_id?.name || 'Item',
-              QtdPrevista: o.quantity,
-              Status: o.status,
-            }))}
-            columns={[
-              { key: 'Ordem', title: 'Ordem' },
-              { key: 'Produto', title: 'Produto' },
-              { key: 'QtdPrevista', title: 'Qtd Prevista' },
-              { key: 'Status', title: 'Status' },
-            ]}
+            headers={['Ordem', 'Produto', 'Qtd Prevista', 'Status']}
+            data={orders.map((o) => [
+              o.order_number,
+              o.expand?.product_id?.name || 'Item',
+              o.quantity,
+              o.status,
+            ])}
           />
         </div>
       </div>

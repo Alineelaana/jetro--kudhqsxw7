@@ -3,6 +3,7 @@ import { DP_SCREEN_DOCS } from './dp-screens'
 import { RH_SCREEN_DOCS } from './rh-screens'
 import { SST_SCREEN_DOCS } from './sst-screens'
 import { FINANCIAL_SCREEN_DOCS } from './financial-screens'
+import { INDUSTRY_SCREEN_DOCS } from './industry-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -907,57 +908,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
-  // 17. PCP E INDÚSTRIA
+  // 17. MÓDULO INDÚSTRIA E PRODUÇÃO (7 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
-  '/admin/industria': {
-    route: '/admin/industria',
-    title: 'Gestão Industrial e PCP',
-    moduleGroup: 'Operação',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Orquestrar o Planejamento e Controle da Produção (PCP), estrutura de produtos (BOM), roteiros de fabricação, alocação de maquinário, manutenção preventiva e controle de qualidade.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Engenharia de produto com lista técnica de insumos e matérias-primas (BOM multinível).\n- Emissão e apontamento em tempo real de Ordens de Produção (OP).\n- Monitoramento de capacidade produtiva, gargalos e cálculo de OEE (Overall Equipment Effectiveness).\n- Rastreabilidade de matéria-prima aplicada por lote produzido com apoio a campanhas de recall.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- A abertura de OP valida a disponibilidade de estoque de matérias-primas e gera reserva física.\n- O fechamento da OP aponta automaticamente o consumo de insumos e credita o produto acabado no estoque.\n- Tolerâncias de perda parametrizadas por linha de envase ou montagem.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. O Plano Mestre de Produção (MPS) gera sugestões de OPs com base na previsão de vendas e pedidos.\n2. O programador confirma e libera as ordens de fabricação para o chão de fábrica.\n3. Os operadores apontam paradas, tempos e unidades produzidas nos terminais industriais.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `production_orders`, `bom_structures`, `production_resources`, `quality_inspections`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Sensores IoT / Cockpit industrial e integração com estoque.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewIndustry(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/industry/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Bloqueio de avanço de fase de produção caso o ensaio de qualidade seja reprovado.',
-    },
-  },
+  ...INDUSTRY_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 18. LOGÍSTICA E TRANSPORTE (TMS)
@@ -1528,6 +1481,30 @@ export function getScreenDocByRoute(route: string): ScreenDocEntry {
 
   // 3. Mapeamento de rotas legadas para telas unificadas (redirecionamentos)
   const LEGACY_ROUTE_MAP: Record<string, string> = {
+    // Indústria legadas -> telas unificadas
+    '/admin/industria/dashboard': '/admin/industria',
+    '/admin/industria/executivo': '/admin/industria',
+    '/admin/industria/cockpit': '/admin/industria',
+    '/admin/industria/intelligence': '/admin/industria',
+    '/admin/industria/kpis': '/admin/industria',
+    '/admin/industria/catalogo': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/especificacoes': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/conversoes': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/bom': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/engenharia-bom': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/formulacoes': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/engenharia': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/roteiros': '/admin/industria/fichas-tecnicas',
+    '/admin/industria/plano-mestre': '/admin/industria/planejamento',
+    '/admin/industria/aps': '/admin/industria/planejamento',
+    '/admin/industria/capacidade': '/admin/industria/planejamento',
+    '/admin/industria/ordens-producao': '/admin/industria/ordem-producao',
+    '/admin/industria/execucao': '/admin/industria/ordem-producao',
+    '/admin/industria/fases': '/admin/industria/ordem-producao',
+    '/admin/industria/rastreabilidade': '/admin/industria/qualidade',
+    '/admin/industria/recursos': '/admin/industria/manutencao',
+    '/admin/industria/calibracao': '/admin/industria/manutencao',
+
     // Financeiro legadas -> telas unificadas
     '/admin/financeiro/contas-receber': '/admin/financeiro/contas-a-receber-cobranca',
     '/admin/financeiro/boletos': '/admin/financeiro/contas-a-receber-cobranca',

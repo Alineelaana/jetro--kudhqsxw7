@@ -885,20 +885,15 @@ export function ScreenOrdemProducao() {
                   </p>
                 </div>
                 <ExportActions
-                  filename={`consumo-op-${currentOrder?.order_number || 'export'}`}
+                  filenamePrefix={`consumo-op-${currentOrder?.order_number || 'export'}`}
                   title={`Consumo de Insumos da OP #${currentOrder?.order_number || ''}`}
-                  data={bomComponents.map((c) => ({
-                    Componente: c.expand?.item_id?.name || 'Insumo',
-                    QtdPrevista: c.quantidade || 0,
-                    Unidade: c.unidade || 'UN',
-                    PerdaPrevista: c.perda_prevista ? `${c.perda_prevista}%` : '0%',
-                  }))}
-                  columns={[
-                    { key: 'Componente', title: 'Componente' },
-                    { key: 'QtdPrevista', title: 'Qtd Prevista' },
-                    { key: 'Unidade', title: 'Unidade' },
-                    { key: 'PerdaPrevista', title: 'Perda Prevista' },
-                  ]}
+                  headers={['Componente', 'Qtd Prevista', 'Unidade', 'Perda Prevista']}
+                  data={bomComponents.map((c) => [
+                    c.expand?.item_id?.name || 'Insumo',
+                    c.quantidade || 0,
+                    c.unidade || 'UN',
+                    c.perda_prevista ? `${c.perda_prevista}%` : '0%',
+                  ])}
                 />
               </div>
 

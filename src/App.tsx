@@ -1173,109 +1173,119 @@ const App = () => (
                                     <Navigate to="/admin/configuracoes/jetro-online" replace />
                                   }
                                 />
-                                <Route
-                                  path="/admin/industria"
-                                  element={<Industry screen="dashboard" />}
-                                />
-                                <Route
-                                  path="/admin/industria/catalogo"
-                                  element={<Industry screen="catalogo" />}
-                                />
-                                <Route
-                                  path="/admin/industria/especificacoes"
-                                  element={<Industry screen="especificacoes" />}
-                                />
-                                <Route
-                                  path="/admin/industria/conversoes"
-                                  element={<Industry screen="conversoes" />}
-                                />
-                                <Route
-                                  path="/admin/industria/bom"
-                                  element={<Industry screen="bom" />}
-                                />
-                                <Route
-                                  path="/admin/industria/engenharia-bom"
-                                  element={<Industry screen="engenharia-bom" />}
-                                />
-                                <Route
-                                  path="/admin/industria/formulacoes"
-                                  element={<Industry screen="formulacoes" />}
-                                />
-                                <Route
-                                  path="/admin/industria/engenharia"
-                                  element={<Industry screen="engenharia" />}
-                                />
-                                <Route
-                                  path="/admin/industria/recursos"
-                                  element={<Industry screen="recursos" />}
-                                />
-                                <Route
-                                  path="/admin/industria/roteiros"
-                                  element={<Industry screen="roteiros" />}
-                                />
-                                <Route
-                                  path="/admin/industria/capacidade"
-                                  element={<Industry screen="capacidade" />}
-                                />
-                                <Route
-                                  path="/admin/industria/plano-mestre"
-                                  element={<Industry screen="plano-mestre" />}
-                                />
-                                <Route
-                                  path="/admin/industria/aps"
-                                  element={<Industry screen="aps" />}
-                                />
-                                <Route
-                                  path="/admin/industria/planejamento"
-                                  element={<Industry screen="planejamento" />}
-                                />
-                                <Route
-                                  path="/admin/industria/custos"
-                                  element={<Industry screen="custos" />}
-                                />
-                                <Route
-                                  path="/admin/industria/ordens-producao"
-                                  element={<Industry screen="ordens-producao" />}
-                                />
-                                <Route
-                                  path="/admin/industria/execucao"
-                                  element={<Industry screen="execucao" />}
-                                />
-                                <Route
-                                  path="/admin/industria/fases"
-                                  element={<Industry screen="fases" />}
-                                />
-                                <Route
-                                  path="/admin/industria/qualidade"
-                                  element={<Industry screen="qualidade" />}
-                                />
-                                <Route
-                                  path="/admin/industria/rastreabilidade"
-                                  element={<Industry screen="rastreabilidade" />}
-                                />
-                                <Route
-                                  path="/admin/industria/kpis"
-                                  element={<Industry screen="kpis" />}
-                                />
-                                <Route
-                                  path="/admin/industria/manutencao"
-                                  element={<Industry screen="manutencao" />}
-                                />
-                                <Route
-                                  path="/admin/industria/calibracao"
-                                  element={<Industry screen="calibracao" />}
-                                />
+                                {/* Módulo Indústria e Produção (7 Telas Oficiais) */}
+                                <Route path="/admin/industria/*" element={<Industry />} />
+
+                                {/* Redirecionamentos de Rotas Industriais Antigas */}
                                 <Route
                                   path="/admin/industria/executivo"
-                                  element={<Industry screen="executivo" />}
+                                  element={<Navigate to="/admin/industria" replace />}
                                 />
                                 <Route
                                   path="/admin/industria/cockpit"
-                                  element={<Industry screen="cockpit" />}
+                                  element={<Navigate to="/admin/industria" replace />}
                                 />
                                 <Route
                                   path="/admin/industria/intelligence"
-                                  element={<Industry screen="intelligence" />}
+                                  element={<Navigate to="/admin/industria" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/kpis"
+                                  element={<Navigate to="/admin/industria" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/dashboard"
+                                  element={<Navigate to="/admin/industria" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/catalogo"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/especificacoes"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/conversoes"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/bom"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/engenharia-bom"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/formulacoes"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/engenharia"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/roteiros"
+                                  element={
+                                    <Navigate to="/admin/industria/fichas-tecnicas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/plano-mestre"
+                                  element={<Navigate to="/admin/industria/planejamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/aps"
+                                  element={<Navigate to="/admin/industria/planejamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/capacidade"
+                                  element={<Navigate to="/admin/industria/planejamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/ordens-producao"
+                                  element={
+                                    <Navigate to="/admin/industria/ordem-producao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/execucao"
+                                  element={
+                                    <Navigate to="/admin/industria/ordem-producao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/fases"
+                                  element={
+                                    <Navigate to="/admin/industria/ordem-producao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/industria/rastreabilidade"
+                                  element={<Navigate to="/admin/industria/qualidade" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/recursos"
+                                  element={<Navigate to="/admin/industria/manutencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/industria/calibracao"
+                                  element={<Navigate to="/admin/industria/manutencao" replace />}
                                 />
                                 <Route
                                   path="/admin/industria/adapta"

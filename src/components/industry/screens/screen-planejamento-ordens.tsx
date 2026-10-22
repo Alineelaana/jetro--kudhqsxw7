@@ -460,15 +460,15 @@ export function ScreenPlanejamentoOrdens() {
                   </p>
                 </div>
                 <ExportActions
-                  filename="mrp-necessidades"
+                  filenamePrefix="mrp-necessidades"
                   title="Necessidades de Materiais MRP"
-                  data={mrpList}
-                  columns={[
-                    { key: 'item_name', title: 'Insumo' },
-                    { key: 'required_quantity', title: 'Necessidade' },
-                    { key: 'available_quantity', title: 'Disponível Estoque' },
-                    { key: 'status', title: 'Situação' },
-                  ]}
+                  headers={['Insumo', 'Necessidade', 'Disponível Estoque', 'Situação']}
+                  data={mrpList.map((m) => [
+                    m.item_name || '',
+                    m.required_quantity ?? 0,
+                    m.available_quantity ?? 0,
+                    m.status || '',
+                  ])}
                 />
               </div>
 
