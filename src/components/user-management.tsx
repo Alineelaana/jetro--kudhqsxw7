@@ -20,6 +20,7 @@ import {
   getFiliais,
   type FilialRecord,
   getNextUserCodigo,
+  UserCreateError,
 } from '@/services/users'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
@@ -302,9 +303,26 @@ export function UserManagement() {
       })
       await loadUsers()
     } catch (err: any) {
-      if (err?.response?.data?.cpf) setError('CPF já cadastrado.')
-      else if (err?.response?.data?.email) setError('E-mail já cadastrado.')
-      else setError('Erro ao criar usuário. Tente novamente.')
+      if (err instanceof UserCreateError) {
+        setError(err.message)
+      } else if (
+        err?.response?.data?.login ||
+        String(err?.message || '')
+          .toLowerCase()
+          .includes('login')
+      ) {
+        setError(
+          'Este login já está em uso por outra empresa do grupo. Escolha um login diferente.',
+        )
+      } else if (err?.response?.data?.cpf) {
+        setError('CPF já cadastrado.')
+      } else if (err?.response?.data?.email) {
+        setError('E-mail já cadastrado.')
+      } else if (err?.message) {
+        setError(err.message)
+      } else {
+        setError('Erro ao criar usuário. Tente novamente.')
+      }
     }
     setSubmitting(false)
   }

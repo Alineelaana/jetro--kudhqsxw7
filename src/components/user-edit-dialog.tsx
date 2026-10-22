@@ -289,6 +289,14 @@ export function UserEditDialog({
       let finalMessage = 'Erro ao atualizar usuário. Tente novamente.'
       if (err instanceof UserUpdateError) {
         finalMessage = err.message
+      } else if (
+        err?.response?.data?.login ||
+        String(err?.message || '')
+          .toLowerCase()
+          .includes('login')
+      ) {
+        finalMessage =
+          'Este login já está em uso por outra empresa do grupo. Escolha um login diferente.'
       } else if (err?.response?.data?.cpf) {
         finalMessage = 'CPF já cadastrado.'
       } else if (err?.response?.data?.email) {

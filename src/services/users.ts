@@ -69,6 +69,15 @@ export async function createUser(data: CreateUserData): Promise<void> {
   if (data.login) {
     const cleanLogin = data.login.trim().toLowerCase()
     recordData.login = cleanLogin
+
+    // Validação preventiva global de login único entre empresas
+    const taken = await isLoginTakenGlobally(cleanLogin)
+    if (taken) {
+      throw new UserCreateError(
+        'Este login já está em uso por outra empresa do grupo. Escolha um login diferente.',
+        { field: 'login' },
+      )
+    }
   }
   if (data.avatar) {
     recordData.avatar = data.avatar
@@ -80,7 +89,51 @@ export async function createUser(data: CreateUserData): Promise<void> {
   if (data.filial_id !== undefined) recordData.filial_id = data.filial_id
   if (data.departamento !== undefined) recordData.departamento = data.departamento
   if (data.cargo !== undefined) recordData.cargo = data.cargo
-  const createdRecord = await pb.collection('users').create(recordData)
+
+  let createdRecord: any
+  try {
+    createdRecord = await pb.collection('users').create(recordData)
+  } catch (err: any) {
+    const responseData = err?.response?.data || {}
+    const errMessage = String(err?.message || '').toLowerCase()
+    const rawDataStr = JSON.stringify(responseData).toLowerCase()
+
+    if (
+      responseData.login ||
+      rawDataStr.includes('"login"') ||
+      errMessage.includes('login') ||
+      rawDataStr.includes('validation_not_unique') ||
+      rawDataStr.includes('login_already_taken') ||
+      errMessage.includes('unique')
+    ) {
+      throw new UserCreateError(
+        'Este login já está em uso por outra empresa do grupo. Escolha um login diferente.',
+        {
+          field: 'login',
+          response: err?.response,
+        },
+      )
+    }
+
+    if (responseData.cpf || rawDataStr.includes('"cpf"') || errMessage.includes('cpf')) {
+      throw new UserCreateError('CPF já cadastrado.', {
+        field: 'cpf',
+        response: err?.response,
+      })
+    }
+
+    if (responseData.email || rawDataStr.includes('"email"') || errMessage.includes('email')) {
+      throw new UserCreateError('E-mail já cadastrado.', {
+        field: 'email',
+        response: err?.response,
+      })
+    }
+
+    const fallbackMsg = err?.message || 'Erro ao criar usuário. Tente novamente.'
+    throw new UserCreateError(fallbackMsg, {
+      response: err?.response,
+    })
+  }
 
   // Sincronizar collection 'usuarios_empresas' caso exista
   const targetEmpresas =
@@ -145,6 +198,50 @@ export class UserUpdateError extends Error {
   }
 }
 
+export class UserCreateError extends Error {
+  code?: string
+  field?: string
+  response?: unknown
+
+  constructor(message: string, options?: { code?: string; field?: string; response?: unknown }) {
+    super(message)
+    this.name = 'UserCreateError'
+    this.code = options?.code
+    this.field = options?.field
+    this.response = options?.response
+  }
+}
+
+/**
+ * Validação prévia de unicidade de login entre todas as empresas vinculadas (case-insensitive).
+ * Retorna true se o login já estiver em uso por outro usuário.
+ */
+export async function isLoginTakenGlobally(
+  login: string,
+  excludeUserId?: string,
+): Promise<boolean> {
+  const cleanLogin = (login || '').trim().toLowerCase()
+  if (!cleanLogin) return false
+
+  try {
+    const filter = excludeUserId
+      ? `id != "${excludeUserId}" && login ~ "${cleanLogin}"`
+      : `login ~ "${cleanLogin}"`
+    const list = await pb.collection('users').getList(1, 10, {
+      filter,
+      fields: 'id,login',
+    })
+    return list.items.some(
+      (u) =>
+        (!excludeUserId || u.id !== excludeUserId) &&
+        (u.login || '').trim().toLowerCase() === cleanLogin,
+    )
+  } catch (err) {
+    console.warn('Erro ao verificar disponibilidade de login:', err)
+    return false
+  }
+}
+
 export async function updateUser(userId: string, data: UpdateUserData): Promise<void> {
   const recordData: Record<string, unknown> = {}
   if (data.name !== undefined) recordData.name = data.name
@@ -152,6 +249,17 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
   if (data.login !== undefined) {
     const cleanLogin = data.login.trim().toLowerCase()
     recordData.login = cleanLogin
+
+    // Validação preventiva global de login único entre empresas (ignorando o próprio usuário)
+    if (cleanLogin) {
+      const taken = await isLoginTakenGlobally(cleanLogin, userId)
+      if (taken) {
+        throw new UserUpdateError(
+          'Este login já está em uso por outra empresa do grupo. Escolha um login diferente.',
+          { field: 'login' },
+        )
+      }
+    }
   }
   if (data.role !== undefined) recordData.role = data.role
   if (data.perfil_id !== undefined) recordData.perfil_id = data.perfil_id
@@ -204,12 +312,22 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
       })
     }
 
-    // 2. Duplicidade de login
-    if (responseData.login || rawDataStr.includes('"login"') || errMessage.includes('login')) {
-      throw new UserUpdateError('Login já em uso.', {
-        field: 'login',
-        response: err?.response,
-      })
+    // 2. Duplicidade de login (global entre empresas)
+    if (
+      responseData.login ||
+      rawDataStr.includes('"login"') ||
+      errMessage.includes('login') ||
+      rawDataStr.includes('validation_not_unique') ||
+      rawDataStr.includes('login_already_taken') ||
+      errMessage.includes('unique')
+    ) {
+      throw new UserUpdateError(
+        'Este login já está em uso por outra empresa do grupo. Escolha um login diferente.',
+        {
+          field: 'login',
+          response: err?.response,
+        },
+      )
     }
 
     // 3. Duplicidade de CPF
