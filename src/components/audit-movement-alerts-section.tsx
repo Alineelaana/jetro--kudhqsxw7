@@ -49,7 +49,7 @@ import {
   type ThresholdType,
   type SystemUserOption,
 } from '@/services/audit-rules'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
 
 const CATEGORY_MAP: Record<AlertCategory, { label: string; icon: typeof Package; color: string }> =
@@ -72,8 +72,8 @@ export function AuditMovementAlertsSection() {
   const [editingRule, setEditingRule] = useState<Partial<AuditAlertRule> | null>(null)
   const [savingRule, setSavingRule] = useState(false)
 
-  const userIdentifier = user?.name || user?.login || user?.email || 'admin'
-  const userEmpresa = user?.empresa || ''
+  const userIdentifier = String(user?.name || user?.login || user?.email || 'admin')
+  const userEmpresa = String((user?.empresa as string) || '')
 
   const loadData = async () => {
     setLoading(true)

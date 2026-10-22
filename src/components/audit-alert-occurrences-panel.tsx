@@ -53,15 +53,15 @@ export function AuditAlertOccurrencesPanel({ onViewLog, currentEmpresa }: Props)
   const [actionNotes, setActionNotes] = useState('')
   const [updating, setUpdating] = useState(false)
 
-  const userIdentifier = user?.name || user?.login || user?.email || 'admin'
-  const filterEmpresa = currentEmpresa || user?.empresa || ''
+  const userIdentifier = String(user?.name || user?.login || user?.email || 'admin')
+  const filterEmpresa = String(currentEmpresa || (user?.empresa as string) || '')
 
   const loadOccurrences = async () => {
     setLoading(true)
     try {
       const list = await getAuditAlertOccurrences({
-        empresa: filterEmpresa,
-        status: statusFilter,
+        empresa: String(filterEmpresa || ''),
+        status: String(statusFilter || 'all'),
         limit: 100,
       })
       setOccurrences(list)

@@ -183,7 +183,7 @@ export function AuditPanel() {
       {showAlertHistory && (
         <div className="mb-4">
           <AuditAlertOccurrencesPanel
-            currentEmpresa={user?.empresa || ''}
+            currentEmpresa={String((user?.empresa as string) || '')}
             onViewLog={(logId) => {
               setFKeyword(logId)
               setShowAlertHistory(false)
