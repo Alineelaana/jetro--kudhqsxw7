@@ -49,7 +49,7 @@ export function NfeHomologationDialog({
   onOpenChange,
   onSuccess,
 }: NfeHomologationDialogProps) {
-  const { empresasDisponiveis, currentBrand } = useBrand()
+  const { empresasDisponiveis, empresaAtivaId } = useBrand()
 
   const [selectedEmpresaId, setSelectedEmpresaId] = useState<string>('')
   const [serie, setSerie] = useState('1')
@@ -88,7 +88,7 @@ export function NfeHomologationDialog({
       setSefazTransmissionError(null)
       setViewXml(false)
     }
-  }, [open, empresasDisponiveis])
+  }, [open, empresaAtivaId, empresasDisponiveis])
 
   const handleGenerate = async () => {
     if (!selectedEmpresaId) {
