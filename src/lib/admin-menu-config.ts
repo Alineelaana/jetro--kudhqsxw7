@@ -33,6 +33,7 @@ import {
   Sparkles,
   Inbox,
   Bot,
+  UserCheck,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -69,7 +70,7 @@ import { canViewTransporte } from '@/lib/transporte-permissions'
 import { canViewIndustry } from '@/lib/industrial-permissions'
 import { canViewCRM } from '@/lib/crm-permissions'
 import { canViewPriceTables } from '@/lib/price-table-permissions'
-import { canViewRH } from '@/lib/rh-permissions'
+import { canViewRH, canViewRH as canViewDP } from '@/lib/rh-permissions'
 import { canViewTradeMarketing } from '@/lib/trade-marketing-permissions'
 import { canViewSA } from '@/lib/supplier-allowance-permissions'
 import { canViewBI } from '@/lib/bi-permissions'

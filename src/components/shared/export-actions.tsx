@@ -56,14 +56,18 @@ export function ExportActions({
         return
       }
 
-      generateRhDpSstPdf({
-        title,
-        subtitle: subtitle || 'Relatório emitido pelo HURAM',
-        headers,
-        rows: data.map((row) =>
-          row.map((val) => (val === null || val === undefined ? '' : String(val))),
-        ),
-      })
+      generateRhDpSstPdf(
+        {
+          title,
+          module: 'HURAM',
+          headers,
+          rows: data.map((row) =>
+            row.map((val) => (val === null || val === undefined ? '' : String(val))),
+          ),
+          summary: subtitle ? [{ label: 'Descrição', value: subtitle }] : undefined,
+        },
+        'Usuário HURAM',
+      )
       toast.success('Documento PDF gerado com sucesso!')
     } catch (err: any) {
       console.error(err)

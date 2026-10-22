@@ -23,12 +23,12 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { Plus, Search, Pencil, Trash2, Loader2, Save, Paperclip } from 'lucide-react'
 import { toast } from 'sonner'
-import type { ScreenConfig } from '@/lib/rh-types'
+import type { RhScreenConfig } from '@/lib/rh-types'
 import { ExportActions } from '@/components/shared/export-actions'
 import { RecordAttachmentsDialog } from '@/components/shared/record-attachments-dialog'
 import { QuickEmployeeLinks } from '@/components/shared/quick-employee-links'
 
-export function RhGenericScreen({ config }: { config: ScreenConfig }) {
+export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
   const { user } = useAuth()
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

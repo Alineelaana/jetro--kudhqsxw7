@@ -109,7 +109,7 @@ export interface RhFieldDef {
 export interface RhScreenConfig {
   collection: string
   title: string
-  nameLabel: string
+  nameLabel?: string
   statusField?: string
   statusOptions?: readonly string[]
   fields: RhFieldDef[]
