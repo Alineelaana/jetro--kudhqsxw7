@@ -532,52 +532,165 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/cadastros',
     title: 'Central de Cadastros Gerais',
     moduleGroup: 'Comercial',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
+    docVersion: '1.1.0',
+    lastUpdated: '2025-05-20',
     author: 'Engenharia de Software Jetro',
     objective: {
       title: 'Objetivo',
       content:
-        'Gerenciar o cadastro unificado de parceiros de negócio (Clientes, Fornecedores, Transportadoras, Representantes), endereços, contatos e restrições comerciais.',
+        'Gerenciar os cadastros mestres e operacionais do sistema, incluindo parceiros de negócio (Clientes, Fornecedores, Transportadoras, Representantes), endereços, contatos, restrições comerciais e a Gestão de Usuários do Sistema, com controle unificado de credenciais, permissões, empresas vinculadas e políticas de sessão.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Tabela unificada com pesquisa por Razão Social, Nome Fantasia, CNPJ/CPF.\n- Formulário com abas: Dados Cadastrais (PF/PJ), Endereços, Contatos e Responsáveis, Dados Financeiros e Restrições de Crédito.\n- Consulta automática de CNPJ e CEP.\n- Controle de ativação/inativação de parceiros.\n- Aba de Cadastro e Gestão de Usuários do Sistema (UserManagement) com definição individual de tempo de inatividade para encerramento automático de sessão.',
+        '- Tabela unificada com pesquisa por Razão Social, Nome Fantasia, CNPJ/CPF.\n- Formulário com abas: Dados Cadastrais (PF/PJ), Endereços, Contatos e Responsáveis, Dados Financeiros e Restrições de Crédito.\n- Consulta automática de CNPJ e CEP.\n- Controle de ativação/inativação de parceiros.\n- Gestão de Usuários do Sistema (UserManagement / UserEditDialog) com criação e edição de usuários, vinculação multiempresa, seleção de perfil de acesso, definição de tempo individual de inatividade de sessão e validação em tempo real de unicidade de credenciais.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Validação obrigatória de CNPJ/CPF com dígito verificador.\n- Parceiros marcados com restrição de crédito exigem liberação especial para emissão de novos pedidos.\n- Exclusão de parceiros bloqueada caso existam transações vinculadas.\n- Controle de Inatividade de Usuários: cada usuário possui configuração individual de "Tempo de inatividade para deslogar" (em minutos, campo `inactivity_timeout_minutes` na coleção `users`, mínimo 1 min, máximo 480 min). O padrão para novos usuários e usuários existentes é de 5 minutos, sendo editável por administradores a qualquer momento. O frontend monitora interações reais (mouse, teclado, cliques, toque, scroll) e exibe contagem regressiva nos últimos 30 segundos com opção "Continuar conectado" antes de deslogar por inatividade e redirecionar para o login com aviso explicativo.',
+        '- Validação obrigatória de CNPJ/CPF com dígito verificador.\n- Parceiros marcados com restrição de crédito exigem liberação especial para emissão de novos pedidos.\n- Exclusão de parceiros bloqueada caso existam transações vinculadas.\n- Login Único GLOBAL entre todas as empresas: o identificador de login de cada usuário é estritamente único em todo o sistema corporativo e transversal a todas as empresas do grupo econômico. A validação é case-insensitive e opera com normalização em minúsculas (lowercase) sem espaços. Em caso de colisão, tanto na criação de novo usuário quanto na edição de usuário existente (ignorando o próprio registro), o sistema emite a mensagem exata: "Este login já está em uso por outra empresa do grupo. Escolha um login diferente.".\n- Dupla Camada de Validação (Frontend e Backend): no frontend, o serviço (`isLoginTakenGlobally` em `src/services/users.ts`) realiza a checagem preventiva em tempo real antes da persistência; no backend, um hook em PocketBase (`pocketbase/hooks/users_global_login_guard.js`) intercepta as requisições `onRecordCreateRequest` e `onRecordUpdateRequest`, normalizando o login em minúsculas e bloqueando com BadRequestError HTTP 400 qualquer duplicidade global entre empresas.\n- Controle de Inatividade de Usuários: cada usuário possui configuração individual de "Tempo de inatividade para deslogar" (em minutos, campo `inactivity_timeout_minutes` na coleção `users`, mínimo 1 min, máximo 480 min). O padrão corporativo é de 480 minutos (8 horas), sendo editável por administradores a qualquer momento. O frontend monitora interações reais (mouse, teclado, cliques, toque, scroll) e exibe contagem regressiva nos últimos 30 segundos com opção "Continuar conectado" antes de deslogar por inatividade e redirecionar para o login com aviso explicativo.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O usuário clica em "Novo Parceiro" ou seleciona um registro existente para edição.\n2. Preenche os dados obrigatórios com validação em tempo real.\n3. Ao salvar, os dados são persistidos na coleção `partners`.',
+        '1. O administrador acessa a tela de Cadastros e seleciona o cadastro desejado (ex.: Usuários ou Parceiros).\n2. Na Gestão de Usuários, ao clicar em "Novo Cadastro", o formulário gera código sequencial automático e o operador informa nome, login, e-mail, senha, perfil de acesso e empresas vinculadas.\n3. O frontend normaliza o login em minúsculas e executa verificação preventiva global de unicidade entre todas as empresas do grupo.\n4. Ao submeter, o hook de backend valida a unicidade global case-insensitive; se o login já existir, a gravação é rejeitada com a mensagem de aviso.\n5. Persistido com sucesso, o registro é atualizado imediatamente na listagem com as flags de auditoria e status de acesso.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções: `partners`, `partner_types`, `partner_addresses`, `partner_financial`, `users`.',
+        '- Coleções PocketBase: `partners`, `partner_types`, `partner_addresses`, `partner_financial`, `users`, `empresas`, `filiais`, `perfis_permissoes`, `usuarios_empresas`.',
     },
     integrations: {
       title: 'Integrações',
-      content: 'Serviços externos de consulta de CNPJ (ReceitaWS/BrasilAPI) e ViaCEP.',
+      content:
+        '- Serviços externos de consulta de CNPJ (ReceitaWS/BrasilAPI) e ViaCEP.\n- Hooks de integridade do PocketBase (`users_global_login_guard.js`) para imposição de regras de autenticação e governança multiempresa.',
     },
     permissions: {
       title: 'Permissões',
       content:
-        '- Visualização: `canManagePartners(role)`.\n- Cadastro e edição: `canRegisterPartners`, `canEditPartners`.\n- Exclusão: restrita a `canDeletePartners` (SUP).',
+        '- Parceiros: `canManagePartners(role)`, `canRegisterPartners`, `canEditPartners` e exclusão restrita a `canDeletePartners` (SUP).\n- Gestão de Usuários: restrita a administradores e supervisores via `canManageUsers(role)` / perfil SUP.',
     },
     dependencies: {
       title: 'Dependências',
       content:
-        'Componentes de `src/components/partner-*`, `src/components/cadastros/*`, `UserManagement`, `UserEditDialog` e `InactivityTracker`.',
+        'Componentes de `src/components/partner-*`, `src/components/cadastros/*`, `UserManagement`, `UserEditDialog`, `src/services/users.ts`, hook `users_global_login_guard.js` e `InactivityTracker`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        'Erros de duplicidade de CNPJ/CPF são identificados e exibidos diretamente no campo correspondente.',
+        '- Erros de duplicidade de CNPJ/CPF são identificados e exibidos diretamente no campo correspondente.\n- Tentativas de cadastro ou alteração de login para um já existente em qualquer empresa do grupo retornam erro claro e destacado: "Este login já está em uso por outra empresa do grupo. Escolha um login diferente.", sem perda dos dados preenchidos no formulário.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 9.1 GESTÃO DE USUÁRIOS (ROTA DIRETA E SUBMENU DE CADASTROS)
+  // -------------------------------------------------------------
+  '/admin/cadastros/usuarios': {
+    route: '/admin/cadastros/usuarios',
+    title: 'Gestão de Usuários (Central de Cadastros)',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-20',
+    author: 'Engenharia de Software Jetro',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Administrar as contas de acesso dos usuários do ERP Jetro, gerenciando credenciais de login, senhas, papéis/perfis de permissão, empresas e filiais autorizadas, política de inatividade de sessão e status operacional (ativo/inativo).',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem completa de usuários com busca em tempo real por código, login, nome, e-mail e cargo.\n- Indicador de código sequencial automático somente leitura.\n- Cadastro de novo usuário via modal com definição de nome, login institucional, e-mail, senha, CPF, perfil de permissões, setor, cargo e vínculo com múltiplas empresas (multiempresa) e filiais.\n- Edição de usuário existente permitindo alteração de dados cadastrais, redefinição forçada de senha no próximo login, alteração de empresas autorizadas e ajuste individual do tempo de inatividade.\n- Alternância instantânea de status de acesso (Ativo / Inativo) via switch com validação de permissão SUP.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Login Único GLOBAL entre todas as empresas: o identificador de login é rigorosamente único em âmbito global, transversal a todas as empresas do grupo econômico. Não é permitido que duas empresas diferentes utilizem o mesmo login para usuários distintos.\n- Normalização e Validação Case-Insensitive: o campo login é tratado com remoção de espaços e normalizado em caracteres minúsculos (lowercase). A validação não diferencia maiúsculas de minúsculas.\n- Mensagem Obrigatória de Validação: ao tentar salvar um login duplicado, tanto na criação quanto na edição de usuário (ignorando o próprio ID em alteração), o sistema apresenta obrigatoriamente a mensagem: "Este login já está em uso por outra empresa do grupo. Escolha um login diferente.".\n- Imposição em Camada Dupla (Frontend e Backend):\n  1. Frontend: o serviço `src/services/users.ts` executa a função preventiva `isLoginTakenGlobally(cleanLogin, excludeUserId)` antes do envio da requisição, capturando conflitos precocemente.\n  2. Backend: o hook PocketBase `pocketbase/hooks/users_global_login_guard.js` valida `onRecordCreateRequest` e `onRecordUpdateRequest`, garantindo que nenhuma requisição direta via API viole a unicidade global entre as empresas.\n- Código do Usuário: numérico sequencial gerado automaticamente pelo sistema, protegido como somente leitura (não editável).\n- Inatividade de Sessão: tempo configurável por usuário no campo `inactivity_timeout_minutes` (entre 1 e 480 minutos, com padrão corporativo de 480 min). Monitorado globalmente pelo componente `InactivityTracker`.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O administrador navega pelo menu lateral em Cadastros > Usuários.\n2. Para cadastrar, clica em "Novo Cadastro"; o formulário atribui o próximo código sequencial disponível.\n3. O usuário preenche os campos; ao digitar o login, a digitação é normalizada em minúsculas.\n4. Ao submeter, o frontend executa a validação preventiva e submete à API do PocketBase.\n5. O hook de backend valida a unicidade global em todas as empresas. Se o login já estiver em uso, a transação é cancelada e a mensagem de bloqueio é exibida.\n6. Com a confirmação, o usuário é cadastrado e sincronizado com os vínculos na coleção `usuarios_empresas`.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `users`, `empresas`, `filiais`, `perfis_permissoes`, `usuarios_empresas`.\n- Hooks de backend: `pocketbase/hooks/users_global_login_guard.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Mecanismo de autenticação e controle de sessões do PocketBase.\n- Motor de auditoria corporativo para registro de ativação/desativação e redefinição de senhas.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso e gestão de usuários restritos a administradores e perfis com permissão `canManageUsers(role)` / perfil SUP.\n- Alteração de status ativo/inativo e exclusão restritas exclusivamente ao perfil SUP.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `src/components/user-management.tsx`, `src/components/user-edit-dialog.tsx`, `src/components/cadastros/cadastros-panel.tsx`.\n- Serviços: `src/services/users.ts`.\n- Hooks de backend: `pocketbase/hooks/users_global_login_guard.js`.\n- Sessão: `src/components/inactivity-tracker.tsx`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Conflito de login global: interceptado com exibição da mensagem "Este login já está em uso por outra empresa do grupo. Escolha um login diferente.".\n- Conflito de CPF ou E-mail: aviso específico de campo já cadastrado.\n- Senha atual inválida em autoedição: notificação clara sem perda dos dados preenchidos.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 9.2 AUDITORIA DE ACESSOS E CENTRAL DE USUÁRIOS
+  // -------------------------------------------------------------
+  '/admin/usuarios': {
+    route: '/admin/usuarios',
+    title: 'Central de Usuários e Auditoria de Acessos',
+    moduleGroup: 'Administração',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-20',
+    author: 'Engenharia de Software Jetro',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Prover controle avançado de governança, auditoria de logins e sessões ativas dos usuários do ERP Jetro, permitindo o acompanhamento de histórico de acessos, anomalias e encerramento remoto de sessões.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Visão geral consolidada de usuários com dados de último acesso, status de MFA e nível de risco.\n- Detalhamento individual com histórico completo de eventos de autenticação (logins, falhas, trocas de senha).\n- Visualização de sessões ativas com possibilidade de término remoto de sessão por administradores.\n- Alertas de auditoria e configuração de políticas de retenção de histórico.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Exclusivo para administradores e perfil SUP (`canManageUsers(role)`).\n- Coordenadas geográficas precisas e exportação de relatórios de auditoria exigem flags de permissão específicas (`canViewUserPreciseCoords`, `canExportUserAudit`).\n- A unicidade e governança de credenciais obedecem à regra de login global único estabelecida no módulo de gestão de usuários.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O administrador acessa Administração > Usuários (/admin/usuarios) pelo menu lateral.\n2. A tabela consolida métricas de auditoria via `fetchUsersAuditOverview`.\n3. Ao selecionar um usuário, abre-se a tela de detalhes com eventos, sessões e alertas carregados em tempo real.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `users`, `audit_logs`, `audit_sessions`, `audit_alerts`, `audit_settings`.\n- Serviço: `src/services/user-audit-service.ts`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: 'Módulos de auditoria de segurança e rastreamento de IP/User-Agent corporativo.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: 'Restrito a `canManageUsers(role)` e perfis autorizados (SUP / Administradores).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        'Componentes: `UsersAdminPage`, `UsersTable`, `UserDetailsScreen`, `RetentionPolicyDialog`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        'Bloqueio de acesso para perfis não autorizados com tela de alerta e opção de retorno seguro ao painel.',
     },
   },
 
