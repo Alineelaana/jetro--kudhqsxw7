@@ -24,7 +24,7 @@ import { JetroColumnDef } from '@/components/jetro-table/types'
 import { RecordAttachmentsDialog } from '@/components/shared/record-attachments-dialog'
 import { ExportActions } from '@/components/shared/export-actions'
 import { finGetList, finCreate, finUpdate } from '@/services/financial'
-import { useRealtime } from '@/hooks/useRealtime'
+import { useRealtime } from '@/hooks/use-realtime'
 import {
   Building2,
   FileSpreadsheet,
@@ -311,7 +311,7 @@ export function ScreenBancosConciliacao() {
       align: 'right',
       defaultWidth: 130,
       cell: ({ value }) => {
-        const v = parseFloat(value || '0')
+        const v = parseFloat(String(value ?? '0'))
         return (
           <span className={`font-bold text-xs ${v < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
             {fmtCurrency(v)}
@@ -428,9 +428,16 @@ export function ScreenBancosConciliacao() {
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <ExportActions
-              data={bankAccounts}
+              title="Relatório de Bancos e Extratos"
+              headers={['Banco', 'Agência', 'Conta', 'Tipo', 'Saldo Atual']}
+              data={bankAccounts.map((b) => [
+                b.banco,
+                b.agencia || '',
+                b.conta || '',
+                b.tipo || '',
+                fmtCurrency(b.saldo_atual),
+              ])}
               filenamePrefix="bancos-conciliacao"
-              pdfTitle="Relatório de Bancos e Extratos"
             />
             <Button
               onClick={() => setImportDialogOpen(true)}

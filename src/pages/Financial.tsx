@@ -1,35 +1,30 @@
 import { FinancialLayout } from '@/components/financial/financial-layout'
-import { FinancialDashboard } from '@/components/financial/financial-dashboard'
-import { FinancialReceivables } from '@/components/financial/financial-receivables'
-import { FinancialPayables } from '@/components/financial/financial-payables'
-import { FinancialCashFlow } from '@/components/financial/financial-cash-flow'
-import { FinancialReconciliation } from '@/components/financial/financial-reconciliation'
-import { FinancialTreasury } from '@/components/financial/financial-treasury'
-import { FinancialCashRegister } from '@/components/financial/financial-cash-register'
-import { FinancialReports } from '@/components/financial/financial-reports'
-import { FinancialGenericScreen } from '@/components/financial/financial-generic-screen'
-import { CollectionCenterScreen } from '@/components/collection-center/collection-center-screen'
-import { FinancialApprovalsEvolved } from '@/components/financial/financial-approvals-evolved'
-import { FINANCIAL_SCREEN_CONFIGS } from '@/lib/financial-types'
+import { ScreenCentralFinanceira } from '@/components/financial/screens/screen-central-financeira'
+import { ScreenContasReceberCobranca } from '@/components/financial/screens/screen-contas-receber-cobranca'
+import { ScreenContasPagarTesouraria } from '@/components/financial/screens/screen-contas-pagar-tesouraria'
+import { ScreenBancosConciliacao } from '@/components/financial/screens/screen-bancos-conciliacao'
+import { ScreenPlanejamentoGestao } from '@/components/financial/screens/screen-planejamento-gestao'
+import { ScreenConfiguracoesFinanceiras } from '@/components/financial/screens/screen-configuracoes-financeiras'
 
 const TITLES: Record<string, string> = {
-  dashboard: 'Dashboard Financeiro',
-  receivables: 'Contas a Receber',
-  payables: 'Contas a Pagar',
-  cash_flow: 'Fluxo de Caixa',
-  reconciliation: 'Conciliação Bancária',
-  treasury: 'Tesouraria',
-  checks: 'Controle de Cheques',
-  cards: 'Cartões',
-  boletos: 'Boletos',
-  pix: 'PIX',
-  collections: 'Cobranças',
-  cash_register: 'Caixa',
-  movements: 'Movimentações Financeiras',
-  transfers: 'Transferências entre Contas',
-  approvals: 'Aprovações Financeiras',
-  closing: 'Fechamento Financeiro',
-  reports: 'Relatórios Financeiros',
+  central: 'Central Financeira',
+  'contas-a-receber-cobranca': 'Contas a Receber e Cobrança',
+  'contas-a-pagar-tesouraria': 'Contas a Pagar e Tesouraria',
+  'bancos-conciliacao': 'Bancos e Conciliação',
+  'planejamento-gestao': 'Planejamento e Gestão',
+  'configuracoes-financeiras': 'Configurações Financeiras',
+  // Legados para exibição
+  dashboard: 'Central Financeira',
+  receivables: 'Contas a Receber e Cobrança',
+  payables: 'Contas a Pagar e Tesouraria',
+  reconciliation: 'Bancos e Conciliação',
+  cash_flow: 'Planejamento e Gestão',
+  reports: 'Planejamento e Gestão',
+  closing: 'Planejamento e Gestão',
+  treasury: 'Contas a Pagar e Tesouraria',
+  cash_register: 'Contas a Pagar e Tesouraria',
+  collections: 'Contas a Receber e Cobrança',
+  approvals: 'Contas a Pagar e Tesouraria',
 }
 
 export default function Financial({ screen }: { screen: string }) {
@@ -37,31 +32,45 @@ export default function Financial({ screen }: { screen: string }) {
 
   const renderScreen = () => {
     switch (screen) {
+      case 'central':
       case 'dashboard':
-        return <FinancialDashboard />
+        return <ScreenCentralFinanceira />
+
+      case 'contas-a-receber-cobranca':
       case 'receivables':
-        return <FinancialReceivables />
-      case 'payables':
-        return <FinancialPayables />
-      case 'cash_flow':
-        return <FinancialCashFlow />
-      case 'reconciliation':
-        return <FinancialReconciliation />
-      case 'treasury':
-        return <FinancialTreasury />
-      case 'cash_register':
-        return <FinancialCashRegister />
       case 'collections':
-        return <CollectionCenterScreen />
+      case 'boletos':
+      case 'cards':
+      case 'checks':
+      case 'pix':
+        return <ScreenContasReceberCobranca />
+
+      case 'contas-a-pagar-tesouraria':
+      case 'payables':
+      case 'treasury':
+      case 'cash_register':
+      case 'movements':
+      case 'transfers':
       case 'approvals':
-        return <FinancialApprovalsEvolved />
+        return <ScreenContasPagarTesouraria />
+
+      case 'bancos-conciliacao':
+      case 'reconciliation':
+      case 'bancos':
+        return <ScreenBancosConciliacao />
+
+      case 'planejamento-gestao':
+      case 'cash_flow':
+      case 'closing':
       case 'reports':
-        return <FinancialReports />
-      default: {
-        const config = FINANCIAL_SCREEN_CONFIGS[screen]
-        if (config) return <FinancialGenericScreen config={config} />
-        return <FinancialDashboard />
-      }
+        return <ScreenPlanejamentoGestao />
+
+      case 'configuracoes-financeiras':
+      case 'configuracoes':
+        return <ScreenConfiguracoesFinanceiras />
+
+      default:
+        return <ScreenCentralFinanceira />
     }
   }
 

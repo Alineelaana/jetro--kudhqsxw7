@@ -15,7 +15,7 @@ import { JetroTable } from '@/components/jetro-table'
 import { JetroColumnDef } from '@/components/jetro-table/types'
 import { RecordAttachmentsDialog } from '@/components/shared/record-attachments-dialog'
 import { ExportActions } from '@/components/shared/export-actions'
-import { getPayrollForecastForCashFlow, isPeriodClosed } from './financial-advanced-service'
+import { getPayrollForecastForCashFlow, isPeriodClosed } from '../financial-advanced-service'
 import { finGetList, getClosings, getPayables, getReceivables } from '@/services/financial'
 import { FinancialReports } from '@/components/financial/financial-reports'
 import {
@@ -225,7 +225,7 @@ export function ScreenPlanejamentoGestao() {
       align: 'right',
       defaultWidth: 120,
       cell: ({ value }) => {
-        const v = parseFloat(value || '0')
+        const v = parseFloat(String(value ?? '0'))
         return (
           <span className={`text-xs font-bold ${v > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
             {v > 0 ? `+${v.toFixed(1)}%` : `${v.toFixed(1)}%`}
@@ -361,9 +361,16 @@ export function ScreenPlanejamentoGestao() {
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <ExportActions
-              data={budgetItems}
+              title="Relatório de Planejamento e Gestão Financeira"
+              headers={['Categoria', 'Previsto', 'Realizado', 'Variação', 'Status']}
+              data={budgetItems.map((b) => [
+                b.categoria,
+                fmtCurrency(b.previsto),
+                fmtCurrency(b.realizado),
+                `${b.variacao > 0 ? '+' : ''}${b.variacao.toFixed(1)}%`,
+                b.status,
+              ])}
               filenamePrefix="planejamento-gestao"
-              pdfTitle="Relatório de Planejamento e Gestão Financeira"
             />
             <Button
               onClick={() => setClosePeriodDialogOpen(true)}

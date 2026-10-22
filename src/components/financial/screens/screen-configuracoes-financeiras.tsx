@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { CADASTROS_CONFIG } from '@/lib/cadastros-config'
+import { CADASTROS } from '@/lib/cadastros-config'
 import { CadastroStandardScreen } from '@/components/cadastros/cadastro-standard-screen'
 import { ExportActions } from '@/components/shared/export-actions'
 import {
@@ -61,14 +61,15 @@ export function ScreenConfiguracoesFinanceiras() {
   })
 
   // Configurações dos 8 Cadastros de Apoio Financeiro
-  const cfgBancos = CADASTROS_CONFIG['bancos']
-  const cfgContas = CADASTROS_CONFIG['contas_bancarias']
-  const cfgFormas = CADASTROS_CONFIG['formas_pagamento']
-  const cfgCondicoes = CADASTROS_CONFIG['condicoes_pagamento']
-  const cfgCategorias = CADASTROS_CONFIG['categorias']
-  const cfgSubcategorias = CADASTROS_CONFIG['subcategorias']
-  const cfgPlanoContas = CADASTROS_CONFIG['plano_contas']
-  const cfgCentrosCusto = CADASTROS_CONFIG['centros_custo']
+  const getCadastro = (key: string) => CADASTROS.find((c) => c.key === key)
+  const cfgBancos = getCadastro('bancos')
+  const cfgContas = getCadastro('contas_bancarias')
+  const cfgFormas = getCadastro('formas_pagamento')
+  const cfgCondicoes = getCadastro('condicoes_pagamento')
+  const cfgCategorias = getCadastro('categorias')
+  const cfgSubcategorias = getCadastro('subcategorias')
+  const cfgPlanoContas = getCadastro('plano_contas')
+  const cfgCentrosCusto = getCadastro('centros_custo')
 
   return (
     <div className="space-y-4">
@@ -86,9 +87,10 @@ export function ScreenConfiguracoesFinanceiras() {
 
         <div className="flex items-center gap-2">
           <ExportActions
-            data={[{ Aba: activeTab, Modulo: 'Configurações Financeiras' }]}
+            title="Parâmetros e Configurações Financeiras"
+            headers={['Aba', 'Módulo']}
+            data={[[activeTab, 'Configurações Financeiras']]}
             filenamePrefix="configuracoes-financeiras"
-            pdfTitle="Parâmetros e Configurações Financeiras"
           />
         </div>
       </div>

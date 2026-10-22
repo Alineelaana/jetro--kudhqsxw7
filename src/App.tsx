@@ -647,81 +647,182 @@ const App = () => (
                                   <Route path="seguranca" element={<SegurancaScreen />} />
                                   <Route path="backup" element={<BackupScreen />} />
                                 </Route>
+                                {/* Módulo Financeiro (6 Telas Oficiais) */}
                                 <Route
                                   path="/admin/financeiro"
-                                  element={<Financial screen="dashboard" />}
+                                  element={<Financial screen="central" />}
                                 />
+                                <Route
+                                  path="/admin/financeiro/contas-a-receber-cobranca"
+                                  element={<Financial screen="contas-a-receber-cobranca" />}
+                                />
+                                <Route
+                                  path="/admin/financeiro/contas-a-pagar-tesouraria"
+                                  element={<Financial screen="contas-a-pagar-tesouraria" />}
+                                />
+                                <Route
+                                  path="/admin/financeiro/bancos-conciliacao"
+                                  element={<Financial screen="bancos-conciliacao" />}
+                                />
+                                <Route
+                                  path="/admin/financeiro/planejamento-gestao"
+                                  element={<Financial screen="planejamento-gestao" />}
+                                />
+                                <Route
+                                  path="/admin/financeiro/configuracoes-financeiras"
+                                  element={<Financial screen="configuracoes-financeiras" />}
+                                />
+
+                                {/* Redirecionamentos de Rotas Antigas do Financeiro */}
                                 <Route
                                   path="/admin/financeiro/contas-receber"
-                                  element={<Financial screen="receivables" />}
-                                />
-                                <Route
-                                  path="/admin/financeiro/contas-pagar"
-                                  element={<Financial screen="payables" />}
-                                />
-                                <Route
-                                  path="/admin/financeiro/fluxo-caixa"
-                                  element={<Financial screen="cash_flow" />}
-                                />
-                                <Route
-                                  path="/admin/financeiro/conciliacao"
-                                  element={<Financial screen="reconciliation" />}
-                                />
-                                <Route
-                                  path="/admin/financeiro/tesouraria"
-                                  element={<Financial screen="treasury" />}
-                                />
-                                <Route
-                                  path="/admin/financeiro/cheques"
-                                  element={<Financial screen="checks" />}
-                                />
-                                <Route
-                                  path="/admin/financeiro/cartoes"
-                                  element={<Financial screen="cards" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/boletos"
-                                  element={<Financial screen="boletos" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/financeiro/cartoes"
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/financeiro/cheques"
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/pix"
-                                  element={<Financial screen="pix" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/cobrancas"
-                                  element={<Financial screen="collections" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/cobranca-config"
-                                  element={<CollectionCenterConfig />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/cobranca-certificacao"
-                                  element={<CollectionCenterCertification />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-receber-cobranca"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/financeiro/contas-pagar"
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-pagar-tesouraria"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/financeiro/tesouraria"
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-pagar-tesouraria"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/caixa"
-                                  element={<Financial screen="cash_register" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-pagar-tesouraria"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/movimentacoes"
-                                  element={<Financial screen="movements" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-pagar-tesouraria"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/transferencias"
-                                  element={<Financial screen="transfers" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-pagar-tesouraria"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/aprovacoes"
-                                  element={<Financial screen="approvals" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/financeiro/contas-a-pagar-tesouraria"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/financeiro/conciliacao"
+                                  element={
+                                    <Navigate to="/admin/financeiro/bancos-conciliacao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/financeiro/fluxo-caixa"
+                                  element={
+                                    <Navigate to="/admin/financeiro/planejamento-gestao" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/fechamento"
-                                  element={<Financial screen="closing" />}
+                                  element={
+                                    <Navigate to="/admin/financeiro/planejamento-gestao" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/financeiro/relatorios"
-                                  element={<Financial screen="reports" />}
+                                  element={
+                                    <Navigate to="/admin/financeiro/planejamento-gestao" replace />
+                                  }
                                 />
                                 {/* Módulo Recursos Humanos (7 Telas Oficiais) */}
                                 <Route path="/admin/rh" element={<RH screen="painel" />} />

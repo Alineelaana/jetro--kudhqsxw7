@@ -4,9 +4,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ExportActions } from '@/components/shared/export-actions'
-import { calculateWorkingCapital, detectDuplicatePayables } from './financial-advanced-service'
+import { calculateWorkingCapital, detectDuplicatePayables } from '../financial-advanced-service'
 import { getReceivables, getPayables, finGetList } from '@/services/financial'
-import { useRealtime } from '@/hooks/useRealtime'
+import { useRealtime } from '@/hooks/use-realtime'
 import {
   DollarSign,
   TrendingUp,
@@ -129,16 +129,17 @@ export function ScreenCentralFinanceira() {
 
         <div className="flex items-center gap-2">
           <ExportActions
+            title="Demonstrativo de Indicadores da Central Financeira"
+            headers={['Indicador', 'Valor']}
             data={[
-              { Indicador: 'Saldo em Bancos', Valor: totalSaldoBancos },
-              { Indicador: 'Contas a Receber em Aberto', Valor: aReceberAberto },
-              { Indicador: 'Inadimplência (Receber Vencidos)', Valor: aReceberVencidos },
-              { Indicador: 'Contas a Pagar em Aberto', Valor: aPagarAberto },
-              { Indicador: 'Pagar Vencidos', Valor: aPagarVencidos },
-              { Indicador: 'Capital de Giro Líquido', Valor: workingCapital.capitalGiroLiquido },
+              ['Saldo em Bancos', fmtCurrency(totalSaldoBancos)],
+              ['Contas a Receber em Aberto', fmtCurrency(aReceberAberto)],
+              ['Inadimplência (Receber Vencidos)', fmtCurrency(aReceberVencidos)],
+              ['Contas a Pagar em Aberto', fmtCurrency(aPagarAberto)],
+              ['Pagar Vencidos', fmtCurrency(aPagarVencidos)],
+              ['Capital de Giro Líquido', fmtCurrency(workingCapital.capitalGiroLiquido)],
             ]}
             filenamePrefix="central-financeira-kpis"
-            pdfTitle="Demonstrativo de Indicadores da Central Financeira"
           />
           <Button
             size="sm"
@@ -159,7 +160,7 @@ export function ScreenCentralFinanceira() {
         <div className="space-y-2">
           {duplicateAlerts.length > 0 && (
             <div
-              onClick={() => navigate('/admin/financeiro/contas-pagar')}
+              onClick={() => navigate('/admin/financeiro/contas-a-pagar-tesouraria')}
               className="p-3 bg-amber-50 border border-amber-300 rounded-lg flex items-center justify-between text-xs text-amber-900 cursor-pointer hover:bg-amber-100 transition-colors"
             >
               <div className="flex items-center gap-2">
@@ -177,7 +178,7 @@ export function ScreenCentralFinanceira() {
 
           {semClassificacao > 0 && (
             <div
-              onClick={() => navigate('/admin/financeiro/configuracoes')}
+              onClick={() => navigate('/admin/financeiro/configuracoes-financeiras')}
               className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between text-xs text-blue-900 cursor-pointer hover:bg-blue-100 transition-colors"
             >
               <div className="flex items-center gap-2">
@@ -199,7 +200,7 @@ export function ScreenCentralFinanceira() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1. Saldo por Conta Bancária */}
         <Card
-          onClick={() => navigate('/admin/financeiro/bancos')}
+          onClick={() => navigate('/admin/financeiro/bancos-conciliacao')}
           className="bg-card border shadow-sm cursor-pointer hover:border-[#005B2E] transition-all hover:shadow-md"
         >
           <CardContent className="p-4 flex flex-col justify-between h-full">
@@ -226,7 +227,7 @@ export function ScreenCentralFinanceira() {
 
         {/* 2. Contas a Receber & Inadimplência */}
         <Card
-          onClick={() => navigate('/admin/financeiro/contas-receber')}
+          onClick={() => navigate('/admin/financeiro/contas-a-receber-cobranca')}
           className="bg-card border shadow-sm cursor-pointer hover:border-[#005B2E] transition-all hover:shadow-md"
         >
           <CardContent className="p-4 flex flex-col justify-between h-full">
@@ -258,7 +259,7 @@ export function ScreenCentralFinanceira() {
 
         {/* 3. Contas a Pagar & Alçadas */}
         <Card
-          onClick={() => navigate('/admin/financeiro/contas-pagar')}
+          onClick={() => navigate('/admin/financeiro/contas-a-pagar-tesouraria')}
           className="bg-card border shadow-sm cursor-pointer hover:border-[#005B2E] transition-all hover:shadow-md"
         >
           <CardContent className="p-4 flex flex-col justify-between h-full">
@@ -290,7 +291,7 @@ export function ScreenCentralFinanceira() {
 
         {/* 4. Capital de Giro Líquido Calculado */}
         <Card
-          onClick={() => navigate('/admin/financeiro/planejamento')}
+          onClick={() => navigate('/admin/financeiro/planejamento-gestao')}
           className="bg-card border shadow-sm cursor-pointer hover:border-[#005B2E] transition-all hover:shadow-md"
         >
           <CardContent className="p-4 flex flex-col justify-between h-full">
@@ -330,7 +331,7 @@ export function ScreenCentralFinanceira() {
               <Landmark className="w-4 h-4 text-[#005B2E]" /> Posição por Conta Bancária
             </h3>
             <span
-              onClick={() => navigate('/admin/financeiro/bancos')}
+              onClick={() => navigate('/admin/financeiro/bancos-conciliacao')}
               className="text-xs text-[#005B2E] font-semibold cursor-pointer hover:underline"
             >
               Extratos
@@ -341,7 +342,7 @@ export function ScreenCentralFinanceira() {
             {bankAccounts.map((acc) => (
               <div
                 key={acc.id}
-                onClick={() => navigate('/admin/financeiro/bancos')}
+                onClick={() => navigate('/admin/financeiro/bancos-conciliacao')}
                 className="p-3 border rounded-md hover:bg-muted/30 cursor-pointer flex items-center justify-between text-xs transition-colors"
               >
                 <div>
@@ -374,7 +375,7 @@ export function ScreenCentralFinanceira() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => navigate('/admin/financeiro/planejamento')}
+              onClick={() => navigate('/admin/financeiro/planejamento-gestao')}
               className="h-7 text-xs text-[#005B2E] border-[#005B2E]/30"
             >
               Ver Projeção Completa
@@ -428,7 +429,7 @@ export function ScreenCentralFinanceira() {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <div
-            onClick={() => navigate('/admin/financeiro/contas-receber')}
+            onClick={() => navigate('/admin/financeiro/contas-a-receber-cobranca')}
             className="p-3 bg-card border rounded-md cursor-pointer hover:border-[#005B2E] transition-all text-xs space-y-1 hover:shadow-sm"
           >
             <span className="font-bold text-[#005B2E]">Contas a Receber e Cobrança</span>
@@ -439,7 +440,7 @@ export function ScreenCentralFinanceira() {
           </div>
 
           <div
-            onClick={() => navigate('/admin/financeiro/contas-pagar')}
+            onClick={() => navigate('/admin/financeiro/contas-a-pagar-tesouraria')}
             className="p-3 bg-card border rounded-md cursor-pointer hover:border-[#005B2E] transition-all text-xs space-y-1 hover:shadow-sm"
           >
             <span className="font-bold text-[#005B2E]">Contas a Pagar e Tesouraria</span>
@@ -450,7 +451,7 @@ export function ScreenCentralFinanceira() {
           </div>
 
           <div
-            onClick={() => navigate('/admin/financeiro/bancos')}
+            onClick={() => navigate('/admin/financeiro/bancos-conciliacao')}
             className="p-3 bg-card border rounded-md cursor-pointer hover:border-[#005B2E] transition-all text-xs space-y-1 hover:shadow-sm"
           >
             <span className="font-bold text-[#005B2E]">Bancos e Conciliação</span>
@@ -461,7 +462,7 @@ export function ScreenCentralFinanceira() {
           </div>
 
           <div
-            onClick={() => navigate('/admin/financeiro/planejamento')}
+            onClick={() => navigate('/admin/financeiro/planejamento-gestao')}
             className="p-3 bg-card border rounded-md cursor-pointer hover:border-[#005B2E] transition-all text-xs space-y-1 hover:shadow-sm"
           >
             <span className="font-bold text-[#005B2E]">Planejamento e Gestão</span>
@@ -472,7 +473,7 @@ export function ScreenCentralFinanceira() {
           </div>
 
           <div
-            onClick={() => navigate('/admin/financeiro/configuracoes')}
+            onClick={() => navigate('/admin/financeiro/configuracoes-financeiras')}
             className="p-3 bg-card border rounded-md cursor-pointer hover:border-[#005B2E] transition-all text-xs space-y-1 hover:shadow-sm"
           >
             <span className="font-bold text-[#005B2E]">Configurações Financeiras</span>
@@ -483,7 +484,7 @@ export function ScreenCentralFinanceira() {
           </div>
 
           <div
-            onClick={() => navigate('/admin/financeiro/relatorios')}
+            onClick={() => navigate('/admin/financeiro/planejamento-gestao')}
             className="p-3 bg-card border rounded-md cursor-pointer hover:border-[#005B2E] transition-all text-xs space-y-1 hover:shadow-sm"
           >
             <span className="font-bold text-[#005B2E]">Relatórios da Diretoria</span>

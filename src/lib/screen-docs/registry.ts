@@ -2,6 +2,7 @@ import type { ScreenDocEntry } from './types'
 import { DP_SCREEN_DOCS } from './dp-screens'
 import { RH_SCREEN_DOCS } from './rh-screens'
 import { SST_SCREEN_DOCS } from './sst-screens'
+import { FINANCIAL_SCREEN_DOCS } from './financial-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -687,57 +688,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
-  // 12. MÓDULO FINANCEIRO
+  // 12. MÓDULO FINANCEIRO (6 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
-  '/admin/financeiro': {
-    route: '/admin/financeiro',
-    title: 'Gestão Financeira e Tesouraria',
-    moduleGroup: 'Financeiro',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Controlar contas a pagar, contas a receber, tesouraria, fluxo de caixa diário e projetado, conciliação bancária e cobrança de inadimplentes.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Painel de contas a pagar e receber com filtros por vencimento, fornecedor/cliente e status.\n- Baixa individual e em lote com cálculo de juros, multas e descontos.\n- Conciliação bancária via extrato OFX e integração PIX.\n- Relatórios gerenciais de fluxo de caixa e DRE financeira.\n- Central de cobrança com régua de notificação e histórico de negociação.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Baixas manuais exigem vinculação de conta bancária de liquidação.\n- Títulos vencidos são classificados em faixas de aging para provisão de crédito de liquidação duvidosa.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. Títulos a receber são gerados a partir do faturamento de pedidos; títulos a pagar a partir de compras e despesas.\n2. O financeiro realiza conciliações bancárias diárias e emite borderôs de pagamento.\n3. Liquidações geram lançamentos contábeis automáticos.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `financial_payables`, `financial_receivables`, `bank_accounts`, `cash_movements`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Módulos bancários e gateways de pagamento homologados.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewFinancial(role)` e `canSettle(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/financial/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Bloqueio de exclusão de títulos baixados ou vinculados a conciliação fechada.',
-    },
-  },
+  ...FINANCIAL_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 13. MÓDULO FISCAL
@@ -1575,6 +1528,27 @@ export function getScreenDocByRoute(route: string): ScreenDocEntry {
 
   // 3. Mapeamento de rotas legadas para telas unificadas (redirecionamentos)
   const LEGACY_ROUTE_MAP: Record<string, string> = {
+    // Financeiro legadas -> telas unificadas
+    '/admin/financeiro/contas-receber': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/boletos': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/cartoes': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/cheques': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/pix': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/cobrancas': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/cobranca-config': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/cobranca-certificacao': '/admin/financeiro/contas-a-receber-cobranca',
+    '/admin/financeiro/contas-pagar': '/admin/financeiro/contas-a-pagar-tesouraria',
+    '/admin/financeiro/tesouraria': '/admin/financeiro/contas-a-pagar-tesouraria',
+    '/admin/financeiro/caixa': '/admin/financeiro/contas-a-pagar-tesouraria',
+    '/admin/financeiro/movimentacoes': '/admin/financeiro/contas-a-pagar-tesouraria',
+    '/admin/financeiro/transferencias': '/admin/financeiro/contas-a-pagar-tesouraria',
+    '/admin/financeiro/aprovacoes': '/admin/financeiro/contas-a-pagar-tesouraria',
+    '/admin/financeiro/conciliacao': '/admin/financeiro/bancos-conciliacao',
+    '/admin/financeiro/fluxo-caixa': '/admin/financeiro/planejamento-gestao',
+    '/admin/financeiro/fechamento': '/admin/financeiro/planejamento-gestao',
+    '/admin/financeiro/relatorios': '/admin/financeiro/planejamento-gestao',
+    '/admin/financeiro/dashboard': '/admin/financeiro',
+
     // DP legadas -> telas unificadas
     '/admin/dp/colaboradores': '/admin/dp/colaboradores-contratos',
     '/admin/dp/contratos': '/admin/dp/colaboradores-contratos',

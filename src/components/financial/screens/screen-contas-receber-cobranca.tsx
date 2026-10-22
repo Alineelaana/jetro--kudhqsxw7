@@ -23,8 +23,8 @@ import { JetroTable } from '@/components/jetro-table'
 import { JetroColumnDef } from '@/components/jetro-table/types'
 import { RecordAttachmentsDialog } from '@/components/shared/record-attachments-dialog'
 import { ExportActions } from '@/components/shared/export-actions'
-import { CriticalJustificationDialog } from './critical-justification-dialog'
-import { isPeriodClosed } from './financial-advanced-service'
+import { CriticalJustificationDialog } from '../critical-justification-dialog'
+import { isPeriodClosed } from '../financial-advanced-service'
 import {
   getReceivables,
   createReceivable,
@@ -35,7 +35,7 @@ import {
   getPix,
   finGetList,
 } from '@/services/financial'
-import { useRealtime } from '@/hooks/useRealtime'
+import { useRealtime } from '@/hooks/use-realtime'
 import { CollectionCenterScreen } from '@/components/collection-center/collection-center-screen'
 import {
   FileText,
@@ -317,7 +317,7 @@ export function ScreenContasReceberCobranca() {
       dataType: 'date',
       defaultWidth: 110,
       cell: ({ value }) => {
-        const isLate = value && new Date(value) < new Date()
+        const isLate = value && new Date(String(value)) < new Date()
         return (
           <span className={`text-xs ${isLate ? 'text-red-600 font-bold' : ''}`}>
             {String(value || '—')}
@@ -486,9 +486,16 @@ export function ScreenContasReceberCobranca() {
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <ExportActions
-              data={filteredTitles}
+              title="Relatório de Contas a Receber"
+              headers={['Nº Título', 'Cliente', 'Vencimento', 'Valor', 'Status']}
+              data={filteredTitles.map((r) => [
+                r.numero_titulo || '',
+                r.cliente || '',
+                r.data_vencimento || '',
+                fmtCurrency(r.valor_original),
+                r.status || '',
+              ])}
               filenamePrefix="contas-a-receber"
-              pdfTitle="Relatório de Contas a Receber"
             />
             <Button
               onClick={handleOpenNew}

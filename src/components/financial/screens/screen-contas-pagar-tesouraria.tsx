@@ -23,8 +23,8 @@ import { JetroTable } from '@/components/jetro-table'
 import { JetroColumnDef } from '@/components/jetro-table/types'
 import { RecordAttachmentsDialog } from '@/components/shared/record-attachments-dialog'
 import { ExportActions } from '@/components/shared/export-actions'
-import { CriticalJustificationDialog } from './critical-justification-dialog'
-import { isPeriodClosed, detectDuplicatePayables } from './financial-advanced-service'
+import { CriticalJustificationDialog } from '../critical-justification-dialog'
+import { isPeriodClosed, detectDuplicatePayables } from '../financial-advanced-service'
 import {
   getPayables,
   createPayable,
@@ -37,7 +37,7 @@ import {
 import { FinancialApprovalsEvolved } from '@/components/financial/financial-approvals-evolved'
 import { FinancialCashRegister } from '@/components/financial/financial-cash-register'
 import { FinancialTreasury } from '@/components/financial/financial-treasury'
-import { useRealtime } from '@/hooks/useRealtime'
+import { useRealtime } from '@/hooks/use-realtime'
 import {
   FileText,
   CalendarDays,
@@ -297,7 +297,7 @@ export function ScreenContasPagarTesouraria() {
       dataType: 'date',
       defaultWidth: 110,
       cell: ({ value }) => {
-        const isLate = value && new Date(value) < new Date()
+        const isLate = value && new Date(String(value)) < new Date()
         return (
           <span className={`text-xs ${isLate ? 'text-red-600 font-bold' : ''}`}>
             {String(value || '—')}
@@ -492,9 +492,16 @@ export function ScreenContasPagarTesouraria() {
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <ExportActions
-              data={filteredTitles}
+              title="Relatório de Contas a Pagar"
+              headers={['Nº Título', 'Fornecedor', 'Vencimento', 'Valor', 'Status']}
+              data={filteredTitles.map((p) => [
+                p.numero_titulo || '',
+                p.fornecedor || '',
+                p.data_vencimento || '',
+                fmtCurrency(p.valor_original),
+                p.status || '',
+              ])}
               filenamePrefix="contas-a-pagar"
-              pdfTitle="Relatório de Contas a Pagar"
             />
             <Button
               onClick={() => {
