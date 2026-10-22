@@ -1,63 +1,81 @@
 import { DpLayout } from '@/components/dp/dp-shared'
-import { DpDashboard } from '@/components/dp/dp-dashboard'
-import { DpGenericScreen } from '@/components/dp/dp-generic-screen'
-import { DpReports } from '@/components/dp/dp-reports'
-import { DpPayroll } from '@/components/dp/dp-payroll'
-import { DpBankHoursLedger } from '@/components/dp/dp-bank-hours-ledger'
-import { DpEsocialMonitor } from '@/components/dp/dp-esocial-monitor'
-import { DpFgtsDigital } from '@/components/dp/dp-fgts-digital'
-import { DpReinstatementFlow } from '@/components/dp/dp-reinstatement-flow'
-import { DpAdapta } from '@/components/dp/dp-adapta'
-import { RhTimeControl } from '@/components/rh/rh-time-control'
-import { RhVacations } from '@/components/rh/rh-vacations'
-import { DP_SCREEN_CONFIGS } from '@/lib/dp-types'
-import { DP_ENTERPRISE_CONFIGS } from '@/lib/dp-enterprise-types'
-
-const ALL_DP_CONFIGS = { ...DP_SCREEN_CONFIGS, ...DP_ENTERPRISE_CONFIGS }
+import { DpPainelScreen } from '@/components/dp/screens/dp-painel-screen'
+import { DpColaboradoresContratosScreen } from '@/components/dp/screens/dp-colaboradores-contratos-screen'
+import { DpJornadaPontoScreen } from '@/components/dp/screens/dp-jornada-ponto-screen'
+import { DpFeriasAfastamentosScreen } from '@/components/dp/screens/dp-ferias-afastamentos-screen'
+import { DpFolhaBeneficiosScreen } from '@/components/dp/screens/dp-folha-beneficios-screen'
+import { DpObrigacoesEsocialScreen } from '@/components/dp/screens/dp-obrigacoes-esocial-screen'
 
 const TITLES: Record<string, string> = {
-  dashboard: 'Dashboard DP',
-  payroll: 'Folha de Pagamento',
-  time_control: 'Controle de Ponto',
-  vacations: 'Férias',
-  reports: 'Relatórios DP',
-  bank_hours: 'Banco de Horas',
-  esocial_monitor: 'Monitor eSocial',
-  fgts_digital: 'FGTS Digital',
-  reinstatement: 'Reintegração',
-  adapta: 'ADAPTA DP',
+  painel: 'Painel DP',
+  'colaboradores-contratos': 'Colaboradores e Contratos',
+  'jornada-ponto': 'Jornada e Ponto',
+  'ferias-afastamentos': 'Férias e Afastamentos',
+  'folha-beneficios': 'Folha e Benefícios',
+  'obrigacoes-esocial': 'Obrigações e eSocial',
+  // Legados para compatibilidade
+  dashboard: 'Painel DP',
+  payroll: 'Folha e Benefícios',
+  time_control: 'Jornada e Ponto',
+  vacations: 'Férias e Afastamentos',
+  reports: 'Obrigações e eSocial',
+  bank_hours: 'Jornada e Ponto',
+  esocial_monitor: 'Obrigações e eSocial',
+  fgts_digital: 'Obrigações e eSocial',
+  reinstatement: 'Colaboradores e Contratos',
 }
 
 export default function DP({ screen }: { screen: string }) {
-  const title = TITLES[screen] || ALL_DP_CONFIGS[screen]?.title || 'DP'
+  const title = TITLES[screen] || 'Departamento Pessoal'
 
   const renderScreen = () => {
     switch (screen) {
+      case 'painel':
       case 'dashboard':
-        return <DpDashboard />
-      case 'payroll':
-        return <DpPayroll />
-      case 'time_control':
-        return <RhTimeControl />
-      case 'vacations':
-        return <RhVacations />
-      case 'reports':
-        return <DpReports />
-      case 'bank_hours':
-        return <DpBankHoursLedger />
-      case 'esocial_monitor':
-        return <DpEsocialMonitor />
-      case 'fgts_digital':
-        return <DpFgtsDigital />
+        return <DpPainelScreen />
+
+      case 'colaboradores-contratos':
       case 'reinstatement':
-        return <DpReinstatementFlow />
-      case 'adapta':
-        return <DpAdapta />
-      default: {
-        const config = ALL_DP_CONFIGS[screen]
-        if (config) return <DpGenericScreen config={config} />
-        return <DpDashboard />
-      }
+      case 'admissoes':
+      case 'alteracoes':
+      case 'desligamentos':
+      case 'reintegracao':
+      case 'documentos':
+        return <DpColaboradoresContratosScreen />
+
+      case 'jornada-ponto':
+      case 'time_control':
+      case 'bank_hours':
+      case 'banco_horas':
+      case 'horas_extras':
+      case 'escalas':
+      case 'jornadas':
+        return <DpJornadaPontoScreen />
+
+      case 'ferias-afastamentos':
+      case 'vacations':
+      case 'afastamentos':
+      case 'licencas':
+        return <DpFeriasAfastamentosScreen />
+
+      case 'folha-beneficios':
+      case 'payroll':
+      case 'rubricas':
+      case 'encargos':
+      case 'provisoes':
+      case 'benefits':
+      case 'consignados':
+        return <DpFolhaBeneficiosScreen />
+
+      case 'obrigacoes-esocial':
+      case 'esocial_monitor':
+      case 'fgts_digital':
+      case 'reports':
+      case 'sindicatos':
+      case 'dissidio':
+      case 'tabelas_tributarias':
+      default:
+        return <DpObrigacoesEsocialScreen />
     }
   }
 

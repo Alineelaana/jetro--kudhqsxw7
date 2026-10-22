@@ -17,23 +17,27 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { RhTable, RhEmptyState, RhLoading, RhStatusBadge } from '@/components/rh/rh-shared'
+import { RhLoading, RhEmptyState, RhTable, RhStatusBadge } from '@/components/rh/rh-shared'
 import { rhGetList, rhCreate, rhUpdate, rhDelete } from '@/services/rh'
 import { useRealtime } from '@/hooks/use-realtime'
-import { useOrgFilter } from '@/hooks/use-org-filter'
-import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
-import type { RhScreenConfig } from '@/lib/rh-types'
-import { Plus, Search, Pencil, Trash2, Loader2, Save } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { Plus, Search, Pencil, Trash2, Loader2, Save, Paperclip } from 'lucide-react'
 import { toast } from 'sonner'
+import type { ScreenConfig } from '@/lib/rh-types'
+import { ExportActions } from '@/components/shared/export-actions'
+import { RecordAttachmentsDialog } from '@/components/shared/record-attachments-dialog'
+import { QuickEmployeeLinks } from '@/components/shared/quick-employee-links'
 
-export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
-  const { hasMissingOrgBinding } = useOrgFilter()
+export function RhGenericScreen({ config }: { config: ScreenConfig }) {
+  const { user } = useAuth()
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<any | null>(null)
+  const [editing, setEditing] = useState<any>(null)
+  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
+  const [attachmentTarget, setAttachmentTarget] = useState<any | null>(null)
   const [saving, setSaving] = useState(false)
 
   const load = async () => {
@@ -112,20 +116,45 @@ export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
     return <MissingTenantNotice moduleName={`Recursos Humanos — ${config.title}`} />
   }
 
+  const exportHeaders = [
+    ...config.fields.map((f) => f.label),
+    ...(config.statusField ? ['Situação'] : []),
+  ]
+  const exportRows = filtered.map((r) => [
+    ...config.fields.map((f) => r[f.name] || ''),
+    ...(config.statusField ? [r[config.statusField] || ''] : []),
+  ])
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h3 className="text-lg font-bold">{config.title}</h3>
-        <Button onClick={openNew} className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold">
-          <Plus className="w-4 h-4 mr-2" /> Novo
-        </Button>
+        <div>
+          <h3 className="text-lg font-bold">{config.title}</h3>
+          <p className="text-xs text-muted-foreground">
+            {records.length} registro(s) encontrado(s)
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <ExportActions
+            title={config.title}
+            headers={exportHeaders}
+            data={exportRows}
+            filenamePrefix={config.collection}
+          />
+          <Button
+            onClick={openNew}
+            className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold h-8 text-xs"
+          >
+            <Plus className="w-4 h-4 mr-1.5" /> Novo Registro
+          </Button>
+        </div>
       </div>
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar..."
+          placeholder="Buscar registros..."
           className="pl-10 focus-visible:ring-[#005B2E]"
         />
       </div>
@@ -148,12 +177,28 @@ export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
                 </td>
               )}
               <td className="px-3 py-3">
-                <div className="flex gap-0.5">
+                <div className="flex items-center gap-1">
+                  {(r.employee_name || r.nome_completo || r.colaborador) && (
+                    <QuickEmployeeLinks
+                      employeeId={r.employee_id || r.id}
+                      employeeName={r.employee_name || r.nome_completo || r.colaborador}
+                    />
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setAttachmentTarget(r)}
+                    className="text-muted-foreground hover:text-[#005B2E] hover:bg-[#005B2E]/10 h-8 w-8 p-0"
+                    title="Anexos do registro"
+                  >
+                    <Paperclip className="w-3.5 h-3.5" />
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => openEdit(r)}
                     className="text-[#005B2E] hover:bg-[#005B2E]/10 h-8 w-8 p-0"
+                    title="Editar"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
@@ -162,6 +207,7 @@ export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
                     variant="ghost"
                     onClick={() => handleDelete(r.id)}
                     className="text-red-600 hover:bg-red-50 h-8 w-8 p-0"
+                    title="Excluir"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
@@ -258,6 +304,16 @@ export function RhGenericScreen({ config }: { config: RhScreenConfig }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {attachmentTarget && (
+        <RecordAttachmentsDialog
+          open={!!attachmentTarget}
+          onOpenChange={(op) => !op && setAttachmentTarget(null)}
+          module="RH"
+          recordId={attachmentTarget.id}
+          recordTitle={`${config.title} — ${attachmentTarget.nome || attachmentTarget.title || attachmentTarget.employee_name || attachmentTarget.id}`}
+        />
+      )}
     </div>
   )
 }

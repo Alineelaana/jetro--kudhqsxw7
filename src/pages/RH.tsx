@@ -1,91 +1,106 @@
+import { Navigate } from 'react-router-dom'
 import { RhLayout } from '@/components/rh/rh-shared'
-import { RhDashboard } from '@/components/rh/rh-dashboard'
-import { RhEmployees } from '@/components/rh/rh-employees'
-import { RhTimeControl } from '@/components/rh/rh-time-control'
-import { RhVacations } from '@/components/rh/rh-vacations'
-import { RhPayroll } from '@/components/rh/rh-payroll'
-import { RhReports } from '@/components/rh/rh-reports'
-import { RhGenericScreen } from '@/components/rh/rh-generic-screen'
-import { RhOrganograma } from '@/components/rh/rh-organograma'
-import { RhNineBox } from '@/components/rh/rh-nine-box'
-import { RhTalentReview } from '@/components/rh/rh-talent-review'
-import { RhEngajamento } from '@/components/rh/rh-engajamento'
-import { RhCockpit } from '@/components/rh/rh-cockpit'
-import { RhAdapta } from '@/components/rh/rh-adapta'
-import { RH_SCREEN_CONFIGS } from '@/lib/rh-types'
-import { RH_ENTERPRISE_CONFIGS } from '@/lib/rh-enterprise-types'
-import { RH_EXTENDED_CONFIGS } from '@/lib/rh-extended-configs'
+import { RhPainelScreen } from '@/components/rh/screens/rh-painel-screen'
+import { RhGestaoTalentosScreen } from '@/components/rh/screens/rh-gestao-talentos-screen'
+import { RhCarreiraDesenvolvimentoScreen } from '@/components/rh/screens/rh-carreira-desenvolvimento-screen'
+import { RhClimaEngajamentoScreen } from '@/components/rh/screens/rh-clima-engajamento-screen'
+import { RhEstruturaOrganizacionalScreen } from '@/components/rh/screens/rh-estrutura-organizacional-screen'
+import { RhJornadaColaboradorScreen } from '@/components/rh/screens/rh-jornada-colaborador-screen'
+import { RhAprovacoesScreen } from '@/components/rh/screens/rh-aprovacoes-screen'
 
 const TITLES: Record<string, string> = {
-  dashboard: 'Dashboard de RH',
-  employees: 'Colaboradores',
-  positions: 'Cargos',
-  departments: 'Departamentos',
-  time_control: 'Controle de Ponto',
-  vacations: 'Férias',
-  payroll: 'Folha de Pagamento',
-  benefits: 'Benefícios',
-  trainings: 'Treinamentos',
-  documents: 'Documentos dos Colaboradores',
-  approvals: 'Aprovações de RH',
-  reports: 'Relatórios de RH',
-  organograma: 'Organograma',
-  posicoes: 'Posições',
-  competencias: 'Competências',
-  avaliacao_competencias: 'Avaliação de Competências',
-  calibracao: 'Calibração',
-  feedback: 'Feedback Contínuo',
-  pdi: 'PDI — Plano de Desenvolvimento',
-  carreira: 'Plano de Carreira',
-  sucessao: 'Sucessão',
-  nine_box: 'Matriz 9 Box',
-  talent_review: 'Talent Review',
-  onboarding: 'Onboarding',
-  offboarding: 'Offboarding',
-  reconhecimento: 'Reconhecimento',
-  engajamento: 'Engajamento',
-  cockpit: 'Cockpit Executivo',
-  adapta: 'ADAPTA RH',
+  painel: 'Painel RH',
+  'gestao-talentos': 'Gestão de Talentos',
+  'carreira-desenvolvimento': 'Carreira e Desenvolvimento',
+  'clima-engajamento': 'Clima e Engajamento',
+  'estrutura-organizacional': 'Estrutura Organizacional',
+  'jornada-colaborador': 'Jornada do Colaborador',
+  aprovacoes: 'Aprovações RH',
+  // Legados para exibição
+  cockpit: 'Painel RH',
+  dashboard: 'Painel RH',
+  nine_box: 'Gestão de Talentos',
+  talent_review: 'Gestão de Talentos',
+  organograma: 'Estrutura Organizacional',
+  engajamento: 'Clima e Engajamento',
 }
 
 export default function RH({ screen }: { screen: string }) {
-  const title = TITLES[screen] || 'RH'
+  // REDIRECIONAMENTOS DE DUPLICIDADES PARA O MÓDULO DP (conforme especificação aprovada)
+  if (screen === 'employees' || screen === 'colaboradores') {
+    return <Navigate to="/admin/dp/colaboradores-contratos" replace />
+  }
+  if (screen === 'vacations' || screen === 'ferias') {
+    return <Navigate to="/admin/dp/ferias-afastamentos" replace />
+  }
+  if (
+    screen === 'payroll' ||
+    screen === 'folha' ||
+    screen === 'benefits' ||
+    screen === 'beneficios'
+  ) {
+    return <Navigate to="/admin/dp/folha-beneficios" replace />
+  }
+  if (screen === 'time_control' || screen === 'ponto') {
+    return <Navigate to="/admin/dp/jornada-ponto" replace />
+  }
+  if (screen === 'documents' || screen === 'documentos') {
+    return <Navigate to="/admin/dp/colaboradores-contratos" replace />
+  }
+  if (screen === 'reports' || screen === 'relatorios') {
+    return <Navigate to="/admin/dp/obrigacoes-esocial" replace />
+  }
+
+  const title = TITLES[screen] || 'Gestão de Pessoas (RH)'
 
   const renderScreen = () => {
     switch (screen) {
-      case 'dashboard':
-        return <RhDashboard />
-      case 'employees':
-        return <RhEmployees />
-      case 'time_control':
-        return <RhTimeControl />
-      case 'vacations':
-        return <RhVacations />
-      case 'payroll':
-        return <RhPayroll />
-      case 'reports':
-        return <RhReports />
-      case 'organograma':
-        return <RhOrganograma />
-      case 'nine_box':
-        return <RhNineBox />
-      case 'talent_review':
-        return <RhTalentReview />
-      case 'engajamento':
-        return <RhEngajamento />
+      case 'painel':
       case 'cockpit':
-        return <RhCockpit />
-      case 'adapta':
-        return <RhAdapta />
-      default: {
-        const config =
-          RH_SCREEN_CONFIGS[screen] ||
-          RH_ENTERPRISE_CONFIGS[screen] ||
-          RH_EXTENDED_CONFIGS[screen] ||
-          (screen === 'carreira' ? RH_EXTENDED_CONFIGS['plano_carreira'] : undefined)
-        if (config) return <RhGenericScreen config={config} />
-        return <RhDashboard />
-      }
+      case 'dashboard':
+        return <RhPainelScreen />
+
+      case 'gestao-talentos':
+      case 'competencias':
+      case 'avaliacao_competencias':
+      case 'calibracao':
+      case 'feedback':
+      case 'pdi':
+      case 'nine_box':
+      case 'talent_review':
+      case 'sucessao':
+        return <RhGestaoTalentosScreen />
+
+      case 'carreira-desenvolvimento':
+      case 'carreira':
+      case 'plano_carreira':
+      case 'trainings':
+      case 'treinamentos':
+      case 'reconhecimento':
+        return <RhCarreiraDesenvolvimentoScreen />
+
+      case 'clima-engajamento':
+      case 'engajamento':
+        return <RhClimaEngajamentoScreen />
+
+      case 'estrutura-organizacional':
+      case 'organograma':
+      case 'cargos':
+      case 'positions':
+      case 'posicoes':
+      case 'departamentos':
+      case 'departments':
+        return <RhEstruturaOrganizacionalScreen />
+
+      case 'jornada-colaborador':
+      case 'onboarding':
+      case 'offboarding':
+        return <RhJornadaColaboradorScreen />
+
+      case 'aprovacoes':
+      case 'approvals':
+      default:
+        return <RhAprovacoesScreen />
     }
   }
 
