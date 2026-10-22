@@ -89,7 +89,6 @@ export const PERMISSION_ACTIONS = [
   'Alterar configurações',
 ]
 export const CONFIG_SCREENS = [
-  { key: 'dados-empresa', path: '/admin/configuracoes/dados-empresa', label: 'Dados da Empresa' },
   { key: 'parametros', path: '/admin/configuracoes/parametros', label: 'Parâmetros do Sistema' },
   { key: 'logs', path: '/admin/configuracoes/logs', label: 'Logs' },
   { key: 'integracoes', path: '/admin/configuracoes/integracoes', label: 'Integrações' },

@@ -609,8 +609,11 @@ const App = () => (
                                   path="/admin/configuracoes"
                                   element={<ConfiguracoesLayout />}
                                 >
-                                  <Route index element={<Navigate to="dados-empresa" replace />} />
-                                  <Route path="dados-empresa" element={<EmpresaScreen />} />
+                                  <Route index element={<Navigate to="parametros" replace />} />
+                                  <Route
+                                    path="dados-empresa"
+                                    element={<Navigate to="/admin/cadastros/empresas" replace />}
+                                  />
                                   <Route path="parametros" element={<ParametrosScreen />} />
                                   <Route
                                     path="permissoes"

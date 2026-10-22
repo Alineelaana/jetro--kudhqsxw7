@@ -583,6 +583,113 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
+  // 9.0 CADASTRO DE EMPRESAS (MATRIZ E FILIAIS / CONSULTA CNPJ)
+  // -------------------------------------------------------------
+  '/admin/cadastros/empresas': {
+    route: '/admin/cadastros/empresas',
+    title: 'Cadastro de Empresas (Matriz e Filiais)',
+    moduleGroup: 'Comercial',
+    docVersion: '1.2.0',
+    lastUpdated: '2026-04-14',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar as pessoas jurídicas do grupo empresarial Huram (empresas independentes, matrizes e filiais vinculadas), permitindo a consulta automatizada de dados públicos cadastrais via CNPJ, parametrização de identidade visual/marca por unidade e preservando o isolamento multitenancy estrito entre os CNPJs do sistema.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem completa de empresas cadastradas com visualização em tabela de código, razão social, nome fantasia, CNPJ, badge de classificação (Matriz vs. Filial com indicador da matriz vinculada), status ativo/inativo e data de cadastro.\n- Busca rápida em tempo real por razão social, nome fantasia, CNPJ ou código.\n- Formulário padronizado de cadastro e edição de empresas via modal (`CadastroFormDialog`), suportando inserção manual ou enriquecimento via consulta de CNPJ.\n- Consulta Pública de CNPJ: botão dedicado "Consultar CNPJ" integrado a provedores públicos (BrasilAPI com fallback transparente para ReceitaWS), que normaliza e preenche automaticamente Razão Social, Nome Fantasia, Endereço consolidado (logradouro, número, complemento e bairro), Município, UF, CEP, Telefone e E-mail.\n- Revisão antes de Salvar: o preenchimento automático nunca trava os campos; todos os dados permanecem 100% editáveis pelo operador antes da confirmação.\n- Classificação de Unidade: seleção do Tipo de Unidade entre "Empresa independente / Matriz" e "Filial".\n- Vínculo Obrigatório de Matriz: ao selecionar "Filial", a interface renderiza campo obrigatório com a lista de empresas matrizes cadastradas (filtrando outras filiais e a própria empresa em edição), garantindo a hierarquia corporativa.\n- Identidade de Marca por Empresa: campos para definição de nome da marca, cor primária, cor secundária, logotipo oficial e flag de empresa padrão do ERP.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Multitenancy Intacto e Isolamento por CNPJ: cada empresa/filial possui seus próprios lançamentos, pedidos, movimentações de estoque, títulos financeiros e permissões de usuários; o vínculo matriz-filial é exclusivamente estrutural e cadastral, sem mistura cruzada de dados operacionais.\n- Validação Obrigatória de Matriz para Filiais: nenhuma unidade classificada como "Filial" pode ser salva sem `matriz_id` válido apontando para uma empresa matriz previamente cadastrada.\n- Auto-vínculo Bloqueado: uma empresa não pode ser matriz de si mesma.\n- Exclusão e Hierarquia: filiais cadastradas não aparecem na listagem de seleção de matrizes para evitar encadeamentos cíclicos inválidos.\n- Resiliência da Consulta de CNPJ: falhas de conectividade, CNPJ inexistente ou instabilidade nos provedores públicos externos exibem aviso claro e não bloqueiam o preenchimento manual nem a operação do formulário.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O operador acessa Cadastros → Empresas (`/admin/cadastros/empresas`).\n2. Para cadastrar nova unidade, clica em "Novo Cadastro".\n3. Informa o CNPJ (14 dígitos) e clica em "Consultar CNPJ". O serviço público consulta BrasilAPI (ou ReceitaWS) e preenche os campos cadastrais disponíveis.\n4. O operador revisa e complementa os dados cadastrais (Razão Social, Nome Fantasia, Inscrição Estadual, Endereço, etc.).\n5. Define o Tipo de Unidade: se "Filial", seleciona obrigatoriamente a empresa Matriz responsável.\n6. Ao clicar em "Salvar", o sistema valida a obrigatoriedade dos campos, persiste na coleção `empresas` com `tipo_unidade` e `matriz_id` e atualiza a listagem.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleção PocketBase: `empresas` (campos: `code`, `name`, `razao_social`, `nome_fantasia`, `cnpj`, `tipo_unidade`, `matriz_id`, `inscricao_estadual`, `inscricao_municipal`, `address`, `city`, `state`, `cep`, `phone`, `email`, `active`, `padrao`, `marca_nome_exibicao`, `marca_cor_primaria`, `marca_cor_secundaria`, `logo`, `marca_logo`).\n- Serviços externos: APIs públicas da BrasilAPI e ReceitaWS para consulta de CNPJ.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Serviço `consultarCNPJPublico` em `src/services/cnpj-service.ts` (BrasilAPI v1/v2 com fallback automático para ReceitaWS v1).\n- Redirecionamento 301/replace da rota antiga `/admin/configuracoes/dados-empresa` para `/admin/cadastros/empresas`.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso liberado conforme a governança de Cadastros/Configurações (`canViewConfiguracoes(role)`).\n- Alteração e criação restritas a administradores e supervisores corporativos autorizados.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `src/components/cadastros/cadastro-standard-screen.tsx`, `src/components/cadastros/cadastro-form-dialog.tsx`.\n- Configuração: `src/lib/cadastros-config.ts` (coleção `empresas`).\n- Serviços: `src/services/cnpj-service.ts`, `src/services/cadastros.ts`.\n- Cliente: `pb` (`src/lib/pocketbase/client.ts`).',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Erro de consulta pública de CNPJ: exibe feedback em toast e card informativo com a mensagem de falha, permitindo preenchimento manual sem perda de dados.\n- Tentativa de salvar Filial sem Matriz: bloqueio imediato com aviso descritivo.\n- Falhas de gravação no banco: notificação via toast destrutivo mantendo os dados preenchidos no formulário.',
+    },
+  },
+
+  // Redirecionamento da rota antiga de dados da empresa para a documentação unificada
+  '/admin/configuracoes/dados-empresa': {
+    route: '/admin/configuracoes/dados-empresa',
+    title: 'Dados da Empresa (Rota Legada → Unificada em Cadastros/Empresas)',
+    moduleGroup: 'Administração',
+    docVersion: '1.2.0',
+    lastUpdated: '2026-04-14',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Rota legada mantida com redirecionamento automático (`<Navigate to="/admin/cadastros/empresas" replace />`) para a tela unificada e oficial de Cadastro de Empresas do ERP Huram.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Redirecionamento transparente e imediato de navegação legada para `/admin/cadastros/empresas`.\n- Unificação do cadastro cadastral e fiscal de empresas na Central de Cadastros com suporte a CNPJ público e hierarquia Matriz/Filial.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- O item "Dados da Empresa" foi removido do menu Configurações para unificar a gestão de pessoas jurídicas sob Cadastros → Empresas.\n- Todas as regras de negócio, permissões e integrações aplicam-se à tela oficial `/admin/cadastros/empresas`.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        'Qualquer requisição ou link para `/admin/configuracoes/dados-empresa` é redirecionado instantaneamente pelo roteador para `/admin/cadastros/empresas`.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content: 'Consulte a documentação de `/admin/cadastros/empresas`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: 'Consulte a documentação de `/admin/cadastros/empresas`.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: 'Consulte a documentação de `/admin/cadastros/empresas`.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: 'Roteamento em `src/App.tsx`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content: 'N/A (redirecionamento declarativo via React Router).',
+    },
+  },
+
+  // -------------------------------------------------------------
   // 9.1 GESTÃO DE USUÁRIOS (ROTA DIRETA E SUBMENU DE CADASTROS)
   // -------------------------------------------------------------
   '/admin/cadastros/usuarios': {

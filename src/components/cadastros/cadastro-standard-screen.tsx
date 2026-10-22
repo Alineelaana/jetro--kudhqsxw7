@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -87,12 +87,35 @@ export function CadastroStandardScreen({ config }: Props) {
   }, [config.collection])
   useRealtime(config.collection, () => load())
 
+  const isEmpresas = config.collection === 'empresas'
+
+  // Mapa de id da empresa -> nome da empresa para lookup rápido da matriz
+  const empresasNameMap = useMemo(() => {
+    const map = new Map<string, string>()
+    if (isEmpresas) {
+      records.forEach((r) => {
+        const nome = String(r.nome_fantasia || r.razao_social || r.name || r.code || r.id)
+        map.set(r.id, nome)
+      })
+    }
+    return map
+  }, [records, isEmpresas])
+
   const filtered = records.filter((r) => {
     const term = search.toLowerCase().trim()
     const matchSearch =
       !term ||
       (r.code || '').toLowerCase().includes(term) ||
-      (r.name || '').toLowerCase().includes(term)
+      (r.name || '').toLowerCase().includes(term) ||
+      String(r.cnpj || '')
+        .toLowerCase()
+        .includes(term) ||
+      String(r.razao_social || '')
+        .toLowerCase()
+        .includes(term) ||
+      String(r.nome_fantasia || '')
+        .toLowerCase()
+        .includes(term)
     const matchStatus =
       statusFilter === 'all' ||
       (statusFilter === 'active' && r.active !== false) ||
@@ -255,15 +278,82 @@ export function CadastroStandardScreen({ config }: Props) {
                 header: 'Nome',
                 accessorKey: 'name',
                 dataType: 'text',
-                defaultWidth: 260,
-                cell: ({ value }) => <span className="font-medium">{String(value || '—')}</span>,
+                defaultWidth: isEmpresas ? 220 : 260,
+                cell: ({ row, value }) => {
+                  const sub =
+                    isEmpresas && row.razao_social && row.razao_social !== value
+                      ? String(row.razao_social)
+                      : null
+                  return (
+                    <div className="flex flex-col">
+                      <span className="font-medium">{String(value || '—')}</span>
+                      {sub && (
+                        <span className="text-[11px] text-muted-foreground truncate max-w-[240px]">
+                          {sub}
+                        </span>
+                      )}
+                    </div>
+                  )
+                },
               },
+              ...(isEmpresas
+                ? [
+                    {
+                      id: 'cnpj',
+                      header: 'CNPJ',
+                      accessorKey: 'cnpj',
+                      dataType: 'text' as const,
+                      defaultWidth: 160,
+                      cell: ({ value }: { value: unknown }) => (
+                        <span className="font-mono text-xs">{String(value || '—')}</span>
+                      ),
+                    },
+                    {
+                      id: 'tipo_unidade',
+                      header: 'Unidade',
+                      accessorKey: 'tipo_unidade',
+                      dataType: 'text' as const,
+                      defaultWidth: 170,
+                      cell: ({ row }: { row: CadastroRecord }) => {
+                        const tipo = String(row.tipo_unidade || 'Matriz').trim()
+                        const isFilial = tipo.toLowerCase() === 'filial'
+                        const matrizNome = row.matriz_id
+                          ? empresasNameMap.get(String(row.matriz_id)) || 'Matriz vinculada'
+                          : null
+
+                        if (isFilial) {
+                          return (
+                            <div className="flex flex-col gap-0.5">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 w-fit">
+                                Filial
+                              </span>
+                              {matrizNome && (
+                                <span
+                                  className="text-[11px] text-muted-foreground truncate max-w-[150px]"
+                                  title={`Matriz: ${matrizNome}`}
+                                >
+                                  ↳ {matrizNome}
+                                </span>
+                              )}
+                            </div>
+                          )
+                        }
+
+                        return (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 w-fit">
+                            Matriz
+                          </span>
+                        )
+                      },
+                    },
+                  ]
+                : []),
               {
                 id: 'created',
                 header: 'Data de Cadastro',
                 accessorKey: 'created',
                 dataType: 'date',
-                defaultWidth: 140,
+                defaultWidth: 130,
                 cell: ({ value }) => (
                   <span className="text-muted-foreground text-xs">
                     {fmtDate(String(value || ''))}

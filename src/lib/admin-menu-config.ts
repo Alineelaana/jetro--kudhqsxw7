@@ -184,11 +184,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'APIs', route: '/admin/configuracoes/apis', perm: canManageApis },
           { label: 'Backup', route: '/admin/configuracoes/backup', perm: canManageBackups },
           {
-            label: 'Dados da Empresa',
-            route: '/admin/configuracoes/dados-empresa',
-            perm: canManageConfiguracoes,
-          },
-          {
             label: 'Importação/Exportação',
             route: '/admin/configuracoes/importacao-exportacao',
             perm: canManageConfiguracoes,
