@@ -70,7 +70,19 @@ function Sel({
   )
 }
 
-export function AuditFilters({ filters, onChange, onClear, hasFilters }: Props) {
+interface ExtendedProps extends Props {
+  onSearch?: () => void
+  loading?: boolean
+}
+
+export function AuditFilters({
+  filters,
+  onChange,
+  onClear,
+  hasFilters,
+  onSearch,
+  loading,
+}: ExtendedProps) {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -204,11 +216,25 @@ export function AuditFilters({ filters, onChange, onClear, hasFilters }: Props) 
           />
         </Field>
       </div>
-      {hasFilters && (
-        <Button variant="ghost" size="sm" onClick={onClear} className="text-muted-foreground">
-          Limpar filtros
-        </Button>
-      )}
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
+        <div className="flex items-center gap-2">
+          {onSearch && (
+            <Button
+              onClick={onSearch}
+              disabled={loading}
+              className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold h-9 px-5 shadow-sm"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Pesquisar
+            </Button>
+          )}
+          {hasFilters && (
+            <Button variant="ghost" size="sm" onClick={onClear} className="text-muted-foreground">
+              Limpar filtros
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

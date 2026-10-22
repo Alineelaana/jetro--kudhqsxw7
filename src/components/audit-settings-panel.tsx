@@ -21,8 +21,19 @@ import {
   type AuditAlertConfig,
 } from '@/services/audit-settings'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
-import { Loader2, Save, Settings, Bell, Archive, FileText, Send, Play } from 'lucide-react'
+import {
+  Loader2,
+  Save,
+  Settings,
+  Bell,
+  Archive,
+  FileText,
+  Send,
+  Play,
+  ShieldAlert,
+} from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { AuditMovementAlertsSection } from '@/components/audit-movement-alerts-section'
 
 function NumField({
   label,
@@ -160,10 +171,13 @@ export function AuditSettingsPanel() {
         </Button>
       </div>
 
-      <Tabs defaultValue="alerts">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+      <Tabs defaultValue="movement-alerts">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+          <TabsTrigger value="movement-alerts" className="font-bold">
+            <ShieldAlert className="w-4 h-4 mr-1 text-[#005B2E]" /> Movimentações Suspeitas
+          </TabsTrigger>
           <TabsTrigger value="alerts">
-            <Bell className="w-4 h-4 mr-1" /> Alertas
+            <Bell className="w-4 h-4 mr-1" /> Limites de Sessão
           </TabsTrigger>
           <TabsTrigger value="notifications">
             <Send className="w-4 h-4 mr-1" /> Notificações
@@ -175,6 +189,10 @@ export function AuditSettingsPanel() {
             <FileText className="w-4 h-4 mr-1" /> Relatórios
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="movement-alerts">
+          <AuditMovementAlertsSection />
+        </TabsContent>
 
         <TabsContent value="alerts">
           <Card className="border-2 border-[#005B2E]/20">

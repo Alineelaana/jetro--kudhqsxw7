@@ -18,15 +18,17 @@ import { getAuditLogs, type AuditLog } from '@/services/audit-logs'
 import { AUDIT_MODULE_OPTIONS, AUDIT_ACTION_OPTIONS, AUDIT_ROLE_OPTIONS } from '@/lib/audit-helpers'
 import { exportAuditExcel, exportAuditPdf } from '@/lib/audit-export'
 import { AuditSettingsPanel } from '@/components/audit-settings-panel'
+import { AuditAlertOccurrencesPanel } from '@/components/audit-alert-occurrences-panel'
 import {
   Loader2,
   FileDown,
   FileSpreadsheet,
   Search,
-  ShieldCheck,
-  Eye,
-  AlertCircle,
   Settings,
+  Eye,
+  ShieldCheck,
+  AlertCircle,
+  AlertTriangle,
 } from 'lucide-react'
 import { AdminBackButton } from '@/components/admin-back-button'
 
@@ -48,6 +50,7 @@ export function AuditPanel() {
   const [fRole, setFRole] = useState('')
   const [fKeyword, setFKeyword] = useState('')
   const [showSettings, setShowSettings] = useState(false)
+  const [showAlertHistory, setShowAlertHistory] = useState(false)
 
   const authorName = (user?.name as string) || (user?.email as string) || 'Usuário'
 
@@ -85,6 +88,11 @@ export function AuditPanel() {
     loadLogs()
   })
 
+  const handleSearch = () => {
+    setPage(1)
+    loadLogs()
+  }
+
   const hasFilters = fUser || fStart || fEnd || fModule || fAction || fRole || fKeyword
   const clearFilters = () => {
     setFUser('')
@@ -94,6 +102,7 @@ export function AuditPanel() {
     setFAction('')
     setFRole('')
     setFKeyword('')
+    setPage(1)
   }
 
   const handleViewDetails = (log: AuditLog) => {
@@ -134,7 +143,19 @@ export function AuditPanel() {
             <ShieldCheck className="w-5 h-5 text-[#005B2E]" /> Auditoria do Sistema
           </h2>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant={showAlertHistory ? 'default' : 'outline'}
+            onClick={() => setShowAlertHistory(!showAlertHistory)}
+            className={
+              showAlertHistory
+                ? 'bg-amber-600 hover:bg-amber-700 text-white font-bold'
+                : 'border-amber-600 text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950 font-bold'
+            }
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {showAlertHistory ? 'Ocultar Ocorrências' : 'Histórico de Alertas'}
+          </Button>
           <Button
             variant="outline"
             onClick={() => setShowSettings(true)}
@@ -158,6 +179,19 @@ export function AuditPanel() {
           </Button>
         </div>
       </div>
+
+      {showAlertHistory && (
+        <div className="mb-4">
+          <AuditAlertOccurrencesPanel
+            currentEmpresa={user?.empresa || ''}
+            onViewLog={(logId) => {
+              setFKeyword(logId)
+              setShowAlertHistory(false)
+              loadLogs()
+            }}
+          />
+        </div>
+      )}
 
       <Card className="border-2 border-[#005B2E]/20">
         <CardContent className="py-4 space-y-3">
@@ -255,16 +289,36 @@ export function AuditPanel() {
               />
             </div>
           </div>
-          {hasFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="text-muted-foreground"
-            >
-              Limpar filtros
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleSearch}
+                disabled={loading}
+                className="bg-[#005B2E] hover:bg-[#01361D] text-white font-bold h-9 px-5 shadow-sm"
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Search className="w-4 h-4 mr-2" />
+                )}
+                Pesquisar
+              </Button>
+              {hasFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-muted-foreground hover:text-foreground h-9"
+                >
+                  Limpar filtros
+                </Button>
+              )}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Total de registros encontrados:{' '}
+              <strong className="text-foreground">{totalItems}</strong>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

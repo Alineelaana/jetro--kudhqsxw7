@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T01:13:34.558Z",
+  "generatedAt": "2026-10-22T02:08:17.117Z",
   "collections": [
     {
       "name": "users",
@@ -7835,6 +7835,48 @@
         {
           "name": "triage_resolved_at",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "filial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsible_user",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rule_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "metadata",
+          "type": "json",
           "required": false,
           "system": false
         }
