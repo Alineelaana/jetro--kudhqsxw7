@@ -38,7 +38,6 @@ export function RhGenericScreen({ config }: { config: ScreenConfig }) {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
   const [attachmentTarget, setAttachmentTarget] = useState<any | null>(null)
-  const [saving, setSaving] = useState(false)
 
   const load = async () => {
     try {
@@ -111,10 +110,6 @@ export function RhGenericScreen({ config }: { config: ScreenConfig }) {
   const tableHeaders = config.fields.slice(0, 4).map((f) => f.label)
   if (config.statusField) tableHeaders.push('Status')
   tableHeaders.push('Ações')
-
-  if (hasMissingOrgBinding) {
-    return <MissingTenantNotice moduleName={`Recursos Humanos — ${config.title}`} />
-  }
 
   const exportHeaders = [
     ...config.fields.map((f) => f.label),

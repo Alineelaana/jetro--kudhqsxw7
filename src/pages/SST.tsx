@@ -1,99 +1,157 @@
 import { SstLayout } from '@/components/sst/sst-shared'
-import { SstDashboard } from '@/components/sst/sst-dashboard'
-import { SstReports } from '@/components/sst/sst-reports'
-import { SstCockpit } from '@/components/sst/sst-cockpit'
-import { SstEsocialMonitor } from '@/components/sst/sst-esocial-monitor'
-import { SstComplianceDashboard } from '@/components/sst/sst-compliance-dashboard'
-import { SstTrainingMatrix } from '@/components/sst/sst-training-matrix'
-import { SstAdapta } from '@/components/sst/sst-adapta'
-import { SstPpp } from '@/components/sst/sst-ppp'
-import { SstInvestigations } from '@/components/sst/sst-investigations'
-import { SstObligationsCalendar } from '@/components/sst/sst-obligations-calendar'
-import { SstAuditChecklists } from '@/components/sst/sst-audit-checklists'
+import { SstPainelScreen } from '@/components/sst/screens/sst-painel-screen'
+import { SstGestaoRiscosPgrScreen } from '@/components/sst/screens/sst-gestao-riscos-pgr-screen'
+import { SstSaudeOcupacionalScreen } from '@/components/sst/screens/sst-saude-ocupacional-screen'
+import { SstSegurancaPrevencaoScreen } from '@/components/sst/screens/sst-seguranca-prevencao-screen'
+import { SstEpisTreinamentosScreen } from '@/components/sst/screens/sst-epis-treinamentos-screen'
+import { SstCentralConformidadeScreen } from '@/components/sst/screens/sst-central-conformidade-screen'
+import { SstDocumentosObrigacoesScreen } from '@/components/sst/screens/sst-documentos-obrigacoes-screen'
+import { SstRelatoriosScreen } from '@/components/sst/screens/sst-relatorios-screen'
 import { RhGenericScreen } from '@/components/rh/rh-generic-screen'
 import { SST_SCREEN_CONFIGS } from '@/lib/sst-types'
 import { SST_ENTERPRISE_SCREEN_CONFIGS } from '@/lib/sst-enterprise-types'
 
 const TITLES: Record<string, string> = {
-  dashboard: 'Dashboard SST',
+  painel: 'Painel SST',
+  'gestao-riscos-pgr': 'Gestão de Riscos e PGR (NR-1)',
+  'saude-ocupacional': 'Saúde Ocupacional',
+  'seguranca-prevencao': 'Segurança e Prevenção',
+  'epis-treinamentos': 'EPIs e Treinamentos',
+  'central-conformidade': 'Central de Conformidade SST',
+  'documentos-obrigacoes': 'Documentos e Obrigações',
+  'relatorios-sst': 'Relatórios SST',
+  // Legados para compatibilidade
+  dashboard: 'Painel SST',
+  cockpit: 'Painel SST',
   reports: 'Relatórios SST',
-  cockpit: 'Cockpit Executivo SST',
-  esocial_monitor: 'Monitor eSocial SST',
-  compliance_dashboard: 'Compliance por NR',
-  training_matrix: 'Matriz de Treinamento',
-  adapta: 'ADAPTA SST',
-  ppp: 'PPP — Perfil Profissiográfico Previdenciário',
-  investigations: 'Investigações de Acidentes',
-  obligations_calendar: 'Calendário de Obrigações',
-  audit_checklists: 'Auditorias SST',
-  nr10: 'NR-10 Segurança em Eletricidade',
-  nr10_electrical: 'NR-10 Segurança em Eletricidade',
-  nr11: 'NR-11 Transporte e Movimentação de Materiais',
-  nr11_material_handling: 'NR-11 Transporte e Movimentação de Materiais',
-  nr12: 'NR-12 Segurança em Máquinas e Equipamentos',
-  nr12_machines: 'NR-12 Segurança em Máquinas e Equipamentos',
-  nr13: 'NR-13 Caldeiras, Vasos de Pressão e Tubulações',
-  nr13_boilers: 'NR-13 Caldeiras, Vasos de Pressão e Tubulações',
-  nr15: 'NR-15 Atividades e Operações Insalubres',
-  nr15_insalubridade: 'NR-15 Atividades e Operações Insalubres',
-  nr16: 'NR-16 Atividades e Operações Perigosas',
-  nr16_periculosidade: 'NR-16 Atividades e Operações Perigosas',
+  compliance: 'Central de Conformidade SST',
+  compliance_dashboard: 'Central de Conformidade SST',
+  'nr-catalog': 'Central de Conformidade SST',
+  ergonomics: 'Central de Conformidade SST',
+  'confined-spaces': 'Central de Conformidade SST',
+  'height-work': 'Central de Conformidade SST',
+  documents: 'Documentos e Obrigações',
+  'obligations-calendar': 'Documentos e Obrigações',
+  'esocial-monitor': 'Documentos e Obrigações',
+  ltcat: 'Documentos e Obrigações',
+  ppp: 'Documentos e Obrigações',
 }
 
 export default function SST({ screen }: { screen: string }) {
-  const normalizedKey =
-    screen === 'nr10'
-      ? 'nr10_electrical'
-      : screen === 'nr11'
-        ? 'nr11_material_handling'
-        : screen === 'nr12'
-          ? 'nr12_machines'
-          : screen === 'nr13'
-            ? 'nr13_boilers'
-            : screen === 'nr15'
-              ? 'nr15_insalubridade'
-              : screen === 'nr16'
-                ? 'nr16_periculosidade'
-                : screen
-
-  const title =
-    TITLES[screen] ||
-    TITLES[normalizedKey] ||
-    SST_SCREEN_CONFIGS[screen]?.title ||
-    SST_ENTERPRISE_SCREEN_CONFIGS[normalizedKey]?.title ||
-    'SST'
+  const title = TITLES[screen] || 'Saúde e Segurança do Trabalho'
 
   const renderScreen = () => {
     switch (screen) {
+      case 'painel':
       case 'dashboard':
-        return <SstDashboard />
-      case 'reports':
-        return <SstReports />
       case 'cockpit':
-        return <SstCockpit />
-      case 'esocial_monitor':
-        return <SstEsocialMonitor />
-      case 'compliance_dashboard':
-        return <SstComplianceDashboard />
-      case 'training_matrix':
-        return <SstTrainingMatrix />
-      case 'adapta':
-        return <SstAdapta />
-      case 'ppp':
-        return <SstPpp />
+        return <SstPainelScreen />
+
+      case 'gestao-riscos-pgr':
+      case 'gro':
+      case 'risk_inventory':
+      case 'risk-inventory':
+      case 'risk_matrix':
+      case 'risk-matrix':
+      case 'action_plans':
+      case 'action-plans':
+      case 'work_environments':
+      case 'work-environments':
+      case 'exposure_groups':
+      case 'exposure-groups':
+      case 'environmental_assessments':
+      case 'environmental-assessments':
+      case 'apr':
+      case 'moc':
+      case 'psychosocial_assessments':
+      case 'psychosocial-assessments':
+        return <SstGestaoRiscosPgrScreen />
+
+      case 'saude-ocupacional':
+      case 'pcmso':
+      case 'aso':
+      case 'exams':
+      case 'medical_records':
+      case 'medical-records':
+      case 'vaccination':
+        return <SstSaudeOcupacionalScreen />
+
+      case 'seguranca-prevencao':
+      case 'accidents':
+      case 'cat':
+      case 'incidents':
       case 'investigations':
-        return <SstInvestigations />
-      case 'obligations_calendar':
-        return <SstObligationsCalendar />
+      case 'inspections':
+      case 'non_conformities':
+      case 'non-conformities':
+      case 'dds':
+      case 'work_permits':
+      case 'work-permits':
+      case 'lockout':
+      case 'emergencies':
+      case 'brigade':
+      case 'cipa':
+        return <SstSegurancaPrevencaoScreen />
+
+      case 'epis-treinamentos':
+      case 'epis':
+      case 'epcs':
+      case 'certificates':
+      case 'training_matrix':
+      case 'training-matrix':
+        return <SstEpisTreinamentosScreen />
+
+      case 'central-conformidade':
+      case 'compliance':
+      case 'compliance_dashboard':
+      case 'nr_catalog':
+      case 'nr-catalog':
+      case 'ergonomics':
+      case 'confined_spaces':
+      case 'confined-spaces':
+      case 'height_work':
+      case 'height-work':
+      case 'nr10':
+      case 'nr10_electrical':
+      case 'nr10-electrical':
+      case 'nr11':
+      case 'nr11_material_handling':
+      case 'nr11-material-handling':
+      case 'nr12':
+      case 'nr12_machines':
+      case 'nr12-machines':
+      case 'nr13':
+      case 'nr13_boilers':
+      case 'nr13-boilers':
+      case 'nr15':
+      case 'nr15_insalubridade':
+      case 'nr15-insalubridade':
+      case 'nr16':
+      case 'nr16_periculosidade':
+      case 'nr16-periculosidade':
+      case 'sesmt':
       case 'audit_checklists':
-        return <SstAuditChecklists />
+      case 'audit-checklists':
+        return <SstCentralConformidadeScreen />
+
+      case 'documentos-obrigacoes':
+      case 'ppp':
+      case 'ltcat':
+      case 'documents':
+      case 'esocial_monitor':
+      case 'esocial-monitor':
+      case 'obligations_calendar':
+      case 'obligations-calendar':
+        return <SstDocumentosObrigacoesScreen />
+
+      case 'relatorios-sst':
+      case 'reports':
+        return <SstRelatoriosScreen />
+
       default: {
-        const config =
-          SST_SCREEN_CONFIGS[screen] ||
-          SST_ENTERPRISE_SCREEN_CONFIGS[screen] ||
-          SST_ENTERPRISE_SCREEN_CONFIGS[normalizedKey]
+        const config = SST_SCREEN_CONFIGS[screen] || SST_ENTERPRISE_SCREEN_CONFIGS[screen]
         if (config) return <RhGenericScreen config={config} />
-        return <SstDashboard />
+        return <SstPainelScreen />
       }
     }
   }

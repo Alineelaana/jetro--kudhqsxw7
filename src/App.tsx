@@ -723,105 +723,157 @@ const App = () => (
                                   path="/admin/financeiro/relatorios"
                                   element={<Financial screen="reports" />}
                                 />
-                                <Route path="/admin/rh" element={<RH screen="dashboard" />} />
+                                {/* Módulo Recursos Humanos (7 Telas Oficiais) */}
+                                <Route path="/admin/rh" element={<RH screen="painel" />} />
+                                <Route
+                                  path="/admin/rh/aprovacoes"
+                                  element={<RH screen="aprovacoes" />}
+                                />
+                                <Route
+                                  path="/admin/rh/carreira-desenvolvimento"
+                                  element={<RH screen="carreira-desenvolvimento" />}
+                                />
+                                <Route
+                                  path="/admin/rh/clima-engajamento"
+                                  element={<RH screen="clima-engajamento" />}
+                                />
+                                <Route
+                                  path="/admin/rh/estrutura-organizacional"
+                                  element={<RH screen="estrutura-organizacional" />}
+                                />
+                                <Route
+                                  path="/admin/rh/gestao-talentos"
+                                  element={<RH screen="gestao-talentos" />}
+                                />
+                                <Route
+                                  path="/admin/rh/jornada-colaborador"
+                                  element={<RH screen="jornada-colaborador" />}
+                                />
+
+                                {/* Redirecionamentos de Rotas Antigas de RH */}
                                 <Route
                                   path="/admin/rh/colaboradores"
-                                  element={<RH screen="employees" />}
+                                  element={<Navigate to="/admin/rh/gestao-talentos" replace />}
                                 />
                                 <Route
                                   path="/admin/rh/cargos"
-                                  element={<RH screen="positions" />}
+                                  element={
+                                    <Navigate to="/admin/rh/estrutura-organizacional" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/rh/departamentos"
-                                  element={<RH screen="departments" />}
-                                />
-                                <Route
-                                  path="/admin/rh/ponto"
-                                  element={<RH screen="time_control" />}
-                                />
-                                <Route
-                                  path="/admin/rh/ferias"
-                                  element={<RH screen="vacations" />}
-                                />
-                                <Route path="/admin/rh/folha" element={<RH screen="payroll" />} />
-                                <Route
-                                  path="/admin/rh/beneficios"
-                                  element={<RH screen="benefits" />}
-                                />
-                                <Route
-                                  path="/admin/rh/treinamentos"
-                                  element={<RH screen="trainings" />}
-                                />
-                                <Route
-                                  path="/admin/rh/documentos"
-                                  element={<RH screen="documents" />}
-                                />
-                                <Route
-                                  path="/admin/rh/aprovacoes"
-                                  element={<RH screen="approvals" />}
-                                />
-                                <Route
-                                  path="/admin/rh/relatorios"
-                                  element={<RH screen="reports" />}
-                                />
-                                <Route
-                                  path="/admin/rh/avaliacao-competencias"
-                                  element={<RH screen="avaliacao_competencias" />}
-                                />
-                                <Route
-                                  path="/admin/rh/calibracao"
-                                  element={<RH screen="calibracao" />}
-                                />
-                                <Route
-                                  path="/admin/rh/carreira"
-                                  element={<RH screen="carreira" />}
-                                />
-                                <Route path="/admin/rh/cockpit" element={<RH screen="cockpit" />} />
-                                <Route
-                                  path="/admin/rh/competencias"
-                                  element={<RH screen="competencias" />}
-                                />
-                                <Route
-                                  path="/admin/rh/engajamento"
-                                  element={<RH screen="engajamento" />}
-                                />
-                                <Route
-                                  path="/admin/rh/feedback"
-                                  element={<RH screen="feedback" />}
-                                />
-                                <Route
-                                  path="/admin/rh/nine-box"
-                                  element={<RH screen="nine_box" />}
-                                />
-                                <Route
-                                  path="/admin/rh/offboarding"
-                                  element={<RH screen="offboarding" />}
-                                />
-                                <Route
-                                  path="/admin/rh/onboarding"
-                                  element={<RH screen="onboarding" />}
+                                  element={
+                                    <Navigate to="/admin/rh/estrutura-organizacional" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/rh/organograma"
-                                  element={<RH screen="organograma" />}
+                                  element={
+                                    <Navigate to="/admin/rh/estrutura-organizacional" replace />
+                                  }
                                 />
-                                <Route path="/admin/rh/pdi" element={<RH screen="pdi" />} />
                                 <Route
                                   path="/admin/rh/posicoes"
-                                  element={<RH screen="posicoes" />}
+                                  element={
+                                    <Navigate to="/admin/rh/estrutura-organizacional" replace />
+                                  }
                                 />
                                 <Route
-                                  path="/admin/rh/reconhecimento"
-                                  element={<RH screen="reconhecimento" />}
+                                  path="/admin/rh/carreira"
+                                  element={
+                                    <Navigate to="/admin/rh/carreira-desenvolvimento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/rh/treinamentos"
+                                  element={
+                                    <Navigate to="/admin/rh/carreira-desenvolvimento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/rh/pdi"
+                                  element={
+                                    <Navigate to="/admin/rh/carreira-desenvolvimento" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/rh/sucessao"
-                                  element={<RH screen="sucessao" />}
+                                  element={
+                                    <Navigate to="/admin/rh/carreira-desenvolvimento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/rh/avaliacao-competencias"
+                                  element={<Navigate to="/admin/rh/gestao-talentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/competencias"
+                                  element={<Navigate to="/admin/rh/gestao-talentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/nine-box"
+                                  element={<Navigate to="/admin/rh/gestao-talentos" replace />}
                                 />
                                 <Route
                                   path="/admin/rh/talent-review"
-                                  element={<RH screen="talent_review" />}
+                                  element={<Navigate to="/admin/rh/gestao-talentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/calibracao"
+                                  element={<Navigate to="/admin/rh/gestao-talentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/clima"
+                                  element={<Navigate to="/admin/rh/clima-engajamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/engajamento"
+                                  element={<Navigate to="/admin/rh/clima-engajamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/feedback"
+                                  element={<Navigate to="/admin/rh/clima-engajamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/reconhecimento"
+                                  element={<Navigate to="/admin/rh/clima-engajamento" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/onboarding"
+                                  element={<Navigate to="/admin/rh/jornada-colaborador" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/offboarding"
+                                  element={<Navigate to="/admin/rh/jornada-colaborador" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/documentos"
+                                  element={<Navigate to="/admin/rh/jornada-colaborador" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/cockpit"
+                                  element={<Navigate to="/admin/rh" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/ponto"
+                                  element={<Navigate to="/admin/dp/jornada-ponto" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/ferias"
+                                  element={<Navigate to="/admin/dp/ferias-afastamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/folha"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/beneficios"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
+                                />
+                                <Route
+                                  path="/admin/rh/relatorios"
+                                  element={<Navigate to="/admin/rh" replace />}
                                 />
                                 <Route
                                   path="/admin/rh/adapta"
@@ -1389,122 +1441,167 @@ const App = () => (
                                   path="/admin/atendimento"
                                   element={<Atendimento screen="dashboard" />}
                                 />
-                                <Route path="/admin/dp" element={<DP screen="dashboard" />} />
+                                {/* Módulo Departamento Pessoal (6 Telas Oficiais) */}
+                                <Route path="/admin/dp" element={<DP screen="painel" />} />
+                                <Route
+                                  path="/admin/dp/colaboradores-contratos"
+                                  element={<DP screen="colaboradores-contratos" />}
+                                />
+                                <Route
+                                  path="/admin/dp/ferias-afastamentos"
+                                  element={<DP screen="ferias-afastamentos" />}
+                                />
+                                <Route
+                                  path="/admin/dp/folha-beneficios"
+                                  element={<DP screen="folha-beneficios" />}
+                                />
+                                <Route
+                                  path="/admin/dp/jornada-ponto"
+                                  element={<DP screen="jornada-ponto" />}
+                                />
+                                <Route
+                                  path="/admin/dp/obrigacoes-esocial"
+                                  element={<DP screen="obrigacoes-esocial" />}
+                                />
+
+                                {/* Redirecionamentos de Rotas Antigas de DP */}
                                 <Route
                                   path="/admin/dp/admissions"
-                                  element={<DP screen="admissions" />}
+                                  element={
+                                    <Navigate to="/admin/dp/colaboradores-contratos" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/dp/contracts"
-                                  element={<DP screen="contracts" />}
+                                  element={
+                                    <Navigate to="/admin/dp/colaboradores-contratos" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/dp/contract-changes"
-                                  element={<DP screen="contract_changes" />}
-                                />
-                                <Route
-                                  path="/admin/dp/jornadas"
-                                  element={<DP screen="jornadas" />}
-                                />
-                                <Route path="/admin/dp/escalas" element={<DP screen="escalas" />} />
-                                <Route
-                                  path="/admin/dp/ponto"
-                                  element={<DP screen="time_control" />}
-                                />
-                                <Route
-                                  path="/admin/dp/banco-horas"
-                                  element={<DP screen="bank_hours" />}
-                                />
-                                <Route
-                                  path="/admin/dp/horas-extras"
-                                  element={<DP screen="horas_extras" />}
-                                />
-                                <Route path="/admin/dp/folha" element={<DP screen="payroll" />} />
-                                <Route
-                                  path="/admin/dp/rubricas"
-                                  element={<DP screen="rubricas" />}
-                                />
-                                <Route
-                                  path="/admin/dp/ferias"
-                                  element={<DP screen="vacations" />}
-                                />
-                                <Route
-                                  path="/admin/dp/13-salario"
-                                  element={<DP screen="13th_salary" />}
-                                />
-                                <Route
-                                  path="/admin/dp/afastamentos"
-                                  element={<DP screen="leaves" />}
-                                />
-                                <Route
-                                  path="/admin/dp/licencas"
-                                  element={<DP screen="licenses" />}
-                                />
-                                <Route
-                                  path="/admin/dp/beneficios"
-                                  element={<DP screen="benefits" />}
+                                  element={
+                                    <Navigate to="/admin/dp/colaboradores-contratos" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/dp/rescisoes"
-                                  element={<DP screen="dismissals" />}
+                                  element={
+                                    <Navigate to="/admin/dp/colaboradores-contratos" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/dp/reintegracao"
-                                  element={<DP screen="reinstatement" />}
-                                />
-                                <Route path="/admin/dp/esocial" element={<DP screen="esocial" />} />
-                                <Route
-                                  path="/admin/dp/esocial-monitor"
-                                  element={<DP screen="esocial_monitor" />}
+                                  element={
+                                    <Navigate to="/admin/dp/colaboradores-contratos" replace />
+                                  }
                                 />
                                 <Route
-                                  path="/admin/dp/fgts"
-                                  element={<DP screen="fgts_digital" />}
+                                  path="/admin/dp/jornadas"
+                                  element={<Navigate to="/admin/dp/jornada-ponto" replace />}
                                 />
                                 <Route
-                                  path="/admin/dp/encargos"
-                                  element={<DP screen="charges" />}
+                                  path="/admin/dp/escalas"
+                                  element={<Navigate to="/admin/dp/jornada-ponto" replace />}
                                 />
                                 <Route
-                                  path="/admin/dp/tabelas-tributarias"
-                                  element={<DP screen="tax_tables" />}
+                                  path="/admin/dp/ponto"
+                                  element={<Navigate to="/admin/dp/jornada-ponto" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/banco-horas"
+                                  element={<Navigate to="/admin/dp/jornada-ponto" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/horas-extras"
+                                  element={<Navigate to="/admin/dp/jornada-ponto" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/folha"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/rubricas"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/13-salario"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/beneficios"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
                                 />
                                 <Route
                                   path="/admin/dp/consignados"
-                                  element={<DP screen="consignments" />}
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
                                 />
                                 <Route
-                                  path="/admin/dp/sindicatos"
-                                  element={<DP screen="unions" />}
-                                />
-                                <Route
-                                  path="/admin/dp/convencoes"
-                                  element={<DP screen="collective_agreements" />}
-                                />
-                                <Route
-                                  path="/admin/dp/dissidio"
-                                  element={<DP screen="wage_adjustments" />}
+                                  path="/admin/dp/encargos"
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
                                 />
                                 <Route
                                   path="/admin/dp/provisoes"
-                                  element={<DP screen="provisions" />}
+                                  element={<Navigate to="/admin/dp/folha-beneficios" replace />}
                                 />
-                                <Route path="/admin/dp/exames" element={<DP screen="exams" />} />
                                 <Route
-                                  path="/admin/dp/epis"
-                                  element={<DP screen="uniforms_epis" />}
+                                  path="/admin/dp/ferias"
+                                  element={<Navigate to="/admin/dp/ferias-afastamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/afastamentos"
+                                  element={<Navigate to="/admin/dp/ferias-afastamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/licencas"
+                                  element={<Navigate to="/admin/dp/ferias-afastamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/esocial"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/esocial-monitor"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/fgts"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/tabelas-tributarias"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/sindicatos"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/convencoes"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/dissidio"
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
                                 />
                                 <Route
                                   path="/admin/dp/documentos-obrigatorios"
-                                  element={<DP screen="mandatory_docs" />}
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
                                 />
                                 <Route
                                   path="/admin/dp/esocial-layouts"
-                                  element={<DP screen="esocial_layouts" />}
+                                  element={<Navigate to="/admin/dp/obrigacoes-esocial" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/exames"
+                                  element={<Navigate to="/admin/sst/saude-ocupacional" replace />}
+                                />
+                                <Route
+                                  path="/admin/dp/epis"
+                                  element={<Navigate to="/admin/sst/epis-treinamentos" replace />}
                                 />
                                 <Route
                                   path="/admin/dp/relatorios"
-                                  element={<DP screen="reports" />}
+                                  element={<Navigate to="/admin/dp" replace />}
                                 />
                                 <Route
                                   path="/admin/dp/adapta"
@@ -1512,22 +1609,276 @@ const App = () => (
                                     <Navigate to="/admin/configuracoes/jetro-online" replace />
                                   }
                                 />
-                                <Route path="/admin/sst" element={<SST screen="dashboard" />} />
+
+                                {/* Módulo SST (8 Telas Oficiais) */}
+                                <Route path="/admin/sst" element={<SST screen="painel" />} />
+                                <Route
+                                  path="/admin/sst/central-conformidade"
+                                  element={<SST screen="central-conformidade" />}
+                                />
+                                <Route
+                                  path="/admin/sst/documentos-obrigacoes"
+                                  element={<SST screen="documentos-obrigacoes" />}
+                                />
+                                <Route
+                                  path="/admin/sst/epis-treinamentos"
+                                  element={<SST screen="epis-treinamentos" />}
+                                />
+                                <Route
+                                  path="/admin/sst/gestao-riscos-pgr"
+                                  element={<SST screen="gestao-riscos-pgr" />}
+                                />
+                                <Route
+                                  path="/admin/sst/relatorios-sst"
+                                  element={<SST screen="relatorios-sst" />}
+                                />
+                                <Route
+                                  path="/admin/sst/saude-ocupacional"
+                                  element={<SST screen="saude-ocupacional" />}
+                                />
+                                <Route
+                                  path="/admin/sst/seguranca-prevencao"
+                                  element={<SST screen="seguranca-prevencao" />}
+                                />
+
+                                {/* Redirecionamentos de Rotas Antigas de SST */}
                                 <Route
                                   path="/admin/sst/cockpit"
-                                  element={<SST screen="cockpit" />}
+                                  element={<Navigate to="/admin/sst" replace />}
                                 />
                                 <Route
-                                  path="/admin/sst/esocial-monitor"
-                                  element={<SST screen="esocial_monitor" />}
+                                  path="/admin/sst/reports"
+                                  element={<Navigate to="/admin/sst/relatorios-sst" replace />}
                                 />
                                 <Route
-                                  path="/admin/sst/compliance"
-                                  element={<SST screen="compliance_dashboard" />}
+                                  path="/admin/sst/gro"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/risk-inventory"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/risk-matrix"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/action-plans"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/work-environments"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/exposure-groups"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/environmental-assessments"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/apr"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/moc"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/psychosocial-assessments"
+                                  element={<Navigate to="/admin/sst/gestao-riscos-pgr" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/pcmso"
+                                  element={<Navigate to="/admin/sst/saude-ocupacional" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/aso"
+                                  element={<Navigate to="/admin/sst/saude-ocupacional" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/medical-records"
+                                  element={<Navigate to="/admin/sst/saude-ocupacional" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/vaccination"
+                                  element={<Navigate to="/admin/sst/saude-ocupacional" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/epis"
+                                  element={<Navigate to="/admin/sst/epis-treinamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/epcs"
+                                  element={<Navigate to="/admin/sst/epis-treinamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/certificates"
+                                  element={<Navigate to="/admin/sst/epis-treinamentos" replace />}
                                 />
                                 <Route
                                   path="/admin/sst/training-matrix"
-                                  element={<SST screen="training_matrix" />}
+                                  element={<Navigate to="/admin/sst/epis-treinamentos" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/accidents"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/cat"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/incidents"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/investigations"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/cipa"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/sesmt"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/inspections"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/non-conformities"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/dds"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/work-permits"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/lockout"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/emergencies"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/brigade"
+                                  element={<Navigate to="/admin/sst/seguranca-prevencao" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/compliance"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr-catalog"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/ergonomics"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/confined-spaces"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/height-work"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr10-electrical"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr11-material-handling"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr12-machines"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr13-boilers"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr15-insalubridade"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/nr16-periculosidade"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/audit-checklists"
+                                  element={
+                                    <Navigate to="/admin/sst/central-conformidade" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/indicators"
+                                  element={<Navigate to="/admin/sst" replace />}
+                                />
+                                <Route
+                                  path="/admin/sst/ppp"
+                                  element={
+                                    <Navigate to="/admin/sst/documentos-obrigacoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/ltcat"
+                                  element={
+                                    <Navigate to="/admin/sst/documentos-obrigacoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/documents"
+                                  element={
+                                    <Navigate to="/admin/sst/documentos-obrigacoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/esocial-monitor"
+                                  element={
+                                    <Navigate to="/admin/sst/documentos-obrigacoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/sst/obligations-calendar"
+                                  element={
+                                    <Navigate to="/admin/sst/documentos-obrigacoes" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/sst/adapta"
@@ -1535,158 +1886,6 @@ const App = () => (
                                     <Navigate to="/admin/configuracoes/jetro-online" replace />
                                   }
                                 />
-                                <Route
-                                  path="/admin/sst/reports"
-                                  element={<SST screen="reports" />}
-                                />
-                                <Route path="/admin/sst/gro" element={<SST screen="gro" />} />
-                                <Route
-                                  path="/admin/sst/risk-inventory"
-                                  element={<SST screen="risk_inventory" />}
-                                />
-                                <Route
-                                  path="/admin/sst/risk-matrix"
-                                  element={<SST screen="risk_matrix_config" />}
-                                />
-                                <Route
-                                  path="/admin/sst/action-plans"
-                                  element={<SST screen="action_plans" />}
-                                />
-                                <Route
-                                  path="/admin/sst/work-environments"
-                                  element={<SST screen="work_environments" />}
-                                />
-                                <Route
-                                  path="/admin/sst/exposure-groups"
-                                  element={<SST screen="exposure_groups" />}
-                                />
-                                <Route
-                                  path="/admin/sst/environmental-assessments"
-                                  element={<SST screen="environmental_assessments" />}
-                                />
-                                <Route path="/admin/sst/ltcat" element={<SST screen="ltcat" />} />
-                                <Route path="/admin/sst/pcmso" element={<SST screen="pcmso" />} />
-                                <Route path="/admin/sst/aso" element={<SST screen="aso" />} />
-                                <Route
-                                  path="/admin/sst/medical-records"
-                                  element={<SST screen="medical_records" />}
-                                />
-                                <Route path="/admin/sst/epis" element={<SST screen="epis" />} />
-                                <Route path="/admin/sst/epcs" element={<SST screen="epcs" />} />
-                                <Route
-                                  path="/admin/sst/accidents"
-                                  element={<SST screen="accidents" />}
-                                />
-                                <Route path="/admin/sst/cat" element={<SST screen="cat" />} />
-                                <Route
-                                  path="/admin/sst/incidents"
-                                  element={<SST screen="incidents" />}
-                                />
-                                <Route path="/admin/sst/cipa" element={<SST screen="cipa" />} />
-                                <Route path="/admin/sst/sesmt" element={<SST screen="sesmt" />} />
-                                <Route
-                                  path="/admin/sst/ergonomics"
-                                  element={<SST screen="ergonomics" />}
-                                />
-                                <Route
-                                  path="/admin/sst/inspections"
-                                  element={<SST screen="inspections" />}
-                                />
-                                <Route path="/admin/sst/apr" element={<SST screen="apr" />} />
-                                <Route
-                                  path="/admin/sst/work-permits"
-                                  element={<SST screen="work_permits" />}
-                                />
-                                <Route
-                                  path="/admin/sst/lockout"
-                                  element={<SST screen="lockout" />}
-                                />
-                                <Route
-                                  path="/admin/sst/confined-spaces"
-                                  element={<SST screen="confined_spaces" />}
-                                />
-                                <Route
-                                  path="/admin/sst/height-work"
-                                  element={<SST screen="height_work" />}
-                                />
-                                <Route
-                                  path="/admin/sst/emergencies"
-                                  element={<SST screen="emergencies" />}
-                                />
-                                <Route
-                                  path="/admin/sst/brigade"
-                                  element={<SST screen="brigade" />}
-                                />
-                                <Route
-                                  path="/admin/sst/moc"
-                                  element={<SST screen="management_of_change" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr-catalog"
-                                  element={<SST screen="nr_catalog" />}
-                                />
-                                <Route
-                                  path="/admin/sst/non-conformities"
-                                  element={<SST screen="non_conformities" />}
-                                />
-                                <Route
-                                  path="/admin/sst/psychosocial-assessments"
-                                  element={<SST screen="psychosocial_assessments" />}
-                                />
-                                <Route path="/admin/sst/dds" element={<SST screen="dds" />} />
-                                <Route
-                                  path="/admin/sst/vaccination"
-                                  element={<SST screen="vaccination" />}
-                                />
-                                <Route
-                                  path="/admin/sst/certificates"
-                                  element={<SST screen="certificates" />}
-                                />
-                                <Route
-                                  path="/admin/sst/documents"
-                                  element={<SST screen="documents" />}
-                                />
-                                <Route
-                                  path="/admin/sst/indicators"
-                                  element={<SST screen="indicators" />}
-                                />
-                                <Route
-                                  path="/admin/sst/obligations-calendar"
-                                  element={<SST screen="obligations_calendar" />}
-                                />
-                                <Route
-                                  path="/admin/sst/audit-checklists"
-                                  element={<SST screen="audit_checklists" />}
-                                />
-                                <Route
-                                  path="/admin/sst/investigations"
-                                  element={<SST screen="investigations" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr10-electrical"
-                                  element={<SST screen="nr10_electrical" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr11-material-handling"
-                                  element={<SST screen="nr11_material_handling" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr12-machines"
-                                  element={<SST screen="nr12_machines" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr13-boilers"
-                                  element={<SST screen="nr13_boilers" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr15-insalubridade"
-                                  element={<SST screen="nr15_insalubridade" />}
-                                />
-                                <Route
-                                  path="/admin/sst/nr16-periculosidade"
-                                  element={<SST screen="nr16_periculosidade" />}
-                                />
-                                <Route path="/admin/sst/ppp" element={<SST screen="ppp" />} />
                                 <Route
                                   path="/admin/promocoes"
                                   element={<Promotions screen="dashboard" />}
