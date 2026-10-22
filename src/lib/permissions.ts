@@ -125,21 +125,72 @@ export function canUserAccessReportModule(role: string | undefined, moduleName: 
 
   switch (moduleName) {
     case 'Comercial':
-      return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+      return [
+        'SUP',
+        'PADRAO',
+        'GESTAO',
+        'DIRETORIA',
+        'SDR',
+        'Vendedor',
+        'FINANCEIRO',
+        'COMERCIAL',
+      ].includes(role)
     case 'Financeiro':
-      return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'FINANCEIRO', 'COMERCIAL'].includes(role)
     case 'Estoque':
-      return ['SUP', 'PADRAO', 'SDR', 'Vendedor', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+      return [
+        'SUP',
+        'PADRAO',
+        'GESTAO',
+        'DIRETORIA',
+        'SDR',
+        'Vendedor',
+        'FINANCEIRO',
+        'COMERCIAL',
+      ].includes(role)
     case 'Logística':
-      return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'COMERCIAL', 'FINANCEIRO'].includes(role)
     case 'Fiscal':
-      return ['SUP', 'PADRAO', 'FINANCEIRO', 'COMERCIAL'].includes(role)
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'FINANCEIRO', 'COMERCIAL'].includes(role)
     case 'DP & RH':
-      return ['SUP', 'PADRAO', 'RH', 'DP'].includes(role)
+    case 'RH & DP':
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'RH', 'DP'].includes(role)
     case 'Compras':
-      return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+    case 'Controladoria':
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'FINANCEIRO'].includes(role)
+    case 'BI & Analytics':
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+    case 'Indústria (PCP)':
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'COMERCIAL', 'FINANCEIRO'].includes(role)
+    case 'Atendimento & Chamados':
+      return [
+        'SUP',
+        'PADRAO',
+        'GESTAO',
+        'DIRETORIA',
+        'COMERCIAL',
+        'FINANCEIRO',
+        'SDR',
+        'Vendedor',
+      ].includes(role)
+    case 'CRM':
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'COMERCIAL', 'SDR', 'Vendedor'].includes(role)
+    case 'Governança & Auditoria':
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA', 'FINANCEIRO'].includes(role)
+    case 'Cadastros Oficiais':
+      return [
+        'SUP',
+        'PADRAO',
+        'GESTAO',
+        'DIRETORIA',
+        'COMERCIAL',
+        'FINANCEIRO',
+        'SDR',
+        'Vendedor',
+      ].includes(role)
     default:
-      return ['SUP', 'PADRAO'].includes(role)
+      return ['SUP', 'PADRAO', 'GESTAO', 'DIRETORIA'].includes(role)
   }
 }
 
