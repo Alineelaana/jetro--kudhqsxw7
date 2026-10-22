@@ -414,7 +414,7 @@ export function ScreenQualidadeRastreabilidade() {
                     id: 'status',
                     header: 'Parecer',
                     accessorKey: 'status',
-                    dataType: 'status',
+                    dataType: 'badge',
                     defaultWidth: 130,
                     cell: ({ value }) => (
                       <Badge

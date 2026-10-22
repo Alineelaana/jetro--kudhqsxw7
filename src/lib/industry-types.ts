@@ -63,6 +63,7 @@ export interface BomVersion {
   version: number
   revision_number?: number | string
   revision_status?: string
+  effective_date?: string
   type: string
   status: string
   vigencia_inicial: string
@@ -102,14 +103,18 @@ export interface ProductionResource {
   id: string
   code: string
   name: string
-  tipo: string
-  description: string
+  type?: string
+  tipo?: string
+  description?: string
   capacity_per_hour: number
-  active: boolean
-  responsible_user: string
-  modulo_origem: string
-  created: string
-  updated: string
+  capacity_unit?: string
+  status?: string
+  location?: string
+  active?: boolean
+  responsible_user?: string
+  modulo_origem?: string
+  created?: string
+  updated?: string
 }
 
 export interface ProductionRoute {

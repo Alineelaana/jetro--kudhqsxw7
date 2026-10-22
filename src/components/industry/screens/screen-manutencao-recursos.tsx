@@ -416,7 +416,7 @@ export function ScreenManutencaoRecursos() {
                     id: 'status',
                     header: 'Disponibilidade',
                     accessorKey: 'status',
-                    dataType: 'status',
+                    dataType: 'badge',
                     defaultWidth: 140,
                     cell: ({ value }) => (
                       <Badge

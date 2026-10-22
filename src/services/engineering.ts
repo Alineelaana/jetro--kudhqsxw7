@@ -113,3 +113,14 @@ export const approveBomRevision = (data: { bom_id: string; action: 'approve' | '
 
 export const getBomExplosion = (productId: string) =>
   pb.send(`/backend/v1/industrial/bom-explosion/${productId}`, { method: 'GET' })
+
+export const getEngineeringChanges = async (): Promise<EngineeringChangeRequest[]> => {
+  try {
+    const list = await pb.collection('engineering_change_requests').getFullList({
+      sort: '-created',
+    })
+    return (list || []) as unknown as EngineeringChangeRequest[]
+  } catch {
+    return []
+  }
+}

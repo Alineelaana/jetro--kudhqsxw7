@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react'
 
-export type TableDataType = 'text' | 'number' | 'currency' | 'percent' | 'date' | 'boolean'
+export type TableDataType =
+  | 'text'
+  | 'number'
+  | 'currency'
+  | 'percent'
+  | 'date'
+  | 'boolean'
+  | 'badge'
 
 export type SortDirection = 'asc' | 'desc' | null
 

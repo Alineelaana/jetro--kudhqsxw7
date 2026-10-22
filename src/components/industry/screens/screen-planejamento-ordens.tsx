@@ -704,7 +704,7 @@ export function ScreenPlanejamentoOrdens() {
                     id: 'status',
                     header: 'Status Atual',
                     accessorKey: 'status',
-                    dataType: 'status',
+                    dataType: 'badge',
                     defaultWidth: 140,
                     cell: ({ value }) => (
                       <Badge className={`text-xs ${STATUS_COLORS[String(value)] || 'bg-gray-100'}`}>

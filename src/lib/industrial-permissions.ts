@@ -3,6 +3,8 @@ export function canViewIndustry(role: string | undefined): boolean {
   return ['SUP', 'PADRAO', 'COMERCIAL', 'FINANCEIRO'].includes(role)
 }
 
+export const canViewIndustrial = canViewIndustry
+
 export function canManageEngineering(role: string | undefined): boolean {
   if (!role) return false
   return ['SUP', 'PADRAO'].includes(role)

@@ -826,9 +826,9 @@ export function ScreenFichasTecnicas() {
                 await createBomComponent({
                   bom_version_id: selectedBomId,
                   item_id: String(fd.get('item_id') || ''),
-                  quantidade: Number(fd.get('quantidade') || 1),
+                  quantidade: String(fd.get('quantidade') || 1),
                   unidade: String(fd.get('unidade') || 'KG'),
-                  perda_prevista: Number(fd.get('perda_prevista') || 0),
+                  perda_prevista: String(fd.get('perda_prevista') || 0),
                   ordem: selectedBomComponents.length + 1,
                 })
                 toast({ title: 'Componente adicionado à receita!' })

@@ -1,9 +1,12 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Layout from '@/components/Layout'
-import { ProtectedRoute } from '@/components/protected-route'
-import { canViewIndustry } from '@/lib/industrial-permissions'
+import { Routes, Route, Navigate, Link } from 'react-router-dom'
+
 import { useAuth } from '@/hooks/use-auth'
+import { AdminLogin } from '@/components/admin-login'
+import { canViewIndustrial } from '@/lib/industrial-permissions'
+import { IndustryLayout } from '@/components/industry/industry-layout'
+import { Button } from '@/components/ui/button'
+import { ShieldAlert, ArrowLeft, Loader2 } from 'lucide-react'
 
 const CentralIndustrial = lazy(() =>
   import('@/components/industry/screens/screen-central-industrial').then((m) => ({
@@ -53,33 +56,57 @@ function IndustryFallback() {
 }
 
 export default function Industry() {
-  const { user } = useAuth()
-  const allowed = canViewIndustry(user?.role)
+  const { isAuthenticated, loading, user } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-[#005B2E] animate-spin" />
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) return <AdminLogin />
+
+  if (!canViewIndustrial(user?.role)) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center max-w-lg">
+        <ShieldAlert className="w-12 h-12 text-destructive mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-foreground">Acesso negado</h2>
+        <p className="text-sm text-muted-foreground mt-2">
+          Você não tem permissão para acessar o módulo Industrial.
+        </p>
+        <Button variant="ghost" asChild className="mt-4 text-[#005B2E]">
+          <Link to="/admin">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Voltar ao painel
+          </Link>
+        </Button>
+      </div>
+    )
+  }
 
   return (
-    <ProtectedRoute allowed={allowed}>
-      <Layout>
-        <Suspense fallback={<IndustryFallback />}>
-          <Routes>
-            <Route index element={<CentralIndustrial />} />
-            <Route path="central" element={<CentralIndustrial />} />
-            <Route path="planejamento" element={<PlanejamentoOrdens />} />
-            <Route path="planejamento-ordens" element={<PlanejamentoOrdens />} />
-            <Route path="ordem-producao" element={<OrdemProducao />} />
-            <Route path="ordem-producao/:id" element={<OrdemProducao />} />
-            <Route path="ordens" element={<OrdemProducao />} />
-            <Route path="ordens/:id" element={<OrdemProducao />} />
-            <Route path="fichas-tecnicas" element={<FichasTecnicas />} />
-            <Route path="qualidade" element={<QualidadeRastreabilidade />} />
-            <Route path="qualidade-rastreabilidade" element={<QualidadeRastreabilidade />} />
-            <Route path="custos" element={<CustosEficiencia />} />
-            <Route path="custos-eficiencia" element={<CustosEficiencia />} />
-            <Route path="manutencao" element={<ManutencaoRecursos />} />
-            <Route path="manutencao-recursos" element={<ManutencaoRecursos />} />
-            <Route path="*" element={<Navigate to="/admin/industria" replace />} />
-          </Routes>
-        </Suspense>
-      </Layout>
-    </ProtectedRoute>
+    <IndustryLayout>
+      <Suspense fallback={<IndustryFallback />}>
+        <Routes>
+          <Route index element={<CentralIndustrial />} />
+          <Route path="central" element={<CentralIndustrial />} />
+          <Route path="planejamento" element={<PlanejamentoOrdens />} />
+          <Route path="planejamento-ordens" element={<PlanejamentoOrdens />} />
+          <Route path="ordem-producao" element={<OrdemProducao />} />
+          <Route path="ordem-producao/:id" element={<OrdemProducao />} />
+          <Route path="ordens" element={<OrdemProducao />} />
+          <Route path="ordens/:id" element={<OrdemProducao />} />
+          <Route path="fichas-tecnicas" element={<FichasTecnicas />} />
+          <Route path="qualidade" element={<QualidadeRastreabilidade />} />
+          <Route path="qualidade-rastreabilidade" element={<QualidadeRastreabilidade />} />
+          <Route path="custos" element={<CustosEficiencia />} />
+          <Route path="custos-eficiencia" element={<CustosEficiencia />} />
+          <Route path="manutencao" element={<ManutencaoRecursos />} />
+          <Route path="manutencao-recursos" element={<ManutencaoRecursos />} />
+          <Route path="*" element={<Navigate to="/admin/industria" replace />} />
+        </Routes>
+      </Suspense>
+    </IndustryLayout>
   )
 }

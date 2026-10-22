@@ -67,7 +67,8 @@ import {
   getTraceability,
 } from '@/services/industrial-extended'
 import { getPhases, getPhaseCosts } from '@/services/industrial-phases'
-import { transitionOrder, transitionPhase, absorbCosts } from '@/services/pcp'
+import { transitionOrder, absorbCosts } from '@/services/pcp'
+import { transitionPhase } from '@/services/industrial-flow'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
