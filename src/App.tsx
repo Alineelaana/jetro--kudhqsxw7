@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -145,7 +145,7 @@ const ChamadosPage = lazy(() => import('@/pages/ChamadosPage'))
 
 function ChamadoDetalhesRedirect() {
   const { id } = useParams<{ id: string }>()
-  return <Navigate to={`/admin/chamados/meus-chamados?tab=detalhe&id=${id || ''}`} replace />
+  return <Navigate to={`/admin/chamados?tab=detalhe&id=${id || ''}`} replace />
 }
 
 // Telas de Configurações
@@ -272,50 +272,44 @@ const App = () => (
                                 <Route path="/admin/dashboard" element={<DashboardPage />} />
                                 <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
 
-                                {/* MÓDULO CHAMADOS / TI: 3 TELAS OFICIAIS */}
+                                {/* MÓDULO CHAMADOS: 3 TELAS OFICIAIS */}
                                 <Route
                                   path="/admin/chamados"
-                                  element={<Navigate to="/admin/chamados/central" replace />}
-                                />
-                                <Route
-                                  path="/admin/chamados/central"
                                   element={<ChamadosPage screen="central" />}
                                 />
                                 <Route
-                                  path="/admin/chamados/meus-chamados"
-                                  element={<ChamadosPage screen="meus-chamados" />}
+                                  path="/admin/chamados/painel"
+                                  element={<ChamadosPage screen="painel" />}
                                 />
                                 <Route
-                                  path="/admin/chamados/painel-sla"
-                                  element={<ChamadosPage screen="painel-sla" />}
+                                  path="/admin/chamados/sla"
+                                  element={<ChamadosPage screen="sla" />}
                                 />
 
                                 {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DO MÓDULO CHAMADOS/TI */}
                                 <Route
+                                  path="/admin/chamados/central"
+                                  element={<Navigate to="/admin/chamados" replace />}
+                                />
+                                <Route
+                                  path="/admin/chamados/meus-chamados"
+                                  element={<Navigate to="/admin/chamados" replace />}
+                                />
+                                <Route
                                   path="/admin/chamados/meus"
-                                  element={<Navigate to="/admin/chamados/meus-chamados" replace />}
+                                  element={<Navigate to="/admin/chamados" replace />}
                                 />
                                 <Route
                                   path="/admin/chamados/novo"
-                                  element={
-                                    <Navigate to="/admin/chamados/meus-chamados?tab=novo" replace />
-                                  }
+                                  element={<Navigate to="/admin/chamados?tab=novo" replace />}
                                 />
                                 <Route
-                                  path="/admin/chamados/painel"
-                                  element={<Navigate to="/admin/chamados/painel-sla" replace />}
-                                />
-                                <Route
-                                  path="/admin/chamados/sla"
-                                  element={
-                                    <Navigate to="/admin/chamados/painel-sla?tab=sla" replace />
-                                  }
+                                  path="/admin/chamados/painel-sla"
+                                  element={<Navigate to="/admin/chamados/painel" replace />}
                                 />
                                 <Route
                                   path="/admin/configuracoes/sla-chamados"
-                                  element={
-                                    <Navigate to="/admin/chamados/painel-sla?tab=sla" replace />
-                                  }
+                                  element={<Navigate to="/admin/chamados/sla" replace />}
                                 />
                                 <Route
                                   path="/admin/chamados/:id"

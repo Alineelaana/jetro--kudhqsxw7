@@ -1621,6 +1621,169 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
         '- Alerta amigável em caso de arquivo corrompido ou formato incompatível.\n- Marcação clara de funções de fórmula não suportadas (#VALOR!) no relatório de importação.\n- Alerta de conflito de concorrência com detecção de versão de servidor.',
     },
   },
+
+  // ---------------------------------------------------------------------------
+  // MÓDULO CHAMADOS: 3 TELAS OFICIAIS
+  // ---------------------------------------------------------------------------
+  '/admin/chamados': {
+    route: '/admin/chamados',
+    title: 'Central de Chamados',
+    moduleGroup: 'CHAMADOS',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-18',
+    author: 'Engenharia Huram',
+    objective: {
+      title: 'Objetivo da Tela',
+      content:
+        'Unificar o autoatendimento e o acompanhamento de suporte técnico corporativo em uma tela centralizada com sub-abas (Meus Chamados, Novo Chamado e Acompanhamento detalhado do ticket selecionado).',
+    },
+    features: {
+      title: 'Funcionalidades Disponíveis',
+      content:
+        '- Visualização da listagem de chamados do usuário logado e da empresa ativa com filtros por status e prioridade.\n- Sub-aba para abertura de novos tickets técnicos (categorização por departamento, prioridade, título, descrição rica e anexo de arquivos).\n- Sub-aba de acompanhamento do ticket com linha do tempo de mensagens, anexos e status de evolução.\n- Suporte multitenant com cabeçalho corporativo e isolamento de dados por empresa ativa.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Tickets abertos vinculam-se automaticamente ao usuário solicitante e ao ID da empresa ativa selecionada no contexto multitenant.\n- Ao selecionar um ticket na lista ou fornecer parâmetro `?id=`, a tela alterna para o modo de acompanhamento do chamado correspondente.\n- O status inicial padrão é "Aberto", herdando os prazos de SLA calculados conforme a prioridade informada.',
+    },
+    workflow: {
+      title: 'Fluxo Operacional',
+      content:
+        '1. O usuário visualiza seus chamados abertos e histórico recente.\n2. Para nova requisição, aciona a sub-aba "Novo Chamado", preenche setor, categoria, assunto, descrição e anexa evidências.\n3. Após salvar, o ticket é persistido e fica acessível na listagem e na aba de acompanhamento.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase de chamados (`chamados`, `chamados_mensagens`, `chamados_categorias`, `chamados_anexos`).\n- Armazenamento local de segurança via storage de chamados.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo Multitenant via hook `useBrand`.\n- Mecanismo de notificação e alertas via toast e audit log.',
+    },
+    permissions: {
+      title: 'Permissões de Acesso',
+      content:
+        '- Todos os usuários autenticados possuem acesso para visualização e abertura de seus próprios chamados.\n- Administradores e equipe de suporte técnico visualizam os tickets de acordo com o escopo atribuído.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `MeusChamadosScreen`, `NovoChamadoScreen`, `ChamadoDetalhesScreen`, `Tabs`, `Badge`, `Button`.\n- Hooks: `useBrand`, `useAuth`, `useSearchParams`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros e Exceções',
+      content:
+        '- Validação de campos obrigatórios no formulário de abertura (título, categoria e descrição).\n- Mensagem instrutiva caso a aba de acompanhamento seja acessada sem chamado selecionado.\n- Feedback visual de erro via toasts em caso de falha de conexão.',
+    },
+  },
+
+  '/admin/chamados/painel': {
+    route: '/admin/chamados/painel',
+    title: 'Painel de Chamados',
+    moduleGroup: 'CHAMADOS',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-18',
+    author: 'Engenharia Huram',
+    objective: {
+      title: 'Objetivo da Tela',
+      content:
+        'Disponibilizar a fila operacional de atendimento e o cockpit gerencial de chamados técnicos para a equipe de TI e suporte, com indicadores, distribuição e controle de status.',
+    },
+    features: {
+      title: 'Funcionalidades Disponíveis',
+      content:
+        '- Painel de indicadores: total de chamados, abertos, em andamento, aguardando resposta e concluídos.\n- Fila técnica de chamados com filtros avançados por departamento, prioridade, status e técnico responsável.\n- Painel de atendimento operacional para atribuição de responsável, alteração de status e triagem rápida de tickets.\n- Cabeçalho padronizado multitenant integrado ao contexto da empresa ativa.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Exibição filtrada por empresa ativa selecionada no cabeçalho ou visão global para perfis com permissão corporativa (SUP).\n- Atualização de status reflete imediatamente nos indicadores do painel operacional.\n- Chamados em atraso recebem destaque visual de alerta.',
+    },
+    workflow: {
+      title: 'Fluxo Operacional',
+      content:
+        '1. A equipe técnica monitora os cards de métricas e volume de fila.\n2. Realiza a triagem dos chamados por setor ou nível de criticidade.\n3. Atribui o ticket a um analista e altera o status de execução até a resolução.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase de chamados e histórico de atendimento (`chamados`, `chamados_mensagens`).',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Multitenancy via hook `useBrand`.\n- Módulo de relatórios e exportação de dados de chamados.',
+    },
+    permissions: {
+      title: 'Permissões de Acesso',
+      content: '- Restrito a perfis com permissão de atendimento técnico, TI, gerência ou SUP.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `PainelChamadosScreen`, `Badge`, `Button`.\n- Hooks: `useBrand`, `useToast`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros e Exceções',
+      content:
+        '- Tratamento de indisponibilidade de rede com botão de recarga rápida da fila técnica.\n- Alertas visuais para chamados que excederam o prazo de atendimento.',
+    },
+  },
+
+  '/admin/chamados/sla': {
+    route: '/admin/chamados/sla',
+    title: 'Gestão de SLA',
+    moduleGroup: 'CHAMADOS',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-18',
+    author: 'Engenharia Huram',
+    objective: {
+      title: 'Objetivo da Tela',
+      content:
+        'Configurar e monitorar as matrizes de Service Level Agreement (SLA) para tickets de atendimento, definindo tempos limites de primeira resposta e de solução por prioridade e setor.',
+    },
+    features: {
+      title: 'Funcionalidades Disponíveis',
+      content:
+        '- Configuração de metas de tempo de primeira resposta e tempo de resolução categorizados por prioridade (baixa, média, alta, crítica/urgente).\n- Definição de regras de SLA por departamento e tipo de solicitação.\n- Regras de cálculo considerando expediente comercial ou atendimento contínuo 24x7.\n- Monitoramento de cumprimento de metas com alertas de proximidade de estouro.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Cada novo chamado aberto herda automaticamente os prazos da matriz de SLA vigente para a sua prioridade e categoria.\n- O cálculo de tempo restante é pausado quando o chamado está no status "Aguardando Usuário/Terceiro", se configurado.\n- Alterações na matriz de SLA aplicam-se a novos chamados ou recalibram chamados em andamento conforme política definida.',
+    },
+    workflow: {
+      title: 'Fluxo Operacional',
+      content:
+        '1. O gestor de TI define ou ajusta os tempos de primeira resposta e resolução em horas/minutos.\n2. Salva as regras e políticas de SLA por departamento.\n3. O sistema aplica as métricas a cada chamado e monitora os indicadores de cumprimento.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Tabela/configuração de políticas de SLA (`chamados_sla_config`, `system_settings`).',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo Central de Chamados e Painel Operacional.\n- Multitenancy via hook `useBrand`.',
+    },
+    permissions: {
+      title: 'Permissões de Acesso',
+      content: '- Restrito a gestores de TI, administradores do sistema e perfil SUP.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ConfiguracaoSlaScreen`, `Badge`, `Button`.\n- Hooks: `useBrand`, `useToast`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros e Exceções',
+      content:
+        '- Validação de limites numéricos positivos para prazos de resposta e resolução.\n- Notificação imediata de sucesso ou erro na persistência das configurações.',
+    },
+  },
 }
 
 /**
@@ -1775,6 +1938,14 @@ export function getScreenDocByRoute(route: string): ScreenDocEntry {
     '/admin/sst/ppp': '/admin/sst/documentos-obrigacoes',
     '/admin/sst/esocial': '/admin/sst/documentos-obrigacoes',
     '/admin/sst/esocial-sst': '/admin/sst/documentos-obrigacoes',
+
+    // Chamados legadas -> telas unificadas
+    '/admin/chamados/central': '/admin/chamados',
+    '/admin/chamados/meus-chamados': '/admin/chamados',
+    '/admin/chamados/meus': '/admin/chamados',
+    '/admin/chamados/novo': '/admin/chamados',
+    '/admin/chamados/painel-sla': '/admin/chamados/painel',
+    '/admin/configuracoes/sla-chamados': '/admin/chamados/sla',
   }
 
   const mappedRoute = LEGACY_ROUTE_MAP[cleanRoute]

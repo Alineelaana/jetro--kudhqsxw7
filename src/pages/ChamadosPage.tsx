@@ -1,16 +1,16 @@
-import { useLocation, useParams, Link } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { AdminLogin } from '@/components/admin-login'
 import { Loader2 } from 'lucide-react'
 
 import {
   ScreenCentralChamados,
-  ScreenMeusChamados,
-  ScreenPainelSla,
+  ScreenPainelChamados,
+  ScreenSla,
 } from '@/components/chamados/screens'
 
 interface ChamadosPageProps {
-  screen?: 'central' | 'meus-chamados' | 'painel-sla'
+  screen?: 'central' | 'painel' | 'sla' | 'meus-chamados' | 'painel-sla'
 }
 
 export function ChamadosPage({ screen: screenProp }: ChamadosPageProps) {
@@ -30,12 +30,14 @@ export function ChamadosPage({ screen: screenProp }: ChamadosPageProps) {
 
   const activeSlug = screenProp || slug || ''
 
-  // 1. Central de Chamados
+  // 1. Central de Chamados (unifica Meus Chamados e Novo Chamado em sub-abas)
   if (
     activeSlug === 'central' ||
+    activeSlug === 'meus-chamados' ||
     pathname === '/admin/chamados' ||
     pathname === '/admin/chamados/' ||
-    pathname === '/admin/chamados/central'
+    pathname.startsWith('/admin/chamados/central') ||
+    pathname.startsWith('/admin/chamados/meus-chamados')
   ) {
     return (
       <div className="container mx-auto px-4 py-6 max-w-7xl">
@@ -44,28 +46,30 @@ export function ChamadosPage({ screen: screenProp }: ChamadosPageProps) {
     )
   }
 
-  // 2. Meus Chamados
+  // 2. Painel de Chamados
   if (
-    activeSlug === 'meus-chamados' ||
-    pathname === '/admin/chamados/meus-chamados' ||
-    pathname.startsWith('/admin/chamados/meus-chamados')
+    activeSlug === 'painel' ||
+    pathname === '/admin/chamados/painel' ||
+    pathname.startsWith('/admin/chamados/painel')
   ) {
     return (
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        <ScreenMeusChamados />
+        <ScreenPainelChamados />
       </div>
     )
   }
 
-  // 3. Painel e SLA
+  // 3. Gestão de SLA
   if (
+    activeSlug === 'sla' ||
     activeSlug === 'painel-sla' ||
-    pathname === '/admin/chamados/painel-sla' ||
+    pathname === '/admin/chamados/sla' ||
+    pathname.startsWith('/admin/chamados/sla') ||
     pathname.startsWith('/admin/chamados/painel-sla')
   ) {
     return (
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        <ScreenPainelSla />
+        <ScreenSla />
       </div>
     )
   }

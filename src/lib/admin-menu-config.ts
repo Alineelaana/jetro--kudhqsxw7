@@ -32,6 +32,7 @@ import {
   FileSpreadsheet,
   Sparkles,
   Inbox,
+  Clock,
   Bot,
   UserCheck,
   type LucideIcon,
@@ -240,22 +241,22 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
     ],
   },
   {
-    title: 'Chamados / TI',
+    title: 'Chamados',
     items: [
       {
         label: 'Central de Chamados',
         icon: Inbox,
-        route: '/admin/chamados/central',
+        route: '/admin/chamados',
       },
       {
-        label: 'Meus Chamados',
-        icon: FileText,
-        route: '/admin/chamados/meus-chamados',
+        label: 'Painel de Chamados',
+        icon: LayoutDashboard,
+        route: '/admin/chamados/painel',
       },
       {
-        label: 'Painel e SLA',
+        label: 'SLA',
         icon: Clock,
-        route: '/admin/chamados/painel-sla',
+        route: '/admin/chamados/sla',
       },
     ],
   },
