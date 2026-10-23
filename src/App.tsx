@@ -314,149 +314,254 @@ const App = () => (
                                   path="/admin/descontos-deducoes"
                                   element={<DescontosDeducoesPage />}
                                 />
+                                {/* MÓDULO LOGÍSTICA & TRANSPORTE: 7 TELAS OFICIAIS */}
                                 <Route
                                   path="/admin/logistica"
-                                  element={<Logistics screen="dashboard" />}
+                                  element={<Logistics screen="central" />}
                                 />
                                 <Route
-                                  path="/admin/logistica/rotas"
-                                  element={<Logistics screen="routes" />}
+                                  path="/admin/logistica/transporte-frota"
+                                  element={<Logistics screen="transporte-frota" />}
                                 />
                                 <Route
-                                  path="/admin/logistica/entregas"
-                                  element={<Logistics screen="deliveries" />}
+                                  path="/admin/logistica/distribuicao-entregas"
+                                  element={<Logistics screen="distribuicao-entregas" />}
                                 />
+                                <Route
+                                  path="/admin/logistica/rotas-roteirizacao"
+                                  element={<Logistics screen="rotas-roteirizacao" />}
+                                />
+                                <Route
+                                  path="/admin/logistica/frete-tabelas"
+                                  element={<Logistics screen="frete-tabelas" />}
+                                />
+                                <Route
+                                  path="/admin/logistica/ocorrencias-rastreabilidade"
+                                  element={<Logistics screen="ocorrencias-rastreabilidade" />}
+                                />
+                                <Route
+                                  path="/admin/logistica/custos-indicadores"
+                                  element={<Logistics screen="custos-indicadores" />}
+                                />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE LOGÍSTICA */}
                                 <Route
                                   path="/admin/logistica/veiculos"
-                                  element={<Logistics screen="vehicles" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/transporte-frota" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/logistica/motoristas"
-                                  element={<Logistics screen="drivers" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/transporte-frota" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/entregas"
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/logistica/romaneios"
-                                  element={<Logistics screen="romaneios" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/fretes"
-                                  element={<Logistics screen="freights" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/tabelas-frete"
-                                  element={<Logistics screen="freight_tables" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/rastreamento"
-                                  element={<Logistics screen="tracking" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/ocorrencias"
-                                  element={<Logistics screen="occurrences" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/comprovantes"
-                                  element={<Logistics screen="proof" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/custos"
-                                  element={<Logistics screen="costs" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/planejamento"
-                                  element={<Logistics screen="orchestration_planning" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/indicadores"
-                                  element={<Logistics screen="indicators" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/reversa"
-                                  element={<Logistics screen="reverse_logistics" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/app-motorista"
-                                  element={<Logistics screen="driver_app" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/relatorios"
-                                  element={<Logistics screen="reports" />}
-                                />
-                                <Route
-                                  path="/admin/logistica/transferencias"
-                                  element={<Logistics screen="transfers" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/logistica/coletas"
-                                  element={<Logistics screen="collections" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/transferencias"
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/reversa"
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/app-motorista"
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/rotas"
+                                  element={
+                                    <Navigate to="/admin/logistica/rotas-roteirizacao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/planejamento"
+                                  element={
+                                    <Navigate to="/admin/logistica/rotas-roteirizacao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/fretes"
+                                  element={<Navigate to="/admin/logistica/frete-tabelas" replace />}
+                                />
+                                <Route
+                                  path="/admin/logistica/tabelas-frete"
+                                  element={<Navigate to="/admin/logistica/frete-tabelas" replace />}
+                                />
+                                <Route
+                                  path="/admin/logistica/ocorrencias"
+                                  element={
+                                    <Navigate
+                                      to="/admin/logistica/ocorrencias-rastreabilidade"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/rastreamento"
+                                  element={
+                                    <Navigate
+                                      to="/admin/logistica/ocorrencias-rastreabilidade"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/comprovantes"
+                                  element={
+                                    <Navigate
+                                      to="/admin/logistica/ocorrencias-rastreabilidade"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/custos"
+                                  element={
+                                    <Navigate to="/admin/logistica/custos-indicadores" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/indicadores"
+                                  element={
+                                    <Navigate to="/admin/logistica/custos-indicadores" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/logistica/relatorios"
+                                  element={
+                                    <Navigate to="/admin/logistica/custos-indicadores" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/logistica/excecoes"
-                                  element={<Logistics screen="exceptions" />}
+                                  element={<Navigate to="/admin/logistica" replace />}
                                 />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE TRANSPORTE */}
                                 <Route
                                   path="/admin/transporte"
-                                  element={<Transporte screen="dashboard" />}
-                                />
-                                <Route
-                                  path="/admin/transporte/cargas"
-                                  element={<Transporte screen="load_building" />}
-                                />
-                                <Route
-                                  path="/admin/transporte/roteirizacao"
-                                  element={<Transporte screen="routing" />}
-                                />
-                                <Route
-                                  path="/admin/transporte/viagens"
-                                  element={<Transporte screen="journeys" />}
-                                />
-                                <Route
-                                  path="/admin/transporte/rotas"
-                                  element={<Transporte screen="routes" />}
-                                />
-                                <Route
-                                  path="/admin/transporte/entregas"
-                                  element={<Transporte screen="deliveries" />}
+                                  element={<Navigate to="/admin/logistica" replace />}
                                 />
                                 <Route
                                   path="/admin/transporte/veiculos"
-                                  element={<Transporte screen="vehicles" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/transporte-frota" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/motoristas"
-                                  element={<Transporte screen="drivers" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/transporte-frota" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/transporte/entregas"
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/transporte/cargas"
+                                  element={
+                                    <Navigate to="/admin/logistica/rotas-roteirizacao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/transporte/roteirizacao"
+                                  element={
+                                    <Navigate to="/admin/logistica/rotas-roteirizacao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/transporte/viagens"
+                                  element={
+                                    <Navigate to="/admin/logistica/rotas-roteirizacao" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/transporte/rotas"
+                                  element={
+                                    <Navigate to="/admin/logistica/rotas-roteirizacao" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/fretes"
-                                  element={<Transporte screen="freights" />}
+                                  element={<Navigate to="/admin/logistica/frete-tabelas" replace />}
                                 />
                                 <Route
                                   path="/admin/transporte/tabelas-frete"
-                                  element={<Transporte screen="freight_tables" />}
+                                  element={<Navigate to="/admin/logistica/frete-tabelas" replace />}
                                 />
                                 <Route
                                   path="/admin/transporte/rastreamento"
-                                  element={<Transporte screen="tracking" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/logistica/ocorrencias-rastreabilidade"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/ocorrencias"
-                                  element={<Transporte screen="occurrences" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/logistica/ocorrencias-rastreabilidade"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/comprovantes"
-                                  element={<Transporte screen="proof" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/logistica/ocorrencias-rastreabilidade"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/custos"
-                                  element={<Transporte screen="costs" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/custos-indicadores" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/app-motorista"
-                                  element={<Transporte screen="driver_app" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/distribuicao-entregas" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/transporte/relatorios"
-                                  element={<Transporte screen="reports" />}
+                                  element={
+                                    <Navigate to="/admin/logistica/custos-indicadores" replace />
+                                  }
                                 />
                                 <Route path="/admin/vendas" element={<SalesDashboardPage />} />
                                 <Route

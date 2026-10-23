@@ -4,6 +4,7 @@ import { RH_SCREEN_DOCS } from './rh-screens'
 import { SST_SCREEN_DOCS } from './sst-screens'
 import { FINANCIAL_SCREEN_DOCS } from './financial-screens'
 import { INDUSTRY_SCREEN_DOCS } from './industry-screens'
+import { LOGISTICS_SCREEN_DOCS } from './logistics-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1242,57 +1243,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   ...INDUSTRY_SCREEN_DOCS,
 
   // -------------------------------------------------------------
-  // 18. LOGÍSTICA E TRANSPORTE (TMS)
+  // 18. MÓDULO LOGÍSTICA E TRANSPORTE (7 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
-  '/admin/logistica': {
-    route: '/admin/logistica',
-    title: 'Logística de Entregas e Orquestração',
-    moduleGroup: 'Operação',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Gerenciar o planejamento de coletas, entregas, expedição de cargas, controle de ocorrências em trânsito e logística reversa.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Formação e roteirização inteligente de cargas por região e capacidade cúbica/peso.\n- Central de exceções e ocorrências de entrega (endereço não localizado, cliente ausente).\n- Painel de logística reversa e devoluções vinculadas aos pedidos de venda.\n- Emissão de romaneios de expedição e manifesto de transporte.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- A expedição só pode ser liberada após a emissão autorizada da NF-e e do MDF-e da viagem.\n- Ocorrências de extravio ou avaria exigem registro fotográfico e termo de responsabilidade.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. Pedidos faturados entram na fila de montagem de romaneio.\n2. A rota é despachada e acompanhada pela torre de controle.\n3. O motorista confirma a entrega colhendo o comprovante digital no destino.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `logistics_shipments`, `logistics_occurrences`, `logistics_vehicles`, `logistics_routes`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Mapeamento geográfico e aplicativo de entrega do motorista.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewLogistics(role)` e `canViewTransporte(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/logistics/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Alertas visuais de atraso ou sobrecarga de veículo na montagem da carga.',
-    },
-  },
+  ...LOGISTICS_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 19. CONTROLADORIA CORPORATIVA

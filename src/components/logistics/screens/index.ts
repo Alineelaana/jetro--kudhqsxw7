@@ -1,0 +1,7 @@
+export { ScreenCentralLogistica } from './screen-central-logistica'
+export { ScreenTransporteFrota } from './screen-transporte-frota'
+export { ScreenDistribuicaoEntregas } from './screen-distribuicao-entregas'
+export { ScreenRotasRoteirizacao } from './screen-rotas-roteirizacao'
+export { ScreenFreteTabelas } from './screen-frete-tabelas'
+export { ScreenOcorrenciasRastreabilidade } from './screen-ocorrencias-rastreabilidade'
+export { ScreenCustosIndicadores } from './screen-custos-indicadores'
