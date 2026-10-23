@@ -264,7 +264,7 @@ const App = () => (
                             <Sonner />
                             <Routes>
                               <Route element={<Layout />}>
-                                <Route path="/" element={<LoginPage />} />
+                                <Route path="/" element={<RootRoute />} />
                                 <Route path="/admin" element={<Admin />} />
                                 <Route path="/admin/dashboard" element={<DashboardPage />} />
                                 <Route path="/admin/orcamentos" element={<BudgetRequestsPanel />} />
@@ -2533,69 +2533,150 @@ const App = () => (
                                 />
                                 <Route path="/admin/usuarios" element={<UsersAdminPage />} />
                                 <Route path="/admin/auditoria" element={<Auditoria />} />
+                                {/* MÓDULO CONTROLADORIA (5 TELAS OFICIAIS) */}
                                 <Route
                                   path="/admin/controladoria"
-                                  element={<Controladoria screen="dashboard" />}
+                                  element={<Controladoria screen="dre-demonstracoes" />}
                                 />
                                 <Route
-                                  path="/admin/controladoria/dre"
-                                  element={<Controladoria screen="dre" />}
+                                  path="/admin/controladoria/dre-demonstracoes"
+                                  element={<Controladoria screen="dre-demonstracoes" />}
                                 />
                                 <Route
-                                  path="/admin/controladoria/dre-analitica"
-                                  element={<Controladoria screen="dre-analitica" />}
+                                  path="/admin/controladoria/planejamento"
+                                  element={<Controladoria screen="planejamento" />}
                                 />
                                 <Route
-                                  path="/admin/controladoria/kpis"
-                                  element={<Controladoria screen="kpis" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/drivers"
-                                  element={<Controladoria screen="drivers" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/budget"
-                                  element={<Controladoria screen="budget" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/forecast"
-                                  element={<Controladoria screen="forecast" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/fechamento"
-                                  element={<Controladoria screen="fechamento" />}
+                                  path="/admin/controladoria/fechamento-consolidacao"
+                                  element={<Controladoria screen="fechamento-consolidacao" />}
                                 />
                                 <Route
                                   path="/admin/controladoria/simulador"
                                   element={<Controladoria screen="simulador" />}
                                 />
                                 <Route
-                                  path="/admin/controladoria/consolidacao"
-                                  element={<Controladoria screen="consolidacao" />}
+                                  path="/admin/controladoria/configuracoes"
+                                  element={<Controladoria screen="configuracoes" />}
+                                />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE CONTROLADORIA */}
+                                <Route
+                                  path="/admin/controladoria/dre"
+                                  element={
+                                    <Navigate to="/admin/controladoria/dre-demonstracoes" replace />
+                                  }
                                 />
                                 <Route
-                                  path="/admin/controladoria/materialidade"
-                                  element={<Controladoria screen="materialidade" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/reclassificacoes"
-                                  element={<Controladoria screen="reclassificacoes" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/visoes-salvas"
-                                  element={<Controladoria screen="visoes-salvas" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/comentarios"
-                                  element={<Controladoria screen="comentarios" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/centros-resultado"
-                                  element={<Controladoria screen="centros-resultado" />}
+                                  path="/admin/controladoria/dre-analitica"
+                                  element={
+                                    <Navigate to="/admin/controladoria/dre-demonstracoes" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/controladoria/ebitda"
-                                  element={<Controladoria screen="ebitda" />}
+                                  element={
+                                    <Navigate to="/admin/controladoria/dre-demonstracoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/balanco"
+                                  element={
+                                    <Navigate to="/admin/controladoria/dre-demonstracoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/budget"
+                                  element={
+                                    <Navigate to="/admin/controladoria/planejamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/forecast"
+                                  element={
+                                    <Navigate to="/admin/controladoria/planejamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/drivers"
+                                  element={
+                                    <Navigate to="/admin/controladoria/planejamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/centros-resultado"
+                                  element={
+                                    <Navigate to="/admin/controladoria/planejamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/centros"
+                                  element={
+                                    <Navigate to="/admin/controladoria/planejamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/fechamento"
+                                  element={
+                                    <Navigate
+                                      to="/admin/controladoria/fechamento-consolidacao"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/consolidacao"
+                                  element={
+                                    <Navigate
+                                      to="/admin/controladoria/fechamento-consolidacao"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/reclassificacoes"
+                                  element={
+                                    <Navigate
+                                      to="/admin/controladoria/fechamento-consolidacao"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/materialidade"
+                                  element={
+                                    <Navigate
+                                      to="/admin/controladoria/fechamento-consolidacao"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/visoes-salvas"
+                                  element={
+                                    <Navigate to="/admin/controladoria/configuracoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/visoes"
+                                  element={
+                                    <Navigate to="/admin/controladoria/configuracoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/comentarios"
+                                  element={
+                                    <Navigate to="/admin/controladoria/configuracoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/kpis"
+                                  element={
+                                    <Navigate to="/admin/controladoria/dre-demonstracoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/controladoria/fluxo-caixa"
+                                  element={<Navigate to="/admin/financeiro" replace />}
                                 />
                                 <Route
                                   path="/admin/controladoria/adapta"
@@ -2604,16 +2685,10 @@ const App = () => (
                                   }
                                 />
                                 <Route
-                                  path="/admin/controladoria/balanco"
-                                  element={<Controladoria screen="balanco" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/fluxo-caixa"
-                                  element={<Controladoria screen="fluxo-caixa" />}
-                                />
-                                <Route
-                                  path="/admin/controladoria/configuracoes"
-                                  element={<Controladoria screen="configuracoes" />}
+                                  path="/admin/controladoria/*"
+                                  element={
+                                    <Navigate to="/admin/controladoria/dre-demonstracoes" replace />
+                                  }
                                 />
                                 {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE VERBAS (ORIGEM ÚNICA EM /admin/marketing/verbas-fornecedor) */}
                                 <Route

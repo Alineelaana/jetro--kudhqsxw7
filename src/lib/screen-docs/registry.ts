@@ -10,6 +10,7 @@ import { FISCAL_SCREEN_DOCS } from './fiscal-screens'
 import { COMMERCIAL_SCREEN_DOCS } from './commercial-screens'
 import { MARKETING_SCREEN_DOCS } from './marketing-screens'
 import { INTELIGENCIA_SCREEN_DOCS } from './inteligencia-screens'
+import { CONTROLADORIA_SCREEN_DOCS } from './controladoria-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1223,57 +1224,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   ...LOGISTICS_SCREEN_DOCS,
 
   // -------------------------------------------------------------
-  // 19. CONTROLADORIA CORPORATIVA
+  // 19. CONTROLADORIA CORPORATIVA (5 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
-  '/admin/controladoria': {
-    route: '/admin/controladoria',
-    title: 'Controladoria e Planejamento Financeiro',
-    moduleGroup: 'Inteligência',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Acompanhar os demonstrativos de resultado gerencial (DRE Gerencial e Analítica), EBITDA, balanço patrimonial, orçamento empresarial (Budget × Realizado) e simulações econômico-financeiras.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Cockpit executivo com visualização consolidada por centro de resultado.\n- DRE Gerencial multinível com drill-down até o lançamento analítico.\n- Gestão de Budget e Forecast com controle de versões orçamentárias.\n- Módulo de reclassificações gerenciais e comentários por conta contábil.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Períodos gerenciais encerrados são protegidos contra inclusão ou alteração de lançamentos extemporâneos.\n- Reclassificações gerenciais não alteram a escrituração fiscal/contábil oficial.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. A controladoria executa a rotina de fechamento mensal agregando contas a pagar, receber e estoque.\n2. Análises de desvios (orçado × realizado) são distribuídas aos gestores de centros de custo.\n3. Projeções de fechamento anual (forecast) são recalculadas com base nas realizações parciais.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `controladoria_dre_records`, `controladoria_budget`, `controladoria_drivers`, `controladoria_comments`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Integração contábil e exportadores executivos em Excel.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewControladoria(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/controladoria/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Sinalização explícita de contas sem amarração de plano gerencial.',
-    },
-  },
+  ...CONTROLADORIA_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // DEPARTAMENTO PESSOAL (DP) — 6 TELAS UNIFICADAS
