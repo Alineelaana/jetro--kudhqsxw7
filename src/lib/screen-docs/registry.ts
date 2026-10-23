@@ -2,6 +2,7 @@ import type { ScreenDocEntry } from './types'
 import { DP_SCREEN_DOCS } from './dp-screens'
 import { RH_SCREEN_DOCS } from './rh-screens'
 import { SST_SCREEN_DOCS } from './sst-screens'
+import { CADASTROS_SCREEN_DOCS } from './cadastros-screens'
 import { FINANCIAL_SCREEN_DOCS } from './financial-screens'
 import { INDUSTRY_SCREEN_DOCS } from './industry-screens'
 import { LOGISTICS_SCREEN_DOCS } from './logistics-screens'
@@ -758,39 +759,39 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   '/admin/cadastros/empresas': {
     route: '/admin/cadastros/empresas',
     title: 'Cadastro de Empresas (Matriz e Filiais)',
-    moduleGroup: 'Comercial',
-    docVersion: '1.2.0',
+    moduleGroup: 'Organização',
+    docVersion: '1.3.0',
     lastUpdated: '2026-04-14',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
       content:
-        'Gerenciar as pessoas jurídicas do grupo empresarial Huram (empresas independentes, matrizes e filiais vinculadas), permitindo a consulta automatizada de dados públicos cadastrais via CNPJ, parametrização de identidade visual/marca por unidade e preservando o isolamento multitenancy estrito entre os CNPJs do sistema.',
+        'Gerenciar as pessoas jurídicas do grupo empresarial Huram (empresas independentes, matrizes e filiais vinculadas), permitindo a consulta automatizada de dados públicos cadastrais via CNPJ, parametrização de identidade visual/marca por unidade, importação/exportação padronizada em Excel (.xlsx) e preservando o isolamento multitenancy estrito entre os CNPJs do sistema.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Listagem completa de empresas cadastradas com visualização em tabela de código, razão social, nome fantasia, CNPJ, badge de classificação (Matriz vs. Filial com indicador da matriz vinculada), status ativo/inativo e data de cadastro.\n- Busca rápida em tempo real por razão social, nome fantasia, CNPJ ou código.\n- Formulário padronizado de cadastro e edição de empresas via modal (`CadastroFormDialog`), suportando inserção manual ou enriquecimento via consulta de CNPJ.\n- Consulta Pública de CNPJ: botão dedicado "Consultar CNPJ" integrado a provedores públicos (BrasilAPI com fallback transparente para ReceitaWS), que normaliza e preenche automaticamente Razão Social, Nome Fantasia, Endereço consolidado (logradouro, número, complemento e bairro), Município, UF, CEP, Telefone e E-mail.\n- Revisão antes de Salvar: o preenchimento automático nunca trava os campos; todos os dados permanecem 100% editáveis pelo operador antes da confirmação.\n- Classificação de Unidade: seleção do Tipo de Unidade entre "Empresa independente / Matriz" e "Filial".\n- Vínculo Obrigatório de Matriz: ao selecionar "Filial", a interface renderiza campo obrigatório com a lista de empresas matrizes cadastradas (filtrando outras filiais e a própria empresa em edição), garantindo a hierarquia corporativa.\n- Identidade de Marca por Empresa: campos para definição de nome da marca, cor primária, cor secundária, logotipo oficial e flag de empresa padrão do ERP.',
+        '- Listagem completa de empresas cadastradas com visualização em tabela de código, razão social, nome fantasia, CNPJ, badge de classificação (Matriz vs. Filial com indicador da matriz vinculada), status ativo/inativo e data de cadastro.\n- Busca rápida em tempo real por razão social, nome fantasia, CNPJ ou código.\n- Formulário padronizado de cadastro e edição de empresas via modal (`CadastroFormDialog`), suportando inserção manual ou enriquecimento via consulta de CNPJ.\n- Consulta Pública de CNPJ: botão dedicado "Consultar CNPJ" integrado a provedores públicos (BrasilAPI com fallback transparente para ReceitaWS), que normaliza e preenche automaticamente Razão Social, Nome Fantasia, Endereço consolidado (logradouro, número, complemento e bairro), Município, UF, CEP, Telefone e E-mail.\n- Botão "Baixar Modelo Excel": geração de planilha .xlsx customizada com todas as colunas da empresa, destaque para campos obrigatórios (*), aba "Instruções" com regras e dicionário de tipos e 2 linhas de exemplo completas.\n- Botão "Importar Excel": leitura do arquivo .xlsx, validação rigorosa de CNPJ (com cálculo de dígito verificador módulo 11), checagem de duplicidade contra o banco e na planilha (registros existentes são ignorados e não sobrescritos), prévia em duas listas (válidos × erros linha a linha) e gravação em lotes com log de auditoria na coleção `audit_logs`.\n- Revisão antes de Salvar: o preenchimento automático nunca trava os campos; todos os dados permanecem 100% editáveis pelo operador antes da confirmação.\n- Classificação de Unidade: seleção do Tipo de Unidade entre "Empresa independente / Matriz" e "Filial".\n- Vínculo Obrigatório de Matriz: ao selecionar "Filial", a interface renderiza campo obrigatório com a lista de empresas matrizes cadastradas, garantindo a hierarquia corporativa.\n- Identidade de Marca por Empresa: campos para definição de nome da marca, cor primária, cor secundária, logotipo oficial e flag de empresa padrão do ERP.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Multitenancy Intacto e Isolamento por CNPJ: cada empresa/filial possui seus próprios lançamentos, pedidos, movimentações de estoque, títulos financeiros e permissões de usuários; o vínculo matriz-filial é exclusivamente estrutural e cadastral, sem mistura cruzada de dados operacionais.\n- Validação Obrigatória de Matriz para Filiais: nenhuma unidade classificada como "Filial" pode ser salva sem `matriz_id` válido apontando para uma empresa matriz previamente cadastrada.\n- Auto-vínculo Bloqueado: uma empresa não pode ser matriz de si mesma.\n- Exclusão e Hierarquia: filiais cadastradas não aparecem na listagem de seleção de matrizes para evitar encadeamentos cíclicos inválidos.\n- Resiliência da Consulta de CNPJ: falhas de conectividade, CNPJ inexistente ou instabilidade nos provedores públicos externos exibem aviso claro e não bloqueiam o preenchimento manual nem a operação do formulário.',
+        '- Multitenancy Intacto e Isolamento por CNPJ: cada empresa/filial possui seus próprios lançamentos, pedidos, movimentações de estoque, títulos financeiros e permissões de usuários; o vínculo matriz-filial é exclusivamente estrutural e cadastral, sem mistura cruzada de dados operacionais.\n- Validação Obrigatória de Matriz para Filiais: nenhuma unidade classificada como "Filial" pode ser salva sem `matriz_id` válido apontando para uma empresa matriz previamente cadastrada.\n- Validação Rigorosa de CNPJ: conferência dos 14 dígitos e dígitos verificadores oficiais.\n- Importação Aditiva: a importação Excel apenas inclui novas empresas, nunca sobrescreve ou apaga dados existentes.\n- Resiliência da Consulta de CNPJ: falhas de conectividade, CNPJ inexistente ou instabilidade nos provedores públicos externos exibem aviso claro e não bloqueiam o preenchimento manual nem a operação do formulário.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O operador acessa Cadastros → Empresas (`/admin/cadastros/empresas`).\n2. Para cadastrar nova unidade, clica em "Novo Cadastro".\n3. Informa o CNPJ (14 dígitos) e clica em "Consultar CNPJ". O serviço público consulta BrasilAPI (ou ReceitaWS) e preenche os campos cadastrais disponíveis.\n4. O operador revisa e complementa os dados cadastrais (Razão Social, Nome Fantasia, Inscrição Estadual, Endereço, etc.).\n5. Define o Tipo de Unidade: se "Filial", seleciona obrigatoriamente a empresa Matriz responsável.\n6. Ao clicar em "Salvar", o sistema valida a obrigatoriedade dos campos, persiste na coleção `empresas` com `tipo_unidade` e `matriz_id` e atualiza a listagem.',
+        '1. O operador acessa Cadastros → Empresas (`/admin/cadastros/empresas`).\n2. Para cadastrar nova unidade manualmente, clica em "Novo Cadastro", informa o CNPJ e opcionalmente aciona "Consultar CNPJ".\n3. Para carga em lote, aciona "Baixar Modelo Excel", preenche os dados cadastrais e em seguida clica em "Importar Excel".\n4. O motor analisa o arquivo, verifica CNPJ, obrigatórios e duplicidades, exibindo a prévia.\n5. O operador confirma a gravação e o sistema efetiva a carga com registro em `audit_logs`.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleção PocketBase: `empresas` (campos: `code`, `name`, `razao_social`, `nome_fantasia`, `cnpj`, `tipo_unidade`, `matriz_id`, `inscricao_estadual`, `inscricao_municipal`, `address`, `city`, `state`, `cep`, `phone`, `email`, `active`, `padrao`, `marca_nome_exibicao`, `marca_cor_primaria`, `marca_cor_secundaria`, `logo`, `marca_logo`).\n- Serviços externos: APIs públicas da BrasilAPI e ReceitaWS para consulta de CNPJ.',
+        '- Coleções PocketBase: `empresas` e `audit_logs`.\n- Serviços externos: APIs públicas da BrasilAPI e ReceitaWS para consulta de CNPJ.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Serviço `consultarCNPJPublico` em `src/services/cnpj-service.ts` (BrasilAPI v1/v2 com fallback automático para ReceitaWS v1).\n- Redirecionamento 301/replace da rota antiga `/admin/configuracoes/dados-empresa` para `/admin/cadastros/empresas`.',
+        '- Motor único de importação Excel (`src/services/excel-import-service.ts`) usando biblioteca xlsx.\n- Serviço `consultarCNPJPublico` em `src/services/cnpj-service.ts`.\n- Registro de auditoria em `src/services/audit-logs.ts`.',
     },
     permissions: {
       title: 'Permissões',
@@ -800,12 +801,12 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `src/components/cadastros/cadastro-standard-screen.tsx`, `src/components/cadastros/cadastro-form-dialog.tsx`.\n- Configuração: `src/lib/cadastros-config.ts` (coleção `empresas`).\n- Serviços: `src/services/cnpj-service.ts`, `src/services/cadastros.ts`.\n- Cliente: `pb` (`src/lib/pocketbase/client.ts`).',
+        '- Componentes: `src/components/cadastros/cadastro-standard-screen.tsx`, `src/components/cadastros/cadastro-form-dialog.tsx`, `src/components/common/ExcelImportDialog.tsx`.\n- Configuração: `src/lib/cadastros-config.ts` (coleção `empresas`).\n- Serviços: `src/services/cnpj-service.ts`, `src/services/cadastros.ts`, `src/services/excel-import-service.ts`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Erro de consulta pública de CNPJ: exibe feedback em toast e card informativo com a mensagem de falha, permitindo preenchimento manual sem perda de dados.\n- Tentativa de salvar Filial sem Matriz: bloqueio imediato com aviso descritivo.\n- Falhas de gravação no banco: notificação via toast destrutivo mantendo os dados preenchidos no formulário.',
+        '- Linhas com CNPJ inválido ou já cadastrado no banco são destacadas na lista de inconsistências da prévia.\n- Feedback imediato permitindo retificar a planilha e reenviá-la antes de confirmar a gravação.',
     },
   },
 
@@ -1102,6 +1103,11 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   // MÓDULO INTELIGÊNCIA (4 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
   ...INTELIGENCIA_SCREEN_DOCS,
+
+  // -------------------------------------------------------------
+  // TELAS PADRÃO DE CADASTROS (MOTOR DE IMPORTAÇÃO EXCEL ETAPA 1)
+  // -------------------------------------------------------------
+  ...CADASTROS_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 14. BI & ANALYTICS (BUSINESS INTELLIGENCE)

@@ -24,7 +24,6 @@ import {
   updateCadastro,
   deleteCadastro,
   exportCadastrosXls,
-  importCsv,
 } from '@/services/cadastros'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
@@ -32,6 +31,8 @@ import { useOrgFilter } from '@/hooks/use-org-filter'
 import { MissingTenantNotice } from '@/components/multitenancy/missing-tenant-notice'
 import { TENANT_COLLECTIONS } from '@/lib/multitenancy'
 import { CadastroFormDialog } from '@/components/cadastros/cadastro-form-dialog'
+import { ExcelImportDialog } from '@/components/common/ExcelImportDialog'
+import { downloadTemplateExcel } from '@/services/excel-import-service'
 import { type CadastroConfig, type CadastroRecord } from '@/lib/cadastros-types'
 import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import {
@@ -44,8 +45,8 @@ import {
   Eye,
   Copy,
   Upload,
+  Download,
   FileSpreadsheet,
-  Package,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -71,6 +72,7 @@ export function CadastroStandardScreen({ config }: Props) {
   const [readOnly, setReadOnly] = useState(false)
   const [confirm, setConfirm] = useState<ConfirmState | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const load = async () => {
@@ -165,17 +167,16 @@ export function CadastroStandardScreen({ config }: Props) {
     setConfirm(null)
   }
 
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleDownloadTemplate = () => {
     try {
-      const count = await importCsv(config.collection, await file.text(), userName)
-      toast({ title: `${count} registro(s) importado(s)` })
-      load()
+      downloadTemplateExcel(config)
+      toast({
+        title: 'Modelo Excel baixado',
+        description: 'Planilha modelo com colunas, validações e instruções gerada com sucesso.',
+      })
     } catch {
-      toast({ title: 'Erro ao importar', variant: 'destructive' })
+      toast({ title: 'Erro ao gerar modelo Excel', variant: 'destructive' })
     }
-    if (fileRef.current) fileRef.current.value = ''
   }
 
   const fmtDate = (d: string) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—')
@@ -193,21 +194,29 @@ export function CadastroStandardScreen({ config }: Props) {
       >
         <h2 className="text-xl font-black text-foreground">{config.label}</h2>
         <div className="flex flex-wrap gap-2">
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".csv,text/csv"
-            className="hidden"
-            onChange={handleImport}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fileRef.current?.click()}
-            className="border-[#005B2E] text-[#005B2E]"
-          >
-            <Upload className="w-4 h-4 mr-1.5" /> Importar
-          </Button>
+          {/* Botões de Excel: na tela de Perfis e Permissões visíveis apenas para SUP */}
+          {(config.key !== 'perfis_permissoes' || user?.role === 'SUP') && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadTemplate}
+                className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-semibold"
+                title="Baixar planilha modelo .xlsx com instruções e exemplos"
+              >
+                <Download className="w-4 h-4 mr-1.5" /> Baixar Modelo Excel
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setImportDialogOpen(true)}
+                className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-semibold"
+                title="Importar dados de planilha Excel (.xlsx) com prévia e validação"
+              >
+                <Upload className="w-4 h-4 mr-1.5" /> Importar Excel
+              </Button>
+            </>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -468,6 +477,12 @@ export function CadastroStandardScreen({ config }: Props) {
         onOpenChange={setFormOpen}
         record={editing}
         readOnly={readOnly}
+        onSuccess={load}
+      />
+      <ExcelImportDialog
+        config={config}
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
         onSuccess={load}
       />
       <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
