@@ -77,7 +77,6 @@ import { canViewBI } from '@/lib/bi-permissions'
 import { canViewControladoria } from '@/lib/controladoria-permissions'
 import { canViewVR } from '@/lib/variable-remuneration-permissions'
 import { canViewAtendimentoModule } from '@/lib/atendimento-permissions'
-import { canViewValidityAlerts } from '@/lib/validity-permissions'
 
 export interface MenuChild {
   label: string
@@ -242,18 +241,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         icon: Layers,
         route: '/admin/platform-layer',
         perm: canViewPlatformInfra,
-      },
-      {
-        label: 'Validade e Vencimentos',
-        icon: CalendarClock,
-        route: '/admin/validade',
-        perm: canViewValidityAlerts,
-        children: [
-          { label: 'Central de Alertas', route: '/admin/validade' },
-          { label: 'Chat IA', route: '/admin/validade/chat' },
-          { label: 'Dashboard', route: '/admin/validade/dashboard' },
-          { label: 'Regras', route: '/admin/validade/regras' },
-        ],
       },
     ],
   },
@@ -667,32 +654,17 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
     title: 'Operação',
     items: [
       {
-        label: 'Estoque',
+        label: 'Estoque e WMS',
         icon: Boxes,
         route: '/admin/estoque',
         perm: canViewStock,
         children: [
-          { label: 'Ajustes', route: '/admin/estoque/ajustes' },
-          { label: 'Alertas WMS', route: '/admin/estoque/wms-alertas' },
-          { label: 'Coletores', route: '/admin/estoque/wms-coletores' },
-          { label: 'Conferência', route: '/admin/estoque/conferencia' },
-          { label: 'Endereçamento', route: '/admin/estoque/enderecamento' },
-          { label: 'Expedição', route: '/admin/estoque/expedicao' },
-          { label: 'Gerencial WMS', route: '/admin/estoque/wms-managerial' },
-          { label: 'Inventário', route: '/admin/estoque/inventario' },
-          { label: 'Localizações', route: '/admin/estoque/localizacoes' },
-          { label: 'Lotes', route: '/admin/estoque/lotes' },
+          { label: 'Central de Estoque', route: '/admin/estoque' },
+          { label: 'Inventário e Conferência', route: '/admin/estoque/inventario' },
+          { label: 'Lotes e Validade', route: '/admin/estoque/lotes' },
           { label: 'Movimentações', route: '/admin/estoque/movimentacoes' },
-          { label: 'Ondas', route: '/admin/estoque/ondas' },
-          { label: 'Operadores', route: '/admin/estoque/wms-operadores' },
-          { label: 'Pallets', route: '/admin/estoque/wms-pallets' },
-          { label: 'Reabastecimento', route: '/admin/estoque/reabastecimento' },
-          { label: 'Recebimento', route: '/admin/estoque/recebimento' },
-          { label: 'Relatórios WMS', route: '/admin/estoque/wms-relatorios' },
-          { label: 'Separação', route: '/admin/estoque/separacao' },
-          { label: 'Transferências', route: '/admin/estoque/transferencias' },
-          { label: 'Validade', route: '/admin/estoque/validade' },
-          { label: 'Volumes', route: '/admin/estoque/wms-volumes' },
+          { label: 'WMS Gerencial', route: '/admin/estoque/wms-gerencial' },
+          { label: 'WMS Operacional', route: '/admin/estoque/wms-operacional' },
         ],
       },
       {

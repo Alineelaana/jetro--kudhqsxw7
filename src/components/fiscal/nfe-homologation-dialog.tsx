@@ -15,7 +15,7 @@ import {
   Building2,
   Clock,
 } from 'lucide-react'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import {
   Dialog,
   DialogContent,

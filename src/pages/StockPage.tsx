@@ -44,19 +44,22 @@ import {
 
 export default function StockPage({ screen }: { screen: string }) {
   switch (screen) {
+    case 'central':
     case 'dashboard':
       return <ScreenCentralEstoque />
+    case 'movimentacoes':
     case 'movements':
     case 'transfers':
     case 'ajustes':
     case 'adjustments':
       return <ScreenMovimentacoes />
+    case 'inventario':
     case 'inventory':
     case 'conferencia':
     case 'checking':
       return <ScreenInventarioConferencia />
-    case 'batches':
     case 'lotes':
+    case 'batches':
     case 'expiry':
     case 'validade':
       return <ScreenLotesValidade />

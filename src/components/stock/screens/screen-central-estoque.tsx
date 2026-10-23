@@ -24,7 +24,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from '@/hooks/use-toast'
 import { StockDashboard } from '@/components/stock/stock-dashboard'
 import { WmsAlertsCenter } from '@/components/stock/wms-alerts-center'
-import { getStockItems, getStockMovements, getStockBatches } from '@/services/stock'
+import { getProductsForStock, getStockMovements, getStockBatches } from '@/services/stock'
 
 export function ScreenCentralEstoque() {
   const navigate = useNavigate()
@@ -56,7 +56,7 @@ export function ScreenCentralEstoque() {
   const loadKpis = async () => {
     try {
       const [items, movements, batches] = await Promise.all([
-        getStockItems().catch(() => []),
+        getProductsForStock().catch(() => []),
         getStockMovements().catch(() => []),
         getStockBatches().catch(() => []),
       ])
@@ -123,7 +123,7 @@ export function ScreenCentralEstoque() {
     loadKpis()
   }, [empresaAtivaId])
 
-  useRealtime('stock_items', () => loadKpis())
+  useRealtime('products', () => loadKpis())
   useRealtime('stock_movements', () => loadKpis())
   useRealtime('stock_batches', () => loadKpis())
 

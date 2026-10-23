@@ -588,93 +588,108 @@ const App = () => (
                                   path="/admin/vendas/historico"
                                   element={<SalesHistoryPage />}
                                 />
+                                {/* Módulo Estoque e WMS (6 Telas Oficiais) */}
                                 <Route
                                   path="/admin/estoque"
-                                  element={<StockPage screen="dashboard" />}
+                                  element={<StockPage screen="central" />}
                                 />
                                 <Route
                                   path="/admin/estoque/movimentacoes"
-                                  element={<StockPage screen="movements" />}
+                                  element={<StockPage screen="movimentacoes" />}
                                 />
                                 <Route
                                   path="/admin/estoque/inventario"
-                                  element={<StockPage screen="inventory" />}
-                                />
-                                <Route
-                                  path="/admin/estoque/transferencias"
-                                  element={<StockPage screen="transfers" />}
-                                />
-                                <Route
-                                  path="/admin/estoque/ajustes"
-                                  element={<StockPage screen="adjustments" />}
+                                  element={<StockPage screen="inventario" />}
                                 />
                                 <Route
                                   path="/admin/estoque/lotes"
-                                  element={<StockPage screen="batches" />}
+                                  element={<StockPage screen="lotes" />}
                                 />
                                 <Route
-                                  path="/admin/estoque/validade"
-                                  element={<StockPage screen="expiry" />}
+                                  path="/admin/estoque/wms-operacional"
+                                  element={<StockPage screen="wms-operacional" />}
                                 />
                                 <Route
-                                  path="/admin/estoque/localizacoes"
-                                  element={<StockPage screen="locations" />}
+                                  path="/admin/estoque/wms-gerencial"
+                                  element={<StockPage screen="wms-gerencial" />}
+                                />
+
+                                {/* Redirecionamentos de Rotas Antigas de Estoque e WMS */}
+                                <Route
+                                  path="/admin/estoque/transferencias"
+                                  element={<Navigate to="/admin/estoque/movimentacoes" replace />}
                                 />
                                 <Route
-                                  path="/admin/estoque/separacao"
-                                  element={<StockPage screen="picking" />}
+                                  path="/admin/estoque/ajustes"
+                                  element={<Navigate to="/admin/estoque/movimentacoes" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/conferencia"
-                                  element={<StockPage screen="checking" />}
+                                  element={<Navigate to="/admin/estoque/inventario" replace />}
+                                />
+                                <Route
+                                  path="/admin/estoque/posicao"
+                                  element={<Navigate to="/admin/estoque" replace />}
+                                />
+                                <Route
+                                  path="/admin/estoque/validade"
+                                  element={<Navigate to="/admin/estoque/lotes" replace />}
+                                />
+                                <Route
+                                  path="/admin/estoque/localizacoes"
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
+                                />
+                                <Route
+                                  path="/admin/estoque/separacao"
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/expedicao"
-                                  element={<StockPage screen="expedition" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/recebimento"
-                                  element={<StockPage screen="receiving" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/enderecamento"
-                                  element={<StockPage screen="putaway" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/ondas"
-                                  element={<StockPage screen="waves" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/reabastecimento"
-                                  element={<StockPage screen="replenishment" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-alertas"
-                                  element={<WmsScreen screen="wms-alerts" />}
+                                  element={<Navigate to="/admin/estoque" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-relatorios"
-                                  element={<WmsScreen screen="wms-reports" />}
+                                  element={<Navigate to="/admin/estoque/wms-gerencial" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-pallets"
-                                  element={<WmsScreen screen="wms-pallets" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-volumes"
-                                  element={<WmsScreen screen="wms-volumes" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-coletores"
-                                  element={<WmsScreen screen="wms-collectors" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-operadores"
-                                  element={<WmsScreen screen="wms-operators" />}
+                                  element={<Navigate to="/admin/estoque/wms-operacional" replace />}
                                 />
                                 <Route
                                   path="/admin/estoque/wms-managerial"
-                                  element={<WmsScreen screen="wms-managerial" />}
+                                  element={<Navigate to="/admin/estoque/wms-gerencial" replace />}
                                 />
                                 {/* Central de Configurações do Jetro On-line */}
                                 <Route
@@ -1640,21 +1655,22 @@ const App = () => (
                                   path="/admin/performance/chat"
                                   element={<Performance screen="chat" />}
                                 />
+                                {/* Redirecionamento das Rotas Antigas de Validade para Lotes e Validade */}
                                 <Route
                                   path="/admin/validade"
-                                  element={<ValidityAlerts screen="alerts" />}
+                                  element={<Navigate to="/admin/estoque/lotes" replace />}
                                 />
                                 <Route
                                   path="/admin/validade/dashboard"
-                                  element={<ValidityAlerts screen="dashboard" />}
+                                  element={<Navigate to="/admin/estoque/lotes" replace />}
                                 />
                                 <Route
                                   path="/admin/validade/regras"
-                                  element={<ValidityAlerts screen="regras" />}
+                                  element={<Navigate to="/admin/estoque/lotes" replace />}
                                 />
                                 <Route
                                   path="/admin/validade/chat"
-                                  element={<ValidityAlerts screen="chat" />}
+                                  element={<Navigate to="/admin/estoque/lotes" replace />}
                                 />
                                 <Route
                                   path="/admin/atendimento"

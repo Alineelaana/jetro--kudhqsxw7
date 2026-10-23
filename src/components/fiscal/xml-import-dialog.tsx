@@ -15,7 +15,7 @@ import {
   ArrowRight,
   ExternalLink,
 } from 'lucide-react'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import {
   Dialog,
   DialogContent,
