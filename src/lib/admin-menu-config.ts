@@ -223,11 +223,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/configuracoes/seguranca',
             perm: canManageConfiguracoes,
           },
-          {
-            label: 'SLA Chamados',
-            route: '/admin/configuracoes/sla-chamados',
-            perm: canManageConfiguracoes,
-          },
         ],
       },
       {
@@ -245,18 +240,22 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
     ],
   },
   {
-    title: 'Chamados',
+    title: 'Chamados / TI',
     items: [
       {
-        label: 'Chamados',
+        label: 'Central de Chamados',
         icon: Inbox,
-        route: '/admin/chamados',
-        children: [
-          { label: 'Configuração de SLA', route: '/admin/chamados/sla' },
-          { label: 'Meus Chamados', route: '/admin/chamados' },
-          { label: 'Novo Chamado', route: '/admin/chamados/novo' },
-          { label: 'Painel', route: '/admin/chamados/painel' },
-        ],
+        route: '/admin/chamados/central',
+      },
+      {
+        label: 'Meus Chamados',
+        icon: FileText,
+        route: '/admin/chamados/meus-chamados',
+      },
+      {
+        label: 'Painel e SLA',
+        icon: Clock,
+        route: '/admin/chamados/painel-sla',
       },
     ],
   },
