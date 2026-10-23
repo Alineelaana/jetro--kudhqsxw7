@@ -22,6 +22,7 @@ import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
 
 // Guards e wrappers estáticos
+import { RootRoute } from '@/components/auth/root-route'
 import { JetroOnlineProtectedRoute } from '@/components/jetro-online-central/jetro-online-protected-route'
 import { AiAdminProtectedRoute } from '@/components/ai-module/ai-admin-protected-route'
 import { BiCenterWrapper } from '@/components/bi/bi-center-wrapper'
