@@ -14,13 +14,29 @@ onRecordUpdateRequest((e) => {
     }
   } catch (_) {}
 
+  // Identifica chamadas derivadas de rotas não-diretas do produto (movimentações de estoque, importação de NF, ordens de produção)
+  try {
+    if (e.httpContext) {
+      var reqPath = ''
+      try {
+        reqPath = e.httpContext.request().url.path || ''
+      } catch (_) {}
+      if (reqPath && reqPath.indexOf('/api/collections/products/records') === -1) {
+        isInternalSystem = true
+      }
+    } else {
+      // Sem contexto HTTP direto (execução em background / hooks)
+      isInternalSystem = true
+    }
+  } catch (_) {}
+
   // Se for chamada interna do sistema, permite prosseguir
   if (isInternalSystem) {
     e.next()
     return
   }
 
-  // Compara o estado original persistido no banco com a tentativa de alteração
+  // Compara o estado original persistido no banco com a tentativa de alteração manual
   var originalRecord = e.record.original()
   if (!originalRecord) {
     e.next()
@@ -111,7 +127,7 @@ onRecordUpdateRequest((e) => {
   return e.forbiddenError(
     'A alteração manual dos custos (' +
       fieldNames +
-      ') é bloqueada pelas políticas de governança do ERP HURAM. Os custos são calculados exclusivamente por documentos fiscais de entrada e ordens de produção.',
+      ') é bloqueada pelas políticas de governança do ERP HURAM (HTTP 403). Os custos são calculados exclusivamente por documentos fiscais de entrada (custo médio ponderado) e ordens de produção.',
   )
 }, 'products')
 
