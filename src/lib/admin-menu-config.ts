@@ -264,6 +264,47 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
     title: 'Comercial',
     items: [
       {
+        label: 'Comercial',
+        icon: ShoppingCart,
+        route: '/admin/comercial',
+        perm: canViewSales,
+        children: [
+          { label: 'Central Comercial', route: '/admin/comercial' },
+          { label: 'Clientes', route: '/admin/comercial/clientes' },
+          { label: 'Comissão Analítica', route: '/admin/comissao-analitica' },
+          { label: 'Comissões', route: '/admin/comercial/comissoes' },
+          {
+            label: 'Consulta de Pedidos',
+            route: '/admin/vendas/consulta-pedidos',
+          },
+          {
+            label: 'Contratos e Devoluções',
+            route: '/admin/comercial/contratos-devolucoes',
+          },
+          {
+            label: 'Cotações e Cotador',
+            route: '/admin/comercial/cotacoes-cotador',
+          },
+          { label: 'CRM', route: '/admin/comercial/crm' },
+          {
+            label: 'Pedidos e Faturamento',
+            route: '/admin/comercial/pedidos-faturamento',
+          },
+          {
+            label: 'Relatórios Comerciais',
+            route: '/admin/comercial/relatorios',
+          },
+          {
+            label: 'Remuneração Variável',
+            route: '/admin/comercial/remuneracao-variavel',
+          },
+          {
+            label: 'Tabelas de Preço e Descontos',
+            route: '/admin/comercial/tabelas-preco-descontos',
+          },
+        ],
+      },
+      {
         label: 'Cadastros',
         icon: FileText,
         route: '/admin/cadastros',
@@ -294,26 +335,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         ],
       },
       {
-        label: 'CRM',
-        icon: Users,
-        route: '/admin/crm',
-        perm: canViewCRM,
-        children: [
-          { label: 'Agenda', route: '/admin/crm/agenda' },
-          { label: 'Atividades', route: '/admin/crm/atividades' },
-          { label: 'Automação', route: '/admin/crm/automacao' },
-          { label: 'Config. Funil', route: '/admin/crm/funil-config' },
-          { label: 'Funil', route: '/admin/crm/funil' },
-          { label: 'Histórico', route: '/admin/crm/historico' },
-          { label: 'Leads', route: '/admin/crm/leads' },
-          { label: 'Metas', route: '/admin/crm/metas' },
-          { label: 'Motivos de Perda', route: '/admin/crm/motivos-perda' },
-          { label: 'Oportunidades', route: '/admin/crm/oportunidades' },
-          { label: 'Propostas', route: '/admin/crm/propostas' },
-          { label: 'Relatórios', route: '/admin/crm/relatorios' },
-        ],
-      },
-      {
         label: 'Marketing Enterprise',
         icon: Megaphone,
         route: '/admin/marketing',
@@ -330,19 +351,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Solicitações', route: '/admin/marketing/solicitacoes' },
           { label: 'Templates', route: '/admin/marketing/templates' },
           { label: 'Trade Marketing', route: '/admin/trade-marketing' },
-        ],
-      },
-      {
-        label: 'Comissões',
-        icon: Percent,
-        route: '/admin/comissao-analitica',
-        perm: canViewSales,
-        children: [
-          { label: 'Comissão Analítica', route: '/admin/comissao-analitica' },
-          { label: 'Comissões MIX', route: '/admin/comissoes-mix' },
-          { label: 'Descontos e Deduções', route: '/admin/descontos-deducoes' },
-          { label: 'Premiações', route: '/admin/premiacoes' },
-          { label: 'Regras de Comissão', route: '/admin/regras-comissao' },
         ],
       },
       {
@@ -366,7 +374,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         ],
       },
       { label: 'Produtos', icon: Package, route: '/admin/produtos' },
-      { label: 'Promoções', icon: Percent, route: '/admin/promocoes', perm: canViewSales },
       {
         label: 'Tabelas de Preços',
         icon: Tag,
@@ -387,31 +394,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Materiais', route: '/admin/trade-marketing/materiais' },
           { label: 'Planejamento Anual', route: '/admin/trade-marketing/planejamento-anual' },
           { label: 'Prestação de Contas', route: '/admin/trade-marketing/prestacao-contas' },
-        ],
-      },
-      {
-        label: 'Vendas',
-        icon: ShoppingCart,
-        route: '/admin/vendas',
-        perm: canViewSales,
-        children: [
-          {
-            label: 'Consulta de Pedidos',
-            route: '/admin/vendas/consulta-pedidos',
-            perm: canViewSales,
-          },
-          { label: 'Contratos', route: '/admin/vendas/contratos' },
-          { label: 'Devoluções', route: '/admin/vendas/devolucoes' },
-          { label: 'Faturamento', route: '/admin/vendas/faturamento' },
-          { label: 'Histórico', route: '/admin/vendas/historico' },
-          {
-            label: 'Inserir Clientes',
-            route: '/admin/vendas/inserir-clientes',
-            perm: canViewSales,
-          },
-          { label: 'NFC-e', route: '/admin/vendas/nfce' },
-          { label: 'NF-e', route: '/admin/vendas/nfe' },
-          { label: 'Pedidos', route: '/admin/vendas/pedidos' },
         ],
       },
     ],

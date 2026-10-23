@@ -442,9 +442,9 @@ export function ScreenCentralComercial() {
                 </Button>
               </div>
 
-              <JetroTable<RecentOrderRow>
+              <JetroTable
                 data={recentOrders}
-                columns={columns}
+                columns={columns as any}
                 pageSize={10}
                 screenId="comercial-central"
               />

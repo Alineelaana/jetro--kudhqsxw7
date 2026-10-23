@@ -355,9 +355,9 @@ export function ScreenTabelasPreco() {
                 </div>
               </div>
 
-              <JetroTable<DiscountPolicy>
+              <JetroTable
                 data={policies}
-                columns={policyColumns}
+                columns={policyColumns as any}
                 pageSize={10}
                 screenId="comercial-politicas-desconto"
                 emptyMessage="Nenhuma política de desconto cadastrada."

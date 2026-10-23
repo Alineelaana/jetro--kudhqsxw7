@@ -98,9 +98,10 @@ const CollectionCenterCertification = lazy(() => import('./pages/CollectionCente
 const RH = lazy(() => import('./pages/RH'))
 const Conformidade = lazy(() => import('./pages/Conformidade'))
 
-// Fiscal e CRM
+// Fiscal, CRM e Comercial
 const Fiscal = lazy(() => import('./pages/Fiscal'))
 const CRM = lazy(() => import('./pages/CRM'))
+const Commercial = lazy(() => import('./pages/Commercial'))
 
 // Notificações e Módulos Centrais
 const Notifications = lazy(() => import('./pages/Notifications'))
@@ -563,19 +564,87 @@ const App = () => (
                                     <Navigate to="/admin/logistica/custos-indicadores" replace />
                                   }
                                 />
-                                <Route path="/admin/vendas" element={<SalesDashboardPage />} />
+                                {/* MÓDULO COMERCIAL (10 Telas Oficiais) */}
+                                <Route path="/admin/comercial" element={<Commercial />} />
+                                <Route path="/admin/comercial/central" element={<Commercial />} />
+                                <Route path="/admin/comercial/clientes" element={<Commercial />} />
+                                <Route path="/admin/comercial/comissoes" element={<Commercial />} />
                                 <Route
-                                  path="/admin/vendas/inserir-clientes"
-                                  element={<InserirClientesScreen />}
+                                  path="/admin/comercial/contratos-devolucoes"
+                                  element={<Commercial />}
                                 />
-                                <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                                <Route path="/admin/comercial/crm" element={<Commercial />} />
+                                <Route
+                                  path="/admin/comercial/cotacoes-cotador"
+                                  element={<Commercial />}
+                                />
+                                <Route
+                                  path="/admin/comercial/pedidos-faturamento"
+                                  element={<Commercial />}
+                                />
+                                <Route
+                                  path="/admin/comercial/relatorios"
+                                  element={<Commercial />}
+                                />
+                                <Route
+                                  path="/admin/comercial/remuneracao-variavel"
+                                  element={<Commercial />}
+                                />
+                                <Route
+                                  path="/admin/comercial/tabelas-preco-descontos"
+                                  element={<Commercial />}
+                                />
+
+                                {/* TELAS PRESERVADAS INTOCADAS (Comissão Analítica e Consulta de Pedidos) */}
                                 <Route
                                   path="/admin/vendas/consulta-pedidos"
                                   element={<SalesOrdersQueryPage />}
                                 />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE VENDAS */}
+                                <Route
+                                  path="/admin/vendas"
+                                  element={<Navigate to="/admin/comercial" replace />}
+                                />
+                                <Route
+                                  path="/admin/vendas/pedidos"
+                                  element={
+                                    <Navigate to="/admin/comercial/pedidos-faturamento" replace />
+                                  }
+                                />
                                 <Route
                                   path="/admin/vendas/faturamento"
-                                  element={<InvoicingPage />}
+                                  element={
+                                    <Navigate to="/admin/comercial/pedidos-faturamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/vendas/orcamentos"
+                                  element={
+                                    <Navigate to="/admin/comercial/pedidos-faturamento" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/vendas/inserir-clientes"
+                                  element={<Navigate to="/admin/comercial/clientes" replace />}
+                                />
+                                <Route
+                                  path="/admin/vendas/contratos"
+                                  element={
+                                    <Navigate to="/admin/comercial/contratos-devolucoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/vendas/devolucoes"
+                                  element={
+                                    <Navigate to="/admin/comercial/contratos-devolucoes" replace />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/vendas/historico"
+                                  element={
+                                    <Navigate to="/admin/comercial/pedidos-faturamento" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/vendas/nfe"
@@ -585,14 +654,37 @@ const App = () => (
                                   path="/admin/vendas/nfce"
                                   element={<Navigate to="/admin/fiscal/documentos" replace />}
                                 />
-                                <Route path="/admin/vendas/contratos" element={<ContractsPage />} />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE COMISSÕES E DESCONTOS (Comissão Analítica mantida intacta acima) */}
                                 <Route
-                                  path="/admin/vendas/devolucoes"
-                                  element={<SalesReturnsPage />}
+                                  path="/admin/regras-comissao"
+                                  element={<Navigate to="/admin/comercial/comissoes" replace />}
                                 />
                                 <Route
-                                  path="/admin/vendas/historico"
-                                  element={<SalesHistoryPage />}
+                                  path="/admin/comissoes-mix"
+                                  element={<Navigate to="/admin/comercial/comissoes" replace />}
+                                />
+                                <Route
+                                  path="/admin/premiacoes"
+                                  element={<Navigate to="/admin/comercial/comissoes" replace />}
+                                />
+                                <Route
+                                  path="/admin/descontos-deducoes"
+                                  element={
+                                    <Navigate
+                                      to="/admin/comercial/tabelas-preco-descontos"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/promocoes"
+                                  element={
+                                    <Navigate
+                                      to="/admin/comercial/tabelas-preco-descontos"
+                                      replace
+                                    />
+                                  }
                                 />
                                 {/* Módulo Estoque e WMS (6 Telas Oficiais) */}
                                 <Route
@@ -1252,42 +1344,60 @@ const App = () => (
                                   path="/admin/fiscal/xml-import"
                                   element={<Navigate to="/admin/fiscal/compras-entradas" replace />}
                                 />
-                                <Route path="/admin/crm" element={<CRM screen="dashboard" />} />
-                                <Route path="/admin/crm/leads" element={<CRM screen="leads" />} />
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE CRM */}
+                                <Route
+                                  path="/admin/crm"
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
+                                />
+                                <Route
+                                  path="/admin/crm/leads"
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
+                                />
                                 <Route
                                   path="/admin/crm/oportunidades"
-                                  element={<CRM screen="oportunidades" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
-                                <Route path="/admin/crm/funil" element={<CRM screen="funil" />} />
+                                <Route
+                                  path="/admin/crm/funil"
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
+                                />
                                 <Route
                                   path="/admin/crm/funil-config"
-                                  element={<CRM screen="funil-config" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
-                                <Route path="/admin/crm/agenda" element={<CRM screen="agenda" />} />
+                                <Route
+                                  path="/admin/crm/agenda"
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
+                                />
                                 <Route
                                   path="/admin/crm/propostas"
-                                  element={<CRM screen="propostas" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
                                 <Route
                                   path="/admin/crm/historico"
-                                  element={<CRM screen="historico" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
                                 <Route
                                   path="/admin/crm/atividades"
-                                  element={<CRM screen="atividades" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
                                 <Route
                                   path="/admin/crm/motivos-perda"
-                                  element={<CRM screen="motivos-perda" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
-                                <Route path="/admin/crm/metas" element={<CRM screen="metas" />} />
+                                <Route
+                                  path="/admin/crm/metas"
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
+                                />
                                 <Route
                                   path="/admin/crm/automacao"
-                                  element={<CRM screen="automacao" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
                                 <Route
                                   path="/admin/crm/relatorios"
-                                  element={<CRM screen="relatorios" />}
+                                  element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
                                 <Route path="/admin/notificacoes" element={<Notifications />} />
                                 <Route
@@ -1475,61 +1585,90 @@ const App = () => (
                                   path="/admin/recuperar-senha"
                                   element={<AdminPasswordRecovery />}
                                 />
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE REMUNERAÇÃO VARIÁVEL E METAS */}
                                 <Route
                                   path="/admin/remuneracao"
-                                  element={<VariableRemuneration screen="dashboard" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/regras"
-                                  element={<VariableRemuneration screen="rules" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/apuracao"
-                                  element={<VariableRemuneration screen="apuration" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/simulador"
-                                  element={<VariableRemuneration screen="simulator" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/aprovacoes"
-                                  element={<VariableRemuneration screen="approvals" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/historico"
-                                  element={<VariableRemuneration screen="history" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/contestacoes"
-                                  element={<VariableRemuneration screen="contests" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/campanhas"
-                                  element={<VariableRemuneration screen="campaigns" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/ranking"
-                                  element={<VariableRemuneration screen="ranking" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/metas"
-                                  element={<VariableRemuneration screen="goals" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/metas-gestao"
-                                  element={<VariableRemuneration screen="goals-management" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/metas-premiacoes"
-                                  element={<VariableRemuneration screen="goals-awards" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/metas-comunicacoes"
-                                  element={<VariableRemuneration screen="goals-communications" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/remuneracao/metas-vendedor"
-                                  element={<VariableRemuneration screen="goals-seller" />}
+                                  element={
+                                    <Navigate to="/admin/comercial/remuneracao-variavel" replace />
+                                  }
                                 />
                                 <Route path="/admin/bi" element={<BI screen="dashboard" />} />
                                 <Route

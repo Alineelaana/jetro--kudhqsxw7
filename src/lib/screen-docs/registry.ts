@@ -86,6 +86,60 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
+  // COMISSÃO ANALÍTICA (TELA PRESERVADA INTOCADA)
+  // -------------------------------------------------------------
+  '/admin/comissao-analitica': {
+    route: '/admin/comissao-analitica',
+    title: 'Comissão Analítica de Vendas',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Apresentar consulta analítica e detalhada das comissões calculadas sobre pedidos faturados por vendedor, representante, canal e período, com filtros multidimensionais e exportação.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Grade analítica com totalizadores de base de cálculo, percentuais e valor líquido de comissão.\n- Filtros por período, representante, status do pedido e empresa.\n- Visualização de regras aplicadas e histórico de lançamentos.\n- Exportação para relatórios gerenciais.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Tela preservada 100% intacta e isolada com regras originais de auditoria de comissões.\n- Acesso restrito a perfis autorizados de gestão comercial e vendedores.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Operador seleciona o período e representante desejado.\n2. O sistema carrega os dados consolidados das vendas faturadas e exibe a decomposição analítica das comissões.\n3. Usuário pode filtrar ou exportar os resultados.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders`, `users`, `commission_rules`, `representantes`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: '- Módulo Comercial e financeiro para conciliação.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- `canViewSales(role)` (SUP, COMERCIAL, VENDEDOR, DIRETORIA).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: '- Componente `ComissaoAnaliticaPage`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Tratamento resiliente com mensagens explicativas em caso de ausência de registros.',
+    },
+  },
+
+  // -------------------------------------------------------------
   // 2. CONSULTA DE PEDIDOS DE VENDA
   // -------------------------------------------------------------
   '/admin/vendas/consulta-pedidos': {
