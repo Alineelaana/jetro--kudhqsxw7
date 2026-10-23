@@ -51,6 +51,9 @@ export interface Product {
   min_stock: number
   max_stock: number
   cost_price?: string
+  cost_origin?: 'fiscal_entry' | 'production' | 'adjustment' | 'initial' | string
+  cost_locked?: boolean
+  cost_type?: 'revenda' | 'fabricado' | string
   profit_margin?: string
   commission?: string
   max_discount?: string
@@ -227,6 +230,9 @@ export interface ProductFormState {
   product_group: string
   active: boolean
   cost_price: string
+  cost_origin?: string
+  cost_locked?: boolean
+  cost_type?: string
   price: string
   profit_margin: string
   commission: string
@@ -287,6 +293,9 @@ export function getInitialFormState(product?: Product | null): ProductFormState 
     product_group: product?.product_group || '',
     active: product?.active !== false,
     cost_price: product?.cost_price || '',
+    cost_origin: product?.cost_origin || 'initial',
+    cost_locked: product?.cost_locked ?? true,
+    cost_type: product?.cost_type || 'revenda',
     price: product?.price || '',
     profit_margin: product?.profit_margin || '',
     commission: product?.commission || '',

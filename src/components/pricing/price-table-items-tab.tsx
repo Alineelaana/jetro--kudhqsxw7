@@ -243,7 +243,11 @@ export function PriceTableItemsTab({ items, setItems, canViewCosts }: Props) {
                   <td className="px-2 py-1">{it.code}</td>
                   <td className="px-2 py-1 font-medium">{it.name}</td>
                   {canViewCosts && (
-                    <td className="text-right px-2 py-1">{formatCurrency(it.cost_price)}</td>
+                    <td className="text-right px-2 py-1 font-mono text-muted-foreground select-none">
+                      <span className="inline-flex items-center gap-1">
+                        {formatCurrency(it.cost_price)}
+                      </span>
+                    </td>
                   )}
                   <td className="text-right px-2 py-1">{formatCurrency(it.current_price)}</td>
                   <td className="text-right px-2 py-1">

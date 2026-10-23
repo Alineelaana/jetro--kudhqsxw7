@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-23T15:05:22.952Z",
+  "generatedAt": "2026-10-23T15:52:38.395Z",
   "collections": [
     {
       "name": "users",
@@ -2831,6 +2831,26 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "cost_origin",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["fiscal_entry", "production", "adjustment", "initial"]
+        },
+        {
+          "name": "cost_locked",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cost_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["revenda", "fabricado"]
         }
       ],
       "indexes": [

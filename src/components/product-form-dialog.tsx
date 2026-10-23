@@ -141,7 +141,8 @@ export function ProductFormDialog({
     fd.append('product_group', form.product_group)
     fd.append('active', String(form.active))
 
-    if (form.cost_price) fd.append('cost_price', form.cost_price)
+    // Custo só é enviado na criação inicial (não em update)
+    if (!isEdit && form.cost_price) fd.append('cost_price', form.cost_price)
     if (form.price) fd.append('price', form.price)
     if (form.profit_margin) fd.append('profit_margin', form.profit_margin)
     if (form.commission) fd.append('commission', form.commission)
@@ -170,7 +171,7 @@ export function ProductFormDialog({
 
     if (form.main_supplier) fd.append('main_supplier', form.main_supplier)
     if (form.supplier_product_code) fd.append('supplier_product_code', form.supplier_product_code)
-    if (form.last_cost) fd.append('last_cost', form.last_cost)
+    if (!isEdit && form.last_cost) fd.append('last_cost', form.last_cost.replace(',', '.'))
     if (form.last_purchase) fd.append('last_purchase', form.last_purchase)
     if (form.replenishment_time) fd.append('replenishment_time', form.replenishment_time)
     if (form.internal_observations) fd.append('internal_observations', form.internal_observations)

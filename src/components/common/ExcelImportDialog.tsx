@@ -230,6 +230,14 @@ export function ExcelImportDialog({ config, open, onOpenChange, onSuccess }: Pro
               </div>
             </div>
 
+            {validation.warning && (
+              <Alert className="border-amber-200 bg-amber-50 text-amber-900">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <AlertTitle>Aviso de Governança</AlertTitle>
+                <AlertDescription>{validation.warning}</AlertDescription>
+              </Alert>
+            )}
+
             {invalidCount > 0 && (
               <Alert variant="destructive">
                 <AlertTriangle className="w-4 h-4" />

@@ -1,5 +1,7 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Lock, Calculator } from 'lucide-react'
 import type { ProductTabProps } from '@/lib/product-types'
 
 export function ProductTabPurchasing({ form, setField }: ProductTabProps) {
@@ -27,13 +29,29 @@ export function ProductTabPurchasing({ form, setField }: ProductTabProps) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-1.5">
-          <Label className="text-sm font-semibold">Último Custo (R$)</Label>
+          <div className="flex items-center justify-between gap-1">
+            <Label className="text-sm font-semibold flex items-center gap-1.5">
+              Último Custo (R$)
+              <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+            </Label>
+            <Badge
+              variant="outline"
+              className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-medium py-0 px-1.5 flex items-center gap-1"
+            >
+              <Calculator className="w-3 h-3 text-emerald-600" />
+              Calculado pelo sistema
+            </Badge>
+          </div>
           <Input
             value={form.last_cost}
-            onChange={(e) => setField('last_cost', e.target.value)}
-            placeholder="Ex: 5,20"
-            className="focus-visible:ring-[#005B2E]"
+            readOnly
+            disabled
+            placeholder="0,00"
+            className="bg-muted/50 cursor-not-allowed font-medium text-foreground select-none"
           />
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+            <Lock className="w-3 h-3" /> Atualizado via conferência de entrada fiscal de compras.
+          </p>
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-semibold">Última Compra</Label>

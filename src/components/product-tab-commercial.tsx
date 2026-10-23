@@ -1,19 +1,46 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Lock, Calculator } from 'lucide-react'
 import type { ProductTabProps } from '@/lib/product-types'
 
 export function ProductTabCommercial({ form, setField }: ProductTabProps) {
+  const originLabels: Record<string, string> = {
+    fiscal_entry: 'Nota Fiscal de Entrada',
+    production: 'Ordem de Produção',
+    adjustment: 'Ajuste Autorizado',
+    initial: 'Carga Inicial',
+  }
+  const originText = originLabels[form.cost_origin || ''] || 'Cálculo de Sistema'
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label className="text-sm font-semibold">Preço de Custo (R$)</Label>
+          <div className="flex items-center justify-between gap-1">
+            <Label className="text-sm font-semibold flex items-center gap-1.5">
+              Preço de Custo (R$)
+              <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+            </Label>
+            <Badge
+              variant="outline"
+              className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-medium py-0 px-1.5 flex items-center gap-1"
+            >
+              <Calculator className="w-3 h-3 text-emerald-600" />
+              Calculado pelo sistema ({originText})
+            </Badge>
+          </div>
           <Input
             value={form.cost_price}
-            onChange={(e) => setField('cost_price', e.target.value)}
-            placeholder="Ex: 5,50"
-            className="focus-visible:ring-[#005B2E]"
+            readOnly
+            disabled
+            placeholder="0,00"
+            className="bg-muted/50 cursor-not-allowed font-medium text-foreground select-none"
           />
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+            <Lock className="w-3 h-3" /> Bloqueado para edição manual. Atualizado via XML fiscal ou
+            produção.
+          </p>
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-semibold">Preço de Venda (R$)</Label>

@@ -23,6 +23,7 @@ export interface ValidationResult {
   validRows: ValidRowItem[]
   invalidRows: InvalidRowItem[]
   duplicatesCount: number
+  warning?: string
 }
 
 export interface ImportExecutionResult {
@@ -495,8 +496,18 @@ function getTemplateColumns(
     { key: 'name', label: nameLabel, required: true },
   ]
 
+  // Campos de custo protegidos que NUNCA devem ser expostos em templates de importação
+  const PROTECTED_COST_FIELDS = new Set([
+    'cost_price',
+    'last_cost',
+    'cost_origin',
+    'cost_locked',
+    'cost_type',
+  ])
+
   for (const field of config.fields) {
     if (field.name === 'code' || field.name === 'name') continue
+    if (PROTECTED_COST_FIELDS.has(field.name)) continue
     cols.push({
       key: field.name,
       label: field.label,
@@ -699,9 +710,33 @@ export async function parseAndValidateExcel(
     field?: CadastroField
   }> = []
 
+  // Rastreia e avisa sobre tentativa de envio de colunas de custo bloqueadas
+  const COST_COLUMN_PATTERNS = [
+    'cost_price',
+    'last_cost',
+    'cost_origin',
+    'cost_locked',
+    'cost_type',
+    'custo',
+    'preço de custo',
+    'preco de custo',
+    'ultimo custo',
+    'último custo',
+  ]
+  const ignoredCostHeaders: string[] = []
+
   headerRow.forEach((header, index) => {
     const cleanHeader = header.replace(/\*/g, '').trim().toLowerCase()
     if (!cleanHeader) return
+
+    // Verifica se é uma coluna de custo protegida
+    const isCostCol = COST_COLUMN_PATTERNS.some(
+      (p) => cleanHeader === p || cleanHeader.includes('custo'),
+    )
+    if (isCostCol && config.collection === 'products') {
+      ignoredCostHeaders.push(header)
+      return // Não mapeia no importador
+    }
 
     // Tenta casar com as colunas configuradas
     const match = templateCols.find((c) => {
@@ -1107,6 +1142,10 @@ export async function parseAndValidateExcel(
     validRows,
     invalidRows,
     duplicatesCount,
+    warning:
+      ignoredCostHeaders.length > 0
+        ? `Colunas de custo ignoradas (${ignoredCostHeaders.join(', ')}) — calculadas exclusivamente pelo sistema.`
+        : undefined,
   }
 }
 
@@ -1135,6 +1174,15 @@ export async function executeImport(
           ...item.data,
           active: item.data.active ?? true,
           responsible_user: userName,
+        }
+
+        // Se a coleção for de produtos, expurga qualquer valor acidental de custo
+        if (config.collection === 'products') {
+          delete payload.cost_price
+          delete payload.last_cost
+          delete payload.cost_origin
+          delete payload.cost_locked
+          delete payload.cost_type
         }
 
         // Se código não informado, gera sequencial automático
