@@ -12,6 +12,7 @@ export interface AuthUser {
   perfil_id?: string
   active?: boolean
   mfa_enabled?: boolean
+  mfa_active?: boolean
   mfa_secret?: string
   inactivity_timeout_minutes?: number
   [key: string]: unknown
