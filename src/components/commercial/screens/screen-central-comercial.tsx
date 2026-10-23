@@ -25,8 +25,7 @@ import { useBrand } from '@/hooks/use-brand'
 import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from '@/hooks/use-toast'
 import pb from '@/lib/pocketbase/client'
-import { JetroTable } from '@/components/jetro-table'
-import type { ColumnDef } from '@/components/jetro-table/types'
+import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { SalesDashboard } from '@/components/sales/sales-dashboard'
 
 interface RecentOrderRow {
@@ -179,23 +178,24 @@ export function ScreenCentralComercial() {
   const fmtCurrency = (v: number) =>
     v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-  const columns: ColumnDef<RecentOrderRow>[] = [
+  const columns: JetroColumnDef<RecentOrderRow>[] = [
     {
       id: 'code',
       header: 'Pedido',
       accessorKey: 'code',
-      cell: ({ value }) => <span className="font-bold text-foreground">#{value}</span>,
+      cell: ({ value }) => <span className="font-bold text-foreground">#{String(value)}</span>,
     },
     {
       id: 'customer_name',
       header: 'Cliente',
       accessorKey: 'customer_name',
-      cell: ({ value }) => <span className="font-medium text-foreground">{value}</span>,
+      cell: ({ value }) => <span className="font-medium text-foreground">{String(value)}</span>,
     },
     {
       id: 'total_amount',
       header: 'Valor Total',
       accessorKey: 'total_amount',
+      dataType: 'currency',
       cell: ({ value }) => (
         <span className="font-semibold text-emerald-700">{fmtCurrency(Number(value) || 0)}</span>
       ),
@@ -204,7 +204,7 @@ export function ScreenCentralComercial() {
       id: 'status',
       header: 'Status',
       accessorKey: 'status',
-      type: 'badge',
+      dataType: 'badge',
       cell: ({ value }) => {
         const s = String(value || '')
         const isGreen = ['Faturado', 'Concluído', 'Aprovado'].includes(s)
@@ -229,7 +229,7 @@ export function ScreenCentralComercial() {
       id: 'created',
       header: 'Data',
       accessorKey: 'created',
-      cell: ({ value }) => <span className="text-xs text-muted-foreground">{value}</span>,
+      cell: ({ value }) => <span className="text-xs text-muted-foreground">{String(value)}</span>,
     },
   ]
 
@@ -445,13 +445,8 @@ export function ScreenCentralComercial() {
               <JetroTable<RecentOrderRow>
                 data={recentOrders}
                 columns={columns}
-                totalCount={recentOrders.length}
-                pageIndex={0}
                 pageSize={10}
-                onPageChange={() => {}}
-                onPageSizeChange={() => {}}
-                searchable
-                onSearchChange={() => {}}
+                screenId="comercial-central"
               />
             </CardContent>
           </Card>
