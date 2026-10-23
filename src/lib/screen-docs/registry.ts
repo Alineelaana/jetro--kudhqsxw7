@@ -6,6 +6,7 @@ import { FINANCIAL_SCREEN_DOCS } from './financial-screens'
 import { INDUSTRY_SCREEN_DOCS } from './industry-screens'
 import { LOGISTICS_SCREEN_DOCS } from './logistics-screens'
 import { STOCK_SCREEN_DOCS } from './stock-screens'
+import { FISCAL_SCREEN_DOCS } from './fiscal-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1024,58 +1025,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   ...FINANCIAL_SCREEN_DOCS,
 
   // -------------------------------------------------------------
-  // 13. MÓDULO FISCAL
+  // 13. MÓDULO FISCAL (7 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
-  '/admin/fiscal': {
-    route: '/admin/fiscal',
-    title: 'Gestão Fiscal e Documentos Eletrônicos (HURAM ERP)',
-    moduleGroup: 'Fiscal',
-    docVersion: '1.1.0',
-    lastUpdated: '2025-05-19',
-    author: 'Engenharia de Software Jetro & HURAM ERP',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Gerenciar a emissão, validação, transmissão e escrituração de documentos fiscais eletrônicos (NF-e mod 55, NFC-e, NFS-e, CT-e, MDF-e), entrada idempotente via XML, simulador auditável de tributos e homologação SEFAZ, com isolamento multitenant entre Dec Eldorado e Gran Romano.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Simulador Fiscal Auditável no Backend (`/backend/v1/huram/fiscal/simulate`): motor server-side que cruza produto, empresa ativa (Dec Eldorado × Gran Romano) e operação (venda interna 5101/5102, interestadual 6101/6102, compras 1101/2101), apurando ICMS, ICMS-ST com MVA, FCP, DIFAL, PIS, COFINS e Reforma Tributária (IBS/CBS com cClassTrib), gravando cada cálculo em `fiscal_simulations` com memória de cálculo passo a passo.\n- Entrada de Mercadorias via XML com Idempotência Estrita (`/backend/v1/huram/fiscal/xml-entry`): upload de XML modelo 55, extração da chave de 44 dígitos (chNFe), bloqueio de reimportação duplicada, matching automático de itens com `supplier_product_refs` (cProd, uCom, fator de conversão) e GTIN/código interno; itens sem de-para permanecem pendentes sem dados inventados; integração com movimentações de estoque em `stock_movements`.\n- Emissão de NF-e em Ambiente de Homologação (`/backend/v1/huram/fiscal/nfe-generate` e `/backend/v1/huram/fiscal/nfe-transmit`): montagem e validação do XML modelo 55 layout PL_009_V400, geração de chave de 44 dígitos com dígito verificador módulo 11, cálculo dos tributos coerente com a configuração da empresa, armazenamento do artefato em `fiscal_document_artifacts` e exportação do XML.\n- Carta de correção eletrônica (CC-e) e manifestação do destinatário.\n- Apuração de tributos e visualização da Reforma Tributária.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Idempotência Estrita por Chave de Acesso: toda NF-e de entrada ou saída possui chave única de 44 dígitos. Tentativa de reimportar o mesmo XML é barrada pelo sistema, informando data e número do lançamento original sem gerar duplicidade de estoque ou financeiro.\n- De-Para de Produtos Fiel: itens de XML que não possuem correspondência exata em `supplier_product_refs`, GTIN ou código interno são classificados como "Pendente De-Para" e nunca geram produtos inventados no estoque.\n- Isolamento Multitenant: cada empresa (Dec Eldorado vs Gran Romano) calcula tributos e emite documentos exclusivamente com seus próprios dados cadastrais e fiscais.\n- PENDÊNCIA EXTERNA DECLARADA (Certificado Digital A1): A geração do XML, cálculos e validação do layout SEFAZ funcionam integralmente no sistema. Contudo, a assinatura digital (XML-DSig RSA-SHA1) e a transmissão via WebService SEFAZ em tempo real requerem a contratação e injeção do Certificado Digital A1 (.pfx) da empresa e o credenciamento de emissor junto à SEFAZ de origem (ES ou SP). Conforme a regra do projeto, nenhuma credencial é inventada.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. Entrada: o usuário faz upload do XML na tela de Entrada de Notas; o backend valida a chave de 44 dígitos, aplica o de-para de fornecedor e alimenta compras e estoque.\n2. Simulação: o operador simula cenários na aba Fiscal por Empresa do produto, recebendo memória de cálculo detalhada e ID de auditoria.\n3. Emissão em Homologação: o operador gera a NF-e de teste em Homologação, valida as tags SEFAZ v4.00, baixa o XML e aciona a transmissão de teste (que valida a presença do Certificado A1).',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `fiscal_simulations` (auditoria imutável), `fiscal_document_artifacts` (XMLs e protocolos), `purchase_invoices` (entradas fiscais), `nfe_records` (saídas), `product_company_fiscal`, `supplier_product_refs`, `stock_movements` e `empresas`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content:
-        'Endpoints backend customizados no Skip Cloud (`/backend/v1/huram/fiscal/*`) e WebServices SEFAZ em homologação/produção.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewFiscal(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/fiscal/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Tratamento detalhado de códigos de rejeição da SEFAZ com orientações de correção.',
-    },
-  },
+  ...FISCAL_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 14. BI & ANALYTICS (BUSINESS INTELLIGENCE)
