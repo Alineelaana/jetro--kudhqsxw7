@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Users, FolderTree, LineChart, Building2 } from 'lucide-react'
 import { useBrand } from '@/hooks/use-brand'
-import { CadastroStandardScreen } from '@/components/cadastros/cadastro-standard-screen'
+import { CadastroClientesOficialScreen } from '@/components/cadastros/cadastro-clientes-oficial-screen'
 import { InserirClientesScreen } from '@/components/vendas/inserir-clientes-screen'
 
 export function ScreenClientes() {
@@ -68,9 +68,9 @@ export function ScreenClientes() {
           </TabsTrigger>
         </TabsList>
 
-        {/* ABA 1: CADASTRO COMPLETO (reutiliza motor padrão de cadastro de parceiros/clientes) */}
+        {/* ABA 1: CADASTRO COMPLETO (reutiliza motor oficial de cadastro e carteira de clientes) */}
         <TabsContent value="cadastro" className="space-y-4">
-          <CadastroStandardScreen configKey="clientes" />
+          <CadastroClientesOficialScreen />
         </TabsContent>
 
         {/* ABA 2: INSERÇÃO RÁPIDA DE CLIENTES */}
