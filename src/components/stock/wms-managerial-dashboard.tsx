@@ -12,7 +12,9 @@ import { printWmsReport, exportWmsXls, exportWmsCsv } from '@/lib/wms-reports-ex
 import { useAuth } from '@/hooks/use-auth'
 import { Loader2, Printer, FileSpreadsheet, FileDown } from 'lucide-react'
 
-export function WmsManagerialDashboard() {
+export function WmsManagerialDashboard({
+  showRotativityDetail = false,
+}: { showRotativityDetail?: boolean } = {}) {
   const { user } = useAuth()
   const userName = (user?.name as string) || 'Usuário'
   const [loading, setLoading] = useState(true)
@@ -206,6 +208,50 @@ export function WmsManagerialDashboard() {
           </Card>
         ))}
       </div>
+      {showRotativityDetail && (
+        <Card className="border-2 border-[#005B2E]/20 p-4">
+          <h3 className="text-sm font-bold text-[#005B2E] mb-2">
+            Curva ABC e Rotatividade por Categoria de Produto
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b bg-[#01361D] text-white">
+                  <th className="text-left p-2">Classificação ABC</th>
+                  <th className="text-left p-2">Participação no Valor</th>
+                  <th className="text-left p-2">Giro Médio (dias)</th>
+                  <th className="text-left p-2">Política de Armazenagem</th>
+                  <th className="text-right p-2">Posições no Armazém</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b hover:bg-muted/50">
+                  <td className="p-2 font-bold text-emerald-700">Classe A (Alta Rotatividade)</td>
+                  <td className="p-2 font-mono">70.0%</td>
+                  <td className="p-2">12 dias</td>
+                  <td className="p-2">Próximo às docas de expedição (Rua 1-3)</td>
+                  <td className="p-2 text-right font-bold">520</td>
+                </tr>
+                <tr className="border-b hover:bg-muted/50">
+                  <td className="p-2 font-bold text-blue-700">Classe B (Média Rotatividade)</td>
+                  <td className="p-2 font-mono">20.0%</td>
+                  <td className="p-2">35 dias</td>
+                  <td className="p-2">Corredores intermediários (Rua 4-7)</td>
+                  <td className="p-2 text-right font-bold">680</td>
+                </tr>
+                <tr className="border-b hover:bg-muted/50">
+                  <td className="p-2 font-bold text-amber-700">Classe C (Baixa Rotatividade)</td>
+                  <td className="p-2 font-mono">10.0%</td>
+                  <td className="p-2">90+ dias</td>
+                  <td className="p-2">Níveis superiores e mezanino (Rua 8-10)</td>
+                  <td className="p-2 text-right font-bold">448</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="border-2 border-[#005B2E]/20">
           <CardContent className="p-4">

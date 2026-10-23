@@ -5,6 +5,7 @@ import { SST_SCREEN_DOCS } from './sst-screens'
 import { FINANCIAL_SCREEN_DOCS } from './financial-screens'
 import { INDUSTRY_SCREEN_DOCS } from './industry-screens'
 import { LOGISTICS_SCREEN_DOCS } from './logistics-screens'
+import { STOCK_SCREEN_DOCS } from './stock-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1183,59 +1184,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
-  // 16. WMS E ESTOQUE
+  // 16. MÓDULO ESTOQUE E WMS (6 TELAS OFICIAIS UNIFICADAS + ABSORÇÃO DE VALIDADE)
   // -------------------------------------------------------------
-  '/admin/estoque': {
-    route: '/admin/estoque',
-    title: 'WMS e Controle de Estoque',
-    moduleGroup: 'Operação',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Gerenciar o recebimento, endereçamento, conferência, movimentação física, inventários periódicos, separação (picking) e expedição de produtos no centro de distribuição.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Mapa de armazém com endereçamento por rua, bloco, nível e vão.\n- Gestão de lotes, datas de fabricação e controle de validade (FEFO/FIFO).\n- Ordens de separação por onda e conferência cega via coletores de dados.\n- Inventário geral e rotativo com reconciliação de divergências.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Estoque negativo é estritamente proibido, exceto se configurada permissão especial `canAllowNegativeStock`.\n- Lotes bloqueados por quarentena da qualidade não podem ser alocados em ordens de separação.\n- Ajustes de estoque que ultrapassem o valor limite exigem aprovação gerencial.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. Entrada física do produto vinculada à NF-e de compra.\n2. Conferência cega e geração de etiquetas de pallet/lote.\n3. Indicação de endereço de armazenagem e liberação para estoque vendível.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `inventory_items`, `stock_locations`, `stock_movements`, `lots`, `inventories`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'Coletores de dados via telas otimizadas e impressão de etiquetas ZPL/PDF.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content:
-        '- Visualização: `canViewStock(role)`.\n- Movimentações e ajustes: `canMakeMovements`, `canMakeAdjustments`, `canApproveAdjustments`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content:
-        'Telas de WMS e controle de estoque de `src/pages/stock/*` e componentes relacionados.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content: 'Bloqueio imediato de separação caso o saldo físico seja inferior ao solicitado.',
-    },
-  },
+  ...STOCK_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 17. MÓDULO INDÚSTRIA E PRODUÇÃO (7 TELAS OFICIAIS UNIFICADAS)

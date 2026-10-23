@@ -33,45 +33,53 @@ const TITLES: Record<string, string> = {
   replenishment: 'Reabastecimento',
 }
 
+import {
+  ScreenCentralEstoque,
+  ScreenMovimentacoes,
+  ScreenInventarioConferencia,
+  ScreenLotesValidade,
+  ScreenWmsOperacional,
+  ScreenWmsGerencial,
+} from '@/components/stock/screens'
+
 export default function StockPage({ screen }: { screen: string }) {
-  const title = TITLES[screen] || 'Estoque'
-
-  const renderScreen = () => {
-    switch (screen) {
-      case 'dashboard':
-        return <StockDashboard />
-      case 'movements':
-        return <StockMovements />
-      case 'inventory':
-        return <StockInventory />
-      case 'transfers':
-        return <StockTransfers />
-      case 'adjustments':
-        return <StockAdjustments />
-      case 'batches':
-        return <StockBatches />
-      case 'expiry':
-        return <StockExpiry />
-      case 'locations':
-        return <StockLocations />
-      case 'picking':
-        return <StockPicking />
-      case 'checking':
-        return <StockChecking />
-      case 'expedition':
-        return <StockExpedition />
-      case 'receiving':
-        return <WmsReceiving />
-      case 'putaway':
-        return <WmsPutaway />
-      case 'waves':
-        return <WmsWaves />
-      case 'replenishment':
-        return <WmsReplenishment />
-      default:
-        return <StockDashboard />
-    }
+  switch (screen) {
+    case 'dashboard':
+      return <ScreenCentralEstoque />
+    case 'movements':
+    case 'transfers':
+    case 'ajustes':
+    case 'adjustments':
+      return <ScreenMovimentacoes />
+    case 'inventory':
+    case 'conferencia':
+    case 'checking':
+      return <ScreenInventarioConferencia />
+    case 'batches':
+    case 'lotes':
+    case 'expiry':
+    case 'validade':
+      return <ScreenLotesValidade />
+    case 'wms-operacional':
+    case 'locations':
+    case 'localizacoes':
+    case 'picking':
+    case 'separacao':
+    case 'expedition':
+    case 'expedicao':
+    case 'receiving':
+    case 'recebimento':
+    case 'putaway':
+    case 'enderecamento':
+    case 'waves':
+    case 'ondas':
+    case 'replenishment':
+    case 'reabastecimento':
+      return <ScreenWmsOperacional />
+    case 'wms-gerencial':
+    case 'wms-managerial':
+      return <ScreenWmsGerencial />
+    default:
+      return <ScreenCentralEstoque />
   }
-
-  return <StockPageWrapper title={title}>{renderScreen()}</StockPageWrapper>
 }

@@ -18,12 +18,24 @@ const SCREENS: Record<string, { title: string; component: ComponentType }> = {
   'wms-managerial': { title: 'Dashboard Gerencial WMS', component: WmsManagerialDashboard },
 }
 
+import {
+  ScreenCentralEstoque,
+  ScreenWmsOperacional,
+  ScreenWmsGerencial,
+} from '@/components/stock/screens'
+
 export default function WmsScreen({ screen }: { screen: string }) {
-  const config = SCREENS[screen] || SCREENS['wms-alerts']
-  const Comp = config.component
-  return (
-    <StockPageWrapper title={config.title}>
-      <Comp />
-    </StockPageWrapper>
-  )
+  switch (screen) {
+    case 'wms-alerts':
+      return <ScreenCentralEstoque />
+    case 'wms-reports':
+    case 'wms-managerial':
+      return <ScreenWmsGerencial />
+    case 'wms-pallets':
+    case 'wms-volumes':
+    case 'wms-collectors':
+    case 'wms-operators':
+    default:
+      return <ScreenWmsOperacional />
+  }
 }

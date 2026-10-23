@@ -29,7 +29,9 @@ const TYPE_COLORS: Record<string, string> = {
   Vencimento: 'bg-red-100 text-red-700',
 }
 
-export function StockMovements() {
+export function StockMovements({
+  initialFilter,
+}: { initialFilter?: 'Entrada' | 'Saída' | string } = {}) {
   const [records, setRecords] = useState<StockMovement[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -57,7 +59,10 @@ export function StockMovements() {
       (r.documento_origem || '').toLowerCase().includes(term) ||
       (r.lote || '').toLowerCase().includes(term)
     const matchType = typeFilter === 'all' || r.tipo_movimentacao === typeFilter
-    return matchSearch && matchType
+    const matchInitial =
+      !initialFilter ||
+      (r.tipo_movimentacao || '').toLowerCase().includes(initialFilter.toLowerCase())
+    return matchSearch && matchType && matchInitial
   })
 
   if (loading)
