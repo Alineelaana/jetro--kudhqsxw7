@@ -159,13 +159,15 @@ export function ScreenTransporteFrota() {
       id: 'id',
       header: 'Código OS',
       accessorKey: 'id',
-      cell: (r) => <span className="font-mono font-bold text-xs text-[#005B2E]">{r.id}</span>,
+      cell: ({ row }) => (
+        <span className="font-mono font-bold text-xs text-[#005B2E]">{row.id}</span>
+      ),
     },
     {
       id: 'veiculo_placa',
       header: 'Placa',
       accessorKey: 'veiculo_placa',
-      cell: (r) => <span className="font-bold text-foreground">{r.veiculo_placa}</span>,
+      cell: ({ row }) => <span className="font-bold text-foreground">{row.veiculo_placa}</span>,
     },
     {
       id: 'veiculo_modelo',
@@ -176,9 +178,9 @@ export function ScreenTransporteFrota() {
       id: 'tipo',
       header: 'Tipo Manutenção',
       accessorKey: 'tipo',
-      cell: (r) => (
+      cell: ({ row }) => (
         <Badge variant="outline" className="text-xs font-semibold">
-          {r.tipo}
+          {row.tipo}
         </Badge>
       ),
     },
@@ -186,8 +188,8 @@ export function ScreenTransporteFrota() {
       id: 'data_programada',
       header: 'Data Programada',
       accessorKey: 'data_programada',
-      cell: (r) =>
-        r.data_programada ? new Date(r.data_programada).toLocaleDateString('pt-BR') : '—',
+      cell: ({ row }) =>
+        row.data_programada ? new Date(row.data_programada).toLocaleDateString('pt-BR') : '—',
     },
     {
       id: 'oficina',
@@ -198,16 +200,16 @@ export function ScreenTransporteFrota() {
       id: 'custo_estimado',
       header: 'Custo Estimado',
       accessorKey: 'custo_estimado',
-      cell: (r) =>
-        r.custo_estimado
-          ? r.custo_estimado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+      cell: ({ row }) =>
+        row.custo_estimado
+          ? row.custo_estimado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
           : 'R$ 0,00',
     },
     {
       id: 'status',
       header: 'Status',
       accessorKey: 'status',
-      cell: (r) => {
+      cell: ({ row }) => {
         const colors: Record<string, string> = {
           Agendada: 'bg-blue-100 text-blue-700',
           'Em Andamento': 'bg-amber-100 text-amber-700',
@@ -216,9 +218,9 @@ export function ScreenTransporteFrota() {
         }
         return (
           <span
-            className={`text-xs font-bold px-2 py-0.5 rounded ${colors[r.status] || 'bg-muted'}`}
+            className={`text-xs font-bold px-2 py-0.5 rounded ${colors[row.status] || 'bg-muted'}`}
           >
-            {r.status}
+            {row.status}
           </span>
         )
       },

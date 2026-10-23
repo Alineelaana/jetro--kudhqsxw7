@@ -24,7 +24,13 @@ export function ScreenOcorrenciasRastreabilidade() {
 
   const empresaAtualNome = useMemo(() => {
     const emp = empresasDisponiveis?.find((e: any) => e.id === empresaAtivaId)
-    return emp?.nome_fantasia || emp?.razao_social || brand?.name || 'Todas as Empresas'
+    return (
+      emp?.nome_fantasia ||
+      emp?.razao_social ||
+      brand?.nomeExibicao ||
+      brand?.empresaNome ||
+      'Todas as Empresas'
+    )
   }, [empresasDisponiveis, empresaAtivaId, brand])
 
   const handleRefresh = () => {
