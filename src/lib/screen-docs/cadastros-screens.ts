@@ -1,6 +1,6 @@
-import type { ScreenDocumentation } from './types'
+import type { ScreenDocEntry } from './types'
 
-export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocumentation> = {
+export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
   '/admin/cadastros/filiais': {
     route: '/admin/cadastros/filiais',
     title: 'Cadastro de Filiais',
