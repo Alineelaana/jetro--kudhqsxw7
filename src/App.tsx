@@ -132,6 +132,7 @@ const SegundoCerebroPage = lazy(() => import('./pages/admin/SegundoCerebroPage')
 const ComparativoMargensGrPage = lazy(() => import('./pages/admin/ComparativoMargensGrPage'))
 const TabelaMaeGrPage = lazy(() => import('./pages/admin/TabelaMaeGrPage'))
 const Controladoria = lazy(() => import('./pages/Controladoria'))
+const MarketingPage = lazy(() => import('./pages/MarketingPage'))
 const SupplierAllowance = lazy(() => import('./pages/SupplierAllowance'))
 const TradeMarketing = lazy(() => import('./pages/TradeMarketing'))
 const MarketingEnterprise = lazy(() => import('./pages/MarketingEnterprise'))
@@ -2312,73 +2313,135 @@ const App = () => (
                                   path="/admin/promocoes"
                                   element={<Promotions screen="dashboard" />}
                                 />
+                                {/* MÓDULO MARKETING E VERBAS (7 TELAS OFICIAIS UNIFICADAS) */}
+                                <Route path="/admin/marketing" element={<MarketingPage />} />
                                 <Route
-                                  path="/admin/marketing"
-                                  element={<MarketingEnterprise screen="cockpit" />}
+                                  path="/admin/marketing/central"
+                                  element={<MarketingPage />}
                                 />
                                 <Route
+                                  path="/admin/marketing/solicitacoes-jobs"
+                                  element={<MarketingPage />}
+                                />
+                                <Route
+                                  path="/admin/marketing/biblioteca-templates"
+                                  element={<MarketingPage />}
+                                />
+                                <Route
+                                  path="/admin/marketing/trade-marketing"
+                                  element={<MarketingPage />}
+                                />
+                                <Route
+                                  path="/admin/marketing/verbas-fornecedor"
+                                  element={<MarketingPage />}
+                                />
+                                <Route
+                                  path="/admin/marketing/cotacoes-externas"
+                                  element={<MarketingPage />}
+                                />
+                                <Route
+                                  path="/admin/marketing/relatorios-auditoria"
+                                  element={<MarketingPage />}
+                                />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE MARKETING */}
+                                <Route
                                   path="/admin/marketing/solicitacoes"
-                                  element={<MarketingEnterprise screen="requests" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/solicitacoes-jobs" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/jobs"
-                                  element={<MarketingEnterprise screen="jobs" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/solicitacoes-jobs" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/aprovacao-pecas"
-                                  element={<MarketingEnterprise screen="approval" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/solicitacoes-jobs" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/calendario"
-                                  element={<MarketingEnterprise screen="calendar" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/solicitacoes-jobs" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/midia"
-                                  element={<MarketingEnterprise screen="media" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/solicitacoes-jobs" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/atribuicao"
-                                  element={<MarketingEnterprise screen="attribution" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/relatorios-auditoria" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/brand"
-                                  element={<MarketingEnterprise screen="brand" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/biblioteca-templates" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/biblioteca"
-                                  element={<MarketingEnterprise screen="library" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/biblioteca-templates" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/marketing/templates"
-                                  element={<MarketingEnterprise screen="templates" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/biblioteca-templates" replace />
+                                  }
                                 />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE TRADE MARKETING */}
                                 <Route
                                   path="/admin/trade-marketing"
-                                  element={<TradeMarketing screen="dashboard" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/trade-marketing" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/calendario"
-                                  element={<TradeMarketing screen="calendar" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/trade-marketing" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/acoes"
-                                  element={<TradeMarketing screen="actions" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/trade-marketing" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/verbas-fornecedor"
-                                  element={<TradeMarketing screen="verbas" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/materiais"
-                                  element={<TradeMarketing screen="materials" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/trade-marketing" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/prestacao-contas"
-                                  element={<TradeMarketing screen="accountability" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/trade-marketing" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/planejamento-anual"
-                                  element={<TradeMarketing screen="annual-plan" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/trade-marketing" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/adapta"
@@ -2388,15 +2451,21 @@ const App = () => (
                                 />
                                 <Route
                                   path="/admin/trade-marketing/cotacoes-externas"
-                                  element={<TradeMarketing screen="cotacoes-externas" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/cotacoes-externas" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/conta-corrente"
-                                  element={<SupplierAllowance screen="accounts" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/trade-marketing/aplicacao-produtos"
-                                  element={<SupplierAllowance screen="appropriations" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/precificacao"
@@ -2510,69 +2579,100 @@ const App = () => (
                                   path="/admin/controladoria/configuracoes"
                                   element={<Controladoria screen="configuracoes" />}
                                 />
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE VERBAS (ORIGEM ÚNICA EM /admin/marketing/verbas-fornecedor) */}
                                 <Route
                                   path="/admin/verbas"
-                                  element={<SupplierAllowance screen="dashboard" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/cockpit"
-                                  element={<SupplierAllowance screen="cockpit" />}
+                                  element={<Navigate to="/admin/marketing" replace />}
                                 />
                                 <Route
                                   path="/admin/verbas/acordos"
-                                  element={<SupplierAllowance screen="agreements" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/conta-corrente"
-                                  element={<SupplierAllowance screen="accounts" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/movimentacoes"
-                                  element={<SupplierAllowance screen="movements" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/relatorios-auditoria" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/apuracoes"
-                                  element={<SupplierAllowance screen="accruals" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/aplicacao-produtos"
-                                  element={<SupplierAllowance screen="appropriations" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/consumos"
-                                  element={<SupplierAllowance screen="consumptions" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/prestacao-contas"
-                                  element={<SupplierAllowance screen="settlements" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/por-fornecedor"
-                                  element={<TradeMarketing screen="verbas" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/cotacoes-externas"
-                                  element={<TradeMarketing screen="cotacoes-externas" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/cotacoes-externas" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/gastos-trade"
-                                  element={<SupplierAllowance screen="trade-expenses" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/relatorios-auditoria" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/creditos-avulsos"
-                                  element={<SupplierAllowance screen="adhoc-credits" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/documentos"
-                                  element={<SupplierAllowance screen="documents" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/relatorios-auditoria" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/auditoria-corporativa"
-                                  element={<SupplierAllowance screen="corporate-audit" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/relatorios-auditoria" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/contas-correntes"
-                                  element={<SupplierAllowance screen="current-accounts" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/verbas-fornecedor" replace />
+                                  }
                                 />
                                 <Route
                                   path="/admin/verbas/adapta"
@@ -2582,7 +2682,9 @@ const App = () => (
                                 />
                                 <Route
                                   path="/admin/verbas/versionamento-relatorios"
-                                  element={<SupplierAllowance screen="report-versions" />}
+                                  element={
+                                    <Navigate to="/admin/marketing/relatorios-auditoria" replace />
+                                  }
                                 />
                                 <Route path="/cliente/login" element={<ClientLogin />} />
                                 <Route path="/cliente/cadastro" element={<ClientRegister />} />

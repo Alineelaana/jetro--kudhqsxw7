@@ -1,0 +1,7 @@
+export { ScreenCentralMarketing } from './screen-central-marketing'
+export { ScreenSolicitacoesJobs } from './screen-solicitacoes-jobs'
+export { ScreenBibliotecaTemplates } from './screen-biblioteca-templates'
+export { ScreenTradeMarketing } from './screen-trade-marketing'
+export { ScreenVerbasFornecedor } from './screen-verbas-fornecedor'
+export { ScreenCotacoesExternas } from './screen-cotacoes-externas'
+export { ScreenRelatoriosAuditoriaMarketing } from './screen-relatorios-auditoria-marketing'
