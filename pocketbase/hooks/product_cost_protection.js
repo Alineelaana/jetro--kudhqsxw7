@@ -1,8 +1,8 @@
 // pb_hooks/product_cost_protection.js
-// Proteção de Custo dos Produtos — ERP HURAM
-// Bloqueia edição manual de campos de custo (cost_price, last_cost, cost_origin, cost_locked, cost_type).
+// Proteção e Governança do Custo dos Produtos — ERP HURAM
+// Bloqueia edição manual de campos de custo (cost_price, cost_average, last_cost, cost_origin, cost_locked, cost_type).
 // Registra criação com normalização e histórico inicial em product_cost_history.
-// Registra violações de segurança em audit_logs.
+// Registra tentativas de violação em audit_logs (HTTP 403 Forbidden).
 
 onRecordUpdateRequest((e) => {
   // Identifica se a operação vem de contexto interno do sistema (ex: hook de estoque ou faturamento)
@@ -25,25 +25,30 @@ onRecordUpdateRequest((e) => {
         isInternalSystem = true
       }
     } else {
-      // Sem contexto HTTP direto (execução em background / hooks)
+      // Sem contexto HTTP direto (execução em background / hooks / scripts)
       isInternalSystem = true
     }
   } catch (_) {}
 
   // Se for chamada interna do sistema, permite prosseguir
   if (isInternalSystem) {
-    e.next()
-    return
+    return e.next()
   }
 
   // Compara o estado original persistido no banco com a tentativa de alteração manual
   var originalRecord = e.record.original()
   if (!originalRecord) {
-    e.next()
-    return
+    return e.next()
   }
 
-  var PROTECTED_FIELDS = ['cost_price', 'last_cost', 'cost_origin', 'cost_locked', 'cost_type']
+  var PROTECTED_FIELDS = [
+    'cost_price',
+    'cost_average',
+    'last_cost',
+    'cost_origin',
+    'cost_locked',
+    'cost_type',
+  ]
   var changedFields = []
 
   for (var i = 0; i < PROTECTED_FIELDS.length; i++) {
@@ -51,7 +56,7 @@ onRecordUpdateRequest((e) => {
     var oldVal = originalRecord.get(field)
     var newVal = e.record.get(field)
 
-    // Normalização para comparação robusta (strings vazias vs null vs undefined)
+    // Normalização para comparação robusta
     var oldStr = oldVal === null || oldVal === undefined ? '' : String(oldVal).trim()
     var newStr = newVal === null || newVal === undefined ? '' : String(newVal).trim()
 
@@ -72,12 +77,10 @@ onRecordUpdateRequest((e) => {
 
   // Se nenhum campo protegido foi alterado, permite o update normalmente
   if (changedFields.length === 0) {
-    e.next()
-    return
+    return e.next()
   }
 
-  // TENTATIVA DE ALTERAÇÃO MANUAL DETECTADA
-  // Registra em audit_logs o evento de segurança
+  // TENTATIVA DE ALTERAÇÃO MANUAL DETECTADA (Bloqueia até SUP)
   try {
     var auditCol = $app.findCollectionByNameOrId('audit_logs')
     var log = new Record(auditCol)
@@ -102,7 +105,7 @@ onRecordUpdateRequest((e) => {
     log.set(
       'new_value',
       JSON.stringify({
-        tentativa: 'Edição manual de campos de custo bloqueada',
+        tentativa: 'Edição manual de campos de custo bloqueada (403)',
         campos_alterados: changedFields,
         origem_bloqueio: 'product_cost_protection.js',
       }),
@@ -111,7 +114,7 @@ onRecordUpdateRequest((e) => {
     log.set('origem', 'Proteção de Custos')
     log.set(
       'justification',
-      'Tentativa de alteração manual de custos de produtos rejeitada pela governança de custos.',
+      'Tentativa de alteração manual de custos de produtos rejeitada pela governança do ERP HURAM.',
     )
     log.set('is_suspicious', true)
     $app.save(log)
@@ -127,7 +130,7 @@ onRecordUpdateRequest((e) => {
   return e.forbiddenError(
     'A alteração manual dos custos (' +
       fieldNames +
-      ') é bloqueada pelas políticas de governança do ERP HURAM (HTTP 403). Os custos são calculados exclusivamente por documentos fiscais de entrada (custo médio ponderado) e ordens de produção.',
+      ') é bloqueada pelas políticas de governança do ERP HURAM (HTTP 403). Os custos são calculados exclusivamente por documentos fiscais de entrada (Custo Médio Ponderado Real) e ordens de produção.',
   )
 }, 'products')
 
@@ -150,13 +153,19 @@ onRecordCreateRequest((e) => {
     e.record.set('cost_locked', isRevenda)
   }
 
-  e.next()
+  // Normaliza cost_average igual a cost_price no cadastro
+  var costPriceRaw = e.record.getString('cost_price') || ''
+  if (!e.record.getString('cost_average') && costPriceRaw) {
+    e.record.set('cost_average', costPriceRaw)
+  }
+
+  return e.next()
 }, 'products')
 
 onRecordAfterCreateSuccess((e) => {
   try {
     // Após criar o produto, registra o custo inicial no product_cost_history
-    var costPriceRaw = e.record.getString('cost_price') || ''
+    var costPriceRaw = e.record.getString('cost_price') || '0'
     var costNum = parseFloat(costPriceRaw.replace(',', '.')) || 0
 
     var historyCol = $app.findCollectionByNameOrId('product_cost_history')
@@ -182,6 +191,6 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error('Falha ao gravar product_cost_history no create', 'error', String(err))
   } finally {
-    e.next()
+    return e.next()
   }
 }, 'products')

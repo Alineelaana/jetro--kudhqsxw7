@@ -216,10 +216,9 @@ export function PurchaseInvoiceDialog({
           const product = products.find((p) => p.code === item.code || p.name === item.product)
           if (product) {
             const currentStock = (product.stock as number) || 0
+            // O saldo físico é atualizado e o custo é recalculado pelo motor de Custo Médio Ponderado Real via backend
             await updateProduct(product.id as string, {
               stock: currentStock + (parseFloat(item.quantity) || 0),
-              cost_price: item.unit_price,
-              last_cost: item.unit_price,
               last_purchase: new Date().toISOString(),
             })
           }

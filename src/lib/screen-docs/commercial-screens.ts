@@ -5,23 +5,23 @@ export const COMMERCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/comercial',
     title: 'Central Comercial — Torre de Controle',
     moduleGroup: 'Comercial',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-04-18',
+    docVersion: '1.1.0',
+    lastUpdated: '2026-04-19',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Atuar como torre de controle executiva e operacional do módulo Comercial, consolidando indicadores em tempo real (pedidos abertos, faturamento do mês, pipeline CRM, contratos ativos, devoluções e comissões) com isolamento multitenancy por empresa e atalhos rápidos para navegação.',
+        'Gerenciar as tabelas de preço por canal/região/empresa e as políticas de alçada de descontos comerciais autorizados, utilizando o Custo Médio Ponderado Real oficial para apuração de margens líquidas.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- KPIs executivos em tempo real: Pedidos Abertos, Faturamento Consolidado, Pipeline Ativo CRM, Contratos Vigentes, Devoluções/Trocas e Comissões a Apurar.\n- Tabela de últimos pedidos e movimentações comerciais com JetroTable.\n- Ações rápidas para emissão de orçamentos, abertura de oportunidades e consulta de clientes.\n- Sincronização em tempo real via PocketBase Realtime e filtro por empresa ativa (useBrand).',
+        '- Aba 1 (Tabelas de Preço): Gestão de tabelas de preço com margens, vigências e reajustes em lote. Leitura estrita dos custos oficiais da coleção `products` (sem edição manual de custos).\n- Aba 2 (Políticas de Desconto): Parametrização de faixas de desconto permitidas por perfil de operador e alçadas de aprovação gerencial.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Isolamento estrito por empresa ativa selecionada no seletor multitenancy.\n- Indicadores clicáveis redirecionam o operador diretamente para as telas operacionais correspondentes.\n- Alertas automáticos para pedidos retidos por crédito ou sem estoque.',
+        '- Pedidos de venda utilizam a tabela associada ao cliente ou canal, validando o período de vigência ativo.\n- Tabelas de preço respeitam a empresa ativa e data de vigência.\n- Integridade de Custos: custos médios e de reposição são somente leitura para os operadores comerciais, garantidos pelo backend via HTTP 403.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
