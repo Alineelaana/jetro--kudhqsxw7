@@ -7,6 +7,7 @@ import { INDUSTRY_SCREEN_DOCS } from './industry-screens'
 import { LOGISTICS_SCREEN_DOCS } from './logistics-screens'
 import { STOCK_SCREEN_DOCS } from './stock-screens'
 import { FISCAL_SCREEN_DOCS } from './fiscal-screens'
+import { COMMERCIAL_SCREEN_DOCS } from './commercial-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1028,6 +1029,11 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   // 13. MÓDULO FISCAL (7 TELAS OFICIAIS UNIFICADAS)
   // -------------------------------------------------------------
   ...FISCAL_SCREEN_DOCS,
+
+  // -------------------------------------------------------------
+  // MÓDULO COMERCIAL (10 TELAS OFICIAIS UNIFICADAS)
+  // -------------------------------------------------------------
+  ...COMMERCIAL_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 14. BI & ANALYTICS (BUSINESS INTELLIGENCE)
