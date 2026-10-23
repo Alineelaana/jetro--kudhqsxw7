@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-23T14:11:58.932Z",
+  "generatedAt": "2026-10-23T14:37:06.848Z",
   "collections": [
     {
       "name": "users",
@@ -7,8 +7,8 @@
       "apiRules": {
         "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || id = @request.auth.id)",
         "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || id = @request.auth.id)",
-        "create": "",
-        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || id = @request.auth.id)",
+        "create": "@request.auth.id != '' && @request.auth.role = 'SUP'",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'SUP' || (id = @request.auth.id && @request.body.role:changed = false && @request.body.perfil_acesso:changed = false && @request.body.perfil_id:changed = false && @request.body.active:changed = false && @request.body.empresa_id:changed = false && @request.body.filial_id:changed = false && @request.body.empresas_ids:changed = false && @request.body.mfa_secret:changed = false && @request.body.mfa_enabled:changed = false && @request.body.mfa_verified_at:changed = false && @request.body.codigo:changed = false && @request.body.force_password_change:changed = false && @request.body.must_change_password:changed = false))",
         "delete": "@request.auth.role = 'SUP'"
       },
       "fields": [

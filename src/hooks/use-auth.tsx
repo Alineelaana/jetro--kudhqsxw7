@@ -82,6 +82,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     pb.authStore.isValid && initialRecord?.active !== false,
   )
   const [mfaRequired, setMfaRequired] = useState(false)
+  const [pendingChallengeToken, setPendingChallengeToken] = useState<string | null>(null)
+  const [pendingPassword, setPendingPassword] = useState<string | null>(null)
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   const mustChangePassword = useMemo(() => {
@@ -222,6 +225,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const email = resolvedIdentity
     try {
+      // 1. Chamar o endpoint seguro de login do backend que verifica MFA no servidor
+      // Se MFA estiver habilitado, o servidor NÃO entrega o token de acesso neste momento,
+      // retornando mfa_required=true e um challenge_token temporário (com expiração de 5 min).
+      try {
+        const secRes = await pb.send<{
+          mfa_required?: boolean
+          challenge_token?: string
+          user_id?: string
+          error?: string
+        }>('/backend/v1/auth/secure-login', {
+          method: 'POST',
+          body: JSON.stringify({ identity: email, password }),
+          headers: { 'Content-Type': 'application/json' },
+        })
+
+        if (secRes && secRes.mfa_required) {
+          // MFA é exigido: limpar qualquer authStore anterior e reter apenas dados do desafio temporário
+          pb.authStore.clear()
+          setUser(null)
+          setIsAuthenticated(false)
+          setMfaRequired(true)
+          setPendingChallengeToken(secRes.challenge_token || null)
+          setPendingPassword(password)
+          setPendingEmail(email)
+          return { error: null, fieldErrors: {} }
+        }
+      } catch (secErr: any) {
+        // Se a chamada ao secure-login retornou erro de credencial ou bloqueio, interrompe
+        if (secErr?.status === 400 || secErr?.status === 401 || secErr?.status === 403) {
+          return {
+            error: secErr?.data?.error || 'Credenciais inválidas. Verifique usuário e senha.',
+            fieldErrors: {},
+          }
+        }
+      }
+
+      // 2. Fluxo regular para contas sem MFA: autenticação completa no PocketBase
       const authData = await pb.collection('users').authWithPassword(email, password)
       const record = authData.record as Record<string, unknown> | null
 
@@ -238,9 +278,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const mfaEnabled = record?.mfa_enabled === true
       const hasSecret = !!(record?.mfa_secret as string)
       if (mfaEnabled && hasSecret) {
-        setUser(record)
-        setMfaRequired(true)
+        // Proteção adicional: se por qualquer motivo passar aqui com MFA ativo,
+        // NÃO manter token ativo antes da verificação
+        pb.authStore.clear()
+        setUser(null)
         setIsAuthenticated(false)
+        setMfaRequired(true)
+        setPendingPassword(password)
+        setPendingEmail(email)
         return { error: null, fieldErrors: {} }
       }
 
@@ -359,16 +404,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const mfaLoginVerify = async (code: string) => {
     try {
+      if (pendingChallengeToken) {
+        // Validação no backend com o desafio temporário (sem token de acesso prévio)
+        const challengeRes = await pb.send<{
+          verified: boolean
+          user?: Record<string, unknown>
+        }>('/backend/v1/mfa/challenge-verify', {
+          method: 'POST',
+          body: JSON.stringify({
+            challenge_token: pendingChallengeToken,
+            code: code.trim(),
+          }),
+          headers: { 'Content-Type': 'application/json' },
+        })
+
+        if (!challengeRes || !challengeRes.verified) {
+          return { error: 'Código MFA inválido. Tente novamente.' }
+        }
+
+        // Agora que o segundo fator foi validado e consumido com sucesso no backend,
+        // geramos a sessão oficial do usuário autenticado
+        if (pendingEmail && pendingPassword) {
+          const finalAuth = await pb
+            .collection('users')
+            .authWithPassword(pendingEmail, pendingPassword)
+          setUser(finalAuth.record as Record<string, unknown>)
+          setIsAuthenticated(true)
+        } else if (challengeRes.user) {
+          setUser(challengeRes.user)
+          setIsAuthenticated(true)
+        }
+
+        setMfaRequired(false)
+        setPendingChallengeToken(null)
+        setPendingPassword(null)
+        setPendingEmail(null)
+        return { error: null }
+      }
+
+      // Fallback legado se chamado em sessão com token prévio
       await pb.send('/backend/v1/mfa/login-verify', {
         method: 'POST',
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code: code.trim() }),
         headers: { 'Content-Type': 'application/json' },
       })
       setMfaRequired(false)
       setIsAuthenticated(true)
       return { error: null }
-    } catch {
-      return { error: 'Código MFA inválido. Tente novamente.' }
+    } catch (err: any) {
+      const msg = err?.data?.error || err?.message || 'Código MFA inválido. Tente novamente.'
+      return { error: msg }
     }
   }
 
@@ -377,6 +462,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null)
     setIsAuthenticated(false)
     setMfaRequired(false)
+    setPendingChallengeToken(null)
+    setPendingPassword(null)
+    setPendingEmail(null)
   }
 
   const signOut = () => {

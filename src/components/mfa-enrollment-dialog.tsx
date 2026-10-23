@@ -106,17 +106,21 @@ export function MfaEnrollmentDialog({ open, onOpenChange, onSuccess }: MfaEnroll
         ) : (
           <div className="space-y-4 py-2">
             <div className="flex flex-col items-center gap-3">
-              <img
-                src={getQrCodeImageUrl(otpauthUrl, 200)}
-                alt="QR Code MFA"
-                className="w-48 h-48 rounded-lg border-2 border-[#005B2E]/20"
-              />
-              <p className="text-xs text-muted-foreground text-center">
-                Escaneie o QR Code com seu app autenticador ou digite a chave manualmente:
-              </p>
-              <code className="text-xs bg-muted px-3 py-1.5 rounded font-mono break-all max-w-[280px]">
-                {secret}
-              </code>
+              <div className="p-4 bg-muted/60 rounded-lg border text-center space-y-2 w-full">
+                <div className="text-xs font-semibold text-foreground">
+                  Chave Secreta TOTP (RFC 6238)
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Por segurança e privacidade, a chave não é enviada para APIs externas de QR Code.
+                  Insira a chave abaixo no seu aplicativo autenticador (Google Authenticator, Authy
+                  ou Microsoft Authenticator):
+                </p>
+                <div className="flex justify-center">
+                  <code className="text-sm bg-background border px-3 py-2 rounded font-mono font-bold tracking-wider break-all select-all text-primary">
+                    {secret}
+                  </code>
+                </div>
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="mfa-code" className="text-sm font-semibold">

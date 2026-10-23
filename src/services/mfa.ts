@@ -1,51 +1,69 @@
-import pb from '@/lib/pocketbase/client'
+import { pb } from '@/lib/pocketbase/client'
 
-export interface MfaSetupResult {
+export interface MfaSetupResponse {
   secret: string
   otpauth_url: string
 }
 
-export interface MfaStatusResult {
+export interface MfaStatusResponse {
   enabled: boolean
   has_secret: boolean
-  verified_at: string
-  mfa_required_for_admins: boolean
-  is_admin: boolean
-  mfa_active: boolean
+  verified_at: string | null
 }
 
-export async function setupMfa(): Promise<MfaSetupResult> {
-  return pb.send('/backend/v1/mfa/setup', { method: 'POST' })
+export interface MfaVerifyResponse {
+  verified: boolean
+  enabled?: boolean
+  user?: any
 }
 
-export async function verifyMfa(code: string): Promise<{ verified: boolean; enabled: boolean }> {
-  return pb.send('/backend/v1/mfa/verify', {
-    method: 'POST',
-    body: JSON.stringify({ code }),
-    headers: { 'Content-Type': 'application/json' },
-  })
+export const mfaService = {
+  async getStatus(): Promise<MfaStatusResponse> {
+    return pb.send<MfaStatusResponse>('/backend/v1/mfa/status', {
+      method: 'GET',
+    })
+  },
+
+  async setup(): Promise<MfaSetupResponse> {
+    return pb.send<MfaSetupResponse>('/backend/v1/mfa/setup', {
+      method: 'POST',
+    })
+  },
+
+  async verify(code: string): Promise<MfaVerifyResponse> {
+    return pb.send<MfaVerifyResponse>('/backend/v1/mfa/verify', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  },
+
+  async challengeVerify(challengeToken: string, code: string): Promise<MfaVerifyResponse> {
+    return pb.send<MfaVerifyResponse>('/backend/v1/mfa/challenge-verify', {
+      method: 'POST',
+      body: JSON.stringify({ challenge_token: challengeToken, code }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  },
+
+  async disable(): Promise<{ disabled: boolean }> {
+    return pb.send<{ disabled: boolean }>('/backend/v1/mfa/disable', {
+      method: 'POST',
+    })
+  },
 }
 
-export async function loginVerifyMfa(code: string): Promise<{ verified: boolean }> {
-  return pb.send('/backend/v1/mfa/login-verify', {
-    method: 'POST',
-    body: JSON.stringify({ code }),
-    headers: { 'Content-Type': 'application/json' },
-  })
-}
+// Aliases para compatibilidade com componentes existentes
+export const setupMfa = mfaService.setup
+export const verifyMfa = mfaService.verify
+export const getMfaStatus = mfaService.getStatus
+export const disableMfa = mfaService.disable
 
-export async function disableMfa(code: string): Promise<{ disabled: boolean }> {
-  return pb.send('/backend/v1/mfa/disable', {
-    method: 'POST',
-    body: JSON.stringify({ code }),
-    headers: { 'Content-Type': 'application/json' },
-  })
-}
-
-export async function getMfaStatus(): Promise<MfaStatusResult> {
-  return pb.send('/backend/v1/mfa/status', { method: 'GET' })
-}
-
-export function getQrCodeImageUrl(otpauthUrl: string, size = 200): string {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(otpauthUrl)}`
+// Para segurança e privacidade, o segredo e otpauth_url NUNCA são vazados para geradores QR externos
+export function getQrCodeImageUrl(_otpauthUrl: string, _size: number = 200): string {
+  return ''
 }
