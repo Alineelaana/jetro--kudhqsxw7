@@ -11,6 +11,7 @@ import { COMMERCIAL_SCREEN_DOCS } from './commercial-screens'
 import { MARKETING_SCREEN_DOCS } from './marketing-screens'
 import { INTELIGENCIA_SCREEN_DOCS } from './inteligencia-screens'
 import { CONTROLADORIA_SCREEN_DOCS } from './controladoria-screens'
+import { IA_SCREEN_DOCS } from './ia-screen-docs'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -1155,58 +1156,9 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
-  // 15. INTELIGÊNCIA ARTIFICIAL E AGENTES JETRO
+  // 15. INTELIGÊNCIA ARTIFICIAL (MÓDULO IA — 4 TELAS OFICIAIS)
   // -------------------------------------------------------------
-  '/admin/ia/dashboard': {
-    route: '/admin/ia/dashboard',
-    title: 'Central de Inteligência Artificial e Automações',
-    moduleGroup: 'Inteligência',
-    docVersion: '1.0.0',
-    lastUpdated: '2025-05-18',
-    author: 'Engenharia de Software Jetro',
-    objective: {
-      title: 'Objetivo',
-      content:
-        'Administrar os agentes de IA, fluxos inteligentes, regras de treinamento, governança de modelos e aprovação de ações autônomas na plataforma Jetro.',
-    },
-    features: {
-      title: 'Funcionalidades',
-      content:
-        '- Monitoramento de interações e consumo de tokens por agente.\n- Gestão de base de conhecimento corporativa (documentos e manuais indexados).\n- Central de aprovação para ações autônomas críticas geradas pelos agentes.\n- Painel de treinamento supervisionado e calibração de prompts.',
-    },
-    businessRules: {
-      title: 'Regras de Negócio',
-      content:
-        '- Ações sugeridas por agentes com nível de criticidade ALTA sempre exigem confirmação humana antes de execução.\n- Respostas com score de confiança inferior ao threshold são direcionadas para revisão.',
-    },
-    workflow: {
-      title: 'Fluxo de Funcionamento',
-      content:
-        '1. Solicitações são enviadas aos agentes via chat ou gatilhos de fluxo de trabalho.\n2. O agente processa a instrução consultando a base de conhecimento e as regras do ERP.\n3. Se necessário, gera solicitação de aprovação na fila de homologação antes de aplicar no banco de dados.',
-    },
-    dataSource: {
-      title: 'Origem dos Dados',
-      content:
-        '- Coleções: `ai_agents`, `ai_interactions`, `ai_knowledge_base`, `ai_approvals`, `ai_settings`.',
-    },
-    integrations: {
-      title: 'Integrações',
-      content: 'APIs LLM Skip Cloud e agentes nativos cadastrados no backend.',
-    },
-    permissions: {
-      title: 'Permissões',
-      content: 'Controlada por `canViewAiModule(role)` e `canManageAiTraining(role)`.',
-    },
-    dependencies: {
-      title: 'Dependências',
-      content: 'Componentes de `src/components/ai-module/*`.',
-    },
-    errorHandling: {
-      title: 'Tratamento de Erros',
-      content:
-        'Fallback para modo assistido caso a API de modelo externo retorne timeout ou indisponibilidade.',
-    },
-  },
+  ...IA_SCREEN_DOCS,
 
   // -------------------------------------------------------------
   // 16. MÓDULO ESTOQUE E WMS (6 TELAS OFICIAIS UNIFICADAS + ABSORÇÃO DE VALIDADE)

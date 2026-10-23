@@ -532,24 +532,31 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         ],
       },
       {
-        label: 'Inteligência Artificial',
+        label: 'IA',
         icon: Bot,
-        route: '/admin/ia/dashboard',
+        route: '/admin/ia/assistente',
         perm: canViewAiModule,
         children: [
-          { label: 'Agentes', route: '/admin/ia/agentes', perm: canViewAiModule },
-          { label: 'Aprovações', route: '/admin/ia/aprovacoes', perm: canViewAiModule },
-          { label: 'Assistente', route: '/admin/ia/assistente', perm: canViewAiModule },
-          { label: 'Automações', route: '/admin/ia/automacoes', perm: canViewAiModule },
+          {
+            label: 'Agentes e Automações',
+            route: '/admin/ia/agentes-automacoes',
+            perm: canViewAiModule,
+          },
+          {
+            label: 'Assistente de IA',
+            route: '/admin/ia/assistente',
+            perm: canViewAiModule,
+          },
           {
             label: 'Base de Conhecimento',
             route: '/admin/ia/base-conhecimento',
             perm: canViewAiModule,
           },
-          { label: 'Configurações', route: '/admin/ia/configuracoes', perm: canChangeAiSettings },
-          { label: 'Fluxos', route: '/admin/ia/fluxos', perm: canViewAiModule },
-          { label: 'Histórico', route: '/admin/ia/historico', perm: canViewAiModule },
-          { label: 'Treinamento', route: '/admin/ia/treinamento', perm: canManageAiTraining },
+          {
+            label: 'Histórico e Aprovações',
+            route: '/admin/ia/historico-aprovacoes',
+            perm: canViewAiModule,
+          },
         ],
       },
       {

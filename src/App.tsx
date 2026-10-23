@@ -107,6 +107,7 @@ const Commercial = lazy(() => import('./pages/Commercial'))
 // Notificações e Módulos Centrais
 const Notifications = lazy(() => import('./pages/Notifications'))
 const AIModule = lazy(() => import('./pages/AIModule'))
+const IaPage = lazy(() => import('./pages/IaPage'))
 const Industry = lazy(() => import('./pages/Industry'))
 const Phase0Foundation = lazy(() => import('./pages/Phase0Foundation'))
 const PlatformLayer = lazy(() => import('./pages/PlatformLayer'))
@@ -1403,53 +1404,59 @@ const App = () => (
                                   element={<Navigate to="/admin/comercial/crm" replace />}
                                 />
                                 <Route path="/admin/notificacoes" element={<Notifications />} />
-                                <Route
-                                  path="/admin/ia/dashboard"
-                                  element={<AIModule screen="dashboard" />}
-                                />
+
+                                {/* MÓDULO IA (4 TELAS OFICIAIS) */}
+                                <Route path="/admin/ia" element={<IaPage screen="assistente" />} />
                                 <Route
                                   path="/admin/ia/assistente"
-                                  element={<AIModule screen="assistant" />}
+                                  element={<IaPage screen="assistente" />}
                                 />
                                 <Route
-                                  path="/admin/ia/agentes"
-                                  element={<AIModule screen="agents" />}
-                                />
-                                <Route
-                                  path="/admin/ia/automacoes"
-                                  element={<AIModule screen="automations" />}
-                                />
-                                <Route
-                                  path="/admin/ia/fluxos"
-                                  element={<AIModule screen="flows" />}
+                                  path="/admin/ia/agentes-automacoes"
+                                  element={<IaPage screen="agentes-automacoes" />}
                                 />
                                 <Route
                                   path="/admin/ia/base-conhecimento"
-                                  element={<AIModule screen="knowledge" />}
+                                  element={<IaPage screen="base-conhecimento" />}
+                                />
+                                <Route
+                                  path="/admin/ia/historico-aprovacoes"
+                                  element={<IaPage screen="historico-aprovacoes" />}
+                                />
+                                <Route path="/admin/ia/:slug" element={<IaPage />} />
+
+                                {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DO MÓDULO IA */}
+                                <Route
+                                  path="/admin/ia/dashboard"
+                                  element={<Navigate to="/admin/ia/assistente" replace />}
+                                />
+                                <Route
+                                  path="/admin/ia/agentes"
+                                  element={<Navigate to="/admin/ia/agentes-automacoes" replace />}
+                                />
+                                <Route
+                                  path="/admin/ia/automacoes"
+                                  element={<Navigate to="/admin/ia/agentes-automacoes" replace />}
+                                />
+                                <Route
+                                  path="/admin/ia/fluxos"
+                                  element={<Navigate to="/admin/ia/agentes-automacoes" replace />}
                                 />
                                 <Route
                                   path="/admin/ia/treinamento"
-                                  element={
-                                    <AiAdminProtectedRoute>
-                                      <AIModule screen="training" />
-                                    </AiAdminProtectedRoute>
-                                  }
+                                  element={<Navigate to="/admin/ia/base-conhecimento" replace />}
                                 />
                                 <Route
                                   path="/admin/ia/historico"
-                                  element={<AIModule screen="history" />}
+                                  element={<Navigate to="/admin/ia/historico-aprovacoes" replace />}
                                 />
                                 <Route
                                   path="/admin/ia/aprovacoes"
-                                  element={<AIModule screen="approvals" />}
+                                  element={<Navigate to="/admin/ia/historico-aprovacoes" replace />}
                                 />
                                 <Route
                                   path="/admin/ia/configuracoes"
-                                  element={
-                                    <AiAdminProtectedRoute>
-                                      <AIModule screen="settings" />
-                                    </AiAdminProtectedRoute>
-                                  }
+                                  element={<Navigate to="/admin/ia/historico-aprovacoes" replace />}
                                 />
                                 <Route
                                   path="/admin/governanca-adapta"
