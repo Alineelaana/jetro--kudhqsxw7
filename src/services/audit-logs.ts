@@ -185,6 +185,7 @@ export interface RegisterAuditLogInput {
   new_value?: Record<string, unknown> | null
   criticidade?: 'Baixa' | 'Média' | 'Alta' | 'Crítica'
   justification?: string
+  origem?: string
 }
 
 export async function registerAuditLog(input: RegisterAuditLogInput): Promise<void> {
@@ -214,7 +215,7 @@ export async function registerAuditLog(input: RegisterAuditLogInput): Promise<vo
       previous_value: input.previous_value || null,
       new_value: input.new_value || null,
       criticidade: input.criticidade || 'Baixa',
-      origem: 'Área da Empresa',
+      origem: input.origem || 'Área da Empresa',
       empresa: authRecord?.empresa_id || '',
       filial: authRecord?.filial_id || '',
       justification: input.justification || '',
