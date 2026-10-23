@@ -111,6 +111,7 @@ const Phase0Foundation = lazy(() => import('./pages/Phase0Foundation'))
 const PlatformLayer = lazy(() => import('./pages/PlatformLayer'))
 const Blueprint = lazy(() => import('./pages/Blueprint'))
 const VariableRemuneration = lazy(() => import('./pages/VariableRemuneration'))
+const InteligenciaPage = lazy(() => import('./pages/InteligenciaPage'))
 const BI = lazy(() => import('./pages/BI'))
 const Performance = lazy(() => import('./pages/Performance'))
 const ValidityAlerts = lazy(() => import('./pages/ValidityAlerts'))
@@ -1671,66 +1672,82 @@ const App = () => (
                                     <Navigate to="/admin/comercial/remuneracao-variavel" replace />
                                   }
                                 />
-                                <Route path="/admin/bi" element={<BI screen="dashboard" />} />
+                                {/* MÓDULO INTELIGÊNCIA (4 TELAS OFICIAIS) */}
+                                <Route path="/admin/inteligencia" element={<InteligenciaPage />} />
+                                <Route
+                                  path="/admin/inteligencia/:slug"
+                                  element={<InteligenciaPage />}
+                                />
+
+                                {/* REDIRECIONAMENTOS DAS ROTAS LEGADAS DE BI PARA INTELIGÊNCIA */}
+                                <Route
+                                  path="/admin/bi"
+                                  element={<Navigate to="/admin/inteligencia" replace />}
+                                />
                                 <Route
                                   path="/admin/bi/executive"
-                                  element={<BI screen="executive" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/commercial"
-                                  element={<BI screen="commercial" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/financial-intel"
-                                  element={<BI screen="financial-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/industrial-intel"
-                                  element={<BI screen="industrial-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/logistics-intel"
-                                  element={<BI screen="logistics-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/stock-intel"
-                                  element={<BI screen="stock-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/fiscal-intel"
-                                  element={<BI screen="fiscal-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/purchasing-intel"
-                                  element={<BI screen="purchasing-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/crm-intel"
-                                  element={<BI screen="crm-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/trade-intel"
-                                  element={<BI screen="trade-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/rh-intel"
-                                  element={<BI screen="rh-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/quality-intel"
-                                  element={<BI screen="quality-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/maintenance-intel"
-                                  element={<BI screen="maintenance-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/vr-intel"
-                                  element={<BI screen="vr-intel" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/custom-dashboards"
-                                  element={<BI screen="custom-dashboards" />}
+                                  element={
+                                    <Navigate
+                                      to="/admin/inteligencia/dashboards-projecoes"
+                                      replace
+                                    />
+                                  }
                                 />
                                 <Route
                                   path="/admin/bi/ai-adapta"
@@ -1740,108 +1757,127 @@ const App = () => (
                                 />
                                 <Route
                                   path="/admin/bi/cross-module"
-                                  element={<BI screen="cross-module" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/bi/projection"
-                                  element={<BI screen="projection" />}
-                                />
-                                <Route path="/admin/bi/sales" element={<BI screen="sales" />} />
-                                <Route path="/admin/bi/stock" element={<BI screen="stock" />} />
-                                <Route
-                                  path="/admin/bi/financial"
-                                  element={<BI screen="financial" />}
-                                />
-                                <Route
-                                  path="/admin/bi/industrial"
-                                  element={<BI screen="industrial" />}
-                                />
-                                <Route
-                                  path="/admin/bi/saved-views"
-                                  element={<BI screen="saved-views" />}
-                                />
-                                <Route
-                                  path="/admin/bi/marketing-intel"
                                   element={
-                                    <BiCenterWrapper
-                                      title="Inteligência de Marketing"
-                                      description="Indicadores de marketing enterprise"
-                                      loadFunction={getMarketingIntelligence}
-                                      realtimeCollection="mk_requests"
+                                    <Navigate
+                                      to="/admin/inteligencia/dashboards-projecoes"
+                                      replace
                                     />
                                   }
                                 />
                                 <Route
-                                  path="/admin/bi/report-center"
-                                  element={<BI screen="report-center" />}
+                                  path="/admin/bi/sales"
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
+                                  path="/admin/bi/stock"
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
+                                />
+                                <Route
+                                  path="/admin/bi/financial"
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
+                                />
+                                <Route
+                                  path="/admin/bi/industrial"
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
+                                />
+                                <Route
+                                  path="/admin/bi/saved-views"
+                                  element={
+                                    <Navigate
+                                      to="/admin/inteligencia/dashboards-projecoes"
+                                      replace
+                                    />
+                                  }
+                                />
+                                <Route
+                                  path="/admin/bi/marketing-intel"
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
+                                />
+                                <Route
+                                  path="/admin/bi/report-center"
+                                  element={<Navigate to="/admin/inteligencia/relatorios" replace />}
+                                />
+                                <Route
+                                  path="/admin/bi/*"
+                                  element={<Navigate to="/admin/inteligencia" replace />}
+                                />
+
+                                {/* REDIRECIONAMENTOS DAS ROTAS LEGADAS DE PERFORMANCE PARA INTELIGÊNCIA */}
+                                <Route
                                   path="/admin/performance"
-                                  element={<Performance screen="dashboard" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/comercial"
-                                  element={<Performance screen="comercial" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/financeiro"
-                                  element={<Performance screen="financeiro" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/fiscal"
-                                  element={<Performance screen="fiscal" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/compras"
-                                  element={<Performance screen="compras" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/estoque"
-                                  element={<Performance screen="estoque" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/logistica"
-                                  element={<Performance screen="logistica" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/producao"
-                                  element={<Performance screen="producao" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/marketing"
-                                  element={<Performance screen="marketing" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/rh"
-                                  element={<Performance screen="rh" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/ti"
-                                  element={<Performance screen="ti" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/administrativo"
-                                  element={<Performance screen="administrativo" />}
+                                  element={<Navigate to="/admin/inteligencia/por-area" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/estrategico"
-                                  element={<Performance screen="estrategico" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/geral"
-                                  element={<Performance screen="geral" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/gamification"
-                                  element={<Performance screen="gamification" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/config"
-                                  element={<Performance screen="config" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 <Route
                                   path="/admin/performance/chat"
-                                  element={<Performance screen="chat" />}
+                                  element={<Navigate to="/admin/inteligencia" replace />}
+                                />
+                                <Route
+                                  path="/admin/performance/*"
+                                  element={<Navigate to="/admin/inteligencia" replace />}
                                 />
                                 {/* Redirecionamento das Rotas Antigas de Validade para Lotes e Validade */}
                                 <Route
