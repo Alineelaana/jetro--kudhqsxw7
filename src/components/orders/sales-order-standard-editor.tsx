@@ -44,7 +44,7 @@ import {
   logSalesAudit,
 } from '@/services/sales'
 import { getProducts } from '@/services/products'
-import { determineCfop } from '@/lib/fiscal-cfop-service'
+
 import { FREIGHT_TYPES, type SalesOrder, type SalesOrderItem } from '@/lib/sales-types'
 import { StandardOrderHeader } from './standard-order-header'
 import { StandardOrderSummary } from './standard-order-summary'
@@ -283,13 +283,13 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
 
             // Sugere CFOP inteligente baseado na operação e se cliente é de outro estado
             const clientUf = (selectedPartner?.address_state as string) || 'ES'
-            const cfopRule = determineCfop({
-              origemUf: 'ES',
-              destinoUf: clientUf,
-              tipoOperacao: 'venda',
-              tipoItem: (prod.item_type as string) || 'mercadoria_revenda',
-            })
-            next.cfop = cfopRule.cfop || '5102'
+            const isInterestadual = clientUf !== 'ES'
+            const isIndustrializado = (prod.item_type as string) === 'produto_acabado'
+            if (isInterestadual) {
+              next.cfop = isIndustrializado ? '6101' : '6102'
+            } else {
+              next.cfop = isIndustrializado ? '5101' : '5102'
+            }
           }
         }
 
@@ -535,7 +535,7 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
               {order ? `Editar Pedido de Venda - ${form.order_number}` : 'Novo Pedido de Venda'}
             </DialogTitle>
             <Badge variant="outline" className="border-[#005B2E] text-[#005B2E] font-bold">
-              v0.0.638
+              v0.0.639
             </Badge>
           </div>
         </DialogHeader>

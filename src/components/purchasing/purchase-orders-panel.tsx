@@ -34,6 +34,7 @@ import {
   type OrderItem,
 } from '@/lib/purchasing-types'
 import { PurchaseOrderImportDialog } from '@/components/purchasing/purchase-order-import-dialog'
+import { PurchaseOrderStandardEditor } from '@/components/orders/purchase-order-standard-editor'
 import {
   Plus,
   Search,
@@ -48,15 +49,6 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-const emptyItem: OrderItem = {
-  code: '',
-  product: '',
-  quantity: '',
-  unit_price: '',
-  discount: '0',
-  total: '0',
-}
-
 export function PurchaseOrdersPanel() {
   const { user } = useAuth()
   const [records, setRecords] = useState<PurchaseOrder[]>([])
@@ -66,21 +58,6 @@ export function PurchaseOrdersPanel() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<PurchaseOrder | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({
-    supplier_id: '',
-    supplier_name: '',
-    company: '',
-    branch: '',
-    buyer: '',
-    payment_condition: '',
-    payment_method: '',
-    delivery_forecast: '',
-    freight: '0',
-    discounts: '0',
-    other_expenses: '0',
-  })
-  const [items, setItems] = useState<OrderItem[]>([{ ...emptyItem }])
   const [importOpen, setImportOpen] = useState(false)
 
   const load = async () => {
@@ -111,139 +88,41 @@ export function PurchaseOrdersPanel() {
     })
   }, [records, search, statusFilter])
 
-  const productsValue = items.reduce((s, i) => s + (parseFloat(i.total) || 0), 0)
-  const totalValue =
-    productsValue +
-    (parseFloat(form.freight) || 0) -
-    (parseFloat(form.discounts) || 0) +
-    (parseFloat(form.other_expenses) || 0)
-
   const handleNew = () => {
     setEditing(null)
-    setForm({
-      supplier_id: '',
-      supplier_name: '',
-      company: '',
-      branch: '',
-      buyer: (user?.name as string) || '',
-      payment_condition: '',
-      payment_method: '',
-      delivery_forecast: '',
-      freight: '0',
-      discounts: '0',
-      other_expenses: '0',
-    })
-    setItems([{ ...emptyItem }])
     setFormOpen(true)
   }
+
   const handleImportConfirm = (importedItems: OrderItem[]) => {
-    setEditing(null)
-    setForm({
+    setEditing({
+      id: '',
+      order_number: '',
       supplier_id: '',
       supplier_name: '',
-      company: '',
-      branch: '',
+      company: 'DEC Eldorado',
+      branch: 'Matriz',
       buyer: (user?.name as string) || '',
+      buyer_id: user?.id,
       payment_condition: '',
       payment_method: '',
       delivery_forecast: '',
       freight: '0',
       discounts: '0',
       other_expenses: '0',
+      products_value: '0',
+      total_value: '0',
+      status: 'Rascunho',
+      items: importedItems,
+      created: '',
+      updated: '',
     })
-    setItems(importedItems.length > 0 ? importedItems : [{ ...emptyItem }])
     setImportOpen(false)
     setFormOpen(true)
   }
 
   const handleEdit = (o: PurchaseOrder) => {
     setEditing(o)
-    setForm({
-      supplier_id: o.supplier_id || '',
-      supplier_name: o.supplier_name || '',
-      company: o.company || '',
-      branch: o.branch || '',
-      buyer: o.buyer || '',
-      payment_condition: o.payment_condition || '',
-      payment_method: o.payment_method || '',
-      delivery_forecast: o.delivery_forecast || '',
-      freight: o.freight || '0',
-      discounts: o.discounts || '0',
-      other_expenses: o.other_expenses || '0',
-    })
-    setItems(o.items?.length ? o.items : [{ ...emptyItem }])
     setFormOpen(true)
-  }
-
-  const setItem = (i: number, field: keyof OrderItem, value: string) => {
-    setItems((prev) =>
-      prev.map((it, idx) => {
-        if (idx !== i) return it
-        const updated = { ...it, [field]: value }
-        const qty = parseFloat(updated.quantity) || 0
-        const price = parseFloat(updated.unit_price) || 0
-        const disc = parseFloat(updated.discount) || 0
-        updated.total = String((qty * price - disc).toFixed(2))
-        return updated
-      }),
-    )
-  }
-
-  const handleSave = async (submitForApproval: boolean) => {
-    setSaving(true)
-    try {
-      const threshold = await getApprovalThreshold()
-      const autoApprove = submitForApproval && totalValue <= threshold
-      const status = submitForApproval
-        ? autoApprove
-          ? 'Aprovado'
-          : 'Aguardando Aprovação'
-        : editing?.status || 'Em Digitação'
-      const data: Record<string, unknown> = {
-        ...form,
-        buyer_id: user?.id as string,
-        items: items.filter((i) => i.product),
-        freight: form.freight,
-        discounts: form.discounts,
-        other_expenses: form.other_expenses,
-        products_value: String(productsValue.toFixed(2)),
-        total_value: String(totalValue.toFixed(2)),
-        status,
-        responsible_user: (user?.name as string) || '',
-        history: [
-          ...(editing?.history || []),
-          {
-            action: submitForApproval
-              ? autoApprove
-                ? 'Aprovado automaticamente'
-                : 'Enviado para aprovação'
-              : 'Salvo',
-            user: (user?.name as string) || '',
-            date: new Date().toISOString(),
-            note: autoApprove ? `Valor R$ ${totalValue.toFixed(2)} <= R$ ${threshold}` : '',
-          },
-        ],
-      }
-      if (editing) {
-        await updatePurchaseOrder(editing.id, data)
-      } else {
-        const { number } = await getNextPurchaseNumber('order')
-        data.order_number = number
-        await createPurchaseOrder(data)
-      }
-      toast.success(
-        submitForApproval
-          ? autoApprove
-            ? 'Pedido aprovado automaticamente'
-            : 'Pedido enviado para aprovação'
-          : 'Pedido salvo',
-      )
-      setFormOpen(false)
-      load()
-    } catch {
-      toast.error('Erro ao salvar pedido')
-    }
-    setSaving(false)
   }
 
   const handlePrint = (o: PurchaseOrder) => {
@@ -416,237 +295,12 @@ export function PurchaseOrdersPanel() {
         onOpenChange={setImportOpen}
         onConfirm={handleImportConfirm}
       />
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Editar Pedido' : 'Novo Pedido de Compra'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <Label className="text-xs">Fornecedor</Label>
-                <Select
-                  value={form.supplier_id}
-                  onValueChange={(v) => {
-                    const s = suppliers.find((sp) => sp.id === v)
-                    setForm({
-                      ...form,
-                      supplier_id: v,
-                      supplier_name: (s?.full_name as string) || (s?.company_name as string) || '',
-                    })
-                  }}
-                >
-                  <SelectTrigger className="focus-visible:ring-[#005B2E]">
-                    <SelectValue placeholder="Fornecedor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {suppliers.map((s) => (
-                      <SelectItem key={s.id as string} value={s.id as string}>
-                        {(s.full_name as string) || (s.company_name as string) || '—'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Empresa</Label>
-                <Input
-                  value={form.company}
-                  onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  className="focus-visible:ring-[#005B2E]"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Filial</Label>
-                <Input
-                  value={form.branch}
-                  onChange={(e) => setForm({ ...form, branch: e.target.value })}
-                  className="focus-visible:ring-[#005B2E]"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <Label className="text-xs">Comprador</Label>
-                <Input
-                  value={form.buyer}
-                  onChange={(e) => setForm({ ...form, buyer: e.target.value })}
-                  className="focus-visible:ring-[#005B2E]"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Cond. Pagamento</Label>
-                <Input
-                  value={form.payment_condition}
-                  onChange={(e) => setForm({ ...form, payment_condition: e.target.value })}
-                  className="focus-visible:ring-[#005B2E]"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Forma Pagamento</Label>
-                <Input
-                  value={form.payment_method}
-                  onChange={(e) => setForm({ ...form, payment_method: e.target.value })}
-                  className="focus-visible:ring-[#005B2E]"
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs">Previsão de Entrega</Label>
-              <Input
-                value={form.delivery_forecast}
-                onChange={(e) => setForm({ ...form, delivery_forecast: e.target.value })}
-                className="focus-visible:ring-[#005B2E]"
-                placeholder="Ex: 15/08/2026"
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-sm font-bold">Produtos</Label>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setItems([...items, { ...emptyItem }])}
-                  className="border-[#005B2E] text-[#005B2E]"
-                >
-                  <Plus className="w-3 h-3 mr-1" /> Item
-                </Button>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="bg-muted">
-                      <th className="text-left p-2">Código</th>
-                      <th className="text-left p-2">Produto</th>
-                      <th className="text-left p-2 w-16">Qtd</th>
-                      <th className="text-left p-2 w-24">Vlr Unit.</th>
-                      <th className="text-left p-2 w-20">Desc.</th>
-                      <th className="text-left p-2 w-24">Total</th>
-                      <th className="w-8"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((it, i) => (
-                      <tr key={i}>
-                        <td className="p-1">
-                          <Input
-                            value={it.code}
-                            onChange={(e) => setItem(i, 'code', e.target.value)}
-                            className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                          />
-                        </td>
-                        <td className="p-1">
-                          <Input
-                            value={it.product}
-                            onChange={(e) => setItem(i, 'product', e.target.value)}
-                            className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                          />
-                        </td>
-                        <td className="p-1">
-                          <Input
-                            type="number"
-                            value={it.quantity}
-                            onChange={(e) => setItem(i, 'quantity', e.target.value)}
-                            className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                          />
-                        </td>
-                        <td className="p-1">
-                          <Input
-                            type="number"
-                            value={it.unit_price}
-                            onChange={(e) => setItem(i, 'unit_price', e.target.value)}
-                            className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                          />
-                        </td>
-                        <td className="p-1">
-                          <Input
-                            type="number"
-                            value={it.discount}
-                            onChange={(e) => setItem(i, 'discount', e.target.value)}
-                            className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                          />
-                        </td>
-                        <td className="p-1 font-bold">{it.total}</td>
-                        <td className="p-1">
-                          {items.length > 1 && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setItems(items.filter((_, idx) => idx !== i))}
-                              className="text-red-600 h-8 w-8 p-0"
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t">
-              <div>
-                <Label className="text-xs">Vlr Produtos</Label>
-                <p className="text-sm font-bold">R$ {productsValue.toFixed(2)}</p>
-              </div>
-              <div>
-                <Label className="text-xs">Frete</Label>
-                <Input
-                  type="number"
-                  value={form.freight}
-                  onChange={(e) => setForm({ ...form, freight: e.target.value })}
-                  className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Descontos</Label>
-                <Input
-                  type="number"
-                  value={form.discounts}
-                  onChange={(e) => setForm({ ...form, discounts: e.target.value })}
-                  className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Outras Despesas</Label>
-                <Input
-                  type="number"
-                  value={form.other_expenses}
-                  onChange={(e) => setForm({ ...form, other_expenses: e.target.value })}
-                  className="h-8 text-xs focus-visible:ring-[#005B2E]"
-                />
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-lg font-black text-[#005B2E]">
-                Valor Total: R$ {totalValue.toFixed(2)}
-              </span>
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setFormOpen(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleSave(false)}
-              disabled={saving}
-              className="border-[#005B2E] text-[#005B2E]"
-            >
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Salvar
-            </Button>
-            <Button
-              onClick={() => handleSave(true)}
-              disabled={saving}
-              className="bg-[#005B2E] hover:bg-[#01361D] text-white"
-            >
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}{' '}
-              <Check className="w-4 h-4 mr-2" /> Aprovar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PurchaseOrderStandardEditor
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        order={editing}
+        onSaved={load}
+      />
     </div>
   )
 }

@@ -411,7 +411,7 @@ export function PurchaseOrderStandardEditor({ open, onOpenChange, order, onSaved
               {order ? `Editar Pedido de Compra - ${form.order_number}` : 'Novo Pedido de Compra'}
             </DialogTitle>
             <Badge variant="outline" className="border-[#005B2E] text-[#005B2E] font-bold">
-              v0.0.638
+              v0.0.639
             </Badge>
           </div>
         </DialogHeader>
