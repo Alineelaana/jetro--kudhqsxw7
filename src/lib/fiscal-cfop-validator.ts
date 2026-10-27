@@ -96,9 +96,9 @@ export function validateFiscalCfopRules(
   const activeRules = rules.filter((r) => r.ativa)
 
   // -------------------------------------------------------------
-  // a) CFOP inexistente ou malformado
+  // a) CFOP inexistente ou malformado (apenas regras ativas)
   // -------------------------------------------------------------
-  rules.forEach((rule) => {
+  activeRules.forEach((rule) => {
     const rawCode = rule.cfop_resultado || ''
     const cleanCode = normalizeCfopCode(rawCode)
 
@@ -198,7 +198,7 @@ export function validateFiscalCfopRules(
     '5405',
   ])
 
-  rules.forEach((rule) => {
+  activeRules.forEach((rule) => {
     const cleanCode = normalizeCfopCode(rule.cfop_resultado)
     const proc = rule.procedencia_item
 
@@ -238,10 +238,10 @@ export function validateFiscalCfopRules(
   })
 
   // -------------------------------------------------------------
-  // e) Incoerência Destino x CFOP
+  // e) Incoerência Destino x CFOP (apenas regras ativas)
   // Primeiro dígito incompatível com o destino da regra (5=dentro, 6=fora, 7=exterior)
   // -------------------------------------------------------------
-  rules.forEach((rule) => {
+  activeRules.forEach((rule) => {
     const cleanCode = normalizeCfopCode(rule.cfop_resultado)
     if (cleanCode.length !== 4) return
     const firstDigit = cleanCode[0]
@@ -296,8 +296,7 @@ export function validateFiscalCfopRules(
   // -------------------------------------------------------------
   // g) Regras vencidas ainda ativas
   // -------------------------------------------------------------
-  rules.forEach((rule) => {
-    if (!rule.ativa) return
+  activeRules.forEach((rule) => {
     const fim = cleanDate(rule.vigencia_fim)
     if (fim && fim < dataReferencia) {
       addFinding({

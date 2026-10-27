@@ -69,7 +69,10 @@ export const fiscalCfopService = {
       this.getCfopRules(params.empresa_id, params.operacao_codigo),
     ])
 
-    return evaluateCfopMatrix(params, operations, rules)
+    // Determinação considera exclusivamente regras com ativo = true
+    const activeRules = rules.filter((r) => r.ativa)
+
+    return evaluateCfopMatrix(params, operations, activeRules)
   },
 
   /**

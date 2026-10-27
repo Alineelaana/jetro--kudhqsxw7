@@ -803,7 +803,14 @@ export function ScreenMatrizCfop() {
                   const oficialValidada = isRegraOficialValidada(rule)
 
                   return (
-                    <tr key={rule.id} className="hover:bg-muted/20">
+                    <tr
+                      key={rule.id}
+                      className={
+                        !rule.ativa
+                          ? 'opacity-60 bg-muted/20 hover:opacity-90 transition-opacity'
+                          : 'hover:bg-muted/20'
+                      }
+                    >
                       <td className="py-2.5 px-3 font-mono font-black text-base text-[#005B2E]">
                         {formatCfopCode(rule.cfop_resultado)}
                         <span className="block text-[10px] font-normal text-muted-foreground">
@@ -872,8 +879,20 @@ export function ScreenMatrizCfop() {
                         )}
                       </td>
                       <td className="py-2.5 px-3 space-y-1">
-                        {/* SELO OFICIAL: Se for regra-semente com conferência oficial da RFB/SEFAZ */}
-                        {oficialValidada ? (
+                        {!rule.ativa ? (
+                          <div className="space-y-0.5">
+                            <Badge
+                              variant="outline"
+                              className="bg-amber-50 text-amber-900 border-amber-300 text-[10px] font-bold gap-1 shadow-sm"
+                            >
+                              <AlertTriangle className="w-3 h-3 text-amber-600" />
+                              Aguarda ativação
+                            </Badge>
+                            <span className="block text-[9px] text-muted-foreground font-medium">
+                              Decisão do Resp. Fiscal
+                            </span>
+                          </div>
+                        ) : oficialValidada ? (
                           <div className="space-y-0.5">
                             <Badge className="bg-[#005B2E] text-white hover:bg-[#004222] text-[10px] font-bold gap-1 shadow-sm">
                               <Sparkles className="w-3 h-3 text-amber-300" />
@@ -889,7 +908,8 @@ export function ScreenMatrizCfop() {
                           </Badge>
                         ) : null}
 
-                        {!oficialValidada &&
+                        {rule.ativa &&
+                          !oficialValidada &&
                           (rule.validado_responsavel_fiscal ? (
                             <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
                               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
