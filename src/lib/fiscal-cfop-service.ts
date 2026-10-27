@@ -11,6 +11,27 @@ import { validateFiscalCfopRules, CfopValidationReport } from './fiscal-cfop-val
 /**
  * Serviço de Integração com PocketBase para CFOP e CGO
  */
+/**
+ * Atalhos auxiliares para resolução de CFOP a partir do serviço fiscal
+ */
+export async function resolveCfopByOperation(
+  params: DetermineCfopParams,
+): Promise<DeterminationOutput> {
+  return fiscalCfopService.determineCfop(params)
+}
+
+export async function findMatchingCfop(params: DetermineCfopParams): Promise<string> {
+  const result = await fiscalCfopService.determineCfop(params)
+  if (result.items && result.items.length > 0 && result.items[0].cfop) {
+    return result.items[0].cfop
+  }
+  return result.globalCfop || '5102'
+}
+
+export async function determineCfop(params: DetermineCfopParams): Promise<DeterminationOutput> {
+  return fiscalCfopService.determineCfop(params)
+}
+
 export const fiscalCfopService = {
   /**
    * Busca todas as operações ativas (ou todas para administração)

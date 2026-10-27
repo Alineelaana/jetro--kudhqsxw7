@@ -46,6 +46,12 @@ import {
 import { getProducts } from '@/services/products'
 
 import { FREIGHT_TYPES, type SalesOrder, type SalesOrderItem } from '@/lib/sales-types'
+import {
+  fiscalCfopService,
+  resolveCfopByOperation,
+  findMatchingCfop,
+  determineCfop,
+} from '@/lib/fiscal-cfop-service'
 import { StandardOrderHeader } from './standard-order-header'
 import { StandardOrderSummary } from './standard-order-summary'
 import { StandardOrderActions } from './standard-order-actions'
@@ -281,15 +287,48 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
             )
             next.ncm = (prod.ncm as string) || ''
 
-            // Sugere CFOP inteligente baseado na operação e se cliente é de outro estado
+            // Determina CFOP a partir do motor fiscal ativo (não editável à mão)
             const clientUf = (selectedPartner?.address_state as string) || 'ES'
             const isInterestadual = clientUf !== 'ES'
             const isIndustrializado = (prod.item_type as string) === 'produto_acabado'
-            if (isInterestadual) {
-              next.cfop = isIndustrializado ? '6101' : '6102'
-            } else {
-              next.cfop = isIndustrializado ? '5101' : '5102'
-            }
+            const fallbackCfop = isInterestadual
+              ? isIndustrializado
+                ? '6101'
+                : '6102'
+              : isIndustrializado
+                ? '5101'
+                : '5102'
+            next.cfop = fallbackCfop
+
+            // Chama motor fiscal assíncrono para resolução precisa por item
+            fiscalCfopService
+              .determineCfop({
+                operacao_codigo: (form.operation_type as string) || 'VENDA_MERCADORIA',
+                uf_origem: 'ES',
+                uf_destino: clientUf,
+                tipo_destinatario: (selectedPartner?.tax_profile as string) || 'contribuinte',
+                itens: [
+                  {
+                    item_codigo: (prod.code as string) || '',
+                    ncm: (prod.ncm as string) || '',
+                    origem_mercadoria: 0,
+                    finalidade: 'comercializacao',
+                  },
+                ],
+              })
+              .then((res) => {
+                if (res.items && res.items[0]?.cfop) {
+                  const resolvedCfop = res.items[0].cfop
+                  setItems((currentItems) =>
+                    currentItems.map((item, i) =>
+                      i === index ? { ...item, cfop: resolvedCfop } : item,
+                    ),
+                  )
+                }
+              })
+              .catch(() => {
+                // Mantém fallback caso serviço não responda
+              })
           }
         }
 
