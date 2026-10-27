@@ -64,6 +64,30 @@ export async function getProductHistory(productId: string) {
   })
 }
 
+export interface ProductCostHistoryRecord {
+  id: string
+  product: string
+  date?: string
+  calculation_method?: string
+  previous_cost?: number
+  new_cost?: number
+  quantity_in?: number
+  balance_before?: number
+  balance_after?: number
+  reference_type?: string
+  reference_id?: string
+  cost_composition?: Record<string, unknown> | string
+  created: string
+  updated: string
+}
+
+export async function getProductCostHistory(productId: string) {
+  return pb.collection('product_cost_history').getList<ProductCostHistoryRecord>(1, 50, {
+    filter: `product = "${productId}"`,
+    sort: '-created',
+  })
+}
+
 // ==========================================
 // 2. CONFIGURAÇÕES FISCAIS POR EMPRESA
 // ==========================================

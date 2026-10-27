@@ -16,7 +16,7 @@ export const MARKETING_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     features: {
       title: 'Funcionalidades',
       content:
-        '- 6 KPIs clicáveis no topo: Jobs Ativos, Solicitações/Briefings, Ações no PDV, Acordos Vigentes de Verba, Saldo de Verbas Ledger e Cotações Abertas.\n- Abas de cockpit: Visão Consolidada (JetroTable com jobs recentes), Marketing Enterprise Cockpit (ROI, CAC, CPL, canais), Trade Marketing Dashboard (ações por status e top fornecedores) e Verbas Ledger Cockpit.\n- Sincronização em tempo real via useRealtime em todas as coleções de marketing, trade e verbas com respeito ao seletor de empresa ativa (useBrand).',
+        '- 6 KPIs clicáveis no topo: Jobs Ativos, Solicitações/Briefings, Ações no PDV, Acordos Vigentes de Verba, Saldo de Verbas Ledger e Cotações Abertas.\n- Abas de cockpit: Visão Consolidada (JetroTable com jobs recentes), Marketing Enterprise Cockpit (ROI, CAC, CPL, canais), Trade Marketing Dashboard (ações por status e top fornecedores) e Verbas Ledger Cockpit.\n- Rastreamento e apropriação oficial de Verbas de Fornecedor conectadas à formação do Custo Médio Ponderado em `product_cost_history` quando classificadas como ajuste de custo de aquisição.\n- Sincronização em tempo real via useRealtime em todas as coleções de marketing, trade e verbas com respeito ao seletor de empresa ativa (useBrand).',
     },
     businessRules: {
       title: 'Regras de Negócio',
@@ -231,7 +231,7 @@ export const MARKETING_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     features: {
       title: 'Funcionalidades',
       content:
-        '- Aba 1 (Gestão de Acordos): Criação e monitoramento de contratos de verba cooperada (percentual sobre compras, valor fixo, bonificação de safra).\n- Aba 2 (Conta Corrente): Extrato financeiro oficial de débitos e créditos com saldo consolidado por fornecedor.\n- Aba 3 (Aplicação em Produtos): Vinculação de saldo de verba para custeio de descontos em itens reais do cadastro de produtos.\n- Aba 4 (Apurações): Motor de apuração automática cruzando notas fiscais de entrada de compras com as regras pactuadas nos acordos.\n- Aba 5 (Prestação / Liquidação): Fechamento de contas, encontro de contas com duplicatas a pagar ou emissão de nota de débito.',
+        '- Aba 1 (Gestão de Acordos): Criação e monitoramento de contratos de verba cooperada (percentual sobre compras, valor fixo, bonificação de safra).\n- Aba 2 (Conta Corrente): Extrato financeiro oficial de débitos e créditos com saldo consolidado por fornecedor.\n- Aba 3 (Aplicação em Produtos): Vinculação de saldo de verba para custeio de descontos em itens reais do cadastro de produtos e integração com o motor de recálculo de custo em `product_cost_history`.\n- Aba 4 (Apurações): Motor de apuração automática cruzando notas fiscais de entrada de compras com as regras pactuadas nos acordos.\n- Aba 5 (Prestação / Liquidação): Fechamento de contas, encontro de contas com duplicatas a pagar ou emissão de nota de débito.',
     },
     businessRules: {
       title: 'Regras de Negócio',

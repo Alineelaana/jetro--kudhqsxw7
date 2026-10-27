@@ -45,6 +45,22 @@ export async function getNextUserCodigo(): Promise<number> {
 }
 
 export async function createUser(data: CreateUserData): Promise<void> {
+  // Validação prévia de senha mínima
+  if (!data.password || data.password.length < 8) {
+    throw new UserCreateError('A senha deve ter no mínimo 8 caracteres.', {
+      field: 'password',
+    })
+  }
+
+  // Validação prévia de tamanho de avatar (máximo 2MB)
+  if (data.avatar && data.avatar instanceof File && data.avatar.size > 2 * 1024 * 1024) {
+    const sizeMb = (data.avatar.size / (1024 * 1024)).toFixed(1)
+    throw new UserCreateError(
+      `A foto de perfil excede o limite de 2MB (arquivo selecionado: ${sizeMb}MB). Escolha uma imagem menor.`,
+      { field: 'avatar' },
+    )
+  }
+
   const recordData: Record<string, unknown> = {
     name: data.name,
     email: data.email,
@@ -53,7 +69,6 @@ export async function createUser(data: CreateUserData): Promise<void> {
     role: data.role,
     cpf: data.cpf || '',
     active: data.active !== undefined ? data.active : true,
-    verified: true, // Usuários criados pelo gestor já nascem verificados
     inactivity_timeout_minutes:
       typeof data.inactivity_timeout_minutes === 'number' && data.inactivity_timeout_minutes > 0
         ? data.inactivity_timeout_minutes
@@ -129,8 +144,43 @@ export async function createUser(data: CreateUserData): Promise<void> {
       })
     }
 
-    const fallbackMsg = err?.message || 'Erro ao criar usuário. Tente novamente.'
-    throw new UserCreateError(fallbackMsg, {
+    // Extrair mensagens detalhadas campo a campo do PocketBase
+    const errorDetails: string[] = []
+    if (responseData && typeof responseData === 'object') {
+      for (const [fKey, fVal] of Object.entries(responseData)) {
+        if (fVal && typeof fVal === 'object' && 'message' in (fVal as any)) {
+          const fieldLabel =
+            fKey === 'password'
+              ? 'Senha'
+              : fKey === 'email'
+                ? 'E-mail'
+                : fKey === 'name'
+                  ? 'Nome'
+                  : fKey === 'login'
+                    ? 'Login'
+                    : fKey === 'cpf'
+                      ? 'CPF'
+                      : fKey === 'avatar'
+                        ? 'Foto de Perfil'
+                        : fKey
+          errorDetails.push(`${fieldLabel}: ${(fVal as any).message}`)
+        }
+      }
+    }
+
+    const detailedMsg =
+      errorDetails.length > 0
+        ? errorDetails.join(' | ')
+        : err?.response?.message || err?.message || 'Erro ao criar usuário. Tente novamente.'
+
+    console.error('[createUser] Falha ao criar usuário:', {
+      status: err?.status,
+      message: err?.message,
+      data: responseData,
+      details: detailedMsg,
+    })
+
+    throw new UserCreateError(detailedMsg, {
       response: err?.response,
     })
   }

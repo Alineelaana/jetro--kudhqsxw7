@@ -941,7 +941,20 @@ export function UserManagement() {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => setAvatar(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null
+                      if (file && file.size > 2 * 1024 * 1024) {
+                        const sizeMb = (file.size / (1024 * 1024)).toFixed(1)
+                        setError(
+                          `A foto selecionada excede o limite de 2MB (${sizeMb}MB). Escolha uma imagem menor.`,
+                        )
+                        setAvatar(null)
+                        e.target.value = ''
+                        return
+                      }
+                      setError('')
+                      setAvatar(file)
+                    }}
                   />
                 </label>
                 {avatar && (
@@ -950,8 +963,10 @@ export function UserManagement() {
                   </Button>
                 )}
               </div>
+              <p className="text-[11px] text-muted-foreground">
+                Formatos aceitos: JPG, PNG, WebP. Tamanho máximo recomendado: 2MB.
+              </p>
             </div>
-
             {error && (
               <p className="text-sm text-destructive col-span-full flex items-center gap-1">
                 <AlertCircle className="w-4 h-4" />
