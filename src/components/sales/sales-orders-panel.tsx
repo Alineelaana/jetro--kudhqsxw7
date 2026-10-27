@@ -12,7 +12,7 @@ import {
 import { getSalesOrders, updateSalesOrder, deleteSalesOrder, logSalesAudit } from '@/services/sales'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
-import { SalesOrderDialog } from '@/components/sales/sales-order-dialog'
+import { SalesOrderStandardEditor } from '@/components/orders/sales-order-standard-editor'
 import { SALES_ORDER_STATUS, STATUS_COLORS, type SalesOrder } from '@/lib/sales-types'
 import { JetroTable, type JetroColumnDef } from '@/components/jetro-table'
 import { Plus, Search, Pencil, Loader2, FileText, X, Copy, Printer, Package } from 'lucide-react'
@@ -277,7 +277,7 @@ export function SalesOrdersPanel() {
           exportFilename="pedidos-venda-jetro.xlsx"
         />
       )}
-      <SalesOrderDialog
+      <SalesOrderStandardEditor
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         order={editing}
