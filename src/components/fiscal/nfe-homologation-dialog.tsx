@@ -111,8 +111,12 @@ export function NfeHomologationDialog({
 
     const runEngine = async () => {
       try {
-        const emp = empresasDisponiveis.find((e) => e.id === selectedEmpresaId)
-        const ufEmit = emp?.estado || emp?.uf || 'SP'
+        const emp = empresasDisponiveis.find((e) => e.id === selectedEmpresaId) as
+          | (Record<string, any> & { code?: string; name?: string })
+          | undefined
+        const ufEmit = (emp?.estado ||
+          emp?.uf ||
+          (emp?.code?.includes('DEC-ELDORADO') ? 'ES' : 'SP')) as string
 
         const [ops, rls] = await Promise.all([
           pb.collection('fiscal_operations').getFullList({ filter: 'ativa = true' }),

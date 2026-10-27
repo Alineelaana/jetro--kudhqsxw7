@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Calculator,
   Play,
@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   ChevronDown,
   ChevronUp,
+  Layers,
 } from 'lucide-react'
 import pb from '@/lib/pocketbase/client'
 import { Button } from '@/components/ui/button'

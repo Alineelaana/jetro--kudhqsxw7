@@ -429,7 +429,7 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     features: {
       title: 'Funcionalidades',
       content:
-        '- Gestão das Operações Comerciais (CGO) com código mnemônico, nome amigável e descrição;\n- Vinculação ao Grupo Gerencial (Camada 1): Vendas, Devoluções, Transferências, Perdas, Remessas e Outros;\n- Configuração explícita de Efeitos Operacionais: estoque (baixa/entrada/reserva/nenhum), financeiro (gera a receber/a pagar/nenhum), pontuação para comissão comercial e contabilização patrimonial;\n- Marcação de "Movimento Comercial Real" para evitar dupla contagem de faturamento e impedir que transferências entre estabelecimentos sejam computadas como vendas;\n- Associação de Finalidade de NF-e (Normal, Complementar, Ajuste, Devolução);\n- Escopo multiempresa (compartilhado ou restrito por empresa/filial).',
+        '- Gestão das Operações Comerciais (CGO) com código mnemônico, nome amigável e descrição;\n- Vinculação ao Grupo Gerencial (Camada 1): Vendas, Devoluções, Transferências, Perdas, Remessas e Outros;\n- Configuração explícita de Efeitos Operacionais: estoque (baixa/entrada/reserva/nenhum), financeiro (gera a receber/a pagar/nenhum), pontuação para comissão comercial e contabilização patrimonial;\n- Marcação de "Movimento Comercial Real" para evitar dupla contagem de faturamento e impedir que transferências entre estabelecimentos sejam computadas como vendas;\n- Associação de Finalidade de NF-e (Normal, Complementar, Ajuste, Devolução);\n- Escopo multiempresa (compartilhado ou restrito por empresa/filial).\n- Filtros por grupo gerencial, pesquisa por código/nome e status ativo/inativo.',
     },
     businessRules: {
       title: 'Regras de Negócio',
@@ -484,12 +484,12 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     features: {
       title: 'Funcionalidades',
       content:
-        '- CRUD completo das regras fiscais da matriz com escopo por empresa/filial, vigência e prioridade;\n- Suporte multiempresa: procedência relativa à emitente (o mesmo produto pode ser fabricação própria na Gran Romano e revenda de terceiros na Dec Eldorado);\n- Alerta explícito de Exemplo Didático: as regras-semente (5.101, 5.102, 6.101, 6.102) são didáticas e necessitam validação do responsável fiscal;\n- Monitor proativo de Conflitos e Ambiguidade: identifica regras ativas com mesma prioridade propondo CFOPs divergentes;\n- Histórico de versões das regras (imutabilidade cadastral para documentos antigos).',
+        '- CRUD completo das regras fiscais da matriz com escopo por empresa/filial, vigência e prioridade;\n- Suporte multiempresa: procedência relativa à emitente (o mesmo produto pode ser fabricação própria na Gran Romano e revenda de terceiros na Dec Eldorado);\n- Alerta explícito de Exemplo Didático: as regras-semente (5.101, 5.102, 6.101, 6.102) são didáticas e necessitam validação do responsável fiscal;\n- Ação de "Validar Regra Fiscal" que registra usuário e data/hora da validação formal;\n- Monitor proativo de Conflitos e Ambiguidade: identifica regras ativas com mesma prioridade propondo CFOPs divergentes;\n- Histórico de versões das regras (imutabilidade cadastral para documentos antigos);\n- Filtros por operação, procedência, destino e status de validação fiscal.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Resolução de CFOP estritamente POR ITEM, nunca atributo global fixo do produto.\n- Bloqueio de Ambiguidade: se nenhuma regra corresponder ou houver regras conflitantes de mesma prioridade, a emissão da NF-e é travada até correção da configuração.\n- Exceções manuais exigem autorização por perfil gestor com justificativa gravada na coleção `fiscal_rule_exceptions`.\n- As regras-semente 5.101/5.102/6.101/6.102 são exemplos didáticos e exigem conferência fiscal antes de homologação definitiva.',
+        '- Resolução de CFOP estritamente POR ITEM, nunca atributo global fixo do produto.\n- Bloqueio de Ambiguidade: se nenhuma regra corresponder ou houver regras conflitantes de mesma prioridade, a emissão da NF-e é travada até correção da configuração.\n- Exceções manuais exigem autorização por perfil gestor com justificativa gravada na coleção `fiscal_rule_exceptions`.\n- As regras-semente 5.101/5.102/6.101/6.102 são exemplos didáticos e exigem conferência e homologação pelo responsável fiscal antes do faturamento em produção.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
@@ -534,17 +534,17 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     objective: {
       title: 'Objetivo',
       content:
-        'Disponibilizar aos usuários fiscais, comerciais e gerentes ferramenta interativa de simulação em tempo real do motor de CFOP, demonstrando a decisão comercial única gerando CFOPs diferenciados por item conforme a procedência e o destino, acompanhados da explicação da regra e indicação de eventuais bloqueios.',
+        'Disponibilizar aos usuários fiscais, comerciais e gerentes ferramenta interativa de simulação em tempo real do motor de determinação de CFOP por item, demonstrando a decisão comercial única gerando CFOPs diferenciados por item conforme a procedência na empresa emitente e o destino da operação, acompanhados da explicação auditável da regra e do apontamento visual de bloqueios.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Seleção da operação comercial CGO, empresa emitente, UF de destino e data de competência;\n- Grade de múltiplos itens com configuração individual de procedência (fabricação própria vs mercadoria de terceiros);\n- Exibição do CFOP resultante por item com a explicação exata da regra aplicada;\n- Apontamento visual de travas e ambiguidades (regras inexistentes ou conflitantes);\n- Demonstração prática do exemplo didático do documento HURAM (5.101/6.101 para produção própria e 5.102/6.102 para revenda).',
+        '- Seleção da operação comercial CGO, empresa emitente, UF de emitente, UF de destino e data de competência;\n- Grade dinâmica de múltiplos itens com configuração individual de procedência (fabricação própria vs mercadoria de terceiros), quantidade e valor unitário;\n- Exibição do CFOP resultante por item com a explicação exata da regra aplicada e destaque se é exemplo didático a validar;\n- Apontamento visual de travas e ambiguidades (regras inexistentes ou conflitantes);\n- Botão de pré-carregamento com o exemplo didático do documento HURAM (Item 1 Gran Romano fabricação própria 5.101/6.101 e Item 2 Dec Eldorado revenda de terceiros 5.102/6.102).',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Simula fielmente as condições de emissão do backend sem persistir rascunhos desnecessários.\n- Permite antecipar o enquadramento fiscal antes da geração e transmissão da nota fiscal.\n- Demonstra que uma mudança fiscal na matriz não requer criação de novas operações para os vendedores.',
+        '- Simula fielmente as condições de emissão do backend sem persistir rascunhos desnecessários.\n- Permite antecipar o enquadramento fiscal antes da geração e transmissão da nota fiscal.\n- Resolução estrita por item: itens no mesmo documento podem receber CFOPs diferentes baseados na procedência para a empresa emitente.\n- Demonstra que uma mudança fiscal na matriz não requer criação de novas operações para os vendedores.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',

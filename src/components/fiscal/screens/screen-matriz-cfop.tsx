@@ -34,7 +34,7 @@ import {
   FileSpreadsheet,
 } from 'lucide-react'
 import { useBrand } from '@/hooks/use-brand'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { toast } from '@/hooks/use-toast'
 import { FiscalCfopRule, FiscalOperation } from '@/lib/fiscal-cfop-engine'
 import { fiscalCfopService } from '@/lib/fiscal-cfop-service'
