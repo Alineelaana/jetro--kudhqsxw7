@@ -410,4 +410,169 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Alerta visual quando o período selecionado não possui dados consolidados para exibição.',
     },
   },
+
+  // -------------------------------------------------------------
+  // 8. OPERAÇÕES COMERCIAIS & FISCAIS (CGO)
+  // -------------------------------------------------------------
+  '/admin/fiscal/operacoes': {
+    route: '/admin/fiscal/operacoes',
+    title: 'Operações Comerciais & Fiscais (CGO)',
+    moduleGroup: 'Fiscal',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Implementar a Camada 2 da Arquitetura HURAM de Operações e CFOP: permitir que o vendedor ou operador comercial escolha a operação de negócio UMA ÚNICA VEZ (Venda Normal, Bonificação, Devolução, Transferência, etc.), definindo os efeitos de processo (estoque, financeiro, comissões e contabilização) sem multiplicar opções comerciais para atender exigências fiscais.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Gestão das Operações Comerciais (CGO) com código mnemônico, nome amigável e descrição;\n- Vinculação ao Grupo Gerencial (Camada 1): Vendas, Devoluções, Transferências, Perdas, Remessas e Outros;\n- Configuração explícita de Efeitos Operacionais: estoque (baixa/entrada/reserva/nenhum), financeiro (gera a receber/a pagar/nenhum), pontuação para comissão comercial e contabilização patrimonial;\n- Marcação de "Movimento Comercial Real" para evitar dupla contagem de faturamento e impedir que transferências entre estabelecimentos sejam computadas como vendas;\n- Associação de Finalidade de NF-e (Normal, Complementar, Ajuste, Devolução);\n- Escopo multiempresa (compartilhado ou restrito por empresa/filial).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- O vendedor escolhe a operação uma vez. Variações de CFOP NÃO geram novas operações comerciais.\n- Transferência entre estabelecimentos NÃO é venda comercial.\n- Venda e Venda para entrega futura podem pertencer ao mesmo grupo Vendas sem compartilhar o mesmo fluxo operacional.\n- Documentos já emitidos ou antigos NUNCA são recalculados retroativamente por alteração cadastral.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O responsável fiscal cadastra ou ajusta a operação comercial definindo seus efeitos operacionais.\n2. Na emissão de pedido ou NF-e, o usuário seleciona a operação comercial.\n3. O sistema despacha a resolução fiscal para a Matriz de CFOP.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content: '- Coleção PocketBase: `fiscal_operations`.\n- Hooks: `useBrand`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Emissão de NF-e em homologação e produção.\n- Módulo de Pedidos e Comercial.\n- Matriz Fiscal de Determinação de CFOP.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Leitura: todos os usuários comerciais e fiscais.\n- Criação/Edição: perfis FISCAL, ADMIN e SUP.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: '- Componentes: `ScreenOperacoesCgo`.\n- Serviços: `@/lib/fiscal-cfop-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Bloqueio de código duplicado e validação de preenchimento dos efeitos operacionais obrigatórios.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 9. MATRIZ FISCAL DE CFOP
+  // -------------------------------------------------------------
+  '/admin/fiscal/matriz-cfop': {
+    route: '/admin/fiscal/matriz-cfop',
+    title: 'Matriz Fiscal de CFOP',
+    moduleGroup: 'Fiscal',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Implementar a Camada 3 da Arquitetura HURAM: motor e matriz de determinação fiscal de CFOP por item, cruzando operação comercial, empresa emitente, procedência da mercadoria nesta empresa, UF de destino, vigência e prioridade, com transparência auditável da regra aplicada e bloqueio estrito de ambiguidades.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- CRUD completo das regras fiscais da matriz com escopo por empresa/filial, vigência e prioridade;\n- Suporte multiempresa: procedência relativa à emitente (o mesmo produto pode ser fabricação própria na Gran Romano e revenda de terceiros na Dec Eldorado);\n- Alerta explícito de Exemplo Didático: as regras-semente (5.101, 5.102, 6.101, 6.102) são didáticas e necessitam validação do responsável fiscal;\n- Monitor proativo de Conflitos e Ambiguidade: identifica regras ativas com mesma prioridade propondo CFOPs divergentes;\n- Histórico de versões das regras (imutabilidade cadastral para documentos antigos).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Resolução de CFOP estritamente POR ITEM, nunca atributo global fixo do produto.\n- Bloqueio de Ambiguidade: se nenhuma regra corresponder ou houver regras conflitantes de mesma prioridade, a emissão da NF-e é travada até correção da configuração.\n- Exceções manuais exigem autorização por perfil gestor com justificativa gravada na coleção `fiscal_rule_exceptions`.\n- As regras-semente 5.101/5.102/6.101/6.102 são exemplos didáticos e exigem conferência fiscal antes de homologação definitiva.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O responsável fiscal modela as regras por procedência e destino.\n2. O sistema avalia a prioridade e detecta eventuais sobreposições.\n3. O responsável valida formalmente cada regra como apta para faturamento.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `fiscal_cfop_rules`, `fiscal_operations`, `fiscal_rule_exceptions`.\n- Hooks: `useBrand`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Motor de Determinação Fiscal (`@/lib/fiscal-cfop-engine`).\n- Emissão de NF-e em Homologação (`NfeHomologationDialog`).\n- Simulador Fiscal Auditável.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- Exclusivo para perfis FISCAL, ADMIN e SUP.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: '- Componentes: `ScreenMatrizCfop`.\n- Serviços: `@/lib/fiscal-cfop-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Destaque visual vermelho de bloqueio de ambiguidade e mensagens claras de inconformidade.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 10. SIMULADOR DE CFOP POR ITEM
+  // -------------------------------------------------------------
+  '/admin/fiscal/simulador-cfop': {
+    route: '/admin/fiscal/simulador-cfop',
+    title: 'Simulador de CFOP por Item',
+    moduleGroup: 'Fiscal',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Disponibilizar aos usuários fiscais, comerciais e gerentes ferramenta interativa de simulação em tempo real do motor de CFOP, demonstrando a decisão comercial única gerando CFOPs diferenciados por item conforme a procedência e o destino, acompanhados da explicação da regra e indicação de eventuais bloqueios.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Seleção da operação comercial CGO, empresa emitente, UF de destino e data de competência;\n- Grade de múltiplos itens com configuração individual de procedência (fabricação própria vs mercadoria de terceiros);\n- Exibição do CFOP resultante por item com a explicação exata da regra aplicada;\n- Apontamento visual de travas e ambiguidades (regras inexistentes ou conflitantes);\n- Demonstração prática do exemplo didático do documento HURAM (5.101/6.101 para produção própria e 5.102/6.102 para revenda).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Simula fielmente as condições de emissão do backend sem persistir rascunhos desnecessários.\n- Permite antecipar o enquadramento fiscal antes da geração e transmissão da nota fiscal.\n- Demonstra que uma mudança fiscal na matriz não requer criação de novas operações para os vendedores.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário seleciona a operação comercial desejada.\n2. Insere os itens e parametriza suas procedências nesta empresa emitente.\n3. Clica em "Simular Resolução de CFOP".\n4. O motor avalia a matriz e exibe os CFOPs resolvidos com a explicação auditável de cada um.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `fiscal_operations`, `fiscal_cfop_rules`.\n- Motor: `evaluateCfopMatrix`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: '- Motor Fiscal da Matriz de CFOP.\n- Módulo de Emissão de NF-e.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso liberado a usuários comerciais, faturamento, fiscal e gerência (`canViewFiscal(role)`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: '- Componentes: `ScreenSimuladorCfop`.\n- Serviços: `@/lib/fiscal-cfop-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Identificação imediata de operações inativas ou regras desatualizadas com exibição do motivo do bloqueio em painel destacado.',
+    },
+  },
 }

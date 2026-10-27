@@ -46,6 +46,13 @@ export function FiscalAuditSimulator({
   const [operacao, setOperacao] = useState<
     'venda_interna' | 'venda_interestadual' | 'entrada_compra' | 'devolucao' | 'bonificacao'
   >('venda_interna')
+  const [operacaoCgo, setOperacaoCgo] = useState('VENDA_NORMAL')
+  const [procedenciaItem, setProcedenciaItem] = useState<
+    'producao_propria' | 'mercadoria_terceiros'
+  >('producao_propria')
+  const [cgoList, setCgoList] = useState<any[]>([])
+  const [cfopDeterminado, setCfopDeterminado] = useState<string>('5101')
+  const [cfopExplicacao, setCfopExplicacao] = useState<string>('')
   const [ufOrigem, setUfOrigem] = useState('ES')
   const [ufDestino, setUfDestino] = useState('ES')
   const [quantidade, setQuantidade] = useState('1')
@@ -58,6 +65,66 @@ export function FiscalAuditSimulator({
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [showMemory, setShowMemory] = useState(true)
+
+  // Carrega operações de negócio (CGO) e resolve CFOP integrado
+  useEffect(() => {
+    pb.collection('fiscal_operations')
+      .getFullList({ filter: 'ativa = true', sort: 'codigo' })
+      .then((ops) => setCgoList(ops))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    const resolveCfop = async () => {
+      try {
+        const [ops, rls] = await Promise.all([
+          pb.collection('fiscal_operations').getFullList({ filter: 'ativa = true' }),
+          pb.collection('fiscal_cfop_rules').getFullList({ filter: 'ativa = true' }),
+        ])
+        const { evaluateCfopMatrix } = await import('@/lib/fiscal-cfop-engine')
+        const out = evaluateCfopMatrix(
+          {
+            operacao_codigo: operacaoCgo,
+            empresa_id: empresaId,
+            uf_emitente: ufOrigem,
+            uf_destinatario: operacao === 'venda_interna' ? ufOrigem : ufDestino,
+            itens: [
+              {
+                descricao: productName,
+                procedencia: procedenciaItem,
+                quantidade: Number(quantidade) || 1,
+                valor_unitario: Number(valorUnitario) || 100,
+              },
+            ],
+          },
+          ops as any,
+          rls as any,
+        )
+        if (!active) return
+        if (out.itens[0]?.cfop) {
+          setCfopDeterminado(out.itens[0].cfop)
+          setCfopExplicacao(out.itens[0].explicacao)
+        }
+      } catch (e) {
+        console.error('Falha ao resolver CFOP no simulador:', e)
+      }
+    }
+    resolveCfop()
+    return () => {
+      active = false
+    }
+  }, [
+    operacaoCgo,
+    empresaId,
+    ufOrigem,
+    ufDestino,
+    operacao,
+    procedenciaItem,
+    productName,
+    quantidade,
+    valorUnitario,
+  ])
 
   const handleSimular = async () => {
     if (!productId || !empresaId) {
@@ -164,6 +231,67 @@ export function FiscalAuditSimulator({
       </CardHeader>
 
       <CardContent className="p-4 space-y-4">
+        {/* Camada de CFOP e Operação Comercial (CGO) HURAM */}
+        <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-lg space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5 uppercase">
+              <Layers className="w-3.5 h-3.5 text-[#005B2E]" /> Determinação de CFOP por Item
+              (Matriz HURAM)
+            </span>
+            <Badge
+              variant="outline"
+              className="border-emerald-300 text-emerald-800 text-[10px] font-bold"
+            >
+              CFOP Resolvido: {cfopDeterminado}
+            </Badge>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div className="space-y-1">
+              <Label className="text-[11px] font-semibold text-muted-foreground">
+                Operação Comercial (CGO)
+              </Label>
+              <Select value={operacaoCgo} onValueChange={setOperacaoCgo}>
+                <SelectTrigger className="h-8 text-xs font-semibold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {cgoList.map((op) => (
+                    <SelectItem key={op.codigo} value={op.codigo}>
+                      {op.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-[11px] font-semibold text-muted-foreground">
+                Procedência nesta Empresa
+              </Label>
+              <Select value={procedenciaItem} onValueChange={(v: any) => setProcedenciaItem(v)}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="producao_propria">Produção Própria (Fábrica)</SelectItem>
+                  <SelectItem value="mercadoria_terceiros">
+                    Mercadoria de Terceiros (Revenda)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-[11px] font-semibold text-muted-foreground">
+                Explicação da Regra
+              </Label>
+              <div className="text-[11px] font-medium text-emerald-900 bg-white/80 p-1.5 rounded border border-emerald-100 truncate">
+                {cfopExplicacao || 'CFOP determinado pela matriz fiscal'}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Parâmetros do Cenário */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-muted/10 p-3 rounded-lg border border-border/60">
           <div className="space-y-1">

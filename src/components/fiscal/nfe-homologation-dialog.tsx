@@ -63,10 +63,19 @@ export function NfeHomologationDialog({
   const [destUf, setDestUf] = useState('ES')
   const [destCidade, setDestCidade] = useState('SERRA')
 
+  // Operação Comercial (CGO) e Procedência do Item
+  const [operacaoCodigo, setOperacaoCodigo] = useState('VENDA_NORMAL')
+  const [itemProcedencia, setItemProcedencia] = useState<
+    'producao_propria' | 'mercadoria_terceiros'
+  >('producao_propria')
+  const [operationsList, setOperationsList] = useState<any[]>([])
+
   // Itens
   const [itemDesc, setItemDesc] = useState('GRANITO PRETO SAO GABRIEL POLIDO')
   const [itemNcm, setItemNcm] = useState('68029390')
-  const [itemCfop, setItemCfop] = useState('5102')
+  const [itemCfop, setItemCfop] = useState('5101')
+  const [cfopExplicacao, setCfopExplicacao] = useState('')
+  const [cfopBloqueio, setCfopBloqueio] = useState<string | null>(null)
   const [itemQtd, setItemQtd] = useState('10')
   const [itemVUn, setItemVUn] = useState('150.00')
 
@@ -87,13 +96,87 @@ export function NfeHomologationDialog({
       setResult(null)
       setSefazTransmissionError(null)
       setViewXml(false)
+
+      pb.collection('fiscal_operations')
+        .getFullList({ filter: 'ativa = true', sort: 'codigo' })
+        .then((ops) => setOperationsList(ops))
+        .catch(() => {})
     }
   }, [open, empresaAtivaId, empresasDisponiveis])
+
+  // Resolução automática do CFOP pelo Motor Fiscal da Matriz
+  useEffect(() => {
+    if (!open) return
+    let active = true
+
+    const runEngine = async () => {
+      try {
+        const emp = empresasDisponiveis.find((e) => e.id === selectedEmpresaId)
+        const ufEmit = emp?.estado || emp?.uf || 'SP'
+
+        const [ops, rls] = await Promise.all([
+          pb.collection('fiscal_operations').getFullList({ filter: 'ativa = true' }),
+          pb.collection('fiscal_cfop_rules').getFullList({ filter: 'ativa = true' }),
+        ])
+
+        const { evaluateCfopMatrix } = await import('@/lib/fiscal-cfop-engine')
+        const out = evaluateCfopMatrix(
+          {
+            operacao_codigo: operacaoCodigo,
+            empresa_id: selectedEmpresaId,
+            uf_emitente: ufEmit,
+            uf_destinatario: destUf,
+            itens: [
+              {
+                descricao: itemDesc,
+                procedencia: itemProcedencia,
+                quantidade: Number(itemQtd) || 1,
+                valor_unitario: Number(itemVUn) || 100,
+              },
+            ],
+          },
+          ops as any,
+          rls as any,
+        )
+
+        if (!active) return
+
+        if (out.tem_bloqueio) {
+          setCfopBloqueio(out.motivo_bloqueio || 'Regra não encontrada')
+          setItemCfop('')
+          setCfopExplicacao('')
+        } else {
+          setCfopBloqueio(null)
+          const first = out.itens[0]
+          if (first && first.cfop) {
+            setItemCfop(first.cfop)
+            setCfopExplicacao(first.explicacao)
+          }
+        }
+      } catch (err: any) {
+        console.error('Falha na determinação fiscal de CFOP:', err)
+      }
+    }
+
+    runEngine()
+    return () => {
+      active = false
+    }
+  }, [open, selectedEmpresaId, operacaoCodigo, destUf, itemProcedencia, itemDesc, itemQtd, itemVUn])
 
   const handleGenerate = async () => {
     if (!selectedEmpresaId) {
       toast({
         title: 'Selecione a empresa emissora',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (cfopBloqueio || !itemCfop) {
+      toast({
+        title: 'Emissão bloqueada pela Matriz Fiscal',
+        description: cfopBloqueio || 'Nenhum CFOP válido para a operação/item selecionado.',
         variant: 'destructive',
       })
       return
@@ -275,7 +358,23 @@ export function NfeHomologationDialog({
               </Select>
             </div>
 
-            <div className="space-y-1 md:col-span-2">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">Operação (CGO Comercial)</Label>
+              <Select value={operacaoCodigo} onValueChange={setOperacaoCodigo}>
+                <SelectTrigger className="h-8 text-xs font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {operationsList.map((op) => (
+                    <SelectItem key={op.codigo} value={op.codigo}>
+                      {op.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
               <Label className="text-xs font-semibold">Natureza da Operação</Label>
               <Input
                 value={naturezaOperacao}
@@ -326,17 +425,27 @@ export function NfeHomologationDialog({
                   placeholder="Descrição do Produto"
                   className="h-8 text-xs"
                 />
-                <div className="grid grid-cols-4 gap-1.5">
+                <div className="grid grid-cols-5 gap-1.5">
+                  <div className="col-span-2">
+                    <Select
+                      value={itemProcedencia}
+                      onValueChange={(v: any) => setItemProcedencia(v)}
+                    >
+                      <SelectTrigger className="h-8 text-[11px]">
+                        <SelectValue placeholder="Procedência" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="producao_propria">Fabricação Própria</SelectItem>
+                        <SelectItem value="mercadoria_terceiros">
+                          Mercadoria Terceiros (Revenda)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Input
                     value={itemNcm}
                     onChange={(e) => setItemNcm(e.target.value)}
                     placeholder="NCM"
-                    className="h-8 text-xs font-mono"
-                  />
-                  <Input
-                    value={itemCfop}
-                    onChange={(e) => setItemCfop(e.target.value)}
-                    placeholder="CFOP"
                     className="h-8 text-xs font-mono"
                   />
                   <Input
@@ -352,6 +461,27 @@ export function NfeHomologationDialog({
                     className="h-8 text-xs font-mono font-bold"
                   />
                 </div>
+
+                {/* Box de CFOP Resolvido pelo Motor ou Bloqueio de Ambiguidade */}
+                {cfopBloqueio ? (
+                  <div className="p-2 bg-rose-50 border border-rose-300 rounded text-[11px] text-rose-800 font-semibold flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>Bloqueio: {cfopBloqueio}</span>
+                  </div>
+                ) : (
+                  <div className="p-2 bg-emerald-50 border border-emerald-200 rounded text-[11px] text-emerald-900 flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-[#005B2E]">CFOP {itemCfop}:</span>{' '}
+                      <span className="text-[10px] text-muted-foreground">{cfopExplicacao}</span>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="border-emerald-300 text-emerald-800 text-[10px]"
+                    >
+                      Resolvido pela Matriz
+                    </Badge>
+                  </div>
+                )}
               </div>
             </div>
           </div>

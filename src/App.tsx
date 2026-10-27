@@ -1226,7 +1226,7 @@ const App = () => (
                                   }
                                 />
                                 <Route path="/admin/conformidade" element={<Conformidade />} />
-                                {/* Módulo Fiscal (7 Telas Oficiais) */}
+                                {/* Módulo Fiscal (Telas Oficiais com Arquitetura de CFOP e CGO) */}
                                 <Route path="/admin/fiscal" element={<Fiscal />} />
                                 <Route path="/admin/fiscal/central" element={<Fiscal />} />
                                 <Route path="/admin/fiscal/documentos" element={<Fiscal />} />
@@ -1238,6 +1238,9 @@ const App = () => (
                                 />
                                 <Route path="/admin/fiscal/compras-entradas" element={<Fiscal />} />
                                 <Route path="/admin/fiscal/relatorios" element={<Fiscal />} />
+                                <Route path="/admin/fiscal/operacoes" element={<Fiscal />} />
+                                <Route path="/admin/fiscal/matriz-cfop" element={<Fiscal />} />
+                                <Route path="/admin/fiscal/simulador-cfop" element={<Fiscal />} />
 
                                 {/* Redirecionamentos de Rotas Antigas do Módulo Fiscal */}
                                 <Route

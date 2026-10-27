@@ -7,6 +7,9 @@ import {
   ScreenCertificadosConfiguracoes,
   ScreenComprasEntradas,
   ScreenRelatoriosFiscais,
+  ScreenOperacoesCgo,
+  ScreenMatrizCfop,
+  ScreenSimuladorCfop,
 } from '@/components/fiscal/screens'
 
 export function Fiscal() {
@@ -88,6 +91,27 @@ export function Fiscal() {
   // 7. Relatórios Fiscais (Livros e Registros, Comparativos, Exportações)
   if (pathname === '/admin/fiscal/relatorios' || pathname.startsWith('/admin/fiscal/relatorios/')) {
     return <ScreenRelatoriosFiscais />
+  }
+
+  // 8. Operações Comerciais & Fiscais (CGO)
+  if (pathname === '/admin/fiscal/operacoes' || pathname.startsWith('/admin/fiscal/operacoes/')) {
+    return <ScreenOperacoesCgo />
+  }
+
+  // 9. Matriz de CFOP
+  if (
+    pathname === '/admin/fiscal/matriz-cfop' ||
+    pathname.startsWith('/admin/fiscal/matriz-cfop/')
+  ) {
+    return <ScreenMatrizCfop />
+  }
+
+  // 10. Simulador de CFOP por Item
+  if (
+    pathname === '/admin/fiscal/simulador-cfop' ||
+    pathname.startsWith('/admin/fiscal/simulador-cfop/')
+  ) {
+    return <ScreenSimuladorCfop />
   }
 
   // Fallback padrão: Central Fiscal
