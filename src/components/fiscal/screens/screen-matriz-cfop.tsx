@@ -886,7 +886,7 @@ export function ScreenMatrizCfop() {
                               className="bg-amber-50 text-amber-900 border-amber-300 text-[10px] font-bold gap-1 shadow-sm"
                             >
                               <AlertTriangle className="w-3 h-3 text-amber-600" />
-                              Aguarda ativação
+                              Aguarda ativação pelo responsável fiscal
                             </Badge>
                             <span className="block text-[9px] text-muted-foreground font-medium">
                               Decisão do Resp. Fiscal
