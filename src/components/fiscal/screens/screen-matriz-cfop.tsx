@@ -30,20 +30,34 @@ import {
   Check,
   ShieldAlert,
   Info,
-  History,
-  FileSpreadsheet,
+  ShieldCheck,
+  Sparkles,
+  RefreshCw,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 import { useBrand } from '@/hooks/use-brand'
 import pb from '@/lib/pocketbase/client'
 import { toast } from '@/hooks/use-toast'
 import { FiscalCfopRule, FiscalOperation } from '@/lib/fiscal-cfop-engine'
 import { fiscalCfopService } from '@/lib/fiscal-cfop-service'
+import {
+  CfopValidationReport,
+  ValidationFinding,
+  validateFiscalCfopRules,
+} from '@/lib/fiscal-cfop-validator'
+import { formatCfopCode } from '@/lib/fiscal-cfop-table'
 
 export function ScreenMatrizCfop() {
   const { brand, empresasDisponiveis, empresaAtivaId } = useBrand()
   const [rules, setRules] = useState<FiscalCfopRule[]>([])
   const [operations, setOperations] = useState<FiscalOperation[]>([])
   const [loading, setLoading] = useState(true)
+  const [validating, setValidating] = useState(false)
+  const [validationReport, setValidationReport] = useState<CfopValidationReport | null>(null)
+  const [showValidationPanel, setShowValidationPanel] = useState(false)
+  const [filterSeverity, setFilterSeverity] = useState<'todos' | 'erro' | 'aviso' | 'info'>('todos')
   const [searchTerm, setSearchTerm] = useState('')
   const [filterOperacao, setFilterOperacao] = useState<string>('todas')
   const [filterDestino, setFilterDestino] = useState<string>('todos')
@@ -97,6 +111,9 @@ export function ScreenMatrizCfop() {
       ])
       setRules(rulesList)
       setOperations(opsList)
+      // Executa validação de background automática
+      const report = validateFiscalCfopRules(rulesList, opsList)
+      setValidationReport(report)
     } catch (err: any) {
       toast({
         title: 'Erro ao carregar matriz de CFOP',
@@ -112,26 +129,52 @@ export function ScreenMatrizCfop() {
     loadData()
   }, [])
 
-  // Detecção proativa de possíveis conflitos e ambiguidades
-  const conflictsDetected = useMemo(() => {
-    const map = new Map<string, FiscalCfopRule[]>()
-    rules.forEach((r) => {
-      if (!r.ativa) return
-      // Chave: operacao + empresa + procedencia + destino + prioridade
-      const key = `${r.operacao_codigo}_${r.empresa_id || 'COMP'}_${r.procedencia_item}_${r.destino_tipo}_${r.prioridade || 0}`
-      if (!map.has(key)) map.set(key, [])
-      map.get(key)!.push(r)
-    })
-
-    const conflicts: { key: string; rules: FiscalCfopRule[]; cfops: string[] }[] = []
-    map.forEach((list, key) => {
-      const distinctCfops = Array.from(new Set(list.map((i) => i.cfop_resultado)))
-      if (distinctCfops.length > 1) {
-        conflicts.push({ key, rules: list, cfops: distinctCfops })
+  const handleRunValidation = async () => {
+    setValidating(true)
+    try {
+      const report = await fiscalCfopService.runCfopRulesValidation(empresaAtivaId)
+      setValidationReport(report)
+      setShowValidationPanel(true)
+      if (report.is100PorcentoConsistente && report.totalAchados === 0) {
+        toast({
+          title: 'Validação Concluída: 100% Consistente!',
+          description: 'Nenhum erro, aviso ou inconsistência fiscal detectada.',
+        })
+      } else if (report.totalErros > 0) {
+        toast({
+          title: `Validação Concluída com ${report.totalErros} Inconsistência(s) Crítica(s)`,
+          description: 'Existem regras conflitantes ou com códigos incompatíveis.',
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Validação Concluída',
+          description: `Regras consistentes sem erros bloqueantes (${report.totalAvisos} aviso(s)).`,
+        })
       }
-    })
-    return conflicts
-  }, [rules])
+    } catch (err: any) {
+      toast({
+        title: 'Erro ao executar validação de regras',
+        description: err.message,
+        variant: 'destructive',
+      })
+    } finally {
+      setValidating(false)
+    }
+  }
+
+  // Verifica se uma regra específica é semente com validação oficial
+  const isRegraOficialValidada = (r: FiscalCfopRule) => {
+    const cfopNorm = r.cfop_resultado?.replace(/\D/g, '')
+    const isSemente =
+      ['5101', '5102', '6101', '6102'].includes(cfopNorm) && r.operacao_codigo === 'VENDA_NORMAL'
+    const temValidacaoOficial =
+      r.validado_responsavel_fiscal &&
+      (r.observacoes?.includes('Receita Federal') ||
+        r.validado_por?.includes('Receita Federal') ||
+        (isSemente && !r.is_exemplo_didatico))
+    return isSemente && temValidacaoOficial
+  }
 
   const filteredRules = useMemo(() => {
     return rules.filter((r) => {
@@ -150,6 +193,14 @@ export function ScreenMatrizCfop() {
       return matchesSearch && matchesOp && matchesDest && matchesEmpresa
     })
   }, [rules, searchTerm, filterOperacao, filterDestino, empresaAtivaId])
+
+  const filteredFindings = useMemo(() => {
+    if (!validationReport) return []
+    return validationReport.achados.filter((f) => {
+      if (filterSeverity === 'todos') return true
+      return f.gravidade === filterSeverity
+    })
+  }, [validationReport, filterSeverity])
 
   const handleOpenCreate = () => {
     setEditingRule(null)
@@ -194,7 +245,7 @@ export function ScreenMatrizCfop() {
       vigencia_inicio: rule.vigencia_inicio || '2026-01-01',
       vigencia_fim: rule.vigencia_fim || '',
       ativa: rule.ativa,
-      versao: (rule.versao || 1) + 1, // incrementa versão na edição
+      versao: (rule.versao || 1) + 1,
       explicacao_padrao: rule.explicacao_padrao || '',
       is_exemplo_didatico: Boolean(rule.is_exemplo_didatico),
       validado_responsavel_fiscal: Boolean(rule.validado_responsavel_fiscal),
@@ -262,7 +313,7 @@ export function ScreenMatrizCfop() {
 
   return (
     <div className="space-y-4">
-      {/* CABEÇALHO */}
+      {/* CABEÇALHO COM AÇÕES */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-[#005B2E] text-white shadow-sm">
@@ -293,65 +344,384 @@ export function ScreenMatrizCfop() {
           </div>
         </div>
 
-        <Button
-          onClick={handleOpenCreate}
-          className="bg-[#005B2E] hover:bg-[#004222] text-white font-bold text-xs gap-1.5 self-start md:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Nova Regra Fiscal
-        </Button>
+        <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
+          <Button
+            onClick={handleRunValidation}
+            disabled={validating}
+            variant="outline"
+            className="border-[#005B2E] text-[#005B2E] hover:bg-[#005B2E]/10 font-bold text-xs gap-1.5"
+          >
+            {validating ? (
+              <RefreshCw className="w-4 h-4 animate-spin text-[#005B2E]" />
+            ) : (
+              <ShieldCheck className="w-4 h-4 text-[#005B2E]" />
+            )}
+            Validar Regras
+          </Button>
+
+          <Button
+            onClick={handleOpenCreate}
+            className="bg-[#005B2E] hover:bg-[#004222] text-white font-bold text-xs gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            Nova Regra Fiscal
+          </Button>
+        </div>
       </div>
 
-      {/* AVISO MANDATÓRIO: EXEMPLO DIDÁTICO A VALIDAR PELO RESPONSÁVEL FISCAL */}
-      <Card className="border-2 border-amber-300 bg-amber-50/60">
-        <CardContent className="p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <h2 className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-              Aviso Importante: As regras-semente (5.101, 5.102, 6.101, 6.102, etc.) são EXEMPLO
-              DIDÁTICO a validar pelo Responsável Fiscal
-            </h2>
-            <p className="text-xs text-amber-900 leading-relaxed">
-              Conforme o documento de arquitetura HURAM, a matriz didática inicial de vendas comuns
-              não constitui enquadramento tributário final pronto para emissão contábil. Casos
-              especiais como consumidor final, substituição tributária (ST) e benefícios fiscais
-              estaduais (ES e SP) devem ser validados e complementados pelo responsável fiscal antes
-              da emissão definitiva.
+      {/* PAINEL DE VALIDAÇÃO AUTOMÁTICA DE CONSISTÊNCIA */}
+      {validationReport && (
+        <div className="space-y-3">
+          {/* Card Resumo do Status de Validação */}
+          {validationReport.is100PorcentoConsistente && validationReport.totalAchados === 0 ? (
+            <Card className="border-2 border-emerald-300 bg-emerald-50/70 shadow-sm">
+              <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-sm font-bold text-emerald-950 uppercase tracking-wide">
+                        Todas as regras estão consistentes
+                      </h2>
+                      <Badge className="bg-emerald-600 text-white font-mono text-[10px]">
+                        100% Consistente
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-emerald-900 mt-0.5">
+                      {validationReport.totalRegrasAtivas} regra(s) ativas avaliadas contra a tabela
+                      oficial da Receita Federal/SEFAZ. Nenhum código inválido, duplicidade,
+                      conflito de prioridade ou incoerência de procedência/destino detectado.
+                    </p>
+                    <span className="text-[11px] text-emerald-800/80 mt-1 block">
+                      Última validação executada em:{' '}
+                      {new Date(validationReport.executadoEm).toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowValidationPanel(!showValidationPanel)}
+                  className="border-emerald-300 text-emerald-900 hover:bg-emerald-100 text-xs shrink-0 self-end md:self-center gap-1"
+                >
+                  {showValidationPanel ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  {showValidationPanel ? 'Recolher Detalhes' : 'Ver Categorias'}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : validationReport.totalErros > 0 ? (
+            <Card className="border-2 border-rose-300 bg-rose-50/80 shadow-sm">
+              <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-rose-100 text-rose-700 shrink-0 mt-0.5">
+                    <ShieldAlert className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-sm font-bold text-rose-950 uppercase tracking-wide">
+                        Inconsistências Detectadas na Matriz ({validationReport.totalErros}{' '}
+                        Bloqueante(s))
+                      </h2>
+                      <Badge variant="destructive" className="font-mono text-[10px]">
+                        Bloqueio Ativo
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-rose-900 mt-0.5">
+                      Foram detectadas inconsistências que bloqueiam ou distorcem a emissão de notas
+                      fiscais (conflito de prioridade, CFOPs incompatíveis ou procedência
+                      incorreta).
+                    </p>
+                    <div className="flex items-center gap-3 text-[11px] text-rose-800 font-semibold mt-1">
+                      <span>Erros: {validationReport.totalErros}</span>
+                      <span>Avisos: {validationReport.totalAvisos}</span>
+                      <span>Info: {validationReport.totalInfo}</span>
+                      <span className="font-normal text-muted-foreground">
+                        | Validado em:{' '}
+                        {new Date(validationReport.executadoEm).toLocaleTimeString('pt-BR')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowValidationPanel(!showValidationPanel)}
+                  className="border-rose-300 text-rose-900 hover:bg-rose-100 text-xs shrink-0 self-end md:self-center gap-1"
+                >
+                  {showValidationPanel ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  {showValidationPanel ? 'Recolher Relatório' : 'Ver Relatório de Achados'}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-2 border-amber-300 bg-amber-50/80 shadow-sm">
+              <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800 shrink-0 mt-0.5">
+                    <AlertTriangle className="w-5 h-5 text-amber-700" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-sm font-bold text-amber-950 uppercase tracking-wide">
+                        Regras Operacionais com {validationReport.totalAvisos} Aviso(s)
+                        Preventivo(s)
+                      </h2>
+                      <Badge className="bg-amber-500 text-white font-mono text-[10px]">
+                        Sem Erros Bloqueantes
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-amber-900 mt-0.5">
+                      Nenhum erro bloqueante identificado. Avisos fiscais preventivos (regras
+                      vencidas ou redundâncias) recomendam saneamento cadastral.
+                    </p>
+                    <span className="text-[11px] text-amber-800/80 mt-1 block">
+                      Validação em: {new Date(validationReport.executadoEm).toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowValidationPanel(!showValidationPanel)}
+                  className="border-amber-300 text-amber-900 hover:bg-amber-100 text-xs shrink-0 self-end md:self-center gap-1"
+                >
+                  {showValidationPanel ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  {showValidationPanel ? 'Recolher Relatório' : 'Ver Avisos'}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Painel Expansível de Detalhes da Validação */}
+          {showValidationPanel && (
+            <Card className="border border-border shadow-sm">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-2">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-[#005B2E]" />
+                    <h3 className="text-xs font-bold uppercase text-foreground">
+                      Relatório de Consistência da Matriz de CFOP ({validationReport.totalAchados}{' '}
+                      apontamento(s))
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[11px] text-muted-foreground mr-1">Filtrar:</span>
+                    <Button
+                      size="sm"
+                      variant={filterSeverity === 'todos' ? 'default' : 'outline'}
+                      onClick={() => setFilterSeverity('todos')}
+                      className={`h-6 text-[10px] px-2 ${filterSeverity === 'todos' ? 'bg-[#005B2E]' : ''}`}
+                    >
+                      Todos ({validationReport.totalAchados})
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={filterSeverity === 'erro' ? 'default' : 'outline'}
+                      onClick={() => setFilterSeverity('erro')}
+                      className={`h-6 text-[10px] px-2 ${filterSeverity === 'erro' ? 'bg-rose-600 text-white' : 'text-rose-700'}`}
+                    >
+                      Erros ({validationReport.totalErros})
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={filterSeverity === 'aviso' ? 'default' : 'outline'}
+                      onClick={() => setFilterSeverity('aviso')}
+                      className={`h-6 text-[10px] px-2 ${filterSeverity === 'aviso' ? 'bg-amber-600 text-white' : 'text-amber-700'}`}
+                    >
+                      Avisos ({validationReport.totalAvisos})
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={filterSeverity === 'info' ? 'default' : 'outline'}
+                      onClick={() => setFilterSeverity('info')}
+                      className={`h-6 text-[10px] px-2 ${filterSeverity === 'info' ? 'bg-blue-600 text-white' : 'text-blue-700'}`}
+                    >
+                      Info ({validationReport.totalInfo})
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Categorias avaliadas */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-1 text-[11px]">
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">
+                      CFOP Inválido
+                    </div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.cfop_invalido || 0}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">Duplicidade</div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.duplicidade_regra || 0}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">Prioridade</div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.conflito_prioridade || 0}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">
+                      Origem x CFOP
+                    </div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.incoerencia_origem || 0}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">
+                      Destino x CFOP
+                    </div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.incoerencia_destino || 0}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">
+                      Vigência Sobreposta
+                    </div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.vigencia_sobreposta || 0}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-muted/40 border">
+                    <div className="text-[10px] text-muted-foreground font-medium">
+                      Regra Vencida
+                    </div>
+                    <div className="text-base font-black text-foreground">
+                      {validationReport.resumoPorCategoria.regra_vencida || 0}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista de Achados */}
+                {filteredFindings.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-muted-foreground bg-muted/20 rounded">
+                    Nenhum achado fiscal para a gravidade selecionada.
+                  </div>
+                ) : (
+                  <div className="space-y-2 pt-1">
+                    {filteredFindings.map((finding) => (
+                      <div
+                        key={finding.id}
+                        className={`p-3 rounded-lg border text-xs space-y-1.5 ${
+                          finding.gravidade === 'erro'
+                            ? 'bg-rose-50/50 border-rose-200'
+                            : finding.gravidade === 'aviso'
+                              ? 'bg-amber-50/50 border-amber-200'
+                              : 'bg-blue-50/50 border-blue-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              className={
+                                finding.gravidade === 'erro'
+                                  ? 'bg-rose-600 text-white'
+                                  : finding.gravidade === 'aviso'
+                                    ? 'bg-amber-600 text-white'
+                                    : 'bg-blue-600 text-white'
+                              }
+                            >
+                              {finding.gravidade.toUpperCase()}
+                            </Badge>
+                            <span className="font-bold text-foreground">{finding.titulo}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              ({finding.categoriaLabel})
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1 font-mono text-[11px]">
+                            {finding.cfopsRelacionados.map((c, i) => (
+                              <Badge key={i} variant="outline" className="font-mono font-bold">
+                                CFOP {formatCfopCode(c)}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        <p className="text-foreground leading-relaxed">{finding.mensagem}</p>
+
+                        <div className="p-2 rounded bg-white/80 border text-[11px] space-y-1">
+                          <div className="font-semibold text-muted-foreground">
+                            Fundamentação Fiscal / Risco SEFAZ:
+                          </div>
+                          <p className="text-muted-foreground italic leading-relaxed">
+                            {finding.explicacaoFiscal}
+                          </p>
+                          {finding.sugestaoAcao && (
+                            <div className="pt-0.5 text-[#005B2E] font-medium">
+                              Sugestão de Ação: {finding.sugestaoAcao}
+                            </div>
+                          )}
+                        </div>
+
+                        {finding.regrasAfetadas.length > 0 && (
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1 flex-wrap pt-0.5">
+                            <span>Regra(s) afetada(s):</span>
+                            {finding.regrasAfetadas.map((r) => (
+                              <Badge
+                                key={r.id}
+                                variant="secondary"
+                                className="font-mono text-[9px]"
+                              >
+                                {r.operacao_codigo} • CFOP {r.cfop_resultado} (id:{' '}
+                                {r.id.slice(0, 8)}...)
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* AVISO MANDATÓRIO DE GOVERNANÇA: RESPONSABILIDADE DO RESPONSÁVEL FISCAL */}
+      <Card className="border border-blue-200 bg-blue-50/50">
+        <CardContent className="p-3.5 flex items-start gap-3">
+          <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+          <div className="space-y-0.5 text-xs">
+            <h4 className="font-bold text-blue-950 uppercase tracking-wide">
+              Validação Oficial e Governança Tributária HURAM
+            </h4>
+            <p className="text-blue-900 leading-relaxed text-[11px]">
+              As 4 regras-semente principais (<strong>5.101</strong>, <strong>5.102</strong>,{' '}
+              <strong>6.101</strong>, <strong>6.102</strong>) foram conferidas contra a Tabela
+              Oficial da Receita Federal/SEFAZ e receberam o selo <em>Validada Oficialmente</em> com
+              a distinção legal estrita mantida (produção própria vs mercadoria de terceiros). Casos
+              especiais (consumidor final não contribuinte, substituição tributária e benefícios
+              fiscais de SP e ES) continuam sob homologação contínua do responsável fiscal da
+              empresa.
             </p>
           </div>
         </CardContent>
       </Card>
-
-      {/* BLOQUEIO DE AMBIGUIDADE / CONFLITOS */}
-      {conflictsDetected.length > 0 && (
-        <Card className="border-2 border-rose-300 bg-rose-50/70">
-          <CardContent className="p-4 space-y-2">
-            <div className="flex items-center gap-2 text-rose-900 font-bold text-xs uppercase">
-              <ShieldAlert className="w-4 h-4 text-rose-600" />
-              Alerta de Bloqueio por Ambiguidade Detectado ({conflictsDetected.length} conflito(s))
-            </div>
-            <p className="text-xs text-rose-800">
-              Foram detectadas regras com o mesmo escopo e mesma prioridade sugerindo CFOPs
-              diferentes. O motor de emissão bloqueará faturamentos que caiam nessas condições até
-              que as prioridades sejam diferenciadas:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
-              {conflictsDetected.map((conf, idx) => (
-                <div key={idx} className="p-2 bg-white/80 rounded border border-rose-200 text-xs">
-                  <div className="font-mono font-bold text-rose-700">
-                    CFOPs conflitantes: {conf.cfops.join(' vs ')}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">
-                    Operação: {conf.rules[0]?.operacao_codigo} | Procedência:{' '}
-                    {conf.rules[0]?.procedencia_item} | Destino: {conf.rules[0]?.destino_tipo} |
-                    Prioridade: {conf.rules[0]?.prioridade}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* FILTROS E BUSCA */}
       <div className="flex flex-col sm:flex-row gap-2 items-center justify-between">
@@ -429,122 +799,139 @@ export function ScreenMatrizCfop() {
                   </td>
                 </tr>
               ) : (
-                filteredRules.map((rule) => (
-                  <tr key={rule.id} className="hover:bg-muted/20">
-                    <td className="py-2.5 px-3 font-mono font-black text-base text-[#005B2E]">
-                      {rule.cfop_resultado}
-                      <span className="block text-[10px] font-normal text-muted-foreground">
-                        CST: {rule.cst_padrao || '00'}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <span className="font-bold text-foreground block">
-                        {rule.operacao_codigo}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {rule.descricao_cfop || 'Sem descrição'}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <Badge
-                        variant="outline"
-                        className={
-                          rule.procedencia_item === 'producao_propria'
-                            ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
-                            : rule.procedencia_item === 'mercadoria_terceiros'
-                              ? 'border-amber-300 bg-amber-50 text-amber-800'
-                              : 'border-slate-300'
-                        }
-                      >
-                        {rule.procedencia_item === 'producao_propria'
-                          ? 'Produção Própria'
-                          : rule.procedencia_item === 'mercadoria_terceiros'
-                            ? 'Mercadoria Terceiros (Revenda)'
-                            : 'Qualquer Procedência'}
-                      </Badge>
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <span className="font-semibold text-foreground block">
-                        {rule.destino_tipo === 'dentro_estado'
-                          ? 'Dentro do Estado (Interno)'
-                          : rule.destino_tipo === 'fora_estado'
-                            ? 'Fora do Estado (Interestadual)'
-                            : rule.destino_tipo === 'exterior'
-                              ? 'Exterior'
-                              : 'Qualquer Destino'}
-                      </span>
-                      {rule.uf_destino && (
-                        <span className="text-[10px] text-muted-foreground font-mono">
-                          UF específica: {rule.uf_destino}
+                filteredRules.map((rule) => {
+                  const oficialValidada = isRegraOficialValidada(rule)
+
+                  return (
+                    <tr key={rule.id} className="hover:bg-muted/20">
+                      <td className="py-2.5 px-3 font-mono font-black text-base text-[#005B2E]">
+                        {formatCfopCode(rule.cfop_resultado)}
+                        <span className="block text-[10px] font-normal text-muted-foreground">
+                          CST: {rule.cst_padrao || '00'}
                         </span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 font-mono text-[11px]">
-                      <div>
-                        Prio: {rule.prioridade || 10} (v{rule.versao || 1})
-                      </div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {rule.vigencia_inicio ? `Desde: ${rule.vigencia_inicio}` : 'Permanente'}
-                      </div>
-                    </td>
-                    <td className="py-2.5 px-3">
-                      {rule.empresa_id ? (
-                        <Badge variant="secondary" className="text-[10px] font-bold">
-                          Empresa Específica
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-[10px] text-muted-foreground">
-                          Compartilhada
-                        </Badge>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 space-y-1">
-                      {rule.is_exemplo_didatico && (
-                        <Badge className="bg-amber-100 text-amber-800 border-amber-300 block text-center text-[10px]">
-                          Exemplo Didático
-                        </Badge>
-                      )}
-                      {rule.validado_responsavel_fiscal ? (
-                        <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                          Validado Fiscal
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="font-bold text-foreground block">
+                          {rule.operacao_codigo}
                         </span>
-                      ) : (
-                        <Button
+                        <span className="text-[11px] text-muted-foreground">
+                          {rule.descricao_cfop || 'Sem descrição'}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <Badge
                           variant="outline"
-                          size="sm"
-                          onClick={() => handleValidateFiscal(rule.id)}
-                          className="h-6 text-[10px] px-2 border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                          className={
+                            rule.procedencia_item === 'producao_propria'
+                              ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
+                              : rule.procedencia_item === 'mercadoria_terceiros'
+                                ? 'border-amber-300 bg-amber-50 text-amber-800'
+                                : 'border-slate-300'
+                          }
                         >
-                          <Check className="w-3 h-3 mr-1" />
-                          Validar Regra
-                        </Button>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenEdit(rule)}
-                          className="h-7 w-7 p-0"
-                          title="Editar Regra"
-                        >
-                          <Edit className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(rule.id, rule.cfop_resultado)}
-                          className="h-7 w-7 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                          title="Excluir Regra"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          {rule.procedencia_item === 'producao_propria'
+                            ? 'Produção Própria'
+                            : rule.procedencia_item === 'mercadoria_terceiros'
+                              ? 'Mercadoria Terceiros (Revenda)'
+                              : 'Qualquer Procedência'}
+                        </Badge>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="font-semibold text-foreground block">
+                          {rule.destino_tipo === 'dentro_estado'
+                            ? 'Dentro do Estado (Interno)'
+                            : rule.destino_tipo === 'fora_estado'
+                              ? 'Fora do Estado (Interestadual)'
+                              : rule.destino_tipo === 'exterior'
+                                ? 'Exterior'
+                                : 'Qualquer Destino'}
+                        </span>
+                        {rule.uf_destino && (
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            UF específica: {rule.uf_destino}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 font-mono text-[11px]">
+                        <div>
+                          Prio: {rule.prioridade || 10} (v{rule.versao || 1})
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {rule.vigencia_inicio ? `Desde: ${rule.vigencia_inicio}` : 'Permanente'}
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {rule.empresa_id ? (
+                          <Badge variant="secondary" className="text-[10px] font-bold">
+                            Empresa Específica
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                            Compartilhada
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 space-y-1">
+                        {/* SELO OFICIAL: Se for regra-semente com conferência oficial da RFB/SEFAZ */}
+                        {oficialValidada ? (
+                          <div className="space-y-0.5">
+                            <Badge className="bg-[#005B2E] text-white hover:bg-[#004222] text-[10px] font-bold gap-1 shadow-sm">
+                              <Sparkles className="w-3 h-3 text-amber-300" />
+                              Validada Oficialmente
+                            </Badge>
+                            <span className="block text-[9px] text-emerald-800 font-medium">
+                              Tabela Oficial RFB/SEFAZ
+                            </span>
+                          </div>
+                        ) : rule.is_exemplo_didatico ? (
+                          <Badge className="bg-amber-100 text-amber-800 border-amber-300 block text-center text-[10px]">
+                            Exemplo Didático
+                          </Badge>
+                        ) : null}
+
+                        {!oficialValidada &&
+                          (rule.validado_responsavel_fiscal ? (
+                            <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              Validado Fiscal
+                            </span>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleValidateFiscal(rule.id)}
+                              className="h-6 text-[10px] px-2 border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                            >
+                              <Check className="w-3 h-3 mr-1" />
+                              Validar Regra
+                            </Button>
+                          ))}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenEdit(rule)}
+                            className="h-7 w-7 p-0"
+                            title="Editar Regra"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(rule.id, rule.cfop_resultado)}
+                            className="h-7 w-7 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                            title="Excluir Regra"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
@@ -557,7 +944,7 @@ export function ScreenMatrizCfop() {
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground">
               {editingRule
-                ? `Editar Regra CFOP: ${editingRule.cfop_resultado} (v${editingRule.versao || 1})`
+                ? `Editar Regra CFOP: ${formatCfopCode(editingRule.cfop_resultado)} (v${editingRule.versao || 1})`
                 : 'Nova Regra na Matriz Fiscal'}
             </DialogTitle>
           </DialogHeader>
@@ -682,6 +1069,15 @@ export function ScreenMatrizCfop() {
                 value={formData.explicacao_padrao}
                 onChange={(e) => setFormData({ ...formData, explicacao_padrao: e.target.value })}
                 placeholder="Ex: CFOP 5.101 — Produção do estabelecimento, nesta empresa, destino dentro do estado."
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-bold">Observações / Fundamentação Legal</Label>
+              <Input
+                value={formData.observacoes}
+                onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                placeholder="Ex: Conferido contra Convênio S/Nº 1970 e Tabela Oficial SEFAZ."
               />
             </div>
 

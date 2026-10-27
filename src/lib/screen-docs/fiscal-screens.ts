@@ -473,38 +473,38 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal/matriz-cfop',
     title: 'Matriz Fiscal de CFOP',
     moduleGroup: 'Fiscal',
-    docVersion: '1.0.0',
+    docVersion: '1.1.0',
     lastUpdated: '2026-04-18',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
       content:
-        'Implementar a Camada 3 da Arquitetura HURAM: motor e matriz de determinação fiscal de CFOP por item, cruzando operação comercial, empresa emitente, procedência da mercadoria nesta empresa, UF de destino, vigência e prioridade, com transparência auditável da regra aplicada e bloqueio estrito de ambiguidades.',
+        'Implementar a Camada 3 da Arquitetura HURAM: motor e matriz de determinação fiscal de CFOP por item, cruzando operação comercial, empresa emitente, procedência da mercadoria nesta empresa, UF de destino, vigência e prioridade, com transparência auditável da regra aplicada, validação automática contínua de consistência e bloqueio estrito de ambiguidades.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- CRUD completo das regras fiscais da matriz com escopo por empresa/filial, vigência e prioridade;\n- Suporte multiempresa: procedência relativa à emitente (o mesmo produto pode ser fabricação própria na Gran Romano e revenda de terceiros na Dec Eldorado);\n- Alerta explícito de Exemplo Didático: as regras-semente (5.101, 5.102, 6.101, 6.102) são didáticas e necessitam validação do responsável fiscal;\n- Ação de "Validar Regra Fiscal" que registra usuário e data/hora da validação formal;\n- Monitor proativo de Conflitos e Ambiguidade: identifica regras ativas com mesma prioridade propondo CFOPs divergentes;\n- Histórico de versões das regras (imutabilidade cadastral para documentos antigos);\n- Filtros por operação, procedência, destino e status de validação fiscal.',
+        '- Botão superior e Ação "Validar Regras": executa auditoria automática completa de consistência da matriz com classificação por gravidade (Erros bloqueantes, Avisos preventivos e Informações);\n- 7 Categorias de Validação Automática implementadas no motor `@/lib/fiscal-cfop-validator`:\n  1. CFOP inexistente ou malformado contra a tabela oficial de saídas da Receita Federal/SEFAZ (Grupos 5.xxx, 6.xxx e 7.xxx);\n  2. Duplicidade de regras: duas regras ativas no mesmo escopo com mesmo CFOP (redundância cadastral);\n  3. Conflito de prioridade: regras de mesma prioridade no mesmo escopo propondo CFOPs divergentes (bloqueio estrito de ambiguidade);\n  4. Incoerência Origem x CFOP: regra marcada como "produção própria" apontando CFOP de revenda (5.102/6.102) ou vice-versa (risco de autuação SEFAZ);\n  5. Incoerência Destino x CFOP: 1º dígito incompatível com o destino da regra (5=dentro do estado, 6=fora do estado, 7=exterior);\n  6. Vigências sobrepostas no mesmo escopo;\n  7. Regras vencidas ainda ativas;\n- Painel dinâmico de consistência: quando 100% consistente, exibe banner verde "Todas as regras estão consistentes" com timestamp; quando há erros, exibe painel detalhado de achados com fundamentação fiscal e sugestão de correção;\n- Selo "Validada Oficialmente": exibe badge distintivo nas 4 regras-semente principais (5.101, 5.102, 6.101 e 6.102) que foram conferidas contra a Tabela Oficial da Receita Federal/SEFAZ (migração 0297);\n- CRUD completo das regras fiscais da matriz com escopo por empresa/filial, vigência e prioridade;\n- Suporte multiempresa: procedência relativa à emitente (o mesmo produto pode ser fabricação própria na Gran Romano e revenda de terceiros na Dec Eldorado);\n- Histórico de versões das regras (imutabilidade cadastral para documentos antigos);\n- Filtros por operação, procedência, destino e severidade de validação.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Resolução de CFOP estritamente POR ITEM, nunca atributo global fixo do produto.\n- Bloqueio de Ambiguidade: se nenhuma regra corresponder ou houver regras conflitantes de mesma prioridade, a emissão da NF-e é travada até correção da configuração.\n- Exceções manuais exigem autorização por perfil gestor com justificativa gravada na coleção `fiscal_rule_exceptions`.\n- As regras-semente 5.101/5.102/6.101/6.102 são exemplos didáticos e exigem conferência e homologação pelo responsável fiscal antes do faturamento em produção.',
+        '- Resolução de CFOP estritamente POR ITEM, nunca atributo global fixo do produto.\n- Bloqueio de Ambiguidade: se nenhuma regra corresponder ou houver regras conflitantes de mesma prioridade, a emissão da NF-e é travada até correção da configuração.\n- Distinção estrita mantida: revenda de mercadoria adquirida de terceiros é sempre 5.102/6.102 mesmo quando vendida para cliente industrial (alinhada à tabela da Receita Federal).\n- As 4 regras-semente 5.101/5.102/6.101/6.102 foram conferidas contra a tabela oficial da Receita Federal em 2026-10-27 (migração 0297). A validação oficial definitiva para casos específicos (consumidor final, substituição tributária e benefícios fiscais estaduais) continua sendo responsabilidade do responsável fiscal da empresa.\n- Exceções manuais exigem autorização por perfil gestor com justificativa gravada na coleção `fiscal_rule_exceptions`.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O responsável fiscal modela as regras por procedência e destino.\n2. O sistema avalia a prioridade e detecta eventuais sobreposições.\n3. O responsável valida formalmente cada regra como apta para faturamento.',
+        '1. O responsável fiscal acessa a tela `/admin/fiscal/matriz-cfop`.\n2. O sistema executa a validação em segundo plano e exibe o status de consistência no topo.\n3. O usuário pode clicar em "Validar Regras" para reprocessar a auditoria sob demanda e inspecionar o relatório por categoria de achado.\n4. Para qualquer inconformidade apontada, visualiza a fundamentação legal e a sugestão de correção, podendo editar a regra diretamente no modal.\n5. As regras semente validadas exibem o selo oficial em verde escuro.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções PocketBase: `fiscal_cfop_rules`, `fiscal_operations`, `fiscal_rule_exceptions`.\n- Hooks: `useBrand`.',
+        '- Coleções PocketBase: `fiscal_cfop_rules`, `fiscal_operations`, `fiscal_rule_exceptions`.\n- Tabela Oficial de CFOPs: `@/lib/fiscal-cfop-table` (Convênio S/Nº 1970 / Ajustes SINIEF / Receita Federal).\n- Hooks: `useBrand`.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Motor de Determinação Fiscal (`@/lib/fiscal-cfop-engine`).\n- Emissão de NF-e em Homologação (`NfeHomologationDialog`).\n- Simulador Fiscal Auditável.',
+        '- Motor de Determinação Fiscal (`@/lib/fiscal-cfop-engine`).\n- Validador Automático de CFOP (`@/lib/fiscal-cfop-validator`).\n- Emissão de NF-e em Homologação (`NfeHomologationDialog`).\n- Simulador Fiscal Auditável (`@/components/fiscal/screens/screen-simulador-cfop`).',
     },
     permissions: {
       title: 'Permissões',
@@ -512,12 +512,13 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     },
     dependencies: {
       title: 'Dependências',
-      content: '- Componentes: `ScreenMatrizCfop`.\n- Serviços: `@/lib/fiscal-cfop-service`.',
+      content:
+        '- Componentes: `ScreenMatrizCfop`.\n- Serviços: `@/lib/fiscal-cfop-service`.\n- Bibliotecas: `@/lib/fiscal-cfop-validator`, `@/lib/fiscal-cfop-table`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Destaque visual vermelho de bloqueio de ambiguidade e mensagens claras de inconformidade.',
+        '- Destaque visual vermelho de bloqueio de ambiguidade e relatório detalhado com classificação de erros, avisos e fundamentação técnica fiscal.',
     },
   },
 

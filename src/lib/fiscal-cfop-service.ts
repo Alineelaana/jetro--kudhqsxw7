@@ -6,6 +6,7 @@ import {
   DeterminationOutput,
   evaluateCfopMatrix,
 } from './fiscal-cfop-engine'
+import { validateFiscalCfopRules, CfopValidationReport } from './fiscal-cfop-validator'
 
 /**
  * Serviço de Integração com PocketBase para CFOP e CGO
@@ -105,5 +106,16 @@ export const fiscalCfopService = {
       validado_em: new Date().toISOString(),
       is_exemplo_didatico: false,
     })
+  },
+
+  /**
+   * Executa a auditoria e validação automática de consistência de todas as regras de CFOP
+   */
+  async runCfopRulesValidation(empresaId?: string): Promise<CfopValidationReport> {
+    const [rules, ops] = await Promise.all([
+      this.getCfopRules(empresaId),
+      this.getOperations(empresaId),
+    ])
+    return validateFiscalCfopRules(rules, ops)
   },
 }
