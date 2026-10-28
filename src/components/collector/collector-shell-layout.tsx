@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useAuth } from '@/custom_hooks/useAuth'
+import { useAuth } from '@/hooks/use-auth'
 import {
   getLocalActiveShift,
   getOfflineQueue,

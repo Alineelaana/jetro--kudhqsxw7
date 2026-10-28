@@ -16,7 +16,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CollectorShellLayout } from './collector-shell-layout'
-import { useAuth } from '@/custom_hooks/useAuth'
+import { useAuth } from '@/hooks/use-auth'
 import { getOpenShiftForOperator, getLocalActiveShift, getOfflineQueue } from '@/services/collector'
 import type { CollectorShift } from '@/types/collector'
 

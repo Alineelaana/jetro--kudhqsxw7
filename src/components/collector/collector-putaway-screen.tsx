@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CollectorShellLayout } from './collector-shell-layout'
 import { CollectorScannerField } from './collector-scanner-field'
-import { useAuth } from '@/custom_hooks/useAuth'
+import { useAuth } from '@/hooks/use-auth'
 import {
   executeCollectorOperation,
   getLocalActiveShift,
