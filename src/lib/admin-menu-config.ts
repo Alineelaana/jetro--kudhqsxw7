@@ -35,6 +35,7 @@ import {
   Clock,
   Bot,
   UserCheck,
+  Smartphone,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -620,6 +621,23 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
   {
     title: 'Operação',
     items: [
+      {
+        label: 'Coletor PWA',
+        icon: Smartphone,
+        route: '/admin/coletor',
+        perm: canViewStock,
+        children: [
+          { label: 'Conferência de Expedição', route: '/admin/coletor/conferencia' },
+          { label: 'Hub do Coletor', route: '/admin/coletor' },
+          { label: 'Inventário Cego', route: '/admin/coletor/inventario' },
+          { label: 'Operações Realizadas', route: '/admin/coletor/operacoes' },
+          { label: 'Putaway e Endereçamento', route: '/admin/coletor/enderecamento' },
+          { label: 'Recebimento e Romaneio', route: '/admin/coletor/recebimento' },
+          { label: 'Separação Dirigida', route: '/admin/coletor/separacao' },
+          { label: 'Transferência de Endereço', route: '/admin/coletor/transferencia' },
+          { label: 'Turno de Trabalho', route: '/admin/coletor/turno' },
+        ],
+      },
       {
         label: 'Estoque e WMS',
         icon: Boxes,
