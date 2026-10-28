@@ -635,6 +635,10 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/industria/fichas-tecnicas',
           },
           {
+            label: 'Laboratório e Laudos',
+            route: '/admin/industria/laboratorio-laudos',
+          },
+          {
             label: 'Manutenção e Recursos',
             route: '/admin/industria/manutencao',
           },
@@ -643,12 +647,28 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/industria/ordem-producao',
           },
           {
+            label: 'Perdas na Linha',
+            route: '/admin/industria/perdas-linha',
+          },
+          {
             label: 'Planejamento e Ordens',
             route: '/admin/industria/planejamento',
           },
           {
             label: 'Qualidade e Rastreabilidade',
             route: '/admin/industria/qualidade',
+          },
+          {
+            label: 'Rastreabilidade Completa',
+            route: '/admin/industria/rastreabilidade-completa',
+          },
+          {
+            label: 'Recebimento de Safra',
+            route: '/admin/industria/recebimento-safra',
+          },
+          {
+            label: 'Tanques de Cura',
+            route: '/admin/industria/tanques-cura',
           },
         ],
       },

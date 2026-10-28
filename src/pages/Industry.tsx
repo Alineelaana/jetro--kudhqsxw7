@@ -43,6 +43,31 @@ const ManutencaoRecursos = lazy(() =>
     default: m.ScreenManutencaoRecursos,
   })),
 )
+const RecebimentoSafra = lazy(() =>
+  import('@/components/industry/screens/screen-recebimento-safra').then((m) => ({
+    default: m.ScreenRecebimentoSafra,
+  })),
+)
+const TanquesCura = lazy(() =>
+  import('@/components/industry/screens/screen-tanques-cura').then((m) => ({
+    default: m.ScreenTanquesCura,
+  })),
+)
+const PerdasLinha = lazy(() =>
+  import('@/components/industry/screens/screen-perdas-linha').then((m) => ({
+    default: m.ScreenPerdasLinha,
+  })),
+)
+const LaboratorioLaudos = lazy(() =>
+  import('@/components/industry/screens/screen-laboratorio-laudos').then((m) => ({
+    default: m.ScreenLaboratorioLaudos,
+  })),
+)
+const RastreabilidadeCompleta = lazy(() =>
+  import('@/components/industry/screens/screen-rastreabilidade-completa').then((m) => ({
+    default: m.ScreenRastreabilidadeCompleta,
+  })),
+)
 
 function IndustryFallback() {
   return (
@@ -104,6 +129,11 @@ export default function Industry() {
           <Route path="custos-eficiencia" element={<CustosEficiencia />} />
           <Route path="manutencao" element={<ManutencaoRecursos />} />
           <Route path="manutencao-recursos" element={<ManutencaoRecursos />} />
+          <Route path="recebimento-safra" element={<RecebimentoSafra />} />
+          <Route path="tanques-cura" element={<TanquesCura />} />
+          <Route path="perdas-linha" element={<PerdasLinha />} />
+          <Route path="laboratorio-laudos" element={<LaboratorioLaudos />} />
+          <Route path="rastreabilidade-completa" element={<RastreabilidadeCompleta />} />
           <Route path="*" element={<Navigate to="/admin/industria" replace />} />
         </Routes>
       </Suspense>

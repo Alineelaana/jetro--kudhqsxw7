@@ -133,13 +133,13 @@ export const INDUSTRY_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/industria/ordem-producao',
     title: 'Ordem de Produção',
     moduleGroup: 'Indústria',
-    docVersion: '2.0.0',
-    lastUpdated: '2026-04-01',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-04-06',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
       content:
-        'Centralizar o ciclo de vida operacional completo da Ordem de Produção (OP), desde a programação, requisição e conferência de insumos, apontamentos de fases de chão de fábrica, pesagem líquida/drenada em envase, rastreabilidade de lotes gerados, registro de perdas/refugos, validação de qualidade até a apropriação dos custos industriais.',
+        'Centralizar o ciclo de vida operacional completo da Ordem de Produção (OP), desde a programação, requisição e conferência de insumos, apontamentos de fases de chão de fábrica, pesagem líquida/drenada em envase, rastreabilidade de lotes gerados (com vínculo aditivo ao tanque de cura e ticket de safra de origem), registro de perdas/refugos alimentando o custo efetivo, validação de qualidade até a apropriação dos custos industriais.',
     },
     features: {
       title: 'Funcionalidades',
@@ -351,6 +351,291 @@ export const INDUSTRY_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
       title: 'Tratamento de Erros',
       content:
         '- Tratamento seguro de divisão por zero em casos de fichas sem custo previsto ou volume nulo.\n- Aviso ao usuário quando não há fechamento de competência de rateios CIF para o mês em análise.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 8. RECEBIMENTO DE SAFRA (BALANÇA E CLASSIFICAÇÃO)
+  // -------------------------------------------------------------
+  '/admin/industria/recebimento-safra': {
+    route: '/admin/industria/recebimento-safra',
+    title: 'Recebimento de Safra',
+    moduleGroup: 'Indústria',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-04-06',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Controlar o recebimento físico e a classificação por grade da fruta in natura (azeitonas) na balança rodoviária, apurando peso bruto, tara e líquido, gerando o pagamento ao produtor agrícola em contas a pagar (sem duplicar com a NF-e) e criando a entrada de estoque de matéria-prima com custo real pela trilha imutável.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Emissão e gestão de Tickets de Pesagem com numeração automática sequencial anual.\n- Vínculo com cadastro de Produtor Agrícola e Propriedade (com CADPRO/CAR e variedades cultivadas).\n- Pesagem rodoviária oficial: registro de peso bruto, tara e cálculo automático do peso líquido em kg.\n- Classificação por Grade de Qualidade: Grade A (Premium), Grade B (Padrão), Grade C (Industrial) e Descarte, com calibre, estágio de maturação (0 a 7) e % de impurezas/defeitos.\n- Formação automática do valor a pagar ao produtor: Fórmula (peso líquido ÷ 1.000) × preço da grade − deduções.\n- Ação de "Fechar Ticket", validação backend que impede fechamento sem classificação.\n- Ação "Gerar Estoque MP": cria movimentação de entrada e alimenta a trilha imutável product_cost_history pelo custo da grade.\n- Ação "Gerar Título (Pagar)": cria título único no módulo financeiro (financial_payables) com unicidade garantida.\n- KPIs de safra: Total recebido em toneladas, Valor total aos produtores, Percentual de fruta Grade A e Produtores ativos.\n- Exportação de dados consolidados em Excel/CSV.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Ticket sem classificação por grade de qualidade não pode ser fechado (validado em pb_hooks).\n- O pagamento ao produtor só pode ser gerado uma única vez por ticket após o status "fechado".\n- A entrada de matéria-prima gera lote no formato SAFRA-TK-{ANO}-{NUM} e registra o custo por kg na trilha imutável sem alterar custo médio à mão.\n- O descarte zera o valor a pagar ao produtor e impede entrada como matéria-prima comercial.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O caminhão/carreta com bins de azeitona chega à fábrica e passa na balança.\n2. O conferente abre novo Ticket de Pesagem informando produtor, placa, variedade e peso bruto.\n3. O técnico agrícola coleta amostragem, afere o calibre, defeitos e maturação, classificando a grade.\n4. O caminhão vazio passa na balança para tara, apurando o líquido e o valor a pagar ao produtor.\n5. O operador fecha o ticket, gera a entrada de estoque da matéria-prima e dispara o título no contas a pagar.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `olive_harvest_tickets`, `agricultural_producers`, `products`, `financial_payables`, `stock_movements`, `product_cost_history`.\n- Hooks server-side: `olive_industry_guards.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo Financeiro (Contas a Pagar): integração oficial gerando títulos pendentes.\n- Módulo de Estoque: geração de lotes de matéria-prima e movimentações de entrada.\n- Módulo de Rastreabilidade: primeiro elo da cadeia produtiva (origem agrícola).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso liberado para perfis autorizados pelo `canViewIndustry(role)`.\n- Fechamento e pagamento restritos a operadores da balança e gestores industriais.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenRecebimentoSafra`, `Card`, `Badge`, `Button`, `Dialog`, `Table`, `ExportActions`.\n- Serviços: `@/services/olive-industry-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Backend bloqueia fechamento com peso líquido negativo ou zero.\n- Bloqueio de duplicidade na geração de título a pagar.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 9. TANQUES DE CURA & SALMOURA
+  // -------------------------------------------------------------
+  '/admin/industria/tanques-cura': {
+    route: '/admin/industria/tanques-cura',
+    title: 'Tanques de Cura',
+    moduleGroup: 'Indústria',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-04-06',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar o parque fermentativo e os tanques físicos de cura de azeitonas, monitorando diariamente a concentração de sal, pH, temperatura e acidez livre da salmoura, controlando as perdas de fermentação e transferindo os lotes concluídos para consumo direto pelas Ordens de Produção (OPs).',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Mapa visual interativo do parque de tanques físicos com status colorido: Em Cura, Pronto para Processamento, Livre/Vazio ou Higienização.\n- Alocação de novos lotes de cura vinculados aos tickets de safra de origem.\n- Histórico completo de medições periódicas de salmoura (sal %, pH, temperatura °C, acidez livre % e perda drenagem em kg).\n- Alerta automático em backend e frontend para medições com pH ou concentração de sal fora da faixa plausível.\n- Ação "Concluir Cura (Liberar Tanque)": valida medição recente com pH adequado (2.5 a 5.0) e altera o status para pronto para processamento.\n- Ação "Consumir em Ordem de Produção (OP)": transfere o lote do tanque para a OP selecionada e coloca o tanque físico em ciclo de higienização.\n- Registro contínuo de perdas acumuladas de fermentação e drenagem.\n- Exportação de dados consolidados dos lotes e medições.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Medições com pH > 5.0 ou < 2.5 e sal < 4% ou > 25% disparam alerta mandatório de correção.\n- Um lote só pode ser processado se o status estiver em "pronto_para_processamento" (validado em pb_hooks).\n- A conclusão do lote exige ao menos uma medição analítica registrada com pH dentro do limite.\n- Ao ser consumido por uma OP, o tanque físico é liberado e marcado como "higienizacao".',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O operador aloca a azeitona recebida da safra em um tanque livre, definindo o tipo de salmoura (natural, estilo sevilhano, estilo californiano ou cura seca).\n2. Diariamente o laboratório registra as medições de sal, pH e temperatura na tabela de histórico.\n3. Concluído o período de cura (90 a 180 dias) e estabilizado o pH, o supervisor clica em "Concluir Cura".\n4. O PCP vincula o lote pronto a uma Ordem de Produção aberta, que consome a matéria-prima curada.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `curing_tanks`, `curing_batches`, `curing_measurements`, `olive_harvest_tickets`, `production_orders`.\n- Hooks: `olive_industry_guards.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Integração com Recebimento de Safra para herança do peso e variedade.\n- Integração com Ordens de Produção para consumo do lote curado.\n- Integração com Rastreabilidade Industrial (elo intermediário da cadeia).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso liberado para supervisores industriais e operadores fabris autorizados por `canViewIndustry(role)`.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenTanquesCura`, `Card`, `Badge`, `Button`, `Dialog`, `Table`, `ExportActions`.\n- Serviços: `@/services/olive-industry-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Bloqueio de processamento prematuro de lote em fermentação.\n- Alerta contra inserção de medições com valores químicos incongruentes.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 10. CONTROLE DE PERDAS NA LINHA
+  // -------------------------------------------------------------
+  '/admin/industria/perdas-linha': {
+    route: '/admin/industria/perdas-linha',
+    title: 'Perdas na Linha',
+    moduleGroup: 'Indústria',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-04-06',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Registrar e analisar as perdas, refugos e descartes ocorridos durante o processamento fabril das azeitonas por fase (descaroçamento, fatiamento, envase, salmoura, rotulagem) e apropriar o impacto financeiro no custo efetivo da Ordem de Produção.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Apontamento detalhado de perdas com vínculo à Ordem de Produção e identificação da fase fabril.\n- Tipificação da perda: refugo, descarte, fora de padrão, avaria de embalagem, vazamento de salmoura ou polpa machucada.\n- Cálculo do impacto no custo da OP: Quantidade perdida × Custo unitário estimado.\n- Destinação controlada do refugo: coproduto/óleo, compostagem agrícola, descarte sanitário ou retrabalho.\n- KPIs de perdas: Massa total perdida em kg, Impacto financeiro acumulado em R$, Contagem de refugos e descartes sanitários.\n- Filtro por fase fabril e busca textual por OP, motivo ou responsável.\n- Exportação de dados para análise de Pareto e Kaizen.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- As perdas registradas compõem o custo efetivo da ordem e abatem do rendimento fabril.\n- Refugos destinados a coproduto são encaminhados para extração secundária de óleo de oliva.\n- Todo apontamento de refugo exige motivo claro e identificação do operador responsável.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Durante o turno, ao ocorrer avaria ou refugo em máquina (ex: descaroçador), o operador pesa a perda.\n2. Acessa `/admin/industria/perdas-linha` e clica em "Registrar Perda / Refugo".\n3. Seleciona a OP em andamento, informa a fase, tipo, peso, custo unitário e motivo.\n4. O sistema grava a perda na coleção `production_line_losses` e atualiza os custos da OP.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `production_line_losses`, `production_orders`.\n- Persistência e consultas em `@/services/olive-industry-service`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo de Ordens de Produção (alimenta os custos da OP e o OEE de qualidade).\n- Módulo de Custos e Eficiência Industrial.\n- Módulo de Rastreabilidade Completa.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso liberado para operadores e gestores com permissão `canViewIndustry(role)`.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenPerdasLinha`, `Card`, `Badge`, `Button`, `Dialog`, `Table`, `ExportActions`.\n- Serviços: `@/services/olive-industry-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Validação de quantidade obrigatória positiva.\n- Confirmação antes de excluir registros de perda.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 11. LABORATÓRIO E LAUDOS
+  // -------------------------------------------------------------
+  '/admin/industria/laboratorio-laudos': {
+    route: '/admin/industria/laboratorio-laudos',
+    title: 'Laboratório e Laudos',
+    moduleGroup: 'Indústria',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-04-06',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Prover a gestão do laboratório de controle de qualidade e a emissão de laudos técnicos conformes às exigências do MAPA e RDC 727/2022, comparando resultados analíticos contra planos de limites e bloqueando a liberação de lotes para faturamento em caso de não conformidade.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Planos de Análise configuráveis para fruta in natura, tanque de cura, produto acabado e salmoura com limites mínimos/máximos e métodos de ensaio.\n- Registro de análises laboratoriais com veredito automático (conforme / não conforme) baseado na checagem dos parâmetros.\n- Trava de liberação de lote: lotes não conformes têm liberação terminantemente bloqueada tanto na interface quanto via regras em `olive_industry_guards.js`.\n- Emissão de Laudo Técnico oficial com verificação de peso drenado nominal vs aferido, peso líquido, registro MAPA e rotulagem RDC 727/2022.\n- Botão de Impressão de Laudo em layout limpo com assinatura técnica, tabela de parâmetros e veredito.\n- KPIs laboratoriais: Total de análises conformes, Não conformidades detectadas, Lotes liberados ao faturamento e Laudos ativos.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Análise com resultado fora da especificação bloqueia obrigatoriamente a liberação do lote no backend.\n- Um lote só pode ser liberado para expedição/faturamento comercial após emissão de laudo técnico CONFORME.\n- Laudos exigem aferição metrológica de peso drenado e peso líquido contra as tolerâncias legais.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O analista de laboratório coleta amostras do tanque de cura ou da linha de envase.\n2. Acessa `/admin/industria/laboratorio-laudos` e registra uma Nova Análise selecionando o plano.\n3. Digita os resultados aferidos; o sistema calcula o veredito instantâneo comparando com os limites.\n4. Caso conforme, emite o Laudo Técnico oficial (PDF imprimível) e libera o lote para faturamento.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `laboratory_analysis_plans`, `laboratory_analyses`, `laboratory_laudos`, `production_orders`, `curing_tanks`.\n- Guardas: `olive_industry_guards.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo Comercial/Faturamento: bloqueio de notas fiscais para lotes sem liberação laboratorial.\n- Módulo de Qualidade e Rastreabilidade.\n- Módulo de Tanques de Cura.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização geral para supervisores industriais; registro e assinatura restritos a responsáveis técnicos (CRQ/CRF/Engenharia).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenLaboratorioLaudos`, `Card`, `Badge`, `Button`, `Dialog`, `Table`, `ExportActions`.\n- Serviços: `@/services/olive-industry-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Bloqueio em pb_hooks ao tentar gravar laudo de liberação para análise reprovada.\n- Feedback imediato via toast descritivo em caso de parâmetros fora de especificação.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 12. RASTREABILIDADE COMPLETA (CAMPO → TANQUE → LOTE → EMBALAGEM)
+  // -------------------------------------------------------------
+  '/admin/industria/rastreabilidade-completa': {
+    route: '/admin/industria/rastreabilidade-completa',
+    title: 'Rastreabilidade Completa',
+    moduleGroup: 'Indústria',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-04-06',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Prover a consulta bidirecional da genealogia industrial e agrícola completa da fábrica de azeitonas, permitindo o rastreamento reverso (do lote da embalagem/cliente até o tanque e produtor rural para recall) e o rastreamento adiante (do ticket de safra até as ordens e lotes comerciais expedidos).',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Barra de pesquisa universal que aceita número de ticket de safra, lote de cura, lote de acabamento, laudo técnico ou número de OP.\n- Linha do tempo visual da cadeia produtiva cobrindo todos os elos: 1. Origem Agrícola (Produtor/Propriedade/CAR) → 2. Recebimento de Safra (Ticket/Pesagem/Grade) → 3. Tanque de Cura (Salmoura/Fermentação) → 4. Ordem de Produção (Envase) → 5. Análise Laboratorial → 6. Laudo Técnico (MAPA/RDC) → 7. Embalagem Final.\n- Detalhamento de perdas e refugos registrados na ordem associada.\n- Indicadores de conformidade: Lote liberado pelo laboratório, Rotulagem RDC conforme e status sanitário.\n- Exportação da cadeia completa para auditorias sanitárias (MAPA/ANVISA/clientes B2B).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Rastreabilidade bidirecional instantânea (tempo de resposta < 1 segundo) para suporte a recalls normativos.\n- Preservação imutável dos vínculos entre o elo agrícola (produtores e tickets) e os elos fabris existentes em `industrial_traceability`.\n- Identificação imediata de todos os tanques e lotes derivados a partir de uma remessa de campo.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O auditor ou responsável pela qualidade acessa `/admin/industria/rastreabilidade-completa`.\n2. Digita o lote do pote de azeitona ou o número do ticket da safra na busca.\n3. O sistema reconstitui instantaneamente a linha do tempo com produtor, tanque de cura, OP, medições de pH e laudo.\n4. O usuário exporta o relatório técnico de rastreabilidade para auditoria externa.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `industrial_traceability`, `agricultural_producers`, `olive_harvest_tickets`, `curing_batches`, `curing_tanks`, `production_orders`, `laboratory_analyses`, `laboratory_laudos`, `production_line_losses`.\n- Serviços: `traceCompleteChain` em `@/services/olive-industry-service`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Integração com todo o ecossistema industrial Huram: Safra, Cura, OPs, Perdas, Laboratório e WMS.\n- Base oficial de conformidade para auditorias ISO 22000, FSSC 22000 e MAPA.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso liberado para perfis autorizados pelo `canViewIndustry(role)` (auditores, diretores, qualidade e PCP).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenRastreabilidadeCompleta`, `Card`, `Badge`, `Button`, `Input`, `ExportActions`.\n- Serviços: `@/services/olive-industry-service`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Feedback visual claro quando um código não for localizado na base.\n- Busca resiliente e tolerante a espaços em branco e variações de caixa.',
     },
   },
 
