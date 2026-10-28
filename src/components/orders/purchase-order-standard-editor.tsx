@@ -268,13 +268,13 @@ export function PurchaseOrderStandardEditor({ open, onOpenChange, order, onSaved
   const handleSaveOrder = async (targetStatus: string) => {
     if (targetStatus === 'Aprovado' || targetStatus === 'Aguardando Aprovação') {
       const val = runValidation()
-      if (!val.valid) {
+      if (!val.valid && targetStatus === 'Aprovado') {
         toast.error('Corrija os erros impeditivos antes de prosseguir.')
         return
       }
       if (targetStatus === 'Aprovado' && val.requiresApproval) {
         toast.warning(
-          'Valor excede o limite de autoaprovação. Redirecionando para aprovação gerencial.',
+          'Valor excede o limite de autoaprovação de compras. Encaminhando para a Central de Aprovações.',
         )
         targetStatus = 'Aguardando Aprovação'
       }
@@ -315,10 +315,25 @@ export function PurchaseOrderStandardEditor({ open, onOpenChange, order, onSaved
         ],
       }
 
+      let savedId = order?.id || ''
       if (order?.id) {
         await updatePurchaseOrder(order.id, orderData)
       } else {
-        await createPurchaseOrder(orderData)
+        const created = await createPurchaseOrder(orderData)
+        savedId = created.id
+      }
+
+      if (targetStatus === 'Aguardando Aprovação' && savedId) {
+        try {
+          await submitOrderForApproval({
+            order_id: savedId,
+            order_type: 'compra',
+            approval_reasons:
+              approvalReasons.length > 0 ? approvalReasons : ['Alçada gerencial de compras'],
+          })
+        } catch {
+          /* intentionally ignored */
+        }
       }
 
       toast.success(`Pedido de Compra gravado com status "${targetStatus}".`)

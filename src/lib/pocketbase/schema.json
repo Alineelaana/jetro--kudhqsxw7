@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T12:04:43.780Z",
+  "generatedAt": "2026-10-28T12:39:04.328Z",
   "collections": [
     {
       "name": "users",
@@ -3305,6 +3305,24 @@
         },
         {
           "name": "approval_data",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_trail",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_at",
           "type": "text",
           "required": false,
           "system": false
@@ -6835,6 +6853,24 @@
         {
           "name": "attachments_metadata",
           "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approval_trail",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "approved_at",
+          "type": "text",
           "required": false,
           "system": false
         }

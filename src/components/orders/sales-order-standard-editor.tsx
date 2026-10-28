@@ -43,6 +43,7 @@ import {
   getNextSalesNumber,
   logSalesAudit,
 } from '@/services/sales'
+import { submitOrderForApproval } from '@/services/order-approvals'
 import { getProducts } from '@/services/products'
 
 import { FREIGHT_TYPES, type SalesOrder, type SalesOrderItem } from '@/lib/sales-types'
@@ -418,13 +419,13 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
     // Se for validar ou confirmar, executa o motor primeiro
     if (targetStatus === 'Confirmado' || targetStatus === 'Aguardando Aprovação') {
       const val = runValidation()
-      if (!val.valid) {
+      if (!val.valid && targetStatus === 'Confirmado') {
         toast.error('Corrija os erros listados antes de prosseguir.')
         return
       }
       if (targetStatus === 'Confirmado' && val.requiresApproval) {
         toast.error(
-          'Este pedido requer aprovação gerencial devido a desconto/margem/crédito. Enviando para aprovação.',
+          'Este pedido requer aprovação gerencial devido a desconto/margem/crédito. Enviando para a Central de Aprovações.',
         )
         targetStatus = 'Aguardando Aprovação'
       }
@@ -464,6 +465,7 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
         ],
       }
 
+      let savedId = order?.id || ''
       if (order?.id) {
         await updateSalesOrder(order.id, orderData)
         logSalesAudit(
@@ -473,13 +475,29 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
           `Pedido de Venda ${num} alterado para status ${targetStatus}`,
         )
       } else {
-        await createSalesOrder(orderData)
+        const created = await createSalesOrder(orderData)
+        savedId = created.id
         logSalesAudit(
           'create',
           'sales',
           '',
           `Pedido de Venda ${num} criado com status ${targetStatus}`,
         )
+      }
+
+      if (targetStatus === 'Aguardando Aprovação' && savedId) {
+        try {
+          await submitOrderForApproval({
+            order_id: savedId,
+            order_type: 'venda',
+            approval_reasons:
+              approvalReasons.length > 0
+                ? approvalReasons
+                : ['Alçada comercial / desconto / crédito'],
+          })
+        } catch {
+          /* intentionally ignored */
+        }
       }
 
       toast.success(`Pedido salvo com status "${targetStatus}".`)

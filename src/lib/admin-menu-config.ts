@@ -275,6 +275,10 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'Comissão Analítica', route: '/admin/comissao-analitica' },
           { label: 'Comissões', route: '/admin/comercial/comissoes' },
           {
+            label: 'Central de Aprovações de Pedidos',
+            route: '/admin/aprovacoes/pedidos',
+          },
+          {
             label: 'Consulta de Pedidos',
             route: '/admin/vendas/consulta-pedidos',
           },

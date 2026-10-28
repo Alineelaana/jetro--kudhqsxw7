@@ -74,6 +74,7 @@ const InserirClientesScreen = lazy(() =>
   })),
 )
 const SalesOrdersPage = lazy(() => import('./pages/sales/SalesOrdersPage'))
+const OrderApprovalsPage = lazy(() => import('./pages/sales/OrderApprovalsPage'))
 const SalesOrdersQueryPage = lazy(() => import('./pages/sales/SalesOrdersQueryPage'))
 const PurchaseOrdersPanel = lazy(() =>
   import('@/components/purchasing/purchase-orders-panel').then((m) => ({
@@ -630,6 +631,10 @@ const App = () => (
 
                                 {/* ROTAS DE PEDIDOS */}
                                 <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                                <Route
+                                  path="/admin/aprovacoes/pedidos"
+                                  element={<OrderApprovalsPage />}
+                                />
                                 <Route
                                   path="/admin/compras/pedidos"
                                   element={<PurchaseOrdersPanel />}

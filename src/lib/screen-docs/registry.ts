@@ -1849,6 +1849,63 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
+  // CENTRAL DE APROVAÇÕES DE PEDIDOS (NOVA TELA v0.0.651)
+  // -------------------------------------------------------------
+  '/admin/aprovacoes/pedidos': {
+    route: '/admin/aprovacoes/pedidos',
+    title: 'Central de Aprovações de Pedidos',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Centralizar a análise, validação e liberação ou rejeição de pedidos pendentes de aprovação (Venda e Compra) do ERP HURAM, garantindo alçadas reais por valor e perfil, segregação de funções, isolamento multiempresa e trilha auditada.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Fila Consolidada de Pendências: Visualização unificada de todos os pedidos em "Aguardando Aprovação" de Vendas e Compras com número, data, parceiro comercial, solicitante, motivos de retenção e valor total.\n- Filtros Dinâmicos e Busca: Filtro por tipo de pedido (Venda/Compra), empresa faturadora/compradora, valor máximo e busca textual livre por número, razão social ou solicitante.\n- Painel de Indicadores Executivos: Contadores e valores totais pendentes de venda, compra e total geral, além de pedidos aptos para liberação conforme a alçada do usuário conectado.\n- Exibição de Alçada do Usuário: Resumo do perfil conectado, teto de valor de aprovação, capacidade de liberação de restrição de crédito e percentual máximo de desconto.\n- Detalhes sem Sair da Central: Modal completo com resumo executivo do pedido, grade de itens com preços/quantidades e motivos detalhados da retenção.\n- Ação de Aprovação: Validação no servidor via hook `/backend/v1/orders/approval/action` com registro de observações e histórico do aprovador.\n- Ação de Rejeição: Cancelamento do pedido com justificativa obrigatória e notificação imediata do solicitante.\n- Trilha Auditada e Matriz de Alçadas: Abas dedicadas para conferência do histórico auditado em `order_approval_records` e visualização da matriz em `order_approval_tiers`.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Alçada por Perfil no Servidor: Apenas usuários com teto de alçada suficiente cadastrado em `order_approval_tiers` (ou SUP/Diretoria) podem aprovar pedidos que ultrapassem o valor limite.\n- Segregação de Funções: O usuário solicitante/vendedor/comprador do pedido é bloqueado no servidor de aprovar o seu próprio pedido (regra de auditoria e governança).\n- Motivo de Rejeição Obrigatório: Toda rejeição exige texto de justificativa que é registrado na trilha permanente e enviado ao solicitante.\n- Mudança Segura de Estágio: Transição feita exclusivamente pelo backend (`order_approval_process.js`), atualizando `status`, `order_stage`, `approved_by`, `approved_at` e reservando estoque em pedidos de venda.\n- Isolamento Multiempresa: O usuário só pode atuar em pedidos de sua própria empresa/filial, exceto perfil SUP.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Um pedido de venda ou compra é submetido e excede os limites de autoaprovação, caindo em "Aguardando Aprovação".\n2. O sistema notifica internamente os gestores/aprovadores habilitados com link para a Central.\n3. O aprovador acessa `/admin/aprovacoes/pedidos` via menu lateral em Comercial.\n4. Avalia os motivos de retenção (estouro de desconto, limite de crédito, alçada de valor de compra).\n5. Clica em "Ver Detalhes" para inspecionar os itens ou aciona "Aprovar" / "Rejeitar" diretamente.\n6. O backend valida alçada e segregação, efetua a transição de status, grava a trilha auditável e notifica o solicitante.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders`, `purchase_orders`, `order_approval_tiers`, `order_approval_records`, `audit_logs`, `notifications`.\n- Migrações: `0299_standardized_orders_evolution.js` e `0304_order_approvals_engine.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Hook Backend: `pocketbase/hooks/order_approval_process.js`.\n- Serviço de aprovações: `src/services/order-approvals.ts`.\n- Motores de regra: `src/lib/order-sales-rules.ts` e `src/lib/order-purchase-rules.ts`.\n- Notificações internas: `src/services/notifications.ts`.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização da central aberta para usuários do Comercial/Suprimentos/Diretoria; Ações de aprovação validadas no servidor conforme tabela de alçadas (`order_approval_tiers`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `OrderApprovalsPage`, `OrderApprovalsHubScreen`, `SalesPageWrapper`.\n- Serviços: `order-approvals.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Erros de validação e alçada insuficiente retornados em formato amigável com código HTTP 403/400 e exibidos via toast destrutivo.\n- Bloqueio preventivo dos botões de aprovação caso o usuário não possua alçada compatível.',
+    },
+  },
+
+  // -------------------------------------------------------------
   // PEDIDO DE COMPRA (FLUXO PADRONIZADO E PAINEL OFICIAL)
   // -------------------------------------------------------------
   '/admin/compras/pedidos': {
