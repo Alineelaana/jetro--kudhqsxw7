@@ -1259,6 +1259,12 @@ const App = () => (
                                 <Route path="/admin/fiscal/operacoes" element={<Fiscal />} />
                                 <Route path="/admin/fiscal/matriz-cfop" element={<Fiscal />} />
                                 <Route path="/admin/fiscal/simulador-cfop" element={<Fiscal />} />
+                                <Route path="/admin/fiscal/cte" element={<Fiscal />} />
+                                <Route path="/admin/fiscal/mdfe" element={<Fiscal />} />
+                                <Route
+                                  path="/admin/fiscal/cte-mdfe-configuracao"
+                                  element={<Fiscal />}
+                                />
 
                                 {/* Redirecionamentos de Rotas Antigas do Módulo Fiscal */}
                                 <Route
@@ -1275,14 +1281,6 @@ const App = () => (
                                 />
                                 <Route
                                   path="/admin/fiscal/nfse"
-                                  element={<Navigate to="/admin/fiscal/documentos" replace />}
-                                />
-                                <Route
-                                  path="/admin/fiscal/cte"
-                                  element={<Navigate to="/admin/fiscal/documentos" replace />}
-                                />
-                                <Route
-                                  path="/admin/fiscal/mdfe"
                                   element={<Navigate to="/admin/fiscal/documentos" replace />}
                                 />
                                 <Route

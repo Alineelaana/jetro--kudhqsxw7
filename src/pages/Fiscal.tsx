@@ -10,6 +10,9 @@ import {
   ScreenOperacoesCgo,
   ScreenMatrizCfop,
   ScreenSimuladorCfop,
+  ScreenCteEmissao,
+  ScreenMdfeEmissao,
+  ScreenCteMdfeConfiguracao,
 } from '@/components/fiscal/screens'
 
 export function Fiscal() {
@@ -112,6 +115,24 @@ export function Fiscal() {
     pathname.startsWith('/admin/fiscal/simulador-cfop/')
   ) {
     return <ScreenSimuladorCfop />
+  }
+
+  // 11. Emissão de CT-e (Conhecimento de Transporte Eletrônico - Modelo 57)
+  if (pathname === '/admin/fiscal/cte' || pathname.startsWith('/admin/fiscal/cte/')) {
+    return <ScreenCteEmissao />
+  }
+
+  // 12. Emissão de MDF-e (Manifesto Eletrônico de Documentos Fiscais - Modelo 58)
+  if (pathname === '/admin/fiscal/mdfe' || pathname.startsWith('/admin/fiscal/mdfe/')) {
+    return <ScreenMdfeEmissao />
+  }
+
+  // 13. Configuração CT-e/MDF-e (Séries, sequenciais, ANTT, regime de transporte)
+  if (
+    pathname === '/admin/fiscal/cte-mdfe-configuracao' ||
+    pathname.startsWith('/admin/fiscal/cte-mdfe-configuracao/')
+  ) {
+    return <ScreenCteMdfeConfiguracao />
   }
 
   // Fallback padrão: Central Fiscal

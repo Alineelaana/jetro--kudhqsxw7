@@ -491,7 +491,13 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/fiscal/certificados-configuracoes',
           },
           { label: 'Compras e Entradas', route: '/admin/fiscal/compras-entradas' },
+          {
+            label: 'Configuração CT-e/MDF-e',
+            route: '/admin/fiscal/cte-mdfe-configuracao',
+          },
           { label: 'Documentos Fiscais', route: '/admin/fiscal/documentos' },
+          { label: 'Emissão de CT-e', route: '/admin/fiscal/cte' },
+          { label: 'Emissão de MDF-e', route: '/admin/fiscal/mdfe' },
           { label: 'Escrituração e Obrigações', route: '/admin/fiscal/escrituracao' },
           { label: 'Matriz de CFOP', route: '/admin/fiscal/matriz-cfop' },
           { label: 'Operações (CGO)', route: '/admin/fiscal/operacoes' },

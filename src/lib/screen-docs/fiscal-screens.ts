@@ -576,4 +576,165 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Identificação imediata de operações inativas ou regras desatualizadas com exibição do motivo do bloqueio em painel destacado.',
     },
   },
+
+  '/admin/fiscal/cte': {
+    route: '/admin/fiscal/cte',
+    title: 'Emissão de Conhecimento de Transporte Eletrônico (CT-e Mod 57)',
+    moduleGroup: 'Fiscal',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-18',
+    author: 'Engenharia Fiscal HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Disponibilizar ao ERP HURAM o ciclo completo de emissão de CT-e multitenant, integrando parceiros cadastrados, cálculo automático de impostos (CST/CSOSN e CFOP via motor fiscal), vinculação com NF-e de saída transportadas e homologação com trilha auditada.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem de CT-e com badges de status, filtros por número/tomador/status e métricas consolidadas (quantidade, homologados, rascunhos, valor total da prestação);\n- Editor completo em abas: Dados Gerais (tipo, modal, percurso origem→destino), Partes (tomador, remetente, destinatário, expedidor, recebedor), Componentes da Prestação (com cálculo total automático), Carga & NF-e (vínculo com notas fiscais de vendas do sistema), e Impostos (CFOP resolvido pelo motor fiscal, memória de cálculo de ICMS com alíquota e redução de BC);\n- Resumo financeiro e de carga fixo no topo do editor;\n- Validação das regras tributárias e do Dígito Verificador Módulo 11 da chave de 44 dígitos;\n- Ações: Salvar Rascunho, Validar e Salvar, Gerar e Baixar XML (modelo 57 em formato texto oficial), Homologar em Ambiente de Testes SEFAZ com justificativa e Cancelar com motivo obrigatório auditado.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Multitenancy rigoroso com isolamento por empresa_id;\n- CT-e com status autorizado é imutável perante a SEFAZ, permitindo exclusivamente evento de cancelamento devidamente justificado;\n- CT-e normal exige definição de tomador, remetente, destinatário, ao menos 1 componente de prestação e ao menos 1 documento transportado vinculado;\n- Chave de acesso obedece estritamente ao layout de 44 dígitos com Dígito Verificador calculado via Módulo 11;\n- Cancelamento exige justificativa com no mínimo 15 caracteres gravada em audit_logs.',
+    },
+    workflow: {
+      title: 'Fluxo Operacional',
+      content:
+        '1. Operador clica em "Novo CT-e", o sistema consulta o endpoint de sequencial e sugere o próximo número.\n2. Parametriza trecho, partes e componentes de frete.\n3. Vincula a NF-e existente faturada.\n4. O motor fiscal sugere o CFOP e calcula a base e o ICMS.\n5. O operador valida o documento e gera o XML para transmissão externa ou homologa no ambiente de testes.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções: `cte_documents`, `cte_configs`, `partners`, `sales_invoices`, `audit_logs`.\n- Motor: `cte-mdfe-engine.ts` e `fiscal-cfop-service.ts`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo Comercial/Vendas (`sales_invoices`) para importação de notas transportadas.\n- Cadastro de Clientes e Fornecedores (`partners`).\n- Motor Fiscal HURAM para resolução de CFOP e ICMS de transporte.',
+    },
+    permissions: {
+      title: 'Permissões de Acesso',
+      content:
+        '- Acesso liberado aos perfis com permissão fiscal (`canViewFiscal(role)`), faturamento, logística e gerência executiva.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componente: `ScreenCteEmissao` em `@/components/fiscal/screens/screen-cte-emissao`.\n- Backend: hooks em `pocketbase/hooks/freight_fiscal_guards.js`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Exceções',
+      content:
+        '- Alertas imediatos caso falte o remetente, tomador ou documentos de carga.\n- Bloqueio no backend contra alteração de CT-e autorizado ou cancelado.',
+    },
+  },
+
+  '/admin/fiscal/mdfe': {
+    route: '/admin/fiscal/mdfe',
+    title: 'Emissão de Manifesto Eletrônico de Documentos Fiscais (MDF-e Mod 58)',
+    moduleGroup: 'Fiscal',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-18',
+    author: 'Engenharia Fiscal HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Garantir a conformidade do transporte de cargas rodoviárias mediante a emissão do manifesto modelo 58, rastreabilidade dos veículos, controle de condutores e encerramento obrigatório ao término do trajeto.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Painel com listagem de manifestos, filtros e indicadores operacionais (total, trânsito, encerrados, valor total da carga);\n- Editor completo em abas: Dados Gerais (trajeto de carregamento→descarregamento), Veículo & Condutores (placa, RNTRC, reboques, condutores com CPF), Vale-Pedágio, CT-e Vinculados (seleção de CT-e emitidos com totalização automática de peso e valor) e Observações;\n- Resumo fixo dos totais da carga no cabeçalho do editor;\n- Validação das regras do manifesto e cálculo de chave de acesso de 44 dígitos;\n- Ações: Salvar Rascunho, Validar, Baixar XML textual modelo 58, Homologar em testes, Cancelar com motivo e Encerrar viagem indicando município/UF de destino.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Manifesto encerrado ou cancelado é estritamente imutável;\n- O encerramento do MDF-e só pode ser realizado se o documento estiver previamente autorizado perante a SEFAZ ou em trânsito;\n- Exige placa do veículo de tração, RNTRC válido perante a ANTT, ao menos 1 condutor cadastrado com CPF e ao menos 1 CT-e vinculado para a carga;\n- Registro automático de todas as ações de criação, alteração e encerramento em `audit_logs`.',
+    },
+    workflow: {
+      title: 'Fluxo Operacional',
+      content:
+        '1. Criação do manifesto vinculando os CT-e que compõem o carregamento do veículo.\n2. Indicação da placa do caminhão, do condutor responsável e do trajeto.\n3. Homologação ou exportação do XML modelo 58 para transmissão.\n4. Ao descarregar no destino final, acionamento do botão "Encerrar" registrando a UF e município de encerramento.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções: `mdfe_documents`, `mdfe_configs`, `cte_documents`, `audit_logs`.\n- Motor: `cte-mdfe-engine.ts`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulo CT-e (`cte_documents`) para amarração e validação de documentos transportados.\n- Controle de frotas e logística.',
+    },
+    permissions: {
+      title: 'Permissões de Acesso',
+      content:
+        '- Acesso concedido a operadores fiscais, expedição, logística e administração (`canViewFiscal(role)`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componente: `ScreenMdfeEmissao` em `@/components/fiscal/screens/screen-mdfe-emissao`.\n- Backend: hooks em `pocketbase/hooks/freight_fiscal_guards.js`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Exceções',
+      content:
+        '- Bloqueio caso se tente encerrar manifesto ainda não autorizado.\n- Exigência de motivo com no mínimo 15 caracteres para cancelamento.',
+    },
+  },
+
+  '/admin/fiscal/cte-mdfe-configuracao': {
+    route: '/admin/fiscal/cte-mdfe-configuracao',
+    title: 'Configurações de CT-e e MDF-e',
+    moduleGroup: 'Fiscal',
+    docVersion: '1.0.0',
+    lastUpdated: '2025-05-18',
+    author: 'Engenharia Fiscal HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Centralizar as configurações administrativas dos documentos fiscais de transporte modelo 57 e 58 por empresa, definindo os parâmetros de emissão, CFOPs padrão e esclarecendo os requisitos de certificação digital externa.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Parametrização de CT-e: série ativa, último número sequencial, ambiente de operação, regime tributário (Simples, Lucro Presumido, Real), RNTRC da empresa, CFOP padrão estadual e interestadual e observações padrão;\n- Parametrização de MDF-e: série, último sequencial, ambiente, RNTRC padrão da frota, tipo de emitente (prestador vs carga própria) e tipo de transportador (ETC, TAC, CTC);\n- Painel explicativo permanente detalhando que a transmissão real exige Certificado Digital A1 fora do ambiente web HURAM, garantindo integridade e conformidade jurídica.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- As configurações são associadas ao tenant multitenant da empresa ativa (`empresa_id`);\n- O incremento sequencial automático nos endpoints respeita o valor configurado nestas séries;\n- Produção oficial requer certificado A1 e transmissão via emissor externo contratado.',
+    },
+    workflow: {
+      title: 'Fluxo Operacional',
+      content:
+        '1. O gestor fiscal acessa a tela e informa a série e último sequencial emitido na SEFAZ.\n2. Define o RNTRC e os regimes padrão.\n3. Salva os parâmetros. Todas as novas emissões de CT-e e MDF-e herdam estas configurações automaticamente.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content: '- Coleções PocketBase: `cte_configs`, `mdfe_configs`, `empresas`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Módulos de emissão de CT-e e MDF-e (`cte_documents`, `mdfe_documents`).\n- Endpoints de sequencial `/backend/v1/cte-numbers/next` e `/backend/v1/mdfe-numbers/next`.',
+    },
+    permissions: {
+      title: 'Permissões de Acesso',
+      content:
+        '- Acesso restrito a gestores fiscais e administradores do sistema (`canViewFiscal(role)`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componente: `ScreenCteMdfeConfiguracao` em `@/components/fiscal/screens/screen-cte-mdfe-configuracao`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Exceções',
+      content:
+        '- Notificações visuais claras de sucesso ou erro na persistência dos parâmetros no banco.',
+    },
+  },
 }
