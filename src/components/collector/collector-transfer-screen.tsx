@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  ArrowLeftRight,
-  CheckCircle2,
-  AlertTriangle,
-  MapPin,
-  Barcode,
-} from 'lucide-react'
+import { ArrowLeftRight, CheckCircle2, AlertTriangle, MapPin, Barcode } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -250,12 +244,7 @@ export const CollectorTransferScreen: React.FC = () => {
 
           <Button
             type="submit"
-            disabled={
-              isSubmitting ||
-              !origem.trim() ||
-              !produtoScan.trim() ||
-              !destino.trim()
-            }
+            disabled={isSubmitting || !origem.trim() || !produtoScan.trim() || !destino.trim()}
             className="w-full h-14 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-base flex items-center justify-center gap-2 shadow-lg shadow-purple-950/40"
           >
             <ArrowLeftRight className="h-5 w-5" />
@@ -263,10 +252,6 @@ export const CollectorTransferScreen: React.FC = () => {
           </Button>
         </form>
       </div>
-    </CollectorTransferScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorTransferScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

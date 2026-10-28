@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  ArrowDownToDot,
-  CheckCircle2,
-  AlertTriangle,
-  MapPin,
-  Sparkles,
-} from 'lucide-react'
+import { ArrowDownToDot, CheckCircle2, AlertTriangle, MapPin, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -284,7 +278,8 @@ export const CollectorPutawayScreen: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-slate-400">
-                  Lote: <strong className="text-slate-200">{itemData.lote}</strong> | Val: {itemData.validade}
+                  Lote: <strong className="text-slate-200">{itemData.lote}</strong> | Val:{' '}
+                  {itemData.validade}
                 </div>
               </div>
 
@@ -333,10 +328,6 @@ export const CollectorPutawayScreen: React.FC = () => {
           </Card>
         )}
       </div>
-    </CollectorPutawayScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorPutawayScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

@@ -17,19 +17,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CollectorShellLayout } from './collector-shell-layout'
 import { useAuth } from '@/custom_hooks/useAuth'
-import {
-  getOpenShiftForOperator,
-  getLocalActiveShift,
-  getOfflineQueue,
-} from '@/services/collector'
+import { getOpenShiftForOperator, getLocalActiveShift, getOfflineQueue } from '@/services/collector'
 import type { CollectorShift } from '@/types/collector'
 
 export const CollectorHubScreen: React.FC = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [activeShift, setActiveShift] = useState<CollectorShift | null>(
-    getLocalActiveShift(),
-  )
+  const [activeShift, setActiveShift] = useState<CollectorShift | null>(getLocalActiveShift())
   const [offlineCount, setOfflineCount] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
@@ -145,9 +139,7 @@ export const CollectorHubScreen: React.FC = () => {
                 <h3 className="font-bold text-base text-slate-100 flex items-center justify-between">
                   <span>{item.title}</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                  {item.desc}
-                </p>
+                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{item.desc}</p>
               </div>
             </button>
           )
@@ -180,9 +172,7 @@ export const CollectorHubScreen: React.FC = () => {
               <Clock className="h-5 w-5 text-emerald-400" />
               <div className="text-left">
                 <div>Abrir Turno de Trabalho</div>
-                <div className="text-[11px] text-slate-400 font-normal">
-                  Dispositivo e operador
-                </div>
+                <div className="text-[11px] text-slate-400 font-normal">Dispositivo e operador</div>
               </div>
             </>
           )}
@@ -204,10 +194,6 @@ export const CollectorHubScreen: React.FC = () => {
           </div>
         </Button>
       </div>
-    </CollectorHubScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorHubScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

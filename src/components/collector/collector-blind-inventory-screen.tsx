@@ -1,13 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  ScanBarcode,
-  CheckCircle2,
-  AlertTriangle,
-  EyeOff,
-  MapPin,
-  ListPlus,
-} from 'lucide-react'
+import { ScanBarcode, CheckCircle2, AlertTriangle, EyeOff, MapPin, ListPlus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -186,9 +179,7 @@ export const CollectorBlindInventoryScreen: React.FC = () => {
         <div className="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800">
           <div className="flex items-center gap-2">
             <EyeOff className="h-4 w-4 text-amber-400" />
-            <span className="text-xs uppercase font-bold text-slate-300">
-              Ciclo da Contagem:
-            </span>
+            <span className="text-xs uppercase font-bold text-slate-300">Ciclo da Contagem:</span>
           </div>
           <div className="flex gap-1">
             <button
@@ -330,10 +321,6 @@ export const CollectorBlindInventoryScreen: React.FC = () => {
           </div>
         )}
       </div>
-    </CollectorBlindInventoryScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorBlindInventoryScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

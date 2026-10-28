@@ -83,13 +83,28 @@ export const CollectorPickingScreen: React.FC = () => {
         } else {
           // Fallback pedidos de teste
           setAvailableOrders([
-            { id: 'ped-101', order_number: 'PED-2025-0101', customer_name: 'Supermercado Central', total: 1250 },
-            { id: 'ped-102', order_number: 'PED-2025-0102', customer_name: 'Pizzaria Bella Itália', total: 680 },
+            {
+              id: 'ped-101',
+              order_number: 'PED-2025-0101',
+              customer_name: 'Supermercado Central',
+              total: 1250,
+            },
+            {
+              id: 'ped-102',
+              order_number: 'PED-2025-0102',
+              customer_name: 'Pizzaria Bella Itália',
+              total: 680,
+            },
           ])
         }
       } catch {
         setAvailableOrders([
-          { id: 'ped-101', order_number: 'PED-2025-0101', customer_name: 'Supermercado Central', total: 1250 },
+          {
+            id: 'ped-101',
+            order_number: 'PED-2025-0101',
+            customer_name: 'Supermercado Central',
+            total: 1250,
+          },
         ])
       }
     }
@@ -97,7 +112,11 @@ export const CollectorPickingScreen: React.FC = () => {
   }, [])
 
   // Iniciar separação do pedido selecionado (ordena linhas por endereço/corredor para diminuir deslocamento)
-  const handleSelectOrder = (order: { id: string; order_number: string; customer_name: string }) => {
+  const handleSelectOrder = (order: {
+    id: string
+    order_number: string
+    customer_name: string
+  }) => {
     const lines: PickingLine[] = [
       {
         id: 'lin-1',
@@ -250,9 +269,7 @@ export const CollectorPickingScreen: React.FC = () => {
     }
 
     // Verificar se há itens com saldo pendente sem motivo
-    const hasIncomplete = selectedOrder.lines.some(
-      (l) => l.quantidadeSeparada < l.quantidadePedida,
-    )
+    const hasIncomplete = selectedOrder.lines.some((l) => l.quantidadeSeparada < l.quantidadePedida)
     if (hasIncomplete && !divergenceReason) {
       setShowDivergenceDialog(true)
       return
@@ -281,7 +298,8 @@ export const CollectorPickingScreen: React.FC = () => {
         quantidade_esperada: l.quantidadePedida,
         quantidade_executada: l.quantidadeSeparada,
         divergencia: div,
-        motivo_divergencia: div !== 0 ? divergenceReason || 'Corte parcial de separação' : undefined,
+        motivo_divergencia:
+          div !== 0 ? divergenceReason || 'Corte parcial de separação' : undefined,
         status: div !== 0 ? 'divergente' : 'concluido',
         idempotency_key: `sep_${selectedOrder.id}_${l.id}_${Date.now()}`,
         metadata: {
@@ -364,12 +382,8 @@ export const CollectorPickingScreen: React.FC = () => {
                     className="w-full p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-blue-500/60 text-left transition-all flex items-center justify-between"
                   >
                     <div>
-                      <div className="font-bold text-white text-sm">
-                        {ord.order_number}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-0.5">
-                        {ord.customer_name}
-                      </div>
+                      <div className="font-bold text-white text-sm">{ord.order_number}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">{ord.customer_name}</div>
                     </div>
                     <div className="flex items-center gap-2 text-right">
                       <Badge className="bg-blue-600/30 text-blue-300 border-blue-500/40 text-xs">
@@ -387,10 +401,8 @@ export const CollectorPickingScreen: React.FC = () => {
             {/* Cabeçalho do Pedido e Progresso */}
             <div className="flex items-center justify-between px-1 text-xs text-slate-300">
               <div>
-                <span className="font-bold text-white text-sm">
-                  {selectedOrder.orderNumber}
-                </span>{' '}
-                - {selectedOrder.customerName}
+                <span className="font-bold text-white text-sm">{selectedOrder.orderNumber}</span> -{' '}
+                {selectedOrder.customerName}
               </div>
               <Button
                 variant="ghost"
@@ -438,12 +450,14 @@ export const CollectorPickingScreen: React.FC = () => {
 
                   {/* Informação do Produto */}
                   <div>
-                    <h3 className="text-lg font-bold text-white">
-                      {currentLine.produtoNome}
-                    </h3>
+                    <h3 className="text-lg font-bold text-white">{currentLine.produtoNome}</h3>
                     <div className="text-xs text-slate-400 flex items-center gap-3 mt-1">
-                      <span>Cód: <strong className="text-slate-200">{currentLine.produtoCodigo}</strong></span>
-                      <span>EAN: <strong className="text-slate-200">{currentLine.barcode}</strong></span>
+                      <span>
+                        Cód: <strong className="text-slate-200">{currentLine.produtoCodigo}</strong>
+                      </span>
+                      <span>
+                        EAN: <strong className="text-slate-200">{currentLine.barcode}</strong>
+                      </span>
                     </div>
                   </div>
 
@@ -452,10 +466,8 @@ export const CollectorPickingScreen: React.FC = () => {
                     <div>
                       <div className="text-xs text-slate-400">Progresso deste item:</div>
                       <div className="text-xl font-mono font-black">
-                        <span className="text-emerald-400">
-                          {currentLine.quantidadeSeparada}
-                        </span>{' '}
-                        / {currentLine.quantidadePedida} un
+                        <span className="text-emerald-400">{currentLine.quantidadeSeparada}</span> /{' '}
+                        {currentLine.quantidadePedida} un
                       </div>
                     </div>
 
@@ -546,8 +558,8 @@ export const CollectorPickingScreen: React.FC = () => {
                 <span>Corte de Separação / Itens Pendentes</span>
               </div>
               <p className="text-xs text-slate-300">
-                Nem todas as quantidades foram separadas integralmente. Informe o motivo
-                do corte para registrar na auditoria WMS:
+                Nem todas as quantidades foram separadas integralmente. Informe o motivo do corte
+                para registrar na auditoria WMS:
               </p>
               <Input
                 value={divergenceReason}
@@ -605,10 +617,6 @@ export const CollectorPickingScreen: React.FC = () => {
           </Button>
         </div>
       )}
-    </CollectorPickingScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorPickingScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

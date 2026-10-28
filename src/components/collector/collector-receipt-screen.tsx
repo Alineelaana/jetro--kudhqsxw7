@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  PackageCheck,
-  CheckCircle2,
-  AlertTriangle,
-  FileText,
-  Barcode,
-  Search,
-} from 'lucide-react'
+import { PackageCheck, CheckCircle2, AlertTriangle, FileText, Barcode, Search } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -245,10 +238,8 @@ export const CollectorReceiptScreen: React.FC = () => {
     }
   }
 
-  const allComplete =
-    items.length > 0 && items.every((i) => i.qtdConferida === i.qtdEsperada)
-  const hasDivergences =
-    items.length > 0 && items.some((i) => i.qtdConferida !== i.qtdEsperada)
+  const allComplete = items.length > 0 && items.every((i) => i.qtdConferida === i.qtdEsperada)
+  const hasDivergences = items.length > 0 && items.some((i) => i.qtdConferida !== i.qtdEsperada)
 
   return (
     <CollectorShellLayout
@@ -373,9 +364,7 @@ export const CollectorReceiptScreen: React.FC = () => {
                             )}
                           </div>
                           <div className="text-xs text-slate-400 flex items-center gap-3 mt-0.5">
-                            <span className="font-mono text-emerald-400">
-                              {it.codigo}
-                            </span>
+                            <span className="font-mono text-emerald-400">{it.codigo}</span>
                             <span>Lote: {it.lote}</span>
                             <span>EAN: {it.barcode}</span>
                           </div>
@@ -395,10 +384,7 @@ export const CollectorReceiptScreen: React.FC = () => {
                             >
                               {it.qtdConferida}
                             </span>
-                            <span className="text-slate-500 text-sm">
-                              {' '}
-                              / {it.qtdEsperada}
-                            </span>
+                            <span className="text-slate-500 text-sm"> / {it.qtdEsperada}</span>
                           </div>
                         </div>
                       </div>
@@ -544,10 +530,6 @@ export const CollectorReceiptScreen: React.FC = () => {
           </Button>
         </div>
       )}
-    </CollectorReceiptScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorReceiptScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

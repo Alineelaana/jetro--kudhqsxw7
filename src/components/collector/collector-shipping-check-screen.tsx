@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Truck,
-  CheckCircle2,
-  AlertTriangle,
-  Package,
-  Layers,
-} from 'lucide-react'
+import { Truck, CheckCircle2, AlertTriangle, Package, Layers } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -93,9 +87,7 @@ export const CollectorShippingCheckScreen: React.FC = () => {
   const handleScanVolume = (code: string) => {
     const trimmed = code.trim().toUpperCase()
     const index = volumes.findIndex(
-      (v) =>
-        v.codigoVolume.toUpperCase() === trimmed ||
-        v.pedidoNumero.toUpperCase() === trimmed,
+      (v) => v.codigoVolume.toUpperCase() === trimmed || v.pedidoNumero.toUpperCase() === trimmed,
     )
 
     if (index === -1) {
@@ -295,7 +287,10 @@ export const CollectorShippingCheckScreen: React.FC = () => {
                             Embarcado
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-slate-400 border-slate-700 text-[10px] py-0">
+                          <Badge
+                            variant="outline"
+                            className="text-slate-400 border-slate-700 text-[10px] py-0"
+                          >
                             Pendente
                           </Badge>
                         )}
@@ -362,10 +357,6 @@ export const CollectorShippingCheckScreen: React.FC = () => {
           </Button>
         </div>
       )}
-    </CollectorShippingCheckScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorShippingCheckScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />

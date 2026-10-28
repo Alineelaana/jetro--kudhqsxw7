@@ -47,7 +47,9 @@ export const CollectorShiftScreen: React.FC = () => {
   const [obsFechamento, setObsFechamento] = useState('')
 
   // Dispositivos cadastrados no sistema
-  const [dispositivosList, setDispositivosList] = useState<Array<{ id: string; codigo: string; nome?: string }>>([])
+  const [dispositivosList, setDispositivosList] = useState<
+    Array<{ id: string; codigo: string; nome?: string }>
+  >([])
 
   useEffect(() => {
     const init = async () => {
@@ -241,7 +243,10 @@ export const CollectorShiftScreen: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="filial" className="text-xs uppercase text-slate-400 flex items-center gap-1">
+                    <Label
+                      htmlFor="filial"
+                      className="text-xs uppercase text-slate-400 flex items-center gap-1"
+                    >
                       <Building className="h-3 w-3" /> Filial / CD
                     </Label>
                     <Input
@@ -254,7 +259,10 @@ export const CollectorShiftScreen: React.FC = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="bateria" className="text-xs uppercase text-slate-400 flex items-center gap-1">
+                    <Label
+                      htmlFor="bateria"
+                      className="text-xs uppercase text-slate-400 flex items-center gap-1"
+                    >
                       <BatteryCharging className="h-3 w-3 text-emerald-400" /> Bateria (%)
                     </Label>
                     <Input
@@ -328,7 +336,10 @@ export const CollectorShiftScreen: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="bateriaFim" className="text-xs uppercase text-slate-400 flex items-center gap-1">
+                <Label
+                  htmlFor="bateriaFim"
+                  className="text-xs uppercase text-slate-400 flex items-center gap-1"
+                >
                   <BatteryCharging className="h-3 w-3 text-red-400" /> Bateria Final (%)
                 </Label>
                 <Input
@@ -377,10 +388,6 @@ export const CollectorShiftScreen: React.FC = () => {
           </Card>
         )}
       </div>
-    </CollectorShiftScreenInner>
+    </CollectorShellLayout>
   )
 }
-
-const CollectorShiftScreenInner: React.FC<React.ComponentProps<typeof CollectorShellLayout>> = (
-  props,
-) => <CollectorShellLayout {...props} />
