@@ -91,8 +91,8 @@ export const CollectorBlindInventoryScreen: React.FC = () => {
 
     setIsSubmitting(true)
 
-    const recordPayload = {
-      tipo: 'inventario' as const,
+    const res = await executeCollectorOperation({
+      tipo: 'inventario',
       shift_id: shift?.id,
       dispositivo_codigo: shift?.dispositivo_codigo || 'COL-01',
       operador_id: user?.id || 'op',
@@ -104,17 +104,15 @@ export const CollectorBlindInventoryScreen: React.FC = () => {
       lote: lote.trim() || 'GERAL',
       endereco_origem: endereco.trim().toUpperCase(),
       quantidade_executada: Number(quantidade) || 1,
-      status: 'concluido' as const,
+      status: 'concluido',
       idempotency_key: `inv_${inventarioId}_${contagemNum}_${endereco}_${itemBarcode}_${Date.now()}`,
       metadata: {
         tipo_contagem: contagemNum === 1 ? '1ª Contagem Cega' : '2ª Contagem Cega',
         cego: true,
       },
-      empresa_id: user?.empresa_id,
-      filial_id: user?.filial_id,
-    }
-
-    const res = await executeCollectorOperation(recordPayload)
+      empresa_id: user?.empresa_id as string | undefined,
+      filial_id: user?.filial_id as string | undefined,
+    })
     setIsSubmitting(false)
 
     if (res.success) {
