@@ -38,6 +38,7 @@ import {
   getNextPurchaseNumber,
   getApprovalThreshold,
 } from '@/services/purchasing'
+import { submitOrderForApproval } from '@/services/order-approvals'
 import { getProducts } from '@/services/products'
 import type { PurchaseOrder, OrderItem } from '@/lib/purchasing-types'
 import { StandardOrderHeader } from './standard-order-header'

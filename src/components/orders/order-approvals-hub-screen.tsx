@@ -330,7 +330,7 @@ export function OrderApprovalsHubScreen() {
               Central de Aprovações de Pedidos
             </h1>
             <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300">
-              v0.0.651
+              v0.0.652
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
