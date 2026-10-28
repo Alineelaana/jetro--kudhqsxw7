@@ -75,6 +75,11 @@ const InserirClientesScreen = lazy(() =>
 )
 const SalesOrdersPage = lazy(() => import('./pages/sales/SalesOrdersPage'))
 const SalesOrdersQueryPage = lazy(() => import('./pages/sales/SalesOrdersQueryPage'))
+const PurchaseOrdersPanel = lazy(() =>
+  import('@/components/purchasing/purchase-orders-panel').then((m) => ({
+    default: m.PurchaseOrdersPanel,
+  })),
+)
 const InvoicingPage = lazy(() => import('./pages/sales/InvoicingPage'))
 const NfePage = lazy(() => import('./pages/sales/NfePage'))
 const NfcePage = lazy(() => import('./pages/sales/NfcePage'))
@@ -623,16 +628,17 @@ const App = () => (
                                   element={<SalesOrdersQueryPage />}
                                 />
 
+                                {/* ROTAS DE PEDIDOS */}
+                                <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                                <Route
+                                  path="/admin/compras/pedidos"
+                                  element={<PurchaseOrdersPanel />}
+                                />
+
                                 {/* REDIRECIONAMENTOS DE ROTAS LEGADAS DE VENDAS */}
                                 <Route
                                   path="/admin/vendas"
                                   element={<Navigate to="/admin/comercial" replace />}
-                                />
-                                <Route
-                                  path="/admin/vendas/pedidos"
-                                  element={
-                                    <Navigate to="/admin/comercial/pedidos-faturamento" replace />
-                                  }
                                 />
                                 <Route
                                   path="/admin/vendas/faturamento"

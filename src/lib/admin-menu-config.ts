@@ -282,6 +282,14 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/comercial/contratos-devolucoes',
           },
           {
+            label: 'Pedido de Venda',
+            route: '/admin/vendas/pedidos',
+          },
+          {
+            label: 'Pedido de Compra',
+            route: '/admin/compras/pedidos',
+          },
+          {
             label: 'Cotações e Cotador',
             route: '/admin/comercial/cotacoes-cotador',
           },
