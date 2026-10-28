@@ -5,12 +5,18 @@ import { ScreenContasPagarTesouraria } from '@/components/financial/screens/scre
 import { ScreenBancosConciliacao } from '@/components/financial/screens/screen-bancos-conciliacao'
 import { ScreenPlanejamentoGestao } from '@/components/financial/screens/screen-planejamento-gestao'
 import { ScreenConfiguracoesFinanceiras } from '@/components/financial/screens/screen-configuracoes-financeiras'
+import { ScreenCnabConfiguracoes } from '@/components/financial/screens/screen-cnab-configuracoes'
+import { ScreenCnabRemessas } from '@/components/financial/screens/screen-cnab-remessas'
+import { ScreenCnabRetornos } from '@/components/financial/screens/screen-cnab-retornos'
 
 const TITLES: Record<string, string> = {
   central: 'Central Financeira',
   'contas-a-receber-cobranca': 'Contas a Receber e Cobrança',
   'contas-a-pagar-tesouraria': 'Contas a Pagar e Tesouraria',
   'bancos-conciliacao': 'Bancos e Conciliação',
+  'cnab-configuracoes': 'Configuração CNAB',
+  'cnab-remessas': 'Remessa CNAB',
+  'cnab-retornos': 'Retorno CNAB',
   'planejamento-gestao': 'Planejamento e Gestão',
   'configuracoes-financeiras': 'Configurações Financeiras',
   // Legados para exibição
@@ -64,6 +70,15 @@ export default function Financial({ screen }: { screen: string }) {
       case 'closing':
       case 'reports':
         return <ScreenPlanejamentoGestao />
+
+      case 'cnab-configuracoes':
+        return <ScreenCnabConfiguracoes />
+
+      case 'cnab-remessas':
+        return <ScreenCnabRemessas />
+
+      case 'cnab-retornos':
+        return <ScreenCnabRetornos />
 
       case 'configuracoes-financeiras':
       case 'configuracoes':

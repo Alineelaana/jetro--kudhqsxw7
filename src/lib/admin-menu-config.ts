@@ -445,6 +445,10 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/financeiro',
           },
           {
+            label: 'Configuração CNAB',
+            route: '/admin/financeiro/cnab-configuracoes',
+          },
+          {
             label: 'Configurações Financeiras',
             route: '/admin/financeiro/configuracoes-financeiras',
           },
@@ -459,6 +463,14 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           {
             label: 'Planejamento e Gestão',
             route: '/admin/financeiro/planejamento-gestao',
+          },
+          {
+            label: 'Remessa CNAB',
+            route: '/admin/financeiro/cnab-remessas',
+          },
+          {
+            label: 'Retorno CNAB',
+            route: '/admin/financeiro/cnab-retornos',
           },
         ],
       },

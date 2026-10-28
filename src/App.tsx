@@ -914,6 +914,18 @@ const App = () => (
                                   element={<Financial screen="bancos-conciliacao" />}
                                 />
                                 <Route
+                                  path="/admin/financeiro/cnab-configuracoes"
+                                  element={<Financial screen="cnab-configuracoes" />}
+                                />
+                                <Route
+                                  path="/admin/financeiro/cnab-remessas"
+                                  element={<Financial screen="cnab-remessas" />}
+                                />
+                                <Route
+                                  path="/admin/financeiro/cnab-retornos"
+                                  element={<Financial screen="cnab-retornos" />}
+                                />
+                                <Route
                                   path="/admin/financeiro/planejamento-gestao"
                                   element={<Financial screen="planejamento-gestao" />}
                                 />

@@ -352,4 +352,173 @@ export const FINANCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Validação de campos obrigatórios (código contábil, nome da conta, agência) com aviso visual.\n- Alerta impeditivo de integridade referencial ao tentar deletar entidades em uso.',
     },
   },
+
+  // -------------------------------------------------------------
+  // 7. CONFIGURAÇÃO CNAB
+  // -------------------------------------------------------------
+  '/admin/financeiro/cnab-configuracoes': {
+    route: '/admin/financeiro/cnab-configuracoes',
+    title: 'Configuração CNAB',
+    moduleGroup: 'Financeiro',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Parametrizar e manter os convênios bancários multitenant FEBRABAN para geração de remessa e processamento de retornos nos padrões CNAB 240 e CNAB 400 por empresa e filial.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Cadastro completo de convênios por banco FEBRABAN (Banco do Brasil 001, Santander 033, Caixa 104, Bradesco 237, Itaú 341, Sicredi 748, Sicoob 756 e outros);\n- Definição do layout padrão (CNAB 240 como padrão recomendado e CNAB 400 para bancos legados);\n- Configuração de agência, conta, dígitos verificadores, carteira, variação de carteira, código do convênio e código do cedente/beneficiário;\n- Modalidade de cobrança: Boleto, PIX ou Híbrido com chave PIX do recebedor;\n- Ambiente operacional (Homologação ou Produção);\n- Parâmetros financeiros: percentual de multa por atraso, juros de mora diários, prazo de baixa/devolução e dias de protesto;\n- Instruções padrão impressas no boleto e controle automático do sequencial de remessa por convênio;\n- Listagem analítica via JetroTable com filtros, ordenação e exportação.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- A criação e alteração de convênios exige obrigatoriamente código do banco, agência, conta, carteira, convênio e código do cedente (validado no hook de backend);\n- Cada convênio controla seu próprio sequencial estrito de arquivo de remessa, incrementado automaticamente após cada geração bem-sucedida;\n- Respeita o isolamento multiempresa e permissões de acesso do ERP.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O gestor financeiro acessa a tela e clica em "Novo Convênio".\n2. Preenche os dados fornecidos pelo banco (agência, conta, convênio, carteira, cedente e instruções).\n3. Define se a cobrança será CNAB 240 ou 400 e se terá suporte a PIX híbrido.\n4. Ao salvar, a configuração fica disponível para o módulo de Remessas CNAB.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleção PocketBase `cnab_configs` com controle de RLS multiempresa.\n- Banco de códigos FEBRABAN oficial.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Integração com os módulos de Remessa CNAB (`cnab_remessas`) e Retorno CNAB (`cnab_retornos`).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- Visualização e edição: SUP, ADMIN e gestores do Financeiro.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenCnabConfiguracoes`, `JetroTable`, `Dialog`, `Select`, `Input`, `Switch`.\n- Serviços: `CnabService` e `@/lib/cnab/types`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Validação visual de campos obrigatórios e bloqueio de exclusão em caso de falha de conexão.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 8. REMESSA CNAB
+  // -------------------------------------------------------------
+  '/admin/financeiro/cnab-remessas': {
+    route: '/admin/financeiro/cnab-remessas',
+    title: 'Remessa CNAB',
+    moduleGroup: 'Financeiro',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerar arquivos de remessa bancária no padrão FEBRABAN CNAB 240 e CNAB 400 para registro de cobrança junto aos bancos homologados, garantindo a unicidade e auditoria dos títulos enviados.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Seleção de títulos em aberto de `financial_receivables` com filtros avançados por cliente, documento e período de vencimento;\n- Geração de arquivo CNAB 240: Header de Arquivo (0), Header de Lote (1), Segmento P (título), Segmento Q (sacado), Segmento R (multa/juros), Trailer de Lote (5) e Trailer de Arquivo (9) rigorosamente alinhados em 240 colunas;\n- Geração de arquivo CNAB 400: Registro 0 (Header), Registro 1 (Detalhe) e Registro 9 (Trailer) rigorosamente alinhados em 400 colunas;\n- Download automático imediato do arquivo .REM com nomenclatura sequencial padrão;\n- Histórico completo de lotes gerados na coleção `cnab_remessas` com checksum sha256 simples, quantidade e valor total dos títulos;\n- Cancelamento de lote de remessa com liberação automática dos títulos para novo envio;\n- Abas "Gerar Remessa" e "Histórico de Lotes" com JetroTable completa.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Unicidade estrita: títulos já remetidos em lote ativo (não cancelado) não podem ser reenviados;\n- Títulos liquidados (status "Recebido" ou "Pago") ou cancelados são bloqueados para envio (validado no hook de backend);\n- A geração incrementa automaticamente o sequencial do convênio bancário e gera registro na trilha imutável de auditoria (`audit_logs`);\n- O CNAB não altera o valor do título nem interfere no fluxo fiscal/faturamento.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O operador seleciona o convênio bancário desejado.\n2. Filtra os recebíveis por vencimento ou cliente e marca os títulos a serem remetidos.\n3. Clica em "Gerar Remessa (.REM)".\n4. O sistema valida as regras no backend, cria o registro do lote, incrementa o sequencial e inicia o download do arquivo .REM.\n5. O operador transmite o arquivo pelo internet banking da instituição financeira.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `financial_receivables`, `cnab_configs`, `cnab_remessas` e `audit_logs`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Conexão direta com o Contas a Receber (`financial_receivables`) e Trilha de Auditoria do Huram ERP.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- Visualização e emissão: Administradores e Operadores Financeiros autorizados.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenCnabRemessas`, `JetroTable`, `Tabs`, `Dialog`.\n- Geradores: `generateCnab240Remessa` e `generateCnab400Remessa`.\n- Serviço: `CnabService`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Rejeição de títulos em duplicidade com mensagem explicativa informando o lote ativo;\n- Bloqueio se o convênio bancário estiver com dados cadastrais incompletos.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // 9. RETORNO CNAB
+  // -------------------------------------------------------------
+  '/admin/financeiro/cnab-retornos': {
+    route: '/admin/financeiro/cnab-retornos',
+    title: 'Retorno CNAB',
+    moduleGroup: 'Financeiro',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-18',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Processar arquivos de retorno bancário (.RET / .TXT), decodificar ocorrências de liquidação, baixa e rejeição, conferir valores e liquidar automaticamente recebíveis compatíveis através do fluxo oficial de baixa do ERP.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Upload de arquivos de retorno nos padrões CNAB 240 (segmentos T e U) e CNAB 400 (registro 1);\n- Parser automático com identificação do layout, banco e decodificação de ocorrências (Liquidação, Baixa Simples, Devolução, Rejeição com motivos decodificados, Liquidação em Cartório, Abatimentos e Descontos);\n- Conferência lado a lado entre o registro bancário e o título em aberto no sistema (por número do título ou nosso número);\n- Classificação automática de conferência: Compatível, Divergente, Já Liquidado ou Não Localizado;\n- Ação "Baixar compatíveis": aplica a baixa utilizando exatamente o fluxo oficial de recebimento de `financial_receivables` com data de pagamento, valor pago, juros e descontos;\n- Bloqueio preventivo: divergências de valor e títulos não localizados não sofrem baixa automática;\n- Histórico de arquivos processados com auditoria de baixas, pendências e checksum.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- O retorno bancário não é fonte de verdade unilateral: títulos com divergência de valor permanecem abertos para conferência manual;\n- A liquidação reutiliza o mesmo caminho de baixa do Contas a Receber existente, preservando integrações contábeis e tesouraria;\n- Todo arquivo processado gera registro imutável em `cnab_retornos` e aciona trilha em `audit_logs`.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O operador faz upload do arquivo .RET baixado do internet banking.\n2. O parser analisa os registros e apresenta a conferência de cada ocorrência.\n3. O operador analisa o painel de divergências e clica em "Baixar Compatíveis".\n4. Os títulos compatíveis são liquidados no sistema e o histórico de processamento é arquivado.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Arquivos de retorno bancário (.RET / .TXT).\n- Coleções PocketBase: `financial_receivables`, `cnab_retornos`, `audit_logs`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Fluxo nativo de baixa do Contas a Receber (`financial_receivables`), conciliação bancária e trilha de auditoria corporativa.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Consulta e Liquidação: restrito a usuários do grupo Financeiro e Administradores.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `ScreenCnabRetornos`, `JetroTable`, `Tabs`, `Dialog`.\n- Parsers: `parseCnab240Retorno` e `parseCnab400Retorno`.\n- Serviço: `CnabService`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Detecção de arquivos corrompidos ou com layout inválido com notificação imediata;\n- Isolamento de erros na liquidação de títulos individuais sem interromper os demais.',
+    },
+  },
 }
