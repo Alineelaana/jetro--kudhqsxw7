@@ -212,8 +212,8 @@ export const CollectorReceiptScreen: React.FC = () => {
         motivo_divergencia: div !== 0 ? it.divergenciaMotivo || 'Ajuste de recebimento' : undefined,
         status: div !== 0 ? 'divergente' : 'concluido',
         idempotency_key: `rec_${docRef}_${it.id}_${Date.now()}`,
-        empresa_id: user?.empresa_id,
-        filial_id: user?.filial_id,
+        empresa_id: user?.empresa_id as string | undefined,
+        filial_id: user?.filial_id as string | undefined,
       })
 
       if (!res.success) {

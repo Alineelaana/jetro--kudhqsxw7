@@ -114,8 +114,8 @@ export const CollectorTransferScreen: React.FC = () => {
       divergencia: 0,
       status: 'concluido',
       idempotency_key: `trf_${origem}_${destino}_${produtoScan}_${Date.now()}`,
-      empresa_id: user?.empresa_id,
-      filial_id: user?.filial_id,
+      empresa_id: user?.empresa_id as string | undefined,
+      filial_id: user?.filial_id as string | undefined,
     })
 
     setIsSubmitting(false)

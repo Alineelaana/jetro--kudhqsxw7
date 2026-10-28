@@ -164,8 +164,8 @@ export const CollectorShippingCheckScreen: React.FC = () => {
           cliente: v.cliente,
           pesoKg: v.pesoKg,
         },
-        empresa_id: user?.empresa_id,
-        filial_id: user?.filial_id,
+        empresa_id: user?.empresa_id as string | undefined,
+        filial_id: user?.filial_id as string | undefined,
       })
     }
 

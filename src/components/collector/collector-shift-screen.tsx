@@ -131,8 +131,8 @@ export const CollectorShiftScreen: React.FC = () => {
         turno_nome: 'Turno Regular',
         bateria_inicial: Number(bateriaInicial) || 100,
         observacoes,
-        empresa_id: user.empresa_id,
-        filial_id: filial.trim() || user.filial_id,
+        empresa_id: user.empresa_id as string | undefined,
+        filial_id: (filial.trim() || user.filial_id) as string | undefined,
       })
       setActiveShift(shift)
       setSuccessMsg('Turno aberto com sucesso! Dispositivo pronto para operação.')
