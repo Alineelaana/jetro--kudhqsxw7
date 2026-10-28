@@ -93,6 +93,7 @@ export interface HistoryEntry {
 export interface SalesOrder {
   id: string
   order_number: string
+  operation_type?: string
   status: string
   client_id: string
   client_name: string

@@ -304,21 +304,19 @@ export function SalesOrderStandardEditor({ open, onOpenChange, order, onSaved }:
             fiscalCfopService
               .determineCfop({
                 operacao_codigo: (form.operation_type as string) || 'VENDA_MERCADORIA',
-                uf_origem: 'ES',
-                uf_destino: clientUf,
-                tipo_destinatario: (selectedPartner?.tax_profile as string) || 'contribuinte',
+                uf_emitente: 'ES',
+                uf_destinatario: clientUf,
                 itens: [
                   {
-                    item_codigo: (prod.code as string) || '',
-                    ncm: (prod.ncm as string) || '',
-                    origem_mercadoria: 0,
-                    finalidade: 'comercializacao',
+                    codigo: (prod.code as string) || '',
+                    descricao: (prod.name as string) || '',
+                    procedencia: isIndustrializado ? 'producao_propria' : 'mercadoria_terceiros',
                   },
                 ],
               })
               .then((res) => {
-                if (res.items && res.items[0]?.cfop) {
-                  const resolvedCfop = res.items[0].cfop
+                if (res.itens && res.itens[0]?.cfop) {
+                  const resolvedCfop = res.itens[0].cfop
                   setItems((currentItems) =>
                     currentItems.map((item, i) =>
                       i === index ? { ...item, cfop: resolvedCfop } : item,

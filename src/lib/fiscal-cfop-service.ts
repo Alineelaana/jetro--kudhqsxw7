@@ -22,10 +22,10 @@ export async function resolveCfopByOperation(
 
 export async function findMatchingCfop(params: DetermineCfopParams): Promise<string> {
   const result = await fiscalCfopService.determineCfop(params)
-  if (result.items && result.items.length > 0 && result.items[0].cfop) {
-    return result.items[0].cfop
+  if (result.itens && result.itens.length > 0 && result.itens[0].cfop) {
+    return result.itens[0].cfop
   }
-  return result.globalCfop || '5102'
+  return '5102'
 }
 
 export async function determineCfop(params: DetermineCfopParams): Promise<DeterminationOutput> {
