@@ -34,7 +34,10 @@ import { IA_SCREEN_DOCS } from './ia-screen-docs'
  */
 
 export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
-
+  // -------------------------------------------------------------
+  // PEDIDO DE VENDA (FLUXO PADRONIZADO E PAINEL OFICIAL)
+  // -------------------------------------------------------------
+  '/admin/vendas/pedidos': {
     route: '/admin/vendas/pedidos',
     title: 'Pedido de Venda',
     moduleGroup: 'Comercial',
@@ -91,7 +94,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   // -------------------------------------------------------------
   // PEDIDO DE COMPRA (FLUXO PADRONIZADO E PAINEL OFICIAL)
   // -------------------------------------------------------------
-
+  '/admin/compras/pedidos': {
     route: '/admin/compras/pedidos',
     title: 'Pedido de Compra',
     moduleGroup: 'Comercial',
@@ -143,13 +146,208 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
       content:
         '- Mensagens impeditivas de erro quando fornecedor não for informado ou itens tiverem quantidades/preços inválidos.\n- Alertas informativos de estouro de alçada ou divergência de cotação.\n- Notificações de toast para sucesso ou falha em operações assíncronas.',
     },
+  },
 
   // -------------------------------------------------------------
   // CENTRAL DE APROVAÇÕES DE PEDIDOS (NOVA TELA v0.0.651)
   // -------------------------------------------------------------
-
-
-
+  '/admin/aprovacoes/pedidos': {
+    route: '/admin/aprovacoes/pedidos',
+    title: 'Central de Aprovações de Pedidos',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Centralizar a governança, análise de crédito, alçadas hierárquicas e fluxo de liberação ou rejeição de pedidos de Venda e Compra pendentes de aprovação no ERP HURAM.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Fila Unificada de Aprovações: Painel operacional com pedidos de Venda e Compra em estágio "Aguardando Aprovação", totalizadores de quantidade e valor em tempo real, e filtros por tipo (Venda/Compra), empresa e valor.\n- Cartão de Alçada Conectada: Exibição da faixa de alçada máxima do usuário logado (definida na matriz `order_approval_tiers` ou SUP irrestrito) e status de permissão para liberação de crédito.\n- Inspeção e Detalhes do Pedido: Modal com dados da contraparte (cliente/fornecedor), itens, valores, motivos de retenção (estouro de desconto, limite de crédito, margem de contribuição ou teto de compra) e histórico interno.\n- Ação de Aprovação: Liberação do pedido dentro do teto de alçada do perfil com registro de notas de governança, transição de status (Venda → "Confirmado", Compra → "Aprovado") e reserva de estoque.\n- Ação de Rejeição: Cancelamento do pedido com obrigatoriedade estrita de justificativa detalhada e transição para "Cancelado".\n- Trilha de Auditoria e Histórico: Exibição da linha do tempo das decisões em `order_approval_records` e registro sincronizado em `audit_logs`.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Matriz de Alçadas Hierárquicas: A aprovação é estritamente condicionada ao teto de valor configurado na coleção `order_approval_tiers` para o perfil do usuário (ou teto padrão de sistema), salvo Superusuário (SUP) com alçada irrestrita.\n- Segregação de Funções: O usuário solicitante (vendedor ou comprador responsável) é estritamente impedido de aprovar seu próprio pedido, prevenindo conflito de interesses.\n- Isolamento Multiempresa: Pedidos pertencentes a outra empresa do grupo não podem ser aprovados por operadores de filial distinta, exceto perfil SUP.\n- Justificativa Obrigatória na Rejeição: Nenhuma rejeição é processada sem preenchimento de motivo formal, gravado de forma imutável no pedido e na trilha auditável.\n- Transição e Efeitos Automáticos: Pedidos de venda aprovados recebem marcação de reserva de estoque (`stock_reserved = true`) e transição para "Confirmado"; pedidos de compra avançam para "Aprovado".',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Pedidos com estouro de desconto, margem insuficiente, limite de crédito excedido ou valor acima do teto de autoaprovação entram na fila com status "Aguardando Aprovação".\n2. O gestor acessa `/admin/aprovacoes/pedidos` no menu Comercial e localiza os pedidos pendentes.\n3. Aciona "Inspecionar" para avaliar motivos de retenção, dados do parceiro e trilha prévia.\n4. Aciona "Aprovar" (com notas opcionais) ou "Rejeitar" (com motivo obrigatório).\n5. O backend valida alçada, segregação de funções e isolamento da empresa via hook `order_approval_process.js`, atualiza o pedido, registra em `order_approval_records` e `audit_logs`, e emite notificação ao solicitante.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders`, `purchase_orders`, `order_approval_tiers`, `order_approval_records`, `audit_logs`, `notifications`, `users`.\n- Estrutura de alçadas e trilha criada pela migração `0304_order_approvals_engine.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Endpoint seguro de aprovação: `POST /backend/v1/orders/approval/action` via hook `order_approval_process.js`.\n- Serviço de frontend: `src/services/order-approvals.ts`.\n- Sistema de notificações do ERP HURAM para aviso em tempo real ao solicitante.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização da fila disponível para perfis com permissão comercial ou de compras (`canViewSales(role)` / `canViewPurchasing(role)`).\n- Ações de aprovação e rejeição exigem perfil SUP, DIRETORIA, FINANCEIRO, COMERCIAL ou gestão com alçada ativa em `order_approval_tiers`.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `OrderApprovalsPage`, `OrderApprovalsHubScreen`, `SalesPageWrapper`.\n- Serviços e tipos: `src/services/order-approvals.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Bloqueio com erro 403 caso o valor do pedido exceda a alçada do aprovador.\n- Bloqueio com erro 403 em tentativa de autoaprovação pelo solicitante.\n- Validação impeditiva de motivo vazio na rejeição no frontend e no backend.\n- Notificações de toast para respostas de gravação e tratamento resiliente de erros de rede.',
+    },
+  },
 }
 
+/**
+ * Módulos agregados que compõem o catálogo completo do ERP Jetro / HURAM.
+ */
+const ALL_MODULE_DOCS: Record<string, ScreenDocEntry>[] = [
+  SCREEN_DOCS_REGISTRY,
+  DP_SCREEN_DOCS,
+  RH_SCREEN_DOCS,
+  SST_SCREEN_DOCS,
+  CADASTROS_SCREEN_DOCS,
+  FINANCIAL_SCREEN_DOCS,
+  INDUSTRY_SCREEN_DOCS,
+  LOGISTICS_SCREEN_DOCS,
+  STOCK_SCREEN_DOCS,
+  FISCAL_SCREEN_DOCS,
+  COMMERCIAL_SCREEN_DOCS,
+  MARKETING_SCREEN_DOCS,
+  INTELIGENCIA_SCREEN_DOCS,
+  CONTROLADORIA_SCREEN_DOCS,
+  IA_SCREEN_DOCS,
+]
 
+/**
+ * Mapa unificado de todas as telas registradas no ERP, indexadas por rota.
+ */
+const UNIFIED_DOCS_MAP: Record<string, ScreenDocEntry> = (() => {
+  const map: Record<string, ScreenDocEntry> = {}
+  for (const moduleDocs of ALL_MODULE_DOCS) {
+    if (moduleDocs && typeof moduleDocs === 'object') {
+      for (const [route, entry] of Object.entries(moduleDocs)) {
+        map[route] = entry
+      }
+    }
+  }
+  return map
+})()
+
+/**
+ * Cria uma entrada padrão para rotas cuja documentação técnica ainda está em levantamento.
+ */
+function createPendingDocEntry(route: string): ScreenDocEntry {
+  const segments = route.split('/').filter(Boolean)
+  const rawTitle = segments[segments.length - 1] || 'Visão Geral'
+  const title = rawTitle
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+
+  const moduleName =
+    segments.length > 1
+      ? segments[1].charAt(0).toUpperCase() + segments[1].slice(1)
+      : 'Administração'
+
+  const pendingText = 'Pendente de validação técnica.'
+
+  return {
+    route,
+    title,
+    moduleGroup: moduleName,
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    features: {
+      title: 'Funcionalidades',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    integrations: {
+      title: 'Integrações',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    permissions: {
+      title: 'Permissões',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: pendingText,
+      pendingValidation: true,
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content: pendingText,
+      pendingValidation: true,
+    },
+  }
+}
+
+/**
+ * Retorna a especificação técnica de uma tela pela sua rota.
+ * Se a rota não estiver mapeada, retorna um objeto estruturado marcado como "Pendente de validação técnica".
+ */
+export function getScreenDocByRoute(currentRoute: string): ScreenDocEntry {
+  if (!currentRoute) {
+    return createPendingDocEntry('/admin')
+  }
+
+  // Busca exata
+  if (UNIFIED_DOCS_MAP[currentRoute]) {
+    return UNIFIED_DOCS_MAP[currentRoute]
+  }
+
+  // Tenta remover barra final ou parâmetros de consulta
+  const cleanRoute = currentRoute.split('?')[0].replace(/\/$/, '')
+  if (UNIFIED_DOCS_MAP[cleanRoute]) {
+    return UNIFIED_DOCS_MAP[cleanRoute]
+  }
+
+  // Fallback: busca por prefixo mais longo
+  const matchingRoutes = Object.keys(UNIFIED_DOCS_MAP).filter((r) => cleanRoute.startsWith(r))
+  if (matchingRoutes.length > 0) {
+    matchingRoutes.sort((a, b) => b.length - a.length)
+    return UNIFIED_DOCS_MAP[matchingRoutes[0]]
+  }
+
+  return createPendingDocEntry(cleanRoute || currentRoute)
+}
+
+/**
+ * Retorna a lista completa de todas as especificações técnicas de telas registradas no ERP.
+ */
+export function getAllScreenDocs(): ScreenDocEntry[] {
+  return Object.values(UNIFIED_DOCS_MAP)
+}
