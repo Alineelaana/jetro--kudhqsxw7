@@ -5,7 +5,14 @@ import { useB2B } from '@/lib/b2b/b2b-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card'
 import { AlertCircle, Building, CheckCircle2, Lock, Mail, Phone, User, MapPin } from 'lucide-react'
 
 export const B2BRegisterScreen: React.FC = () => {
@@ -46,7 +53,9 @@ export const B2BRegisterScreen: React.FC = () => {
     } else if (raw.length <= 12) {
       setCnpj(`${raw.slice(0, 2)}.${raw.slice(2, 5)}.${raw.slice(5, 8)}/${raw.slice(8)}`)
     } else {
-      setCnpj(`${raw.slice(0, 2)}.${raw.slice(2, 5)}.${raw.slice(5, 8)}/${raw.slice(8, 12)}-${raw.slice(12)}`)
+      setCnpj(
+        `${raw.slice(0, 2)}.${raw.slice(2, 5)}.${raw.slice(5, 8)}/${raw.slice(8, 12)}-${raw.slice(12)}`,
+      )
     }
   }
 
@@ -95,7 +104,10 @@ export const B2BRegisterScreen: React.FC = () => {
       }, 1500)
     } catch (err: unknown) {
       console.error(err)
-      const message = err instanceof Error ? err.message : 'Falha ao processar o cadastro. Verifique os dados informados.'
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Falha ao processar o cadastro. Verifique os dados informados.'
       setErrorMsg(message)
     } finally {
       setIsLoading(false)
@@ -122,7 +134,9 @@ export const B2BRegisterScreen: React.FC = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl px-4 sm:px-0">
         <Card className="shadow-lg border-slate-200">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-slate-800">Ficha Cadastral da Empresa</CardTitle>
+            <CardTitle className="text-xl font-semibold text-slate-800">
+              Ficha Cadastral da Empresa
+            </CardTitle>
             <CardDescription>
               Preencha os dados da pessoa jurídica e o contato do responsável por compras
             </CardDescription>

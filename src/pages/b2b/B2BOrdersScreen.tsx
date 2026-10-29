@@ -4,7 +4,14 @@ import { b2bService } from '@/lib/b2b/b2b-service'
 import { B2BOrderListItem, B2BOrderDetail } from '@/lib/b2b/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
@@ -163,7 +170,10 @@ export const B2BOrdersScreen: React.FC = () => {
                         {o.items_count}
                       </TableCell>
                       <TableCell className="text-right font-bold text-slate-900">
-                        R$ {parseFloat(o.total_value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R${' '}
+                        {parseFloat(o.total_value || '0').toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                        })}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -238,7 +248,10 @@ export const B2BOrdersScreen: React.FC = () => {
                 <div>
                   <span className="text-slate-500 block">Valor Total</span>
                   <span className="font-bold text-sm text-indigo-700 block mt-0.5">
-                    R$ {parseFloat(selectedOrder.total_value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    R${' '}
+                    {parseFloat(selectedOrder.total_value || '0').toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
               </div>
@@ -280,16 +293,25 @@ export const B2BOrdersScreen: React.FC = () => {
                         <TableRow key={idx}>
                           <TableCell className="text-xs">
                             <div className="font-medium text-slate-800">{it.name}</div>
-                            {it.code && <div className="text-slate-400 font-mono">Cód: {it.code}</div>}
+                            {it.code && (
+                              <div className="text-slate-400 font-mono">Cód: {it.code}</div>
+                            )}
                           </TableCell>
                           <TableCell className="text-center text-xs font-semibold">
                             {it.quantity} {it.unit || 'un'}
                           </TableCell>
                           <TableCell className="text-right text-xs text-slate-600">
-                            R$ {(it.unit_price || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R${' '}
+                            {(it.unit_price || 0).toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                            })}
                           </TableCell>
                           <TableCell className="text-right text-xs font-bold text-slate-900">
-                            R$ {(it.total_price || it.quantity * it.unit_price || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R${' '}
+                            {(it.total_price || it.quantity * it.unit_price || 0).toLocaleString(
+                              'pt-BR',
+                              { minimumFractionDigits: 2 },
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}

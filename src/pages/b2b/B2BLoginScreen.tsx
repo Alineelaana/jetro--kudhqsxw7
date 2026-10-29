@@ -5,7 +5,14 @@ import { useB2B } from '@/lib/b2b/b2b-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card'
 import { AlertCircle, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export const B2BLoginScreen: React.FC = () => {
@@ -27,7 +34,8 @@ export const B2BLoginScreen: React.FC = () => {
       navigate('/portal/catalogo')
     } catch (err: unknown) {
       console.error(err)
-      const message = err instanceof Error ? err.message : 'Credenciais inválidas. Verifique seu e-mail e senha.'
+      const message =
+        err instanceof Error ? err.message : 'Credenciais inválidas. Verifique seu e-mail e senha.'
       setErrorMsg(message)
     } finally {
       setIsLoading(false)
@@ -54,10 +62,10 @@ export const B2BLoginScreen: React.FC = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <Card className="shadow-lg border-slate-200">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl font-semibold text-slate-800">Entrar na sua conta</CardTitle>
-            <CardDescription>
-              Informe seu e-mail corporativo e senha cadastrados
-            </CardDescription>
+            <CardTitle className="text-xl font-semibold text-slate-800">
+              Entrar na sua conta
+            </CardTitle>
+            <CardDescription>Informe seu e-mail corporativo e senha cadastrados</CardDescription>
           </CardHeader>
           <CardContent>
             {errorMsg && (

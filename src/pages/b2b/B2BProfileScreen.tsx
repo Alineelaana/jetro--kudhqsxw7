@@ -10,7 +10,9 @@ export const B2BProfileScreen: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dados Cadastrais da Empresa</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          Dados Cadastrais da Empresa
+        </h1>
         <p className="text-sm text-slate-500">
           Informações corporativas registradas no ERP para faturamento e emissão de NF-e
         </p>
@@ -39,8 +41,8 @@ export const B2BProfileScreen: React.FC = () => {
                   {partner.limite_credito_disponivel
                     ? `R$ ${partner.limite_credito_disponivel}`
                     : partner.limite_credito
-                    ? `R$ ${partner.limite_credito}`
-                    : 'R$ 0,00'}
+                      ? `R$ ${partner.limite_credito}`
+                      : 'R$ 0,00'}
                 </span>
               </div>
               <div className="bg-white p-3 rounded-lg border border-emerald-100 shadow-xs">
@@ -126,7 +128,8 @@ export const B2BProfileScreen: React.FC = () => {
                 <strong>Bairro:</strong> {partner.address_district || 'Não informado'}
               </p>
               <p>
-                <strong>Município / UF:</strong> {partner.address_city || ''} - {partner.address_state || ''}
+                <strong>Município / UF:</strong> {partner.address_city || ''} -{' '}
+                {partner.address_state || ''}
               </p>
               <p>
                 <strong>CEP:</strong> {partner.cep || 'Não informado'}
@@ -134,7 +137,8 @@ export const B2BProfileScreen: React.FC = () => {
             </div>
           ) : (
             <p className="text-xs text-slate-500 italic">
-              Nenhum endereço físico registrado na ficha principal. O endereço de entrega pode ser indicado ao finalizar pedidos.
+              Nenhum endereço físico registrado na ficha principal. O endereço de entrega pode ser
+              indicado ao finalizar pedidos.
             </p>
           )}
         </CardContent>
@@ -143,7 +147,8 @@ export const B2BProfileScreen: React.FC = () => {
       <div className="flex items-center gap-2 text-xs text-slate-500 p-3 bg-slate-100 rounded-lg">
         <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
         <span>
-          Para solicitar alteração de razão social, endereço de entrega ou inclusão de novos compradores, contate nossa equipe comercial interna.
+          Para solicitar alteração de razão social, endereço de entrega ou inclusão de novos
+          compradores, contate nossa equipe comercial interna.
         </span>
       </div>
     </div>

@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { pb } from '@/lib/pocketbase/client'
 import { b2bService } from '@/lib/b2b/b2b-service'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -103,7 +110,9 @@ export const AdminB2BClientsScreen: React.FC = () => {
       await b2bService.adminToggleCreditFlag(partnerId, nextVal, token)
 
       setClients((prev) =>
-        prev.map((c) => (c.partner_id === partnerId ? { ...c, exibir_limite_credito: nextVal } : c)),
+        prev.map((c) =>
+          c.partner_id === partnerId ? { ...c, exibir_limite_credito: nextVal } : c,
+        ),
       )
 
       toast({
@@ -181,12 +190,22 @@ export const AdminB2BClientsScreen: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadData}
+            disabled={loading}
+            className="gap-1.5"
+          >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Atualizar
           </Button>
           <a href="/portal/login" target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm" className="gap-1.5 text-indigo-600 border-indigo-200">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-indigo-600 border-indigo-200"
+            >
               <ExternalLink className="w-4 h-4" />
               Ver Portal do Cliente
             </Button>
@@ -198,9 +217,13 @@ export const AdminB2BClientsScreen: React.FC = () => {
       <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-xs sm:text-sm text-indigo-900 flex items-start gap-3">
         <CreditCard className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
         <div>
-          <p className="font-semibold text-indigo-950">Política de Exibição de Limite de Crédito (Decisão 3)</p>
+          <p className="font-semibold text-indigo-950">
+            Política de Exibição de Limite de Crédito (Decisão 3)
+          </p>
           <p className="text-indigo-800 text-xs mt-1">
-            Por padrão, nenhum cliente visualiza o limite de crédito no portal (default desligado). Ative a chave &quot;Exibir Limite&quot; apenas quando o limite do parceiro estiver revisado e atualizado pela controladoria/financeiro.
+            Por padrão, nenhum cliente visualiza o limite de crédito no portal (default desligado).
+            Ative a chave &quot;Exibir Limite&quot; apenas quando o limite do parceiro estiver
+            revisado e atualizado pela controladoria/financeiro.
           </p>
         </div>
       </div>
@@ -263,7 +286,9 @@ export const AdminB2BClientsScreen: React.FC = () => {
                           <div className="font-mono text-xs text-slate-800 font-medium">
                             {client.cnpj || 'Sem CNPJ'}
                           </div>
-                          <div className="text-xs text-slate-500">{client.email || client.phone}</div>
+                          <div className="text-xs text-slate-500">
+                            {client.email || client.phone}
+                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">

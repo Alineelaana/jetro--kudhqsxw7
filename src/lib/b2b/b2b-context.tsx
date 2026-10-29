@@ -37,7 +37,9 @@ export const B2BProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     try {
       localStorage.setItem('huram_b2b_cart', JSON.stringify(cart))
-    } catch { /* intentionally ignored */ }
+    } catch {
+      /* intentionally ignored */
+    }
   }, [cart])
 
   const refreshProfile = async () => {
@@ -100,9 +102,7 @@ export const B2BProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       removeFromCart(productId)
       return
     }
-    setCart((prev) =>
-      prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i)),
-    )
+    setCart((prev) => prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i)))
   }
 
   const removeFromCart = (productId: string) => {

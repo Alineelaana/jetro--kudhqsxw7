@@ -827,6 +827,12 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
     title: 'Portal B2B',
     items: [
       {
+        label: 'Acessos B2B',
+        icon: UserCheck,
+        route: '/admin/b2b/acessos',
+        perm: canViewSales,
+      },
+      {
         label: 'Clientes do Portal',
         icon: Users,
         route: '/admin/b2b/clientes',

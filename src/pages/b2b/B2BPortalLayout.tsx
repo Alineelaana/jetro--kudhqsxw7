@@ -23,7 +23,11 @@ export const B2BPortalLayout: React.FC = () => {
 
   // Se não autenticado e não está em telas públicas, redireciona
   React.useEffect(() => {
-    if (!client && !location.pathname.includes('/portal/login') && !location.pathname.includes('/portal/cadastro')) {
+    if (
+      !client &&
+      !location.pathname.includes('/portal/login') &&
+      !location.pathname.includes('/portal/cadastro')
+    ) {
       // Deixar a rota protegida tratar ou redirecionar
     }
   }, [client, location.pathname])
@@ -141,8 +145,8 @@ export const B2BPortalLayout: React.FC = () => {
                     {partner.limite_credito_disponivel
                       ? `R$ ${partner.limite_credito_disponivel}`
                       : partner.limite_credito
-                      ? `R$ ${partner.limite_credito}`
-                      : 'R$ 0,00'}
+                        ? `R$ ${partner.limite_credito}`
+                        : 'R$ 0,00'}
                   </strong>
                 </span>
                 {partner.limite_credito && (

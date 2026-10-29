@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { pb } from '@/lib/pocketbase/client'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -127,7 +134,13 @@ export const AdminB2BOrdersScreen: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={loadOrders} disabled={loading} className="gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadOrders}
+            disabled={loading}
+            className="gap-1.5"
+          >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Atualizar
           </Button>
@@ -146,7 +159,9 @@ export const AdminB2BOrdersScreen: React.FC = () => {
         <div>
           <p className="font-semibold text-slate-900">Fluxo Integrado de Aprovação (Decisão 2)</p>
           <p className="text-slate-600 text-xs mt-1">
-            Todo pedido gerado pelo cliente no Portal B2B nasce automaticamente com status &quot;Aguardando Aprovação&quot; e entra na fila da Central de Aprovações (/admin/aprovacoes/pedidos) para deliberação das alçadas comerciais e financeiras.
+            Todo pedido gerado pelo cliente no Portal B2B nasce automaticamente com status
+            &quot;Aguardando Aprovação&quot; e entra na fila da Central de Aprovações
+            (/admin/aprovacoes/pedidos) para deliberação das alçadas comerciais e financeiras.
           </p>
         </div>
       </div>
@@ -217,7 +232,10 @@ export const AdminB2BOrdersScreen: React.FC = () => {
                       </TableCell>
                       <TableCell>{getStatusBadge(order.status)}</TableCell>
                       <TableCell className="text-right font-bold text-slate-900">
-                        R$ {parseFloat(order.total_value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R${' '}
+                        {parseFloat(order.total_value || '0').toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                        })}
                       </TableCell>
                       <TableCell className="text-right">
                         <Link to="/admin/aprovacoes/pedidos">

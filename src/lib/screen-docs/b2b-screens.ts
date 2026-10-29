@@ -50,7 +50,12 @@ export const b2bPortalScreenDocs: ScreenDoc[] = [
       'Notificações em tempo real enviadas para a equipe interna de aprovadores (COMERCIAL, FINANCEIRO, SUP).',
       'Registro imediato de auditoria em b2b_audit_trail.',
     ],
-    backendCollections: ['sales_orders', 'order_approval_records', 'notifications', 'b2b_audit_trail'],
+    backendCollections: [
+      'sales_orders',
+      'order_approval_records',
+      'notifications',
+      'b2b_audit_trail',
+    ],
   },
   {
     route: '/portal/pedidos',

@@ -1,14 +1,16 @@
 /**
  * Hook: b2b_portal_endpoints.js
  * Endpoints seguros para o Portal B2B:
- * 1. POST /backend/v1/b2b/signup: Self-service cadastro de cliente B2B
+ * 1. POST /backend/v1/b2b/signup: Self-service cadastro de cliente B2B (Decisão 1)
  * 2. GET /backend/v1/b2b/me: Dados do cliente autenticado e do parceiro vinculado
  * 3. GET /backend/v1/b2b/products: Catálogo liberado para B2B com preços do cliente
- * 4. POST /backend/v1/b2b/orders/create: Montagem e submissão de pedido B2B
+ * 4. POST /backend/v1/b2b/orders/create: Montagem e submissão de pedido B2B (Decisão 2)
  * 5. GET /backend/v1/b2b/orders: Lista de pedidos pertencentes EXCLUSIVAMENTE ao cliente autenticado
  * 6. GET /backend/v1/b2b/orders/{id}: Detalhe do pedido do cliente autenticado
- * 7. POST /backend/v1/b2b/admin/toggle-credit-flag: Gestor interno ativa/desativa exibir_limite_credito
+ * 7. POST /backend/v1/b2b/admin/toggle-credit-flag: Gestor interno ativa/desativa exibir_limite_credito (Decisão 3)
  * 8. POST /backend/v1/b2b/admin/toggle-client-status: Gestor ativa/desativa acesso do cliente
+ * 9. GET /backend/v1/b2b/admin/access-requests: Listagem de solicitações de acesso B2B
+ * 10. POST /backend/v1/b2b/admin/approve-access: Aprovação/Rejeição de acesso B2B com vínculo ao parceiro
  */
 
 // 1. POST /backend/v1/b2b/signup
@@ -61,13 +63,12 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
   const cnpjClean = cnpjRaw.replace(/\D/g, '')
 
   let partnerRecord = null
-  let isNewPartner = false
 
   // Buscar partner existente por CNPJ ou email
   try {
     const partners = $app.findRecordsByFilter(
       'partners',
-      `cnpj ~ "${cnpjClean}" || cnpj = "${cnpjRaw}" || email = "${email}"`,
+      `cnpj ~ "${cnpjClean}" || cnpj = "${cnpjRaw}"`,
       '-created',
       1,
       0,
@@ -77,7 +78,14 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
     }
   } catch (_) {}
 
-  // Se não existe partner correspondente, cria novo partner tipo 'Cliente'
+  // DECISÃO 1: Se houver correspondência exata de parceiro já cadastrado e ativo com B2B aprovado,
+  // ou se não houver correspondência, fica PENDENTE de aprovação da equipe no HURAM!
+  // "o cadastro vincula ao registro de parceiro/Cliente correspondente (por CNPJ) ou fica pendente de aprovação se não houver correspondência. Enquanto pendente, o cliente não vê nada além do aviso 'cadastro em análise'."
+  const hasMatchedPartner = !!partnerRecord
+  const initialStatus = hasMatchedPartner ? 'ativo' : 'pendente'
+  const isApprovedImmediately = hasMatchedPartner
+
+  // Criar parceiro se não existir ainda (como pré-parceiro ou parceiro pendente)
   if (!partnerRecord) {
     try {
       const partnersCol = $app.findCollectionByNameOrId('partners')
@@ -96,30 +104,25 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
       partnerRecord.set('address_city', addressCity)
       partnerRecord.set('address_state', addressState)
       partnerRecord.set('cep', cep)
-      partnerRecord.set('active', true)
-      partnerRecord.set('b2b_ativo', true)
-      partnerRecord.set('b2b_status', 'ativo')
+      partnerRecord.set('active', false) // Inativo até aprovação
+      partnerRecord.set('b2b_ativo', false)
+      partnerRecord.set('b2b_status', 'pendente')
       partnerRecord.set('exibir_limite_credito', false) // Decisão 3: default false
       partnerRecord.set('canal_comercial', 'Portal B2B')
       partnerRecord.set('forma_atendimento', 'Portal B2B')
       if (empresaId) partnerRecord.set('empresa_id', empresaId)
       if (filialId) partnerRecord.set('filial_id', filialId)
       $app.save(partnerRecord)
-      isNewPartner = true
     } catch (createPartnerErr) {
       return e.json(500, {
-        error: 'Falha ao criar ficha cadastral do parceiro: ' + String(createPartnerErr),
+        error: 'Falha ao criar registro cadastral preliminar: ' + String(createPartnerErr),
       })
     }
   } else {
-    // Partner existente: ativar flags B2B se ainda não ativas
-    try {
-      partnerRecord.set('b2b_ativo', true)
-      if (!partnerRecord.getString('b2b_status')) {
-        partnerRecord.set('b2b_status', 'ativo')
-      }
-      $app.save(partnerRecord)
-    } catch (_) {}
+    // Se o parceiro já existe no HURAM:
+    partnerRecord.set('b2b_ativo', true)
+    partnerRecord.set('b2b_status', 'ativo')
+    $app.save(partnerRecord)
   }
 
   // Criar registro na coleção auth clients
@@ -135,8 +138,8 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
     newClientAuth.set('cnpj', cnpjRaw)
     newClientAuth.set('company_name', companyName)
     newClientAuth.set('phone', phone)
-    newClientAuth.set('active', true)
-    newClientAuth.set('status', 'ativo')
+    newClientAuth.set('active', isApprovedImmediately)
+    newClientAuth.set('status', initialStatus)
     if (empresaId) newClientAuth.set('empresa_id', empresaId)
     if (filialId) newClientAuth.set('filial_id', filialId)
     $app.save(newClientAuth)
@@ -146,9 +149,35 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
     $app.save(partnerRecord)
   } catch (clientErr) {
     return e.json(500, {
-      error: 'Falha ao registrar credenciais do cliente B2B: ' + String(clientErr),
+      error: 'Falha ao registrar credenciais de acesso: ' + String(clientErr),
     })
   }
+
+  // Criar registro na fila de b2b_access_requests
+  try {
+    const accessReqCol = $app.findCollectionByNameOrId('b2b_access_requests')
+    if (accessReqCol) {
+      const accessReq = new Record(accessReqCol)
+      accessReq.set('client_id', newClientAuth.id)
+      accessReq.set('partner_id', partnerRecord.id)
+      accessReq.set('company_name', companyName)
+      accessReq.set('trade_name', tradeName)
+      accessReq.set('cnpj', cnpjRaw)
+      accessReq.set('email', email)
+      accessReq.set('phone', phone)
+      accessReq.set('contact_name', contactName)
+      accessReq.set('status', initialStatus)
+      accessReq.set(
+        'notes',
+        hasMatchedPartner
+          ? 'CNPJ correspondente já localizado no ERP. Acesso vinculado automaticamente ao parceiro existente.'
+          : 'Novo cadastro self-service sem parceiro prévio correspondente. Aguardando aprovação da equipe HURAM.',
+      )
+      accessReq.set('empresa_id', empresaId)
+      accessReq.set('filial_id', filialId)
+      $app.save(accessReq)
+    }
+  } catch (_) {}
 
   // Gravar auditoria B2B
   try {
@@ -161,12 +190,17 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
     b2bLog.set('action', 'signup')
     b2bLog.set(
       'details',
-      `Auto-cadastro B2B realizado com sucesso. Parceiro ${isNewPartner ? 'novo criado' : 'existente vinculado'}.`,
+      `Auto-cadastro B2B submetido. Status inicial: ${initialStatus}. ${
+        hasMatchedPartner
+          ? 'Correspondência de CNPJ encontrada com parceiro existente.'
+          : 'Pendente de validação cadastral pela equipe interna.'
+      }`,
     )
     b2bLog.set('metadata', {
       email,
       company_name: companyName,
-      is_new_partner: isNewPartner,
+      has_matched_partner: hasMatchedPartner,
+      initial_status: initialStatus,
     })
     b2bLog.set('empresa_id', empresaId)
     b2bLog.set('filial_id', filialId)
@@ -178,7 +212,7 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
     const notifCol = $app.findCollectionByNameOrId('notifications')
     const admins = $app.findRecordsByFilter(
       '_pb_users_auth_',
-      `active = true && (role = "SUP" || role = "COMERCIAL")`,
+      `active = true && (role = "SUP" || role = "COMERCIAL" || role = "FINANCEIRO")`,
       '',
       10,
       0,
@@ -186,14 +220,14 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
     admins.forEach((admin) => {
       try {
         const n = new Record(notifCol)
-        n.set('title', 'Novo Cadastro no Portal B2B')
+        n.set('title', 'Novo Cadastro B2B Realizado')
         n.set(
           'message',
-          `O cliente "${companyName}" (CNPJ ${cnpjRaw}) completou o auto-cadastro no Portal B2B.`,
+          `Cliente "${companyName}" (CNPJ ${cnpjRaw}) se cadastrou no portal (${initialStatus.toUpperCase()}).`,
         )
         n.set('recipient', admin.id)
         n.set('read', false)
-        n.set('link', '/admin/b2b/clientes')
+        n.set('link', '/admin/b2b/acessos')
         n.set('type', 'other')
         $app.save(n)
       } catch (_) {}
@@ -202,7 +236,10 @@ routerAdd('POST', '/backend/v1/b2b/signup', (e) => {
 
   return e.json(200, {
     success: true,
-    message: 'Cadastro realizado com sucesso! Você já pode acessar o Portal B2B.',
+    status: initialStatus,
+    message: hasMatchedPartner
+      ? 'Cadastro concluído e vinculado com sucesso! Seu acesso já está ativo.'
+      : 'Cadastro realizado com sucesso! Seu acesso está em análise pela nossa equipe.',
     client_id: newClientAuth.id,
     partner_id: partnerRecord.id,
     company_name: companyName,
@@ -224,13 +261,16 @@ routerAdd('GET', '/backend/v1/b2b/me', (e) => {
     } catch (_) {}
   }
 
+  const clientStatus =
+    clientAuth.getString('status') || (clientAuth.getBool('active') ? 'ativo' : 'pendente')
+
   // Verificar se a flag de limite de crédito está ativada no parceiro
+  // Decisão 3: Não exibir por padrão aos clientes. Somente se a flag for explicitamente verdadeira
   const exibirLimite = partner ? partner.getBool('exibir_limite_credito') === true : false
   const limiteCredito = exibirLimite && partner ? partner.getString('limite_credito') : null
   const limiteDisponivel =
     exibirLimite && partner ? partner.getString('limite_credito_disponivel') : null
-  const situacaoCredito =
-    exibirLimite && partner ? partner.getString('situacao_credito') : null
+  const situacaoCredito = exibirLimite && partner ? partner.getString('situacao_credito') : null
 
   return e.json(200, {
     client: {
@@ -241,7 +281,7 @@ routerAdd('GET', '/backend/v1/b2b/me', (e) => {
       cnpj: clientAuth.getString('cnpj'),
       phone: clientAuth.getString('phone'),
       active: clientAuth.getBool('active'),
-      status: clientAuth.getString('status') || 'ativo',
+      status: clientStatus,
       empresa_id: clientAuth.getString('empresa_id'),
       filial_id: clientAuth.getString('filial_id'),
     },
@@ -277,16 +317,19 @@ routerAdd('GET', '/backend/v1/b2b/products', (e) => {
     return e.json(401, { error: 'Autenticação de cliente B2B necessária' })
   }
 
+  // Validar se status do cliente está aprovado
+  const clientStatus =
+    clientAuth.getString('status') || (clientAuth.getBool('active') ? 'ativo' : 'pendente')
+  if (clientStatus !== 'ativo') {
+    return e.json(403, {
+      error: 'Seu cadastro está em análise. Catálogo disponível após aprovação.',
+    })
+  }
+
   try {
     let records = []
     try {
-      records = $app.findRecordsByFilter(
-        'products',
-        'active = true',
-        'name',
-        200,
-        0,
-      )
+      records = $app.findRecordsByFilter('products', 'active = true', 'name', 200, 0)
     } catch (_) {
       records = []
     }
@@ -319,10 +362,20 @@ routerAdd('GET', '/backend/v1/b2b/products', (e) => {
 })
 
 // 4. POST /backend/v1/b2b/orders/create
+// DECISÃO 2: Montado pelo cliente e submetido pelo MESMO motor do fluxo de aprovação existente
 routerAdd('POST', '/backend/v1/b2b/orders/create', (e) => {
   const clientAuth = e.auth && e.auth.collectionName === 'clients' ? e.auth : null
   if (!clientAuth) {
     return e.json(401, { error: 'Autenticação necessária' })
+  }
+
+  // Validar se cliente está ativo/aprovado
+  const clientStatus =
+    clientAuth.getString('status') || (clientAuth.getBool('active') ? 'ativo' : 'pendente')
+  if (clientStatus !== 'ativo') {
+    return e.json(403, {
+      error: 'Seu cadastro está em análise. A criação de pedidos está liberada após aprovação.',
+    })
   }
 
   const reqInfo = e.requestInfo()
@@ -443,7 +496,7 @@ routerAdd('POST', '/backend/v1/b2b/orders/create', (e) => {
 
     $app.save(order)
 
-    // Gravar em order_approval_records para alimentar a Central de Aprovações imediatamente
+    // Gravar em order_approval_records para alimentar a Central de Aprovações em /admin/aprovacoes/pedidos
     try {
       const recordsCol = $app.findCollectionByNameOrId('order_approval_records')
       const apprRec = new Record(recordsCol)
@@ -457,7 +510,10 @@ routerAdd('POST', '/backend/v1/b2b/orders/create', (e) => {
       apprRec.set('requester_name', `Cliente B2B: ${clientName}`)
       apprRec.set('action', 'solicitado')
       apprRec.set('approval_reasons', ['Pedido Portal B2B'])
-      apprRec.set('notes', `Pedido B2B submetido por ${clientName} no valor de R$ ${grossTotal.toFixed(2)}.`)
+      apprRec.set(
+        'notes',
+        `Pedido B2B submetido por ${clientName} no valor de R$ ${grossTotal.toFixed(2)}.`,
+      )
       $app.save(apprRec)
     } catch (_) {}
 
@@ -497,7 +553,10 @@ routerAdd('POST', '/backend/v1/b2b/orders/create', (e) => {
       b2bLog.set('user_name', clientName)
       b2bLog.set('cnpj', clientCnpj)
       b2bLog.set('action', 'order_placed')
-      b2bLog.set('details', `Pedido nº ${orderNumber} de R$ ${grossTotal.toFixed(2)} finalizado com sucesso.`)
+      b2bLog.set(
+        'details',
+        `Pedido nº ${orderNumber} de R$ ${grossTotal.toFixed(2)} finalizado com sucesso.`,
+      )
       b2bLog.set('metadata', {
         order_id: order.id,
         order_number: orderNumber,
@@ -722,5 +781,162 @@ routerAdd('POST', '/backend/v1/b2b/admin/toggle-client-status', (e) => {
     })
   } catch (err) {
     return e.json(500, { error: 'Falha ao alterar status de acesso: ' + String(err) })
+  }
+})
+
+// 9. GET /backend/v1/b2b/admin/access-requests
+// Listar solicitações de acesso B2B pendentes e processadas
+routerAdd('GET', '/backend/v1/b2b/admin/access-requests', (e) => {
+  const auth = e.auth
+  if (!auth || auth.collectionName !== 'users') {
+    return e.json(401, { error: 'Autenticação necessária' })
+  }
+
+  try {
+    let requests = []
+    try {
+      requests = $app.findRecordsByFilter('b2b_access_requests', '', '-created', 100, 0)
+    } catch (_) {}
+
+    const result = requests.map((r) => ({
+      id: r.id,
+      client_id: r.getString('client_id'),
+      partner_id: r.getString('partner_id'),
+      company_name: r.getString('company_name'),
+      trade_name: r.getString('trade_name'),
+      cnpj: r.getString('cnpj'),
+      email: r.getString('email'),
+      phone: r.getString('phone'),
+      contact_name: r.getString('contact_name'),
+      status: r.getString('status') || 'pendente',
+      rejection_reason: r.getString('rejection_reason'),
+      approved_by: r.getString('approved_by'),
+      approved_at: r.getString('approved_at'),
+      notes: r.getString('notes'),
+      created: r.getString('created'),
+    }))
+
+    return e.json(200, { requests: result })
+  } catch (err) {
+    return e.json(500, { error: 'Falha ao buscar solicitações: ' + String(err) })
+  }
+})
+
+// 10. POST /backend/v1/b2b/admin/approve-access
+// Aprovar ou rejeitar acesso B2B com vínculo ao parceiro
+routerAdd('POST', '/backend/v1/b2b/admin/approve-access', (e) => {
+  const auth = e.auth
+  if (!auth || auth.collectionName !== 'users') {
+    return e.json(401, { error: 'Autenticação de operador interno necessária' })
+  }
+
+  const reqInfo = e.requestInfo()
+  const body = reqInfo.body || {}
+  const requestId = body.request_id
+  const action = body.action // 'aprovar' ou 'rejeitar'
+  const partnerIdBinding = body.partner_id // Opcional: vincular a parceiro existente selecionado
+  const rejectionReason = body.rejection_reason || ''
+
+  if (!requestId || !action) {
+    return e.json(400, { error: 'request_id e action são obrigatórios' })
+  }
+
+  try {
+    const accessReq = $app.findRecordById('b2b_access_requests', requestId)
+    if (!accessReq) {
+      return e.json(404, { error: 'Solicitação não encontrada' })
+    }
+
+    const clientId = accessReq.getString('client_id')
+    let client = null
+    if (clientId) {
+      try {
+        client = $app.findRecordById('clients', clientId)
+      } catch (_) {}
+    }
+
+    let targetPartnerId = partnerIdBinding || accessReq.getString('partner_id')
+    let partner = null
+    if (targetPartnerId) {
+      try {
+        partner = $app.findRecordById('partners', targetPartnerId)
+      } catch (_) {}
+    }
+
+    const nowIso = new Date().toISOString()
+    const approverName = auth.getString('name') || auth.getString('email') || 'Administrador'
+
+    if (action === 'aprovar') {
+      accessReq.set('status', 'aprovado')
+      accessReq.set('approved_by', approverName)
+      accessReq.set('approved_at', nowIso)
+      if (targetPartnerId) accessReq.set('partner_id', targetPartnerId)
+      $app.save(accessReq)
+
+      if (client) {
+        client.set('active', true)
+        client.set('status', 'ativo')
+        if (targetPartnerId) client.set('partner_id', targetPartnerId)
+        $app.save(client)
+      }
+
+      if (partner) {
+        partner.set('active', true)
+        partner.set('b2b_ativo', true)
+        partner.set('b2b_status', 'ativo')
+        if (clientId) partner.set('client_id', clientId)
+        $app.save(partner)
+      }
+
+      // Trilha de auditoria
+      try {
+        const auditCol = $app.findCollectionByNameOrId('audit_logs')
+        const audit = new Record(auditCol)
+        audit.set('user_id', auth.id)
+        audit.set('user_name', approverName)
+        audit.set('action', 'b2b_access_approved')
+        audit.set('module', 'b2b')
+        audit.set('target_collection', 'b2b_access_requests')
+        audit.set('target_id', requestId)
+        audit.set(
+          'target_summary',
+          `Acesso B2B aprovado para ${accessReq.getString('company_name')} (CNPJ ${accessReq.getString('cnpj')}).`,
+        )
+        $app.save(audit)
+      } catch (_) {}
+
+      return e.json(200, {
+        success: true,
+        message: 'Acesso B2B aprovado com sucesso! O cliente agora pode efetuar pedidos.',
+        status: 'aprovado',
+      })
+    } else {
+      // Rejeição
+      accessReq.set('status', 'rejeitado')
+      accessReq.set('rejection_reason', rejectionReason)
+      accessReq.set('approved_by', approverName)
+      accessReq.set('approved_at', nowIso)
+      $app.save(accessReq)
+
+      if (client) {
+        client.set('active', false)
+        client.set('status', 'rejeitado')
+        $app.save(client)
+      }
+
+      if (partner) {
+        partner.set('b2b_ativo', false)
+        partner.set('b2b_status', 'rejeitado')
+        $app.save(partner)
+      }
+
+      return e.json(200, {
+        success: true,
+        message: 'Acesso B2B rejeitado com sucesso.',
+        status: 'rejeitado',
+      })
+    }
+  } catch (err) {
+    return e.json(500, { error: 'Falha ao processar deliberação de acesso: ' + String(err) })
   }
 })

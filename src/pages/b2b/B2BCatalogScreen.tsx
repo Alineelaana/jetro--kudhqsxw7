@@ -31,17 +31,14 @@ export const B2BCatalogScreen: React.FC = () => {
     load()
   }, [])
 
-  const categories = Array.from(
-    new Set(products.map((p) => p.category).filter(Boolean)),
-  )
+  const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)))
 
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.code.toLowerCase().includes(search.toLowerCase()) ||
       (p.brand && p.brand.toLowerCase().includes(search.toLowerCase()))
-    const matchesCategory =
-      selectedCategory === 'all' || p.category === selectedCategory
+    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory
     return matchesSearch && matchesCategory
   })
 
@@ -64,7 +61,9 @@ export const B2BCatalogScreen: React.FC = () => {
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Catálogo de Produtos B2B</h1>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Catálogo de Produtos B2B
+            </h1>
             <p className="text-sm text-slate-500">
               Produtos com disponibilidade para faturamento e suprimento corporativo
             </p>
@@ -159,14 +158,14 @@ export const B2BCatalogScreen: React.FC = () => {
 
                 <CardContent className="space-y-3 pb-3">
                   {product.description && (
-                    <p className="text-xs text-slate-500 line-clamp-2">
-                      {product.description}
-                    </p>
+                    <p className="text-xs text-slate-500 line-clamp-2">{product.description}</p>
                   )}
 
                   <div className="pt-2 border-t border-slate-100 flex items-baseline justify-between">
                     <div>
-                      <span className="text-xs text-slate-500">Preço B2B / {product.unit || 'un'}</span>
+                      <span className="text-xs text-slate-500">
+                        Preço B2B / {product.unit || 'un'}
+                      </span>
                       <p className="text-xl font-bold text-slate-900 tracking-tight">
                         R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
@@ -198,7 +197,9 @@ export const B2BCatalogScreen: React.FC = () => {
                       ) : (
                         <>
                           <ShoppingCart className="w-4 h-4 mr-1.5" />
-                          {inCart > 0 ? `Adicionar mais (${inCart} no carrinho)` : 'Adicionar ao Pedido'}
+                          {inCart > 0
+                            ? `Adicionar mais (${inCart} no carrinho)`
+                            : 'Adicionar ao Pedido'}
                         </>
                       )}
                     </Button>

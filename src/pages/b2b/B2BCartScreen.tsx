@@ -7,7 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import {
   ShoppingCart,
   Trash2,
@@ -22,7 +29,8 @@ import {
 
 export const B2BCartScreen: React.FC = () => {
   const navigate = useNavigate()
-  const { cart, updateCartQuantity, removeFromCart, clearCart, cartTotal, partner, client } = useB2B()
+  const { cart, updateCartQuantity, removeFromCart, clearCart, cartTotal, partner, client } =
+    useB2B()
 
   const [notes, setNotes] = useState('')
   const [deliveryAddress, setDeliveryAddress] = useState(
@@ -30,7 +38,9 @@ export const B2BCartScreen: React.FC = () => {
       ? `${partner.address}, ${partner.address_number || 'S/N'} - ${partner.address_district || ''}, ${partner.address_city || ''}/${partner.address_state || ''}`
       : '',
   )
-  const [paymentCondition, setPaymentCondition] = useState('Boleto Bancário 28 DDL (Faturamento B2B)')
+  const [paymentCondition, setPaymentCondition] = useState(
+    'Boleto Bancário 28 DDL (Faturamento B2B)',
+  )
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [createdOrderNumber, setCreatedOrderNumber] = useState<string | null>(null)
@@ -70,15 +80,21 @@ export const B2BCartScreen: React.FC = () => {
             </div>
             <h2 className="text-2xl font-bold text-slate-900">Pedido B2B Enviado com Sucesso!</h2>
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 max-w-sm mx-auto">
-              <span className="text-xs text-slate-500 uppercase tracking-wider block">Número do Pedido</span>
-              <span className="text-xl font-mono font-bold text-indigo-700">{createdOrderNumber}</span>
+              <span className="text-xs text-slate-500 uppercase tracking-wider block">
+                Número do Pedido
+              </span>
+              <span className="text-xl font-mono font-bold text-indigo-700">
+                {createdOrderNumber}
+              </span>
             </div>
             <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-lg text-sm text-indigo-800 text-left max-w-lg mx-auto flex items-start gap-3">
               <FileCheck2 className="w-5 h-5 mt-0.5 text-indigo-600 shrink-0" />
               <div>
                 <p className="font-semibold">Submetido para a Central de Aprovações</p>
                 <p className="text-xs mt-1 text-indigo-700">
-                  Seu pedido foi registrado no sistema e encaminhado diretamente para aprovação da equipe comercial e financeira. Você pode acompanhar cada etapa do faturamento em tempo real na aba &quot;Meus Pedidos&quot;.
+                  Seu pedido foi registrado no sistema e encaminhado diretamente para aprovação da
+                  equipe comercial e financeira. Você pode acompanhar cada etapa do faturamento em
+                  tempo real na aba &quot;Meus Pedidos&quot;.
                 </p>
               </div>
             </div>
@@ -109,7 +125,8 @@ export const B2BCartScreen: React.FC = () => {
         <ShoppingCart className="w-12 h-12 text-slate-400 mx-auto mb-3" />
         <h3 className="text-lg font-semibold text-slate-800">Seu carrinho B2B está vazio</h3>
         <p className="text-sm text-slate-500 mt-1 mb-6">
-          Navegue pelo nosso catálogo corporativo para adicionar produtos e montar sua cotação/pedido.
+          Navegue pelo nosso catálogo corporativo para adicionar produtos e montar sua
+          cotação/pedido.
         </p>
         <Link to="/portal/catalogo">
           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
@@ -125,7 +142,9 @@ export const B2BCartScreen: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Carrinho de Compras B2B</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Carrinho de Compras B2B
+          </h1>
           <p className="text-sm text-slate-500">
             Revise as quantidades e condições comerciais antes de submeter o pedido
           </p>
@@ -185,7 +204,8 @@ export const B2BCartScreen: React.FC = () => {
                               {item.product.name}
                             </div>
                             <div className="text-xs text-slate-500 font-mono">
-                              Cód: {item.product.code || item.product.id.slice(0, 8)} • Un: {item.product.unit}
+                              Cód: {item.product.code || item.product.id.slice(0, 8)} • Un:{' '}
+                              {item.product.unit}
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
@@ -193,7 +213,9 @@ export const B2BCartScreen: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateCartQuantity(item.product.id, item.quantity - 1)}
+                                onClick={() =>
+                                  updateCartQuantity(item.product.id, item.quantity - 1)
+                                }
                                 className="h-7 w-7 p-0 text-slate-600 hover:bg-white"
                               >
                                 <Minus className="w-3 h-3" />
@@ -204,7 +226,9 @@ export const B2BCartScreen: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateCartQuantity(item.product.id, item.quantity + 1)}
+                                onClick={() =>
+                                  updateCartQuantity(item.product.id, item.quantity + 1)
+                                }
                                 className="h-7 w-7 p-0 text-slate-600 hover:bg-white"
                               >
                                 <Plus className="w-3 h-3" />
@@ -212,7 +236,8 @@ export const B2BCartScreen: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-right text-sm text-slate-600 font-medium whitespace-nowrap">
-                            R$ {item.unit_price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R${' '}
+                            {item.unit_price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </TableCell>
                           <TableCell className="text-right text-sm font-bold text-slate-900 whitespace-nowrap">
                             R$ {totalItem.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -318,7 +343,8 @@ export const B2BCartScreen: React.FC = () => {
               </div>
 
               <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-800">
-                <strong>Atenção:</strong> Ao finalizar, seu pedido será submetido à Central de Aprovações para análise de crédito, estoque e faturamento comercial.
+                <strong>Atenção:</strong> Ao finalizar, seu pedido será submetido à Central de
+                Aprovações para análise de crédito, estoque e faturamento comercial.
               </div>
 
               <Button
