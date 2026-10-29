@@ -249,6 +249,59 @@ const JetroOnlineRelatoriosScreen = lazy(() =>
   })),
 )
 
+// ROTAS DO PORTAL B2B
+const AdminB2BAccessRequestsScreen = lazy(() =>
+  import('@/pages/admin/b2b/AdminB2BAccessRequestsScreen').then((m) => ({
+    default: m.AdminB2BAccessRequestsScreen,
+  })),
+)
+const AdminB2BClientsScreen = lazy(() =>
+  import('@/pages/admin/b2b/AdminB2BClientsScreen').then((m) => ({
+    default: m.AdminB2BClientsScreen,
+  })),
+)
+const AdminB2BOrdersScreen = lazy(() =>
+  import('@/pages/admin/b2b/AdminB2BOrdersScreen').then((m) => ({
+    default: m.AdminB2BOrdersScreen,
+  })),
+)
+
+const B2BPortalLayout = lazy(() =>
+  import('@/pages/b2b/B2BPortalLayout').then((m) => ({
+    default: m.B2BPortalLayout,
+  })),
+)
+const B2BLoginScreen = lazy(() =>
+  import('@/pages/b2b/B2BLoginScreen').then((m) => ({
+    default: m.B2BLoginScreen,
+  })),
+)
+const B2BRegisterScreen = lazy(() =>
+  import('@/pages/b2b/B2BRegisterScreen').then((m) => ({
+    default: m.B2BRegisterScreen,
+  })),
+)
+const B2BCatalogScreen = lazy(() =>
+  import('@/pages/b2b/B2BCatalogScreen').then((m) => ({
+    default: m.B2BCatalogScreen,
+  })),
+)
+const B2BCartScreen = lazy(() =>
+  import('@/pages/b2b/B2BCartScreen').then((m) => ({
+    default: m.B2BCartScreen,
+  })),
+)
+const B2BOrdersScreen = lazy(() =>
+  import('@/pages/b2b/B2BOrdersScreen').then((m) => ({
+    default: m.B2BOrdersScreen,
+  })),
+)
+const B2BProfileScreen = lazy(() =>
+  import('@/pages/b2b/B2BProfileScreen').then((m) => ({
+    default: m.B2BProfileScreen,
+  })),
+)
+
 const PageFallback = () => (
   <div className="flex items-center justify-center min-h-[40vh] w-full p-8">
     <div className="w-7 h-7 rounded-full border-2 border-[#063D30] border-t-transparent animate-spin" />
@@ -2847,6 +2900,35 @@ const App = () => (
                                     <Navigate to="/admin/marketing/relatorios-auditoria" replace />
                                   }
                                 />
+
+                                {/* GESTÃO INTERNA PORTAL B2B */}
+                                <Route
+                                  path="/admin/b2b/acessos"
+                                  element={<AdminB2BAccessRequestsScreen />}
+                                />
+                                <Route
+                                  path="/admin/b2b/clientes"
+                                  element={<AdminB2BClientsScreen />}
+                                />
+                                <Route
+                                  path="/admin/b2b/pedidos"
+                                  element={<AdminB2BOrdersScreen />}
+                                />
+
+                                {/* PORTAL B2B DO CLIENTE (AUTOSSERVIÇO PÚBLICO E ÁREA DO CLIENTE) */}
+                                <Route path="/portal/login" element={<B2BLoginScreen />} />
+                                <Route path="/portal/cadastro" element={<B2BRegisterScreen />} />
+                                <Route path="/portal" element={<B2BPortalLayout />}>
+                                  <Route
+                                    index
+                                    element={<Navigate to="/portal/catalogo" replace />}
+                                  />
+                                  <Route path="catalogo" element={<B2BCatalogScreen />} />
+                                  <Route path="carrinho" element={<B2BCartScreen />} />
+                                  <Route path="pedidos" element={<B2BOrdersScreen />} />
+                                  <Route path="perfil" element={<B2BProfileScreen />} />
+                                </Route>
+
                                 <Route path="/cliente/login" element={<ClientLogin />} />
                                 <Route path="/cliente/cadastro" element={<ClientRegister />} />
                                 <Route

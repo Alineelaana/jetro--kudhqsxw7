@@ -1,4 +1,15 @@
-import type { ScreenDoc } from './types'
+export interface ScreenDoc {
+  route: string
+  title: string
+  description: string
+  purpose: string
+  mainWorkflows: Array<{
+    title: string
+    steps: string[]
+  }>
+  technicalRules: string[]
+  backendCollections: string[]
+}
 
 export const b2bPortalScreenDocs: ScreenDoc[] = [
   {

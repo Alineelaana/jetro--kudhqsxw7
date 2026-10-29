@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   FileCheck2,
+  Clock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -37,6 +38,83 @@ export const B2BPortalLayout: React.FC = () => {
     { label: 'Meus Pedidos', path: '/portal/pedidos', icon: Package },
     { label: 'Dados da Empresa', path: '/portal/perfil', icon: User },
   ]
+
+  // DECISÃO 1: Se cliente estiver logado com status PENDENTE ou diferente de "ativo", vê EXCLUSIVAMENTE o aviso "cadastro em análise"
+  if (client && client.status !== 'ativo') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+        <header className="bg-white border-b border-slate-200 py-4 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-sm">
+              H
+            </div>
+            <div>
+              <span className="font-bold text-slate-900 tracking-tight text-base">HURAM</span>
+              <span className="ml-1 text-xs font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                PORTAL B2B
+              </span>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="text-slate-500 hover:text-rose-600 gap-1.5"
+          >
+            <LogOut className="w-4 h-4" />
+            Sair
+          </Button>
+        </header>
+
+        <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
+          <div className="max-w-md w-full bg-white rounded-xl border border-slate-200 shadow-md p-6 sm:p-8 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600">
+              <Clock className="w-8 h-8 animate-pulse" />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-slate-900">Cadastro em Análise</h2>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Olá, <strong>{client.company_name || client.name}</strong>. Seus dados cadastrais
+                foram recebidos e estão sob validação da equipe comercial do HURAM ERP.
+              </p>
+            </div>
+
+            <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-600 text-left space-y-1 border border-slate-100">
+              <p>
+                • <strong>CNPJ:</strong> {client.cnpj || 'Não informado'}
+              </p>
+              <p>
+                • <strong>E-mail:</strong> {client.email}
+              </p>
+              <p>
+                • <strong>Status atual:</strong>{' '}
+                <span className="font-semibold text-amber-700 capitalize">
+                  {client.status || 'Pendente'}
+                </span>
+              </p>
+            </div>
+
+            <p className="text-xs text-slate-500">
+              Assim que o seu acesso for aprovado pela equipe interna no HURAM, este portal será
+              liberado para navegação no catálogo, consulta de preços e emissão de pedidos de
+              compra.
+            </p>
+
+            <div className="pt-2">
+              <Button variant="outline" size="sm" onClick={logout} className="w-full">
+                Encerrar Sessão
+              </Button>
+            </div>
+          </div>
+        </main>
+
+        <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+          HURAM ERP • Portal de Autosserviço B2B
+        </footer>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">

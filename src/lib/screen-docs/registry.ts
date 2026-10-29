@@ -206,6 +206,63 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
   },
 
   // -------------------------------------------------------------
+  // GESTÃO INTERNA PORTAL B2B - APROVAÇÃO DE ACESSOS (v0.0.658 / v0.0.659)
+  // -------------------------------------------------------------
+  '/admin/b2b/acessos': {
+    route: '/admin/b2b/acessos',
+    title: 'Portal B2B • Central de Aprovação de Acessos',
+    moduleGroup: 'Portal B2B',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Analisar, aprovar ou rejeitar solicitações de acesso ao Portal B2B submetidas por novos clientes no auto-cadastro público, vinculando o cadastro a um parceiro existente ou criando novo parceiro no ERP.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Visualização de solicitações de acesso B2B pendentes, aprovadas e rejeitadas.\n- Comparador de dados da solicitação com parceiros existentes do HURAM por CNPJ/Razão Social.\n- Seletor inteligente de parceiro no modal de aprovação com opção de vincular a cliente existente ou cadastrar novo parceiro.\n- Configuração imediata da flag `exibir_limite_credito` no momento da aprovação.\n- Rejeição fundamentada com registro de justificativa comercial.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Decisão 1: Clientes cadastrados na página pública que não possuem aprovação prévia permanecem com status pendente e visualizam estritamente a tela "Cadastro em Análise" até que esta deliberação seja concluída.\n- Decisão 3: Por padrão a flag `exibir_limite_credito` nasce desmarcada, garantindo que o cliente não veja limite de crédito a menos que expressamente autorizado.\n- A aprovação ativa o registro de autenticação em `clients` e sincroniza o campo `b2b_status = "ativo"` em `partners`.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Cliente envia auto-cadastro na página pública `/portal/cadastro`.\n2. A solicitação é gravada em `b2b_access_requests` e notifica os gestores.\n3. O operador do HURAM abre `/admin/b2b/acessos`, revisa a solicitação e clica em Aprovar.\n4. Seleciona o parceiro correspondente do ERP, define se exibirá limite de crédito e confirma.\n5. O status é alterado para "aprovado" e o cliente tem acesso imediato liberado.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `b2b_access_requests`, `partners`, `clients`, `audit_logs`, `notifications`.\n- Estrutura consolidada pela migração `0306_b2b_access_approval_engine.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Endpoints de aprovação: `POST /backend/v1/b2b/admin/approve-access` e `GET /backend/v1/b2b/admin/access-requests` via hook `b2b_portal_endpoints.js`.\n- Integração com o cadastro mestre de parceiros (`partners`).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso exclusivo a operadores internos do ERP com perfil SUP, COMERCIAL, FINANCEIRO ou gestão administrativa.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `AdminB2BAccessRequestsScreen`, `Dialog`, `Select`, `Badge`, `Switch`, `Table`.\n- Serviço: `b2bService.adminApproveAccessRequest`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Bloqueio impeditivo de aprovação sem parceiro selecionado ou rejeição sem motivo.\n- Notificações de erro via toast e tratamento resiliente de falhas de comunicação.',
+    },
+  },
+
+  // -------------------------------------------------------------
   // GESTÃO INTERNA PORTAL B2B - CLIENTES (NOVA TELA v0.0.658)
   // -------------------------------------------------------------
   '/admin/b2b/clientes': {
@@ -316,6 +373,163 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
       title: 'Tratamento de Erros',
       content:
         '- Tratamento defensivo de conexão e indicação de lista vazia quando nenhum pedido foi emitido.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // PORTAL PÚBLICO B2B - AUTOSSERVIÇO DO CLIENTE (v0.0.658 / v0.0.659)
+  // -------------------------------------------------------------
+  '/portal/catalogo': {
+    route: '/portal/catalogo',
+    title: 'Portal B2B • Catálogo de Produtos e Preços',
+    moduleGroup: 'Portal B2B (Cliente)',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Apresentar o catálogo comercial de produtos com preços de atacado B2B e permitir montagem de pedidos diretamente pelo cliente cadastrado e aprovado.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Busca e filtragem de produtos por categoria, código e nome.\n- Exibição de preços unitários B2B, lote mínimo e disponibilidade.\n- Adição e ajuste de quantidades no carrinho de compras corporativo.\n- Indicador de limite de crédito condicional (visível estritamente quando `exibir_limite_credito === true`).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Decisão 1: Clientes com cadastro pendente não têm acesso ao catálogo e são barrados no layout com aviso de "Cadastro em Análise".\n- Decisão 3: Nenhum limite de crédito é exibido a menos que a flag esteja marcada no parceiro.\n- Bloqueio de submissão para clientes inativos.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Cliente aprovado faz login em `/portal/login` e acessa o catálogo.\n2. Seleciona itens desejados e adiciona ao carrinho.\n3. Navega para `/portal/carrinho` para concluir a montagem do pedido de venda.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `products`, `clients`, `partners`.\n- Endpoint `GET /backend/v1/b2b/products`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: '- API B2B `/backend/v1/b2b/products` e contexto `useB2B()`.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- Clientes B2B autenticados na coleção `clients` com status ativo.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `B2BCatalogScreen`, `B2BPortalLayout`, `Card`, `Badge`, `Button`.\n- Contexto: `B2BProvider`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Exibição de mensagem informativa caso o catálogo esteja vazio ou haja indisponibilidade de rede.',
+    },
+  },
+
+  '/portal/carrinho': {
+    route: '/portal/carrinho',
+    title: 'Portal B2B • Carrinho e Fechamento de Pedido',
+    moduleGroup: 'Portal B2B (Cliente)',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Permitir a conferência dos itens selecionados, inserção de dados de entrega e finalização do pedido de venda B2B integrado ao fluxo de aprovação do HURAM ERP.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem detalhada de itens com alteração de quantidade e remoção.\n- Cálculo automático de subtotal e valor bruto do pedido.\n- Preenchimento de endereço de entrega, forma de pagamento e observações.\n- Submissão direta para o motor de aprovação do ERP HURAM.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Decisão 2: O pedido é gravado em `sales_orders` com estágio "Aguardando Aprovação" e em `order_approval_records`, integrado à Central de Aprovações em `/admin/aprovacoes/pedidos` com notificação aos aprovadores internos.\n- O carrinho é esvaziado automaticamente após submissão bem-sucedida.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Cliente revisa itens no carrinho.\n2. Clica em "Finalizar Pedido B2B".\n3. O backend gera o número B2B-AAAA-XXXX, cria o registro em `sales_orders` e na fila de aprovações.\n4. O cliente é direcionado para a tela Meus Pedidos.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders`, `order_approval_records`, `notifications`, `b2b_audit_trail`.\n- Endpoint `POST /backend/v1/b2b/orders/create`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: '- Motor de aprovações do HURAM e Central de Aprovações de Pedidos.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- Clientes B2B autenticados com status aprovado/ativo.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content: '- Componentes: `B2BCartScreen`, `b2bService.createOrder`.\n- Contexto: `useB2B()`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Validação impeditiva de carrinho vazio e tratamento de respostas de falha com avisos claros ao cliente.',
+    },
+  },
+
+  '/portal/pedidos': {
+    route: '/portal/pedidos',
+    title: 'Portal B2B • Meus Pedidos',
+    moduleGroup: 'Portal B2B (Cliente)',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Permitir que o cliente corporativo acompanhe o status em tempo real de aprovação, faturamento e histórico de todos os pedidos realizados no Portal B2B.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem de pedidos de venda emitidos pelo cliente com paginação e ordenação decrescente por data.\n- Visualização de status de aprovação ("Aguardando Aprovação", "Aprovado", "Faturado", "Cancelado").\n- Detalhamento de itens, valores e histórico de deliberação do pedido.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Exibe apenas pedidos vinculados ao `client_id` ou `b2b_client_id` do usuário logado.\n- Status sincronizado diretamente com as deliberações ocorridas na Central de Aprovações do ERP.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Cliente acessa "Meus Pedidos" no menu superior do Portal B2B.\n2. Visualiza a lista de pedidos e clica em um registro para ver os detalhes da aprovação.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content: '- Coleção PocketBase `sales_orders` via endpoint `GET /backend/v1/b2b/orders`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content: '- API B2B `/backend/v1/b2b/orders` e sincronização com a Central de Aprovações.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: '- Clientes B2B autenticados com status aprovado/ativo.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `B2BOrdersScreen`, `Table`, `Badge`, `Dialog`.\n- Serviço: `b2bService.listOrders`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Tratamento defensivo de conexão e exibição de mensagem acolhedora se ainda não houver pedidos emitidos.',
     },
   },
 }

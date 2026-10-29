@@ -36,6 +36,7 @@ import {
   Bot,
   UserCheck,
   Smartphone,
+  ShoppingBag,
   type LucideIcon,
 } from 'lucide-react'
 import {
