@@ -204,6 +204,120 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
         '- Bloqueio com erro 403 caso o valor do pedido exceda a alçada do aprovador.\n- Bloqueio com erro 403 em tentativa de autoaprovação pelo solicitante.\n- Validação impeditiva de motivo vazio na rejeição no frontend e no backend.\n- Notificações de toast para respostas de gravação e tratamento resiliente de erros de rede.',
     },
   },
+
+  // -------------------------------------------------------------
+  // GESTÃO INTERNA PORTAL B2B - CLIENTES (NOVA TELA v0.0.658)
+  // -------------------------------------------------------------
+  '/admin/b2b/clientes': {
+    route: '/admin/b2b/clientes',
+    title: 'Portal B2B • Gestão de Clientes e Governança de Crédito',
+    moduleGroup: 'Portal B2B',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Controlar o acesso dos clientes corporativos ao Portal de Autosserviço B2B e gerenciar individualmente a flag de exibição de saldo e limite de crédito no portal.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem de parceiros comerciais cadastrados com filtro por Razão Social, CNPJ ou e-mail.\n- Alternador de status de acesso B2B (Ativar / Suspender acesso).\n- Controle de Governança de Crédito: interruptor individual para o campo `exibir_limite_credito` (por padrão desligado, atendendo à Decisão 3).\n- Exibição de limite cadastrado e limite disponível do ERP para conferência rápida pelo operador.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Decisão 3: Não exibir limite de crédito por padrão aos clientes no Portal B2B. Apenas quando a flag `exibir_limite_credito` for explicitamente ativada neste painel pelo usuário interno, o cliente passará a ver o saldo de crédito na área logada.\n- Bloqueio imediato do acesso B2B impede login e submissão de novos pedidos pelo cliente.\n- Toda alteração na flag de crédito ou no status de acesso gera log auditável em `audit_logs`.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Operador comercial/financeiro acessa o menu lateral em Portal B2B → Clientes do Portal.\n2. Localiza o cliente pelo CNPJ ou Razão Social.\n3. Aciona a chave "Exibir Limite de Crédito" para liberar a visualização no portal após conferência cadastral.\n4. O backend atualiza o parceiro e emite auditoria imediata.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `partners`, `clients`, `audit_logs`.\n- Campos B2B e `exibir_limite_credito` definidos na migração `0305_portal_b2b_architecture.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Endpoints seguros: `POST /backend/v1/b2b/admin/toggle-credit-flag` e `POST /backend/v1/b2b/admin/toggle-client-status`.\n- Trilha de auditoria interna: `audit_logs`.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso restrito a usuários internos do ERP com permissão comercial ou administrativa (`canViewSales(role)` / `canManageConfiguracoes(role)` / SUP).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `AdminB2BClientsScreen`, `Switch`, `Table`, `Badge`.\n- Serviços: `b2bService.adminToggleCreditFlag`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Notificações de toast para confirmação e reversão automática do switch em caso de falha de comunicação com o servidor.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // GESTÃO INTERNA PORTAL B2B - PEDIDOS (NOVA TELA v0.0.658)
+  // -------------------------------------------------------------
+  '/admin/b2b/pedidos': {
+    route: '/admin/b2b/pedidos',
+    title: 'Portal B2B • Pedidos Recebidos',
+    moduleGroup: 'Portal B2B',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-04-20',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Monitorar todos os pedidos gerados pelos clientes corporativos no Portal de Autosserviço B2B e direcionar para o fluxo de deliberação na Central de Aprovações.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem em tempo real de pedidos de venda com canal "Portal B2B".\n- Exibição de número do pedido (formato B2B-AAAA-XXXX), cliente, CNPJ, data, valor total e status.\n- Atalho direto para deliberação na Central de Aprovações de Pedidos (/admin/aprovacoes/pedidos).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Decisão 2: O pedido montado pelo cliente entra diretamente no fluxo de aprovação existente do ERP, nascendo com status "Aguardando Aprovação".\n- Multitenancy preservado por empresa e filial da transação.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Cliente monta pedido no portal público B2B e finaliza a compra.\n2. O pedido é registrado no ERP com status "Aguardando Aprovação" e aparece nesta tela e na Central de Aprovações.\n3. O gestor visualiza os dados e aciona o fluxo de liberação ou cancelamento.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders`, `order_approval_records`, `partners`.\n- Criado na migração `0305_portal_b2b_architecture.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Integração nativa com a Central de Aprovações (`/admin/aprovacoes/pedidos`) e motor `order_approval_process.js`.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Usuários internos com acesso ao módulo comercial ou financeiro (`canViewSales(role)`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `AdminB2BOrdersScreen`, `Table`, `Badge`, `Button`.\n- Serviço: PocketBase `sales_orders`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Tratamento defensivo de conexão e indicação de lista vazia quando nenhum pedido foi emitido.',
+    },
+  },
 }
 
 /**

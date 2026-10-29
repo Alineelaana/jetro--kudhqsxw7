@@ -823,6 +823,23 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
       },
     ],
   },
+  {
+    title: 'Portal B2B',
+    items: [
+      {
+        label: 'Clientes do Portal',
+        icon: Users,
+        route: '/admin/b2b/clientes',
+        perm: canViewSales,
+      },
+      {
+        label: 'Pedidos B2B',
+        icon: ShoppingBag,
+        route: '/admin/b2b/pedidos',
+        perm: canViewSales,
+      },
+    ],
+  },
 ]
 
 export const ADMIN_MENU: MenuGroup[] = sortAdminMenu(RAW_ADMIN_MENU)
