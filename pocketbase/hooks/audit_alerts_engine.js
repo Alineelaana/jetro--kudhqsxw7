@@ -34,12 +34,25 @@ routerAdd('POST', '/backend/v1/audit/rules/evaluate', function (e) {
       '</div>' +
       '</div>'
 
+    var senderAddress = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
+    var senderName = $app.settings().meta.senderName || 'HURAM — Auditoria do Sistema'
+
     for (var i = 0; i < recipients.length; i++) {
       var email = recipients[i]
       if (!email || email.indexOf('@') === -1) continue
+
+      var emLower = email.toLowerCase().trim()
+      if (
+        emLower.indexOf('teste') !== -1 ||
+        emLower.indexOf('exemplo') !== -1 ||
+        emLower.indexOf('@example.') !== -1
+      ) {
+        continue
+      }
+
       try {
         var msg = new MailerMessage({
-          from: { address: 'auditoria@huram.com.br', name: 'HURAM — Auditoria do Sistema' },
+          from: { address: senderAddress, name: senderName },
           to: [{ address: email }],
           subject: '[AUDITORIA HURAM] ' + alertTitle,
           html: html,
@@ -310,12 +323,25 @@ routerAdd('POST', '/backend/v1/audit/rules/dispatch-event', function (e) {
       '</div>' +
       '</div>'
 
+    var senderAddressDispatch = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
+    var senderNameDispatch = $app.settings().meta.senderName || 'HURAM — Auditoria do Sistema'
+
     for (var i = 0; i < recipients.length; i++) {
       var email = recipients[i]
       if (!email || email.indexOf('@') === -1) continue
+
+      var emDispatchLower = email.toLowerCase().trim()
+      if (
+        emDispatchLower.indexOf('teste') !== -1 ||
+        emDispatchLower.indexOf('exemplo') !== -1 ||
+        emDispatchLower.indexOf('@example.') !== -1
+      ) {
+        continue
+      }
+
       try {
         var msg = new MailerMessage({
-          from: { address: 'auditoria@huram.com.br', name: 'HURAM — Auditoria do Sistema' },
+          from: { address: senderAddressDispatch, name: senderNameDispatch },
           to: [{ address: email }],
           subject: '[AUDITORIA HURAM] ' + alertTitle,
           html: html,

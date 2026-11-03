@@ -42,7 +42,7 @@ import {
   AlertCircle,
   ExternalLink,
 } from 'lucide-react'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { toast } from '@/hooks/use-toast'
 
 interface AccessRequest {

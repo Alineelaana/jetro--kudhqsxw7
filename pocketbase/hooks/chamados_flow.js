@@ -181,6 +181,18 @@ onRecordAfterCreateSuccess((e) => {
 
   // 2. Disparo de e-mails de abertura (responsável, solicitante e convidados)
   try {
+    // Desativar envio de e-mail para chamados de teste ou demonstração
+    var assuntoLower = (assunto || '').toLowerCase()
+    if (
+      assuntoLower.indexOf('[teste]') !== -1 ||
+      assuntoLower.indexOf('teste') !== -1 ||
+      assuntoLower.indexOf('demonstração') !== -1 ||
+      assuntoLower.indexOf('demonstracao') !== -1
+    ) {
+      e.next()
+      return
+    }
+
     var setorNome = 'Não especificado'
     if (setorId) {
       try {
@@ -281,11 +293,25 @@ onRecordAfterCreateSuccess((e) => {
       )
     }
 
+    // Função auxiliar para validar se um e-mail é real e não de teste
+    var isRealEmail = function (em) {
+      if (!em || typeof em !== 'string') return false
+      var lower = em.toLowerCase().trim()
+      if (lower.indexOf('@') === -1) return false
+      if (lower.indexOf('teste') !== -1) return false
+      if (lower.indexOf('exemplo') !== -1) return false
+      if (lower.indexOf('@example.') !== -1) return false
+      return true
+    }
+
+    var senderAddress = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
+    var senderName = $app.settings().meta.senderName || 'HURAM — Central de Chamados'
+
     // 2a. E-mail para o responsável
-    if (respEmail) {
+    if (respEmail && isRealEmail(respEmail)) {
       try {
         var msgResp = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
+          from: { address: senderAddress, name: senderName },
           to: [{ address: respEmail }],
           subject: '[HURAM] Novo Chamado Atribuído a Você: ' + numero + ' — ' + assunto,
           html: buildInternalHtml(
@@ -310,10 +336,10 @@ onRecordAfterCreateSuccess((e) => {
     }
 
     // 2b. E-mail de confirmação para o solicitante
-    if (solicitanteEmail && solicitanteEmail !== respEmail) {
+    if (solicitanteEmail && solicitanteEmail !== respEmail && isRealEmail(solicitanteEmail)) {
       try {
         var msgSol = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
+          from: { address: senderAddress, name: senderName },
           to: [{ address: solicitanteEmail }],
           subject: '[HURAM] Confirmação de Abertura: Chamado ' + numero,
           html: buildInternalHtml(
@@ -340,7 +366,13 @@ onRecordAfterCreateSuccess((e) => {
     // 2c. E-mail restrito para convidados externos (sem anexos ou dados confidenciais)
     for (var i = 0; i < convidadosEmails.length; i++) {
       var convEmail = String(convidadosEmails[i] || '').trim()
-      if (!convEmail || convEmail === respEmail || convEmail === solicitanteEmail) continue
+      if (
+        !convEmail ||
+        !isRealEmail(convEmail) ||
+        convEmail === respEmail ||
+        convEmail === solicitanteEmail
+      )
+        continue
       try {
         var htmlExterno =
           '<div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
@@ -367,7 +399,7 @@ onRecordAfterCreateSuccess((e) => {
           '</div>'
 
         var msgConv = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
+          from: { address: senderAddress, name: senderName },
           to: [{ address: convEmail }],
           subject: '[HURAM] Acompanhamento de Chamado: ' + numero,
           html: htmlExterno,
@@ -428,84 +460,108 @@ onRecordAfterUpdateSuccess((e) => {
   var aprovadorId = rec.getString('aprovador') || ''
 
   try {
-    var mailClient = $app.newMailClient()
-    var baseUrl = 'https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev'
-    var linkChamado = baseUrl + '/admin/chamados/' + chamadoId
+    // Desativar envio de e-mail de atualização para chamados de teste ou demonstração
+    var assuntoUpLower = (assunto || '').toLowerCase()
+    if (
+      assuntoUpLower.indexOf('[teste]') !== -1 ||
+      assuntoUpLower.indexOf('teste') !== -1 ||
+      assuntoUpLower.indexOf('demonstração') !== -1 ||
+      assuntoUpLower.indexOf('demonstracao') !== -1
+    ) {
+      // Pula envio de e-mail, mas ainda gera notificações internas no sino
+      emailsParaNotificar = []
+    } else {
+      var mailClient = $app.newMailClient()
+      var baseUrl = 'https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev'
+      var linkChamado = baseUrl + '/admin/chamados/' + chamadoId
 
-    var emailsParaNotificar = []
+      var emailsParaNotificar = []
 
-    // Notificar solicitante
-    if (solicitanteId) {
-      try {
-        var sRec = $app.findRecordById('users', solicitanteId)
-        var sEmail = sRec.getString('email')
-        if (sEmail)
-          emailsParaNotificar.push({ email: sEmail, nome: sRec.getString('name') || sEmail })
-      } catch (_) {}
-    }
-
-    // Notificar responsável
-    if (responsavelId) {
-      try {
-        var rRec = $app.findRecordById('users', responsavelId)
-        var rEmail = rRec.getString('email')
-        if (rEmail && (!emailsParaNotificar.length || emailsParaNotificar[0].email !== rEmail)) {
-          emailsParaNotificar.push({ email: rEmail, nome: rRec.getString('name') || rEmail })
-        }
-      } catch (_) {}
-    }
-
-    // Se estiver em aprovação, garantir notificação ao aprovador
-    if (status === 'aprovacao' && aprovadorId) {
-      try {
-        var aRec = $app.findRecordById('users', aprovadorId)
-        var aEmail = aRec.getString('email')
-        if (aEmail) {
-          emailsParaNotificar.push({ email: aEmail, nome: aRec.getString('name') || aEmail })
-        }
-      } catch (_) {}
-    }
-
-    var subject =
-      '[HURAM] Atualização de Status do Chamado ' + numero + ' → ' + status.toUpperCase()
-    var html =
-      '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
-      '<div style="background: #002817; padding: 20px; text-align: center; border-bottom: 3px solid #C9A227;">' +
-      '<h2 style="color: #E4C46A; margin: 0; font-size: 18px;">HURAM — Atualização de Chamado</h2>' +
-      '</div>' +
-      '<div style="padding: 24px;">' +
-      '<p style="font-size: 15px; margin-top: 0;">O status do chamado <strong>' +
-      numero +
-      '</strong> foi atualizado para: <strong style="color: #005B2E; text-transform: uppercase;">' +
-      status +
-      '</strong>.</p>' +
-      '<p style="font-size: 13px; color: #64748b;">Assunto: ' +
-      assunto +
-      '</p>' +
-      '<div style="text-align: center; margin: 24px 0 10px;">' +
-      '<a href="' +
-      linkChamado +
-      '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Abrir Chamado no HURAM</a>' +
-      '</div>' +
-      '</div>' +
-      '</div>'
-
-    for (var j = 0; j < emailsParaNotificar.length; j++) {
-      try {
-        var msg = new MailerMessage({
-          from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
-          to: [{ address: emailsParaNotificar[j].email }],
-          subject: subject,
-          html: html,
-        })
-        mailClient.send(msg)
-        $app
-          .logger()
-          .info('E-mail de status enviado', 'dest', emailsParaNotificar[j].email, 'status', status)
-      } catch (errNotif) {
-        $app.logger().warn('Falha no envio de notificacao de status', 'error', String(errNotif))
+      // Notificar solicitante
+      if (solicitanteId) {
+        try {
+          var sRec = $app.findRecordById('users', solicitanteId)
+          var sEmail = sRec.getString('email')
+          if (sEmail)
+            emailsParaNotificar.push({ email: sEmail, nome: sRec.getString('name') || sEmail })
+        } catch (_) {}
       }
-    }
+
+      // Notificar responsável
+      if (responsavelId) {
+        try {
+          var rRec = $app.findRecordById('users', responsavelId)
+          var rEmail = rRec.getString('email')
+          if (rEmail && (!emailsParaNotificar.length || emailsParaNotificar[0].email !== rEmail)) {
+            emailsParaNotificar.push({ email: rEmail, nome: rRec.getString('name') || rEmail })
+          }
+        } catch (_) {}
+      }
+
+      // Se estiver em aprovação, garantir notificação ao aprovador
+      if (status === 'aprovacao' && aprovadorId) {
+        try {
+          var aRec = $app.findRecordById('users', aprovadorId)
+          var aEmail = aRec.getString('email')
+          if (aEmail) {
+            emailsParaNotificar.push({ email: aEmail, nome: aRec.getString('name') || aEmail })
+          }
+        } catch (_) {}
+      }
+
+      var subject =
+        '[HURAM] Atualização de Status do Chamado ' + numero + ' → ' + status.toUpperCase()
+      var html =
+        '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">' +
+        '<div style="background: #002817; padding: 20px; text-align: center; border-bottom: 3px solid #C9A227;">' +
+        '<h2 style="color: #E4C46A; margin: 0; font-size: 18px;">HURAM — Atualização de Chamado</h2>' +
+        '</div>' +
+        '<div style="padding: 24px;">' +
+        '<p style="font-size: 15px; margin-top: 0;">O status do chamado <strong>' +
+        numero +
+        '</strong> foi atualizado para: <strong style="color: #005B2E; text-transform: uppercase;">' +
+        status +
+        '</strong>.</p>' +
+        '<p style="font-size: 13px; color: #64748b;">Assunto: ' +
+        assunto +
+        '</p>' +
+        '<div style="text-align: center; margin: 24px 0 10px;">' +
+        '<a href="' +
+        linkChamado +
+        '" style="background: #002817; border: 1px solid #C9A227; color: #E4C46A; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Abrir Chamado no HURAM</a>' +
+        '</div>' +
+        '</div>' +
+        '</div>'
+
+      var senderAddressUp = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
+      var senderNameUp = $app.settings().meta.senderName || 'HURAM — Central de Chamados'
+
+      for (var j = 0; j < emailsParaNotificar.length; j++) {
+        var destEm = emailsParaNotificar[j].email || ''
+        var destEmLower = destEm.toLowerCase().trim()
+        if (
+          !destEmLower ||
+          destEmLower.indexOf('@') === -1 ||
+          destEmLower.indexOf('teste') !== -1 ||
+          destEmLower.indexOf('exemplo') !== -1 ||
+          destEmLower.indexOf('@example.') !== -1
+        ) {
+          continue
+        }
+        try {
+          var msg = new MailerMessage({
+            from: { address: senderAddressUp, name: senderNameUp },
+            to: [{ address: destEm }],
+            subject: subject,
+            html: html,
+          })
+          mailClient.send(msg)
+          $app.logger().info('E-mail de status enviado', 'dest', destEm, 'status', status)
+        } catch (errNotif) {
+          $app.logger().warn('Falha no envio de notificacao de status', 'error', String(errNotif))
+        }
+      }
+    } // fim do else de chamado não teste
 
     // Criar notificações no sino para os envolvidos (solicitante, responsável, aprovador)
     try {

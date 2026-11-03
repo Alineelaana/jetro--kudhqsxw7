@@ -137,52 +137,72 @@ onRecordAfterCreateSuccess((e) => {
       }
     }
 
-    // 2. Disparo de e-mail de notificação para a administração (se houver remetente configurado)
+    // 2. Disparo de e-mail de notificação administrativa: desativado envio para destinatário fictício administracao@jetro.com.br.
+    // A notificação interna já foi gerada acima na coleção 'notifications' para todos os SUP/ADMIN.
+    // O envio externo só ocorrerá se houver um e-mail de notificação configurado expressamente nas configurações do sistema.
     try {
-      var mailClient = $app.newMailClient()
-      var subject = '[HURAM] Novo Depoimento do Site Institucional para Aprovação'
-      var html =
-        '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">' +
-        '<div style="background: #003D30; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 3px solid #D6A755;">' +
-        '<h2 style="color: #E4C46A; margin: 0;">HURAM — Sistema Inteligente de Gestão</h2>' +
-        '<p style="color: #ffffff; font-size: 13px; margin: 6px 0 0;">Novo depoimento recebido via site institucional</p>' +
-        '</div>' +
-        '<div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; background: #ffffff; border-radius: 0 0 8px 8px;">' +
-        '<p style="font-size: 15px;">Um novo cliente enviou um depoimento sobre o HURAM e aguarda moderação administrativa antes da publicação.</p>' +
-        '<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">' +
-        '<tr><td style="padding: 8px; font-weight: bold; width: 140px; background: #f8fafc;">Autor:</td><td style="padding: 8px; background: #f8fafc;">' +
-        nomeAutor +
-        '</td></tr>' +
-        '<tr><td style="padding: 8px; font-weight: bold;">Empresa:</td><td style="padding: 8px;">' +
-        empresa +
-        '</td></tr>' +
-        '<tr><td style="padding: 8px; font-weight: bold; background: #f8fafc;">E-mail do autor:</td><td style="padding: 8px; background: #f8fafc;">' +
-        email +
-        ' (não público)</td></tr>' +
-        '<tr><td style="padding: 8px; font-weight: bold;">Status:</td><td style="padding: 8px; color: #b45309; font-weight: bold;">Pendente de Aprovação</td></tr>' +
-        '</table>' +
-        '<p style="font-size: 13px; color: #64748b; line-height: 1.5;">O depoimento <strong>não</strong> é publicado automaticamente. Acesse a Central Administrativa do HURAM para visualizar o texto na íntegra, a autorização e aprovar ou reprovar.</p>' +
-        '<div style="text-align: center; margin: 24px 0 10px;">' +
-        '<a href="https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev/admin/site-depoimentos" style="background: #003D30; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Analisar Depoimento no ERP</a>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+      var customAdminEmail = ''
+      try {
+        var cfgRec = $app.findFirstRecordByData('settings', 'key', 'audit_alert_config')
+        if (cfgRec) {
+          var parsedCfg = JSON.parse(cfgRec.getString('value') || '{}')
+          if (parsedCfg.email_notifications_enabled && parsedCfg.notification_email) {
+            customAdminEmail = parsedCfg.notification_email.trim()
+          }
+        }
+      } catch (_) {}
 
-      var adminDest = 'administracao@jetro.com.br'
-      var msg = new MailerMessage({
-        from: {
-          address: 'sistema@jetro.com.br',
-          name: 'HURAM - Notificações',
-        },
-        to: [{ address: adminDest }],
-        subject: subject,
-        html: html,
-      })
-      mailClient.send(msg)
+      if (
+        customAdminEmail &&
+        customAdminEmail.indexOf('@') !== -1 &&
+        customAdminEmail.indexOf('jetro.com.br') === -1
+      ) {
+        var mailClient = $app.newMailClient()
+        var senderAddr = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
+        var senderNm = $app.settings().meta.senderName || 'HURAM — Notificações'
+        var subject = '[HURAM] Novo Depoimento do Site Institucional para Aprovação'
+        var html =
+          '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">' +
+          '<div style="background: #003D30; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 3px solid #D6A755;">' +
+          '<h2 style="color: #E4C46A; margin: 0;">HURAM — Sistema Inteligente de Gestão</h2>' +
+          '<p style="color: #ffffff; font-size: 13px; margin: 6px 0 0;">Novo depoimento recebido via site institucional</p>' +
+          '</div>' +
+          '<div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; background: #ffffff; border-radius: 0 0 8px 8px;">' +
+          '<p style="font-size: 15px;">Um novo cliente enviou um depoimento sobre o HURAM e aguarda moderação administrativa antes da publicação.</p>' +
+          '<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">' +
+          '<tr><td style="padding: 8px; font-weight: bold; width: 140px; background: #f8fafc;">Autor:</td><td style="padding: 8px; background: #f8fafc;">' +
+          nomeAutor +
+          '</td></tr>' +
+          '<tr><td style="padding: 8px; font-weight: bold;">Empresa:</td><td style="padding: 8px;">' +
+          empresa +
+          '</td></tr>' +
+          '<tr><td style="padding: 8px; font-weight: bold; background: #f8fafc;">E-mail do autor:</td><td style="padding: 8px; background: #f8fafc;">' +
+          email +
+          ' (não público)</td></tr>' +
+          '<tr><td style="padding: 8px; font-weight: bold;">Status:</td><td style="padding: 8px; color: #b45309; font-weight: bold;">Pendente de Aprovação</td></tr>' +
+          '</table>' +
+          '<div style="text-align: center; margin: 24px 0 10px;">' +
+          '<a href="https://logistica-premium-es-2cc14.shrd03.internal.goskip.dev/admin/site-depoimentos" style="background: #003D30; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Analisar Depoimento no ERP</a>' +
+          '</div>' +
+          '</div>' +
+          '</div>'
+
+        var msg = new MailerMessage({
+          from: { address: senderAddr, name: senderNm },
+          to: [{ address: customAdminEmail }],
+          subject: subject,
+          html: html,
+        })
+        mailClient.send(msg)
+      }
     } catch (mailErr) {
       $app
         .logger()
-        .warn('Notificacao por e-mail de novo depoimento falhou', 'error', String(mailErr))
+        .warn(
+          'Notificacao por e-mail de novo depoimento ignorada ou falhou',
+          'error',
+          String(mailErr),
+        )
     }
   } catch (outerErr) {
     $app.logger().error('Erro geral no hook de depoimento', 'error', String(outerErr))

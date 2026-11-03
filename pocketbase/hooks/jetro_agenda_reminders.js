@@ -1,5 +1,5 @@
 // ============================================================================
-// Hooks e Automação de Lembretes da Agenda Jetro
+// Hooks e Automação de Lembretes da Agenda HURAM
 //
 // 1. Sincronização automática de lembretes ao criar/editar/excluir compromisso:
 //    - onRecordAfterCreateSuccess
@@ -9,191 +9,138 @@
 // 2. Cron de disparo automático no servidor a cada 2 minutos (jetro_agenda_reminders_worker)
 //    - Processa lembretes pendentes cujo scheduled_for <= agora (UTC)
 //    - Evita duplicidade (status = 'sent', sent_at)
-//    - Não envia lembretes cujo horário de início já passou no momento da criação
-//    - E-mail corporativo no padrão HURAM (verde institucional #063D30, dourado #C69B45)
+//    - Ignora destinatários de teste ou inválidos
 // ============================================================================
 
-function parseJSON(str, fallback) {
-  if (!str) return fallback
-  if (typeof str === 'object') return str
+// Hook pós-criação
+onRecordAfterCreateSuccess((e) => {
+  if (e.record.collectionName !== 'jetro_agenda_appointments') return e.next()
   try {
-    return JSON.parse(str)
-  } catch (_) {
-    return fallback
-  }
-}
-
-function xmlEscape(s) {
-  if (!s) return ''
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
-}
-
-// Converte offset string para minutos antes do evento
-// Suporta: 15m, 30m, 1h, 2h, 6h, 12h, 1d, 2d, 1w e personalizadas "custom:Xm", "custom:Xh", "custom:Xd"
-function parseOffsetToMinutes(offsetKey) {
-  if (!offsetKey) return null
-  var key = String(offsetKey).trim().toLowerCase()
-
-  if (key.indexOf('custom:') === 0) {
-    var raw = key.substring(7)
-    if (raw.endsWith('m')) return parseInt(raw.replace('m', ''), 10) || null
-    if (raw.endsWith('h')) return (parseInt(raw.replace('h', ''), 10) || 0) * 60 || null
-    if (raw.endsWith('d')) return (parseInt(raw.replace('d', ''), 10) || 0) * 1440 || null
-    return parseInt(raw, 10) || null
-  }
-
-  if (key === '15m' || key === '15 min') return 15
-  if (key === '30m' || key === '30 min') return 30
-  if (key === '1h' || key === '1 hora') return 60
-  if (key === '2h' || key === '2 horas') return 120
-  if (key === '6h' || key === '6 horas') return 360
-  if (key === '12h' || key === '12 horas') return 720
-  if (key === '1d' || key === '1 dia') return 1440
-  if (key === '2d' || key === '2 dias') return 2880
-  if (key === '1w' || key === '1 semana') return 10080
-
-  return null
-}
-
-function formatOffsetLabel(offsetKey) {
-  var mins = parseOffsetToMinutes(offsetKey)
-  if (!mins) return offsetKey
-  if (mins === 15) return '15 minutos antes'
-  if (mins === 30) return '30 minutos antes'
-  if (mins === 60) return '1 hora antes'
-  if (mins === 120) return '2 horas antes'
-  if (mins === 360) return '6 horas antes'
-  if (mins === 720) return '12 horas antes'
-  if (mins === 1440) return '1 dia antes'
-  if (mins === 2880) return '2 dias antes'
-  if (mins === 10080) return '1 semana antes'
-  if (mins < 60) return mins + ' minutos antes'
-  if (mins < 1440) return Math.round(mins / 60) + ' horas antes'
-  return Math.round(mins / 1440) + ' dias antes'
-}
-
-// Converte YYYY-MM-DD e HH:mm no fuso de Brasília (-03:00) em timestamp UTC em milissegundos
-function computeTargetUtcMs(dateStr, timeStr) {
-  var t = timeStr && timeStr.indexOf(':') !== -1 ? timeStr.trim() : '09:00'
-  var isoWithTz = dateStr + 'T' + t + ':00-03:00'
-  var targetDate = new Date(isoWithTz)
-  return targetDate.getTime()
-}
-
-// Função para sincronizar os registros de lembretes no banco
-function syncRemindersForAppointment(apptRecord) {
-  var apptId = apptRecord.id
-  var userId = apptRecord.getString('user_id')
-  var status = apptRecord.getString('status')
-  var hasReminder = apptRecord.getBool('has_reminder')
-  var reminderConfigs = parseJSON(apptRecord.getString('reminder_configs'), [])
-  var dateStr = apptRecord.getString('date')
-  var timeStr =
-    apptRecord.getString('start_time') ||
-    apptRecord.getString('reference_time_for_reminder') ||
-    '09:00'
-
-  var reminderCol = $app.findCollectionByNameOrId('jetro_agenda_reminders')
-
-  // Se o compromisso foi cancelado ou concluído, ou se has_reminder = false, cancela todos os lembretes pendentes
-  if (!hasReminder || status === 'Cancelado' || status === 'Concluido') {
+    var apptRecord = e.record
+    var apptId = apptRecord.id
+    var userId = apptRecord.getString('user_id')
+    var status = apptRecord.getString('status')
+    var hasReminder = apptRecord.getBool('has_reminder')
+    var rawConfigs = apptRecord.getString('reminder_configs')
+    var reminderConfigs = []
     try {
-      var existing = $app.findRecordsByFilter(
+      if (rawConfigs) reminderConfigs = JSON.parse(rawConfigs)
+    } catch (_) {}
+    if (!Array.isArray(reminderConfigs)) reminderConfigs = []
+
+    var dateStr = apptRecord.getString('date')
+    var timeStr =
+      apptRecord.getString('start_time') ||
+      apptRecord.getString('reference_time_for_reminder') ||
+      '09:00'
+
+    var reminderCol = $app.findCollectionByNameOrId('jetro_agenda_reminders')
+
+    if (!hasReminder || status === 'Cancelado' || status === 'Concluido') {
+      try {
+        var existing = $app.findRecordsByFilter(
+          'jetro_agenda_reminders',
+          'appointment_id = "' + apptId + '" && status = "pending"',
+          '',
+          100,
+          0,
+        )
+        for (var i = 0; i < existing.length; i++) {
+          existing[i].set('status', 'cancelled')
+          $app.saveNoValidate(existing[i])
+        }
+      } catch (_) {}
+      return e.next()
+    }
+
+    var recipientEmail = apptRecord.getString('reminder_target_email')
+    var recipientName = apptRecord.getString('user_name') || ''
+
+    if (!recipientEmail && userId) {
+      try {
+        var uRec = $app.findRecordById('users', userId)
+        if (uRec) {
+          recipientEmail = uRec.getString('email')
+          if (!recipientName) recipientName = uRec.getString('name')
+        }
+      } catch (_) {}
+    }
+
+    if (!recipientEmail || recipientEmail.indexOf('@') === -1) {
+      return e.next()
+    }
+
+    var tTime = timeStr && timeStr.indexOf(':') !== -1 ? timeStr.trim() : '09:00'
+    var targetDate = new Date(dateStr + 'T' + tTime + ':00-03:00')
+    var targetUtcMs = targetDate.getTime()
+    var nowUtcMs = Date.now()
+
+    var currentReminders = []
+    try {
+      currentReminders = $app.findRecordsByFilter(
         'jetro_agenda_reminders',
-        'appointment_id = "' + apptId + '" && status = "pending"',
+        'appointment_id = "' + apptId + '"',
         '',
         100,
         0,
       )
-      for (var i = 0; i < existing.length; i++) {
-        existing[i].set('status', 'cancelled')
-        $app.saveNoValidate(existing[i])
-      }
     } catch (_) {}
-    return
-  }
 
-  // Busca e-mail do destinatário: prioridade reminder_target_email, senão e-mail do usuário
-  var recipientEmail = apptRecord.getString('reminder_target_email')
-  var recipientName = apptRecord.getString('user_name') || ''
+    var currentByOffset = {}
+    for (var cIdx = 0; cIdx < currentReminders.length; cIdx++) {
+      var cr = currentReminders[cIdx]
+      currentByOffset[cr.getString('reminder_offset_key')] = cr
+    }
 
-  if (!recipientEmail && userId) {
-    try {
-      var uRec = $app.findRecordById('users', userId)
-      if (uRec) {
-        recipientEmail = uRec.getString('email')
-        if (!recipientName) recipientName = uRec.getString('name')
+    var parseOffsetMins = function (offsetKey) {
+      if (!offsetKey) return null
+      var key = String(offsetKey).trim().toLowerCase()
+      if (key.indexOf('custom:') === 0) {
+        var raw = key.substring(7)
+        if (raw.endsWith('m')) return parseInt(raw.replace('m', ''), 10) || null
+        if (raw.endsWith('h')) return (parseInt(raw.replace('h', ''), 10) || 0) * 60 || null
+        if (raw.endsWith('d')) return (parseInt(raw.replace('d', ''), 10) || 0) * 1440 || null
+        return parseInt(raw, 10) || null
       }
-    } catch (_) {}
-  }
+      if (key === '15m' || key === '15 min') return 15
+      if (key === '30m' || key === '30 min') return 30
+      if (key === '1h' || key === '1 hora') return 60
+      if (key === '2h' || key === '2 horas') return 120
+      if (key === '6h' || key === '6 horas') return 360
+      if (key === '12h' || key === '12 horas') return 720
+      if (key === '1d' || key === '1 dia') return 1440
+      if (key === '2d' || key === '2 dias') return 2880
+      if (key === '1w' || key === '1 semana') return 10080
+      return null
+    }
 
-  if (!recipientEmail || recipientEmail.indexOf('@') === -1) {
-    return
-  }
-
-  var targetUtcMs = computeTargetUtcMs(dateStr, timeStr)
-  var nowUtcMs = Date.now()
-
-  // Busca lembretes já existentes deste compromisso
-  var currentReminders = []
-  try {
-    currentReminders = $app.findRecordsByFilter(
-      'jetro_agenda_reminders',
-      'appointment_id = "' + apptId + '"',
-      '',
-      100,
-      0,
-    )
-  } catch (_) {}
-
-  var currentByOffset = {}
-  for (var cIdx = 0; cIdx < currentReminders.length; cIdx++) {
-    var r = currentReminders[cIdx]
-    currentByOffset[r.getString('reminder_offset_key')] = r
-  }
-
-  var validOffsetsConfigured = {}
-
-  if (Array.isArray(reminderConfigs)) {
+    var validOffsets = {}
     for (var k = 0; k < reminderConfigs.length; k++) {
-      var offsetKey = String(reminderConfigs[k]).trim()
-      var mins = parseOffsetToMinutes(offsetKey)
+      var offKey = String(reminderConfigs[k]).trim()
+      var mins = parseOffsetMins(offKey)
       if (mins === null) continue
-      validOffsetsConfigured[offsetKey] = mins
+      validOffsets[offKey] = mins
 
-      var scheduledTimeMs = targetUtcMs - mins * 60 * 1000
-      var scheduledIso = new Date(scheduledTimeMs).toISOString()
+      var schedMs = targetUtcMs - mins * 60 * 1000
+      var schedIso = new Date(schedMs).toISOString()
+      var exRec = currentByOffset[offKey]
 
-      var existingRec = currentByOffset[offsetKey]
-      if (existingRec) {
-        // Se já existe e ainda está pendente ou cancelled, atualiza dados do compromisso
-        if (
-          existingRec.getString('status') === 'pending' ||
-          existingRec.getString('status') === 'cancelled'
-        ) {
-          // Se o momento programado já passou, marca skipped_past
-          var newStatus = scheduledTimeMs <= nowUtcMs ? 'skipped_past' : 'pending'
-          existingRec.set('recipient_email', recipientEmail)
-          existingRec.set('recipient_name', recipientName)
-          existingRec.set('appointment_title', apptRecord.getString('title'))
-          existingRec.set('appointment_description', apptRecord.getString('description'))
-          existingRec.set('appointment_date', dateStr)
-          existingRec.set('appointment_time', timeStr)
-          existingRec.set('appointment_priority', apptRecord.getString('priority'))
-          existingRec.set('appointment_type', apptRecord.getString('type'))
-          existingRec.set('scheduled_for', scheduledIso)
-          existingRec.set('status', newStatus)
-          $app.saveNoValidate(existingRec)
+      if (exRec) {
+        if (exRec.getString('status') === 'pending' || exRec.getString('status') === 'cancelled') {
+          exRec.set('recipient_email', recipientEmail)
+          exRec.set('recipient_name', recipientName)
+          exRec.set('appointment_title', apptRecord.getString('title'))
+          exRec.set('appointment_description', apptRecord.getString('description'))
+          exRec.set('appointment_date', dateStr)
+          exRec.set('appointment_time', timeStr)
+          exRec.set('appointment_priority', apptRecord.getString('priority'))
+          exRec.set('appointment_type', apptRecord.getString('type'))
+          exRec.set('scheduled_for', schedIso)
+          exRec.set('status', schedMs <= nowUtcMs ? 'skipped_past' : 'pending')
+          $app.saveNoValidate(exRec)
         }
       } else {
-        // Criar novo lembrete se o horário alvo ainda não passou totalmente
-        var initialStatus = scheduledTimeMs <= nowUtcMs ? 'skipped_past' : 'pending'
-        var newRem = new Record(reminderCol, {
+        var nRem = new Record(reminderCol, {
           appointment_id: apptId,
           user_id: userId,
           recipient_email: recipientEmail,
@@ -204,33 +151,14 @@ function syncRemindersForAppointment(apptRecord) {
           appointment_time: timeStr,
           appointment_priority: apptRecord.getString('priority'),
           appointment_type: apptRecord.getString('type'),
-          reminder_offset_key: offsetKey,
-          scheduled_for: scheduledIso,
-          status: initialStatus,
+          reminder_offset_key: offKey,
+          scheduled_for: schedIso,
+          status: schedMs <= nowUtcMs ? 'skipped_past' : 'pending',
           attempts: 0,
         })
-        $app.saveNoValidate(newRem)
+        $app.saveNoValidate(nRem)
       }
     }
-  }
-
-  // Cancela lembretes antigos que foram removidos da configuração do compromisso
-  for (var offsetInDb in currentByOffset) {
-    if (!validOffsetsConfigured[offsetInDb]) {
-      var toCancel = currentByOffset[offsetInDb]
-      if (toCancel.getString('status') === 'pending') {
-        toCancel.set('status', 'cancelled')
-        $app.saveNoValidate(toCancel)
-      }
-    }
-  }
-}
-
-// Hook pós-criação
-onRecordAfterCreateSuccess((e) => {
-  if (e.record.collectionName !== 'jetro_agenda_appointments') return e.next()
-  try {
-    syncRemindersForAppointment(e.record)
   } catch (err) {
     $app.logger().error('Falha ao sincronizar lembretes pós-create', 'error', String(err))
   }
@@ -241,7 +169,159 @@ onRecordAfterCreateSuccess((e) => {
 onRecordAfterUpdateSuccess((e) => {
   if (e.record.collectionName !== 'jetro_agenda_appointments') return e.next()
   try {
-    syncRemindersForAppointment(e.record)
+    var apptRecord = e.record
+    var apptId = apptRecord.id
+    var userId = apptRecord.getString('user_id')
+    var status = apptRecord.getString('status')
+    var hasReminder = apptRecord.getBool('has_reminder')
+    var rawConfigs = apptRecord.getString('reminder_configs')
+    var reminderConfigs = []
+    try {
+      if (rawConfigs) reminderConfigs = JSON.parse(rawConfigs)
+    } catch (_) {}
+    if (!Array.isArray(reminderConfigs)) reminderConfigs = []
+
+    var dateStr = apptRecord.getString('date')
+    var timeStr =
+      apptRecord.getString('start_time') ||
+      apptRecord.getString('reference_time_for_reminder') ||
+      '09:00'
+
+    var reminderCol = $app.findCollectionByNameOrId('jetro_agenda_reminders')
+
+    if (!hasReminder || status === 'Cancelado' || status === 'Concluido') {
+      try {
+        var existing = $app.findRecordsByFilter(
+          'jetro_agenda_reminders',
+          'appointment_id = "' + apptId + '" && status = "pending"',
+          '',
+          100,
+          0,
+        )
+        for (var i = 0; i < existing.length; i++) {
+          existing[i].set('status', 'cancelled')
+          $app.saveNoValidate(existing[i])
+        }
+      } catch (_) {}
+      return e.next()
+    }
+
+    var recipientEmail = apptRecord.getString('reminder_target_email')
+    var recipientName = apptRecord.getString('user_name') || ''
+
+    if (!recipientEmail && userId) {
+      try {
+        var uRec = $app.findRecordById('users', userId)
+        if (uRec) {
+          recipientEmail = uRec.getString('email')
+          if (!recipientName) recipientName = uRec.getString('name')
+        }
+      } catch (_) {}
+    }
+
+    if (!recipientEmail || recipientEmail.indexOf('@') === -1) {
+      return e.next()
+    }
+
+    var tTime = timeStr && timeStr.indexOf(':') !== -1 ? timeStr.trim() : '09:00'
+    var targetDate = new Date(dateStr + 'T' + tTime + ':00-03:00')
+    var targetUtcMs = targetDate.getTime()
+    var nowUtcMs = Date.now()
+
+    var currentReminders = []
+    try {
+      currentReminders = $app.findRecordsByFilter(
+        'jetro_agenda_reminders',
+        'appointment_id = "' + apptId + '"',
+        '',
+        100,
+        0,
+      )
+    } catch (_) {}
+
+    var currentByOffset = {}
+    for (var cIdx = 0; cIdx < currentReminders.length; cIdx++) {
+      var cr = currentReminders[cIdx]
+      currentByOffset[cr.getString('reminder_offset_key')] = cr
+    }
+
+    var parseOffsetMins = function (offsetKey) {
+      if (!offsetKey) return null
+      var key = String(offsetKey).trim().toLowerCase()
+      if (key.indexOf('custom:') === 0) {
+        var raw = key.substring(7)
+        if (raw.endsWith('m')) return parseInt(raw.replace('m', ''), 10) || null
+        if (raw.endsWith('h')) return (parseInt(raw.replace('h', ''), 10) || 0) * 60 || null
+        if (raw.endsWith('d')) return (parseInt(raw.replace('d', ''), 10) || 0) * 1440 || null
+        return parseInt(raw, 10) || null
+      }
+      if (key === '15m' || key === '15 min') return 15
+      if (key === '30m' || key === '30 min') return 30
+      if (key === '1h' || key === '1 hora') return 60
+      if (key === '2h' || key === '2 horas') return 120
+      if (key === '6h' || key === '6 horas') return 360
+      if (key === '12h' || key === '12 horas') return 720
+      if (key === '1d' || key === '1 dia') return 1440
+      if (key === '2d' || key === '2 dias') return 2880
+      if (key === '1w' || key === '1 semana') return 10080
+      return null
+    }
+
+    var validOffsets = {}
+    for (var k = 0; k < reminderConfigs.length; k++) {
+      var offKey = String(reminderConfigs[k]).trim()
+      var mins = parseOffsetMins(offKey)
+      if (mins === null) continue
+      validOffsets[offKey] = mins
+
+      var schedMs = targetUtcMs - mins * 60 * 1000
+      var schedIso = new Date(schedMs).toISOString()
+      var exRec = currentByOffset[offKey]
+
+      if (exRec) {
+        if (exRec.getString('status') === 'pending' || exRec.getString('status') === 'cancelled') {
+          exRec.set('recipient_email', recipientEmail)
+          exRec.set('recipient_name', recipientName)
+          exRec.set('appointment_title', apptRecord.getString('title'))
+          exRec.set('appointment_description', apptRecord.getString('description'))
+          exRec.set('appointment_date', dateStr)
+          exRec.set('appointment_time', timeStr)
+          exRec.set('appointment_priority', apptRecord.getString('priority'))
+          exRec.set('appointment_type', apptRecord.getString('type'))
+          exRec.set('scheduled_for', schedIso)
+          exRec.set('status', schedMs <= nowUtcMs ? 'skipped_past' : 'pending')
+          $app.saveNoValidate(exRec)
+        }
+      } else {
+        var nRem = new Record(reminderCol, {
+          appointment_id: apptId,
+          user_id: userId,
+          recipient_email: recipientEmail,
+          recipient_name: recipientName,
+          appointment_title: apptRecord.getString('title'),
+          appointment_description: apptRecord.getString('description'),
+          appointment_date: dateStr,
+          appointment_time: timeStr,
+          appointment_priority: apptRecord.getString('priority'),
+          appointment_type: apptRecord.getString('type'),
+          reminder_offset_key: offKey,
+          scheduled_for: schedIso,
+          status: schedMs <= nowUtcMs ? 'skipped_past' : 'pending',
+          attempts: 0,
+        })
+        $app.saveNoValidate(nRem)
+      }
+    }
+
+    for (var offKeyDb in currentByOffset) {
+      if (!validOffsets[offKeyDb]) {
+        var toCancel = currentByOffset[offKeyDb]
+        if (toCancel.getString('status') === 'pending') {
+          toCancel.set('status', 'cancelled')
+          $app.saveNoValidate(toCancel)
+        }
+      }
+    }
   } catch (err) {
     $app.logger().error('Falha ao sincronizar lembretes pós-update', 'error', String(err))
   }
@@ -270,119 +350,7 @@ onRecordAfterDeleteSuccess((e) => {
   return e.next()
 }, 'jetro_agenda_appointments')
 
-// ============================================================================
-// Layout corporativo de e-mail Jetro para Lembretes da Agenda
-// ============================================================================
-function buildReminderEmailHtml(reminderRecord) {
-  var title = reminderRecord.getString('appointment_title')
-  var desc = reminderRecord.getString('appointment_description')
-  var dateStr = reminderRecord.getString('appointment_date')
-  var timeStr = reminderRecord.getString('appointment_time') || 'Dia inteiro / Horário flexível'
-  var priority = reminderRecord.getString('appointment_priority') || 'Média'
-  var type = reminderRecord.getString('appointment_type') || 'Compromisso'
-  var offsetKey = reminderRecord.getString('reminder_offset_key')
-  var recipientName = reminderRecord.getString('recipient_name') || 'Colaborador'
-  var offsetLabel = formatOffsetLabel(offsetKey)
-
-  // Formata data brasileira DD/MM/AAAA
-  var formattedDate = dateStr
-  if (dateStr && dateStr.indexOf('-') !== -1) {
-    var parts = dateStr.split('-')
-    if (parts.length === 3) {
-      formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0]
-    }
-  }
-
-  // Cor do badge de prioridade
-  var priorityColor = '#063D30'
-  var priorityBg = '#e6f4ea'
-  if (priority === 'Alta') {
-    priorityColor = '#b45309'
-    priorityBg = '#fef3c7'
-  } else if (priority === 'Urgente') {
-    priorityColor = '#b91c1c'
-    priorityBg = '#fee2e2'
-  }
-
-  var descHtml = desc
-    ? '<div style="margin-top: 14px; padding: 12px 14px; background: #F8FAF9; border-radius: 6px; border-left: 3px solid #C69B45; font-size: 13px; color: #202B28; line-height: 1.5;">' +
-      xmlEscape(desc).replace(/\n/g, '<br/>') +
-      '</div>'
-    : ''
-
-  return (
-    '<!DOCTYPE html>' +
-    '<html lang="pt-BR"><head><meta charset="utf-8" /></head>' +
-    '<body style="font-family: Arial, Helvetica, sans-serif; background-color: #F8FAF9; margin: 0; padding: 24px; color: #202B28;">' +
-    '<div style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 10px; border: 1px solid #E4EAE6; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">' +
-    '  <div style="background: #063D30; padding: 22px 26px; border-bottom: 3px solid #C69B45;">' +
-    '    <div style="display: table; width: 100%;">' +
-    '      <div style="display: table-cell; vertical-align: middle;">' +
-    '        <div style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px;">HURAM<span style="color: #C69B45;">.</span></div>' +
-    '        <div style="font-size: 12px; color: #E4EAE6; margin-top: 2px;">Sistema Inteligente de Gestão — Agenda Corporativa</div>' +
-    '      </div>' +
-    '      <div style="display: table-cell; vertical-align: middle; text-align: right;">' +
-    '        <span style="display: inline-block; background: #C69B45; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px;">Lembrete</span>' +
-    '      </div>' +
-    '    </div>' +
-    '  </div>' +
-    '  <div style="padding: 26px;">' +
-    '    <p style="font-size: 14px; color: #202B28; margin: 0 0 16px 0;">Olá, <strong>' +
-    xmlEscape(recipientName) +
-    '</strong>. Este é um lembrete da <strong>Agenda HURAM</strong> programado para ' +
-    xmlEscape(offsetLabel) +
-    ':</p>' +
-    '    <div style="background: #F8FAF9; border: 1px solid #E4EAE6; border-radius: 8px; padding: 18px 20px; margin-bottom: 20px;">' +
-    '      <div style="display: inline-block; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #063D30; background: #e6f4ef; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;">' +
-    xmlEscape(type) +
-    '      </div>' +
-    '      <h2 style="font-size: 20px; font-weight: bold; color: #063D30; margin: 0 0 12px 0; line-height: 1.3;">' +
-    xmlEscape(title) +
-    '      </h2>' +
-    '      <table style="width: 100%; font-size: 13px; color: #374151; border-collapse: collapse;">' +
-    '        <tr>' +
-    '          <td style="padding: 6px 0; width: 90px; color: #6b7280; font-weight: 600;">Data:</td>' +
-    '          <td style="padding: 6px 0; font-weight: bold; color: #111827;">' +
-    xmlEscape(formattedDate) +
-    '</td>' +
-    '        </tr>' +
-    '        <tr>' +
-    '          <td style="padding: 6px 0; color: #6b7280; font-weight: 600;">Horário:</td>' +
-    '          <td style="padding: 6px 0; font-weight: bold; color: #111827;">' +
-    xmlEscape(timeStr) +
-    '</td>' +
-    '        </tr>' +
-    '        <tr>' +
-    '          <td style="padding: 6px 0; color: #6b7280; font-weight: 600;">Prioridade:</td>' +
-    '          <td style="padding: 6px 0;">' +
-    '            <span style="display: inline-block; font-size: 11px; font-weight: bold; color: ' +
-    priorityColor +
-    '; background: ' +
-    priorityBg +
-    '; padding: 2px 8px; border-radius: 4px;">' +
-    xmlEscape(priority) +
-    '</span>' +
-    '          </td>' +
-    '        </tr>' +
-    '      </table>' +
-    descHtml +
-    '    </div>' +
-    '    <p style="font-size: 12px; color: #6b7280; margin: 0 0 20px 0; line-height: 1.4;">' +
-    '      Para gerenciar, concluir ou remarcar esta atividade, acesse o painel principal do HURAM no menu da sua <strong>Agenda Inteligente</strong>.' +
-    '    </p>' +
-    '    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">' +
-    '      Lembrete automático enviado pela Agenda HURAM.<br/>Você recebeu esta notificação porque configurou um aviso prévio para este compromisso.' +
-    '    </div>' +
-    '  </div>' +
-    '</div>' +
-    '</body></html>'
-  )
-}
-
-// ============================================================================
 // Cron Job de Processamento e Envio de Lembretes no Servidor
-// Executa a cada 2 minutos para checar lembretes vencidos
-// ============================================================================
 cronAdd('jetro_agenda_reminders_worker', '*/2 * * * *', () => {
   var nowUtcIso = new Date().toISOString()
   var pendingReminders = []
@@ -402,14 +370,13 @@ cronAdd('jetro_agenda_reminders_worker', '*/2 * * * *', () => {
 
   if (!pendingReminders || pendingReminders.length === 0) return
 
-  var senderAddress = $app.settings().meta.senderAddress || 'no-reply@jetro.com.br'
+  var senderAddress = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
   var senderName = $app.settings().meta.senderName || 'HURAM — Agenda'
 
   for (var i = 0; i < pendingReminders.length; i++) {
     var rem = pendingReminders[i]
     var apptId = rem.getString('appointment_id')
 
-    // Verifica se o compromisso ainda existe e está ativo (não cancelado nem concluído)
     var apptRecord = null
     try {
       apptRecord = $app.findRecordById('jetro_agenda_appointments', apptId)
@@ -427,30 +394,78 @@ cronAdd('jetro_agenda_reminders_worker', '*/2 * * * *', () => {
     }
 
     var recipientEmail = rem.getString('recipient_email')
-    if (!recipientEmail || recipientEmail.indexOf('@') === -1) {
+    var rEmailLower = (recipientEmail || '').toLowerCase().trim()
+    if (
+      !rEmailLower ||
+      rEmailLower.indexOf('@') === -1 ||
+      rEmailLower.indexOf('teste') !== -1 ||
+      rEmailLower.indexOf('exemplo') !== -1 ||
+      rEmailLower.indexOf('@example.') !== -1
+    ) {
       rem.set('status', 'failed')
-      rem.set('error_message', 'E-mail destinatário inválido')
+      rem.set('error_message', 'E-mail destinatário de teste ou inválido ignorado')
       $app.saveNoValidate(rem)
       continue
     }
 
     var title = rem.getString('appointment_title')
+    var desc = rem.getString('appointment_description')
+    var dateStr = rem.getString('appointment_date')
+    var timeStr = rem.getString('appointment_time') || 'Dia inteiro / Horário flexível'
+    var priority = rem.getString('appointment_priority') || 'Média'
+    var type = rem.getString('appointment_type') || 'Compromisso'
+    var offsetKey = rem.getString('reminder_offset_key')
+    var recipientName = rem.getString('recipient_name') || 'Colaborador'
     var subject = 'Lembrete da Agenda HURAM: ' + title
 
+    var formatOffsetLabel = function (k) {
+      if (k === '15m') return '15 minutos antes'
+      if (k === '30m') return '30 minutos antes'
+      if (k === '1h') return '1 hora antes'
+      if (k === '2h') return '2 horas antes'
+      if (k === '1d') return '1 dia antes'
+      return k || 'horário programado'
+    }
+
+    var htmlBody =
+      '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">' +
+      '<div style="background: #003D30; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 3px solid #D6A755;">' +
+      '<h2 style="color: #E4C46A; margin: 0;">HURAM — Agenda Corporativa</h2>' +
+      '<p style="color: #ffffff; font-size: 13px; margin: 6px 0 0;">Lembrete de Compromisso</p>' +
+      '</div>' +
+      '<div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; background: #ffffff; border-radius: 0 0 8px 8px;">' +
+      '<p style="font-size: 15px;">Olá, <strong>' +
+      recipientName +
+      '</strong>. Você tem um compromisso agendado para ' +
+      formatOffsetLabel(offsetKey) +
+      ':</p>' +
+      '<h3 style="color: #003D30; margin: 12px 0;">' +
+      title +
+      '</h3>' +
+      '<p style="font-size: 14px; margin: 4px 0;"><strong>Data:</strong> ' +
+      dateStr +
+      ' às ' +
+      timeStr +
+      '</p>' +
+      '<p style="font-size: 14px; margin: 4px 0;"><strong>Tipo:</strong> ' +
+      type +
+      ' | <strong>Prioridade:</strong> ' +
+      priority +
+      '</p>' +
+      (desc
+        ? '<p style="font-size: 13px; color: #64748b; margin-top: 10px;">' + desc + '</p>'
+        : '') +
+      '</div>' +
+      '</div>'
+
     try {
-      var htmlBody = buildReminderEmailHtml(rem)
-      var mailOptions = {
-        from: {
-          address: senderAddress,
-          name: senderName,
-        },
+      var msg = new MailerMessage({
+        from: { address: senderAddress, name: senderName },
         to: [{ address: recipientEmail }],
         subject: subject,
         html: htmlBody,
-      }
-
-      var message = new MailerMessage(mailOptions)
-      $app.newMailClient().send(message)
+      })
+      $app.newMailClient().send(msg)
 
       rem.set('status', 'sent')
       rem.set('sent_at', new Date().toISOString())
@@ -458,20 +473,15 @@ cronAdd('jetro_agenda_reminders_worker', '*/2 * * * *', () => {
       rem.set('attempts', (rem.getInt('attempts') || 0) + 1)
       $app.saveNoValidate(rem)
 
-      // Também emite notificação interna no Jetro ERP (coleção notifications)
       try {
         var notifCol = $app.findCollectionByNameOrId('notifications')
-        var userId = rem.getString('user_id')
-        if (userId) {
+        var uId = rem.getString('user_id')
+        if (uId) {
           var nRec = new Record(notifCol, {
             title: 'Lembrete: ' + title,
-            message:
-              'Data: ' +
-              rem.getString('appointment_date') +
-              ' às ' +
-              (rem.getString('appointment_time') || 'horário comercial'),
+            message: 'Data: ' + dateStr + ' às ' + timeStr,
             type: 'agenda_reminder',
-            recipient: userId,
+            recipient: uId,
             read: false,
             link: '/admin',
           })

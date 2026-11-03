@@ -35,7 +35,7 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
       chamadosAbertos =
         $app.findRecordsByFilter(
           'chamados',
-          'status != "finalizado" && status != "cancelado"',
+          'status != "finalizado" && status != "cancelado" && assunto !~ "[TESTE]" && assunto !~ "teste"',
           '-created',
           500,
           0,
@@ -67,6 +67,18 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
       var chamadoId = chamado.id
       var numero = chamado.getString('numero') || 'CH-' + chamadoId
       var assunto = chamado.getString('assunto') || 'Sem assunto'
+
+      // Desativar qualquer envio para chamados de teste, validação ou demonstração
+      var assuntoLower = assunto.toLowerCase()
+      if (
+        assuntoLower.indexOf('[teste]') !== -1 ||
+        assuntoLower.indexOf('teste') !== -1 ||
+        assuntoLower.indexOf('homolog') !== -1 ||
+        assuntoLower.indexOf('demonstração') !== -1 ||
+        assuntoLower.indexOf('demonstracao') !== -1
+      ) {
+        continue
+      }
       var prioridade = chamado.getString('prioridade') || 'normal'
       var status = chamado.getString('status') || 'novo'
       var setorId = chamado.getString('setor_responsavel') || ''
@@ -248,9 +260,24 @@ cronAdd('chamados_alertas_cron', '0 * * * *', () => {
 
       for (var d = 0; d < destinatarios.length; d++) {
         var dest = destinatarios[d]
+        var emailLower = (dest.email || '').toLowerCase().trim()
+
+        // Ignorar e-mails de teste ou exemplos de demonstração
+        if (
+          !emailLower ||
+          emailLower.indexOf('@') === -1 ||
+          emailLower.indexOf('teste') !== -1 ||
+          emailLower.indexOf('exemplo') !== -1 ||
+          emailLower.indexOf('@example.') !== -1
+        ) {
+          continue
+        }
+
         try {
+          var senderEmail = $app.settings().meta.senderAddress || 'no-reply@huram.com.br'
+          var senderName = $app.settings().meta.senderName || 'HURAM — Central de Chamados'
           var msgAlerta = new MailerMessage({
-            from: { address: 'chamados@jetro.com.br', name: 'HURAM — Central de Chamados' },
+            from: { address: senderEmail, name: senderName },
             to: [{ address: dest.email }],
             subject: subject,
             html: htmlContent,
