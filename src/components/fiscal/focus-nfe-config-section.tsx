@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Cloud, CheckCircle2, AlertTriangle, Info, Loader2 } from 'lucide-react'
 import { useBrand } from '@/hooks/use-brand'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 
 interface FocusConfig {
   ambiente: string

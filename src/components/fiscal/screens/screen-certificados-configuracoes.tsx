@@ -15,6 +15,7 @@ import {
 import { useBrand } from '@/hooks/use-brand'
 import { FiscalGenericScreen } from '@/components/fiscal/fiscal-generic-screen'
 import { CERTIFICATE_FIELDS, type FiscalScreenConfig } from '@/lib/fiscal-types'
+import { FocusNfeConfigSection } from '@/components/fiscal/focus-nfe-config-section'
 
 const CERT_SCREEN: FiscalScreenConfig = {
   collection: 'fiscal_certificates',
@@ -158,6 +159,7 @@ export function ScreenCertificadosConfiguracoes() {
         {/* ABA 1: CERTIFICADO DIGITAL A1 */}
         <TabsContent value="certificados" className="space-y-4">
           <FiscalGenericScreen config={CERT_SCREEN} />
+          <FocusNfeConfigSection />
         </TabsContent>
 
         {/* ABA 2: PARÂMETROS POR EMPRESA */}

@@ -93,37 +93,37 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Geração de NF-e modelo 55 layout 4.00 opera em Ambiente de Homologação com pendência externa formalmente declarada de Certificado A1 e credenciamento SEFAZ para transmissão em produção.\n- Não é permitida a emissão de Carta de Correção para campos proibidos por legislação (valores, alíquotas, dados cadastrais de remetente/destinatário ou data de emissão).\n- Inutilização de numeração exige justificativa obrigatória com no mínimo 15 caracteres.',
+        '- Geração de NF-e modelo 55 layout 4.00 opera em Ambiente de Homologação com pendência externa formalmente declarada de Certificado A1 e credenciamento SEFAZ para transmissão em produção.\n- A transmissão real de NF-e é feita exclusivamente via Focus NFe, no ambiente configurado para a empresa (homologação tpAmb=2 ou produção); nunca cruza ambientes.\n- Cancelamento de NF-e exige motivo obrigatório com no mínimo 15 caracteres; Carta de Correção exige texto obrigatório e respeita o limite de até 20 correções por nota.\n- Não é permitida a emissão de Carta de Correção para campos proibidos por legislação (valores, alíquotas, dados cadastrais de remetente/destinatário ou data de emissão).\n- Inutilização de numeração exige justificativa obrigatória com no mínimo 15 caracteres.\n- Cada operação fiscal (transmissão, cancelamento, CC-e) registra audit_logs com o autor e o resultado.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O usuário seleciona o modelo de documento fiscal na aba correspondente.\n2. Para NF-e, visualiza a lista com status de transmissão e botões para emissão ou simulação fiscal.\n3. Aciona o diálogo de emissão ou importação XML para processamento.\n4. Visualiza os protocolos e DANFE em caso de autorização.',
+        '1. O usuário seleciona o modelo de documento fiscal na aba correspondente.\n2. Para NF-e, visualiza a lista com status de transmissão e botões para emissão ou simulação fiscal.\n3. Aciona o diálogo de emissão ou importação XML para processamento.\n4. Após gerar o XML, o painel Focus NFe dentro do diálogo permite: Transmitir (envia ao Focus NFe, que assina e transmite à SEFAZ, gravando status SEFAZ, protocolo e motivo de rejeição), Consultar recibo (polling até decisão final), Baixar DANFE em PDF, Cancelar (motivo ≥15 caracteres) e emitir Carta de Correção (texto obrigatório).\n5. Visualiza os protocolos e DANFE em caso de autorização.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções PocketBase: `nfe_records`, `purchase_invoices`, `sales_nfce`, `nfse_records`, `cte_records`, `mdfe_records`, `fiscal_corrections`, `fiscal_inutilizations`, `fiscal_manifestations`.\n- Hooks: `useBrand` e `useRealtime`.',
+        '- Coleções PocketBase: `nfe_records`, `purchase_invoices`, `sales_nfce`, `nfse_records`, `cte_records`, `mdfe_records`, `fiscal_corrections`, `fiscal_inutilizations`, `fiscal_manifestations`, `fiscal_document_artifacts`, `fiscal_focus_nfe_config`.\n- Endpoints backend: `/backend/v1/huram/fiscal/nfe-transmit`, `/nfe-status/:chave`, `/nfe-cancel`, `/nfe-cce`, `/nfe-danfe` (cliente Focus NFe em `focus_nfe_api.js`).\n- Hooks: `useBrand` e `useRealtime`.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Módulo de Vendas (redirecionamento de rotas de NF-e para esta tela).\n- Módulo de Estoque (baixa automática de itens vinculados a NF-e autorizadas).\n- SEFAZ Estadual.',
+        '- Focus NFe (transmissão real de NF-e: envio, consulta de recibo com polling, cancelamento, CC-e e DANFE em PDF).\n- Módulo de Vendas (redirecionamento de rotas de NF-e para esta tela).\n- Módulo de Estoque (baixa automática de itens vinculados a NF-e autorizadas).\n- SEFAZ Estadual (via autorizador do Focus NFe).',
     },
     permissions: {
       title: 'Permissões',
       content:
-        '- Visualização e Emissão: `canViewFiscal(role)` e perfis autorizados de faturamento/fiscal.',
+        '- Visualização e Emissão: `canViewFiscal(role)` e perfis autorizados de faturamento/fiscal.\n- Operações de transmissão/cancelamento/CC-e exigem sessão autenticada e isolamento por empresa/filial.',
     },
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `ScreenDocumentosFiscais`, `NfePanel`, `NfcePanel`, `NfsePanel`, `CtePanel`, `MdfePanel`, `CartaCorrecao`, `ManifestacaoDestinatario`, `FiscalGenericScreen`, `PurchaseInvoicesPanel`.\n- Serviços: `@/services/fiscal` e `@/services/sales`.',
+        '- Componentes: `ScreenDocumentosFiscais`, `NfePanel`, `NfcePanel`, `NfsePanel`, `CtePanel`, `MdfePanel`, `CartaCorrecao`, `ManifestacaoDestinatario`, `FiscalGenericScreen`, `PurchaseInvoicesPanel`, `NfeHomologationDialog`, `FocusNfePanel`.\n- Serviços: `@/services/fiscal` e `@/services/sales`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Validação de esquema XML antes do envio e mapeamento de códigos de retorno da SEFAZ.',
+        '- Validação de esquema XML antes do envio e mapeamento de códigos de retorno da SEFAZ.\n- Falhas do Focus NFe (credencial ausente, credencial recusada, rejeição SEFAZ, timeout) retornam mensagens amigáveis em português, com idempotência por `(chave_acesso, ambiente)` em `fiscal_document_artifacts`.',
     },
   },
 
@@ -253,47 +253,47 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     objective: {
       title: 'Objetivo',
       content:
-        'Prover a governança e segurança fiscal da empresa: gestão do Certificado Digital padrão ICP-Brasil (A1), parametrização fiscal por empresa/filial (regime, CRT, inscrições, ambiente) e controle de séries e numeração de documentos fiscais eletrônicos.',
+        'Prover a governança e segurança fiscal da empresa: gestão do Certificado Digital padrão ICP-Brasil (A1), parametrização fiscal por empresa/filial (regime, CRT, inscrições, ambiente), controle de séries e numeração de documentos fiscais eletrônicos e configuração da integração Focus NFe para emissão real de NF-e.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Box de Declaração Explícita de Pendências Externas: destaca de forma transparente que a geração de XML modelo 55 layout 4.00 opera em Homologação e depende da instalação de Certificado A1 válido e credenciamento na SEFAZ Estadual para produção.\n- 3 Abas Internas estruturadas:\n  1. "Certificado Digital A1": upload, monitoramento de validade e titularidade de certificados ICP-Brasil;\n  2. "Parâmetros por Empresa": regime tributário (Simples Nacional, Lucro Presumido, Lucro Real), CRT, Inscrição Estadual/Municipal e ambiente SEFAZ;\n  3. "Séries e Numeração": controle rigoroso e sequencial dos últimos números emitidos por série para evitar quebra de sequência ou duplicidade.',
+        '- Box de Declaração Explícita de Pendências Externas: destaca de forma transparente que a geração de XML modelo 55 layout 4.00 opera em Homologação e depende da instalação de Certificado A1 válido e credenciamento na SEFAZ Estadual para produção.\n- 3 Abas Internas estruturadas:\n  1. "Certificado Digital A1": upload, monitoramento de validade e titularidade de certificados ICP-Brasil; ao final desta aba, seção "Focus NFe — Emissão Real de NF-e" com seleção de ambiente (Homologação tpAmb=2 / Produção), identificador do emitente (ref), status da credencial (badge "Credencial configurada" / "Credencial não configurada"), botão "Salvar configuração" e botão "Testar credencial" (consulta real ao Focus NFe; quando o token não está definido nas variáveis de ambiente do backend exibe orientação amigável, sem quebrar o fluxo);\n  2. "Parâmetros por Empresa": regime tributário (Simples Nacional, Lucro Presumido, Lucro Real), CRT, Inscrição Estadual/Municipal e ambiente SEFAZ;\n  3. "Séries e Numeração": controle rigoroso e sequencial dos últimos números emitidos por série para evitar quebra de sequência ou duplicidade.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Nunca declarar transmissão SEFAZ em produção como pronta até que as pendências externas (Certificado A1 e credenciamento) estejam resolvidas.\n- Não é permitida a regressão ou reutilização de numeração fiscal já autorizada.\n- Certificados com vencimento inferior a 30 dias geram alerta persistente na Central Fiscal.',
+        '- Nunca declarar transmissão SEFAZ em produção como pronta até que as pendências externas (Certificado A1 e credenciamento) estejam resolvidas.\n- Não é permitida a regressão ou reutilização de numeração fiscal já autorizada.\n- Certificados com vencimento inferior a 30 dias geram alerta persistente na Central Fiscal.\n- O token Focus NFe nunca é exibido ou digitado na tela: fica apenas em variáveis de ambiente do backend (FOCUS_NFE_TOKEN_HOMOLOG para homologação, FOCUS_NFE_TOKEN para produção).\n- O ambiente Focus NFe é configurado por empresa e todas as chamadas (transmissão, consulta, DANFE, cancelamento, CCe) usam o mesmo ambiente; homologação nunca cruza com produção.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O administrador configura a empresa e parâmetros fiscais na aba correspondente.\n2. Faz o upload e validação do Certificado Digital A1.\n3. Define a numeração inicial e série para emissão de NF-e e NFC-e.\n4. O sistema valida as credenciais para habilitação dos fluxos de emissão.',
+        '1. O administrador configura a empresa e parâmetros fiscais na aba correspondente.\n2. Faz o upload e validação do Certificado Digital A1.\n3. Na aba Certificado Digital A1, configura a integração Focus NFe: escolhe o ambiente, informa o identificador do emitente e salva.\n4. Clica em "Testar credencial": o backend consulta o Focus NFe e grava o status da validação; sem token configurado, a resposta orienta a definição da variável de ambiente na Skip Cloud.\n5. Define a numeração inicial e série para emissão de NF-e e NFC-e.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções PocketBase: `fiscal_certificates`, `fiscal_configurations`, `system_configurations`.\n- Hooks: `useBrand` e `useRealtime`.',
+        '- Coleções PocketBase: `fiscal_certificates`, `fiscal_configurations`, `system_configurations`, `fiscal_focus_nfe_config`.\n- Endpoints backend: `/backend/v1/huram/fiscal/focus-nfe/config/:empresaId` (GET), `/focus-nfe/config` (POST), `/focus-nfe/test` (POST).\n- Hooks: `useBrand` e `useRealtime`.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Motor de Assinatura XML e WebServices da SEFAZ Estadual.\n- Módulo de Cadastros de Empresas (matriz e filiais).',
+        '- Focus NFe (API REST via hooks backend): teste de credencial e configuração por empresa.\n- Motor de Assinatura XML e WebServices da SEFAZ Estadual.\n- Módulo de Cadastros de Empresas (matriz e filiais).',
     },
     permissions: {
       title: 'Permissões',
       content:
-        '- Acesso restrito a perfis com permissão de gestão de segurança fiscal (SUP, ADMIN e FISCAL).',
+        '- Acesso restrito a perfis com permissão de gestão de segurança fiscal (SUP, ADMIN e FISCAL).\n- Operações Focus NFe exigem sessão autenticada e isolamento por empresa (SUP tem acesso irrestrito).',
     },
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `ScreenCertificadosConfiguracoes`, `FiscalGenericScreen`.\n- Serviços: `@/services/fiscal`.',
+        '- Componentes: `ScreenCertificadosConfiguracoes`, `FiscalGenericScreen`, `FocusNfeConfigSection`.\n- Serviços: `@/services/fiscal`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Validação da cadeia de certificados ICP-Brasil e aviso imediato de formato de arquivo inválido ou senha incorreta.',
+        '- Validação da cadeia de certificados ICP-Brasil e aviso imediato de formato de arquivo inválido ou senha incorreta.\n- Falha de credencial Focus NFe é reportada como mensagem amigável ("Credencial não configurada" / credencial recusada com código HTTP), mantendo o restante do fluxo fiscal funcional em modo XML.',
     },
   },
 

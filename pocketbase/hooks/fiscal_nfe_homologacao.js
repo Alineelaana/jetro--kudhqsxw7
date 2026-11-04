@@ -557,14 +557,18 @@ routerAdd(
   $apis.requireAuth(),
 )
 
-// Endpoint de Transmissão / Simulação de Homologação
+// Endpoint de Transmissão — delega ao cliente Focus NFe (focus_nfe_api.js).
+// O XML já foi gerado e validado em nfe-generate; aqui a NF-e é enviada de
+// verdade à SEFAZ via Focus NFe (token apenas no backend). Mantemos o contrato
+// de resposta (success / status / error / chave_acesso) que o frontend já
+// consome, gravando status/protocolo/motivo no artefato fiscal.
 routerAdd(
   'POST',
   '/backend/v1/huram/fiscal/nfe-transmit',
-  (e) => {
+  function (e) {
     var body = e.requestInfo().body || {}
     var chaveAcesso = body.chave_acesso || ''
-    var ambiente = body.ambiente || 'homologacao'
+    var ambienteSolicitado = body.ambiente || 'homologacao'
 
     if (!chaveAcesso || chaveAcesso.length !== 44) {
       return e.json(400, { error: 'Chave de acesso de 44 digitos e obrigatoria' })
@@ -580,31 +584,144 @@ routerAdd(
       return e.json(404, { error: 'Artefato fiscal da NF-e nao encontrado' })
     }
 
-    // Verificar se existe certificado configurado no backend
-    // Não inventar credenciais: como list_secrets confirmou ausência de certs A1, documentar pendência explícita
-    var certA1Exists = false // Segredo de certificado A1 não existe nas variáveis do backend
+    // Ambiente NUNCA cruza: usa o configurado para a empresa (tpAmb do XML),
+    // ignorando o que vier do cliente quando houver configuração persistida.
+    var cfg = null
+    try {
+      cfg = $app.findFirstRecordByFilter(
+        'fiscal_focus_nfe_config',
+        'empresa_id = "' + artifact.getString('empresa_id') + '"',
+      )
+    } catch (_) {}
+    var ambiente = cfg ? cfg.getString('ambiente') || ambienteSolicitado : ambienteSolicitado
 
-    if (!certA1Exists) {
+    var helpers = focusRouteHelpers(e)
+    var token = helpers.focusToken(ambiente)
+    if (!token) {
       return e.json(422, {
         success: false,
         chave_acesso: chaveAcesso,
-        status: 'Pendente Certificado Digital A1',
-        error_code: 'CERT_A1_NOT_CONFIGURED',
-        error:
-          'Transmissao para a SEFAZ bloqueada: Certificado Digital A1 da empresa emissora nao configurado.',
-        pendencia_externa_detalhes: {
-          motivo:
-            'Para assinar digitalmente o XML (XML-DSig RSA-SHA1) e estabelecer o canal TLS mútuo com os WebServices da SEFAZ, e obrigatorio o Certificado Digital A1 (.pfx).',
-          passos_necessarios: [
-            '1. Obter certificado digital A1 válido da empresa (Dec Eldorado ou Gran Romano)',
-            '2. Realizar o credenciamento de emissor em homologação na SEFAZ do estado (ES / SP)',
-            '3. Configurar a credencial A1 segura nas variáveis de ambiente do Skip Cloud',
-          ],
-        },
+        status: 'Credencial não configurada',
+        error_code: 'FOCUS_NFE_TOKEN_MISSING',
+        error: helpers.focusCredMensagem(ambiente),
+        xml_disponivel_download: true,
       })
     }
 
-    return e.json(200, { success: true })
+    var probe = helpers.focusProbe(ambiente)
+    if (!probe.ok) {
+      return e.json(502, {
+        success: false,
+        chave_acesso: chaveAcesso,
+        error_code: 'FOCUS_NFE_CREDENCIAL_RECUSADA',
+        error:
+          'Credencial Focus NFe recusada no ambiente de ' +
+          ambiente +
+          ' (HTTP ' +
+          probe.statusCode +
+          '). Verifique o token configurado.',
+      })
+    }
+
+    // Idempotência: NF-e já autorizada nunca é retransmitida
+    if (artifact.getString('focus_nfe_status_sefaz') === 'autorizado') {
+      return e.json(200, {
+        success: true,
+        already_authorized: true,
+        chave_acesso: chaveAcesso,
+        status: 'autorizado',
+        protocolo: artifact.getString('focus_nfe_protocolo'),
+        message: 'NF-e já autorizada pela SEFAZ. Não é necessário retransmitir.',
+      })
+    }
+
+    var xml = artifact.getString('xml_conteudo') || ''
+    if (!xml) {
+      return e.json(422, { error: 'XML da NF-e não encontrado no artefato fiscal' })
+    }
+
+    var ref = chaveAcesso
+    var payload = { xml: xml, xml_assinado: xml }
+    if (cfg && cfg.getString('emitente_ref')) payload.ref = cfg.getString('emitente_ref')
+
+    var res = helpers.focusRequest(
+      ambiente,
+      'POST',
+      '/v2/nfe?ref=' + encodeURIComponent(ref),
+      payload,
+      probe.mode,
+      60,
+    )
+    if (res.sem_credencial) {
+      return e.json(422, {
+        success: false,
+        error_code: 'FOCUS_NFE_TOKEN_MISSING',
+        error: helpers.focusCredMensagem(ambiente),
+      })
+    }
+    if (res.statusCode >= 400) {
+      // ref já existente no Focus NFe: recuperar o estado real do documento
+      var raw = JSON.stringify(res.json || {})
+      var dup = res.statusCode === 422 && raw.indexOf('ref') !== -1 && raw.indexOf('xisting') !== -1
+      if (dup) {
+        var rec = helpers.focusRequest(
+          ambiente,
+          'GET',
+          '/v2/nfe/' + encodeURIComponent(ref),
+          null,
+          probe.mode,
+          30,
+        )
+        if (rec.statusCode === 200 && rec.json) {
+          var mr = helpers.mapFocusResult(rec.json)
+          artifact.set('focus_nfe_ref', ref)
+          artifact.set('focus_nfe_ambiente', ambiente)
+          helpers.saveStatusOnArtifact(artifact, mr)
+          helpers.writeAudit(e.auth, 'nfe_consulta', artifact.id, 'NF-e ' + chaveAcesso, mr)
+          return e.json(200, {
+            success: true,
+            recovered: true,
+            chave_acesso: chaveAcesso,
+            status: mr.status,
+            protocolo: mr.protocolo,
+            motivo: mr.motivo,
+            message: 'NF-e já registrada no Focus NFe — estado recuperado da SEFAZ.',
+          })
+        }
+      }
+      var msg = 'Falha na transmissão via Focus NFe (HTTP ' + res.statusCode + ').'
+      if (res.json && res.json.erro) msg = String(res.json.erro)
+      else if (res.json && res.json.error_description) msg = String(res.json.error_description)
+      return e.json(502, { success: false, chave_acesso: chaveAcesso, error: msg })
+    }
+
+    var mapped = helpers.mapFocusResult(res.json || {})
+    artifact.set('focus_nfe_ref', ref)
+    artifact.set('focus_nfe_ambiente', ambiente)
+    helpers.saveStatusOnArtifact(artifact, mapped)
+    helpers.writeAudit(
+      e.auth,
+      'nfe_transmit',
+      artifact.id,
+      'NF-e ' + chaveAcesso + ' → ' + ambiente,
+      mapped,
+    )
+
+    return e.json(200, {
+      success: true,
+      chave_acesso: chaveAcesso,
+      status: mapped.status,
+      status_raw: mapped.status_raw,
+      codigo_status: mapped.codigo_status,
+      motivo: mapped.motivo,
+      protocolo: mapped.protocolo,
+      message:
+        mapped.status === 'autorizado'
+          ? 'NF-e autorizada pela SEFAZ.'
+          : 'NF-e enviada ao Focus NFe. Use "Consultar recibo" para acompanhar o processamento.',
+      registro: mapped,
+      ambiente: ambiente,
+    })
   },
   $apis.requireAuth(),
 )

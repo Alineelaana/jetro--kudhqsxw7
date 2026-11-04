@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from '@/hooks/use-toast'
 import { useBrand } from '@/hooks/use-brand'
+import { FocusNfePanel } from '@/components/fiscal/nfe-transmission'
 
 interface NfeHomologationDialogProps {
   open: boolean
@@ -259,17 +260,33 @@ export function NfeHomologationDialog({
 
       if (resp?.success) {
         toast({
-          title: 'NF-e Transmitida com Sucesso',
-          description: 'Protocolo de autorização recebido da SEFAZ.',
+          title: resp?.already_authorized
+            ? 'NF-e já autorizada pela SEFAZ'
+            : resp?.status === 'autorizado'
+              ? 'NF-e Autorizada pela SEFAZ'
+              : 'NF-e Enviada ao Focus NFe',
+          description:
+            resp?.message ||
+            (resp?.status === 'autorizado'
+              ? 'Protocolo de autorização recebido da SEFAZ.'
+              : 'Acompanhe pelo botão "Consultar recibo".'),
+        })
+      } else if (resp?.error) {
+        setSefazTransmissionError({ error: resp.error })
+        toast({
+          title: 'Transmissão SEFAZ Interrompida',
+          description: resp.error,
+          variant: 'destructive',
         })
       }
     } catch (err: any) {
-      // Como não há certificado A1 configurado, o backend retorna status 422 com detalhes claros
+      // Backend devolve mensagens amigáveis em português (credencial ausente,
+      // credencial recusada, falha de transmissão etc.)
       const data = err?.data || {}
       setSefazTransmissionError(data)
       toast({
         title: 'Transmissão SEFAZ Interrompida',
-        description: data.error || 'Requer certificado digital A1 para transmissão real.',
+        description: data.error || 'Falha na transmissão via Focus NFe.',
         variant: 'destructive',
       })
     } finally {
@@ -599,32 +616,39 @@ export function NfeHomologationDialog({
                 <div className="p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-xl space-y-2">
                   <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-bold text-sm">
                     <ShieldAlert className="w-5 h-5 text-amber-600" />
-                    Pendência Externa Declarada: Certificado Digital A1 Obrigatório
+                    Transmissão Interrompida — Focus NFe
                   </div>
                   <p className="text-xs text-amber-900/90 dark:text-amber-200 leading-relaxed">
-                    {sefazTransmissionError.pendencia_externa_detalhes?.motivo ||
-                      sefazTransmissionError.error}
+                    {sefazTransmissionError.error ||
+                      sefazTransmissionError.pendencia_externa_detalhes?.motivo ||
+                      'Não foi possível concluir a transmissão da NF-e.'}
                   </p>
                   <div className="pt-1">
                     <span className="text-[11px] font-bold uppercase text-amber-800 dark:text-amber-300">
-                      Requisitos Externos para Emissão Real:
+                      Como resolver:
                     </span>
                     <ul className="list-disc list-inside mt-1 text-xs space-y-0.5 text-amber-900/80 dark:text-amber-200">
                       <li>
-                        Certificado Digital A1 (.pfx) emitido por Autoridade Certificadora
-                        ICP-Brasil.
+                        Confira o ambiente e o status da credencial na aba{' '}
+                        <strong>Configuração</strong> da tela Certificados e Configurações (seção
+                        Focus NFe).
                       </li>
                       <li>
-                        Credenciamento da empresa como emissora no portal da SEFAZ estadual (ES ou
-                        SP).
+                        A credencial Focus NFe é configurada pelo administrador nas variáveis de
+                        ambiente do backend na Skip Cloud — nunca nesta tela.
                       </li>
                       <li>
-                        Injeção da credencial segura nas variáveis do backend para assinatura
-                        digital (XML-DSig).
+                        Enquanto a transmissão não estiver disponível, o XML segue disponível para
+                        download (fluxo em modo XML).
                       </li>
                     </ul>
                   </div>
                 </div>
+              )}
+
+              {/* Painel Focus NFe: transmitir/consultar/DANFE/cancelar/CCe */}
+              {result?.chave_acesso && (
+                <FocusNfePanel chaveAcesso={result.chave_acesso} empresaId={selectedEmpresaId} />
               )}
             </div>
           )}

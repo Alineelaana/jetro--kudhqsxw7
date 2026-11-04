@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-04T15:48:42.787Z",
+  "generatedAt": "2026-11-04T16:04:55.140Z",
   "collections": [
     {
       "name": "users",
@@ -7316,6 +7316,54 @@
         {
           "name": "homologacao_pendencia",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_ref",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_ambiente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_status_sefaz",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_codigo_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_motivo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_protocolo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_data_hora",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_cce_historico",
+          "type": "json",
           "required": false,
           "system": false
         }
@@ -20808,7 +20856,20 @@
         "update": null,
         "delete": "@request.auth.role = 'SUP'"
       },
-      "fields": [],
+      "fields": [
+        {
+          "name": "focus_nfe_ambiente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "focus_nfe_emitente_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        }
+      ],
       "indexes": []
     },
     {

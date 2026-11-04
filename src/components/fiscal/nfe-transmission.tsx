@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 
 export interface FocusNfeRegistro {
   chave_acesso?: string
