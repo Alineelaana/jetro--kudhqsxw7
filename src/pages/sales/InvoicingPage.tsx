@@ -93,7 +93,7 @@ export default function InvoicingPage() {
         pb
           .collection('sales_orders')
           .getFullList<SalesOrderRecord>({
-            filter: `status = "liberado_faturamento" || status = "liberado" || invoicing_status = "liberado_faturamento"`,
+            filter: `faturamento_status = "pendente_faturamento" && is_invoiced != true`,
             sort: '-created',
           })
           .catch(async () => {
@@ -102,10 +102,7 @@ export default function InvoicingPage() {
               sort: '-created',
             })
             return list.filter(
-              (o) =>
-                o.status === 'liberado_faturamento' ||
-                o.status === 'liberado' ||
-                o.invoicing_status === 'liberado_faturamento',
+              (o) => o.faturamento_status === 'pendente_faturamento' && !o.is_invoiced,
             )
           }),
         getSalesInvoices().catch(() => [] as any),
@@ -542,7 +539,10 @@ export default function InvoicingPage() {
         cell: ({ row }) => (
           <Badge className="bg-sky-600 hover:bg-sky-700 text-white border-0 text-xs font-semibold">
             <FileCheck2 className="w-3 h-3 mr-1" />
-            {row.faturamento_status === 'liberado' ? 'Liberado para Faturar' : row.status}
+            {row.faturamento_status === 'pendente_faturamento' ||
+            row.faturamento_status === 'liberado'
+              ? 'Liberado para Faturar'
+              : row.status}
           </Badge>
         ),
       },
