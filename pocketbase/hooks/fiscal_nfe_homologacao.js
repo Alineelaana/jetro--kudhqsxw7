@@ -595,20 +595,163 @@ routerAdd(
     } catch (_) {}
     var ambiente = cfg ? cfg.getString('ambiente') || ambienteSolicitado : ambienteSolicitado
 
-    var helpers = focusRouteHelpers(e)
-    var token = helpers.focusToken(ambiente)
+    var focusBase = {
+      homologacao: 'https://homologacao.focusnfe.com.br',
+      producao: 'https://api.focusnfe.com.br',
+    }
+
+    function b64encode(str) {
+      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+      var out = ''
+      var i
+      for (i = 0; i < str.length; i += 3) {
+        var b1 = str.charCodeAt(i) & 0xff
+        var b2 = i + 1 < str.length ? str.charCodeAt(i + 1) & 0xff : NaN
+        var b3 = i + 2 < str.length ? str.charCodeAt(i + 2) & 0xff : NaN
+        var e1 = b1 >> 2
+        var e2 = ((b1 & 3) << 4) | (isNaN(b2) ? 0 : b2 >> 4)
+        var e3 = isNaN(b2) ? 61 : ((b2 & 15) << 2) | (isNaN(b3) ? 0 : b3 >> 6)
+        var e4 = isNaN(b3) ? 61 : b3 & 63
+        out += chars.charAt(e1) + chars.charAt(e2) + chars.charAt(e3) + chars.charAt(e4)
+      }
+      return out
+    }
+
+    function focusToken(amb) {
+      var prod = ''
+      var hom = ''
+      try {
+        prod = $os.getenv('FOCUS_NFE_TOKEN') || ''
+      } catch (_) {}
+      try {
+        hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
+      } catch (_) {}
+      if (amb === 'producao') return prod || hom
+      return hom || prod
+    }
+
+    function focusAuthHeader(tokenVal, mode) {
+      if (mode === 'raw') return 'Basic ' + tokenVal
+      if (tokenVal.indexOf(':') !== -1) return 'Basic ' + b64encode(tokenVal)
+      return 'Basic ' + b64encode(tokenVal + ':')
+    }
+
+    function focusRequest(amb, method, path, reqBody, mode, timeoutSec) {
+      var t = focusToken(amb)
+      if (!t) return { sem_credencial: true }
+      try {
+        var resp = $http.send({
+          url: focusBase[amb] + path,
+          method: method,
+          headers: {
+            Authorization: focusAuthHeader(t, mode),
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: reqBody ? JSON.stringify(reqBody) : '',
+          timeout: timeoutSec || 45,
+        })
+        return { statusCode: resp.statusCode, json: resp.json || null, body: resp.body || '' }
+      } catch (err) {
+        return { statusCode: 0, json: null, body: '', transport_error: String(err) }
+      }
+    }
+
+    function focusProbe(amb) {
+      var modes = ['b64', 'raw']
+      var last = null
+      for (var i = 0; i < modes.length; i++) {
+        var r = focusRequest(amb, 'GET', '/v2/nfe/__probe_huram__', null, modes[i], 20)
+        if (r.sem_credencial) return { sem_credencial: true }
+        if (r.statusCode === 404) return { ok: true, mode: modes[i], statusCode: r.statusCode }
+        if (r.statusCode && r.statusCode !== 401 && r.statusCode !== 403)
+          return { ok: true, mode: modes[i], statusCode: r.statusCode }
+        last = r
+      }
+      return { ok: false, statusCode: last ? last.statusCode : 0, body: last ? last.body : '' }
+    }
+
+    function focusCredMensagem(amb) {
+      return (
+        'Credencial não configurada. Defina a variável ' +
+        (amb === 'producao' ? 'FOCUS_NFE_TOKEN' : 'FOCUS_NFE_TOKEN_HOMOLOG') +
+        ' nas variáveis de ambiente do backend (Skip Cloud).'
+      )
+    }
+
+    function normalizeStatus(rawStatus, codigoStatus) {
+      var s = (rawStatus || '').toLowerCase()
+      var c = String(codigoStatus || '')
+      if (s.indexOf('autorizado') !== -1 || c === '100' || c === '150') return 'autorizado'
+      if (s.indexOf('denegado') !== -1 || c === '110' || c === '205' || c === '206')
+        return 'denegado'
+      if (s.indexOf('cancelado') !== -1 || c === '101' || c === '151' || c === '135' || c === '155')
+        return 'cancelado'
+      if (s.indexOf('erro') !== -1 || (c && c.charAt(0) === '2' && c !== '204')) return 'rejeitado'
+      return 'processando'
+    }
+
+    function mapFocusResult(json) {
+      json = json || {}
+      var codigo = json.codigo_status || json.cStatus || json.codigo_status_sefaz || ''
+      var out = {
+        status_raw: json.status || json.status_nfe || '',
+        codigo_status: String(codigo),
+        motivo: json.motivo_status || json.motivo || json.xMotivo || json.mensagem_sefaz || '',
+        protocolo: json.numero_protocolo || json.protocolo || json.nProt || '',
+        data_hora: json.data_autorizacao || json.data_protocolo || json.dhRecbto || '',
+        url_pdf: json.url_pdf || json.url_danfe || '',
+        erro: json.erro || json.error || json.error_description || '',
+      }
+      out.status = normalizeStatus(out.status_raw, out.codigo_status)
+      return out
+    }
+
+    function saveStatusOnArtifact(art, mappedData) {
+      art.set('focus_nfe_status_sefaz', mappedData.status)
+      art.set('focus_nfe_codigo_status', mappedData.codigo_status)
+      art.set('focus_nfe_motivo', mappedData.motivo || mappedData.erro || '')
+      art.set('focus_nfe_protocolo', mappedData.protocolo)
+      art.set('focus_nfe_data_hora', mappedData.data_hora)
+      $app.saveNoValidate(art)
+    }
+
+    function writeAudit(authRecord, action, targetId, summary, newValue) {
+      try {
+        var col = $app.findCollectionByNameOrId('audit_logs')
+        var log = new Record(col)
+        log.set('user_id', authRecord ? authRecord.id : '')
+        log.set(
+          'user_name',
+          authRecord ? authRecord.getString('name') || authRecord.getString('email') || '' : '',
+        )
+        log.set('user_role', authRecord ? authRecord.getString('role') : '')
+        log.set('action', action)
+        log.set('module', 'fiscal')
+        log.set('target_collection', 'fiscal_document_artifacts')
+        log.set('target_id', targetId || '')
+        log.set('target_summary', summary || '')
+        log.set('previous_value', null)
+        log.set('new_value', newValue || {})
+        $app.saveNoValidate(log)
+      } catch (err) {
+        $app.logger().error('fiscal_nfe audit log failed', 'error', String(err))
+      }
+    }
+
+    var token = focusToken(ambiente)
     if (!token) {
       return e.json(422, {
         success: false,
         chave_acesso: chaveAcesso,
         status: 'Credencial não configurada',
         error_code: 'FOCUS_NFE_TOKEN_MISSING',
-        error: helpers.focusCredMensagem(ambiente),
+        error: focusCredMensagem(ambiente),
         xml_disponivel_download: true,
       })
     }
 
-    var probe = helpers.focusProbe(ambiente)
+    var probe = focusProbe(ambiente)
     if (!probe.ok) {
       return e.json(502, {
         success: false,
@@ -644,7 +787,7 @@ routerAdd(
     var payload = { xml: xml, xml_assinado: xml }
     if (cfg && cfg.getString('emitente_ref')) payload.ref = cfg.getString('emitente_ref')
 
-    var res = helpers.focusRequest(
+    var res = focusRequest(
       ambiente,
       'POST',
       '/v2/nfe?ref=' + encodeURIComponent(ref),
@@ -656,7 +799,7 @@ routerAdd(
       return e.json(422, {
         success: false,
         error_code: 'FOCUS_NFE_TOKEN_MISSING',
-        error: helpers.focusCredMensagem(ambiente),
+        error: focusCredMensagem(ambiente),
       })
     }
     if (res.statusCode >= 400) {
@@ -664,7 +807,7 @@ routerAdd(
       var raw = JSON.stringify(res.json || {})
       var dup = res.statusCode === 422 && raw.indexOf('ref') !== -1 && raw.indexOf('xisting') !== -1
       if (dup) {
-        var rec = helpers.focusRequest(
+        var rec = focusRequest(
           ambiente,
           'GET',
           '/v2/nfe/' + encodeURIComponent(ref),
@@ -673,11 +816,11 @@ routerAdd(
           30,
         )
         if (rec.statusCode === 200 && rec.json) {
-          var mr = helpers.mapFocusResult(rec.json)
+          var mr = mapFocusResult(rec.json)
           artifact.set('focus_nfe_ref', ref)
           artifact.set('focus_nfe_ambiente', ambiente)
-          helpers.saveStatusOnArtifact(artifact, mr)
-          helpers.writeAudit(e.auth, 'nfe_consulta', artifact.id, 'NF-e ' + chaveAcesso, mr)
+          saveStatusOnArtifact(artifact, mr)
+          writeAudit(e.auth, 'nfe_consulta', artifact.id, 'NF-e ' + chaveAcesso, mr)
           return e.json(200, {
             success: true,
             recovered: true,
@@ -695,11 +838,11 @@ routerAdd(
       return e.json(502, { success: false, chave_acesso: chaveAcesso, error: msg })
     }
 
-    var mapped = helpers.mapFocusResult(res.json || {})
+    var mapped = mapFocusResult(res.json || {})
     artifact.set('focus_nfe_ref', ref)
     artifact.set('focus_nfe_ambiente', ambiente)
-    helpers.saveStatusOnArtifact(artifact, mapped)
-    helpers.writeAudit(
+    saveStatusOnArtifact(artifact, mapped)
+    writeAudit(
       e.auth,
       'nfe_transmit',
       artifact.id,

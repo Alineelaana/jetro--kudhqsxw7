@@ -20,8 +20,8 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal',
     title: 'Central Fiscal',
     moduleGroup: 'Fiscal',
-    docVersion: '2.0.0',
-    lastUpdated: '2026-04-01',
+    docVersion: '2.0.1',
+    lastUpdated: '2026-11-05',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
@@ -273,7 +273,7 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções PocketBase: `fiscal_certificates`, `fiscal_configurations`, `system_configurations`, `fiscal_focus_nfe_config`.\n- Endpoints backend: `/backend/v1/huram/fiscal/focus-nfe/config/:empresaId` (GET), `/focus-nfe/config` (POST), `/focus-nfe/test` (POST).\n- Hooks: `useBrand` e `useRealtime`.',
+        '- Coleções PocketBase: `fiscal_certificates`, `fiscal_configurations`, `system_configurations`, `fiscal_focus_nfe_config`.\n- Endpoints backend: `/backend/v1/huram/fiscal/focus-nfe/config/:empresaId` (GET), `/backend/v1/huram/fiscal/focus-nfe/config` (POST), `/backend/v1/huram/fiscal/focus-nfe/test` (POST).\n- Hooks: `useBrand` e `useRealtime` (runtime PocketBase com lógica inline por callback em `focus_nfe_api.js` e `fiscal_nfe_homologacao.js`, sem helpers fora de escopo).',
     },
     integrations: {
       title: 'Integrações',
