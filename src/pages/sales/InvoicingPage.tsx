@@ -135,6 +135,18 @@ export default function InvoicingPage() {
     [orders, selectedOrderId],
   )
 
+  const selectedOrderItems: OrderItem[] = useMemo(() => {
+    if (!selectedOrder?.items) return []
+    if (typeof selectedOrder.items === 'string') {
+      try {
+        return JSON.parse(selectedOrder.items)
+      } catch {
+        return []
+      }
+    }
+    return Array.isArray(selectedOrder.items) ? (selectedOrder.items as OrderItem[]) : []
+  }, [selectedOrder])
+
   const selectedInvoice = useMemo(
     () => invoices.find((i) => i.id === selectedInvoiceId) || null,
     [invoices, selectedInvoiceId],
@@ -451,7 +463,7 @@ export default function InvoicingPage() {
         accessorKey: 'order_number',
         cell: ({ row }) => (
           <span className="font-mono font-bold text-sky-700 dark:text-sky-300">
-            {row.original.order_number}
+            {row.order_number}
           </span>
         ),
       },
@@ -461,11 +473,9 @@ export default function InvoicingPage() {
         accessorKey: 'client_name',
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">{row.original.client_name || 'Não informado'}</div>
-            {row.original.customer_cnpj && (
-              <div className="text-xs text-muted-foreground font-mono">
-                {row.original.customer_cnpj}
-              </div>
+            <div className="font-medium">{row.client_name || 'Não informado'}</div>
+            {row.customer_cnpj && (
+              <div className="text-xs text-muted-foreground font-mono">{row.customer_cnpj}</div>
             )}
           </div>
         ),
@@ -476,10 +486,8 @@ export default function InvoicingPage() {
         accessorKey: 'company',
         cell: ({ row }) => (
           <div className="text-xs">
-            <span className="font-semibold">{row.original.company || 'Padrão'}</span>
-            {row.original.branch && (
-              <span className="text-muted-foreground"> / {row.original.branch}</span>
-            )}
+            <span className="font-semibold">{row.company || 'Padrão'}</span>
+            {row.branch && <span className="text-muted-foreground"> / {row.branch}</span>}
           </div>
         ),
       },
@@ -488,8 +496,7 @@ export default function InvoicingPage() {
         header: 'Data Liberação',
         accessorKey: 'created',
         cell: ({ row }) => {
-          const dt =
-            row.original.liberado_faturamento_at || row.original.updated || row.original.created
+          const dt = row.liberado_faturamento_at || row.updated || row.created
           return (
             <span className="text-xs text-muted-foreground">
               {dt ? new Date(dt).toLocaleString('pt-BR') : '-'}
@@ -501,26 +508,26 @@ export default function InvoicingPage() {
         id: 'carrier_name',
         header: 'Transportadora',
         accessorKey: 'carrier_name',
-        cell: ({ row }) => (
-          <span className="text-xs">{row.original.carrier_name || 'A definir'}</span>
-        ),
+        cell: ({ row }) => <span className="text-xs">{row.carrier_name || 'A definir'}</span>,
       },
       {
         id: 'items_count',
         header: 'Itens',
-        accessorFn: (row) => row.items?.length || 0,
-        cell: ({ row }) => (
-          <Badge variant="outline" className="text-xs">
-            {row.original.items?.length || 0} ite{row.original.items?.length === 1 ? 'm' : 'ns'}
-          </Badge>
-        ),
+        cell: ({ row }) => {
+          const itemsArr = Array.isArray(row.items) ? row.items : []
+          return (
+            <Badge variant="outline" className="text-xs">
+              {itemsArr.length} ite{itemsArr.length === 1 ? 'm' : 'ns'}
+            </Badge>
+          )
+        },
       },
       {
         id: 'total_value',
         header: 'Valor Total',
         accessorKey: 'total_value',
         cell: ({ row }) => {
-          const val = Number(row.original.total_value || 0)
+          const val = Number(row.total_value || 0)
           return (
             <span className="font-semibold text-emerald-700 dark:text-emerald-400">
               {val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -535,9 +542,7 @@ export default function InvoicingPage() {
         cell: ({ row }) => (
           <Badge className="bg-sky-600 hover:bg-sky-700 text-white border-0 text-xs font-semibold">
             <FileCheck2 className="w-3 h-3 mr-1" />
-            {row.original.faturamento_status === 'liberado'
-              ? 'Liberado para Faturar'
-              : row.original.status}
+            {row.faturamento_status === 'liberado' ? 'Liberado para Faturar' : row.status}
           </Badge>
         ),
       },
@@ -549,7 +554,7 @@ export default function InvoicingPage() {
             size="sm"
             onClick={(e) => {
               e.stopPropagation()
-              handleOpenInvoiceDialog(row.original)
+              handleOpenInvoiceDialog(row)
             }}
             className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
           >
@@ -570,7 +575,7 @@ export default function InvoicingPage() {
         accessorKey: 'invoice_number',
         cell: ({ row }) => (
           <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-            {row.original.invoice_number}
+            {row.invoice_number}
           </span>
         ),
       },
@@ -583,7 +588,7 @@ export default function InvoicingPage() {
             variant="outline"
             className="font-mono text-xs border-sky-300 text-sky-700 dark:text-sky-300"
           >
-            {row.original.order_number || 'N/A'}
+            {row.order_number || 'N/A'}
           </Badge>
         ),
       },
@@ -591,16 +596,14 @@ export default function InvoicingPage() {
         id: 'client_name',
         header: 'Cliente',
         accessorKey: 'client_name',
-        cell: ({ row }) => (
-          <span className="font-medium text-xs">{row.original.client_name || '-'}</span>
-        ),
+        cell: ({ row }) => <span className="font-medium text-xs">{row.client_name || '-'}</span>,
       },
       {
         id: 'invoice_date',
         header: 'Data Emissão',
         accessorKey: 'invoice_date',
         cell: ({ row }) => {
-          const dt = row.original.invoice_date || row.original.created
+          const dt = row.invoice_date || row.created
           return (
             <span className="text-xs text-muted-foreground">
               {dt ? new Date(dt).toLocaleString('pt-BR') : '-'}
@@ -613,7 +616,7 @@ export default function InvoicingPage() {
         header: 'Transportadora',
         accessorKey: 'carrier_name',
         cell: ({ row }) => (
-          <span className="text-xs text-muted-foreground">{row.original.carrier_name || '-'}</span>
+          <span className="text-xs text-muted-foreground">{row.carrier_name || '-'}</span>
         ),
       },
       {
@@ -621,7 +624,7 @@ export default function InvoicingPage() {
         header: 'Valor da Nota',
         accessorKey: 'total_value',
         cell: ({ row }) => {
-          const val = Number(row.original.total_value || 0)
+          const val = Number(row.total_value || 0)
           return (
             <span className="font-semibold text-emerald-700 dark:text-emerald-400 text-xs">
               {val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -633,7 +636,7 @@ export default function InvoicingPage() {
         id: 'nfe_status',
         header: 'Status Sefaz/Focus',
         cell: ({ row }) => {
-          const nfe = findNfeRecordForInvoice(row.original)
+          const nfe = findNfeRecordForInvoice(row)
           if (!nfe) {
             return (
               <Badge variant="outline" className="text-xs text-amber-700 border-amber-300">
@@ -641,7 +644,7 @@ export default function InvoicingPage() {
               </Badge>
             )
           }
-          if (nfe.focus_nfe_status_sefaz === 'autorizado' || nfe.status === 'Autorizada') {
+          if ((nfe as any).focus_nfe_status_sefaz === 'autorizado' || nfe.status === 'Autorizada') {
             return (
               <Badge className="bg-emerald-600 text-white text-xs">
                 <ShieldCheck className="w-3 h-3 mr-1" />
@@ -649,7 +652,7 @@ export default function InvoicingPage() {
               </Badge>
             )
           }
-          if (nfe.focus_nfe_status_sefaz === 'rejeitado' || nfe.status === 'Rejeitada') {
+          if ((nfe as any).focus_nfe_status_sefaz === 'rejeitado' || nfe.status === 'Rejeitada') {
             return (
               <Badge variant="destructive" className="text-xs">
                 Rejeitada
@@ -658,7 +661,7 @@ export default function InvoicingPage() {
           }
           return (
             <Badge variant="secondary" className="text-xs">
-              {nfe.focus_nfe_status_sefaz || nfe.status || 'Gerada'}
+              {(nfe as any).focus_nfe_status_sefaz || nfe.status || 'Gerada'}
             </Badge>
           )
         },
@@ -667,7 +670,7 @@ export default function InvoicingPage() {
         id: 'actions',
         header: 'Ações Fiscais',
         cell: ({ row }) => {
-          const inv = row.original
+          const inv = row
           const nfe = findNfeRecordForInvoice(inv)
           return (
             <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -719,7 +722,7 @@ export default function InvoicingPage() {
                 </Tooltip>
               </TooltipProvider>
 
-              {nfe?.xml_conteudo && (
+              {(nfe as any)?.xml_conteudo && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -960,7 +963,7 @@ export default function InvoicingPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {(selectedOrder.items || []).map((it, idx) => (
+                      {selectedOrderItems.map((it, idx) => (
                         <tr key={idx} className="hover:bg-muted/20">
                           <td className="py-2 px-3 font-mono text-muted-foreground">
                             {it.product_code || '-'}

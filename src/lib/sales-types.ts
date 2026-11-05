@@ -90,6 +90,53 @@ export interface HistoryEntry {
   note: string
 }
 
+export interface SalesOrderRecord {
+  id: string
+  order_number: string
+  status: string
+  client_id?: string
+  client_name?: string
+  customer_cnpj?: string
+  customer_city?: string
+  customer_district?: string
+  customer_address?: string
+  salesperson_id?: string
+  salesperson_name?: string
+  payment_condition?: string
+  payment_method?: string
+  delivery_date?: string
+  carrier_name?: string
+  freight_type?: string
+  freight_value?: string
+  total_value?: string
+  gross_value?: string
+  items?: any
+  company?: string
+  branch?: string
+  empresa_id?: string
+  filial_id?: string
+  stock_reserved?: boolean
+  history?: any
+  approval_data?: any
+  // Campos do ciclo de faturamento e migração 0310
+  faturamento_status?: string
+  invoicing_status?: string
+  separacao_status?: string
+  separacao_confirmada_at?: string
+  separacao_confirmada_por?: string
+  liberado_faturamento_at?: string
+  liberado_faturamento_por?: string
+  receivable_id?: string
+  nfe_record_id?: string
+  nfe_chave_acesso?: string
+  nfe_numero?: string
+  is_invoiced?: boolean
+  invoiced_at?: string
+  cancellation_reason?: string
+  created: string
+  updated: string
+}
+
 export interface SalesOrder {
   id: string
   order_number: string
@@ -123,6 +170,9 @@ export interface SalesOrder {
   history: HistoryEntry[]
   responsible_user: string
   stock_reserved: boolean
+  faturamento_status?: string
+  invoicing_status?: string
+  separacao_status?: string
   created: string
   updated: string
 }
@@ -156,6 +206,8 @@ export interface NfeRecord {
   status: string
   invoice_id: string
   order_id: string
+  sales_order_id?: string
+  sales_order_number?: string
   client_name: string
   company: string
   nature_of_operation: string
@@ -170,6 +222,13 @@ export interface NfeRecord {
   rejection_reason: string
   history: HistoryEntry[]
   responsible_user: string
+  chave_acesso?: string
+  focus_nfe_ref?: string
+  focus_nfe_protocolo?: string
+  focus_nfe_status_sefaz?: string
+  danfe_url?: string
+  xml_url?: string
+  xml_conteudo?: string
   created: string
 }
 

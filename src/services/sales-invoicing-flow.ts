@@ -46,6 +46,7 @@ export interface SalesOrderRecord {
   gross_value?: string
   items?: OrderItem[] | string
   company?: string
+  branch?: string
   empresa_id?: string
   filial_id?: string
   stock_reserved?: boolean
@@ -62,6 +63,7 @@ export interface SalesOrderRecord {
     status?: string
   }
   faturamento_status?: FaturamentoStatus | string
+  invoicing_status?: string
   separacao_status?: SeparacaoStatus | string
   separacao_confirmada_at?: string
   separacao_confirmada_por?: string
