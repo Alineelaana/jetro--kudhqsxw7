@@ -467,12 +467,7 @@ export async function cancelSalesOrder(
       }
     }
 
-    const newHistory = appendHistory(
-      order.history,
-      `Pedido Cancelado: ${reason}`,
-      userName,
-      reason,
-    )
+    const newHistory = appendHistory(order.history, `Pedido Cancelado: ${reason}`, userName, reason)
 
     await pb.collection('sales_orders').update(order.id, {
       status: 'Cancelado',

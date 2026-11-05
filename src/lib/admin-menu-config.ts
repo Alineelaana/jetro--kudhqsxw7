@@ -271,13 +271,29 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/comercial',
         perm: canViewSales,
         children: [
-          { label: 'Central Comercial', route: '/admin/comercial' },
-          { label: 'Clientes', route: '/admin/comercial/clientes' },
-          { label: 'Comissão Analítica', route: '/admin/comissao-analitica' },
-          { label: 'Comissões', route: '/admin/comercial/comissoes' },
+          {
+            label: 'Central Comercial',
+            route: '/admin/comercial',
+          },
           {
             label: 'Central de Aprovações de Pedidos',
             route: '/admin/aprovacoes/pedidos',
+          },
+          {
+            label: 'Central de Faturamento',
+            route: '/admin/vendas/faturamento',
+          },
+          {
+            label: 'Clientes',
+            route: '/admin/comercial/clientes',
+          },
+          {
+            label: 'Comissão Analítica',
+            route: '/admin/comissao-analitica',
+          },
+          {
+            label: 'Comissões',
+            route: '/admin/comercial/comissoes',
           },
           {
             label: 'Consulta de Pedidos',
@@ -288,18 +304,21 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/comercial/contratos-devolucoes',
           },
           {
-            label: 'Pedido de Venda',
-            route: '/admin/vendas/pedidos',
+            label: 'Cotações e Cotador',
+            route: '/admin/comercial/cotacoes-cotador',
+          },
+          {
+            label: 'CRM',
+            route: '/admin/comercial/crm',
           },
           {
             label: 'Pedido de Compra',
             route: '/admin/compras/pedidos',
           },
           {
-            label: 'Cotações e Cotador',
-            route: '/admin/comercial/cotacoes-cotador',
+            label: 'Pedido de Venda',
+            route: '/admin/vendas/pedidos',
           },
-          { label: 'CRM', route: '/admin/comercial/crm' },
           {
             label: 'Pedidos e Faturamento',
             route: '/admin/comercial/pedidos-faturamento',

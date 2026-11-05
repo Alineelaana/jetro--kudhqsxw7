@@ -109,28 +109,28 @@ export const COMMERCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/comercial/pedidos-faturamento',
     title: 'Pedidos e Faturamento',
     moduleGroup: 'Comercial',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-04-18',
+    docVersion: '1.1.0',
+    lastUpdated: '2026-11-05',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Gerenciar o ciclo de vida comercial dos pedidos de venda, orçamentos, faturamento e campanhas promocionais integradas. NOTA: A Consulta de Pedidos permanece como tela própria analítica separada e intacta.',
+        'Painel comercial consolidado para orçamentos, campanhas promocionais e visão geral do pipeline de pedidos. O ciclo operacional direto é realizado nas telas dedicadas: Pedido de Venda (/admin/vendas/pedidos) e Central de Faturamento (/admin/vendas/faturamento).',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Aba 1 (Pedidos de Venda): Emissão, aprovação e acompanhamento de status de pedidos de venda.\n- Aba 2 (Orçamentos): Criação de propostas comerciais e orçamentos com conversão direta em pedido.\n- Aba 3 (Faturamento): Liberação para expedição e geração de documento fiscal com origem única.\n- Aba 4 (Promoções): Configuração de campanhas comerciais, descontos por volume e brindes.',
+        '- Aba 1 (Pedidos de Venda): Acompanhamento e atalhos para a esteira oficial de pedidos.\n- Aba 2 (Orçamentos): Criação de propostas comerciais e orçamentos com conversão direta em pedido.\n- Aba 3 (Faturamento): Visão e direcionamento para a Central de Faturamento oficial.\n- Aba 4 (Promoções): Configuração de campanhas comerciais, descontos por volume e brindes.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Pedidos aprovados efetuam reserva no estoque da empresa correspondente.\n- Faturamento gera contas a receber e envia os dados ao módulo Fiscal para NF-e mod 55.\n- A tela Consulta de Pedidos (/admin/vendas/consulta-pedidos) permanece independente conforme regra do projeto.',
+        '- A esteira de ciclo de vida (Confirmar, Separar, Liberar Faturamento, Cancelar) é operada oficialmente pela tela /admin/vendas/pedidos e a emissão de NF-e pela Central /admin/vendas/faturamento.\n- A tela Consulta de Pedidos (/admin/vendas/consulta-pedidos) permanece independente conforme regra do projeto.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O orçamento é elaborado e enviado para aprovação do cliente.\n2. Ao ser aprovado, converte-se em pedido de venda.\n3. O pedido passa por validação de crédito e estoque até a liberação de faturamento.',
+        '1. O orçamento é elaborado e enviado para aprovação do cliente.\n2. Ao ser aprovado, converte-se em pedido de venda.\n3. O pedido é encaminhado para a esteira em Pedidos de Venda e posteriormente faturado na Central de Faturamento.',
     },
     dataSource: {
       title: 'Origem dos Dados',
@@ -140,7 +140,7 @@ export const COMMERCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     integrations: {
       title: 'Integrações',
       content:
-        '- Fiscal (emissão de NF-e), Estoque (reserva/baixa de produtos), Financeiro (títulos a receber).',
+        '- Serviço `sales-invoicing-flow.ts`, módulo fiscal (NF-e Focus NFe), estoque e financeiro.',
     },
     permissions: {
       title: 'Permissões',

@@ -682,8 +682,12 @@ const App = () => (
                                   element={<SalesOrdersQueryPage />}
                                 />
 
-                                {/* ROTAS DE PEDIDOS */}
+                                {/* ROTAS DE PEDIDOS E FATURAMENTO */}
                                 <Route path="/admin/vendas/pedidos" element={<SalesOrdersPage />} />
+                                <Route
+                                  path="/admin/vendas/faturamento"
+                                  element={<InvoicingPage />}
+                                />
                                 <Route
                                   path="/admin/aprovacoes/pedidos"
                                   element={<OrderApprovalsPage />}
@@ -697,12 +701,6 @@ const App = () => (
                                 <Route
                                   path="/admin/vendas"
                                   element={<Navigate to="/admin/comercial" replace />}
-                                />
-                                <Route
-                                  path="/admin/vendas/faturamento"
-                                  element={
-                                    <Navigate to="/admin/comercial/pedidos-faturamento" replace />
-                                  }
                                 />
                                 <Route
                                   path="/admin/vendas/orcamentos"

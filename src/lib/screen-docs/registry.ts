@@ -41,53 +41,110 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/pedidos',
     title: 'Pedido de Venda',
     moduleGroup: 'Comercial',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-04-20',
+    docVersion: '2.0.0',
+    lastUpdated: '2026-11-05',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Gerenciar o ciclo de vida completo dos pedidos de venda do ERP HURAM através de editor padronizado e governança corporativa, garantindo validações de crédito, alçadas de desconto, controle de margem de contribuição e amarração fiscal por item.',
+        'Controlar o ciclo de vida completo dos pedidos de venda do ERP HURAM em arquitetura Master-Detalhe com esteira operacional oficial: rascunho → confirmação (provisão financeira e reserva de estoque) → separação → liberação de faturamento → faturamento definitivo ou cancelamento/estorno.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Cabeçalho Padronizado: Exibição estruturada com número automático sequencial, empresa faturadora, operação comercial, datas de emissão e entrega, situação cadastral, responsável/vendedor, dados completos do cliente (CNPJ/IE/contato), condição de pagamento e observações.\n- 6 Abas Padronizadas: 1. Dados Gerais (seleção do cliente oficial, vendedor, canal comercial, dados cadastrais e empresa/filial); 2. Produtos e Valores (grid de itens com produto, quantidade, unidade, estoque em tempo real, preço de tabela, preço unitário, desconto, acréscimo, custo médio somente leitura, margem % e subtotal); 3. Financeiro (condição de pagamento, forma de pagamento, tabela de preços, frete, seguro e outras despesas); 4. Fiscal (enquadramento CFOP predominante por item via motor fiscal ativo, destino estadual/interestadual e observações fiscais impressas na NF-e); 5. Logística e Entrega (previsão de entrega, modalidade de frete CIF/FOB, transportadora e endereço de entrega); 6. Anexos e Histórico (observações internas e trilha de auditoria completa com histórico de eventos e transições de status).\n- Resumo Financeiro Fixo: Totalizadores em tempo real de subtotal bruto, descontos, acréscimos, frete, seguro, despesas, valor total do pedido, margem estimada percentual e valor, e limite de crédito disponível do parceiro.\n- Barra de Ações: Botões de ação contextualizados por status (Salvar Rascunho, Validar, Enviar para Aprovação, Confirmar, Imprimir/PDF, Cancelar e Fechar).\n- Impressão e Relatório: Geração de documento de impressão formatado com cabeçalho HURAM, dados das partes, itens detalhados e totais financeiros.',
+        '- Arquitetura Master-Detalhe: Cabeçalho com métricas em tempo real (Total de Pedidos, Pendentes Faturamento, Pendentes Liberação, Faturados, Cancelados e Valor Total).\n- Filtros Rápidos por Status: Pendente Faturamento (confirmado/separado/liberado), Pendente Liberação (confirmado/separação), Faturado, Cancelado ou Todos.\n- Tabela Master JetroTable com seleção única ou múltipla por intervalo/checkbox, busca por cliente e número, e paginação completa.\n- Painel de Detalhes dos Itens: Ao clicar ou selecionar um pedido, visualização dos itens em tabela detalhada (código, produto, quantidade, unidade, preço unitário, desconto, subtotal e reserva de estoque).\n- Ações Operacionais Conectadas ao Serviço sales-invoicing-flow: Confirmar Pedido (com provisão financeira e reserva de estoque), Confirmar Separação (com validação de saldo físico/lote), Liberar Faturamento (encaminha para a Central de Faturamento) e Cancelar Pedido (com estorno integral de reservas e provisões).\n- Execução em Lote: Capacidade de aplicar ações a múltiplos pedidos selecionados com relatório de sucessos e falhas.\n- Edição e Novo Pedido: Abertura do editor padrão HURAM para cadastro de novos pedidos e alteração de rascunhos.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Fluxo Oficial de Status: Rascunho → Validado → Aguardando Aprovação → Confirmado → Separação/Expedição → Faturado Parcialmente / Faturado Totalmente → Concluído. Transições registradas com histórico e validadas conforme o motor de regras e migração 0299.\n- Regras do Motor order-sales-rules: Verificação preventiva de limite de crédito, restrição financeira e bloqueio a prazo do cliente; validação de alçada de desconto máximo; verificação de margem mínima configurada; e alerta de estoque disponível insuficiente.\n- Custos Estritamente Somente Leitura: Os campos Custo Médio e Custo de Reposição são protegidos contra edição manual no pedido, refletindo os valores oficiais apurados pelo motor de estoque.\n- Resolução Fiscal Automática: CFOP determinado dinamicamente pelo motor fiscal (fiscalCfopService / determineCfop) com base na operação e UF de destino do cliente.\n- Rascunhos e Validações Inócuos: O pedido em estado Rascunho ou sob Validação não movimenta estoque nem fatura títulos financeiros.',
+        '- Ciclo de Vida Oficial: Rascunho → Confirmado → Em Separação / Separado → Liberado para Faturamento → Faturado (ou Cancelado). Todas as transições são intermediadas pelo serviço centralizado `sales-invoicing-flow.ts` (sem lógica inline duplicada).\n- Confirmação do Pedido: Efetua a reserva no estoque físico da empresa faturadora e cria a provisão preventiva no módulo financeiro.\n- Confirmação de Separação: Valida a disponibilidade física dos lotes e produtos antes da expedição.\n- Liberação de Faturamento: Torna o pedido elegível na Central de Faturamento (/admin/vendas/faturamento).\n- Cancelamento: Realiza o estorno atômico de reservas de estoque e estorno de títulos provisionados no financeiro.\n- Pedidos já Faturados ou Cancelados possuem suas ações operacionais bloqueadas para evitar duplicidade ou inconsistência fiscal.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. Operador cria novo pedido de venda ou edita registro existente na rota `/admin/vendas/pedidos`.\n2. Seleciona o cliente oficial, cujos dados cadastrais, limite e condições são carregados automaticamente.\n3. Adiciona produtos com cálculo automático de preços de tabela, descontos, margens de contribuição e determinação de CFOP.\n4. Ao acionar "Validar", o motor avalia regras comerciais e de crédito; divergências de alçada encaminham o pedido para "Aguardando Aprovação".\n5. Com o pedido "Confirmado", a esteira libera o processo para separação, expedição e posterior faturamento.',
+        '1. Operador visualiza a lista master de pedidos na rota `/admin/vendas/pedidos` com filtros por status.\n2. Clica em um pedido para inspecionar os itens no painel detalhe inferior.\n3. Aciona as ações da esteira: "Confirmar Pedido" → "Confirmar Separação" → "Liberar Faturamento".\n4. Com o pedido liberado, o processo segue para emissão da NF-e na Central de Faturamento `/admin/vendas/faturamento`.\n5. Em caso de desistência ou desacordo comercial, o operador aciona "Cancelar Pedido" que desfaz reservas e provisões.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções PocketBase: `sales_orders`, `partners` (clientes), `products`, `users`, `price_tables`, `payment_conditions`, `payment_methods`, `carriers`.\n- Esquema aditivo de campos via migração `0299_standardized_orders_evolution.js`.',
+        '- Coleções PocketBase: `sales_orders`, `sales_order_items`, `partners` (clientes), `products`, `users`, `stock_reservations`, `financial_entries`.\n- Migração `0310_sales_invoicing_redesign.js` com colunas de esteira de faturamento e auditoria.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Motor de regras de venda: `src/lib/order-sales-rules.ts`.\n- Motor fiscal de determinação de CFOP: `src/lib/fiscal-cfop-service.ts`.\n- Serviços de suporte: `src/services/sales.ts` e `src/services/products.ts`.\n- Módulo Financeiro e Fiscal para faturamento posterior.',
+        '- Serviço central: `src/services/sales-invoicing-flow.ts`.\n- Central de Faturamento `/admin/vendas/faturamento` para emissão fiscal.\n- Módulo de Estoque (reservas e baixas) e Módulo Financeiro (provisões e títulos).',
     },
     permissions: {
       title: 'Permissões',
       content:
-        '- Controlada pela política comercial `canViewSales(role)` (perfis SUP, COMERCIAL, Vendedor, DIRETORIA). Ações de aprovação exigem alçada de gestão comercial.',
+        '- Acesso comercial controlado por `canViewSales(role)` (perfis SUP, COMERCIAL, Vendedor, DIRETORIA). Ações de cancelamento e liberação requerem perfil comercial autorizado.',
     },
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `SalesOrdersPage`, `SalesOrdersPanel`, `SalesOrderStandardEditor`, `StandardOrderHeader`, `StandardOrderSummary`, `StandardOrderActions`.\n- Utilitários: `order-sales-rules`, `fiscal-cfop-service`, `sales-types`.',
+        '- Componentes: `SalesOrdersPage`, `JetroTable`, `SalesOrderStandardEditor`, `sales-page-wrapper`.\n- Serviços: `sales-invoicing-flow`, `sales`, `products`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Alertas visuais impeditivos em caixa destrutiva para erros de validação (itens sem produto, quantidade/preço zerados, cliente bloqueado).\n- Caixa de aviso informativa para alçadas de margem/desconto pendentes de aprovação gerencial.\n- Notificações de toast para respostas de gravação e tratamento resiliente de erros na API.',
+        '- Diálogos de confirmação com validação de status antes de disparar qualquer transição.\n- Notificações de toast para respostas de sucesso e mensagens claras em caso de saldo insuficiente de estoque ou cliente bloqueado.',
+    },
+  },
+
+  // -------------------------------------------------------------
+  // CENTRAL DE FATURAMENTO (EMISSÃO E GESTÃO DE NF-E)
+  // -------------------------------------------------------------
+  '/admin/vendas/faturamento': {
+    route: '/admin/vendas/faturamento',
+    title: 'Central de Faturamento',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-05',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Centralizar a fila de pedidos de venda liberados para faturamento, permitindo a geração oficial de notas fiscais eletrônicas (NF-e modelo 55), baixa definitiva de estoque, conversão de provisões financeiras em títulos reais a receber e emissão/download do DANFE via Focus NFe.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Fila de Pedidos Liberados: Tabela dedicada exibindo exclusivamente os pedidos com status "liberado_faturamento" e "faturado_parcial".\n- Painel Detalhe do Pedido Selecionado: Inspeção imediata dos itens, valores unitários, CFOPs associados, cliente e impostos previstos.\n- Ação "Faturar Pedido": Disparo seguro da operação `invoiceOrder` no serviço `sales-invoicing-flow`, gerando o registro oficial de NF-e vinculado ao pedido de origem, convertendo a provisão financeira em contas a receber real e efetuando a baixa de estoque.\n- Faturamento em Lote: Capacidade de faturar múltiplos pedidos selecionados sequencialmente.\n- Histórico de Notas Emitidas: Tabela com número da NF-e, série, chave de acesso, status da transmissão (homologação/produção/autorizada), valor total e pedido referenciado.\n- Ações sobre a Nota: Visualização completa do espelho da NF-e e botão de Impressão / Download de DANFE em PDF integrado ao Focus NFe e ao backend HURAM.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Apenas pedidos previamente liberados na esteira operacional podem ser faturados.\n- O faturamento cria obrigatoriamente a NF referenciando o pedido de origem (sales_order_id e order_number no registro fiscal).\n- Títulos a receber são criados automaticamente a partir das condições de pagamento do pedido e a provisão é liquidada.\n- O estoque é baixado em definitivo, consumindo a reserva efetuada na etapa de confirmação.\n- A transmissão de NF-e utiliza o provedor homologado Focus NFe conforme configurações por empresa (`fiscal_focus_nfe_config`).',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O faturista acessa a Central de Faturamento na rota `/admin/vendas/faturamento`.\n2. Visualiza os pedidos liberados pelo setor de expedição/comercial.\n3. Seleciona o pedido desejado e confere os itens e totais na tabela de detalhes.\n4. Clica no botão "Faturar Pedido" e confirma a operação no diálogo informativo.\n5. O sistema gera a nota fiscal, atualiza o pedido para "faturado", grava as duplicatas e disponibiliza as ações de Visualizar Nota e Imprimir DANFE.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders`, `sales_order_items`, `invoices`, `fiscal_focus_nfe_config`, `financial_receivables`.\n- Migração `0310_sales_invoicing_redesign.js`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Serviço central `sales-invoicing-flow.ts` para orquestração fiscal/estoque/financeiro.\n- Focus NFe API (pb_hooks) para autorização e DANFE em PDF.\n- Rota vinculada ao menu lateral Comercial em ordem alfabética.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Restrito a operadores autorizados do setor fiscal e comercial via política `canViewSales(role)` e `canEmitNfe`.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `InvoicingPage`, `JetroTable`, `sales-page-wrapper`.\n- Serviços: `sales-invoicing-flow`, `nfe-transmission`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Validação de inconsistências cadastrais ou tributárias antes da emissão.\n- Notificação de toast em caso de indisponibilidade de comunicação com o provedor Focus NFe.',
     },
   },
 
