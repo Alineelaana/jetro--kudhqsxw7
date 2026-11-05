@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T14:00:41.206Z",
+  "generatedAt": "2026-11-05T15:01:33.576Z",
   "collections": [
     {
       "name": "users",
@@ -6975,6 +6975,66 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "separacao_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "separacao_confirmada_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "separacao_confirmada_por",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "faturamento_status",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "liberado_faturamento_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "liberado_faturamento_por",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "receivable_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nfe_record_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nfe_chave_acesso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nfe_numero",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -7364,6 +7424,18 @@
         {
           "name": "focus_nfe_cce_historico",
           "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sales_order_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sales_order_number",
+          "type": "text",
           "required": false,
           "system": false
         }
