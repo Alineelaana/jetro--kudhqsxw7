@@ -136,7 +136,7 @@ export default function InvoicingPage() {
     if (!selectedOrder?.items) return []
     if (typeof selectedOrder.items === 'string') {
       try {
-        return JSON.parse(selectedOrder.items)
+        return JSON.parse(selectedOrder.items) as OrderItem[]
       } catch {
         return []
       }
