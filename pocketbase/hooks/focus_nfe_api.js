@@ -610,6 +610,73 @@ routerAdd(
         for (k in extra) artifact.set(k, extra[k])
       }
       $app.saveNoValidate(artifact)
+
+      try {
+        var chv = artifact.getString('chave_acesso')
+        var docId = artifact.getString('document_id')
+        var nfeRec = null
+        if (chv) {
+          try {
+            nfeRec = $app.findFirstRecordByFilter('nfe_records', 'chave_acesso = "' + chv + '"')
+          } catch (_) {}
+        }
+        if (!nfeRec && docId) {
+          try {
+            nfeRec = $app.findRecordById('nfe_records', docId)
+          } catch (_) {}
+          if (!nfeRec) {
+            try {
+              nfeRec = $app.findFirstRecordByFilter(
+                'nfe_records',
+                'sales_order_id = "' + docId + '" || order_id = "' + docId + '"',
+              )
+            } catch (_) {}
+          }
+        }
+        if (nfeRec) {
+          nfeRec.set('focus_nfe_status_sefaz', mapped.status)
+          nfeRec.set('focus_nfe_codigo_status', mapped.codigo_status)
+          nfeRec.set('focus_nfe_motivo', mapped.motivo || mapped.erro || '')
+          nfeRec.set('focus_nfe_protocolo', mapped.protocolo)
+          nfeRec.set('focus_nfe_data_hora', mapped.data_hora)
+          if (artifact.getString('focus_nfe_ref')) {
+            nfeRec.set('focus_nfe_ref', artifact.getString('focus_nfe_ref'))
+          }
+          if (artifact.getString('focus_nfe_ambiente')) {
+            nfeRec.set('focus_nfe_ambiente', artifact.getString('focus_nfe_ambiente'))
+            nfeRec.set('ambiente', artifact.getString('focus_nfe_ambiente'))
+          }
+          if (mapped.protocolo) {
+            nfeRec.set('authorization_protocol', mapped.protocolo)
+            nfeRec.set('protocolo', mapped.protocolo)
+          }
+          if (mapped.motivo || mapped.erro) {
+            nfeRec.set('motivo', mapped.motivo || mapped.erro)
+            if (mapped.status === 'rejeitado' || mapped.status === 'denegado') {
+              nfeRec.set('rejection_reason', mapped.motivo || mapped.erro)
+            }
+          }
+          if (mapped.url_pdf) {
+            nfeRec.set('danfe_url', mapped.url_pdf)
+          }
+          if (mapped.status === 'autorizado') {
+            nfeRec.set('status', 'Autorizada')
+          } else if (mapped.status === 'rejeitado') {
+            nfeRec.set('status', 'Rejeitada')
+          } else if (mapped.status === 'denegado') {
+            nfeRec.set('status', 'Denegada')
+          } else if (mapped.status === 'cancelado') {
+            nfeRec.set('status', 'Cancelada')
+          } else if (mapped.status === 'processando') {
+            nfeRec.set('status', 'Processando SEFAZ')
+          }
+          $app.saveNoValidate(nfeRec)
+        }
+      } catch (errSync) {
+        $app
+          .logger()
+          .error('failed to sync status to nfe_records in focus_nfe_api', 'error', String(errSync))
+      }
     }
 
     function focusErrorResponse(e2, res, acao) {

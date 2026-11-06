@@ -192,7 +192,7 @@ export default function InvoicingPage() {
     setInvoicingLoading(true)
     try {
       const empId = selectedOrder.empresa_id || selectedOrder.company || 'default'
-      const result = await invoiceSalesOrder(selectedOrder, empId, 'homologacao', userName)
+      const result = await invoiceSalesOrder(selectedOrder, empId, undefined, userName)
       if (!result.success) {
         throw new Error(result.error || 'Erro ao faturar pedido')
       }

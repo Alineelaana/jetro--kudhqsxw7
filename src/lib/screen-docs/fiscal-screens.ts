@@ -247,18 +247,18 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal/certificados-configuracoes',
     title: 'Certificados e Configurações',
     moduleGroup: 'Fiscal',
-    docVersion: '2.0.0',
-    lastUpdated: '2026-04-01',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-11-06',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
       content:
-        'Prover a governança e segurança fiscal da empresa: gestão do Certificado Digital padrão ICP-Brasil (A1), parametrização fiscal por empresa/filial (regime, CRT, inscrições, ambiente), controle de séries e numeração de documentos fiscais eletrônicos e configuração da integração Focus NFe para emissão real de NF-e.',
+        'Prover a governança e segurança fiscal da empresa: gestão do Certificado Digital padrão ICP-Brasil (A1), parametrização fiscal por empresa/filial (regime, CRT, inscrições, ambiente), controle de séries e numeração de documentos fiscais eletrônicos e configuração da integração Focus NFe com suporte a ambiente de produção, série da NF-e por emitente e emissão real de NF-e.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Box de Declaração Explícita de Pendências Externas: destaca de forma transparente que a geração de XML modelo 55 layout 4.00 opera em Homologação e depende da instalação de Certificado A1 válido e credenciamento na SEFAZ Estadual para produção.\n- 3 Abas Internas estruturadas:\n  1. "Certificado Digital A1": upload, monitoramento de validade e titularidade de certificados ICP-Brasil; ao final desta aba, seção "Focus NFe — Emissão Real de NF-e" com seleção de ambiente (Homologação tpAmb=2 / Produção), identificador do emitente (ref), status da credencial (badge "Credencial configurada" / "Credencial não configurada"), botão "Salvar configuração" e botão "Testar credencial" (consulta real ao Focus NFe; quando o token não está definido nas variáveis de ambiente do backend exibe orientação amigável, sem quebrar o fluxo);\n  2. "Parâmetros por Empresa": regime tributário (Simples Nacional, Lucro Presumido, Lucro Real), CRT, Inscrição Estadual/Municipal e ambiente SEFAZ;\n  3. "Séries e Numeração": controle rigoroso e sequencial dos últimos números emitidos por série para evitar quebra de sequência ou duplicidade.',
+        '- Box de Declaração Explícita de Pendências Externas: destaca de forma transparente que a geração de XML modelo 55 layout 4.00 opera em Homologação e depende da instalação de Certificado A1 válido e credenciamento na SEFAZ Estadual para produção.\n- 3 Abas Internas estruturadas:\n  1. "Certificado Digital A1": upload, monitoramento de validade e titularidade de certificados ICP-Brasil; ao final desta aba, seção "Focus NFe — Emissão Real de NF-e" com seleção de ambiente (Homologação tpAmb=2 / Produção), campo editável "Série da NF-e" (ex: série 2 da Gran Romano), identificador do emitente no Focus NFe (ref, ex: 282422), status da credencial (badge "Credencial configurada" / "Credencial não configurada"), botão "Salvar configuração" e botão "Testar credencial" (consulta real ao Focus NFe; quando o token não está definido nas variáveis de ambiente do backend exibe orientação amigável, sem quebrar o fluxo);\n  2. "Parâmetros por Empresa": regime tributário (Simples Nacional, Lucro Presumido, Lucro Real), CRT, Inscrição Estadual/Municipal e ambiente SEFAZ;\n  3. "Séries e Numeração": controle rigoroso e sequencial dos últimos números emitidos por série para evitar quebra de sequência ou duplicidade.',
     },
     businessRules: {
       title: 'Regras de Negócio',

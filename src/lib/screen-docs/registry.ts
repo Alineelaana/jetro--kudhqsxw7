@@ -98,23 +98,23 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/faturamento',
     title: 'Central de Faturamento',
     moduleGroup: 'Comercial',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-11-05',
+    docVersion: '1.1.0',
+    lastUpdated: '2026-11-06',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Centralizar a fila de pedidos de venda liberados para faturamento, permitindo a geração oficial de notas fiscais eletrônicas (NF-e modelo 55), baixa definitiva de estoque, conversão de provisões financeiras em títulos reais a receber e emissão/download do DANFE via Focus NFe.',
+        'Centralizar a fila de pedidos de venda liberados para faturamento, permitindo a geração oficial de notas fiscais eletrônicas (NF-e modelo 55) com resolução automática de série e ambiente da empresa emissora via Focus NFe, baixa definitiva de estoque, conversão de provisões financeiras em títulos reais a receber e emissão/download do DANFE via Focus NFe.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Fila de Pedidos Liberados: Tabela dedicada exibindo exclusivamente os pedidos prontos para faturamento (`faturamento_status = "pendente_faturamento"` e `is_invoiced != true`).\n- Painel Detalhe do Pedido Selecionado: Inspeção imediata dos itens, valores unitários, CFOPs associados, cliente e impostos previstos.\n- Ação "Faturar Pedido": Disparo seguro da operação `invoiceSalesOrder` no serviço `sales-invoicing-flow`, gerando o registro oficial de NF-e vinculado ao pedido de origem, convertendo a provisão financeira em contas a receber real e efetuando a baixa de estoque.\n- Faturamento em Lote: Capacidade de faturar múltiplos pedidos selecionados sequencialmente.\n- Histórico de Notas Emitidas: Tabela com número da NF-e, série, chave de acesso, status da transmissão (homologação/produção/autorizada), valor total e pedido referenciado.\n- Ações sobre a Nota: Visualização completa do espelho da NF-e e botão de Impressão / Download de DANFE em PDF integrado ao Focus NFe e ao backend HURAM.',
+        '- Fila de Pedidos Liberados: Tabela dedicada exibindo exclusivamente os pedidos prontos para faturamento (`faturamento_status = "pendente_faturamento"` e `is_invoiced != true`).\n- Painel Detalhe do Pedido Selecionado: Inspeção imediata dos itens, valores unitários, CFOPs associados, cliente e impostos previstos.\n- Ação "Faturar Pedido": Disparo seguro da operação `invoiceSalesOrder` no serviço `sales-invoicing-flow`, consultando a configuração da empresa ativa em `fiscal_focus_nfe_config` para aplicar a série (ex: série 2 para Gran Romano) e o ambiente correto (produção/homologação), gerando o XML oficial e registrando em `nfe_records` com sincronização automática do retorno Focus NFe (status SEFAZ, protocolo, motivo e DANFE).\n- Faturamento em Lote: Capacidade de faturar múltiplos pedidos selecionados sequencialmente.\n- Histórico de Notas Emitidas: Tabela com número da NF-e, série, chave de acesso, status da transmissão (homologação/produção/autorizada/rejeitada), valor total e pedido referenciado.\n- Ações sobre a Nota: Visualização completa do espelho da NF-e e botão de Impressão / Download de DANFE em PDF integrado ao Focus NFe e ao backend HURAM.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Apenas pedidos previamente liberados na esteira operacional podem ser faturados.\n- O faturamento cria obrigatoriamente a NF referenciando o pedido de origem (sales_order_id e order_number no registro fiscal).\n- Títulos a receber são criados automaticamente a partir das condições de pagamento do pedido e a provisão é liquidada.\n- O estoque é baixado em definitivo, consumindo a reserva efetuada na etapa de confirmação.\n- A transmissão de NF-e utiliza o provedor homologado Focus NFe conforme configurações por empresa (`fiscal_focus_nfe_config`).',
+        '- Apenas pedidos previamente liberados na esteira operacional podem ser faturados.\n- O faturamento busca a parametrização em `fiscal_focus_nfe_config` da empresa para definir a série e ambiente efetivos da nota, nunca fixando série 1 quando houver série configurada.\n- O faturamento cria obrigatoriamente a NF referenciando o pedido de origem (sales_order_id e order_number no registro fiscal).\n- Títulos a receber são criados automaticamente a partir das condições de pagamento do pedido e a provisão é liquidada.\n- O estoque é baixado em definitivo, consumindo a reserva efetuada na etapa de confirmação.\n- A transmissão de NF-e utiliza o provedor Focus NFe conforme emitente configurado (ex: emitente 282422 para Gran Romano), atualizando `nfe_records` com os dados da autorização/rejeição SEFAZ.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',

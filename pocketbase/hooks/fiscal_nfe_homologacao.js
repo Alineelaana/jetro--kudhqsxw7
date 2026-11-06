@@ -88,6 +88,31 @@ routerAdd(
     // Gerar cNF (código numérico aleatório de 8 dígitos)
     var cNF = String(Math.floor(10000000 + Math.random() * 90000000))
 
+    // Destinatário
+    var destDoc = (destinatario.cnpj || destinatario.cpf || '00000000000191').replace(/\D/g, '')
+    var isCnpj = destDoc.length > 11
+    var destNome = destinatario.nome || 'CLIENTE PADRAO EM HOMOLOGACAO'
+    var destUf = (destinatario.uf || emitUf).toUpperCase()
+    var destMun = destinatario.cidade || emitMun
+    var destIe = destinatario.ie || 'ISENTO'
+    var destIndIe = destinatario.ind_ie || (destIe === 'ISENTO' ? '9' : '1') // 1=Contribuinte, 2=Isento, 9=Nao Contribuinte
+
+    // Buscar configuração Focus NFe da empresa para resolver série/ambiente
+    try {
+      var focusCfg = $app.findFirstRecordByFilter(
+        'fiscal_focus_nfe_config',
+        'empresa_id = "' + empresaId + '"',
+      )
+      if (focusCfg) {
+        if (!body.serie && focusCfg.getString('serie')) {
+          serie = focusCfg.getString('serie')
+        }
+        if (!body.ambiente && focusCfg.getString('ambiente')) {
+          ambiente = focusCfg.getString('ambiente')
+        }
+      }
+    } catch (_) {}
+
     // Montar chave de acesso preliminar de 43 dígitos para calcular dígito verificador (DV)
     // Layout Chave: cUF(2) + AAMM(4) + CNPJ(14) + mod(2, "55") + serie(3) + nNF(9) + tpEmis(1, "1") + cNF(8)
     var seriePad = ('000' + serie).slice(-3)
@@ -106,15 +131,6 @@ routerAdd(
     var resto = soma % 11
     var cDV = resto === 0 || resto === 1 ? 0 : 11 - resto
     var chaveAcesso = chave43 + String(cDV)
-
-    // Destinatário
-    var destDoc = (destinatario.cnpj || destinatario.cpf || '00000000000191').replace(/\D/g, '')
-    var isCnpj = destDoc.length > 11
-    var destNome = destinatario.nome || 'CLIENTE PADRAO EM HOMOLOGACAO'
-    var destUf = (destinatario.uf || emitUf).toUpperCase()
-    var destMun = destinatario.cidade || emitMun
-    var destIe = destinatario.ie || 'ISENTO'
-    var destIndIe = destinatario.ind_ie || (destIe === 'ISENTO' ? '9' : '1') // 1=Contribuinte, 2=Isento, 9=Nao Contribuinte
 
     // Processamento dos itens e cálculo de tributos coerente com o cadastro
     var round2 = function (n) {
@@ -509,17 +525,24 @@ routerAdd(
         nfeRecord = new Record(nfeRecCol)
       }
 
-      nfeRecord.set('numero', numeroNota)
+      nfeRecord.set('nfe_number', numeroNota)
       nfeRecord.set('serie', serie)
       nfeRecord.set('chave_acesso', chaveAcesso)
       nfeRecord.set('empresa_id', empresaId)
-      nfeRecord.set('cliente', destNome)
-      nfeRecord.set('cnpj_cpf', destDoc)
-      nfeRecord.set('data_emissao', dhEmi.substring(0, 10))
-      nfeRecord.set('valor_total', round2(totalVNF))
-      nfeRecord.set('status', 'Validado Homologação')
+      nfeRecord.set('company', empresaId)
+      nfeRecord.set('client_name', destNome)
+      nfeRecord.set('total_value', round2(totalVNF))
+      nfeRecord.set('tax_value', round2(totalVICMS + totalVPIS + totalVCOFINS))
+      nfeRecord.set('nature_of_operation', naturezaOperacao)
+      var statusGerada =
+        ambiente === 'producao' ? 'Gerada (Pronta para Transmissão)' : 'Validado Homologação'
+      nfeRecord.set('status', statusGerada)
       nfeRecord.set('ambiente', ambiente)
       nfeRecord.set('xml_conteudo', xmlNfe)
+      if (documentId) {
+        nfeRecord.set('sales_order_id', documentId)
+        nfeRecord.set('order_id', documentId)
+      }
       nfeRecord.set(
         'homologacao_pendencia',
         'Requer Certificado Digital A1 para transmissao direta a SEFAZ',
@@ -714,6 +737,72 @@ routerAdd(
       art.set('focus_nfe_protocolo', mappedData.protocolo)
       art.set('focus_nfe_data_hora', mappedData.data_hora)
       $app.saveNoValidate(art)
+
+      // Sincroniza em nfe_records para visibilidade imediata no ERP/Faturamento
+      try {
+        var chv = art.getString('chave_acesso')
+        var docId = art.getString('document_id')
+        var nfeRec = null
+        if (chv) {
+          try {
+            nfeRec = $app.findFirstRecordByFilter('nfe_records', 'chave_acesso = "' + chv + '"')
+          } catch (_) {}
+        }
+        if (!nfeRec && docId) {
+          try {
+            nfeRec = $app.findRecordById('nfe_records', docId)
+          } catch (_) {}
+          if (!nfeRec) {
+            try {
+              nfeRec = $app.findFirstRecordByFilter(
+                'nfe_records',
+                'sales_order_id = "' + docId + '" || order_id = "' + docId + '"',
+              )
+            } catch (_) {}
+          }
+        }
+        if (nfeRec) {
+          nfeRec.set('focus_nfe_status_sefaz', mappedData.status)
+          nfeRec.set('focus_nfe_codigo_status', mappedData.codigo_status)
+          nfeRec.set('focus_nfe_motivo', mappedData.motivo || mappedData.erro || '')
+          nfeRec.set('focus_nfe_protocolo', mappedData.protocolo)
+          nfeRec.set('focus_nfe_data_hora', mappedData.data_hora)
+          if (art.getString('focus_nfe_ref')) {
+            nfeRec.set('focus_nfe_ref', art.getString('focus_nfe_ref'))
+          }
+          if (art.getString('focus_nfe_ambiente')) {
+            nfeRec.set('focus_nfe_ambiente', art.getString('focus_nfe_ambiente'))
+            nfeRec.set('ambiente', art.getString('focus_nfe_ambiente'))
+          }
+          if (mappedData.protocolo) {
+            nfeRec.set('authorization_protocol', mappedData.protocolo)
+            nfeRec.set('protocolo', mappedData.protocolo)
+          }
+          if (mappedData.motivo || mappedData.erro) {
+            nfeRec.set('motivo', mappedData.motivo || mappedData.erro)
+            if (mappedData.status === 'rejeitado' || mappedData.status === 'denegado') {
+              nfeRec.set('rejection_reason', mappedData.motivo || mappedData.erro)
+            }
+          }
+          if (mappedData.url_pdf) {
+            nfeRec.set('danfe_url', mappedData.url_pdf)
+          }
+          if (mappedData.status === 'autorizado') {
+            nfeRec.set('status', 'Autorizada')
+          } else if (mappedData.status === 'rejeitado') {
+            nfeRec.set('status', 'Rejeitada')
+          } else if (mappedData.status === 'denegado') {
+            nfeRec.set('status', 'Denegada')
+          } else if (mappedData.status === 'cancelado') {
+            nfeRec.set('status', 'Cancelada')
+          } else if (mappedData.status === 'processando') {
+            nfeRec.set('status', 'Processando SEFAZ')
+          }
+          $app.saveNoValidate(nfeRec)
+        }
+      } catch (errSync) {
+        $app.logger().error('failed to sync status to nfe_records', 'error', String(errSync))
+      }
     }
 
     function writeAudit(authRecord, action, targetId, summary, newValue) {

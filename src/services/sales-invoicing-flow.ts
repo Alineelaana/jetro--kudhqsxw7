@@ -497,8 +497,8 @@ export interface FaturarResult {
 
 export async function invoiceSalesOrder(
   order: SalesOrderRecord,
-  empresaId: string,
-  ambiente = 'homologacao',
+  empresaId?: string,
+  ambiente?: string,
   userName = 'Operador',
 ): Promise<FaturarResult> {
   try {
@@ -520,6 +520,25 @@ export async function invoiceSalesOrder(
       return { success: false, error: 'Empresa emissora é obrigatória para faturar.' }
     }
 
+    // Buscar configuração Focus NFe da empresa para usar ambiente e série reais
+    let serieEfetiva = '1'
+    let ambienteEfetivo = ambiente || 'homologacao'
+    try {
+      const focusCfg = await pb
+        .collection('fiscal_focus_nfe_config')
+        .getFirstListItem(`empresa_id = "${emp}"`)
+      if (focusCfg) {
+        if (focusCfg.serie) {
+          serieEfetiva = String(focusCfg.serie).trim() || '1'
+        }
+        if (focusCfg.ambiente) {
+          ambienteEfetivo = String(focusCfg.ambiente).trim() || ambienteEfetivo
+        }
+      }
+    } catch {
+      // Se não houver configuração salva, utiliza os padrões informados
+    }
+
     const fiscalItens = items.map((it) => ({
       name: it.product_name || it.name || it.description || 'Produto',
       ncm: it.ncm || '68029390',
@@ -532,8 +551,8 @@ export async function invoiceSalesOrder(
     const genBody = {
       empresa_id: emp,
       document_id: order.id,
-      serie: '1',
-      ambiente,
+      serie: serieEfetiva,
+      ambiente: ambienteEfetivo,
       natureza_operacao: 'VENDA DE MERCADORIAS',
       destinatario: {
         nome: order.client_name || 'CLIENTE PADRAO',
@@ -576,7 +595,7 @@ export async function invoiceSalesOrder(
         method: 'POST',
         body: {
           chave_acesso: chave,
-          ambiente,
+          ambiente: ambienteEfetivo,
         },
       })
       if (transResp?.status) {
