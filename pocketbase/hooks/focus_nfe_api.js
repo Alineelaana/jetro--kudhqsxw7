@@ -74,6 +74,7 @@ routerAdd(
       config: cfg
         ? {
             ambiente: cfg.getString('ambiente') || 'homologacao',
+            serie: cfg.getString('serie') || '1',
             emitente_ref: cfg.getString('emitente_ref') || '',
             cnpj_emitente: cfg.getString('cnpj_emitente') || '',
             status_ultima_validacao: cfg.getString('status_ultima_validacao') || '',
@@ -161,12 +162,16 @@ routerAdd(
       cfg.set('cnpj_emitente', emp ? (emp.getString('cnpj') || '').replace(/\D/g, '') : '')
     }
     cfg.set('ambiente', ambiente)
+    if (body.serie !== undefined) {
+      cfg.set('serie', String(body.serie || '1').trim())
+    }
     cfg.set('emitente_ref', body.emitente_ref || '')
     cfg.set('auth_mode', body.auth_mode === 'raw' ? 'raw' : 'b64')
     cfg.set('updated_by', e.auth ? e.auth.id : '')
     $app.saveNoValidate(cfg)
     writeAudit(e.auth, 'settings_change', cfg.id, 'Focus NFe config ' + ambiente, {
       ambiente: ambiente,
+      serie: cfg.getString('serie') || '1',
       emitente_ref: body.emitente_ref || '',
     })
     return e.json(200, { success: true })

@@ -7,6 +7,7 @@ import pb from '@/lib/pocketbase/client'
 
 interface FocusConfig {
   ambiente: string
+  serie?: string
   emitente_ref: string
   cnpj_emitente: string
   status_ultima_validacao: string
@@ -16,6 +17,7 @@ interface FocusConfig {
 export function FocusNfeConfigSection() {
   const { empresasDisponiveis, empresaAtivaId } = useBrand()
   const [ambiente, setAmbiente] = useState('homologacao')
+  const [serie, setSerie] = useState('1')
   const [emitenteRef, setEmitenteRef] = useState('')
   const [credencialOk, setCredencialOk] = useState<boolean | null>(null)
   const [statusValidacao, setStatusValidacao] = useState('')
@@ -34,6 +36,7 @@ export function FocusNfeConfigSection() {
       setCredencialOk(res?.credencial_configurada ?? false)
       if (res?.config) {
         setAmbiente(res.config.ambiente || 'homologacao')
+        setSerie(res.config.serie || '1')
         setEmitenteRef(res.config.emitente_ref || '')
         setStatusValidacao(res.config.status_ultima_validacao || '')
       }
@@ -53,7 +56,12 @@ export function FocusNfeConfigSection() {
     try {
       await pb.send('/backend/v1/huram/fiscal/focus-nfe/config', {
         method: 'POST',
-        body: { empresa_id: empresaAtivaId, ambiente, emitente_ref: emitenteRef },
+        body: {
+          empresa_id: empresaAtivaId,
+          ambiente,
+          serie: serie.trim() || '1',
+          emitente_ref: emitenteRef,
+        },
       })
       setMsg('Configuração salva para esta empresa.')
     } catch (err: unknown) {
@@ -131,7 +139,7 @@ export function FocusNfeConfigSection() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <div className="space-y-1">
             <label className="text-xs font-bold">Ambiente</label>
             <select
@@ -144,11 +152,20 @@ export function FocusNfeConfigSection() {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold">Identificador do emitente (ref)</label>
+            <label className="text-xs font-bold">Série da NF-e</label>
+            <input
+              value={serie}
+              onChange={(ev) => setSerie(ev.target.value.replace(/\D/g, '').slice(0, 3))}
+              placeholder="Ex: 1, 2"
+              className="w-full text-sm border rounded-lg px-3 py-2"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-bold">Identificador emitente (ref Focus)</label>
             <input
               value={emitenteRef}
               onChange={(ev) => setEmitenteRef(ev.target.value)}
-              placeholder="Referência técnica do emitente no Focus NFe (opcional)"
+              placeholder="Ref no Focus NFe (ex: 282422)"
               className="w-full text-sm border rounded-lg px-3 py-2"
             />
           </div>
