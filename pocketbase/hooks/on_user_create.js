@@ -27,5 +27,25 @@ onRecordCreateRequest((e) => {
   e.record.set('mfa_secret', '')
   e.record.set('mfa_verified_at', '')
 
+  // BUG 1 (correção): usuário criado pelo admin deve conseguir logar no
+  // PRIMEIRO acesso com a senha definida no cadastro.
+  //  - verified = true: conta criada por administrador não nasce pendente de verificação;
+  //  - force_password_change / must_change_password só permanecem verdadeiros se o
+  //    admin os enviou EXPLICITAMENTE como true no corpo da requisição — nunca por
+  //    padrão (por padrão eles bloqueavam o primeiro login sem mensagem clara).
+  e.record.set('verified', true)
+  var body = {}
+  try {
+    body = e.requestInfo().body || {}
+  } catch (_) {
+    body = {}
+  }
+  if (body.force_password_change !== true) {
+    e.record.set('force_password_change', false)
+  }
+  if (body.must_change_password !== true) {
+    e.record.set('must_change_password', false)
+  }
+
   e.next()
 }, 'users')
