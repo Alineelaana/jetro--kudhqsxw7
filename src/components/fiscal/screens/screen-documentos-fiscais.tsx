@@ -14,7 +14,7 @@ import {
   Upload,
 } from 'lucide-react'
 import { useBrand } from '@/hooks/use-brand'
-import { NfePanel } from '@/components/sales/nfe-panel'
+import { DocumentosFiscais } from '@/components/fiscal/documentos-fiscais'
 import { NfcePanel } from '@/components/sales/nfce-panel'
 import { NfsePanel } from '@/components/fiscal/nfse-panel'
 import { CtePanel, MdfePanel } from '@/components/fiscal/cte-mdfe-panel'
@@ -133,7 +133,7 @@ export function ScreenDocumentosFiscais() {
 
         {/* ABA 1: NF-E EMITIDAS */}
         <TabsContent value="nfe_emitidas" className="space-y-4">
-          <NfePanel />
+          <DocumentosFiscais />
         </TabsContent>
 
         {/* ABA 2: NF-E ENTRADA / XML */}

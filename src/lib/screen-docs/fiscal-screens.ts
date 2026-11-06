@@ -77,28 +77,28 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal/documentos',
     title: 'Documentos Fiscais',
     moduleGroup: 'Fiscal',
-    docVersion: '2.0.0',
-    lastUpdated: '2026-04-01',
+    docVersion: '2.2.0',
+    lastUpdated: '2026-11-06',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
       content:
-        'Centralizar e unificar a gestão de emissão, autorização, cancelamento, correção e manifestação de todos os modelos de documentos fiscais eletrônicos da empresa (NF-e mod. 55, entrada XML, NFC-e mod. 65, NFS-e, CT-e mod. 57, MDF-e mod. 58, CC-e e Inutilização). Absorve a emissão de NF-e antes duplicada em Vendas, estabelecendo origem única.',
+        'Centralizar e unificar a gestão de emissão, autorização, transmissão à SEFAZ via Focus NFe, cancelamento, correção e manifestação de todos os modelos de documentos fiscais eletrônicos da empresa (NF-e mod. 55, entrada XML, NFC-e mod. 65, NFS-e, CT-e mod. 57, MDF-e mod. 58, CC-e e Inutilização).',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- 7 Abas Internas estruturadas:\n  1. "NF-e Emitidas": painel completo de NF-e modelo 55 layout 4.00, geração de DANFE, simulação de tributos e transmissão em homologação;\n  2. "NF-e Entrada / XML": painel de notas de compra recebidas e importação com verificação de integridade;\n  3. "NFC-e": emissão e histórico de notas fiscais ao consumidor eletrônicas;\n  4. "NFS-e": controle de notas fiscais de serviços tomados e prestados;\n  5. "CT-e / MDF-e": conhecimentos de transporte e manifestos de documentos fiscais integrados;\n  6. "Carta de Correção": emissão e consulta de eventos de CC-e vinculados a NF-e autorizadas;\n  7. "Inutilização & Manifestação": inutilização de faixas de numeração não utilizadas e manifestação do destinatário (ciência da operação, confirmação, desconhecimento ou operação não realizada).',
+        '- 7 Abas Internas estruturadas:\n  1. "NF-e Emitidas": tabela unificada de documentos fiscais com ação "Transmitir" direta na grade para notas no status "Gerada (Pronta para Transmissão)", botão "Consultar Recibo" para notas com retorno pendente na SEFAZ, visualização detalhada de dados de autorização/rejeição SEFAZ com chave de 44 dígitos, download de XML oficial e envio por e-mail;\n  2. "NF-e Entrada / XML": painel de notas de compra recebidas e importação com verificação de integridade;\n  3. "NFC-e": emissão e histórico de notas fiscais ao consumidor eletrônicas;\n  4. "NFS-e": controle de notas fiscais de serviços tomados e prestados;\n  5. "CT-e / MDF-e": conhecimentos de transporte e manifestos de documentos fiscais integrados;\n  6. "Carta de Correção": emissão e consulta de eventos de CC-e vinculados a NF-e autorizadas;\n  7. "Inutilização & Manifestação": inutilização de faixas de numeração não utilizadas e manifestação do destinatário.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Geração de NF-e modelo 55 layout 4.00 opera em Ambiente de Homologação com pendência externa formalmente declarada de Certificado A1 e credenciamento SEFAZ para transmissão em produção.\n- A transmissão real de NF-e é feita exclusivamente via Focus NFe, no ambiente configurado para a empresa (homologação tpAmb=2 ou produção); nunca cruza ambientes.\n- Cancelamento de NF-e exige motivo obrigatório com no mínimo 15 caracteres; Carta de Correção exige texto obrigatório e respeita o limite de até 20 correções por nota.\n- Não é permitida a emissão de Carta de Correção para campos proibidos por legislação (valores, alíquotas, dados cadastrais de remetente/destinatário ou data de emissão).\n- Inutilização de numeração exige justificativa obrigatória com no mínimo 15 caracteres.\n- Cada operação fiscal (transmissão, cancelamento, CC-e) registra audit_logs com o autor e o resultado.',
+        '- Notas faturadas pelo fluxo de vendas entram com status "Gerada (Pronta para Transmissão)" e chave de acesso vinculada.\n- A ação "Transmitir" na grade envia o XML assinado ao Focus NFe usando a configuração fiscal da empresa (ambiente de homologação ou produção, série configurada, emitente cadastrado).\n- Se a SEFAZ autorizar a nota, o status muda imediatamente para "Autorizada" e o protocolo de autorização é gravado no registro da NF-e (`nfe_records`) e no artefato fiscal (`fiscal_document_artifacts`).\n- Se a SEFAZ rejeitar a nota (ex: divergência cadastral ou de tributação), o código de status e o motivo exato retornado pela SEFAZ são exibidos na tela para fácil correção pelo operador.\n- Emissões para a Gran Romano utilizam o código da UF do Espírito Santo (32) e série 2 de produção no Focus NFe.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O usuário seleciona o modelo de documento fiscal na aba correspondente.\n2. Para NF-e, visualiza a lista com status de transmissão e botões para emissão ou simulação fiscal.\n3. Aciona o diálogo de emissão ou importação XML para processamento.\n4. Após gerar o XML, o painel Focus NFe dentro do diálogo permite: Transmitir (envia ao Focus NFe, que assina e transmite à SEFAZ, gravando status SEFAZ, protocolo e motivo de rejeição), Consultar recibo (polling até decisão final), Baixar DANFE em PDF, Cancelar (motivo ≥15 caracteres) e emitir Carta de Correção (texto obrigatório).\n5. Visualiza os protocolos e DANFE em caso de autorização.',
+        '1. O usuário acessa `/admin/fiscal/documentos` e localiza na aba "NF-e Emitidas" as notas geradas prontas para transmissão.\n2. Ao clicar no botão "Transmitir", o sistema chama o endpoint `/backend/v1/huram/fiscal/focus-nfe/transmit` passando a chave de acesso e o ID da nota.\n3. O backend submete a NF-e ao Focus NFe e, se o processamento for síncrono ou rápido, consulta o recibo até obter o protocolo ou a rejeição da SEFAZ.\n4. Caso a SEFAZ demore a responder, o operador pode utilizar o botão "Consultar" a qualquer momento para buscar a situação atualizada.\n5. Notas autorizadas exibem protocolo e liberam o download do XML oficial e do DANFE.',
     },
     dataSource: {
       title: 'Origem dos Dados',

@@ -697,7 +697,49 @@ routerAdd(
 
     var body = e.requestInfo().body || {}
     var chave = (body.chave_acesso || '').trim()
-    var artifact = findArtifactByChave(chave)
+    var nfeId = (body.nfe_id || '').trim()
+    var artifact = null
+    if (chave) {
+      artifact = findArtifactByChave(chave)
+    }
+    if (!artifact && nfeId) {
+      try {
+        var nfeRecLookup = $app.findRecordById('nfe_records', nfeId)
+        if (nfeRecLookup) {
+          chave = nfeRecLookup.getString('chave_acesso')
+          if (chave) artifact = findArtifactByChave(chave)
+        }
+      } catch (_) {}
+    }
+    if (!artifact && chave) {
+      try {
+        var nfeRecLookup2 = $app.findFirstRecordByFilter(
+          'nfe_records',
+          'chave_acesso = "' + chave + '"',
+        )
+        if (nfeRecLookup2 && nfeRecLookup2.getString('xml_conteudo')) {
+          // Criar ou sincronizar artefato sob demanda a partir do nfe_records
+          var colArt = $app.findCollectionByNameOrId('fiscal_document_artifacts')
+          artifact = new Record(colArt)
+          artifact.set('document_type', 'NFE')
+          artifact.set('document_id', nfeRecLookup2.id)
+          artifact.set(
+            'document_number',
+            String(nfeRecLookup2.get('nfe_number') || nfeRecLookup2.get('numero') || ''),
+          )
+          artifact.set('serie', String(nfeRecLookup2.get('serie') || '1'))
+          artifact.set('empresa_id', nfeRecLookup2.getString('empresa_id'))
+          artifact.set('chave_acesso', chave)
+          artifact.set('ambiente', nfeRecLookup2.getString('ambiente') || 'producao')
+          artifact.set('xml_conteudo', nfeRecLookup2.getString('xml_conteudo'))
+          artifact.set(
+            'external_idempotency_key',
+            chave + '_' + (nfeRecLookup2.getString('ambiente') || 'producao'),
+          )
+          $app.saveNoValidate(artifact)
+        }
+      } catch (_) {}
+    }
     if (!artifact) return e.json(404, { error: 'NF-e não encontrada no sistema' })
     var access = checkEmpresaAccess(e.auth, artifact.getString('empresa_id'))
     if (!access.ok) return e.json(access.code, { error: access.msg })
@@ -997,6 +1039,73 @@ routerAdd(
         for (k in extra) artifact.set(k, extra[k])
       }
       $app.saveNoValidate(artifact)
+
+      try {
+        var chv = artifact.getString('chave_acesso')
+        var docId = artifact.getString('document_id')
+        var nfeRec = null
+        if (chv) {
+          try {
+            nfeRec = $app.findFirstRecordByFilter('nfe_records', 'chave_acesso = "' + chv + '"')
+          } catch (_) {}
+        }
+        if (!nfeRec && docId) {
+          try {
+            nfeRec = $app.findRecordById('nfe_records', docId)
+          } catch (_) {}
+          if (!nfeRec) {
+            try {
+              nfeRec = $app.findFirstRecordByFilter(
+                'nfe_records',
+                'sales_order_id = "' + docId + '" || order_id = "' + docId + '"',
+              )
+            } catch (_) {}
+          }
+        }
+        if (nfeRec) {
+          nfeRec.set('focus_nfe_status_sefaz', mapped.status)
+          nfeRec.set('focus_nfe_codigo_status', mapped.codigo_status)
+          nfeRec.set('focus_nfe_motivo', mapped.motivo || mapped.erro || '')
+          nfeRec.set('focus_nfe_protocolo', mapped.protocolo)
+          nfeRec.set('focus_nfe_data_hora', mapped.data_hora)
+          if (artifact.getString('focus_nfe_ref')) {
+            nfeRec.set('focus_nfe_ref', artifact.getString('focus_nfe_ref'))
+          }
+          if (artifact.getString('focus_nfe_ambiente')) {
+            nfeRec.set('focus_nfe_ambiente', artifact.getString('focus_nfe_ambiente'))
+            nfeRec.set('ambiente', artifact.getString('focus_nfe_ambiente'))
+          }
+          if (mapped.protocolo) {
+            nfeRec.set('authorization_protocol', mapped.protocolo)
+            nfeRec.set('protocolo', mapped.protocolo)
+          }
+          if (mapped.motivo || mapped.erro) {
+            nfeRec.set('motivo', mapped.motivo || mapped.erro)
+            if (mapped.status === 'rejeitado' || mapped.status === 'denegado') {
+              nfeRec.set('rejection_reason', mapped.motivo || mapped.erro)
+            }
+          }
+          if (mapped.url_pdf) {
+            nfeRec.set('danfe_url', mapped.url_pdf)
+          }
+          if (mapped.status === 'autorizado') {
+            nfeRec.set('status', 'Autorizada')
+          } else if (mapped.status === 'rejeitado') {
+            nfeRec.set('status', 'Rejeitada')
+          } else if (mapped.status === 'denegado') {
+            nfeRec.set('status', 'Denegada')
+          } else if (mapped.status === 'cancelado') {
+            nfeRec.set('status', 'Cancelada')
+          } else if (mapped.status === 'processando') {
+            nfeRec.set('status', 'Processando SEFAZ')
+          }
+          $app.saveNoValidate(nfeRec)
+        }
+      } catch (errSync) {
+        $app
+          .logger()
+          .error('failed to sync status to nfe_records on consult', 'error', String(errSync))
+      }
     }
 
     function focusErrorResponse(e2, res, acao) {
@@ -1017,7 +1126,49 @@ routerAdd(
 
     var body = e.requestInfo().body || {}
     var chave = (body.chave_acesso || '').trim()
-    var artifact = findArtifactByChave(chave)
+    var nfeId = (body.nfe_id || '').trim()
+    var artifact = null
+    if (chave) {
+      artifact = findArtifactByChave(chave)
+    }
+    if (!artifact && nfeId) {
+      try {
+        var nfeRecLookup = $app.findRecordById('nfe_records', nfeId)
+        if (nfeRecLookup) {
+          chave = nfeRecLookup.getString('chave_acesso')
+          if (chave) artifact = findArtifactByChave(chave)
+        }
+      } catch (_) {}
+    }
+    if (!artifact && chave) {
+      try {
+        var nfeRecLookup3 = $app.findFirstRecordByFilter(
+          'nfe_records',
+          'chave_acesso = "' + chave + '"',
+        )
+        if (nfeRecLookup3 && nfeRecLookup3.getString('focus_nfe_ref')) {
+          var ref3 = nfeRecLookup3.getString('focus_nfe_ref')
+          var amb3 = nfeRecLookup3.getString('ambiente') || 'producao'
+          var rec3 = focusRequest(
+            amb3,
+            'GET',
+            '/v2/nfe/' + encodeURIComponent(ref3),
+            null,
+            'b64',
+            30,
+          )
+          if (rec3.statusCode === 200 && rec3.json) {
+            var m3 = mapFocusResult(rec3.json)
+            nfeRecLookup3.set('focus_nfe_status_sefaz', m3.status)
+            if (m3.protocolo) nfeRecLookup3.set('authorization_protocol', m3.protocolo)
+            if (m3.motivo) nfeRecLookup3.set('motivo', m3.motivo)
+            if (m3.status === 'autorizado') nfeRecLookup3.set('status', 'Autorizada')
+            $app.saveNoValidate(nfeRecLookup3)
+            return e.json(200, { success: true, registro: m3 })
+          }
+        }
+      } catch (_) {}
+    }
     if (!artifact) return e.json(404, { error: 'NF-e não encontrada no sistema' })
     var access = checkEmpresaAccess(e.auth, artifact.getString('empresa_id'))
     if (!access.ok) return e.json(access.code, { error: access.msg })

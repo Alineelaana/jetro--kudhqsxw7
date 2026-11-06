@@ -62,7 +62,7 @@ routerAdd(
     ).replace(/\s/g, '')
     var emitUf = (
       empresaRec.getString('state') ||
-      (empresaRec.getString('code') === 'GRAN-ROMANO' ? 'SP' : 'ES')
+      (empresaRec.getString('code') === 'GRAN-ROMANO' ? 'ES' : 'ES')
     ).toUpperCase()
     var emitLogradouro = empresaRec.getString('address') || 'RUA PRINCIPAL'
     var emitNumero = '100'
