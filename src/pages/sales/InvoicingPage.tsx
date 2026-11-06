@@ -280,7 +280,7 @@ export default function InvoicingPage() {
       return
     }
 
-    const items = inv.items || []
+    const items = (inv.items || []) as OrderItem[]
     const total = Number(inv.total_value || 0).toLocaleString('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -1103,7 +1103,7 @@ export default function InvoicingPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {(selectedInvoice.items || []).map((it, idx) => (
+                      {((selectedInvoice.items || []) as OrderItem[]).map((it, idx) => (
                         <tr key={idx} className="hover:bg-muted/20">
                           <td className="py-2 px-3 font-mono">{idx + 1}</td>
                           <td className="py-2 px-3 font-mono text-muted-foreground">
@@ -1335,7 +1335,7 @@ export default function InvoicingPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {(viewInvoice.items || []).map((it, idx) => (
+                      {((viewInvoice.items || []) as OrderItem[]).map((it, idx) => (
                         <tr key={idx}>
                           <td className="py-1.5 px-2 font-mono text-muted-foreground">
                             {it.product_code || '-'}
