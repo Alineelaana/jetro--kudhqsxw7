@@ -649,8 +649,9 @@ routerAdd(
       try {
         hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
       } catch (_) {}
-      if (amb === 'producao') return prod || hom
-      return hom || prod
+      if (amb === 'producao') return prod || ''
+      if (amb === 'homologacao') return hom || ''
+      return ''
     }
 
     function focusAuthHeader(tokenVal, mode) {
@@ -842,6 +843,17 @@ routerAdd(
 
     var probe = focusProbe(ambiente)
     if (!probe.ok) {
+      $app
+        .logger()
+        .error(
+          'focus probe failed',
+          'ambiente',
+          ambiente,
+          'statusCode',
+          probe.statusCode,
+          'body',
+          (probe.body || '').substr(0, 200),
+        )
       return e.json(502, {
         success: false,
         chave_acesso: chaveAcesso,
