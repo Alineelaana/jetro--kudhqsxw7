@@ -447,8 +447,9 @@ routerAdd(
       try {
         hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
       } catch (_) {}
-      if (ambiente === 'producao') return prod || hom
-      return hom || prod
+      if (ambiente === 'producao') return prod || ''
+      if (ambiente === 'homologacao') return hom || ''
+      return ''
     }
 
     function focusAuthHeader(token, mode) {
@@ -887,8 +888,9 @@ routerAdd(
       try {
         hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
       } catch (_) {}
-      if (ambiente === 'producao') return prod || hom
-      return hom || prod
+      if (ambiente === 'producao') return prod || ''
+      if (ambiente === 'homologacao') return hom || ''
+      return ''
     }
 
     function focusAuthHeader(token, mode) {
@@ -1261,8 +1263,9 @@ routerAdd(
       try {
         hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
       } catch (_) {}
-      if (ambiente === 'producao') return prod || hom
-      return hom || prod
+      if (ambiente === 'producao') return prod || ''
+      if (ambiente === 'homologacao') return hom || ''
+      return ''
     }
 
     function focusAuthHeader(token, mode) {
@@ -1429,8 +1432,9 @@ routerAdd(
       try {
         hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
       } catch (_) {}
-      if (ambiente === 'producao') return prod || hom
-      return hom || prod
+      if (ambiente === 'producao') return prod || ''
+      if (ambiente === 'homologacao') return hom || ''
+      return ''
     }
 
     function focusAuthHeader(token, mode) {
@@ -1692,8 +1696,9 @@ routerAdd(
       try {
         hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
       } catch (_) {}
-      if (ambiente === 'producao') return prod || hom
-      return hom || prod
+      if (ambiente === 'producao') return prod || ''
+      if (ambiente === 'homologacao') return hom || ''
+      return ''
     }
 
     function focusAuthHeader(token, mode) {
