@@ -367,7 +367,10 @@ export function exportTableToExcel<T>(
 ) {
   const visibleColumns = preferences.columnOrder
     .map((id) => columns.find((c) => c.id === id))
-    .filter((c): c is JetroColumnDef<T> => !!c && preferences.columnVisibility[c.id] !== false)
+    .filter(
+      (c): c is JetroColumnDef<T> =>
+        !!c && c.id !== 'actions' && preferences.columnVisibility[c.id] !== false,
+    )
 
   if (visibleColumns.length === 0) return
 
@@ -473,7 +476,10 @@ export function exportTableToPdf<T>(
 ) {
   const visibleColumns = preferences.columnOrder
     .map((id) => columns.find((c) => c.id === id))
-    .filter((c): c is JetroColumnDef<T> => !!c && preferences.columnVisibility[c.id] !== false)
+    .filter(
+      (c): c is JetroColumnDef<T> =>
+        !!c && c.id !== 'actions' && preferences.columnVisibility[c.id] !== false,
+    )
 
   if (visibleColumns.length === 0) return
 

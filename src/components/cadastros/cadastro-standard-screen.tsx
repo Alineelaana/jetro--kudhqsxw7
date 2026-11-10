@@ -400,6 +400,7 @@ export function CadastroStandardScreen({ config }: Props) {
                 hideable: false,
                 resizable: false,
                 draggable: false,
+                sticky: 'right',
                 defaultWidth: 180,
                 cell: ({ row: r }) => (
                   <div className="flex items-center justify-center gap-0.5">

@@ -1,6 +1,59 @@
 import type { ScreenDocEntry } from './types'
 
 export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
+  '/admin/cadastros/empresas': {
+    route: '/admin/cadastros/empresas',
+    title: 'Cadastro de Empresas',
+    moduleGroup: 'Organização',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-10',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar as empresas (pessoas jurídicas emissoras) do grupo, mantendo razão social, nome fantasia, CNPJ, tipo de unidade (Matriz/Filial) e situação, servindo de base para o isolamento multiempresa do ERP.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem via JetroTable com código, nome (com razão social como subtítulo), CNPJ, unidade (badge Matriz/Filial com indicação da matriz vinculada), data de cadastro, situação e responsável.\n- Coluna "Ações" fixa à direita (sticky), sempre visível mesmo com rolagem horizontal da tabela; é excluída automaticamente das exportações (Excel/PDF).\n- Ações por linha: Visualizar, Editar, Duplicar, Ativar/Inativar e Excluir. "Editar" abre o CadastroFormDialog em modo edição com todos os campos preenchidos (incluindo CNPJ com busca automática, unidade e situação), salvando pelo mesmo fluxo do "Novo Cadastro"; a lista reflete o valor novo sem recarregar a página (reload + realtime).\n- Busca por código, nome, CNPJ ou razão social e filtro de status (Todos/Ativo/Inativo).\n- Botão "Baixar Modelo Excel", "Importar Excel" (com prévia e validação) e "Exportar".\n- Botão "Novo Cadastro" abre o mesmo formulário em modo criação.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- CNPJ validado com dígitos verificadores; o formulário oferece busca automática de dados públicos pelo CNPJ.\n- O responsável pelo registro é gravado automaticamente no primeiro cadastro (responsible_user).\n- Filiais podem estar vinculadas a uma empresa matriz (matriz_id).\n- Isolamento multiempresa: empresas é coleção de contexto organizacional e respeita o vínculo do usuário autenticado.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário acessa Cadastros > Empresas no menu lateral.\n2. Para editar, clica no ícone de lápis (Editar) na linha desejada; o cadastro abre em dialog já preenchido.\n3. Altera os dados e clica em Salvar; o registro é atualizado via updateCadastroFormData e a listagem é recarregada (inclusive via realtime).\n4. Para criar, clica em "Novo Cadastro"; para carga em lote, usa "Baixar Modelo Excel" + "Importar Excel".',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleção PocketBase: `empresas` (via `listCadastros`/`createCadastroFormData`/`updateCadastroFormData` em `src/services/cadastros.ts`).',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Serviço de busca de dados por CNPJ (`src/services/cnpj-service.ts`).\n- Motor único de importação Excel (`src/services/excel-import-service.ts`).\n- Realtime PocketBase (`useRealtime`) para atualização da listagem.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: 'Acesso conforme perfil de Cadastros/Configurações (`canViewConfiguracoes(role)`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `CadastroStandardScreen`, `CadastroFormDialog`, `ExcelImportDialog`, `JetroTable`.\n- Configuração: `cadastros-config.ts` (key `empresas`, coleção `empresas`).',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Falhas de listagem exibem lista vazia; falhas de gravação exibem toast de erro sem fechar o formulário.\n- Importação reporta erros linha a linha na prévia (CNPJ inválido, duplicidade).',
+    },
+  },
+
   '/admin/cadastros/filiais': {
     route: '/admin/cadastros/filiais',
     title: 'Cadastro de Filiais',

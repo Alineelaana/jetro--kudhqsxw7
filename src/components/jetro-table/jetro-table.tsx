@@ -368,6 +368,30 @@ export function JetroTable<T extends object = Record<string, any>>({
                   const isResizable = col.resizable !== false
                   const isSortable = col.sortable !== false
                   const width = preferences.columnWidths[col.id] || col.defaultWidth
+                  const isSticky = col.sticky === 'right' || col.sticky === 'left'
+                  // Deslocamento sticky: soma das larguras das colunas fixas anteriores
+                  // (todas à esquerda da atual, na ordem visível)
+                  let stickyOffset = 0
+                  if (isSticky) {
+                    for (const c of visibleColumns) {
+                      if (col.sticky === 'left' && c.id === col.id) break
+                      if (c.sticky === (col.sticky as 'left' | 'right')) {
+                        stickyOffset += c.defaultWidth || 0
+                      }
+                    }
+                    if (col.sticky === 'right') {
+                      // Para sticky right o deslocamento é calculado a partir do fim
+                      stickyOffset = 0
+                    }
+                  }
+                  const stickyStyle = isSticky
+                    ? {
+                        position: 'sticky' as const,
+                        ...(col.sticky === 'right' ? { right: 0 } : { left: `${stickyOffset}px` }),
+                        zIndex: 1,
+                        backgroundColor: 'var(--brand-primary, #063D30)',
+                      }
+                    : undefined
 
                   return (
                     <th
@@ -378,7 +402,14 @@ export function JetroTable<T extends object = Record<string, any>>({
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, col.id)}
                       onDragEnd={handleDragEnd}
-                      style={width ? { width: `${width}px`, minWidth: `${width}px` } : undefined}
+                      style={
+                        width || stickyStyle
+                          ? {
+                              ...(width ? { width: `${width}px`, minWidth: `${width}px` } : {}),
+                              ...stickyStyle,
+                            }
+                          : undefined
+                      }
                       className={`relative px-3 py-3 font-bold text-xs uppercase tracking-wider transition-colors ${
                         col.align === 'center'
                           ? 'text-center'
@@ -522,13 +553,21 @@ export function JetroTable<T extends object = Record<string, any>>({
                               : String(value)
 
                         const width = preferences.columnWidths[col.id] || col.defaultWidth
+                        const isStickyCell = col.sticky === 'right' || col.sticky === 'left'
+                        const stickyCellStyle = isStickyCell
+                          ? {
+                              ...(width ? { width: `${width}px`, minWidth: `${width}px` } : {}),
+                              position: 'sticky' as const,
+                              ...(col.sticky === 'right' ? { right: 0 } : { left: 0 }),
+                              zIndex: 1,
+                              backgroundColor: 'var(--brand-primary-soft, rgba(6,61,48,0.04))',
+                            }
+                          : undefined
 
                         return (
                           <td
                             key={col.id}
-                            style={
-                              width ? { width: `${width}px`, minWidth: `${width}px` } : undefined
-                            }
+                            style={stickyCellStyle}
                             className={`px-3 py-2.5 text-xs text-foreground align-middle ${
                               col.align === 'center'
                                 ? 'text-center'

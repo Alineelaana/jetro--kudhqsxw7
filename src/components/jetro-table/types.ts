@@ -55,6 +55,8 @@ export interface JetroColumnDef<T = any> {
   draggable?: boolean
   /** Alinhamento do texto */
   align?: 'left' | 'center' | 'right'
+  /** Fixa a coluna horizontalmente na rolagem (sticky). Ações costumam usar 'right'. */
+  sticky?: 'left' | 'right'
   /** Classe CSS extra para o cabeçalho */
   headerClassName?: string
   /** Classe CSS extra para a célula */
