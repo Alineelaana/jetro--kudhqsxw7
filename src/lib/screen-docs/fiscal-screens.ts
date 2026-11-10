@@ -77,7 +77,7 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal/documentos',
     title: 'Documentos Fiscais',
     moduleGroup: 'Fiscal',
-    docVersion: '2.2.2',
+    docVersion: '2.2.3',
     lastUpdated: '2026-11-10',
     author: 'Engenharia de Software Huram',
     objective: {
@@ -93,7 +93,7 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Notas faturadas pelo fluxo de vendas entram com status "Gerada (Pronta para Transmissão)" e chave de acesso vinculada.\n- A ação "Transmitir" na grade envia o XML assinado ao Focus NFe usando a configuração fiscal da empresa (ambiente de homologação ou produção, série configurada, emitente cadastrado).\n- Se a SEFAZ autorizar a nota, o status muda imediatamente para "Autorizada" e o protocolo de autorização é gravado no registro da NF-e (`nfe_records`) e no artefato fiscal (`fiscal_document_artifacts`).\n- Se a SEFAZ rejeitar a nota (ex: divergência cadastral ou de tributação), o código de status e o motivo exato retornado pela SEFAZ são exibidos na tela para fácil correção pelo operador.\n- Emissões para a Gran Romano utilizam o código da UF do Espírito Santo (32) e série 2 de produção no Focus NFe.',
+        '- Notas faturadas pelo fluxo de vendas entram com status "Gerada (Pronta para Transmissão)" e chave de acesso vinculada.\n- A ação "Transmitir" na grade envia o XML assinado ao Focus NFe usando a configuração fiscal da empresa (ambiente de homologação ou produção, série configurada, emitente cadastrado).\n- Se a SEFAZ autorizar a nota, o status muda imediatamente para "Autorizada" e o protocolo de autorização é gravado no registro da NF-e (`nfe_records`) e no artefato fiscal (`fiscal_document_artifacts`).\n- Se a SEFAZ rejeitar a nota (ex: divergência cadastral ou de tributação), o código de status e o motivo exato retornado pela SEFAZ são exibidos na tela para fácil correção pelo operador.\n- Emissões para a Gran Romano utilizam o CNPJ oficial 33.516.806/0001-96 (sem pontuação no XML/chave), código da UF do Espírito Santo (32) e série 2 de produção no Focus NFe.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
