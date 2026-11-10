@@ -190,23 +190,55 @@ export default function InvoicingPage() {
   const handleConfirmInvoice = async () => {
     if (!selectedOrder) return
     setInvoicingLoading(true)
+    const num = selectedOrder.order_number || '—'
     try {
-      const empId = selectedOrder.empresa_id || selectedOrder.company || 'default'
-      const result = await invoiceSalesOrder(selectedOrder, empId, undefined, userName)
+      const empId =
+        selectedOrder.empresa_id ||
+        (selectedOrder as unknown as Record<string, unknown>).company_id ||
+        selectedOrder.company ||
+        ''
+      const result = await invoiceSalesOrder(
+        selectedOrder,
+        empId ? String(empId) : undefined,
+        undefined,
+        userName,
+      )
       if (!result.success) {
         throw new Error(result.error || 'Erro ao faturar pedido')
       }
       toast.success(
-        `Nota ${result.numero_nota || ''} gerada com sucesso! Pedido #${selectedOrder.order_number} faturado.`,
+        `Nota ${result.numero_nota || ''} gerada com sucesso! Pedido #${num} faturado.`,
+        { duration: 6000 },
       )
       setInvoiceDialogOpen(false)
       setSelectedOrderId(null)
       await loadData()
       // Troca para a aba de notas para o usuário ver a nota gerada
       setActiveTab('notas')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Falha ao faturar pedido:', err)
-      toast.error(`Falha ao faturar: ${err.message || 'Erro desconhecido'}`)
+      const errObj = err as {
+        response?: Record<string, unknown>
+        data?: Record<string, unknown>
+        message?: string
+      }
+      const rawData =
+        (errObj?.response?.data as Record<string, unknown> | undefined) ||
+        (errObj?.response as Record<string, unknown> | undefined) ||
+        (errObj?.data as Record<string, unknown> | undefined)
+
+      const serverError =
+        (typeof rawData?.error === 'string' && rawData.error) ||
+        (typeof rawData?.message === 'string' && rawData.message) ||
+        (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+        (typeof errObj?.message === 'string' &&
+          errObj.message !== 'Something went wrong.' &&
+          errObj.message) ||
+        ''
+
+      toast.error(`Falha ao faturar: ${serverError || 'Erro inesperado no servidor'}`, {
+        duration: 8000,
+      })
     } finally {
       setInvoicingLoading(false)
     }

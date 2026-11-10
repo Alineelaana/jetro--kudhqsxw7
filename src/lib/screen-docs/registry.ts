@@ -98,7 +98,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/faturamento',
     title: 'Central de Faturamento',
     moduleGroup: 'Comercial',
-    docVersion: '1.2.0',
+    docVersion: '1.2.1',
     lastUpdated: '2026-11-10',
     author: 'Engenharia de Software HURAM',
     objective: {
@@ -109,7 +109,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     features: {
       title: 'Funcionalidades',
       content:
-        '- Fila de Pedidos Liberados: Tabela dedicada exibindo exclusivamente os pedidos prontos para faturamento (`faturamento_status = "pendente_faturamento"` e `is_invoiced != true`).\n- Painel Detalhe do Pedido Selecionado: Inspeção imediata dos itens, valores unitários, CFOPs associados, cliente e impostos previstos.\n- Ação "Faturar Pedido": Disparo seguro da operação `invoiceSalesOrder` no serviço `sales-invoicing-flow`, consultando a configuração da empresa ativa em `fiscal_focus_nfe_config` para aplicar a série (ex: série 2 para Gran Romano) e o ambiente correto (produção/homologação), gerando o XML oficial e registrando em `nfe_records` com sincronização automática do retorno Focus NFe (status SEFAZ, protocolo, motivo e DANFE).\n- Faturamento em Lote: Capacidade de faturar múltiplos pedidos selecionados sequencialmente.\n- Histórico de Notas Emitidas: Tabela com número da NF-e, série, chave de acesso, status da transmissão (homologação/produção/autorizada/rejeitada), valor total e pedido referenciado.\n- Ações sobre a Nota: Visualização completa do espelho da NF-e e botão de Impressão / Download de DANFE em PDF integrado ao Focus NFe e ao backend HURAM.',
+        '- Fila de Pedidos Liberados: Tabela dedicada exibindo exclusivamente os pedidos prontos para faturamento (`faturamento_status = "pendente_faturamento"` e `is_invoiced != true`).\n- Painel Detalhe do Pedido Selecionado: Inspeção imediata dos itens, valores unitários, CFOPs associados, cliente e impostos previstos.\n- Ação "Faturar Pedido": Disparo seguro da operação `invoiceSalesOrder` no serviço `sales-invoicing-flow`, consultando a configuração da empresa ativa em `fiscal_focus_nfe_config` para aplicar a série (ex: série 2 para Gran Romano) e o ambiente correto (produção/homologação), gerando o XML oficial e registrando em `nfe_records` com sincronização automática do retorno Focus NFe (status SEFAZ, protocolo, motivo e DANFE).\n- Resolução Resiliente de Empresa Emissora: O faturamento resolve e valida a empresa emissora tanto por ID quanto por campos equivalentes (`empresa_id`, `company_id` e `company`), garantindo compatibilidade entre pedidos gerados pelo novo wizard e o motor fiscal `/backend/v1/huram/fiscal/nfe-generate`.\n- Tratamento Transparente de Erros Fiscais: Em caso de falha de validação ou recusa na geração fiscal, a Central de Faturamento extrai e exibe o motivo real retornado pelo servidor em vez de mensagens genéricas ("Something went wrong").\n- Faturamento em Lote: Capacidade de faturar múltiplos pedidos selecionados sequencialmente.\n- Histórico de Notas Emitidas: Tabela com número da NF-e, série, chave de acesso, status da transmissão (homologação/produção/autorizada/rejeitada), valor total e pedido referenciado.\n- Ações sobre a Nota: Visualização completa do espelho da NF-e e botão de Impressão / Download de DANFE em PDF integrado ao Focus NFe e ao backend HURAM.',
     },
     businessRules: {
       title: 'Regras de Negócio',
@@ -144,7 +144,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Validação de inconsistências cadastrais ou tributárias antes da emissão.\n- Notificação de toast em caso de indisponibilidade de comunicação com o provedor Focus NFe.',
+        '- Extração e apresentação direta do erro específico retornado pelo servidor fiscal (`genResp.error` ou corpo da resposta HTTP) no toast da interface, sem máscaras genéricas.\n- Validação de inconsistências cadastrais ou tributárias antes da emissão.\n- Notificação de toast em caso de indisponibilidade de comunicação com o provedor Focus NFe.',
     },
   },
 

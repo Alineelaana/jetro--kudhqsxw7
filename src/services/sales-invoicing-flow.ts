@@ -515,18 +515,50 @@ export async function invoiceSalesOrder(
       return { success: false, error: 'Pedido sem itens para faturamento.' }
     }
 
-    const emp = empresaId || order.empresa_id || order.company
+    // Resolução resiliente da empresa emissora (empresaId, empresa_id ou company)
+    let emp = (empresaId ||
+      order.empresa_id ||
+      (order as unknown as Record<string, unknown>).company_id ||
+      order.company ||
+      '') as string
     if (!emp) {
       return { success: false, error: 'Empresa emissora é obrigatória para faturar.' }
+    }
+
+    // Se emp não tem formato de ID PocketBase (15 chars alphanum) ou não existe como ID, tenta resolver pelo nome na coleção empresas
+    if (emp && emp.length !== 15) {
+      try {
+        const found = await pb
+          .collection('empresas')
+          .getFirstListItem(
+            `name = "${emp}" || razao_social = "${emp}" || nome_fantasia = "${emp}"`,
+          )
+        if (found?.id) {
+          emp = found.id
+        }
+      } catch {
+        // Prossegue com valor original caso a busca falhe
+      }
     }
 
     // Buscar configuração Focus NFe da empresa para usar ambiente e série reais
     let serieEfetiva = '1'
     let ambienteEfetivo = ambiente || 'homologacao'
     try {
-      const focusCfg = await pb
+      let focusCfg = await pb
         .collection('fiscal_focus_nfe_config')
         .getFirstListItem(`empresa_id = "${emp}"`)
+        .catch(() => null)
+
+      // Fallback: se não encontrou por ID, tenta por emitente_ref ou padrão geral
+      if (!focusCfg) {
+        try {
+          focusCfg = await pb.collection('fiscal_focus_nfe_config').getFirstListItem('')
+        } catch {
+          focusCfg = null
+        }
+      }
+
       if (focusCfg) {
         if (focusCfg.serie) {
           serieEfetiva = String(focusCfg.serie).trim() || '1'
@@ -557,21 +589,55 @@ export async function invoiceSalesOrder(
       destinatario: {
         nome: order.client_name || 'CLIENTE PADRAO',
         cnpj: (order.customer_cnpj || '00000000000191').replace(/\D/g, ''),
-        cidade: order.customer_city || 'SAO PAULO',
-        uf: 'SP',
+        cidade: order.customer_city || 'SERRA',
+        uf: 'ES',
       },
       itens: fiscalItens,
     }
 
-    const genResp = await pb.send<{
+    let genResp: {
       success: boolean
       chave_acesso?: string
       numero_nota?: string
       error?: string
-    }>('/backend/v1/huram/fiscal/nfe-generate', {
-      method: 'POST',
-      body: genBody,
-    })
+    } | null = null
+
+    try {
+      genResp = await pb.send<{
+        success: boolean
+        chave_acesso?: string
+        numero_nota?: string
+        error?: string
+      }>('/backend/v1/huram/fiscal/nfe-generate', {
+        method: 'POST',
+        body: genBody,
+      })
+    } catch (sendErr: unknown) {
+      const errObj = sendErr as {
+        response?: Record<string, unknown>
+        data?: Record<string, unknown>
+        message?: string
+        status?: number
+      }
+      const rawData =
+        (errObj?.response?.data as Record<string, unknown> | undefined) ||
+        (errObj?.response as Record<string, unknown> | undefined) ||
+        (errObj?.data as Record<string, unknown> | undefined)
+
+      const serverError =
+        (typeof rawData?.error === 'string' && rawData.error) ||
+        (typeof rawData?.message === 'string' && rawData.message) ||
+        (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+        (typeof errObj?.message === 'string' &&
+          errObj.message !== 'Something went wrong.' &&
+          errObj.message) ||
+        ''
+
+      return {
+        success: false,
+        error: serverError || `Erro no servidor fiscal (código ${errObj?.status || 500})`,
+      }
+    }
 
     if (!genResp || !genResp.success || !genResp.chave_acesso) {
       return {
@@ -601,8 +667,27 @@ export async function invoiceSalesOrder(
       if (transResp?.status) {
         statusSefaz = transResp.status
       }
-    } catch (transErr) {
-      console.warn('Aviso: transmissão imediata retornou pendência ou erro:', transErr)
+    } catch (transErr: unknown) {
+      const errObj = transErr as {
+        response?: Record<string, unknown>
+        data?: Record<string, unknown>
+        message?: string
+      }
+      const rawData =
+        (errObj?.response?.data as Record<string, unknown> | undefined) ||
+        (errObj?.response as Record<string, unknown> | undefined) ||
+        (errObj?.data as Record<string, unknown> | undefined)
+
+      const serverMsg =
+        (typeof rawData?.error === 'string' && rawData.error) ||
+        (typeof rawData?.message === 'string' && rawData.message) ||
+        (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+        (typeof errObj?.message === 'string' &&
+          errObj.message !== 'Something went wrong.' &&
+          errObj.message) ||
+        ''
+
+      console.warn('Aviso: transmissão imediata retornou pendência ou erro:', serverMsg || transErr)
     }
 
     let nfeRecId = ''
@@ -672,7 +757,26 @@ export async function invoiceSalesOrder(
       status: statusSefaz,
     }
   } catch (err: unknown) {
-    const msg = (err as { message?: string })?.message || 'Falha no faturamento do pedido.'
+    const errObj = err as {
+      response?: Record<string, unknown>
+      data?: Record<string, unknown>
+      message?: string
+    }
+    const rawData =
+      (errObj?.response?.data as Record<string, unknown> | undefined) ||
+      (errObj?.response as Record<string, unknown> | undefined) ||
+      (errObj?.data as Record<string, unknown> | undefined)
+
+    const serverError =
+      (typeof rawData?.error === 'string' && rawData.error) ||
+      (typeof rawData?.message === 'string' && rawData.message) ||
+      (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+      (typeof errObj?.message === 'string' &&
+        errObj.message !== 'Something went wrong.' &&
+        errObj.message) ||
+      ''
+
+    const msg = serverError || 'Falha no faturamento do pedido.'
     return { success: false, error: msg }
   }
 }

@@ -725,6 +725,7 @@ export function SalesOrderWizardDialog({
       // 3. CRIAÇÃO DO PEDIDO DE VENDA
       const newOrderPayload = {
         order_number: nextNumber,
+        empresa_id: selectedCompanyId,
         company_id: selectedCompanyId,
         company: companyName,
         branch: 'Matriz',

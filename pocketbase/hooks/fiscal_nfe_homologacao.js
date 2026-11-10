@@ -27,6 +27,31 @@ routerAdd(
       return e.json(400, { error: 'A NF-e deve possuir pelo menos um item' })
     }
 
+    // Buscar empresa emissora (por ID ou por Nome/Razão Social caso venha texto)
+    var empresaRec = null
+    try {
+      empresaRec = $app.findRecordById('empresas', empresaId)
+    } catch (_) {
+      try {
+        var safeEmpName = empresaId.replace(/"/g, '\\"')
+        empresaRec = $app.findFirstRecordByFilter(
+          'empresas',
+          'name = "' +
+            safeEmpName +
+            '" || razao_social = "' +
+            safeEmpName +
+            '" || nome_fantasia = "' +
+            safeEmpName +
+            '"',
+        )
+      } catch (_) {}
+    }
+
+    if (!empresaRec) {
+      return e.json(404, { error: 'Empresa emissora não encontrada (' + empresaId + ')' })
+    }
+    empresaId = empresaRec.id
+
     // Multitenancy guard
     if (userRole !== 'SUP') {
       var userEmpresa = authRecord ? authRecord.getString('empresa_id') : ''
@@ -38,14 +63,6 @@ routerAdd(
       if (!hasAccess && userEmpresa) {
         return e.json(403, { error: 'Acesso negado: emissao restrita a sua empresa autorizada' })
       }
-    }
-
-    // Buscar empresa emissora
-    var empresaRec = null
-    try {
-      empresaRec = $app.findRecordById('empresas', empresaId)
-    } catch (_) {
-      return e.json(404, { error: 'Empresa emissora nao encontrada' })
     }
 
     var emitCnpj = (empresaRec.getString('cnpj') || '').replace(/\D/g, '')
