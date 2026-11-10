@@ -41,13 +41,13 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/pedidos',
     title: 'Pedido de Venda',
     moduleGroup: 'Comercial',
-    docVersion: '2.0.0',
-    lastUpdated: '2026-11-05',
+    docVersion: '2.1.0',
+    lastUpdated: '2026-11-10',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Controlar o ciclo de vida completo dos pedidos de venda do ERP HURAM em arquitetura Master-Detalhe com esteira operacional oficial: rascunho → confirmação (provisão financeira e reserva de estoque) → separação → liberação de faturamento → faturamento definitivo ou cancelamento/estorno.',
+        'Controlar o ciclo de vida completo dos pedidos de venda do ERP HURAM em arquitetura Master-Detalhe com esteira operacional oficial: rascunho → confirmação (provisão financeira e reserva de estoque) → separação → liberação de faturamento → faturamento definitivo ou cancelamento/estorno. Suporta pedidos sequenciais completos (ex: PV-000004 e PV-000005) com espelhamento íntegro de cliente, itens, estoque reservado e provisão de títulos a receber.',
     },
     features: {
       title: 'Funcionalidades',
@@ -98,13 +98,13 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/faturamento',
     title: 'Central de Faturamento',
     moduleGroup: 'Comercial',
-    docVersion: '1.1.0',
-    lastUpdated: '2026-11-06',
+    docVersion: '1.2.0',
+    lastUpdated: '2026-11-10',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Centralizar a fila de pedidos de venda liberados para faturamento, permitindo a geração oficial de notas fiscais eletrônicas (NF-e modelo 55) com resolução automática de série e ambiente da empresa emissora via Focus NFe, baixa definitiva de estoque, conversão de provisões financeiras em títulos reais a receber e emissão/download do DANFE via Focus NFe.',
+        'Centralizar a fila de pedidos de venda liberados para faturamento, permitindo a geração oficial de notas fiscais eletrônicas (NF-e modelo 55) com resolução automática de série e ambiente da empresa emissora via Focus NFe, numeração sequencial alinhada (Série 2 iniciando em número 2 para produção Gran Romano), baixa definitiva de estoque, conversão de provisões financeiras em títulos reais a receber e emissão/download do DANFE via Focus NFe.',
     },
     features: {
       title: 'Funcionalidades',

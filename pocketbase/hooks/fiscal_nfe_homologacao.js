@@ -75,9 +75,100 @@ routerAdd(
     var cUf = emitUf === 'SP' ? '35' : emitUf === 'ES' ? '32' : '32'
     var cMunFG = emitUf === 'SP' ? '3550308' : '3205002'
 
-    // Gerar número sequencial se não informado
+    // Buscar configuração Focus NFe da empresa para resolver série/ambiente
+    var focusCfg = null
+    try {
+      focusCfg = $app.findFirstRecordByFilter(
+        'fiscal_focus_nfe_config',
+        'empresa_id = "' + empresaId + '"',
+      )
+      if (focusCfg) {
+        if (!body.serie && focusCfg.getString('serie')) {
+          serie = focusCfg.getString('serie')
+        }
+        if (!body.ambiente && focusCfg.getString('ambiente')) {
+          ambiente = focusCfg.getString('ambiente')
+        }
+      }
+    } catch (_) {}
+
+    // Resolver número sequencial da NF se não informado:
+    // 1) Se ambiente for producao e serie for 2, consultar Focus NFe (GET /v2/nfes?limit=1)
+    // 2) Se focusCfg.proximo_numero_nfe existir e > 0, usar e incrementar
+    // 3) Fallback seguro
     if (!numeroNota) {
-      numeroNota = String(Math.floor(1000 + Math.random() * 9000))
+      var derivedFromFocus = 0
+      if (ambiente === 'producao' && String(serie) === '2') {
+        try {
+          var tokenProd = $os.getenv('FOCUS_NFE_TOKEN') || ''
+          if (tokenProd) {
+            var b64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+            var strToEnc = tokenProd.indexOf(':') !== -1 ? tokenProd : tokenProd + ':'
+            var b64out = ''
+            for (var bi = 0; bi < strToEnc.length; bi += 3) {
+              var bb1 = strToEnc.charCodeAt(bi) & 0xff
+              var bb2 = bi + 1 < strToEnc.length ? strToEnc.charCodeAt(bi + 1) & 0xff : NaN
+              var bb3 = bi + 2 < strToEnc.length ? strToEnc.charCodeAt(bi + 2) & 0xff : NaN
+              var be1 = bb1 >> 2
+              var be2 = ((bb1 & 3) << 4) | (isNaN(bb2) ? 0 : bb2 >> 4)
+              var be3 = isNaN(bb2) ? 61 : ((bb2 & 15) << 2) | (isNaN(bb3) ? 0 : bb3 >> 6)
+              var be4 = isNaN(bb3) ? 61 : bb3 & 63
+              b64out +=
+                b64chars.charAt(be1) +
+                b64chars.charAt(be2) +
+                b64chars.charAt(be3) +
+                b64chars.charAt(be4)
+            }
+            var focusListResp = $http.send({
+              url: 'https://api.focusnfe.com.br/v2/nfes?limit=5',
+              method: 'GET',
+              headers: {
+                Authorization: 'Basic ' + b64out,
+                Accept: 'application/json',
+              },
+              timeout: 15,
+            })
+            if (focusListResp.statusCode === 200 && focusListResp.json) {
+              var nfesList = Array.isArray(focusListResp.json) ? focusListResp.json : []
+              var maxSerie2Num = 0
+              for (var ni = 0; ni < nfesList.length; ni++) {
+                var itemNfe = nfesList[ni]
+                var itemSerie = String(itemNfe.serie || itemNfe.series || '')
+                var itemNum = parseInt(itemNfe.numero || itemNfe.number || 0, 10)
+                if (itemSerie === '2' && itemNum > maxSerie2Num) {
+                  maxSerie2Num = itemNum
+                }
+              }
+              if (maxSerie2Num > 0) {
+                derivedFromFocus = maxSerie2Num + 1
+              }
+            }
+          }
+        } catch (focusErr) {
+          $app
+            .logger()
+            .warn('focus nfe listing next_number lookup notice', 'error', String(focusErr))
+        }
+      }
+
+      if (derivedFromFocus > 0) {
+        numeroNota = String(derivedFromFocus)
+      } else if (focusCfg && focusCfg.getInt('proximo_numero_nfe') > 0) {
+        numeroNota = String(focusCfg.getInt('proximo_numero_nfe'))
+      } else {
+        numeroNota = String(Math.floor(1000 + Math.random() * 9000))
+      }
+
+      // Atualizar proximo_numero_nfe na configuração para a próxima emissão
+      if (focusCfg) {
+        try {
+          var currentNumInt = parseInt(numeroNota, 10)
+          if (!isNaN(currentNumInt)) {
+            focusCfg.set('proximo_numero_nfe', currentNumInt + 1)
+            $app.saveNoValidate(focusCfg)
+          }
+        } catch (_) {}
+      }
     }
 
     // Data de emissão (formato AAAA-MM-DDTHH:MM:SS-03:00)
@@ -96,22 +187,6 @@ routerAdd(
     var destMun = destinatario.cidade || emitMun
     var destIe = destinatario.ie || 'ISENTO'
     var destIndIe = destinatario.ind_ie || (destIe === 'ISENTO' ? '9' : '1') // 1=Contribuinte, 2=Isento, 9=Nao Contribuinte
-
-    // Buscar configuração Focus NFe da empresa para resolver série/ambiente
-    try {
-      var focusCfg = $app.findFirstRecordByFilter(
-        'fiscal_focus_nfe_config',
-        'empresa_id = "' + empresaId + '"',
-      )
-      if (focusCfg) {
-        if (!body.serie && focusCfg.getString('serie')) {
-          serie = focusCfg.getString('serie')
-        }
-        if (!body.ambiente && focusCfg.getString('ambiente')) {
-          ambiente = focusCfg.getString('ambiente')
-        }
-      }
-    } catch (_) {}
 
     // Montar chave de acesso preliminar de 43 dígitos para calcular dígito verificador (DV)
     // Layout Chave: cUF(2) + AAMM(4) + CNPJ(14) + mod(2, "55") + serie(3) + nNF(9) + tpEmis(1, "1") + cNF(8)
