@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import pb from '@/lib/pocketbase/client'
 import { useAuth } from '@/hooks/use-auth'
+import { useBrand } from '@/hooks/use-brand'
 import {
   Dialog,
   DialogContent,
@@ -67,6 +68,7 @@ export function SalesOrderWizardDialog({
   onSuccess,
 }: SalesOrderWizardDialogProps) {
   const { user } = useAuth()
+  const { brand, empresaAtivaId, empresasDoUsuario } = useBrand()
   const userName = user?.name || user?.login || 'Operador Vendas'
 
   // Etapa atual: 1 = Cabeçalho, 2 = Produtos, 3 = Conferência
@@ -125,6 +127,13 @@ export function SalesOrderWizardDialog({
       setHeaderDraftSaved(false)
       setItems([])
       setProductSearch('')
+      setSelectedCompanyId('')
+      setSelectedClientId('')
+      setSelectedSalespersonId('')
+      setSelectedPriceTableId('')
+      setPaymentMethod('')
+      setPaymentCondition('')
+      setObservations('')
       return
     }
 
@@ -220,20 +229,48 @@ export function SalesOrderWizardDialog({
           cnpj: (e.cnpj as string) || '',
           uf: (e.uf as string) || 'ES',
         }))
-        setCompanies(empList)
-        if (empList.length > 0 && !selectedCompanyId) {
-          setSelectedCompanyId(empList[0].id)
-        }
+
+        // Respeita empresas vinculadas ao acesso do usuário se houver restrição
+        const permittedEmpresaIds = new Set(empresasDoUsuario.map((e) => e.id))
+        const filteredEmpList =
+          empresasDoUsuario.length > 0
+            ? empList.filter((e) => permittedEmpresaIds.has(e.id))
+            : empList
+        const finalCompanies = filteredEmpList.length > 0 ? filteredEmpList : empList
+        setCompanies(finalCompanies)
+
+        // Pré-preenchimento padrão com a empresa ativa no contexto do sistema
+        const activeContextCompanyId =
+          empresaAtivaId || brand?.empresaId || (user as { empresa_id?: string })?.empresa_id || ''
+        const isPermittedAndActive =
+          Boolean(activeContextCompanyId) &&
+          finalCompanies.some((c) => c.id === activeContextCompanyId)
+
+        const initialCompanyId = isPermittedAndActive ? activeContextCompanyId : ''
+        setSelectedCompanyId(initialCompanyId)
 
         setClients(cls as Array<Record<string, unknown>>)
         setSalespeople(sps)
-        if (sps.length > 0 && !selectedSalespersonId) {
-          setSelectedSalespersonId(sps[0].id)
+        if (sps.length > 0) {
+          const matchingSp =
+            (initialCompanyId && sps.find((s) => s.company_id === initialCompanyId)) || sps[0]
+          setSelectedSalespersonId(matchingSp ? matchingSp.id : sps[0].id)
         }
 
-        setPriceTables(pts as Array<Record<string, unknown>>)
-        if (pts.length > 0 && !selectedPriceTableId) {
-          setSelectedPriceTableId((pts[0] as Record<string, unknown>).id as string)
+        const priceTableList = pts as Array<Record<string, unknown>>
+        setPriceTables(priceTableList)
+        if (priceTableList.length > 0) {
+          const matchingTable =
+            (initialCompanyId &&
+              priceTableList.find(
+                (pt) =>
+                  pt.empresa_id === initialCompanyId ||
+                  pt.empresa === initialCompanyId ||
+                  (initialCompanyId &&
+                    pt.empresa === finalCompanies.find((c) => c.id === initialCompanyId)?.name),
+              )) ||
+            priceTableList[0]
+          setSelectedPriceTableId((matchingTable as Record<string, unknown>).id as string)
         }
 
         const opList = (fops as Array<Record<string, unknown>>).map((op) => ({
@@ -252,7 +289,7 @@ export function SalesOrderWizardDialog({
         )
       })
       .finally(() => setLoadingData(false))
-  }, [open])
+  }, [open, empresaAtivaId, brand?.empresaId, empresasDoUsuario, user])
 
   // Cliente selecionado
   const currentClient = useMemo(() => {
@@ -829,7 +866,26 @@ export function SalesOrderWizardDialog({
                       </Label>
                       <select
                         value={selectedCompanyId}
-                        onChange={(e) => setSelectedCompanyId(e.target.value)}
+                        onChange={(e) => {
+                          const newCompId = e.target.value
+                          setSelectedCompanyId(newCompId)
+                          if (newCompId) {
+                            const matchingSp = salespeople.find((s) => s.company_id === newCompId)
+                            if (matchingSp) {
+                              setSelectedSalespersonId(matchingSp.id)
+                            }
+                            const compName = companies.find((c) => c.id === newCompId)?.name
+                            const matchingPt = priceTables.find(
+                              (pt) =>
+                                pt.empresa_id === newCompId ||
+                                pt.empresa === newCompId ||
+                                (compName && pt.empresa === compName),
+                            )
+                            if (matchingPt) {
+                              setSelectedPriceTableId(matchingPt.id as string)
+                            }
+                          }
+                        }}
                         className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:ring-1 focus:ring-[#005B2E]"
                       >
                         <option value="">Selecione a empresa...</option>
