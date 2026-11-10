@@ -104,11 +104,26 @@ export function FocusNfePanel({ chaveAcesso, empresaId }: Props) {
       if (res?.error) setErro(res.error)
       return res
     } catch (err: unknown) {
-      const detail =
-        (err as { response?: { message?: string; error?: string } })?.response?.message ||
-        (err as { message?: string })?.message ||
-        'Falha na comunicação com o servidor fiscal.'
-      setErro(detail)
+      const errObj = err as {
+        response?: Record<string, unknown>
+        data?: Record<string, unknown>
+        message?: string
+      }
+      const rawData =
+        (errObj?.response?.data as Record<string, unknown> | undefined) ||
+        (errObj?.response as Record<string, unknown> | undefined) ||
+        (errObj?.data as Record<string, unknown> | undefined)
+
+      const serverError =
+        (typeof rawData?.error === 'string' && rawData.error) ||
+        (typeof rawData?.message === 'string' && rawData.message) ||
+        (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+        (typeof errObj?.message === 'string' &&
+          errObj.message !== 'Something went wrong.' &&
+          errObj.message) ||
+        ''
+
+      setErro(serverError || 'Falha na comunicação com o servidor fiscal.')
       return null
     } finally {
       setLoading(false)

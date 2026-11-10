@@ -775,6 +775,15 @@ routerAdd(
       })
     }
     if (!probe.ok) {
+      var probeSnippet = (probe.body || '').substr(0, 200)
+      console.error(
+        '[Focus NFe Probe Failed] ambiente=' +
+          ambiente +
+          ' statusCode=' +
+          probe.statusCode +
+          ' bodySnippet=' +
+          probeSnippet,
+      )
       $app
         .logger()
         .error(
@@ -784,16 +793,17 @@ routerAdd(
           'statusCode',
           probe.statusCode,
           'body',
-          (probe.body || '').substr(0, 200),
+          probeSnippet,
         )
       return e.json(502, {
         success: false,
+        statusCode: probe.statusCode,
         error:
           'Credencial Focus NFe recusada no ambiente de ' +
           ambiente +
           ' (HTTP ' +
           probe.statusCode +
-          '). Verifique o token configurado.',
+          '). Verifique se FOCUS_NFE_TOKEN contém o token de PRODUÇÃO da conta Focus NFe — tokens de homologação são recusados na API de produção.',
       })
     }
 

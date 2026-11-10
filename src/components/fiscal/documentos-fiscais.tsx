@@ -156,12 +156,26 @@ export function DocumentosFiscais() {
         })
       }
     } catch (err: unknown) {
-      const resp = (err as { response?: { data?: { error?: string }; message?: string } })?.response
-      const msg =
-        resp?.data?.error ||
-        resp?.message ||
-        (err as { message?: string })?.message ||
-        'Erro inesperado na transmissão'
+      const errObj = err as {
+        response?: Record<string, unknown>
+        data?: Record<string, unknown>
+        message?: string
+      }
+      const rawData =
+        (errObj?.response?.data as Record<string, unknown> | undefined) ||
+        (errObj?.response as Record<string, unknown> | undefined) ||
+        (errObj?.data as Record<string, unknown> | undefined)
+
+      const serverError =
+        (typeof rawData?.error === 'string' && rawData.error) ||
+        (typeof rawData?.message === 'string' && rawData.message) ||
+        (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+        (typeof errObj?.message === 'string' &&
+          errObj.message !== 'Something went wrong.' &&
+          errObj.message) ||
+        ''
+
+      const msg = serverError || 'Erro inesperado na transmissão'
       toast.error(`Falha ao transmitir NF-e ${num}: ${msg}`, { id: toastId, duration: 8000 })
     } finally {
       setTransmittingChave(null)
@@ -215,12 +229,26 @@ export function DocumentosFiscais() {
         toast.error(res?.error || 'Não foi possível consultar o recibo.', { id: toastId })
       }
     } catch (err: unknown) {
-      const resp = (err as { response?: { data?: { error?: string }; message?: string } })?.response
-      const msg =
-        resp?.data?.error ||
-        resp?.message ||
-        (err as { message?: string })?.message ||
-        'Falha ao consultar'
+      const errObj = err as {
+        response?: Record<string, unknown>
+        data?: Record<string, unknown>
+        message?: string
+      }
+      const rawData =
+        (errObj?.response?.data as Record<string, unknown> | undefined) ||
+        (errObj?.response as Record<string, unknown> | undefined) ||
+        (errObj?.data as Record<string, unknown> | undefined)
+
+      const serverError =
+        (typeof rawData?.error === 'string' && rawData.error) ||
+        (typeof rawData?.message === 'string' && rawData.message) ||
+        (typeof errObj?.response?.message === 'string' && errObj.response.message) ||
+        (typeof errObj?.message === 'string' &&
+          errObj.message !== 'Something went wrong.' &&
+          errObj.message) ||
+        ''
+
+      const msg = serverError || 'Falha ao consultar'
       toast.error(`Erro na consulta: ${msg}`, { id: toastId })
     } finally {
       setConsultingChave(null)
