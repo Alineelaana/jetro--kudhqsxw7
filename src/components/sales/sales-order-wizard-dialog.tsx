@@ -23,19 +23,15 @@ import {
   ArrowRight,
   ArrowLeft,
   AlertCircle,
-  AlertTriangle,
   Building2,
   UserCheck,
   FileSpreadsheet,
   FileCheck,
   PackageCheck,
-  Clock,
   DollarSign,
   Loader2,
-  ShieldAlert,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { fiscalCfopService } from '@/lib/fiscal-cfop-service'
 import { logSalesAudit } from '@/services/sales'
 
 export interface SalesOrderWizardDialogProps {
@@ -246,7 +242,11 @@ export function SalesOrderWizardDialog({
           Boolean(activeContextCompanyId) &&
           finalCompanies.some((c) => c.id === activeContextCompanyId)
 
-        const initialCompanyId = isPermittedAndActive ? activeContextCompanyId : ''
+        const initialCompanyId = isPermittedAndActive
+          ? activeContextCompanyId
+          : finalCompanies.length === 1
+            ? finalCompanies[0].id
+            : ''
         setSelectedCompanyId(initialCompanyId)
 
         setClients(cls as Array<Record<string, unknown>>)
