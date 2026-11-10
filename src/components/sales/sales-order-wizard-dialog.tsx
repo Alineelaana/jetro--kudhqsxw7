@@ -138,8 +138,13 @@ export function SalesOrderWizardDialog({
       // Empresas
       pb
         .collection('empresas')
-        .getFullList({ filter: 'ativa = true' })
-        .catch(() => []),
+        .getFullList({ filter: 'active != false', sort: '-padrao,name' })
+        .catch(() =>
+          pb
+            .collection('empresas')
+            .getFullList({ sort: '-padrao,name' })
+            .catch(() => []),
+        ),
       // Clientes
       pb
         .collection('partners')
@@ -153,7 +158,15 @@ export function SalesOrderWizardDialog({
         const unifiedList: Array<{ id: string; name: string; type: string; company_id?: string }> =
           []
         try {
-          const rcas = await pb.collection('representantes').getFullList({ filter: 'ativo = true' })
+          const rcas = await pb
+            .collection('representantes')
+            .getFullList({ filter: 'active != false' })
+            .catch(() =>
+              pb
+                .collection('representantes')
+                .getFullList()
+                .catch(() => []),
+            )
           for (const r of rcas) {
             unifiedList.push({
               id: r.id,
@@ -236,15 +249,21 @@ export function SalesOrderWizardDialog({
         setCompanies(finalCompanies)
 
         // Pré-preenchimento padrão com a empresa ativa no contexto do sistema
+        const storedActiveId =
+          typeof window !== 'undefined' ? localStorage.getItem('huram_empresa_ativa_id') || '' : ''
         const activeContextCompanyId =
-          empresaAtivaId || brand?.empresaId || (user as { empresa_id?: string })?.empresa_id || ''
+          empresaAtivaId ||
+          brand?.empresaId ||
+          storedActiveId ||
+          (user as { empresa_id?: string })?.empresa_id ||
+          ''
         const isPermittedAndActive =
           Boolean(activeContextCompanyId) &&
           finalCompanies.some((c) => c.id === activeContextCompanyId)
 
         const initialCompanyId = isPermittedAndActive
           ? activeContextCompanyId
-          : finalCompanies.length === 1
+          : !activeContextCompanyId && finalCompanies.length === 1
             ? finalCompanies[0].id
             : ''
         setSelectedCompanyId(initialCompanyId)
@@ -270,7 +289,9 @@ export function SalesOrderWizardDialog({
                     pt.empresa === finalCompanies.find((c) => c.id === initialCompanyId)?.name),
               )) ||
             priceTableList[0]
-          setSelectedPriceTableId((matchingTable as Record<string, unknown>).id as string)
+          if (matchingTable && (matchingTable as Record<string, unknown>).id) {
+            setSelectedPriceTableId((matchingTable as Record<string, unknown>).id as string)
+          }
         }
 
         const opList = (fops as Array<Record<string, unknown>>).map((op) => ({
@@ -715,7 +736,11 @@ export function SalesOrderWizardDialog({
         salesperson_id: selectedSalespersonId,
         salesperson_name: salespersonName,
         price_table_id: selectedPriceTableId,
-        price_table_name: (currentPriceTable?.name as string) || 'Tabela Padrão',
+        price_table_name:
+          (currentPriceTable?.table_name as string) ||
+          (currentPriceTable?.name as string) ||
+          (currentPriceTable?.description as string) ||
+          'Tabela Padrão',
         operation_type: selectedCgo,
         cfop: cfopDeterminado,
         natureza_operacao: naturezaOperacao,
@@ -956,7 +981,11 @@ export function SalesOrderWizardDialog({
                         <option value="">Selecione a tabela de preços...</option>
                         {priceTables.map((pt) => (
                           <option key={pt.id as string} value={pt.id as string}>
-                            {(pt.name as string) || 'Tabela'} (Válida)
+                            {(pt.table_name as string) ||
+                              (pt.name as string) ||
+                              (pt.description as string) ||
+                              'Tabela de Preços'}{' '}
+                            (Válida)
                           </option>
                         ))}
                       </select>
