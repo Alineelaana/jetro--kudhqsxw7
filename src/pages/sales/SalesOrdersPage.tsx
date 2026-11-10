@@ -41,8 +41,10 @@ import {
   Layers,
   FileText,
   AlertTriangle,
+  PlusCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { SalesOrderWizardDialog } from '@/components/sales/sales-order-wizard-dialog'
 
 type FilterKey = 'all' | FaturamentoStatus
 
@@ -125,6 +127,7 @@ export default function SalesOrdersPage() {
   // Diálogo de cancelamento com justificativa
   const [cancelModalOpen, setCancelModalOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
+  const [wizardOpen, setWizardOpen] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
 
   // Diálogo de resultado da separação / conferência de estoque
@@ -423,20 +426,31 @@ export default function SalesOrdersPage() {
               Pedidos de Venda — Ciclo Comercial
             </h2>
             <p className="text-sm text-muted-foreground">
-              Gestão master-detalhe do ciclo comercial: confirmação, separação de estoque, liberação
-              e cancelamento com estorno.
+              Gestão master-detalhe do ciclo comercial: criação via wizard em 2 etapas, confirmação,
+              separação de estoque, liberação e cancelamento com estorno.
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void loadOrders()}
-            disabled={loading || actionLoading}
-            className="self-start sm:self-auto gap-2"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Atualizar
-          </Button>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setWizardOpen(true)}
+              className="bg-[#005B2E] hover:bg-[#01361D] text-white gap-2 font-bold shadow-sm"
+              title="Criar novo pedido de venda via wizard de 2 etapas"
+            >
+              <PlusCircle className="w-4 h-4" />＋ Novo Pedido de Venda
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void loadOrders()}
+              disabled={loading || actionLoading}
+              className="gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+          </div>
         </div>
 
         {/* Barra de Filtros de Status (4 status oficiais + Todos) */}
@@ -722,6 +736,18 @@ export default function SalesOrdersPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Wizard Visual de Criação de Pedido de Venda */}
+      <SalesOrderWizardDialog
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        onSuccess={async (newOrder) => {
+          await loadOrders()
+          if (newOrder?.id) {
+            setSelectedOrderId(newOrder.id as string)
+          }
+        }}
+      />
 
       {/* Diálogo de Cancelamento */}
       <Dialog open={cancelModalOpen} onOpenChange={setCancelModalOpen}>

@@ -41,53 +41,53 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/pedidos',
     title: 'Pedido de Venda',
     moduleGroup: 'Comercial',
-    docVersion: '2.1.0',
+    docVersion: '2.2.0',
     lastUpdated: '2026-11-10',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Controlar o ciclo de vida completo dos pedidos de venda do ERP HURAM em arquitetura Master-Detalhe com esteira operacional oficial: rascunho → confirmação (provisão financeira e reserva de estoque) → separação → liberação de faturamento → faturamento definitivo ou cancelamento/estorno. Suporta pedidos sequenciais completos (ex: PV-000004 e PV-000005) com espelhamento íntegro de cliente, itens, estoque reservado e provisão de títulos a receber.',
+        'Controlar o ciclo de vida completo dos pedidos de venda do ERP HURAM em arquitetura Master-Detalhe com esteira operacional oficial e Wizard Visual de criação em 2 etapas: Etapa 1 (Cabeçalho com empresa, cliente, vendedores unificados RCA + internos, determinação automática de CGO/CFOP/natureza e condições comerciais dinâmicas da tabela com média de prazo ponderada) → Etapa 2 (Produtos com catálogo em tempo real, validação estrita de estoque disponível e teto de desconto autorizado) → Conferência e Finalização com geração transacional de numeração oficial PV-00000X via endpoint dedicado, criação de reservas de estoque e encaminhamento automático para a Central de Faturamento.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Arquitetura Master-Detalhe: Cabeçalho com métricas em tempo real (Total de Pedidos, Pendentes Faturamento, Pendentes Liberação, Faturados, Cancelados e Valor Total).\n- Filtros Rápidos por Status: Pendente Faturamento (confirmado/separado/liberado), Pendente Liberação (confirmado/separação), Faturado, Cancelado ou Todos.\n- Tabela Master JetroTable com seleção única ou múltipla por intervalo/checkbox, busca por cliente e número, e paginação completa.\n- Painel de Detalhes dos Itens: Ao clicar ou selecionar um pedido, visualização dos itens em tabela detalhada (código, produto, quantidade, unidade, preço unitário, desconto, subtotal e reserva de estoque).\n- Ações Operacionais Conectadas ao Serviço sales-invoicing-flow: Confirmar Pedido (com provisão financeira e reserva de estoque), Confirmar Separação (com validação de saldo físico/lote), Liberar Faturamento (encaminha para a Central de Faturamento) e Cancelar Pedido (com estorno integral de reservas e provisões).\n- Execução em Lote: Capacidade de aplicar ações a múltiplos pedidos selecionados com relatório de sucessos e falhas.\n- Edição e Novo Pedido: Abertura do editor padrão HURAM para cadastro de novos pedidos e alteração de rascunhos.',
+        '- Botão "＋ Novo Pedido de Venda": Acionamento direto no cabeçalho da página abrindo o SalesOrderWizardDialog.\n- Wizard Visual com Indicador de Etapas: Etapa 1 (Cabeçalho), Etapa 2 (Produtos) e Etapa 3 (Conferência).\n- Cabeçalho Comercial Inteligente: Empresa emissora, cliente com busca, vendedor unificado (RCAs de representantes + vendedores internos + usuários), determinação automática de CFOP estadual/interestadual e natureza da operação a partir do CGO e UF da empresa/cliente, e tabela de preços com regras de parcelamento.\n- Condições de Pagamento Dinâmicas: Respeito às opções configuradas na tabela (PIX, transferência bancária, boletos) e cálculo em tempo real da média de prazo ponderada em dias.\n- Catálogo e Inclusão de Produtos: Busca por código, descrição e EAN; visualização de estoque disponível líquido (estoque físico menos reservas ativas de stock_reservations); bloqueio estrito de quantidades nulas ou superiores ao disponível; controle de desconto percentual com trava de teto máximo da tabela/produto.\n- Conferência e Finalização: Resumo detalhado dos dados fiscais, prazos e consolidado financeiro (bruto, descontos e líquido). Botões para retornar e retificar cabeçalho ou produtos.\n- Salvar Pedido com Revalidação Concorrente: Consulta atômica ao saldo de estoque e reservas no momento da gravação, impedindo que dois operadores vendam o mesmo item; obtenção de número sequencial transacional via endpoint `/backend/v1/sales-numbers/next` (formato PV-00000X); criação de reservas de estoque em `stock_reservations`; registro em auditoria comercial e disponibilidade imediata na Central de Faturamento.\n- Arquitetura Master-Detalhe Existente Preservada: JetroTable com filtros rápidos de status (Pendente Faturamento, Pendente Liberação, Faturado, Cancelado, Todos), inspeção de itens selecionados e ações da esteira (Confirmar, Confirmar Separação, Liberar Faturamento e Cancelar com Estorno).',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Ciclo de Vida Oficial: Rascunho → Confirmado → Em Separação / Separado → Liberado para Faturamento → Faturado (ou Cancelado). Todas as transições são intermediadas pelo serviço centralizado `sales-invoicing-flow.ts` (sem lógica inline duplicada).\n- Confirmação do Pedido: Efetua a reserva no estoque físico da empresa faturadora e cria a provisão preventiva no módulo financeiro.\n- Confirmação de Separação: Valida a disponibilidade física dos lotes e produtos antes da expedição.\n- Liberação de Faturamento: Torna o pedido elegível na Central de Faturamento (/admin/vendas/faturamento).\n- Cancelamento: Realiza o estorno atômico de reservas de estoque e estorno de títulos provisionados no financeiro.\n- Pedidos já Faturados ou Cancelados possuem suas ações operacionais bloqueadas para evitar duplicidade ou inconsistência fiscal.',
+        '- Numeração Imutável: O número sequencial do pedido é atribuído exclusivamente pelo endpoint transacional `/backend/v1/sales-numbers/next` (formato PV-00000X), impedindo edição manual ou duplicidade por concorrência.\n- Vendedores Unificados: Seleção comercial agrega tanto representantes autônomos (RCAs da coleção representantes) quanto vendedores internos da empresa faturadora.\n- Motor Fiscal e Natureza Automática: Operação fiscal CGO combinada com as UFs da empresa emissora e do cliente determina automaticamente o CFOP (ex: 5102 interno / 6102 interestadual) e a natureza da operação de forma travada.\n- Prazos e Condições pela Tabela: Formas de pagamento e parcelamentos permitidos são lidos dinamicamente da tabela de preços selecionada; a média de prazo exibida é calculada de forma ponderada pelas parcelas.\n- Trava Estrita de Estoque: Nenhum produto pode ser inserido ou confirmado com quantidade superior ao estoque disponível físico menos reservas ativas; na finalização ocorre revalidação mandatória contra concorrência.\n- Trava Estrita de Desconto: O desconto por item não pode ultrapassar a margem percentual autorizada na tabela de preços/cadastro do item.\n- Ciclo Operacional: Novos pedidos são criados confirmados, com reservas ativas e faturamento_status = "pendente_faturamento", preservando o ciclo sem gerar títulos nem NF automaticamente antes da etapa de faturamento.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. Operador visualiza a lista master de pedidos na rota `/admin/vendas/pedidos` com filtros por status.\n2. Clica em um pedido para inspecionar os itens no painel detalhe inferior.\n3. Aciona as ações da esteira: "Confirmar Pedido" → "Confirmar Separação" → "Liberar Faturamento".\n4. Com o pedido liberado, o processo segue para emissão da NF-e na Central de Faturamento `/admin/vendas/faturamento`.\n5. Em caso de desistência ou desacordo comercial, o operador aciona "Cancelar Pedido" que desfaz reservas e provisões.',
+        '1. O operador clica em "＋ Novo Pedido de Venda" no topo da tela `/admin/vendas/pedidos`.\n2. Etapa 1 (Cabeçalho): Seleciona empresa emissora, cliente, vendedor (RCA/interno), CGO (com preenchimento automático do CFOP/natureza), tabela de preços e prazos de pagamento. Clica em "Salvar Cabeçalho e Continuar".\n3. Etapa 2 (Produtos): Busca e adiciona produtos, definindo quantidades e descontos autorizados sob validação em tempo real de estoque disponível. Clica em "Avançar para Conferência".\n4. Etapa 3 (Conferência): Confere os dados fiscais, comerciais e financeiros consolidados. Pode retornar para retificar o cabeçalho ou os produtos.\n5. Clica em "Salvar Pedido (Gerar PV)": O sistema revalida concorrentemente o estoque, consome o próximo número PV no endpoint transacional, cria o pedido e as reservas em `stock_reservations` e atualiza a listagem na tela.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções PocketBase: `sales_orders`, `sales_order_items`, `partners` (clientes), `products`, `users`, `stock_reservations`, `financial_entries`.\n- Migração `0310_sales_invoicing_redesign.js` com colunas de esteira de faturamento e auditoria.',
+        '- Coleções PocketBase: `sales_orders`, `sales_order_items`, `empresas`, `partners` (clientes), `representantes`, `vendedores`, `users`, `price_tables`, `fiscal_operations`, `products`, `stock_reservations`, `sales_numbers_counter`.\n- Endpoint transacional: `/backend/v1/sales-numbers/next`.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Serviço central: `src/services/sales-invoicing-flow.ts`.\n- Central de Faturamento `/admin/vendas/faturamento` para emissão fiscal.\n- Módulo de Estoque (reservas e baixas) e Módulo Financeiro (provisões e títulos).',
+        '- Serviço central: `src/services/sales-invoicing-flow.ts` e `src/services/sales.ts`.\n- Endpoint transacional de numeração de pedidos `pocketbase/hooks/sales_numbers_next.js`.\n- Motor fiscal `fiscalCfopService` e tabela de operações fiscais.\n- Central de Faturamento `/admin/vendas/faturamento` para emissão fiscal subsequente.',
     },
     permissions: {
       title: 'Permissões',
       content:
-        '- Acesso comercial controlado por `canViewSales(role)` (perfis SUP, COMERCIAL, Vendedor, DIRETORIA). Ações de cancelamento e liberação requerem perfil comercial autorizado.',
+        '- Acesso comercial controlado por `canViewSales(role)` (perfis SUP, COMERCIAL, Vendedor, DIRETORIA). Ações de criação, cancelamento e liberação requerem perfil comercial autorizado.',
     },
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `SalesOrdersPage`, `JetroTable`, `SalesOrderStandardEditor`, `sales-page-wrapper`.\n- Serviços: `sales-invoicing-flow`, `sales`, `products`.',
+        '- Componentes: `SalesOrdersPage`, `SalesOrderWizardDialog`, `JetroTable`, `sales-page-wrapper`.\n- Serviços: `sales-invoicing-flow`, `sales`, `fiscal-cfop-service`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Diálogos de confirmação com validação de status antes de disparar qualquer transição.\n- Notificações de toast para respostas de sucesso e mensagens claras em caso de saldo insuficiente de estoque ou cliente bloqueado.',
+        '- Validação obrigatória dos campos de cabeçalho antes de liberar o avanço para produtos.\n- Bloqueio imediato na interface para desconto superior ao teto autorizado.\n- Bloqueio imediato para quantidade zerada, negativa ou superior ao estoque disponível líquido.\n- Revalidação atômica e concorrente de estoque no momento da gravação com recusa explicativa em toast caso outro operador tenha reservado o saldo.',
     },
   },
 
