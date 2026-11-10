@@ -683,19 +683,80 @@ routerAdd(
     }
 
     function focusErrorResponse(e2, res, acao) {
-      var msg = 'Falha de comunicação com o Focus NFe (' + acao + ').'
+      var status = res ? Number(res.statusCode || 0) : 0
+      var rawBody = ''
+      try {
+        if (res && res.body !== undefined && res.body !== null) {
+          rawBody = String(res.body)
+        }
+      } catch (_) {}
+      var bodyLog = rawBody ? rawBody.substring(0, 500) : ''
+      var bodySnippet = rawBody
+        ? rawBody
+            .replace(/[\r\n\t]+/g, ' ')
+            .trim()
+            .substring(0, 300)
+        : ''
+
+      console.error(
+        '[Focus NFe transmit error] acao=' +
+          acao +
+          ' statusCode=' +
+          status +
+          ' bodySnippet=' +
+          bodyLog,
+      )
+      try {
+        $app
+          .logger()
+          .error(
+            '[Focus NFe transmit error]',
+            'acao',
+            acao,
+            'statusCode',
+            status,
+            'bodySnippet',
+            bodyLog,
+          )
+      } catch (_) {}
+
+      var mappedMsg = ''
       if (res && res.json) {
         var j = res.json
-        if (j.erro) msg = String(j.erro)
-        else if (j.error_description) msg = String(j.error_description)
-        else if (j.error) msg = typeof j.error === 'string' ? j.error : msg
-        else if (j.motivo_status) msg = String(j.motivo_status)
+        if (j.erro) mappedMsg = String(j.erro)
+        else if (j.error_description) mappedMsg = String(j.error_description)
+        else if (j.error) mappedMsg = typeof j.error === 'string' ? j.error : ''
+        else if (j.motivo_status) mappedMsg = String(j.motivo_status)
+        else if (j.mensagem) mappedMsg = String(j.mensagem)
+        else if (j.message) mappedMsg = String(j.message)
       }
-      if (res && res.transport_error)
+
+      var msg = ''
+      if (mappedMsg) {
+        msg = mappedMsg
+      } else if (res && res.transport_error) {
         msg = 'Falha de rede ao contatar o Focus NFe: ' + res.transport_error
-      if (res && res.statusCode === 401)
+      } else if (status === 401) {
         msg = 'Credencial Focus NFe recusada (401). Verifique o token configurado no ambiente.'
-      return e2.json(502, { success: false, error: msg, status_code: res ? res.statusCode : 0 })
+      } else {
+        var base = 'Falha de comunicação com o Focus NFe (' + acao + ')'
+        if (status > 0) {
+          base += ' (HTTP ' + status + ')'
+        }
+        if (bodySnippet) {
+          base += ': ' + bodySnippet
+        } else {
+          base += '.'
+        }
+        msg = base
+      }
+
+      return e2.json(502, {
+        success: false,
+        error: msg,
+        status_code: status,
+        raw_body_snippet: bodySnippet || undefined,
+      })
     }
 
     var body = e.requestInfo().body || {}
@@ -1134,19 +1195,80 @@ routerAdd(
     }
 
     function focusErrorResponse(e2, res, acao) {
-      var msg = 'Falha de comunicação com o Focus NFe (' + acao + ').'
+      var status = res ? Number(res.statusCode || 0) : 0
+      var rawBody = ''
+      try {
+        if (res && res.body !== undefined && res.body !== null) {
+          rawBody = String(res.body)
+        }
+      } catch (_) {}
+      var bodyLog = rawBody ? rawBody.substring(0, 500) : ''
+      var bodySnippet = rawBody
+        ? rawBody
+            .replace(/[\r\n\t]+/g, ' ')
+            .trim()
+            .substring(0, 300)
+        : ''
+
+      console.error(
+        '[Focus NFe transmit error] acao=' +
+          acao +
+          ' statusCode=' +
+          status +
+          ' bodySnippet=' +
+          bodyLog,
+      )
+      try {
+        $app
+          .logger()
+          .error(
+            '[Focus NFe transmit error]',
+            'acao',
+            acao,
+            'statusCode',
+            status,
+            'bodySnippet',
+            bodyLog,
+          )
+      } catch (_) {}
+
+      var mappedMsg = ''
       if (res && res.json) {
         var j = res.json
-        if (j.erro) msg = String(j.erro)
-        else if (j.error_description) msg = String(j.error_description)
-        else if (j.error) msg = typeof j.error === 'string' ? j.error : msg
-        else if (j.motivo_status) msg = String(j.motivo_status)
+        if (j.erro) mappedMsg = String(j.erro)
+        else if (j.error_description) mappedMsg = String(j.error_description)
+        else if (j.error) mappedMsg = typeof j.error === 'string' ? j.error : ''
+        else if (j.motivo_status) mappedMsg = String(j.motivo_status)
+        else if (j.mensagem) mappedMsg = String(j.mensagem)
+        else if (j.message) mappedMsg = String(j.message)
       }
-      if (res && res.transport_error)
+
+      var msg = ''
+      if (mappedMsg) {
+        msg = mappedMsg
+      } else if (res && res.transport_error) {
         msg = 'Falha de rede ao contatar o Focus NFe: ' + res.transport_error
-      if (res && res.statusCode === 401)
+      } else if (status === 401) {
         msg = 'Credencial Focus NFe recusada (401). Verifique o token configurado no ambiente.'
-      return e2.json(502, { success: false, error: msg, status_code: res ? res.statusCode : 0 })
+      } else {
+        var base = 'Falha de comunicação com o Focus NFe (' + acao + ')'
+        if (status > 0) {
+          base += ' (HTTP ' + status + ')'
+        }
+        if (bodySnippet) {
+          base += ': ' + bodySnippet
+        } else {
+          base += '.'
+        }
+        msg = base
+      }
+
+      return e2.json(502, {
+        success: false,
+        error: msg,
+        status_code: status,
+        raw_body_snippet: bodySnippet || undefined,
+      })
     }
 
     var body = e.requestInfo().body || {}
@@ -1593,19 +1715,80 @@ routerAdd(
     }
 
     function focusErrorResponse(e2, res, acao) {
-      var msg = 'Falha de comunicação com o Focus NFe (' + acao + ').'
+      var status = res ? Number(res.statusCode || 0) : 0
+      var rawBody = ''
+      try {
+        if (res && res.body !== undefined && res.body !== null) {
+          rawBody = String(res.body)
+        }
+      } catch (_) {}
+      var bodyLog = rawBody ? rawBody.substring(0, 500) : ''
+      var bodySnippet = rawBody
+        ? rawBody
+            .replace(/[\r\n\t]+/g, ' ')
+            .trim()
+            .substring(0, 300)
+        : ''
+
+      console.error(
+        '[Focus NFe transmit error] acao=' +
+          acao +
+          ' statusCode=' +
+          status +
+          ' bodySnippet=' +
+          bodyLog,
+      )
+      try {
+        $app
+          .logger()
+          .error(
+            '[Focus NFe transmit error]',
+            'acao',
+            acao,
+            'statusCode',
+            status,
+            'bodySnippet',
+            bodyLog,
+          )
+      } catch (_) {}
+
+      var mappedMsg = ''
       if (res && res.json) {
         var j = res.json
-        if (j.erro) msg = String(j.erro)
-        else if (j.error_description) msg = String(j.error_description)
-        else if (j.error) msg = typeof j.error === 'string' ? j.error : msg
-        else if (j.motivo_status) msg = String(j.motivo_status)
+        if (j.erro) mappedMsg = String(j.erro)
+        else if (j.error_description) mappedMsg = String(j.error_description)
+        else if (j.error) mappedMsg = typeof j.error === 'string' ? j.error : ''
+        else if (j.motivo_status) mappedMsg = String(j.motivo_status)
+        else if (j.mensagem) mappedMsg = String(j.mensagem)
+        else if (j.message) mappedMsg = String(j.message)
       }
-      if (res && res.transport_error)
+
+      var msg = ''
+      if (mappedMsg) {
+        msg = mappedMsg
+      } else if (res && res.transport_error) {
         msg = 'Falha de rede ao contatar o Focus NFe: ' + res.transport_error
-      if (res && res.statusCode === 401)
+      } else if (status === 401) {
         msg = 'Credencial Focus NFe recusada (401). Verifique o token configurado no ambiente.'
-      return e2.json(502, { success: false, error: msg, status_code: res ? res.statusCode : 0 })
+      } else {
+        var base = 'Falha de comunicação com o Focus NFe (' + acao + ')'
+        if (status > 0) {
+          base += ' (HTTP ' + status + ')'
+        }
+        if (bodySnippet) {
+          base += ': ' + bodySnippet
+        } else {
+          base += '.'
+        }
+        msg = base
+      }
+
+      return e2.json(502, {
+        success: false,
+        error: msg,
+        status_code: status,
+        raw_body_snippet: bodySnippet || undefined,
+      })
     }
 
     var body = e.requestInfo().body || {}
@@ -1844,19 +2027,80 @@ routerAdd(
     }
 
     function focusErrorResponse(e2, res, acao) {
-      var msg = 'Falha de comunicação com o Focus NFe (' + acao + ').'
+      var status = res ? Number(res.statusCode || 0) : 0
+      var rawBody = ''
+      try {
+        if (res && res.body !== undefined && res.body !== null) {
+          rawBody = String(res.body)
+        }
+      } catch (_) {}
+      var bodyLog = rawBody ? rawBody.substring(0, 500) : ''
+      var bodySnippet = rawBody
+        ? rawBody
+            .replace(/[\r\n\t]+/g, ' ')
+            .trim()
+            .substring(0, 300)
+        : ''
+
+      console.error(
+        '[Focus NFe transmit error] acao=' +
+          acao +
+          ' statusCode=' +
+          status +
+          ' bodySnippet=' +
+          bodyLog,
+      )
+      try {
+        $app
+          .logger()
+          .error(
+            '[Focus NFe transmit error]',
+            'acao',
+            acao,
+            'statusCode',
+            status,
+            'bodySnippet',
+            bodyLog,
+          )
+      } catch (_) {}
+
+      var mappedMsg = ''
       if (res && res.json) {
         var j = res.json
-        if (j.erro) msg = String(j.erro)
-        else if (j.error_description) msg = String(j.error_description)
-        else if (j.error) msg = typeof j.error === 'string' ? j.error : msg
-        else if (j.motivo_status) msg = String(j.motivo_status)
+        if (j.erro) mappedMsg = String(j.erro)
+        else if (j.error_description) mappedMsg = String(j.error_description)
+        else if (j.error) mappedMsg = typeof j.error === 'string' ? j.error : ''
+        else if (j.motivo_status) mappedMsg = String(j.motivo_status)
+        else if (j.mensagem) mappedMsg = String(j.mensagem)
+        else if (j.message) mappedMsg = String(j.message)
       }
-      if (res && res.transport_error)
+
+      var msg = ''
+      if (mappedMsg) {
+        msg = mappedMsg
+      } else if (res && res.transport_error) {
         msg = 'Falha de rede ao contatar o Focus NFe: ' + res.transport_error
-      if (res && res.statusCode === 401)
+      } else if (status === 401) {
         msg = 'Credencial Focus NFe recusada (401). Verifique o token configurado no ambiente.'
-      return e2.json(502, { success: false, error: msg, status_code: res ? res.statusCode : 0 })
+      } else {
+        var base = 'Falha de comunicação com o Focus NFe (' + acao + ')'
+        if (status > 0) {
+          base += ' (HTTP ' + status + ')'
+        }
+        if (bodySnippet) {
+          base += ': ' + bodySnippet
+        } else {
+          base += '.'
+        }
+        msg = base
+      }
+
+      return e2.json(502, {
+        success: false,
+        error: msg,
+        status_code: status,
+        raw_body_snippet: bodySnippet || undefined,
+      })
     }
 
     var body = e.requestInfo().body || {}

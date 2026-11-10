@@ -77,7 +77,7 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal/documentos',
     title: 'Documentos Fiscais',
     moduleGroup: 'Fiscal',
-    docVersion: '2.2.1',
+    docVersion: '2.2.2',
     lastUpdated: '2026-11-10',
     author: 'Engenharia de Software Huram',
     objective: {
@@ -123,7 +123,7 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Validação de esquema XML antes do envio e mapeamento de códigos de retorno da SEFAZ.\n- Falhas do Focus NFe (credencial ausente, credencial recusada, rejeição SEFAZ, timeout) retornam mensagens amigáveis e detalhadas em português (extraindo mensagens reais do corpo JSON do servidor em caso de erros HTTP 4xx/5xx sem exibir o genérico "Something went wrong"), com logging detalhado de probe e idempotência por `(chave_acesso, ambiente)` em `fiscal_document_artifacts`.',
+        '- Validação de esquema XML antes do envio e mapeamento de códigos de retorno da SEFAZ.\n- Falhas do Focus NFe (credencial ausente, credencial recusada, rejeição SEFAZ, timeout, erros de validação HTTP 4xx/5xx) capturam e expõem o código HTTP e o corpo real da resposta Focus NFe no toast e nos logs de hooks ([Focus NFe transmit error]), garantindo diagnóstico imediato na tela sem ocultar o erro sob mensagens genéricas, com idempotência por `(chave_acesso, ambiente)` em `fiscal_document_artifacts`.',
     },
   },
 
