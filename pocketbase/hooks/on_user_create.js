@@ -1,3 +1,15 @@
+// Criação de usuários — HURAM
+//
+// CAUSA RAIZ do erro "verified: Values don't match.":
+// No PocketBase v0.23+, hooks de REQUISIÇÃO (onRecordCreateRequest) rodam ANTES
+// da validação do formulário. Ao alterar campos do registro ali (ex.: `verified`),
+// o validador compara o valor enviado pelo cliente (ausente) com o valor alterado
+// pelo hook (true) e falha com validation_values_mismatch.
+//
+// CORREÇÃO DEFINITIVA:
+//  - onRecordCreateRequest: APENAS autorização (quem pode criar). Nenhum e.record.set aqui.
+//  - onRecordCreate (hook de BANCO): roda DEPOIS da validação — é o lugar seguro para
+//    sanitizar campos (verified, role, MFA).
 onRecordCreateRequest((e) => {
   var authUser = e.auth
   var isSupCreator = false
@@ -16,7 +28,13 @@ onRecordCreateRequest((e) => {
     return e.forbiddenError('Apenas administradores SUP podem criar novos usuários no sistema.')
   }
 
-  // Sanitizar role: se não informada ou inválida, padroniza como PADRAO
+  e.next()
+}, 'users')
+
+// Hook de BANCO (após validação): mutações de campos não disparam
+// "Values don't match" aqui.
+onRecordCreate((e) => {
+  // Sanitizar role: se não informada ou vazia, padroniza como PADRAO
   var role = e.record.getString('role')
   if (!role) {
     e.record.set('role', 'PADRAO')
@@ -27,25 +45,11 @@ onRecordCreateRequest((e) => {
   e.record.set('mfa_secret', '')
   e.record.set('mfa_verified_at', '')
 
-  // BUG 1 (correção): usuário criado pelo admin deve conseguir logar no
-  // PRIMEIRO acesso com a senha definida no cadastro.
-  //  - verified = true: conta criada por administrador não nasce pendente de verificação;
-  //  - force_password_change / must_change_password só permanecem verdadeiros se o
-  //    admin os enviou EXPLICITAMENTE como true no corpo da requisição — nunca por
-  //    padrão (por padrão eles bloqueavam o primeiro login sem mensagem clara).
+  // Usuário criado pelo administrador nasce verificado: consegue logar no
+  // PRIMEIRO acesso com a senha definida no cadastro, sem pendência de
+  // verificação de e-mail.
   e.record.set('verified', true)
-  var body = {}
-  try {
-    body = e.requestInfo().body || {}
-  } catch (_) {
-    body = {}
-  }
-  if (body.force_password_change !== true) {
-    e.record.set('force_password_change', false)
-  }
-  if (body.must_change_password !== true) {
-    e.record.set('must_change_password', false)
-  }
 
-  e.next()
+  // force_password_change / must_change_password: o formulário envia o valor
+  // real do toggle (o serviço já grava false quando ausente), nada a forçar aqui.
 }, 'users')

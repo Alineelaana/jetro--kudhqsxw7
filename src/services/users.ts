@@ -1,4 +1,33 @@
 import pb from '@/lib/pocketbase/client'
+import { translatePbMessage } from '@/lib/pocketbase/errors'
+
+/** Rótulos amigáveis (pt-BR) dos campos de usuário exibidos em mensagens de erro. */
+export const USER_FIELD_LABELS: Record<string, string> = {
+  verified: 'Verificação de e-mail',
+  email: 'E-mail',
+  password: 'Senha',
+  passwordConfirm: 'Confirmação de senha',
+  password_confirm: 'Confirmação de senha',
+  oldPassword: 'Senha atual',
+  old_password: 'Senha atual',
+  name: 'Nome',
+  login: 'Login',
+  cpf: 'CPF',
+  avatar: 'Foto de Perfil',
+  role: 'Papel de acesso',
+  perfil_id: 'Perfil de acesso',
+  perfil_acesso: 'Perfil de acesso',
+  empresa_id: 'Empresa',
+  empresas_ids: 'Empresas Vinculadas',
+  filial_id: 'Filial Padrão',
+  codigo: 'Código',
+  active: 'Situação',
+  inactivity_timeout_minutes: 'Tempo de inatividade para deslogar',
+  force_password_change: 'Criar nova senha no próximo login',
+  must_change_password: 'Criar nova senha no próximo login',
+  cargo: 'Cargo',
+  departamento: 'Departamento',
+}
 
 export interface CreateUserData {
   name: string
@@ -144,26 +173,17 @@ export async function createUser(data: CreateUserData): Promise<void> {
       })
     }
 
-    // Extrair mensagens detalhadas campo a campo do PocketBase
+    // Extrair mensagens detalhadas campo a campo do PocketBase, traduzidas (pt-BR)
+    // e com rótulo amigável — nunca texto cru tipo "verified: Values don't match."
     const errorDetails: string[] = []
+    let firstErrorField: string | undefined
     if (responseData && typeof responseData === 'object') {
       for (const [fKey, fVal] of Object.entries(responseData)) {
         if (fVal && typeof fVal === 'object' && 'message' in (fVal as any)) {
-          const fieldLabel =
-            fKey === 'password'
-              ? 'Senha'
-              : fKey === 'email'
-                ? 'E-mail'
-                : fKey === 'name'
-                  ? 'Nome'
-                  : fKey === 'login'
-                    ? 'Login'
-                    : fKey === 'cpf'
-                      ? 'CPF'
-                      : fKey === 'avatar'
-                        ? 'Foto de Perfil'
-                        : fKey
-          errorDetails.push(`${fieldLabel}: ${(fVal as any).message}`)
+          if (!firstErrorField) firstErrorField = fKey
+          const fieldLabel = USER_FIELD_LABELS[fKey] || fKey
+          const translated = translatePbMessage((fVal as any).message)
+          errorDetails.push(`${fieldLabel}: ${translated}`)
         }
       }
     }
@@ -171,7 +191,10 @@ export async function createUser(data: CreateUserData): Promise<void> {
     const detailedMsg =
       errorDetails.length > 0
         ? errorDetails.join(' | ')
-        : err?.response?.message || err?.message || 'Erro ao criar usuário. Tente novamente.'
+        : translatePbMessage(err?.response?.message || '') ||
+          err?.response?.message ||
+          err?.message ||
+          'Erro ao criar usuário. Tente novamente.'
 
     console.error('[createUser] Falha ao criar usuário:', {
       status: err?.status,
@@ -181,6 +204,7 @@ export async function createUser(data: CreateUserData): Promise<void> {
     })
 
     throw new UserCreateError(detailedMsg, {
+      field: firstErrorField,
       response: err?.response,
     })
   }
@@ -396,9 +420,29 @@ export async function updateUser(userId: string, data: UpdateUserData): Promise<
       })
     }
 
-    // Propaga erro com mensagem amigável ou o erro original
-    const fallbackMsg = err?.message || 'Erro ao atualizar usuário. Tente novamente.'
+    // Mensagens campo a campo traduzidas (pt-BR), com rótulo amigável — nunca texto cru
+    const updateDetails: string[] = []
+    let firstField: string | undefined
+    if (responseData && typeof responseData === 'object') {
+      for (const [fKey, fVal] of Object.entries(responseData)) {
+        if (fVal && typeof fVal === 'object' && 'message' in (fVal as any)) {
+          if (!firstField) firstField = fKey
+          const fieldLabel = USER_FIELD_LABELS[fKey] || fKey
+          const translated = translatePbMessage((fVal as any).message)
+          updateDetails.push(`${fieldLabel}: ${translated}`)
+        }
+      }
+    }
+
+    const fallbackMsg =
+      updateDetails.length > 0
+        ? updateDetails.join(' | ')
+        : translatePbMessage(err?.response?.message || '') ||
+          err?.response?.message ||
+          err?.message ||
+          'Erro ao atualizar usuário. Tente novamente.'
     throw new UserUpdateError(fallbackMsg, {
+      field: firstField,
       response: err?.response,
     })
   }
