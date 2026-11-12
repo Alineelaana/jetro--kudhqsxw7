@@ -210,12 +210,24 @@ export async function createUser(data: CreateUserData): Promise<void> {
   }
 
   // Sincronizar collection 'usuarios_empresas' caso exista
+  // (a criação do vínculo NUNCA pode falhar em silêncio: sem usuário gravado e
+  // vinculado de fato não há sucesso — sem toast falso e sem usuário órfão)
   const targetEmpresas =
     data.empresas_ids && data.empresas_ids.length > 0
       ? data.empresas_ids
       : data.empresa_id
         ? [data.empresa_id]
         : []
+
+  if (targetEmpresas.length === 0) {
+    // Sem empresa informada não há vínculo: reverter a criação para não deixar
+    // usuário gravado sem empresa (estado inconsistente na listagem multiempresa)
+    await pb.collection('users').delete(createdRecord.id)
+    throw new UserCreateError(
+      'Nenhuma empresa vinculada informada para o usuário. Selecione ao menos uma empresa e tente novamente.',
+      { field: 'empresa_id' },
+    )
+  }
 
   for (const empId of targetEmpresas) {
     try {
@@ -225,8 +237,31 @@ export async function createUser(data: CreateUserData): Promise<void> {
         filial_padrao: data.filial_id || '',
         ativo: true,
       })
-    } catch {
-      /* intentionally ignored */
+    } catch (err: any) {
+      // ROLLBACK: remover o usuário recém-criado para não deixar órfão
+      // (sem vínculo com empresa o usuário ficaria inutilizável e invisível
+      // nas telas com escopo multiempresa)
+      try {
+        await pb.collection('users').delete(createdRecord.id)
+      } catch (rollbackErr) {
+        console.error('[createUser] Falha ao reverter usuário órfão:', rollbackErr)
+      }
+
+      const responseData = err?.response?.data || {}
+      const errMessage = String(err?.response?.message || err?.message || '')
+      console.error('[createUser] Falha ao vincular usuário à empresa:', {
+        empresa: empId,
+        status: err?.status,
+        message: errMessage,
+        data: responseData,
+      })
+
+      throw new UserCreateError(
+        `Usuário criado, mas o vínculo com a empresa falhou e foi revertido. ` +
+          `Detalhe: ${translatePbMessage(errMessage) || errMessage || 'erro desconhecido'}. ` +
+          'Tente novamente.',
+        { field: 'empresa_id', response: err?.response },
+      )
     }
   }
 }

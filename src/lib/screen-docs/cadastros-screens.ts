@@ -798,8 +798,8 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/cadastros/usuarios',
     title: 'Usuários',
     moduleGroup: 'Organização',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-11-11',
+    docVersion: '1.1.0',
+    lastUpdated: '2026-11-12',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
@@ -814,7 +814,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Apenas usuários com papel SUP podem criar novos usuários (bloqueio no servidor pelo hook on_user_create).\n- Senha mínima de 8 caracteres e tempo de inatividade entre 1 e 480 minutos (padrão corporativo: 480 min).\n- CPF validado com dígitos verificadores quando informado; foto de perfil limitada a 2MB.\n- Login é único globalmente entre todas as empresas do grupo (validado preventivamente antes da gravação).\n- Usuário criado nasce verificado (verified = true no hook de banco, pós-validação), conseguindo logar no primeiro acesso com a senha definida no cadastro.\n- Campos de MFA nunca podem ser definidos manualmente na criação.\n- Vínculos multiempresa gravados na coleção usuarios_empresas (usuario, empresa, filial_padrao, ativo).',
+        '- Apenas usuários com papel SUP podem criar novos usuários (bloqueio no servidor pelo hook on_user_create).\n- Senha mínima de 8 caracteres e tempo de inatividade entre 1 e 480 minutos (padrão corporativo: 480 min).\n- CPF validado com dígitos verificadores quando informado; foto de perfil limitada a 2MB.\n- Login é único globalmente entre todas as empresas do grupo (validado preventivamente antes da gravação).\n- Usuário criado nasce verificado (verified = true no hook de banco, pós-validação), conseguindo logar no primeiro acesso com a senha definida no cadastro.\n- Campos de MFA nunca podem ser definidos manualmente na criação.\n- Vínculos multiempresa gravados na coleção usuarios_empresas (usuario, empresa, filial_padrao, ativo).\n- Se nenhuma empresa for informada, a criação é revertida (o usuário não fica gravado sem vínculo).\n- Falha ao gravar o vínculo em usuarios_empresas reverte a criação (usuário recém-criado é excluído, sem registro órfão) e propaga erro claro; sucesso só é confirmado com usuário gravado E vinculado.\n- O código sequencial é calculado como máximo existente + 1; como a criação falha é revertida por completo, não há furo na sequência.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
@@ -829,7 +829,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     integrations: {
       title: 'Integrações',
       content:
-        '- Hook de servidor `pocketbase/hooks/on_user_create.js`: autorização de criação (onRecordCreateRequest, apenas SUP) e sanitização pós-validação (onRecordCreate: role padrão, limpeza de MFA, verified = true).\n- Tradução de erros de validação `src/lib/pocketbase/errors.ts`.\n- Auditoria `registerAuditLog` quando a opção "Criar nova senha no próximo login" é ativada.',
+        '- Hook de servidor `pocketbase/hooks/on_user_create.js`: autorização de criação (onRecordCreateRequest, apenas SUP), sanitização pós-validação (onRecordCreate: role padrão, limpeza de MFA, verified = true) e finalização da gravação via e.next() — sem e.next() o PocketBase não grava o registro apesar de responder 200.\n- Tradução de erros de validação `src/lib/pocketbase/errors.ts`.\n- Auditoria `registerAuditLog` quando a opção "Criar nova senha no próximo login" é ativada.',
     },
     permissions: {
       title: 'Permissões',
@@ -844,7 +844,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Validações prévias no cliente: campos obrigatórios, senha mínima de 8 caracteres, CPF inválido e tempo de inatividade fora do intervalo 1–480.\n- Erros de validação do PocketBase (HTTP 400) são traduzidos e rotulados em português campo a campo (ex: "Verificação de e-mail: Os valores informados não coincidem..."), via translatePbMessage/rótulos de `src/lib/pocketbase/errors.ts` e `USER_FIELD_LABELS` de `src/services/users.ts` — nunca texto cru como "verified: Values nao coincidem.".\n- Casos específicos tratados com mensagem dedicada: login já em uso (global entre empresas), CPF já cadastrado, e-mail já cadastrado e senha atual incorreta (edição).\n- O erro é exibido dentro do próprio modal de cadastro/edição (bloco de erro geral), que permanece aberto para correção; falhas de listagem, exclusão e alteração de status exibem toast de erro.',
+        '- Validações prévias no cliente: campos obrigatórios, senha mínima de 8 caracteres, CPF inválido e tempo de inatividade fora do intervalo 1–480.\n- Erros de validação do PocketBase (HTTP 400) são traduzidos e rotulados em português campo a campo (ex: "Verificação de e-mail: Os valores informados não coincidem..."), via translatePbMessage/rótulos de `src/lib/pocketbase/errors.ts` e `USER_FIELD_LABELS` de `src/services/users.ts` — nunca texto cru como "verified: Values nao coincidem.".\n- Casos específicos tratados com mensagem dedicada: login já em uso (global entre empresas), CPF já cadastrado, e-mail já cadastrado e senha atual incorreta (edição).\n- O erro é exibido dentro do próprio modal de cadastro/edição (bloco de erro geral), que permanece aberto para correção; falhas de listagem, exclusão e alteração de status exibem toast de erro.\n- Falha no vínculo com a empresa (usuarios_empresas) reverte a criação do usuário e exibe erro explícito no modal — nunca toast de sucesso com código, e não deixa usuário órfão.',
     },
   },
 }

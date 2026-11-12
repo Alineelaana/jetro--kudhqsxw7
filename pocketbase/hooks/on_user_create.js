@@ -52,4 +52,10 @@ onRecordCreate((e) => {
 
   // force_password_change / must_change_password: o formulário envia o valor
   // real do toggle (o serviço já grava false quando ausente), nada a forçar aqui.
+
+  // CRÍTICO: sem e.next() o PocketBase NÃO grava o registro, mas a API ainda
+  // responde 200 — o "usuário criado" nunca existia no banco e o vínculo em
+  // usuarios_empresas falhava com 400 (relação usuario apontando para um
+  // registro inexistente), deixando a tela com sucesso falso.
+  e.next()
 }, 'users')
