@@ -116,14 +116,13 @@ routerAdd('POST', '/backend/v1/auth/resolve-identity', (e) => {
 
     // 5. Busca no banco por campo login exato
     try {
-      const records = $app.findRecordsByFilter(
-        'users',
-        'login = {:login} || username = {:login}',
-        '-created',
-        5,
-        0,
-        { login: safe },
-      )
+      // IMPORTANTE (v0.0.706): a auth collection users NÃO tem campo `username`
+      // (apenas login e email). Referenciá-lo no filtro lançava erro, o catch
+      // silenciava e a resolução de identidade por login devolvia 404
+      // "Usuário não encontrado" — travando o primeiro acesso por login.
+      const records = $app.findRecordsByFilter('users', 'login = {:login}', '-created', 5, 0, {
+        login: safe,
+      })
 
       if (records && records.length > 0) {
         const u = records[0]

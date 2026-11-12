@@ -20,14 +20,13 @@ routerAdd('POST', '/backend/v1/auth/secure-login', (e) => {
       if (lower.indexOf('@') !== -1) {
         userRecord = $app.findAuthRecordByEmail('users', lower)
       } else {
-        var found = $app.findRecordsByFilter(
-          'users',
-          'login = {:login} || username = {:login}',
-          '-created',
-          1,
-          0,
-          { login: lower },
-        )
+        // IMPORTANTE (v0.0.706): a auth collection users NÃO tem campo `username`
+        // (apenas login e email). Referenciá-lo no filtro lançava erro, o catch
+        // silenciava e TODO login por nome de usuário devolvia 400
+        // "Credenciais inválidas" antes mesmo de validar a senha.
+        var found = $app.findRecordsByFilter('users', 'login = {:login}', '-created', 1, 0, {
+          login: lower,
+        })
         if (found && found.length > 0) {
           userRecord = found[0]
         }
