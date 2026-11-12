@@ -1,5 +1,10 @@
 // Criação de usuários — HURAM
 //
+// v0.0.703: versão corrigida reimplantada no backend. Nas rodadas anteriores o
+// deploy nunca aconteceu porque o build do front quebrava (translatePbMessage
+// ausente em src/lib/pocketbase/errors.ts), deixando o servidor com o hook antigo
+// sem e.next() ("sucesso falso": API 200 sem gravar o registro).
+//
 // CAUSA RAIZ do erro "verified: Values don't match.":
 // No PocketBase v0.23+, hooks de REQUISIÇÃO (onRecordCreateRequest) rodam ANTES
 // da validação do formulário. Ao alterar campos do registro ali (ex.: `verified`),
