@@ -22,7 +22,7 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { useToast } from '@/hooks/use-toast'
 import type { Product, Empresa } from '@/lib/product-types'
 import { recordProductAuditLog } from '@/services/products'
