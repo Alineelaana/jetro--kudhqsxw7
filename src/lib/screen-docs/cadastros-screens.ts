@@ -793,4 +793,58 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
       content: '- Valores não numéricos nas parcelas ou prazos são reportados com precisão.',
     },
   },
+
+  '/admin/cadastros/usuarios': {
+    route: '/admin/cadastros/usuarios',
+    title: 'Usuários',
+    moduleGroup: 'Organização',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-11',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar os usuários do ERP HURAM: criação, edição, ativação/inativação, exclusão, vínculos multiempresa (empresas, filial padrão, perfil de acesso) e parâmetros de sessão (tempo de inatividade para deslogar, criação obrigatória de nova senha no próximo login).',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem de usuários cadastrados com código, avatar, nome, login, e-mail, cargo, papel de acesso, empresa(s) vinculada(s), situação e indicativo de MFA.\n- Busca por código, login, nome, e-mail ou cargo.\n- Botão "Novo Cadastro": abre o formulário de criação de usuário (nome, login, e-mail, senha, papel/perfil de acesso, cargo, CPF, empresas vinculadas multiempresa, empresa/filial padrão, tempo de inatividade, "Criar nova senha no próximo login" e foto de perfil).\n- Edição via UserEditDialog (ícone de lápis na linha do usuário).\n- Ativação/inativação de acesso por linha (exclusiva de SUP) e exclusão de usuário.\n- Atualização da listagem em tempo real via realtime PocketBase.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Apenas usuários com papel SUP podem criar novos usuários (bloqueio no servidor pelo hook on_user_create).\n- Senha mínima de 8 caracteres e tempo de inatividade entre 1 e 480 minutos (padrão corporativo: 480 min).\n- CPF validado com dígitos verificadores quando informado; foto de perfil limitada a 2MB.\n- Login é único globalmente entre todas as empresas do grupo (validado preventivamente antes da gravação).\n- Usuário criado nasce verificado (verified = true no hook de banco, pós-validação), conseguindo logar no primeiro acesso com a senha definida no cadastro.\n- Campos de MFA nunca podem ser definidos manualmente na criação.\n- Vínculos multiempresa gravados na coleção usuarios_empresas (usuario, empresa, filial_padrao, ativo).',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O administrador SUP acessa Cadastros > Usuários no menu lateral.\n2. Clica em "Novo Cadastro"; o sistema pré-carrega o próximo código sequencial.\n3. Preenche os dados do usuário, marca as empresas vinculadas e salva.\n4. Em caso de erro de validação, o formulário permanece aberto exibindo o erro traduzido (campo a campo, com rótulo amigável em português); em caso de sucesso, o modal fecha, a listagem é recarregada e um toast confirma a criação.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `users`, `usuarios_empresas`, `empresas`, `filiais`, `perfis_permissoes` (via `src/services/users.ts` e `src/lib/profile-permissions.ts`).',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Hook de servidor `pocketbase/hooks/on_user_create.js`: autorização de criação (onRecordCreateRequest, apenas SUP) e sanitização pós-validação (onRecordCreate: role padrão, limpeza de MFA, verified = true).\n- Tradução de erros de validação `src/lib/pocketbase/errors.ts`.\n- Auditoria `registerAuditLog` quando a opção "Criar nova senha no próximo login" é ativada.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Criação, edição, ativação/inativação e exclusão de usuários restritas ao papel SUP (o servidor recusa a criação por não-SUP com erro traduzido).\n- Visualização da listagem para usuários autenticados com acesso à tela.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `UserManagement`, `UserEditDialog`, `JetroTable`-like de listagem própria.\n- Serviços: `src/services/users.ts` (createUser, updateUser, getUsers, getNextUserCodigo, isLoginTakenGlobally), `src/services/audit-logs.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Validações prévias no cliente: campos obrigatórios, senha mínima de 8 caracteres, CPF inválido e tempo de inatividade fora do intervalo 1–480.\n- Erros de validação do PocketBase (HTTP 400) são traduzidos e rotulados em português campo a campo (ex: "Verificação de e-mail: Os valores informados não coincidem..."), via translatePbMessage/rótulos de `src/lib/pocketbase/errors.ts` e `USER_FIELD_LABELS` de `src/services/users.ts` — nunca texto cru como "verified: Values nao coincidem.".\n- Casos específicos tratados com mensagem dedicada: login já em uso (global entre empresas), CPF já cadastrado, e-mail já cadastrado e senha atual incorreta (edição).\n- O erro é exibido dentro do próprio modal de cadastro/edição (bloco de erro geral), que permanece aberto para correção; falhas de listagem, exclusão e alteração de status exibem toast de erro.',
+    },
+  },
 }
