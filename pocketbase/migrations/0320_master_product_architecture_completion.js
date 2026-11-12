@@ -24,7 +24,11 @@ migrate(
       var hasUniqueCode = false
       for (var i = 0; i < idx.length; i++) {
         var s = String(idx[i]).toUpperCase().replace(/\s+/g, ' ')
-        if (s.indexOf('ON PRODUCTS') >= 0 && s.indexOf('UNIQUE INDEX') >= 0 && s.indexOf('(CODE') >= 0) {
+        if (
+          s.indexOf('ON PRODUCTS') >= 0 &&
+          s.indexOf('UNIQUE INDEX') >= 0 &&
+          s.indexOf('(CODE') >= 0
+        ) {
           hasUniqueCode = true
         }
       }
