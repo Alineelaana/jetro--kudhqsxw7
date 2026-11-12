@@ -80,8 +80,10 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
     try {
       // 1. Chamar endpoint autenticado no backend (pb_hooks) com privilégio adequado
       // para gravar a nova senha com hash nativo e desativar os flags force_password_change / must_change_password
-      let response: { success?: boolean; message?: string; error?: string } | null = null
-
+      // NÃO há fallback via update direto na coleção users: a regra de API impede que o
+      // usuário comum altere must_change_password / force_password_change (:changed = false),
+      // e o update sempre falharia em 400 (comprovado em produção).
+      let response: { success?: boolean; message?: string; error?: string }
       try {
         response = await pb.send<{ success?: boolean; message?: string; error?: string }>(
           '/backend/v1/auth/reset-forced-password',
@@ -95,58 +97,49 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
           },
         )
       } catch (endpointErr: any) {
-        console.warn(
-          'Endpoint /backend/v1/auth/reset-forced-password falhou, tentando fallback via API users:',
-          endpointErr,
-        )
-        // Fallback: se o endpoint falhar por algum motivo, tentar update direto
-        try {
-          await pb.collection('users').update(user.id, {
-            password: newPassword,
-            passwordConfirm: confirmPassword,
-            force_password_change: false,
-            must_change_password: false,
-          })
-          response = { success: true }
-        } catch (directErr: any) {
-          // Extrair mensagem de erro amigável em português
-          const status = endpointErr?.status || directErr?.status
-          const serverMsg =
-            endpointErr?.data?.error ||
-            endpointErr?.response?.data?.error ||
-            directErr?.data?.message ||
-            directErr?.message
+        const status = endpointErr?.status
+        const serverMsg = endpointErr?.data?.error || endpointErr?.response?.data?.error
 
-          if (
-            serverMsg &&
-            typeof serverMsg === 'string' &&
-            !serverMsg.toLowerCase().includes('failed to update')
-          ) {
-            throw new Error(serverMsg)
-          }
-
-          if (status === 400) {
-            throw new Error(
-              'A nova senha informada não é válida. Verifique se possui no mínimo 8 dígitos e se os dois campos são idênticos.',
-            )
-          }
-          if (status === 401 || status === 403) {
-            throw new Error(
-              'Sessão expirada ou sem permissão para esta alteração. Por favor, saia e entre novamente no sistema.',
-            )
-          }
-
+        if (serverMsg && typeof serverMsg === 'string') {
+          throw new Error(serverMsg)
+        }
+        if (status === 400) {
           throw new Error(
-            'Não foi possível salvar a nova senha. Tente novamente em alguns instantes.',
+            'A nova senha informada não é válida. Verifique se possui no mínimo 8 dígitos e se os dois campos são idênticos.',
           )
         }
+        if (status === 401 || status === 403) {
+          throw new Error(
+            'Sessão expirada ou sem permissão para esta alteração. Por favor, saia e entre novamente no sistema.',
+          )
+        }
+
+        throw new Error(
+          'Não foi possível salvar a nova senha. Tente novamente em alguns instantes.',
+        )
       }
 
       if (response && response.error) {
         throw new Error(response.error)
       }
 
-      // 2. Registrar evento de auditoria local complementar (o hook também já registra no backend)
+      // 2. A troca de senha regenera o tokenKey no PocketBase, o que INVALIDA o token
+      // de autenticação usado nesta sessão. Reautenticar com a nova senha para obter
+      // um token válido — sem isso o primeiro acesso terminaria em 401 em toda
+      // chamada seguinte e o usuário nunca concluía o login.
+      try {
+        const identityEmail = ((user.email as string) || '').trim()
+        const identityLogin = ((user.login as string) || '').trim()
+        if (identityEmail) {
+          await pb.collection('users').authWithPassword(identityEmail, newPassword)
+        } else if (identityLogin) {
+          await pb.collection('users').authWithPassword(identityLogin, newPassword)
+        }
+      } catch (reauthErr) {
+        console.warn('Reautenticação com a nova senha falhou:', reauthErr)
+      }
+
+      // 4. Registrar evento de auditoria local complementar (o hook também já registra no backend)
       try {
         await registerAuditLog({
           action: 'user_password_reset_forced',
@@ -166,14 +159,8 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
         console.warn('Falha ao gravar auditoria complementar da troca de senha:', auditErr)
       }
 
-      // 3. Atualizar token e dados locais da autenticação no PocketBase authStore
-      try {
-        await pb.collection('users').authRefresh()
-      } catch (refreshErr) {
-        console.warn('Aviso ao sincronizar token após alteração de senha:', refreshErr)
-      }
-
-      // 4. Atualizar estado local de autenticação
+      // 5. Atualizar dados locais da autenticação (o authStore já contém a sessão
+      // renovada obtida na reautenticação com a nova senha)
       clearMustChangePassword()
       setSuccess(true)
 
