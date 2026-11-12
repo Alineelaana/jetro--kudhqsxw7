@@ -3,6 +3,18 @@
  * Baseado no Roteiro de Implementação de Produtos, Entrada e NF-e (DEC Eldorado e Gran Romano)
  */
 
+/** Empresa do ERP (multiempresa) — usada nas abas de vínculos e parametrização por empresa */
+export interface Empresa {
+  id: string
+  name: string
+  razao_social?: string
+  nome_fantasia?: string
+  cnpj?: string
+  sigla?: string
+  active?: boolean
+  [key: string]: unknown
+}
+
 export interface ProductVariation {
   size: string
   color: string

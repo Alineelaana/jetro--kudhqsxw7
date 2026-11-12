@@ -14,6 +14,49 @@ import type {
 // 1. PRODUTOS GERAIS
 // ==========================================
 
+/**
+ * Padrão de auditoria do projeto: grava em `audit_logs` (mesma coleção usada
+ * pelas demais telas), diferenciando alteração GLOBAL no produto mestre de
+ * alteração POR EMPRESA (vínculos e parametrizações).
+ */
+export interface ProductAuditLogInput {
+  productId: string
+  scope: 'global' | 'empresa'
+  action: 'create' | 'update' | 'delete' | 'block' | 'unblock'
+  field?: string
+  oldValue?: string | number | boolean | null
+  newValue?: string | number | boolean | null
+  empresaId?: string
+  empresaName?: string
+  description?: string
+}
+
+export async function recordProductAuditLog(input: ProductAuditLogInput): Promise<void> {
+  const auth = pb.authStore.record as { id?: string; name?: string; role?: string } | undefined
+  const scopeLabel =
+    input.scope === 'global'
+      ? input.empresaName || 'Dados Globais'
+      : input.empresaName || input.empresaId || 'Empresa'
+
+  await pb.collection('audit_logs').create({
+    user_id: auth?.id || '',
+    user_name: auth?.name || 'Sistema',
+    user_role: (auth as { role?: string })?.role || '',
+    action: input.action,
+    module: 'Produtos',
+    target_collection: input.scope === 'global' ? 'products' : 'product_company_links',
+    target_id: input.productId,
+    target_summary: `Produto ${input.productId} — ${scopeLabel}`,
+    previous_value:
+      input.oldValue !== undefined ? { field: input.field || '', value: input.oldValue } : null,
+    new_value:
+      input.newValue !== undefined ? { field: input.field || '', value: input.newValue } : null,
+    justification: input.description || '',
+    empresa: input.empresaId || '',
+    criticidade: 'Média',
+  })
+}
+
 export async function getProducts(): Promise<Product[]> {
   return pb.collection('products').getFullList<Product>({ sort: '-created' })
 }
