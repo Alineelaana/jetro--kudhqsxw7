@@ -5,6 +5,9 @@ import type {
   ProductUnit,
   SupplierProductRef,
   FiscalCatalogEntry,
+  ProductCompanyLink,
+  ProductCompanyCommercial,
+  ProductCompanyStock,
 } from '@/lib/product-types'
 
 // ==========================================
@@ -86,6 +89,77 @@ export async function getProductCostHistory(productId: string) {
     filter: `product = "${productId}"`,
     sort: '-created',
   })
+}
+
+// ==========================================
+// 1.1 ARQUITETURA MESTRE — VÍNCULOS E PARAMETRIZAÇÕES POR EMPRESA (0319)
+// ==========================================
+
+export async function getProductCompanyLinks(productId: string): Promise<ProductCompanyLink[]> {
+  return pb.collection('product_company_links').getFullList<ProductCompanyLink>({
+    filter: `product_id = "${productId}"`,
+    expand: 'empresa_id',
+    sort: 'created',
+  })
+}
+
+export async function saveProductCompanyLink(
+  data: Partial<ProductCompanyLink>,
+): Promise<ProductCompanyLink> {
+  if (data.id) {
+    return pb.collection('product_company_links').update<ProductCompanyLink>(data.id, data)
+  }
+  return pb.collection('product_company_links').create<ProductCompanyLink>(data)
+}
+
+export async function getProductCompanyCommercial(
+  productId: string,
+  empresaId: string,
+): Promise<ProductCompanyCommercial | null> {
+  try {
+    const list = await pb
+      .collection('product_company_commercial')
+      .getList<ProductCompanyCommercial>(1, 1, {
+        filter: `product_id = "${productId}" && empresa_id = "${empresaId}"`,
+      })
+    return list.items[0] || null
+  } catch {
+    return null
+  }
+}
+
+export async function saveProductCompanyCommercial(
+  data: Partial<ProductCompanyCommercial>,
+): Promise<ProductCompanyCommercial> {
+  if (data.id) {
+    return pb
+      .collection('product_company_commercial')
+      .update<ProductCompanyCommercial>(data.id, data)
+  }
+  return pb.collection('product_company_commercial').create<ProductCompanyCommercial>(data)
+}
+
+export async function getProductCompanyStock(
+  productId: string,
+  empresaId: string,
+): Promise<ProductCompanyStock | null> {
+  try {
+    const list = await pb.collection('product_company_stock').getList<ProductCompanyStock>(1, 1, {
+      filter: `product_id = "${productId}" && empresa_id = "${empresaId}"`,
+    })
+    return list.items[0] || null
+  } catch {
+    return null
+  }
+}
+
+export async function saveProductCompanyStock(
+  data: Partial<ProductCompanyStock>,
+): Promise<ProductCompanyStock> {
+  if (data.id) {
+    return pb.collection('product_company_stock').update<ProductCompanyStock>(data.id, data)
+  }
+  return pb.collection('product_company_stock').create<ProductCompanyStock>(data)
 }
 
 // ==========================================
