@@ -11,12 +11,12 @@ migrate(
         var lp = legacyProducts[li]
         var lcode = lp.getString('code')
         if (!lcode || lcode === '') {
-          lp.set('code', 'LEGADO-' + lp.getId().slice(0, 8).toUpperCase())
+          lp.set('code', 'LEGADO-' + lp.id.slice(0, 8).toUpperCase())
           app.save(lp)
         }
       }
     } catch (err0) {
-      $app.logger().error('0319 legacy code fix failed: ' + String(err0))
+      app.logger().error('0319 legacy code fix failed: ' + String(err0))
     }
 
     // ============================================
@@ -43,7 +43,7 @@ migrate(
         app.save(productsCol)
       }
     } catch (err1) {
-      $app.logger().error('0319 unique code index failed: ' + String(err1))
+      app.logger().error('0319 unique code index failed: ' + String(err1))
     }
 
     // ============================================
@@ -284,13 +284,13 @@ migrate(
           try {
             existing = app.findFirstRecordByFilter(
               'product_company_links',
-              'product_id = "' + prod.getId() + '" && empresa_id = "' + emp.getId() + '"',
+              'product_id = "' + prod.id + '" && empresa_id = "' + emp.id + '"',
             )
           } catch (_) {}
           if (!existing) {
             var linkRec = new Record(linksCol)
-            linkRec.set('product_id', prod.getId())
-            linkRec.set('empresa_id', emp.getId())
+            linkRec.set('product_id', prod.id)
+            linkRec.set('empresa_id', emp.id)
             linkRec.set('status', 'ativo')
             linkRec.set('can_purchase', true)
             linkRec.set('can_sell', true)
@@ -306,9 +306,9 @@ migrate(
           }
         }
       }
-      $app.logger().info('0319 backfill product_company_links criados: ' + String(createdCount))
+      app.logger().info('0319 backfill product_company_links criados: ' + String(createdCount))
     } catch (err6) {
-      $app.logger().error('0319 backfill links failed: ' + String(err6))
+      app.logger().error('0319 backfill links failed: ' + String(err6))
     }
   },
   (app) => {

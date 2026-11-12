@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T00:57:38.018Z",
+  "generatedAt": "2026-11-12T01:16:24.294Z",
   "collections": [
     {
       "name": "users",
@@ -2939,6 +2939,205 @@
         {
           "name": "b2b_min_order_qty",
           "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "description_complementar",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fabricante",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "modelo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dun14",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cadastro_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ativo", "inativo", "descontinuado"]
+        },
+        {
+          "name": "dim_length",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dim_width",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dim_height",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dim_depth",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dim_unit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "weight_net",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "weight_gross",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "weight_unit",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_units_per_box",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_dim_length",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_dim_width",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_dim_height",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_weight_net",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_weight_gross",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "master_dun14",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pallet_boxes_per_layer",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pallet_layers_per_pallet",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pallet_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pallet_empty_weight",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pallet_max_height",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "packaging_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "packaging_qty",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "max_stacking",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fragile",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "special_storage",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "storage_temperature",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "shelf_life_days",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "transport_restrictions",
+          "type": "text",
           "required": false,
           "system": false
         }
