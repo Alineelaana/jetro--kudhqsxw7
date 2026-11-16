@@ -141,6 +141,7 @@ export function FocusNfeSendDebug({ chaveAcesso, className }: Props) {
     setError('')
     pb.send<DebugResponse & { error?: string }>(
       `/backend/v1/huram/fiscal/focus-nfe/debug/${encodeURIComponent(chaveAcesso)}`,
+      {},
     )
       .then((json) => {
         if (json?.error) throw new Error(json.error)
