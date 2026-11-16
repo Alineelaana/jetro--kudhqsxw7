@@ -4,19 +4,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
+import pb from '@/lib/pocketbase/client'
 
 /**
  * Box de Diagnóstico de Envio (suporte Focus NFe) — usado no visualizador da NF-e.
- * Mostra o payload exato do POST /v2/nfe?ref=, o XML completo, a URL do POST
- * e a resposta da última tentativa de transmissão, sempre com botão de copiar
- * (ou download, no caso do XML) — sem truncamento.
+ * Mostra o payload exato do POST /v2/nfe?ref= (MODELO DE CAMPOS: flat JSON com
+ * emitente, destinatário, items e tributos — sem xml/xml_assinado), o XML
+ * completo (apenas como referência/download), a URL do POST e a resposta da
+ * última tentativa de transmissão, sempre com botão de copiar (ou download, no
+ * caso do XML) — sem truncamento.
  */
 
-interface DebugPayload {
-  xml: string
-  xml_assinado: string
-  ref?: string
-}
+type DebugPayload = Record<string, unknown>
 
 interface DebugResponse {
   success: boolean
@@ -140,13 +139,11 @@ export function FocusNfeSendDebug({ chaveAcesso, className }: Props) {
     let active = true
     setLoading(true)
     setError('')
-    fetch(`/backend/v1/huram/fiscal/focus-nfe/debug/${encodeURIComponent(chaveAcesso)}`, {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-    })
-      .then(async (res) => {
-        const json = (await res.json()) as DebugResponse & { error?: string }
-        if (!res.ok || json?.error) throw new Error(json?.error || 'Falha ao carregar dados')
+    pb.send<DebugResponse & { error?: string }>(
+      `/backend/v1/huram/fiscal/focus-nfe/debug/${encodeURIComponent(chaveAcesso)}`,
+    )
+      .then((json) => {
+        if (json?.error) throw new Error(json.error)
         if (active) setData(json)
       })
       .catch((err: unknown) => {
@@ -160,19 +157,9 @@ export function FocusNfeSendDebug({ chaveAcesso, className }: Props) {
     }
   }, [chaveAcesso])
 
-  const payloadJson = data
-    ? JSON.stringify(
-        data.payload.ref
-          ? {
-              xml: data.payload.xml,
-              xml_assinado: data.payload.xml_assinado,
-              ref: data.payload.ref,
-            }
-          : { xml: data.payload.xml, xml_assinado: data.payload.xml_assinado },
-        null,
-        2,
-      )
-    : ''
+  // JSON do corpo do POST /v2/nfe?ref= — MODELO DE CAMPOS (flat JSON),
+  // exatamente o que o backend transmite (sem xml/xml_assinado).
+  const payloadJson = data ? JSON.stringify(data.payload, null, 2) : ''
   const ultimaRespostaJson = data?.ultima_resposta
     ? JSON.stringify(
         Object.fromEntries(Object.entries(data.ultima_resposta).filter(([, v]) => v)),
@@ -194,8 +181,8 @@ export function FocusNfeSendDebug({ chaveAcesso, className }: Props) {
           Diagnóstico de Envio — Suporte Focus NFe
         </h3>
         <p className="text-xs text-muted-foreground">
-          Payload exato, XML completo e URL da chamada de transmissão desta NF-e — para colar no
-          chamado do suporte.
+          JSON de envio no modelo de campos (emitente, destinatário, items e tributos), URL do POST
+          e XML de referência desta NF-e — para colar no chamado do suporte.
         </p>
       </div>
 

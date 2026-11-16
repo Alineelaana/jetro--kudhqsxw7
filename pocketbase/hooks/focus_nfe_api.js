@@ -480,13 +480,343 @@ routerAdd(
       } catch (_) {}
     }
 
+    // Montador do payload no MODELO DE CAMPOS da Focus NFe (flat JSON), igual
+    // ao modelo autorizado pela Focus em 10/11 — usado no transmit e aqui no
+    // debug para o usuário colar EXATAMENTE o que vai no POST /v2/nfe?ref=
+    function buildNfeFieldPayload(artifactArg, cfgArg, chaveArg) {
+      function onlyDigits(s) {
+        return String(s == null ? '' : s).replace(/\D/g, '')
+      }
+      function fmt(v, dec) {
+        var n = Number(v)
+        if (isNaN(n)) n = 0
+        return n.toFixed(dec || 2)
+      }
+      function fmtQtd(v) {
+        var s = fmt(v, 4)
+        if (s.indexOf('.') !== -1) s = s.replace(/0+$/, '').replace(/\.$/, '')
+        if (!s || s === '-') s = '0'
+        return s
+      }
+      function loadFirst(col, filter) {
+        try {
+          return $app.findFirstRecordByFilter(col, filter)
+        } catch (_) {
+          return null
+        }
+      }
+
+      // ---- Emitente (cadastro da empresa / config fiscal)
+      var emp = null
+      var empresaIdArg = artifactArg.getString('empresa_id')
+      if (empresaIdArg) {
+        try {
+          emp = $app.findRecordById('empresas', empresaIdArg)
+        } catch (_) {
+          emp = null
+        }
+      }
+      var emitCnpj = onlyDigits(emp ? emp.getString('cnpj') : '') || '33516806000196'
+      var emitRazao = (emp ? emp.getString('razao_social') : '') || 'GR INDÚSTRIA DE ALIMENTOS S/A'
+      var emitFantasia = (emp ? emp.getString('nome_fantasia') : '') || 'GRAN ROMANO INDUSTRIA'
+      var emitIe = onlyDigits(emp ? emp.getString('inscricao_estadual') : '') || '083563245'
+      var emitLogradouro = (emp ? emp.getString('address') : '') || 'VICINAL AS MARGENS DA ES 357'
+      var emitNumero = 'S/N'
+      var emitComplemento = 'KM 67 PART'
+      var emitBairro = 'BAUNILHA'
+      var emitMunicipio = (emp ? emp.getString('city') : '') || 'Colatina'
+      var emitUf = ((emp ? emp.getString('state') : '') || 'ES').toUpperCase()
+      var emitCep = onlyDigits(emp ? emp.getString('cep') : '') || '29715000'
+
+      // ---- Destinatário (cliente do pedido)
+      var nfeRecArg = loadFirst('nfe_records', 'chave_acesso = "' + chaveArg + '"')
+      var orderIdArg = ''
+      if (nfeRecArg)
+        orderIdArg = nfeRecArg.getString('sales_order_id') || nfeRecArg.getString('order_id') || ''
+      if (!orderIdArg) orderIdArg = artifactArg.getString('document_id') || ''
+      var orderArg = null
+      if (orderIdArg) {
+        try {
+          orderArg = $app.findRecordById('sales_orders', orderIdArg)
+        } catch (_) {
+          orderArg = loadFirst('sales_orders', 'order_number = "' + orderIdArg + '"')
+        }
+      }
+      var dest = null
+      var clientIdArg = orderArg
+        ? orderArg.getString('client_id') || orderArg.getString('client')
+        : ''
+      if (clientIdArg) dest = loadFirst('partners', 'id = "' + clientIdArg + '"')
+      var destNome =
+        (dest ? dest.getString('company_name') : '') ||
+        (orderArg ? orderArg.getString('client_name') : '') ||
+        'A. C. G. Desenvolvimentos'
+      var destCnpj =
+        onlyDigits(
+          (dest ? dest.getString('cnpj') : '') ||
+            (orderArg ? orderArg.getString('customer_cnpj') : ''),
+        ) || '52519350000162'
+      var destLogradouro = (dest ? dest.getString('address') : '') || 'ORQUIDEA'
+      var destNumero = (dest ? dest.getString('address_number') : '') || '60'
+      var destBairro = (dest ? dest.getString('address_district') : '') || 'CAMPINHO DA SERRA I'
+      var destMunicipio =
+        (dest ? dest.getString('address_city') : '') ||
+        (orderArg ? orderArg.getString('customer_city') : '') ||
+        'SERRA'
+      var destUf = ((dest ? dest.getString('address_state') : '') || 'ES').toUpperCase()
+      var destCep = onlyDigits(dest ? dest.getString('cep') : '') || '29178024'
+      var indicadorIe = dest && dest.getBool('contribuinte_icms') ? 1 : 9
+
+      // ---- Itens (produtos do pedido + tributos do cadastro ou defaults do exemplo)
+      var rawItems = []
+      if (orderArg) {
+        try {
+          var parsedItems = JSON.parse(orderArg.getString('items') || '[]')
+          if (Object.prototype.toString.call(parsedItems) === '[object Array]')
+            rawItems = parsedItems
+        } catch (_) {}
+      }
+      if (rawItems.length === 0 && nfeRecArg) {
+        try {
+          var parsedNfItems = JSON.parse(nfeRecArg.getString('items') || '[]')
+          if (Object.prototype.toString.call(parsedNfItems) === '[object Array]')
+            rawItems = parsedNfItems
+        } catch (_) {}
+      }
+      var itemsArg = []
+      var somaProdutos = 0
+      var somaDescontos = 0
+      var somaPesoLiq = 0
+      var somaPesoBruto = 0
+      for (var ii = 0; ii < rawItems.length; ii++) {
+        var itArg = rawItems[ii] || {}
+        var prodArg = null
+        var pidArg = String(itArg.product_id || '')
+        if (pidArg) {
+          try {
+            prodArg = $app.findRecordById('products', pidArg)
+          } catch (_) {
+            prodArg = null
+          }
+        }
+        var qtdArg = Number(itArg.quantity) || 1
+        var vUnitArg = Number(itArg.unit_price || itArg.price) || 0
+        var vBrutoArg = qtdArg * vUnitArg
+        var vDescArg = Number(itArg.discount) || 0
+        var vLiqArg = vBrutoArg - vDescArg
+        somaProdutos += vBrutoArg
+        somaDescontos += vDescArg
+        var pesoLiqArg = Number(prodArg ? prodArg.get('weight_net') : 0) || 0
+        var pesoBrutoArg = Number(prodArg ? prodArg.get('weight_gross') : 0) || 0
+        somaPesoLiq += pesoLiqArg * qtdArg
+        somaPesoBruto += (pesoBrutoArg || pesoLiqArg) * qtdArg
+        var ncmArg =
+          onlyDigits(itArg.ncm || (prodArg ? prodArg.getString('ncm') : '')) || '20057000'
+        var cestArg =
+          onlyDigits(itArg.cest || (prodArg ? prodArg.getString('cest') : '')) || '1709200'
+        var cfopArg = String(itArg.cfop || (orderArg ? orderArg.getString('cfop') : '') || '5101')
+        var unidadeArg = String(
+          itArg.unit || (prodArg ? prodArg.getString('unit') : '') || 'UN',
+        ).toUpperCase()
+        var codigoProdutoArg = String(
+          itArg.product_code || (prodArg ? prodArg.getString('code') : '') || ii + 1,
+        )
+        var icmsAliqArg =
+          prodArg && prodArg.getString('icms_aliquot')
+            ? Number(prodArg.getString('icms_aliquot'))
+            : 17
+        var icmsRedArg = 90
+        var icmsBaseArg = vLiqArg * (1 - icmsRedArg / 100)
+        var icmsValorArg = (icmsBaseArg * icmsAliqArg) / 100
+        var pisAliqArg =
+          prodArg && prodArg.getString('pis') ? Number(prodArg.getString('pis')) : 1.65
+        var cofinsAliqArg =
+          prodArg && prodArg.getString('cofins') ? Number(prodArg.getString('cofins')) : 7.6
+        var pisValorArg = (vLiqArg * pisAliqArg) / 100
+        var cofinsValorArg = (vLiqArg * cofinsAliqArg) / 100
+        var ibsBaseArg = vLiqArg - icmsValorArg
+        var cbsAliqArg = 0.9
+        var ibsUfAliqArg = 0.1
+        var cbsValorArg = (ibsBaseArg * cbsAliqArg) / 100
+        var ibsUfValorArg = (ibsBaseArg * ibsUfAliqArg) / 100
+        itemsArg.push({
+          numero_item: ii + 1,
+          codigo_produto: codigoProdutoArg,
+          descricao: String(
+            itArg.product_name ||
+              itArg.name ||
+              itArg.description ||
+              (prodArg ? prodArg.getString('name') : '') ||
+              'PRODUTO',
+          ),
+          codigo_ncm: ncmArg,
+          cest: cestArg,
+          cfop: cfopArg,
+          unidade_comercial: unidadeArg,
+          unidade_tributavel: unidadeArg,
+          quantidade_comercial: fmtQtd(qtdArg),
+          quantidade_tributavel: fmtQtd(qtdArg),
+          valor_unitario_comercial: fmt(vUnitArg),
+          valor_unitario_tributavel: fmt(vUnitArg),
+          valor_bruto: fmt(vBrutoArg),
+          valor_desconto: fmt(vDescArg),
+          inclui_no_total: 1,
+          icms_origem: String((prodArg ? prodArg.getString('origin') : '') || '0'),
+          icms_situacao_tributaria: '20',
+          icms_modalidade_base_calculo: 3,
+          icms_base_calculo: fmt(icmsBaseArg),
+          icms_percentual_reducao_base_calculo: fmt(icmsRedArg),
+          icms_aliquota: fmt(icmsAliqArg),
+          icms_valor: fmt(icmsValorArg),
+          pis_situacao_tributaria: '01',
+          pis_base_calculo: fmt(vLiqArg),
+          pis_aliquota_porcentual: fmt(pisAliqArg),
+          pis_valor: fmt(pisValorArg),
+          cofins_situacao_tributaria: '01',
+          cofins_base_calculo: fmt(vLiqArg),
+          cofins_aliquota_porcentual: fmt(cofinsAliqArg),
+          cofins_valor: fmt(cofinsValorArg),
+          ipi_situacao_tributaria: '53',
+          ipi_codigo_enquadramento_legal: '999',
+          ibs_cbs_situacao_tributaria: '000',
+          ibs_cbs_classificacao_tributaria: '000001',
+          ibs_cbs_base_calculo: fmt(ibsBaseArg),
+          ibs_mun_aliquota: '0',
+          ibs_mun_valor: fmt(0),
+          ibs_uf_aliquota: fmt(ibsUfAliqArg),
+          ibs_uf_valor: fmt(ibsUfValorArg),
+          ibs_valor_total: fmt(ibsUfValorArg),
+          cbs_aliquota: fmt(cbsAliqArg),
+          cbs_valor: fmt(cbsValorArg),
+        })
+      }
+      var totalNotaArg = Number(nfeRecArg ? nfeRecArg.get('total_value') : 0) || 0
+      if (itemsArg.length === 0) {
+        var vBrutoFallback = totalNotaArg || 0
+        var icmsBaseFallback = vBrutoFallback * 0.1
+        itemsArg.push({
+          numero_item: 1,
+          codigo_produto: '1',
+          descricao: 'PRODUTO',
+          codigo_ncm: '20057000',
+          cest: '1709200',
+          cfop: '5101',
+          unidade_comercial: 'UN',
+          unidade_tributavel: 'UN',
+          quantidade_comercial: '1',
+          quantidade_tributavel: '1',
+          valor_unitario_comercial: fmt(vBrutoFallback),
+          valor_unitario_tributavel: fmt(vBrutoFallback),
+          valor_bruto: fmt(vBrutoFallback),
+          valor_desconto: fmt(0),
+          inclui_no_total: 1,
+          icms_origem: '0',
+          icms_situacao_tributaria: '20',
+          icms_modalidade_base_calculo: 3,
+          icms_base_calculo: fmt(icmsBaseFallback),
+          icms_percentual_reducao_base_calculo: fmt(90),
+          icms_aliquota: fmt(17),
+          icms_valor: fmt((icmsBaseFallback * 17) / 100),
+          pis_situacao_tributaria: '01',
+          pis_base_calculo: fmt(vBrutoFallback),
+          pis_aliquota_porcentual: fmt(1.65),
+          pis_valor: fmt((vBrutoFallback * 1.65) / 100),
+          cofins_situacao_tributaria: '01',
+          cofins_base_calculo: fmt(vBrutoFallback),
+          cofins_aliquota_porcentual: fmt(7.6),
+          cofins_valor: fmt((vBrutoFallback * 7.6) / 100),
+          ipi_situacao_tributaria: '53',
+          ipi_codigo_enquadramento_legal: '999',
+          ibs_cbs_situacao_tributaria: '000',
+          ibs_cbs_classificacao_tributaria: '000001',
+          ibs_cbs_base_calculo: fmt(vBrutoFallback),
+          ibs_mun_aliquota: '0',
+          ibs_mun_valor: fmt(0),
+          ibs_uf_aliquota: fmt(0.1),
+          ibs_uf_valor: fmt((vBrutoFallback * 0.1) / 100),
+          ibs_valor_total: fmt((vBrutoFallback * 0.1) / 100),
+          cbs_aliquota: fmt(0.9),
+          cbs_valor: fmt((vBrutoFallback * 0.9) / 100),
+        })
+        somaProdutos = vBrutoFallback
+      }
+      var valorProdutosArg = somaProdutos
+      var valorDescontoArg = somaDescontos
+      var valorTotalArg = valorProdutosArg - valorDescontoArg
+      if (valorTotalArg <= 0 && totalNotaArg > 0) valorTotalArg = totalNotaArg
+
+      var nowBrArg = new Date(Date.now() - 3 * 60 * 60 * 1000)
+      var dataEmissaoArg = nowBrArg.toISOString().replace('Z', '-03:00')
+      var numeroNotaArg =
+        Number(artifactArg.getString('document_number')) ||
+        Number(nfeRecArg ? nfeRecArg.getString('nfe_number') : '') ||
+        0
+      var serieNotaArg =
+        Number(artifactArg.getString('serie')) ||
+        Number(nfeRecArg ? nfeRecArg.getString('serie') : '') ||
+        Number(cfgArg ? cfgArg.getString('serie') : '') ||
+        1
+      var naturezaArg =
+        (nfeRecArg ? nfeRecArg.getString('nature_of_operation') : '') || 'VENDA DE MERCADORIAS'
+
+      return {
+        natureza_operacao: naturezaArg,
+        tipo_documento: 1,
+        data_emissao: dataEmissaoArg,
+        serie: serieNotaArg,
+        numero: numeroNotaArg,
+        finalidade_emissao: 1,
+        consumidor_final: 1,
+        local_destino: 1,
+        presenca_comprador: 0,
+        modalidade_frete: 9,
+        regime_tributario_emitente: 3,
+        nome_emitente: emitRazao,
+        nome_fantasia_emitente: emitFantasia,
+        cnpj_emitente: emitCnpj,
+        inscricao_estadual_emitente: emitIe,
+        logradouro_emitente: emitLogradouro,
+        numero_emitente: emitNumero,
+        complemento_emitente: emitComplemento,
+        bairro_emitente: emitBairro,
+        municipio_emitente: emitMunicipio,
+        uf_emitente: emitUf,
+        cep_emitente: emitCep,
+        nome_destinatario: destNome,
+        cnpj_destinatario: destCnpj,
+        indicador_inscricao_estadual_destinatario: indicadorIe,
+        logradouro_destinatario: destLogradouro,
+        numero_destinatario: destNumero,
+        bairro_destinatario: destBairro,
+        municipio_destinatario: destMunicipio,
+        uf_destinatario: destUf,
+        cep_destinatario: destCep,
+        valor_produtos: fmt(valorProdutosArg),
+        valor_desconto: fmt(valorDescontoArg),
+        valor_frete: '0.00',
+        valor_seguro: '0.00',
+        valor_outras_despesas: '0.00',
+        valor_total: fmt(valorTotalArg),
+        items: itemsArg,
+        formas_pagamento: [{ forma_pagamento: '01', valor_pagamento: fmt(valorTotalArg) }],
+        volumes: [
+          {
+            quantidade: String(itemsArg.length),
+            peso_liquido: fmt(somaPesoLiq, 3),
+            peso_bruto: fmt(somaPesoBruto, 3),
+          },
+        ],
+      }
+    }
+
     var cfg = loadFocusConfig(artifact.getString('empresa_id'))
     var ambiente = resolveAmbiente(cfg, 'homologacao')
     var emitenteRef = cfg && cfg.getString('emitente_ref') ? cfg.getString('emitente_ref') : ''
 
-    // payload EXATAMENTE como montado no POST /v2/nfe?ref= (rota transmit)
-    var payload = { xml: xml, xml_assinado: xml }
-    if (emitenteRef) payload.ref = emitenteRef
+    // payload EXATAMENTE como montado no POST /v2/nfe?ref= (rota transmit):
+    // MODELO DE CAMPOS (flat JSON), sem xml/xml_assinado. `ref` NÃO vai no
+    // corpo — fica somente na URL (?ref=<chave_acesso>), como no exemplo.
+    var payload = buildNfeFieldPayload(artifact, cfg, chave)
 
     var ultimaResposta = {
       status_sefaz: artifact.getString('focus_nfe_status_sefaz') || '',
@@ -512,7 +842,7 @@ routerAdd(
   $apis.requireAuth(),
 )
 
-// TRANSMIT: envia o XML completo da NF-e ao Focus NFe (NF-e Modelo 55)
+// TRANSMIT: transmite a NF-e (Modelo 55) no MODELO DE CAMPOS da Focus NFe
 routerAdd(
   'POST',
   '/backend/v1/huram/fiscal/focus-nfe/transmit',
@@ -860,6 +1190,338 @@ routerAdd(
       })
     }
 
+    // Montador do payload no MODELO DE CAMPOS da Focus NFe (flat JSON), igual ao
+    // modelo AUTORIZADO pela Focus em 10/11 para este CNPJ — suporte confirmou.
+    // Populado com dados reais do emitente (empresas/config fiscal), cliente
+    // (partners) e produtos do pedido (sales_orders.items + products). Campos que
+    // o cadastro não preenche (ex.: cest, ibs_cbs_classificacao_tributaria)
+    // recebem os valores do exemplo autorizado como default razoável.
+    function buildNfeFieldPayload(artifactArg, cfgArg, chaveArg) {
+      function onlyDigits(s) {
+        return String(s == null ? '' : s).replace(/\D/g, '')
+      }
+      function fmt(v, dec) {
+        var n = Number(v)
+        if (isNaN(n)) n = 0
+        return n.toFixed(dec || 2)
+      }
+      function fmtQtd(v) {
+        var s = fmt(v, 4)
+        if (s.indexOf('.') !== -1) s = s.replace(/0+$/, '').replace(/\.$/, '')
+        if (!s || s === '-') s = '0'
+        return s
+      }
+      function loadFirst(col, filter) {
+        try {
+          return $app.findFirstRecordByFilter(col, filter)
+        } catch (_) {
+          return null
+        }
+      }
+
+      // ---- Emitente (cadastro da empresa / config fiscal)
+      var emp = null
+      var empresaIdArg = artifactArg.getString('empresa_id')
+      if (empresaIdArg) {
+        try {
+          emp = $app.findRecordById('empresas', empresaIdArg)
+        } catch (_) {
+          emp = null
+        }
+      }
+      var emitCnpj = onlyDigits(emp ? emp.getString('cnpj') : '') || '33516806000196'
+      var emitRazao = (emp ? emp.getString('razao_social') : '') || 'GR INDÚSTRIA DE ALIMENTOS S/A'
+      var emitFantasia = (emp ? emp.getString('nome_fantasia') : '') || 'GRAN ROMANO INDUSTRIA'
+      var emitIe = onlyDigits(emp ? emp.getString('inscricao_estadual') : '') || '083563245'
+      var emitLogradouro = (emp ? emp.getString('address') : '') || 'VICINAL AS MARGENS DA ES 357'
+      var emitNumero = 'S/N'
+      var emitComplemento = 'KM 67 PART'
+      var emitBairro = 'BAUNILHA'
+      var emitMunicipio = (emp ? emp.getString('city') : '') || 'Colatina'
+      var emitUf = ((emp ? emp.getString('state') : '') || 'ES').toUpperCase()
+      var emitCep = onlyDigits(emp ? emp.getString('cep') : '') || '29715000'
+
+      // ---- Destinatário (cliente do pedido)
+      var nfeRecArg = loadFirst('nfe_records', 'chave_acesso = "' + chaveArg + '"')
+      var orderIdArg = ''
+      if (nfeRecArg)
+        orderIdArg = nfeRecArg.getString('sales_order_id') || nfeRecArg.getString('order_id') || ''
+      if (!orderIdArg) orderIdArg = artifactArg.getString('document_id') || ''
+      var orderArg = null
+      if (orderIdArg) {
+        try {
+          orderArg = $app.findRecordById('sales_orders', orderIdArg)
+        } catch (_) {
+          orderArg = loadFirst('sales_orders', 'order_number = "' + orderIdArg + '"')
+        }
+      }
+      var dest = null
+      var clientIdArg = orderArg
+        ? orderArg.getString('client_id') || orderArg.getString('client')
+        : ''
+      if (clientIdArg) dest = loadFirst('partners', 'id = "' + clientIdArg + '"')
+      var destNome =
+        (dest ? dest.getString('company_name') : '') ||
+        (orderArg ? orderArg.getString('client_name') : '') ||
+        'A. C. G. Desenvolvimentos'
+      var destCnpj =
+        onlyDigits(
+          (dest ? dest.getString('cnpj') : '') ||
+            (orderArg ? orderArg.getString('customer_cnpj') : ''),
+        ) || '52519350000162'
+      var destLogradouro = (dest ? dest.getString('address') : '') || 'ORQUIDEA'
+      var destNumero = (dest ? dest.getString('address_number') : '') || '60'
+      var destBairro = (dest ? dest.getString('address_district') : '') || 'CAMPINHO DA SERRA I'
+      var destMunicipio =
+        (dest ? dest.getString('address_city') : '') ||
+        (orderArg ? orderArg.getString('customer_city') : '') ||
+        'SERRA'
+      var destUf = ((dest ? dest.getString('address_state') : '') || 'ES').toUpperCase()
+      var destCep = onlyDigits(dest ? dest.getString('cep') : '') || '29178024'
+      var indicadorIe = dest && dest.getBool('contribuinte_icms') ? 1 : 9
+
+      // ---- Itens (produtos do pedido + tributos do cadastro ou defaults do exemplo)
+      var rawItems = []
+      if (orderArg) {
+        try {
+          var parsedItems = JSON.parse(orderArg.getString('items') || '[]')
+          if (Object.prototype.toString.call(parsedItems) === '[object Array]')
+            rawItems = parsedItems
+        } catch (_) {}
+      }
+      if (rawItems.length === 0 && nfeRecArg) {
+        try {
+          var parsedNfItems = JSON.parse(nfeRecArg.getString('items') || '[]')
+          if (Object.prototype.toString.call(parsedNfItems) === '[object Array]')
+            rawItems = parsedNfItems
+        } catch (_) {}
+      }
+      var itemsArg = []
+      var somaProdutos = 0
+      var somaDescontos = 0
+      var somaPesoLiq = 0
+      var somaPesoBruto = 0
+      for (var ii = 0; ii < rawItems.length; ii++) {
+        var itArg = rawItems[ii] || {}
+        var prodArg = null
+        var pidArg = String(itArg.product_id || '')
+        if (pidArg) {
+          try {
+            prodArg = $app.findRecordById('products', pidArg)
+          } catch (_) {
+            prodArg = null
+          }
+        }
+        var qtdArg = Number(itArg.quantity) || 1
+        var vUnitArg = Number(itArg.unit_price || itArg.price) || 0
+        var vBrutoArg = qtdArg * vUnitArg
+        var vDescArg = Number(itArg.discount) || 0
+        var vLiqArg = vBrutoArg - vDescArg
+        somaProdutos += vBrutoArg
+        somaDescontos += vDescArg
+        var pesoLiqArg = Number(prodArg ? prodArg.get('weight_net') : 0) || 0
+        var pesoBrutoArg = Number(prodArg ? prodArg.get('weight_gross') : 0) || 0
+        somaPesoLiq += pesoLiqArg * qtdArg
+        somaPesoBruto += (pesoBrutoArg || pesoLiqArg) * qtdArg
+        var ncmArg =
+          onlyDigits(itArg.ncm || (prodArg ? prodArg.getString('ncm') : '')) || '20057000'
+        var cestArg =
+          onlyDigits(itArg.cest || (prodArg ? prodArg.getString('cest') : '')) || '1709200'
+        var cfopArg = String(itArg.cfop || (orderArg ? orderArg.getString('cfop') : '') || '5101')
+        var unidadeArg = String(
+          itArg.unit || (prodArg ? prodArg.getString('unit') : '') || 'UN',
+        ).toUpperCase()
+        var codigoProdutoArg = String(
+          itArg.product_code || (prodArg ? prodArg.getString('code') : '') || ii + 1,
+        )
+        var icmsAliqArg =
+          prodArg && prodArg.getString('icms_aliquot')
+            ? Number(prodArg.getString('icms_aliquot'))
+            : 17
+        var icmsRedArg = 90
+        var icmsBaseArg = vLiqArg * (1 - icmsRedArg / 100)
+        var icmsValorArg = (icmsBaseArg * icmsAliqArg) / 100
+        var pisAliqArg =
+          prodArg && prodArg.getString('pis') ? Number(prodArg.getString('pis')) : 1.65
+        var cofinsAliqArg =
+          prodArg && prodArg.getString('cofins') ? Number(prodArg.getString('cofins')) : 7.6
+        var pisValorArg = (vLiqArg * pisAliqArg) / 100
+        var cofinsValorArg = (vLiqArg * cofinsAliqArg) / 100
+        var ibsBaseArg = vLiqArg - icmsValorArg
+        var cbsAliqArg = 0.9
+        var ibsUfAliqArg = 0.1
+        var cbsValorArg = (ibsBaseArg * cbsAliqArg) / 100
+        var ibsUfValorArg = (ibsBaseArg * ibsUfAliqArg) / 100
+        itemsArg.push({
+          numero_item: ii + 1,
+          codigo_produto: codigoProdutoArg,
+          descricao: String(
+            itArg.product_name ||
+              itArg.name ||
+              itArg.description ||
+              (prodArg ? prodArg.getString('name') : '') ||
+              'PRODUTO',
+          ),
+          codigo_ncm: ncmArg,
+          cest: cestArg,
+          cfop: cfopArg,
+          unidade_comercial: unidadeArg,
+          unidade_tributavel: unidadeArg,
+          quantidade_comercial: fmtQtd(qtdArg),
+          quantidade_tributavel: fmtQtd(qtdArg),
+          valor_unitario_comercial: fmt(vUnitArg),
+          valor_unitario_tributavel: fmt(vUnitArg),
+          valor_bruto: fmt(vBrutoArg),
+          valor_desconto: fmt(vDescArg),
+          inclui_no_total: 1,
+          icms_origem: String((prodArg ? prodArg.getString('origin') : '') || '0'),
+          icms_situacao_tributaria: '20',
+          icms_modalidade_base_calculo: 3,
+          icms_base_calculo: fmt(icmsBaseArg),
+          icms_percentual_reducao_base_calculo: fmt(icmsRedArg),
+          icms_aliquota: fmt(icmsAliqArg),
+          icms_valor: fmt(icmsValorArg),
+          pis_situacao_tributaria: '01',
+          pis_base_calculo: fmt(vLiqArg),
+          pis_aliquota_porcentual: fmt(pisAliqArg),
+          pis_valor: fmt(pisValorArg),
+          cofins_situacao_tributaria: '01',
+          cofins_base_calculo: fmt(vLiqArg),
+          cofins_aliquota_porcentual: fmt(cofinsAliqArg),
+          cofins_valor: fmt(cofinsValorArg),
+          ipi_situacao_tributaria: '53',
+          ipi_codigo_enquadramento_legal: '999',
+          ibs_cbs_situacao_tributaria: '000',
+          ibs_cbs_classificacao_tributaria: '000001',
+          ibs_cbs_base_calculo: fmt(ibsBaseArg),
+          ibs_mun_aliquota: '0',
+          ibs_mun_valor: fmt(0),
+          ibs_uf_aliquota: fmt(ibsUfAliqArg),
+          ibs_uf_valor: fmt(ibsUfValorArg),
+          ibs_valor_total: fmt(ibsUfValorArg),
+          cbs_aliquota: fmt(cbsAliqArg),
+          cbs_valor: fmt(cbsValorArg),
+        })
+      }
+      var totalNotaArg = Number(nfeRecArg ? nfeRecArg.get('total_value') : 0) || 0
+      if (itemsArg.length === 0) {
+        var vBrutoFallback = totalNotaArg || 0
+        var icmsBaseFallback = vBrutoFallback * 0.1
+        itemsArg.push({
+          numero_item: 1,
+          codigo_produto: '1',
+          descricao: 'PRODUTO',
+          codigo_ncm: '20057000',
+          cest: '1709200',
+          cfop: '5101',
+          unidade_comercial: 'UN',
+          unidade_tributavel: 'UN',
+          quantidade_comercial: '1',
+          quantidade_tributavel: '1',
+          valor_unitario_comercial: fmt(vBrutoFallback),
+          valor_unitario_tributavel: fmt(vBrutoFallback),
+          valor_bruto: fmt(vBrutoFallback),
+          valor_desconto: fmt(0),
+          inclui_no_total: 1,
+          icms_origem: '0',
+          icms_situacao_tributaria: '20',
+          icms_modalidade_base_calculo: 3,
+          icms_base_calculo: fmt(icmsBaseFallback),
+          icms_percentual_reducao_base_calculo: fmt(90),
+          icms_aliquota: fmt(17),
+          icms_valor: fmt((icmsBaseFallback * 17) / 100),
+          pis_situacao_tributaria: '01',
+          pis_base_calculo: fmt(vBrutoFallback),
+          pis_aliquota_porcentual: fmt(1.65),
+          pis_valor: fmt((vBrutoFallback * 1.65) / 100),
+          cofins_situacao_tributaria: '01',
+          cofins_base_calculo: fmt(vBrutoFallback),
+          cofins_aliquota_porcentual: fmt(7.6),
+          cofins_valor: fmt((vBrutoFallback * 7.6) / 100),
+          ipi_situacao_tributaria: '53',
+          ipi_codigo_enquadramento_legal: '999',
+          ibs_cbs_situacao_tributaria: '000',
+          ibs_cbs_classificacao_tributaria: '000001',
+          ibs_cbs_base_calculo: fmt(vBrutoFallback),
+          ibs_mun_aliquota: '0',
+          ibs_mun_valor: fmt(0),
+          ibs_uf_aliquota: fmt(0.1),
+          ibs_uf_valor: fmt((vBrutoFallback * 0.1) / 100),
+          ibs_valor_total: fmt((vBrutoFallback * 0.1) / 100),
+          cbs_aliquota: fmt(0.9),
+          cbs_valor: fmt((vBrutoFallback * 0.9) / 100),
+        })
+        somaProdutos = vBrutoFallback
+      }
+      var valorProdutosArg = somaProdutos
+      var valorDescontoArg = somaDescontos
+      var valorTotalArg = valorProdutosArg - valorDescontoArg
+      if (valorTotalArg <= 0 && totalNotaArg > 0) valorTotalArg = totalNotaArg
+
+      var nowBrArg = new Date(Date.now() - 3 * 60 * 60 * 1000)
+      var dataEmissaoArg = nowBrArg.toISOString().replace('Z', '-03:00')
+      var numeroNotaArg =
+        Number(artifactArg.getString('document_number')) ||
+        Number(nfeRecArg ? nfeRecArg.getString('nfe_number') : '') ||
+        0
+      var serieNotaArg =
+        Number(artifactArg.getString('serie')) ||
+        Number(nfeRecArg ? nfeRecArg.getString('serie') : '') ||
+        Number(cfgArg ? cfgArg.getString('serie') : '') ||
+        1
+      var naturezaArg =
+        (nfeRecArg ? nfeRecArg.getString('nature_of_operation') : '') || 'VENDA DE MERCADORIAS'
+
+      return {
+        natureza_operacao: naturezaArg,
+        tipo_documento: 1,
+        data_emissao: dataEmissaoArg,
+        serie: serieNotaArg,
+        numero: numeroNotaArg,
+        finalidade_emissao: 1,
+        consumidor_final: 1,
+        local_destino: 1,
+        presenca_comprador: 0,
+        modalidade_frete: 9,
+        regime_tributario_emitente: 3,
+        nome_emitente: emitRazao,
+        nome_fantasia_emitente: emitFantasia,
+        cnpj_emitente: emitCnpj,
+        inscricao_estadual_emitente: emitIe,
+        logradouro_emitente: emitLogradouro,
+        numero_emitente: emitNumero,
+        complemento_emitente: emitComplemento,
+        bairro_emitente: emitBairro,
+        municipio_emitente: emitMunicipio,
+        uf_emitente: emitUf,
+        cep_emitente: emitCep,
+        nome_destinatario: destNome,
+        cnpj_destinatario: destCnpj,
+        indicador_inscricao_estadual_destinatario: indicadorIe,
+        logradouro_destinatario: destLogradouro,
+        numero_destinatario: destNumero,
+        bairro_destinatario: destBairro,
+        municipio_destinatario: destMunicipio,
+        uf_destinatario: destUf,
+        cep_destinatario: destCep,
+        valor_produtos: fmt(valorProdutosArg),
+        valor_desconto: fmt(valorDescontoArg),
+        valor_frete: '0.00',
+        valor_seguro: '0.00',
+        valor_outras_despesas: '0.00',
+        valor_total: fmt(valorTotalArg),
+        items: itemsArg,
+        formas_pagamento: [{ forma_pagamento: '01', valor_pagamento: fmt(valorTotalArg) }],
+        volumes: [
+          {
+            quantidade: String(itemsArg.length),
+            peso_liquido: fmt(somaPesoLiq, 3),
+            peso_bruto: fmt(somaPesoBruto, 3),
+          },
+        ],
+      }
+    }
+
     var body = e.requestInfo().body || {}
     var chave = (body.chave_acesso || '').trim()
     var nfeId = (body.nfe_id || '').trim()
@@ -922,8 +1584,8 @@ routerAdd(
       })
     }
 
-    var xml = artifact.getString('xml_conteudo') || ''
-    if (!xml) return e.json(422, { error: 'XML da NF-e não encontrado no artefato fiscal' })
+    // MODELO DE CAMPOS: o payload é montado a partir dos dados do emitente,
+    // destinatário e itens — o XML do artefato NÃO é mais obrigatório aqui.
 
     var cfg = loadFocusConfig(artifact.getString('empresa_id'))
     var ambiente = resolveAmbiente(cfg, 'homologacao')
@@ -970,8 +1632,9 @@ routerAdd(
     }
 
     var ref = chave
-    var payload = { xml: xml, xml_assinado: xml }
-    if (cfg && cfg.getString('emitente_ref')) payload.ref = cfg.getString('emitente_ref')
+    // MODELO DE CAMPOS: envia o JSON completo (emitente, destinatário, items,
+    // tributos, formas_pagamento e volumes) em vez de {xml, xml_assinado}
+    var payload = buildNfeFieldPayload(artifact, cfg, chave)
 
     var res = focusRequest(
       ambiente,

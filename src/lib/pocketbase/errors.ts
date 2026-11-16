@@ -27,7 +27,3 @@ export function getErrorMessage(error: unknown): string {
   const msgs = Object.values(extractFieldErrors(error))
   return msgs.length > 0 ? msgs.join(' ') : error.message || 'An unexpected error occurred.'
 }
-
-// Reexport de compatibilidade: a dependência real agora é src/lib/pocketbase/translate.ts
-// (módulo isolado, pois este export desapareceu repetidamente de errors.ts quebrando o build).
-export { translatePbMessage } from './translate'
