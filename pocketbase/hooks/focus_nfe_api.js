@@ -411,6 +411,107 @@ routerAdd(
   $apis.requireAuth(),
 )
 
+// DEBUG/SUPORTE: devolve o payload EXATO de transmissão + XML completo + URL do POST
+// + resposta da última tentativa (para suporte Focus NFe). Sem truncamento; sem token.
+routerAdd(
+  'GET',
+  '/backend/v1/huram/fiscal/focus-nfe/debug/{chave}',
+  function (e) {
+    var focusBase = {
+      homologacao: 'https://homologacao.focusnfe.com.br',
+      producao: 'https://api.focusnfe.com.br',
+    }
+
+    function checkEmpresaAccess(authRecord, empresaId) {
+      if (!authRecord) return { ok: false, code: 401, msg: 'Autenticação obrigatória' }
+      var role = authRecord.getString('role') || ''
+      if (role === 'SUP') return { ok: true }
+      var userEmpresa = authRecord.getString('empresa_id') || ''
+      var ids = authRecord.get('empresas_ids') || []
+      if (userEmpresa === empresaId) return { ok: true }
+      if (Array.isArray(ids) && ids.indexOf(empresaId) !== -1) return { ok: true }
+      return {
+        ok: false,
+        code: 403,
+        msg: 'Acesso negado: operação restrita à sua empresa autorizada',
+      }
+    }
+
+    function findArtifactByChave(chave) {
+      try {
+        return $app.findFirstRecordByFilter(
+          'fiscal_document_artifacts',
+          'chave_acesso = "' + chave + '"',
+        )
+      } catch (_) {
+        return null
+      }
+    }
+
+    function loadFocusConfig(empresaId) {
+      if (!empresaId) return null
+      try {
+        return $app.findFirstRecordByFilter(
+          'fiscal_focus_nfe_config',
+          'empresa_id = "' + empresaId + '"',
+        )
+      } catch (_) {
+        return null
+      }
+    }
+
+    function resolveAmbiente(cfg, fallback) {
+      var amb = cfg ? cfg.getString('ambiente') : ''
+      if (amb === 'producao' || amb === 'homologacao') return amb
+      return fallback === 'producao' ? 'producao' : 'homologacao'
+    }
+
+    var chave = e.request.pathValue('chave')
+    var artifact = findArtifactByChave(chave)
+    if (!artifact) return e.json(404, { error: 'NF-e não encontrada no sistema' })
+    var access = checkEmpresaAccess(e.auth, artifact.getString('empresa_id'))
+    if (!access.ok) return e.json(access.code, { error: access.msg })
+
+    var xml = artifact.getString('xml_conteudo') || ''
+    if (!xml) {
+      try {
+        var nfeRec = $app.findFirstRecordByFilter('nfe_records', 'chave_acesso = "' + chave + '"')
+        if (nfeRec) xml = nfeRec.getString('xml_conteudo') || ''
+      } catch (_) {}
+    }
+
+    var cfg = loadFocusConfig(artifact.getString('empresa_id'))
+    var ambiente = resolveAmbiente(cfg, 'homologacao')
+    var emitenteRef = cfg && cfg.getString('emitente_ref') ? cfg.getString('emitente_ref') : ''
+
+    // payload EXATAMENTE como montado no POST /v2/nfe?ref= (rota transmit)
+    var payload = { xml: xml, xml_assinado: xml }
+    if (emitenteRef) payload.ref = emitenteRef
+
+    var ultimaResposta = {
+      status_sefaz: artifact.getString('focus_nfe_status_sefaz') || '',
+      codigo_status: artifact.getString('focus_nfe_codigo_status') || '',
+      motivo: artifact.getString('focus_nfe_motivo') || '',
+      protocolo: artifact.getString('focus_nfe_protocolo') || '',
+      data_hora: artifact.getString('focus_nfe_data_hora') || '',
+      ambiente: artifact.getString('focus_nfe_ambiente') || '',
+      ref: artifact.getString('focus_nfe_ref') || chave,
+    }
+
+    return e.json(200, {
+      success: true,
+      chave_acesso: chave,
+      xml_conteudo: xml,
+      ambiente: ambiente,
+      emitente_ref: emitenteRef,
+      url_post: focusBase[ambiente] + '/v2/nfe?ref=' + encodeURIComponent(chave),
+      payload: payload,
+      ultima_resposta: ultimaResposta,
+    })
+  },
+  $apis.requireAuth(),
+)
+
 // TRANSMIT: envia o XML completo da NF-e ao Focus NFe (NF-e Modelo 55)
 routerAdd(
   'POST',

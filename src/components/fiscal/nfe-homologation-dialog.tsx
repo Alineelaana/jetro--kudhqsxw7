@@ -38,6 +38,7 @@ import {
 import { toast } from '@/hooks/use-toast'
 import { useBrand } from '@/hooks/use-brand'
 import { FocusNfePanel } from '@/components/fiscal/nfe-transmission'
+import { FocusNfeSendDebug } from '@/components/fiscal/focus-nfe-send-debug'
 
 interface NfeHomologationDialogProps {
   open: boolean
@@ -650,6 +651,9 @@ export function NfeHomologationDialog({
               {result?.chave_acesso && (
                 <FocusNfePanel chaveAcesso={result.chave_acesso} empresaId={selectedEmpresaId} />
               )}
+
+              {/* Diagnóstico de Envio (suporte Focus NFe): JSON exato do POST, XML completo e URL */}
+              {result?.chave_acesso && <FocusNfeSendDebug chaveAcesso={result.chave_acesso} />}
             </div>
           )}
         </div>

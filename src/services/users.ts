@@ -1,5 +1,5 @@
 import pb from '@/lib/pocketbase/client'
-import { translatePbMessage } from '@/lib/pocketbase/errors'
+import { translatePbMessage } from '@/lib/pocketbase/translate'
 
 /** Rótulos amigáveis (pt-BR) dos campos de usuário exibidos em mensagens de erro. */
 export const USER_FIELD_LABELS: Record<string, string> = {

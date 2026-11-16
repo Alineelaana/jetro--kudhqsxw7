@@ -77,8 +77,8 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/fiscal/documentos',
     title: 'Documentos Fiscais',
     moduleGroup: 'Fiscal',
-    docVersion: '2.2.3',
-    lastUpdated: '2026-11-10',
+    docVersion: '2.3.0',
+    lastUpdated: '2026-11-12',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
@@ -118,12 +118,12 @@ export const FISCAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     dependencies: {
       title: 'Dependências',
       content:
-        '- Componentes: `ScreenDocumentosFiscais`, `NfePanel`, `NfcePanel`, `NfsePanel`, `CtePanel`, `MdfePanel`, `CartaCorrecao`, `ManifestacaoDestinatario`, `FiscalGenericScreen`, `PurchaseInvoicesPanel`, `NfeHomologationDialog`, `FocusNfePanel`.\n- Serviços: `@/services/fiscal` e `@/services/sales`.',
+        '- Componentes: `ScreenDocumentosFiscais`, `NfePanel`, `NfcePanel`, `NfsePanel`, `CtePanel`, `MdfePanel`, `CartaCorrecao`, `ManifestacaoDestinatario`, `FiscalGenericScreen`, `PurchaseInvoicesPanel`, `NfeHomologationDialog`, `FocusNfePanel`, `FocusNfeSendDebug`.\n- Serviços: `@/services/fiscal` e `@/services/sales`.',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
       content:
-        '- Validação de esquema XML antes do envio e mapeamento de códigos de retorno da SEFAZ.\n- Falhas do Focus NFe (credencial ausente, credencial recusada, rejeição SEFAZ, timeout, erros de validação HTTP 4xx/5xx) capturam e expõem o código HTTP e o corpo real da resposta Focus NFe no toast e nos logs de hooks ([Focus NFe transmit error]), garantindo diagnóstico imediato na tela sem ocultar o erro sob mensagens genéricas, com idempotência por `(chave_acesso, ambiente)` em `fiscal_document_artifacts`.',
+        '- Validação de esquema XML antes do envio e mapeamento de códigos de retorno da SEFAZ.\n- Falhas do Focus NFe (credencial ausente, credencial recusada, rejeição SEFAZ, timeout, erros de validação HTTP 4xx/5xx) capturam e expõem o código HTTP e o corpo real da resposta Focus NFe no toast e nos logs de hooks ([Focus NFe transmit error]), garantindo diagnóstico imediato na tela sem ocultar o erro sob mensagens genéricas, com idempotência por `(chave_acesso, ambiente)` em `fiscal_document_artifacts`.\n- Box "Diagnóstico de Envio — Suporte Focus NFe" no visualizador da NF-e (também no diálogo de transmissão da Faturação): exibe a URL completa do POST de transmissão (POST https://.../v2/nfe?ref=<chave_acesso>, conforme o ambiente da config fiscal), o JSON exato do corpo enviado ({xml, xml_assinado} — com o campo `ref` do emitente quando configurado) e o XML integral do artefato (`xml_conteudo`), cada um com botão de copiar sem truncamento, botão "Baixar XML" (.xml) e, quando existir, a resposta da última tentativa de transmissão (status/código/motivo/protocolo) com botão de copiar. Serve para o usuário colar no chamado do suporte Focus NFe durante a sessão do ERP.',
     },
   },
 

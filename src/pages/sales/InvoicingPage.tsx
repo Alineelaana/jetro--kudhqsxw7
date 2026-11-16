@@ -46,6 +46,7 @@ import {
 import type { SalesInvoice, NfeRecord } from '@/lib/sales-types'
 import { getSalesInvoices, getNfeRecords } from '@/services/sales'
 import { FocusNfePanel } from '@/components/fiscal/nfe-transmission'
+import { FocusNfeSendDebug } from '@/components/fiscal/focus-nfe-send-debug'
 import { toast } from 'sonner'
 import pb from '@/lib/pocketbase/client'
 
@@ -1481,8 +1482,9 @@ export default function InvoicingPage() {
             </DialogDescription>
           </DialogHeader>
           {nfeToTransmit?.chave_acesso ? (
-            <div className="py-2">
+            <div className="py-2 space-y-3">
               <FocusNfePanel chaveAcesso={nfeToTransmit.chave_acesso} />
+              <FocusNfeSendDebug chaveAcesso={nfeToTransmit.chave_acesso} />
             </div>
           ) : (
             <div className="py-6 text-center text-muted-foreground text-sm">
