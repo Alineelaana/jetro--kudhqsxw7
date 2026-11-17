@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T18:28:29.636Z",
+  "generatedAt": "2026-11-17T18:35:48.883Z",
   "collections": [
     {
       "name": "users",
@@ -20931,8 +20931,8 @@
       "name": "nfse_records",
       "type": "base",
       "apiRules": {
-        "list": null,
-        "view": null,
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
         "update": null,
         "delete": "@request.auth.role = 'SUP'"
@@ -20944,8 +20944,8 @@
       "name": "cte_records",
       "type": "base",
       "apiRules": {
-        "list": null,
-        "view": null,
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
         "update": null,
         "delete": "@request.auth.role = 'SUP'"
@@ -20957,8 +20957,8 @@
       "name": "mdfe_records",
       "type": "base",
       "apiRules": {
-        "list": null,
-        "view": null,
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
         "update": null,
         "delete": "@request.auth.role = 'SUP'"
@@ -21087,8 +21087,8 @@
       "name": "fiscal_corrections",
       "type": "base",
       "apiRules": {
-        "list": null,
-        "view": null,
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
         "update": null,
         "delete": "@request.auth.role = 'SUP'"
