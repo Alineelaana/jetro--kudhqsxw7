@@ -2,6 +2,8 @@ export interface PriceTableItem {
   product_id: string
   code: string
   name: string
+  kind: 'produto' | 'servico'
+  supplier: string
   cost_price: string
   current_price: string
   new_price: string
@@ -14,20 +16,20 @@ export interface PriceTableItem {
 }
 
 export interface PriceTableRules {
-  empresas: string
-  filiais: string
-  clientes: string
-  grupos_clientes: string
-  regioes: string
-  cidades: string
-  estados: string
-  canais: string
-  vendedores: string
-  representantes: string
-  contratos: string
-  campanhas: string
-  formas_pagamento: string
-  condicoes_pagamento: string
+  empresas: string[]
+  filiais: string[]
+  clientes: string[]
+  grupos_clientes: string[]
+  regioes: string[]
+  cidades: string[]
+  estados: string[]
+  canais: string[]
+  vendedores: string[]
+  representantes: string[]
+  contratos: string[]
+  campanhas: string[]
+  formas_pagamento: string[]
+  condicoes_pagamento: string[]
 }
 
 export interface EnhancedPriceTable {
@@ -137,20 +139,20 @@ export const RULE_FIELDS: { key: keyof PriceTableRules; label: string }[] = [
 
 export function getInitialRules(): PriceTableRules {
   return {
-    empresas: '',
-    filiais: '',
-    clientes: '',
-    grupos_clientes: '',
-    regioes: '',
-    cidades: '',
-    estados: '',
-    canais: '',
-    vendedores: '',
-    representantes: '',
-    contratos: '',
-    campanhas: '',
-    formas_pagamento: '',
-    condicoes_pagamento: '',
+    empresas: [],
+    filiais: [],
+    clientes: [],
+    grupos_clientes: [],
+    regioes: [],
+    cidades: [],
+    estados: [],
+    canais: [],
+    vendedores: [],
+    representantes: [],
+    contratos: [],
+    campanhas: [],
+    formas_pagamento: [],
+    condicoes_pagamento: [],
   }
 }
 
@@ -174,10 +176,15 @@ export function getInitialFormState(): PriceTableFormState {
 }
 
 export function parseItems(v: unknown): PriceTableItem[] {
-  if (Array.isArray(v)) return v as PriceTableItem[]
+  if (Array.isArray(v)) {
+    return v.map((raw) => {
+      const it = raw as Partial<PriceTableItem>
+      return { ...it, kind: it.kind === 'servico' ? 'servico' : 'produto' } as PriceTableItem
+    })
+  }
   if (typeof v === 'string') {
     try {
-      return JSON.parse(v)
+      return parseItems(JSON.parse(v))
     } catch {
       return []
     }
@@ -186,17 +193,32 @@ export function parseItems(v: unknown): PriceTableItem[] {
 }
 
 export function parseRules(v: unknown): PriceTableRules {
+  const base = getInitialRules()
   if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
-    return { ...getInitialRules(), ...(v as Partial<PriceTableRules>) }
+    const partial = v as Record<string, unknown>
+    const out = { ...base }
+    for (const key of Object.keys(base) as (keyof PriceTableRules)[]) {
+      const val = partial[key]
+      if (Array.isArray(val)) {
+        out[key] = val.map((x) => String(x)).filter(Boolean)
+      } else if (typeof val === 'string' && val.trim()) {
+        // compatibilidade com formato antigo (texto CSV) já persistido
+        out[key] = val
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      }
+    }
+    return out
   }
   if (typeof v === 'string') {
     try {
-      return { ...getInitialRules(), ...JSON.parse(v) }
+      return parseRules(JSON.parse(v))
     } catch {
       /* intentionally ignored */
     }
   }
-  return getInitialRules()
+  return base
 }
 
 export function formatCurrency(v: string | number): string {
