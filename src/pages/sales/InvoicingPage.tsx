@@ -62,6 +62,8 @@ export default function InvoicingPage() {
   const [orders, setOrders] = useState<SalesOrderRecord[]>([])
   const [invoices, setInvoices] = useState<SalesInvoice[]>([])
   const [nfeRecords, setNfeRecords] = useState<NfeRecord[]>([])
+  // Conjunto de chaves já representadas por uma venda em sales_invoices (evita duplicidade no merge)
+  const [invCoveredKeys, setInvCoveredKeys] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<'fila' | 'notas'>('fila')
@@ -114,8 +116,17 @@ export default function InvoicingPage() {
         getNfeRecords().catch(() => [] as any),
       ])
       setOrders(allOrders)
-      setInvoices(invList as SalesInvoice[])
+      const invs = invList as SalesInvoice[]
+      setInvoices(invs)
       setNfeRecords(nfeList as NfeRecord[])
+      // Chaves de acesso já cobertas por uma nota legada em sales_invoices (para deduplicar o merge)
+      const covered = new Set<string>()
+      for (const inv of invs) {
+        const nfe = (nfeList as NfeRecord[]).find((n) => n.invoice_id === inv.id)
+        const key = nfe?.chave_acesso || (nfe as any)?.focus_nfe_ref || ''
+        if (key) covered.add(String(key))
+      }
+      setInvCoveredKeys(covered)
     } catch (err: any) {
       console.error('Erro ao carregar dados da Central de Faturamento:', err)
       toast.error('Erro ao carregar pedidos para faturamento')
@@ -149,11 +160,6 @@ export default function InvoicingPage() {
     return Array.isArray(selectedOrder.items) ? (selectedOrder.items as OrderItem[]) : []
   }, [selectedOrder])
 
-  const selectedInvoice = useMemo(
-    () => invoices.find((i) => i.id === selectedInvoiceId) || null,
-    [invoices, selectedInvoiceId],
-  )
-
   // Filtragem de pedidos na fila
   const filteredOrders = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -167,18 +173,85 @@ export default function InvoicingPage() {
     )
   }, [orders, search])
 
+  /**
+   * Lista unificada de NOTAS EMITIDAS.
+   * Fonte primária: nfe_records — toda NF gerada/transmitida pelo motor fiscal (Focus NFe)
+   * entra aqui, com status SEFAZ, chave de acesso e protocolo atualizados.
+   * Notas legadas sem registro em nfe_records (sales_invoices antigos) são mantidas
+   * como linhas adicionais; registros de nfe_records já cobertos por essas notas
+   * legadas são deduplicados para não aparecerem duas vezes.
+   */
+  const notasEmitidas = useMemo(() => {
+    const list: SalesInvoice[] = []
+    const coveredIds = new Set<string>()
+
+    for (const inv of invoices) {
+      const nfe = nfeRecords.find((n) => n.invoice_id === inv.id)
+      if (nfe) coveredIds.add(nfe.id)
+      list.push({
+        ...inv,
+        order_number:
+          inv.order_number || (nfe as any)?.sales_order_number || (nfe as any)?.order_id || '',
+        __nfe_record: nfe,
+      } as SalesInvoice)
+    }
+
+    for (const nfe of nfeRecords) {
+      if (coveredIds.has(nfe.id)) continue
+      // Validações de homologação (não são emissões de nota para cliente) não entram na aba
+      if (nfe.status === 'Validado Homologação') continue
+      if (nfe.chave_acesso && invCoveredKeys.has(nfe.chave_acesso)) continue
+      const serie = String((nfe as any).serie || '').trim()
+      const numero = String(nfe.nfe_number || '').trim()
+      list.push({
+        __nfe_record: nfe,
+        id: nfe.id,
+        invoice_number: numero ? (serie ? `Nº ${numero} (Série ${serie})` : numero) : 'N/A',
+        status: nfe.status || '',
+        order_id: (nfe as any).sales_order_id || nfe.order_id || '',
+        order_number: (nfe as any).sales_order_number || '',
+        client_name: nfe.client_name || '',
+        invoice_date: nfe.created,
+        items: Array.isArray(nfe.items) ? nfe.items : [],
+        total_value: String(nfe.total_value || '0'),
+        carrier_name: nfe.carrier_name || '',
+        volumes: String(nfe.volumes || ''),
+        gross_weight: '',
+        net_weight: '',
+        freight_value: '0',
+        other_expenses: '',
+        company: nfe.company || '',
+        branch: '',
+        history: [],
+        responsible_user: nfe.responsible_user || '',
+        created: nfe.created,
+      } as SalesInvoice)
+    }
+
+    return list.sort(
+      (a, b) =>
+        new Date(b.invoice_date || b.created).getTime() -
+        new Date(a.invoice_date || a.created).getTime(),
+    )
+  }, [invoices, nfeRecords, invCoveredKeys])
+
+  const selectedInvoice = useMemo(
+    () => notasEmitidas.find((i) => i.id === selectedInvoiceId) || null,
+    [notasEmitidas, selectedInvoiceId],
+  )
+
   // Filtragem de notas emitidas
   const filteredInvoices = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return invoices
-    return invoices.filter(
+    if (!q) return notasEmitidas
+    return notasEmitidas.filter(
       (inv) =>
         inv.invoice_number?.toLowerCase().includes(q) ||
         inv.order_number?.toLowerCase().includes(q) ||
         inv.client_name?.toLowerCase().includes(q) ||
         inv.carrier_name?.toLowerCase().includes(q),
     )
-  }, [invoices, search])
+  }, [notasEmitidas, search])
 
   // Abre diálogo de faturamento pré-preenchendo dados do pedido selecionado
   const handleOpenInvoiceDialog = (order: SalesOrderRecord) => {
@@ -249,9 +322,13 @@ export default function InvoicingPage() {
     }
   }
 
-  // Busca o registro de NFe correspondente a uma nota fiscal
+  // Busca o registro de NFe correspondente a uma nota fiscal.
+  // Notas vindas diretamente de nfe_records já carregam o próprio registro em __nfe_record;
+  // notas legadas de sales_invoices são casadas por invoice_id, order_id ou order_number.
   const findNfeRecordForInvoice = useCallback(
     (inv: SalesInvoice): NfeRecord | undefined => {
+      const direct = (inv as any).__nfe_record as NfeRecord | undefined
+      if (direct) return direct
       return nfeRecords.find(
         (nfe) =>
           nfe.invoice_id === inv.id ||
@@ -716,7 +793,7 @@ export default function InvoicingPage() {
         id: 'nfe_status',
         header: 'Status Sefaz/Focus',
         cell: ({ row }) => {
-          const nfe = findNfeRecordForInvoice(row)
+          const nfe = (row as any).__nfe_record || findNfeRecordForInvoice(row)
           if (!nfe) {
             return (
               <Badge variant="outline" className="text-xs text-amber-700 border-amber-300">
@@ -739,9 +816,16 @@ export default function InvoicingPage() {
               </Badge>
             )
           }
+          if (nfe.status === 'Cancelada') {
+            return (
+              <Badge variant="destructive" className="text-xs">
+                Cancelada
+              </Badge>
+            )
+          }
           return (
             <Badge variant="secondary" className="text-xs">
-              {(nfe as any).focus_nfe_status_sefaz || nfe.status || 'Gerada'}
+              {nfe.status || (nfe as any).focus_nfe_status_sefaz || 'Gerada'}
             </Badge>
           )
         },
@@ -751,7 +835,7 @@ export default function InvoicingPage() {
         header: 'Ações Fiscais',
         cell: ({ row }) => {
           const inv = row
-          const nfe = findNfeRecordForInvoice(inv)
+          const nfe = (inv as any).__nfe_record || findNfeRecordForInvoice(inv)
           return (
             <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
               <TooltipProvider>
@@ -861,10 +945,9 @@ export default function InvoicingPage() {
   )
 
   const totalNotasValor = useMemo(
-    () => invoices.reduce((acc, i) => acc + Number(i.total_value || 0), 0),
-    [invoices],
+    () => notasEmitidas.reduce((acc, i) => acc + Number(i.total_value || 0), 0),
+    [notasEmitidas],
   )
-
   return (
     <SalesPageWrapper>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -919,7 +1002,7 @@ export default function InvoicingPage() {
                 Notas Emitidas (Faturadas)
               </div>
               <div className="text-2xl font-bold mt-1 text-emerald-700 dark:text-emerald-300">
-                {invoices.length}
+                {notasEmitidas.length}
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">
                 Total:{' '}
@@ -987,7 +1070,7 @@ export default function InvoicingPage() {
             }`}
           >
             <Receipt className="w-3.5 h-3.5" />
-            Notas Emitidas ({invoices.length})
+            Notas Emitidas ({notasEmitidas.length})
           </button>
         </div>
 
