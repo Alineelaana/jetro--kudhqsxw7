@@ -73,9 +73,14 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
         observacoes: table?.observacoes || '',
         data_inicial: table?.data_inicial || '',
         data_final: table?.data_final || '',
+        prazo_medio_dias:
+          table?.rules?.prazo_medio_dias && table.rules.prazo_medio_dias > 0
+            ? String(table.rules.prazo_medio_dias)
+            : '',
       })
       setItems(parseItems(table?.items))
       setRules(parseRules(table?.rules))
+      setManterMesmoPrazoDivergente(false)
       setActiveTab('general')
     }
   }, [open, table])
@@ -87,10 +92,9 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
   // Aviso de prazo médio: compara as condições escolhidas com o prazo da tabela.
   // Usa o prazo médio explícito da tabela (rules.prazo_medio_dias); se não
   // preenchido, deduz do nome/observações (ex.: "Tabela 7 dias" -> 7).
-  const prazoExplicito = rules.prazo_medio_dias && rules.prazo_medio_dias > 0
-  const prazoTabelaDias = prazoExplicito
-    ? (rules.prazo_medio_dias as number)
-    : prazoMedioDaTabela(form.table_name, form.observacoes)
+  const prazoExplicito = parseFloat(String(form.prazo_medio_dias || '').replace(',', '.')) || 0
+  const prazoTabelaDias =
+    prazoExplicito > 0 ? prazoExplicito : prazoMedioDaTabela(form.table_name, form.observacoes)
   const condicoesSelecionadas = mapearCondicoesSelecionadas(
     rules.condicoes_pagamento,
     condicoesCatalogo,
@@ -136,8 +140,9 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
         return min > 0 && price < min
       })
       const finalStatus = belowMin && form.status === 'ativa' ? 'aguardando_aprovacao' : form.status
+      const { prazo_medio_dias: _prazoForm, ...formSemPrazo } = form
       const data: Record<string, unknown> = {
-        ...form,
+        ...formSemPrazo,
         prioridade: parseInt(form.prioridade, 10) || 0,
         items,
         rules: { ...rules, prazo_medio_dias: prazoTabelaDias || 0 },

@@ -166,6 +166,28 @@ export function PriceTableGeneralTab({ form, setField }: Props) {
           </Select>
         </div>
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <Label className="text-xs mb-1 block">% Ajuste sobre Tabela Base</Label>
+          <Input
+            value={form.percentual_ajuste}
+            onChange={(e) => setField('percentual_ajuste', e.target.value)}
+            placeholder="Ex: 10 ou -5"
+            className="focus-visible:ring-[#005B2E]"
+          />
+        </div>
+        <div>
+          <Label className="text-xs mb-1 block">Prazo Médio (dias)</Label>
+          <Input
+            type="number"
+            min="0"
+            value={form.prazo_medio_dias}
+            onChange={(e) => setField('prazo_medio_dias', e.target.value)}
+            placeholder="Ex: 7 (vazio = deduz do nome/observações)"
+            className="focus-visible:ring-[#005B2E]"
+          />
+        </div>
+      </div>
       <div>
         <Label className="text-xs mb-1 block">Observações</Label>
         <Textarea

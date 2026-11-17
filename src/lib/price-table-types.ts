@@ -80,6 +80,8 @@ export interface PriceTableFormState {
   observacoes: string
   data_inicial: string
   data_final: string
+  /** Prazo médio declarado da tabela em dias (vazio = deduz do nome/observações) */
+  prazo_medio_dias: string
 }
 
 export const TABLE_TYPE_OPTIONS = [
@@ -175,6 +177,7 @@ export function getInitialFormState(): PriceTableFormState {
     observacoes: '',
     data_inicial: '',
     data_final: '',
+    prazo_medio_dias: '',
   }
 }
 

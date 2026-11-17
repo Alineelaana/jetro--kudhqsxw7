@@ -486,6 +486,27 @@ export default function InvoicingPage() {
     printWindow.document.close()
   }
 
+  // Visualizar nota: abre o DANFE autorizado (PDF) ou o espelho local da nota
+  const handleViewDanfeOrInvoice = (inv: SalesInvoice) => {
+    const nfe = nfeAutorizada(inv)
+    if (nfe?.chave_acesso) {
+      handleBaixarDanfe(inv)
+    } else {
+      setViewInvoice(inv)
+      setViewInvoiceOpen(true)
+    }
+  }
+
+  // Imprimir/baixar DANFE: PDF oficial quando autorizada, senão espelho local
+  const handlePrintOrDownloadDanfe = (inv: SalesInvoice) => {
+    const nfe = nfeAutorizada(inv)
+    if (nfe?.chave_acesso) {
+      handleBaixarDanfe(inv)
+    } else {
+      printLocalDanfeMirror(inv, findNfeRecordForInvoice(inv))
+    }
+  }
+
   // Transmitir NF-e via Focus NFe
   const handleTransmitNfe = (inv: SalesInvoice) => {
     const nfe = findNfeRecordForInvoice(inv)
