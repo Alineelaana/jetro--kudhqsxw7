@@ -511,4 +511,58 @@ export const COMMERCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Avisos de consulta ampla com limite seguro de linhas para prevenir sobrecarga de memória.',
     },
   },
+
+  '/admin/tabelas-precos': {
+    route: '/admin/tabelas-precos',
+    title: 'Tabela de Preços',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-17',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Cadastrar e gerenciar as tabelas de preços do ERP HURAM com produtos/serviços, condições de pagamento atreladas à tabela e regras de aplicação, alimentando o Pedido de Venda e a Precificação.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem de tabelas com busca, filtros por tipo e status, e ações conforme permissão (visualizar, editar, duplicar, ativar/inativar, cancelar).\n- Formulário em diálogo com 3 abas: "Dados Gerais" (nome, código, tipo, empresa/filial, moeda, prioridade, vigências e status), "Produtos e Serviços" (itens da tabela com preço novo, preço mínimo e visualização de custo conforme permissão; inclui "Selecionar todos" e busca por fornecedor via main_supplier) e "Regras de Aplicação" (condições de pagamento atreladas à tabela e seletores de regras para Empresas, Filiais, Clientes, Grupos, Regiões, Cidades, Estados, Canais de Venda, Vendedores, Representantes, Contratos e Campanhas).\n- Duplicação de tabela com novo nome e vigências.\n- Atualização em tempo real da listagem via realtime.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Condições de pagamento atreladas à tabela: o operador escolhe as condições (catálogo de condições de pagamento cadastrado) que a tabela aceita.\n- Prazo médio: o prazo da tabela é informado explicitamente (campo de prazo médio em dias) ou deduzido do nome/observações (ex.: "Tabela 7 dias" → 7). O prazo médio das condições selecionadas é calculado pela média dos dias das parcelas de cada condição.\n- Validação de divergência de prazo: se o prazo médio das condições divergir do prazo da tabela em mais de ±2 dias, o salvamento é bloqueado, exibindo box âmbar com os valores comparados e o checkbox "Manter mesmo assim (o usuário decide)". O salvamento só prossegue com o checkbox marcado; o prazo persiste em rules.prazo_medio_dias.\n- Preço abaixo do mínimo em tabela "ativa" envia a tabela para "aguardando_aprovacao".\n- Regras de aplicação definem a quem a tabela se aplica (empresas, filiais, clientes, grupos, regiões, cidades, estados, canais, vendedores, representantes, contratos e campanhas), alimentadas por cadastros reais.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O gestor comercial acessa /admin/tabelas-precos e clica em "Nova Tabela" (ou edita/duplica uma existente).\n2. Na aba Dados Gerais preenche identificação, vigências e status.\n3. Na aba Produtos e Serviços inclui itens com preços (com seleção em massa e busca por fornecedor).\n4. Na aba Regras de Aplicação escolhe as condições de pagamento e os seletores de escopo; o sistema compara o prazo médio das condições com o prazo da tabela (tolerância ±2 dias).\n5. Em caso de divergência, o box âmbar aparece e o salvamento só segue com o checkbox "Manter mesmo assim" marcado.\n6. Ao salvar, a tabela fica disponível para o Pedido de Venda, que consome suas condições de pagamento e preços.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `price_tables` (itens em `items` e regras em `rules`, JSON), cadastros de condição de pagamento, `products`, `services`, `suppliers`, além das coleções dos seletores (empresas, filiais, partners, representantes, vendedores etc.).\n- Serviços: `src/services/price-tables.ts` e `src/services/cadastros.ts`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Pedido de Venda (consumo de preços e condições dinâmicas).\n- Precificação (módulo de pricing) para simulações e versionamento.\n- Realtime PocketBase para atualização da listagem.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Visualização: `canViewSales(role)`; criação/edição/duplicação/ativação/cancelamento conforme `src/lib/price-table-permissions.ts`; custos visíveis apenas com `canViewPriceTableCosts`.',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `PricingTables`, `PriceTableFormDialog`, `PriceTableGeneralTab`, `PriceTableItemsTab`, `PriceTableRulesTab`, `JetroTable`.\n- Utilitários: `price-table-types`, `pricing/condicoes-prazo`, `pricing/rule-options`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Nome da tabela obrigatório para salvar.\n- Bloqueio de salvamento com box âmbar quando o prazo médio das condições diverge do prazo da tabela (tolerância ±2 dias), liberado apenas pelo checkbox "Manter mesmo assim".\n- Tabela com preço abaixo do mínimo muda de "ativa" para "aguardando_aprovacao" com toast explicativo.\n- Toasts de erro para falhas de criação/edição/duplicação com mensagens traduzidas do backend.',
+    },
+  },
 }

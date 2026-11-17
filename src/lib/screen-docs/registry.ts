@@ -98,7 +98,7 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/faturamento',
     title: 'Central de Faturamento',
     moduleGroup: 'Comercial',
-    docVersion: '1.3.0',
+    docVersion: '1.4.0',
     lastUpdated: '2026-11-17',
     author: 'Engenharia de Software HURAM',
     objective: {
@@ -119,7 +119,8 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O faturista acessa a Central de Faturamento na rota `/admin/vendas/faturamento`.\n2. Visualiza os pedidos liberados pelo setor de expedição/comercial.\n3. Seleciona o pedido desejado e confere os itens e totais na tabela de detalhes.\n4. Clica no botão "Faturar Pedido" e confirma a operação no diálogo informativo.\n5. O sistema gera a nota fiscal, atualiza o pedido para "faturado", grava as duplicatas e disponibiliza as ações de Visualizar Nota e Imprimir DANFE.',
+        '1. O faturista acessa a Central de Faturamento na rota `/admin/vendas/faturamento`.\n2. Visualiza os pedidos liberados pelo setor de expedição/comercial.\n3. Seleciona o pedido desejado e confere os itens e totais na tabela de detalhes.\n4. Clica no botão "Faturar Pedido" e confirma a operação no diálogo informativo.\n5. O sistema gera a nota fiscal, atualiza o pedido para "faturado", grava as duplicatas e disponibiliza as ações de Visualizar Nota e Imprimir DANFE.\n\
+6. Na aba "Notas Emitidas", notas com status autorizado e chave de acesso exibem os botões "Baixar DANFE (PDF)" e "Baixar XML", que buscam o arquivo diretamente na Focus NFe pelos mesmos endpoints já usados pela tela Fiscal (/backend/v1/huram/fiscal/focus-nfe/danfe/{chave} e /xml/{chave}) e salvam o arquivo no dispositivo.',
     },
     dataSource: {
       title: 'Origem dos Dados',
