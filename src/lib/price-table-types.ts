@@ -30,6 +30,8 @@ export interface PriceTableRules {
   campanhas: string[]
   formas_pagamento: string[]
   condicoes_pagamento: string[]
+  /** Prazo médio declarado da tabela, em dias (persistido no JSON `rules`) */
+  prazo_medio_dias?: number
 }
 
 export interface EnhancedPriceTable {
@@ -153,6 +155,7 @@ export function getInitialRules(): PriceTableRules {
     campanhas: [],
     formas_pagamento: [],
     condicoes_pagamento: [],
+    prazo_medio_dias: 0,
   }
 }
 
@@ -199,7 +202,10 @@ export function parseRules(v: unknown): PriceTableRules {
     const out = { ...base }
     for (const key of Object.keys(base) as (keyof PriceTableRules)[]) {
       const val = partial[key]
-      if (Array.isArray(val)) {
+      if (key === 'prazo_medio_dias') {
+        out.prazo_medio_dias = toNumOrZero(val)
+        continue
+      } else if (Array.isArray(val)) {
         out[key] = val.map((x) => String(x)).filter(Boolean)
       } else if (typeof val === 'string' && val.trim()) {
         // compatibilidade com formato antigo (texto CSV) já persistido
@@ -219,6 +225,12 @@ export function parseRules(v: unknown): PriceTableRules {
     }
   }
   return base
+}
+
+function toNumOrZero(v: unknown): number {
+  if (typeof v === 'number' && !isNaN(v)) return v
+  const n = parseFloat(String(v ?? '').replace(',', '.'))
+  return isNaN(n) ? 0 : n
 }
 
 export function formatCurrency(v: string | number): string {

@@ -141,6 +141,47 @@ export function useRuleOptions() {
   return { options, loading }
 }
 
+/** Condições de pagamento reais da coleção `condicoes_pagamento` */
+export function useCondicoesPagamento() {
+  const [condicoes, setCondicoes] = useState<
+    { id: string; name: string; parcelas?: number; intervalo?: number; entrada?: string }[]
+  >([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    listCadastros('condicoes_pagamento')
+      .then((rows) => {
+        if (cancelled) return
+        setCondicoes(
+          rows
+            .filter((r) => r.active !== false)
+            .map((r) => ({
+              id: str(r.id),
+              name: str(r.name),
+              parcelas: toNumber(r.parcelas),
+              intervalo: toNumber(r.intervalo),
+              entrada: str(r.entrada),
+            })),
+        )
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return { condicoes, loading }
+}
+
+function toNumber(v: unknown): number {
+  const n = typeof v === 'number' ? v : parseFloat(String(v ?? '').replace(',', '.'))
+  return isNaN(n) ? 0 : n
+}
+
 export type ProductLite = {
   id: string
   code?: string

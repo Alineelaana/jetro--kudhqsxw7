@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,15 @@ import {
 import { PriceTableGeneralTab } from '@/components/pricing/price-table-general-tab'
 import { PriceTableItemsTab } from '@/components/pricing/price-table-items-tab'
 import { PriceTableRulesTab } from '@/components/pricing/price-table-rules-tab'
+import { useCondicoesPagamento } from '@/components/pricing/rule-options'
+import {
+  prazoMedioDaTabela,
+  prazoMedioTotal,
+  mapearCondicoesSelecionadas,
+  TOLERANCIA_PRAZO_DIAS,
+  type ComparacaoPrazo,
+} from '@/components/pricing/condicoes-prazo'
+import { AlertTriangle } from 'lucide-react'
 
 interface Props {
   open: boolean
@@ -41,6 +50,9 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
   const [form, setForm] = useState<PriceTableFormState>(getInitialFormState())
   const [items, setItems] = useState<PriceTableItem[]>([])
   const [rules, setRules] = useState<PriceTableRules>(getInitialRules())
+  const [manterMesmoPrazoDivergente, setManterMesmoPrazoDivergente] = useState(false)
+
+  const { condicoes: condicoesCatalogo } = useCondicoesPagamento()
 
   const canViewCosts = canViewPriceTableCosts(user?.role as string)
 
@@ -72,6 +84,30 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
     setForm((p) => ({ ...p, [field]: value }))
   }
 
+  // Aviso de prazo médio: compara as condições escolhidas com o prazo da tabela.
+  // Usa o prazo médio explícito da tabela (rules.prazo_medio_dias); se não
+  // preenchido, deduz do nome/observações (ex.: "Tabela 7 dias" -> 7).
+  const prazoExplicito = rules.prazo_medio_dias && rules.prazo_medio_dias > 0
+  const prazoTabelaDias = prazoExplicito
+    ? (rules.prazo_medio_dias as number)
+    : prazoMedioDaTabela(form.table_name, form.observacoes)
+  const condicoesSelecionadas = mapearCondicoesSelecionadas(
+    rules.condicoes_pagamento,
+    condicoesCatalogo,
+  )
+  const prazoCondicoesDias = prazoMedioTotal(condicoesSelecionadas)
+  const diferencaPrazo = prazoCondicoesDias - prazoTabelaDias
+  const comparacaoPrazo: ComparacaoPrazo = {
+    prazoTabela: prazoTabelaDias,
+    prazoCondicoes: prazoCondicoesDias,
+    diferenca: diferencaPrazo,
+    divergente:
+      condicoesSelecionadas.length > 0 &&
+      prazoTabelaDias > 0 &&
+      Math.abs(diferencaPrazo) > TOLERANCIA_PRAZO_DIAS,
+  }
+  const prazoDivergente = comparacaoPrazo.divergente && !manterMesmoPrazoDivergente
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.table_name.trim()) {
@@ -81,6 +117,19 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
     }
     setSaving(true)
     try {
+      if (comparacaoPrazo.divergente && !manterMesmoPrazoDivergente) {
+        setActiveTab('rules')
+        toast({
+          title: 'Prazo médio das condições de pagamento divergente',
+          description:
+            `Tabela: ${comparacaoPrazo.prazoTabela.toFixed(1)} dias · ` +
+            `Condições: ${comparacaoPrazo.prazoCondicoes.toFixed(1)} dias. ` +
+            `Revise as condições ou confirme para manter assim.`,
+          variant: 'destructive',
+        })
+        setSaving(false)
+        return
+      }
       const belowMin = items.some((it) => {
         const min = parseFloat(String(it.min_price || '0').replace(',', '.')) || 0
         const price = parseFloat(String(it.new_price || '0').replace(',', '.')) || 0
@@ -91,7 +140,7 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
         ...form,
         prioridade: parseInt(form.prioridade, 10) || 0,
         items,
-        rules,
+        rules: { ...rules, prazo_medio_dias: prazoTabelaDias || 0 },
         status: finalStatus,
         responsible_user: (user?.name as string) || '',
         active: finalStatus === 'ativa',
@@ -129,10 +178,13 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full flex-wrap h-auto">
               <TabsTrigger value="general">Dados Gerais</TabsTrigger>
-              <TabsTrigger value="items">
+              <TabsTrigger value="items" className="gap-1">
                 Produtos e Serviços{items.length > 0 ? ` (${items.length})` : ''}
               </TabsTrigger>
-              <TabsTrigger value="rules">Regras de Aplicação</TabsTrigger>
+              <TabsTrigger value="rules" className="gap-1">
+                Regras de Aplicação
+                {prazoDivergente && <AlertTriangle className="w-3 h-3 text-amber-500" />}
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="general" className="mt-4">
               <PriceTableGeneralTab form={form} setField={setField} />
@@ -141,9 +193,35 @@ export function PriceTableFormDialog({ open, onOpenChange, table, onSuccess }: P
               <PriceTableItemsTab items={items} setItems={setItems} canViewCosts={canViewCosts} />
             </TabsContent>
             <TabsContent value="rules" className="mt-4">
-              <PriceTableRulesTab rules={rules} setRules={setRules} />
+              <PriceTableRulesTab
+                rules={rules}
+                setRules={(r) => {
+                  setRules(r)
+                  setManterMesmoPrazoDivergente(false)
+                }}
+              />
             </TabsContent>
           </Tabs>
+          {prazoDivergente && (
+            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-xs space-y-2">
+              <p className="flex items-center gap-1 font-medium text-amber-800">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Prazo médio das condições de pagamento ({comparacaoPrazo.prazoCondicoes.toFixed(
+                  1,
+                )}{' '}
+                dias) difere do prazo da tabela ({comparacaoPrazo.prazoTabela.toFixed(1)} dias).
+              </p>
+              <label className="flex items-center gap-2 text-amber-800">
+                <input
+                  type="checkbox"
+                  checked={manterMesmoPrazoDivergente}
+                  onChange={(e) => setManterMesmoPrazoDivergente(e.target.checked)}
+                  className="accent-[#005B2E]"
+                />
+                Manter mesmo assim (o usuário decide)
+              </label>
+            </div>
+          )}
           <DialogFooter className="gap-2 sm:gap-0 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
