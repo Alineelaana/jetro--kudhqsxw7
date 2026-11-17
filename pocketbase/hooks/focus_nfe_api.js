@@ -2260,8 +2260,22 @@ routerAdd(
       return e.json(422, { success: false, error: focusCredMensagem(ambiente) })
 
     try {
+      var cons = $http.send({
+        url: focusBase[ambiente] + '/v2/nfe/' + encodeURIComponent(ref),
+        method: 'GET',
+        headers: {
+          Authorization: focusAuthHeader(focusToken(ambiente), probe.mode),
+          Accept: 'application/json',
+        },
+        timeout: 60,
+      })
+      var caminhoPdf = cons.json && cons.json.caminho_danfe
+      if (cons.statusCode !== 200 || !caminhoPdf)
+        return e.json(422, {
+          error: 'DANFE indisponível: a Focus NFe não informou o caminho do PDF desta nota.',
+        })
       var res = $http.send({
-        url: focusBase[ambiente] + '/v2/nfe/' + encodeURIComponent(ref) + '.pdf',
+        url: caminhoPdf.indexOf('http') === 0 ? caminhoPdf : focusBase[ambiente] + caminhoPdf,
         method: 'GET',
         headers: {
           Authorization: focusAuthHeader(focusToken(ambiente), probe.mode),
@@ -2287,6 +2301,181 @@ routerAdd(
       })
     } catch (err) {
       return e.json(502, { error: 'Falha ao obter o DANFE: ' + String(err) })
+    }
+  },
+  $apis.requireAuth(),
+)
+
+// XML: serve o XML autorizado da NF-e (proxy autenticado, token nunca exposto)
+routerAdd(
+  'GET',
+  '/backend/v1/huram/fiscal/focus-nfe/xml/{chave}',
+  function (e) {
+    var focusBase = {
+      homologacao: 'https://homologacao.focusnfe.com.br',
+      producao: 'https://api.focusnfe.com.br',
+    }
+
+    function b64encode(str) {
+      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+      var out = ''
+      var i
+      for (i = 0; i < str.length; i += 3) {
+        var b1 = str.charCodeAt(i) & 0xff
+        var b2 = i + 1 < str.length ? str.charCodeAt(i + 1) & 0xff : NaN
+        var b3 = i + 2 < str.length ? str.charCodeAt(i + 2) & 0xff : NaN
+        var e1 = b1 >> 2
+        var e2 = ((b1 & 3) << 4) | (isNaN(b2) ? 0 : b2 >> 4)
+        var e3 = isNaN(b2) ? 61 : ((b2 & 15) << 2) | (isNaN(b3) ? 0 : b3 >> 6)
+        var e4 = isNaN(b3) ? 61 : b3 & 63
+        out += chars.charAt(e1) + chars.charAt(e2) + chars.charAt(e3) + chars.charAt(e4)
+      }
+      return out
+    }
+
+    function focusToken(ambiente) {
+      var prod = ''
+      var hom = ''
+      try {
+        prod = $os.getenv('FOCUS_NFE_TOKEN') || ''
+      } catch (_) {}
+      try {
+        hom = $os.getenv('FOCUS_NFE_TOKEN_HOMOLOG') || ''
+      } catch (_) {}
+      if (ambiente === 'producao') return prod || ''
+      if (ambiente === 'homologacao') return hom || ''
+      return ''
+    }
+
+    function focusAuthHeader(token, mode) {
+      if (mode === 'raw') return 'Basic ' + token
+      if (token.indexOf(':') !== -1) return 'Basic ' + b64encode(token)
+      return 'Basic ' + b64encode(token + ':')
+    }
+
+    function focusRequest(ambiente, path, mode, timeoutSec) {
+      var token = focusToken(ambiente)
+      if (!token) return { sem_credencial: true }
+      try {
+        var res = $http.send({
+          url: focusBase[ambiente] + path,
+          method: 'GET',
+          headers: {
+            Authorization: focusAuthHeader(token, mode),
+            Accept: 'application/json',
+          },
+          timeout: timeoutSec || 45,
+        })
+        return { statusCode: res.statusCode, json: res.json || null, body: res.body || '' }
+      } catch (err) {
+        return { statusCode: 0, json: null, body: '', transport_error: String(err) }
+      }
+    }
+
+    function focusProbe(ambiente) {
+      var modes = ['b64', 'raw']
+      var last = null
+      for (var i = 0; i < modes.length; i++) {
+        var r = focusRequest(ambiente, '/v2/nfe/__probe_huram__', modes[i], 20)
+        if (r.sem_credencial) return { sem_credencial: true }
+        if (r.statusCode === 404) return { ok: true, mode: modes[i], statusCode: r.statusCode }
+        if (r.statusCode && r.statusCode !== 401 && r.statusCode !== 403)
+          return { ok: true, mode: modes[i], statusCode: r.statusCode }
+        last = r
+      }
+      return { ok: false, statusCode: last ? last.statusCode : 0, body: last ? last.body : '' }
+    }
+
+    function focusCredMensagem(ambiente) {
+      return (
+        'Credencial não configurada. Defina a variável ' +
+        (ambiente === 'producao' ? 'FOCUS_NFE_TOKEN' : 'FOCUS_NFE_TOKEN_HOMOLOG') +
+        ' nas variáveis de ambiente do backend (Skip Cloud).'
+      )
+    }
+
+    function checkEmpresaAccess(authRecord, empresaId) {
+      if (!authRecord) return { ok: false, code: 401, msg: 'Autenticação obrigatória' }
+      var role = authRecord.getString('role') || ''
+      if (role === 'SUP') return { ok: true }
+      var userEmpresa = authRecord.getString('empresa_id') || ''
+      var ids = authRecord.get('empresas_ids') || []
+      if (userEmpresa === empresaId) return { ok: true }
+      if (Array.isArray(ids) && ids.indexOf(empresaId) !== -1) return { ok: true }
+      return {
+        ok: false,
+        code: 403,
+        msg: 'Acesso negado: operação restrita à sua empresa autorizada',
+      }
+    }
+
+    function findArtifactByChave(chave) {
+      try {
+        return $app.findFirstRecordByFilter(
+          'fiscal_document_artifacts',
+          'chave_acesso = "' + chave + '"',
+        )
+      } catch (_) {
+        return null
+      }
+    }
+
+    var chave = e.request.pathValue('chave')
+    var artifact = findArtifactByChave(chave)
+    if (!artifact) return e.json(404, { error: 'NF-e não encontrada no sistema' })
+    var access = checkEmpresaAccess(e.auth, artifact.getString('empresa_id'))
+    if (!access.ok) return e.json(access.code, { error: access.msg })
+    if (artifact.getString('focus_nfe_status_sefaz') !== 'autorizado')
+      return e.json(422, { error: 'XML disponível apenas para NF-e autorizada.' })
+
+    var ambiente = artifact.getString('focus_nfe_ambiente') || 'homologacao'
+    var ref = artifact.getString('focus_nfe_ref') || chave
+    var probe = focusProbe(ambiente)
+    if (probe.sem_credencial)
+      return e.json(422, { success: false, error: focusCredMensagem(ambiente) })
+
+    try {
+      var consXml = $http.send({
+        url: focusBase[ambiente] + '/v2/nfe/' + encodeURIComponent(ref),
+        method: 'GET',
+        headers: {
+          Authorization: focusAuthHeader(focusToken(ambiente), probe.mode),
+          Accept: 'application/json',
+        },
+        timeout: 60,
+      })
+      var caminhoXml = consXml.json && consXml.json.caminho_xml_nota_fiscal
+      if (consXml.statusCode !== 200 || !caminhoXml)
+        return e.json(422, {
+          error: 'XML indisponível: a Focus NFe não informou o caminho do XML desta nota.',
+        })
+      var res = $http.send({
+        url: caminhoXml.indexOf('http') === 0 ? caminhoXml : focusBase[ambiente] + caminhoXml,
+        method: 'GET',
+        headers: {
+          Authorization: focusAuthHeader(focusToken(ambiente), probe.mode),
+          Accept: 'application/xml',
+        },
+        timeout: 60,
+      })
+      if (res.statusCode !== 200)
+        return e.json(502, {
+          error: 'Focus NFe não devolveu o XML da NF-e (HTTP ' + res.statusCode + ').',
+        })
+      var bytes = res.body
+      var bin = ''
+      if (typeof bytes === 'string') {
+        bin = bytes
+      } else {
+        for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i] & 0xff)
+      }
+      return e.json(200, {
+        success: true,
+        xml_base64: b64encode(bin),
+        filename: 'NFe-' + chave + '.xml',
+      })
+    } catch (err) {
+      return e.json(502, { error: 'Falha ao obter o XML: ' + String(err) })
     }
   },
   $apis.requireAuth(),

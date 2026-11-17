@@ -32,17 +32,32 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   processando: { label: 'Em processamento', cls: 'bg-blue-100 text-blue-800 border-blue-300' },
 }
 
-function baixarPdf(base64: string, filename: string) {
+function baixarArquivo(base64: string, filename: string, mime: string) {
   const bin = atob(base64)
   const bytes = new Uint8Array(bin.length)
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  const blob = new Blob([bytes], { type: 'application/pdf' })
+  const blob = new Blob([bytes], { type: mime })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
   a.download = filename
   a.click()
   URL.revokeObjectURL(url)
+}
+
+function mensagemErroServidor(err: unknown, padrao: string): string {
+  const e = err as {
+    response?: { error?: string; message?: string }
+    data?: { error?: string; message?: string }
+    message?: string
+  }
+  const msg =
+    e?.response?.error ||
+    e?.response?.message ||
+    e?.data?.error ||
+    e?.data?.message ||
+    (typeof e?.message === 'string' && e.message !== 'Something went wrong.' ? e.message : '')
+  return msg || padrao
 }
 
 export function FocusNfePanel({ chaveAcesso, empresaId }: Props) {
@@ -144,10 +159,29 @@ export function FocusNfePanel({ chaveAcesso, empresaId }: Props) {
         `/backend/v1/huram/fiscal/focus-nfe/danfe/${chaveAcesso}`,
         { method: 'GET' },
       )
-      if (res?.pdf_base64) baixarPdf(res.pdf_base64, res.filename || `DANFE-${chaveAcesso}.pdf`)
+      if (res?.pdf_base64)
+        baixarArquivo(res.pdf_base64, res.filename || `DANFE-${chaveAcesso}.pdf`, 'application/pdf')
       else setErro('PDF do DANFE indisponível.')
     } catch (err: unknown) {
-      setErro((err as { message?: string })?.message || 'Falha ao obter o DANFE.')
+      setErro(mensagemErroServidor(err, 'Falha ao obter o DANFE.'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const baixarXml = async () => {
+    setLoading(true)
+    setErro('')
+    try {
+      const res = await pb.send<{ success: boolean; xml_base64: string; filename: string }>(
+        `/backend/v1/huram/fiscal/focus-nfe/xml/${chaveAcesso}`,
+        { method: 'GET' },
+      )
+      if (res?.xml_base64)
+        baixarArquivo(res.xml_base64, res.filename || `NFe-${chaveAcesso}.xml`, 'application/xml')
+      else setErro('XML da NF-e indisponível.')
+    } catch (err: unknown) {
+      setErro(mensagemErroServidor(err, 'Falha ao obter o XML.'))
     } finally {
       setLoading(false)
     }
@@ -225,6 +259,13 @@ export function FocusNfePanel({ chaveAcesso, empresaId }: Props) {
         </div>
       )}
 
+      {!autorizado && (
+        <p className="text-xs text-muted-foreground">
+          DANFE (PDF) e XML ficam disponíveis somente para NF-e autorizada pela SEFAZ
+          {status ? ` (situação atual: ${badge?.label ?? status})` : ''}.
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-2">
         {!autorizado && status !== 'cancelado' && (
           <button
@@ -255,6 +296,14 @@ export function FocusNfePanel({ chaveAcesso, empresaId }: Props) {
               className="text-xs font-bold px-3 py-2 rounded-lg border border-[#005B2E]/40 text-[#005B2E] bg-white"
             >
               Baixar DANFE (PDF)
+            </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={baixarXml}
+              className="text-xs font-bold px-3 py-2 rounded-lg border border-[#005B2E]/40 text-[#005B2E] bg-white"
+            >
+              Baixar XML
             </button>
             <button
               type="button"
