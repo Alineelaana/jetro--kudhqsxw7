@@ -32,20 +32,7 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   processando: { label: 'Em processamento', cls: 'bg-blue-100 text-blue-800 border-blue-300' },
 }
 
-function baixarArquivo(base64: string, filename: string, mime: string) {
-  const bin = atob(base64)
-  const bytes = new Uint8Array(bin.length)
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  const blob = new Blob([bytes], { type: mime })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-function mensagemErroServidor(err: unknown, padrao: string): string {
+export function mensagemErroServidor(err: unknown, padrao: string): string {
   const e = err as {
     response?: { error?: string; message?: string }
     data?: { error?: string; message?: string }
@@ -58,6 +45,19 @@ function mensagemErroServidor(err: unknown, padrao: string): string {
     e?.data?.message ||
     (typeof e?.message === 'string' && e.message !== 'Something went wrong.' ? e.message : '')
   return msg || padrao
+}
+
+export function baixarArquivo(base64: string, filename: string, mime: string) {
+  const bin = atob(base64)
+  const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+  const blob = new Blob([bytes], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 export function FocusNfePanel({ chaveAcesso, empresaId }: Props) {

@@ -45,7 +45,11 @@ import {
 } from '@/services/sales-invoicing-flow'
 import type { SalesInvoice, NfeRecord } from '@/lib/sales-types'
 import { getSalesInvoices, getNfeRecords } from '@/services/sales'
-import { FocusNfePanel } from '@/components/fiscal/nfe-transmission'
+import {
+  FocusNfePanel,
+  baixarArquivo,
+  mensagemErroServidor,
+} from '@/components/fiscal/nfe-transmission'
 import { FocusNfeSendDebug } from '@/components/fiscal/focus-nfe-send-debug'
 import { toast } from 'sonner'
 import pb from '@/lib/pocketbase/client'
@@ -259,50 +263,72 @@ export default function InvoicingPage() {
     [nfeRecords],
   )
 
-  // Ação: Visualizar DANFE ou Nota
-  const handleViewDanfeOrInvoice = (inv: SalesInvoice) => {
+  // Busca o registro Focus NFe de uma nota, autorizado pela SEFAZ
+  const nfeAutorizada = (inv: SalesInvoice): NfeRecord | undefined => {
     const nfe = findNfeRecordForInvoice(inv)
-    if (nfe?.danfe_url) {
-      window.open(nfe.danfe_url, '_blank', 'noopener,noreferrer')
-      return
-    }
-    // Caso ainda não tenha danfe_url remoto, abre visualizador detalhado da nota
-    setViewInvoice(inv)
-    setViewInvoiceOpen(true)
+    if (!nfe) return undefined
+    const status = (nfe as any).focus_nfe_status_sefaz || String(nfe.status || '').toLowerCase()
+    return status === 'autorizado' || status === 'autorizada' ? nfe : undefined
   }
 
-  // Ação: Imprimir / Baixar DANFE
-  const handlePrintOrDownloadDanfe = async (inv: SalesInvoice) => {
-    const nfe = findNfeRecordForInvoice(inv)
+  // Estado de download por nota (evita múltiplos cliques)
+  const [downloading, setDownloading] = useState<Record<string, 'danfe' | 'xml' | null>>({})
 
-    // Se já temos a danfe_url (via Focus NFe ou upload), abre direto para impressão/download
-    if (nfe?.danfe_url) {
-      window.open(nfe.danfe_url, '_blank', 'noopener,noreferrer')
+  const setDownloadingKey = (key: string, kind: 'danfe' | 'xml' | null) =>
+    setDownloading((prev) => ({ ...prev, [key]: kind }))
+
+  // Baixar DANFE (PDF) via endpoint backend existente (mesmo da tela Fiscal)
+  const handleBaixarDanfe = async (inv: SalesInvoice) => {
+    const nfe = nfeAutorizada(inv)
+    if (!nfe?.chave_acesso) {
+      toast.error('Somente notas autorizadas possuem DANFE para download.')
       return
     }
-
-    // Se tem registro Focus NFe mas não baixou o DANFE direto, tenta consultar endpoint do Focus NFe
-    if ((nfe as any)?.focus_nfe_ref || nfe?.chave_acesso) {
-      try {
-        toast.info('Consultando DANFE na Focus NFe...')
-        const ref = (nfe as any)?.focus_nfe_ref || nfe?.chave_acesso
-        const res = await pb.send(
-          `/backend/v1/fiscal/focus-nfe/danfe?ref=${encodeURIComponent(ref)}`,
-          {
-            method: 'GET',
-          },
+    setDownloadingKey(inv.id, 'danfe')
+    try {
+      const res = await pb.send<{ success: boolean; pdf_base64: string; filename: string }>(
+        `/backend/v1/huram/fiscal/focus-nfe/danfe/${encodeURIComponent(nfe.chave_acesso)}`,
+        { method: 'GET' },
+      )
+      if (res?.pdf_base64)
+        baixarArquivo(
+          res.pdf_base64,
+          res.filename || `DANFE-${nfe.chave_acesso}.pdf`,
+          'application/pdf',
         )
-        if (res?.danfe_url) {
-          window.open(res.danfe_url, '_blank', 'noopener,noreferrer')
-          return
-        }
-      } catch {
-        // Prossegue para o gerador de DANFE local/impressão
-      }
+      else toast.error('PDF do DANFE indisponível na Focus NFe.')
+    } catch (err: unknown) {
+      toast.error(mensagemErroServidor(err, 'Falha ao obter o DANFE.'))
+    } finally {
+      setDownloadingKey(inv.id, null)
     }
+  }
 
-    // Impressão / visualização de espelho de DANFE local caso ainda não transmitido
-    printLocalDanfeMirror(inv, nfe)
+  // Baixar XML via endpoint backend existente (mesmo da tela Fiscal)
+  const handleBaixarXml = async (inv: SalesInvoice) => {
+    const nfe = nfeAutorizada(inv)
+    if (!nfe?.chave_acesso) {
+      toast.error('Somente notas autorizadas possuem XML para download.')
+      return
+    }
+    setDownloadingKey(inv.id, 'xml')
+    try {
+      const res = await pb.send<{ success: boolean; xml_base64: string; filename: string }>(
+        `/backend/v1/huram/fiscal/focus-nfe/xml/${encodeURIComponent(nfe.chave_acesso)}`,
+        { method: 'GET' },
+      )
+      if (res?.xml_base64)
+        baixarArquivo(
+          res.xml_base64,
+          res.filename || `NFe-${nfe.chave_acesso}.xml`,
+          'application/xml',
+        )
+      else toast.error('XML da NF-e indisponível na Focus NFe.')
+    } catch (err: unknown) {
+      toast.error(mensagemErroServidor(err, 'Falha ao obter o XML.'))
+    } finally {
+      setDownloadingKey(inv.id, null)
+    }
   }
 
   // Gera janela de impressão com layout de DANFE Simplificado / Espelho Fiscal
@@ -755,29 +781,57 @@ export default function InvoicingPage() {
                 </Tooltip>
               </TooltipProvider>
 
-              {(nfe as any)?.xml_conteudo && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 text-slate-700 hover:bg-slate-100"
-                        onClick={() => handleViewXml(inv)}
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Ver XML</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              {nfeAutorizada(inv) && (
+                <>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          disabled={downloading[inv.id] === 'danfe'}
+                          className="h-7 w-7 text-red-700 hover:text-red-800 hover:bg-red-50"
+                          onClick={() => handleBaixarDanfe(inv)}
+                        >
+                          {downloading[inv.id] === 'danfe' ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <FileText className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Baixar DANFE (PDF)</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          disabled={downloading[inv.id] === 'xml'}
+                          className="h-7 w-7 text-slate-700 hover:bg-slate-100"
+                          onClick={() => handleBaixarXml(inv)}
+                        >
+                          {downloading[inv.id] === 'xml' ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Download className="w-3.5 h-3.5" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Baixar XML</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </>
               )}
             </div>
           )
         },
       },
     ]
-  }, [findNfeRecordForInvoice])
+  }, [findNfeRecordForInvoice, nfeAutorizada, downloading])
 
   // Totalizador da fila
   const totalFilaValor = useMemo(
@@ -1087,6 +1141,38 @@ export default function InvoicingPage() {
                       <Printer className="w-3.5 h-3.5" />
                       Imprimir / Baixar DANFE
                     </Button>
+                    {nfeAutorizada(selectedInvoice) && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={downloading[selectedInvoice.id] === 'danfe'}
+                          onClick={() => handleBaixarDanfe(selectedInvoice)}
+                          className="gap-1.5 text-xs text-red-700 hover:text-red-800"
+                        >
+                          {downloading[selectedInvoice.id] === 'danfe' ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <FileText className="w-3.5 h-3.5" />
+                          )}
+                          Baixar DANFE (PDF)
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={downloading[selectedInvoice.id] === 'xml'}
+                          onClick={() => handleBaixarXml(selectedInvoice)}
+                          className="gap-1.5 text-xs text-slate-700"
+                        >
+                          {downloading[selectedInvoice.id] === 'xml' ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Download className="w-3.5 h-3.5" />
+                          )}
+                          Baixar XML
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
 

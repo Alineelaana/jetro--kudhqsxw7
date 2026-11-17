@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T17:50:59.691Z",
+  "generatedAt": "2026-11-17T18:28:29.636Z",
   "collections": [
     {
       "name": "users",
@@ -7666,8 +7666,8 @@
       "name": "nfce_records",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '' || (company = '' && @request.auth.empresa_id = ''))",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'SUP' || @request.auth.perfil_acesso = 'SUP' || company = @request.auth.empresa_id || company = '' || (company = '' && @request.auth.empresa_id = ''))",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.id != ''"
