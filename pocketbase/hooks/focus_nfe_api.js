@@ -2766,15 +2766,32 @@ routerAdd(
 
     var res = focusRequest(
       ambiente,
-      'POST',
+      'DELETE',
       '/v2/nfe/' + encodeURIComponent(ref),
-      { cancelar: true, justificativa: motivo, xJust: motivo, sequencia_evento: 1 },
+      { justificativa: motivo },
       probe.mode,
       60,
     )
     if (res.statusCode >= 400) return focusErrorResponse(e, res, 'cancelamento')
 
-    var mapped = mapFocusResult(res.json || {})
+    var json = res.json || {}
+    var mapped = mapFocusResult(json)
+    // Resposta síncrona do cancelamento Focus: status/status_sefaz/mensagem_sefaz
+    if (mapped.status !== 'cancelado') {
+      var rawSt = String(json.status || '').toLowerCase()
+      var codSt = String(json.status_sefaz || json.cStatus || '')
+      if (
+        rawSt.indexOf('cancelado') !== -1 ||
+        codSt === '101' ||
+        codSt === '135' ||
+        codSt === '151' ||
+        codSt === '155'
+      )
+        mapped.status = 'cancelado'
+      else if (rawSt.indexOf('erro') !== -1) mapped.status = 'rejeitado'
+      if (!mapped.motivo) mapped.motivo = String(json.mensagem_sefaz || json.motivo || '')
+      if (!mapped.protocolo) mapped.protocolo = String(json.protocolo || json.nProt || '')
+    }
     var historico = artifact.get('focus_nfe_cce_historico') || []
     var lista = Array.isArray(historico) ? historico.slice() : []
     lista.push({
@@ -2788,6 +2805,35 @@ routerAdd(
     artifact.set('focus_nfe_cce_historico', lista)
     if (mapped.status === 'cancelado' || mapped.status === 'autorizado') {
       saveStatusOnArtifact(artifact, mapped)
+    }
+    // Sincroniza o cancelamento em nfe_records (fonte da aba Notas Emitidas do Faturamento)
+    try {
+      var docId = artifact.getString('document_id')
+      var nfeRec = null
+      if (chave) {
+        try {
+          nfeRec = $app.findFirstRecordByFilter('nfe_records', 'chave_acesso = "' + chave + '"')
+        } catch (_) {}
+      }
+      if (!nfeRec && docId) {
+        try {
+          nfeRec = $app.findRecordById('nfe_records', docId)
+        } catch (_) {}
+      }
+      if (nfeRec && mapped.status === 'cancelado') {
+        nfeRec.set('focus_nfe_status_sefaz', 'cancelado')
+        nfeRec.set('focus_nfe_codigo_status', mapped.codigo_status)
+        nfeRec.set('focus_nfe_motivo', mapped.motivo || motivo)
+        if (mapped.protocolo) {
+          nfeRec.set('focus_nfe_protocolo', mapped.protocolo)
+          nfeRec.set('protocolo', mapped.protocolo)
+        }
+        nfeRec.set('motivo', mapped.motivo || motivo)
+        nfeRec.set('status', 'Cancelada')
+        $app.saveNoValidate(nfeRec)
+      }
+    } catch (errSync) {
+      $app.logger().error('failed to sync cancel status to nfe_records', 'error', String(errSync))
     }
     writeAudit(e.auth, 'nfe_cancelamento', artifact.id, 'NF-e ' + chave + ' cancelada', {
       motivo: motivo,

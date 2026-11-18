@@ -98,8 +98,8 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
     route: '/admin/vendas/faturamento',
     title: 'Central de Faturamento',
     moduleGroup: 'Comercial',
-    docVersion: '1.4.1',
-    lastUpdated: '2026-11-17',
+    docVersion: '1.5.0',
+    lastUpdated: '2026-11-18',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
@@ -120,7 +120,8 @@ export const SCREEN_DOCS_REGISTRY: Record<string, ScreenDocEntry> = {
       title: 'Fluxo de Funcionamento',
       content:
         '1. O faturista acessa a Central de Faturamento na rota `/admin/vendas/faturamento`.\n2. Visualiza os pedidos liberados pelo setor de expedição/comercial.\n3. Seleciona o pedido desejado e confere os itens e totais na tabela de detalhes.\n4. Clica no botão "Faturar Pedido" e confirma a operação no diálogo informativo.\n5. O sistema gera a nota fiscal, atualiza o pedido para "faturado", grava as duplicatas e disponibiliza as ações de Visualizar Nota e Imprimir DANFE.\n\
-6. Na aba "Notas Emitidas", notas com status autorizado e chave de acesso exibem os botões "Baixar DANFE (PDF)" e "Baixar XML", que buscam o arquivo diretamente na Focus NFe pelos mesmos endpoints já usados pela tela Fiscal (/backend/v1/huram/fiscal/focus-nfe/danfe/{chave} e /xml/{chave}) e salvam o arquivo no dispositivo.',
+6. Na aba "Notas Emitidas", notas com status autorizado e chave de acesso exibem os botões "Baixar DANFE (PDF)" e "Baixar XML", que buscam o arquivo diretamente na Focus NFe pelos mesmos endpoints já usados pela tela Fiscal (/backend/v1/huram/fiscal/focus-nfe/danfe/{chave} e /xml/{chave}) e salvam o arquivo no dispositivo.\n\
+7. Na aba "Notas Emitidas", notas com status Autorizada (status SEFAZ `autorizado`) exibem também o botão "Cancelar NF-e" (ícone de proibido), que abre o diálogo de cancelamento: o diálogo mostra a data/hora de autorização da nota, alerta que o prazo legal de cancelamento na SEFAZ é de 24 horas após a autorização (avisando que, expirado o prazo, a SEFAZ provavelmente rejeitará e o caminho será emitir NF-e de devolução/entrada), exige JUSTIFICATIVA de 15 a 255 caracteres (com contador e bloqueio do botão abaixo do mínimo) e chama o endpoint POST /backend/v1/huram/fiscal/focus-nfe/cancel com a chave de acesso e a justificativa. Em caso de sucesso, o status da nota passa a "Cancelada" na lista (sincronizado em `nfe_records` e no artefato fiscal, com protocolo do evento e motivo gravados); se a SEFAZ/Focus rejeitar (ex.: prazo expirado ou nota com circulação de mercadoria), a mensagem de rejeição retornada é exibida na tela. Notas em qualquer outro status não exibem o botão de cancelar.',
     },
     dataSource: {
       title: 'Origem dos Dados',

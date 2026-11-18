@@ -33,6 +33,7 @@ import {
   Send,
   Loader2,
   Boxes,
+  Ban,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -51,6 +52,7 @@ import {
   mensagemErroServidor,
 } from '@/components/fiscal/nfe-transmission'
 import { FocusNfeSendDebug } from '@/components/fiscal/focus-nfe-send-debug'
+import NfeCancelDialog from '@/components/fiscal/nfe-cancel-dialog'
 import { toast } from 'sonner'
 import pb from '@/lib/pocketbase/client'
 
@@ -93,6 +95,10 @@ export default function InvoicingPage() {
   // Diálogo para visualizar XML
   const [xmlDialogOpen, setXmlDialogOpen] = useState(false)
   const [xmlContent, setXmlContent] = useState('')
+
+  // Diálogo de cancelamento de NF-e autorizada
+  const [nfeCancelDialogOpen, setNfeCancelDialogOpen] = useState(false)
+  const [nfeToCancel, setNfeToCancel] = useState<NfeRecord | null>(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -608,6 +614,21 @@ export default function InvoicingPage() {
     }
   }
 
+  // Abrir diálogo de cancelamento (somente notas Autorizadas)
+  const handleOpenCancelNfe = (inv: SalesInvoice) => {
+    const nfe = (inv as any).__nfe_record || findNfeRecordForInvoice(inv)
+    if (!nfe || !nfe.chave_acesso) {
+      toast.error('Registro ou Chave de Acesso da NF-e não localizados para esta nota.')
+      return
+    }
+    if (!nfeAutorizada(inv)) {
+      toast.error('Somente notas com status Autorizada podem ser canceladas.')
+      return
+    }
+    setNfeToCancel(nfe)
+    setNfeCancelDialogOpen(true)
+  }
+
   // Colunas da JetroTable para FILA DE FATURAMENTO (Pedidos Liberados)
   const readyOrdersColumns = useMemo<JetroColumnDef<SalesOrderRecord>[]>(() => {
     return [
@@ -930,6 +951,24 @@ export default function InvoicingPage() {
                     </Tooltip>
                   </TooltipProvider>
                 </>
+              )}
+
+              {nfeAutorizada(inv) && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-red-700 hover:text-red-800 hover:bg-red-50"
+                        onClick={() => handleOpenCancelNfe(inv)}
+                      >
+                        <Ban className="w-3.5 h-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Cancelar NF-e (SEFAZ)</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </div>
           )
@@ -1694,6 +1733,20 @@ export default function InvoicingPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Diálogo de Cancelamento de NF-e Autorizada */}
+      <NfeCancelDialog
+        open={nfeCancelDialogOpen}
+        onOpenChange={setNfeCancelDialogOpen}
+        nfe={nfeToCancel}
+        numeroNota={nfeToCancel?.nfe_number || ''}
+        autorizadaEm={
+          (nfeToCancel as any)?.focus_nfe_data_hora ||
+          (nfeToCancel as any)?.updated ||
+          nfeToCancel?.created
+        }
+        onDone={loadData}
+      />
     </SalesPageWrapper>
   )
 }
