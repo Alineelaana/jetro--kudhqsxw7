@@ -98,7 +98,7 @@ export function MkEqDetail({ quotation: initialQ, onBack }: MkEqDetailProps) {
       email: (s.email as string) || '',
       city: (s.address_city as string) || '',
       state: (s.address_state as string) || '',
-      category: (s.partner_type as string) || '',
+      category: (s.fornecedor === true ? 'Fornecedor' : (s.partner_type as string)) || '',
       status: 'solicitado',
       invited_at: new Date().toISOString(),
     }

@@ -187,9 +187,9 @@ export function CadastroClientesOficialScreen() {
       const solics = await listSolicitacoes('', '-created')
       setSolicitacoes(solics)
 
-      // 2. Clientes Oficiais (partners com partner_type = 'Cliente')
+      // 2. Clientes Oficiais (partners com flag cliente = true)
       const clients = await pb.collection('partners').getFullList({
-        filter: 'partner_type = "Cliente"',
+        filter: 'cliente = true',
         sort: '-created',
       })
       setClientesOficiais(clients as unknown as ClienteOficialRecord[])
@@ -593,6 +593,7 @@ export function CadastroClientesOficialScreen() {
 
       const dados: Partial<ClienteOficialRecord> = {
         partner_type: 'Cliente',
+        cliente: true,
         person_type: tipoPessoa,
         cnpj: tipoPessoa === 'PJ' ? cpfCnpj : '',
         cpf: tipoPessoa === 'PF' ? cpfCnpj : '',

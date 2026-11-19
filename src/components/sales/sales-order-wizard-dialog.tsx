@@ -149,7 +149,7 @@ export function SalesOrderWizardDialog({
       pb
         .collection('partners')
         .getFullList({
-          filter: 'partner_type ~ "Cliente" && active = true',
+          filter: 'cliente = true && active = true',
           sort: 'company_name',
         })
         .catch(() => []),

@@ -54,7 +54,7 @@ export const AdminB2BClientsScreen: React.FC = () => {
       setLoading(true)
       // Buscar parceiros cadastrados como Cliente no ERP
       const records = await pb.collection('partners').getFullList({
-        filter: 'partner_type = "Cliente"',
+        filter: 'cliente = true',
         sort: '-created',
       })
 

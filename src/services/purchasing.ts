@@ -91,7 +91,7 @@ export async function getApprovalThreshold(): Promise<number> {
 
 export async function getSuppliers() {
   try {
-    return await pb.collection('partners').getFullList({ filter: 'partner_type ~ "Fornecedor"' })
+    return await pb.collection('partners').getFullList({ filter: 'fornecedor = true' })
   } catch {
     return []
   }

@@ -340,7 +340,7 @@ export default function SalesOrdersQueryPage() {
 
       try {
         const clientList = await pb.collection('partners').getFullList({
-          filter: 'partner_type ~ "Cliente"',
+          filter: 'cliente = true',
           sort: 'company_name',
         })
         setClients(

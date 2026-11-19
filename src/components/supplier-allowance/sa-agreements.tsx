@@ -55,7 +55,7 @@ export function SaAgreements() {
   useEffect(() => {
     load()
     getPartners()
-      .then((p) => setSuppliers((p as any[]).filter((s) => s.partner_type?.includes('Fornecedor'))))
+      .then((p) => setSuppliers((p as any[]).filter((s) => s.fornecedor === true)))
       .catch(() => {})
   }, [])
   useRealtime(SA_COLLECTIONS.agreements, () => load())

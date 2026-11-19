@@ -252,7 +252,7 @@ export async function generateEqPurchaseRequest(
 
 export async function getCorporateSuppliers(): Promise<Record<string, unknown>[]> {
   try {
-    return await pb.collection('partners').getFullList({ filter: 'partner_type ~ "Fornecedor"' })
+    return await pb.collection('partners').getFullList({ filter: 'fornecedor = true' })
   } catch {
     return []
   }

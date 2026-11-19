@@ -90,6 +90,33 @@ export function PartnerListTable({
       ),
     },
     {
+      id: 'flags',
+      header: 'Perfil',
+      dataType: 'text',
+      defaultWidth: 170,
+      getSortValue: (row) =>
+        [row.cliente === true ? 'Cliente' : '', row.fornecedor === true ? 'Fornecedor' : '']
+          .filter(Boolean)
+          .join(', '),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1">
+          {row.cliente === true && (
+            <Badge className="bg-[#005B2E] hover:bg-[#004222] text-white text-[10px]">
+              Cliente
+            </Badge>
+          )}
+          {row.fornecedor === true && (
+            <Badge className="bg-[#C89B3C] hover:bg-[#A87F2E] text-white text-[10px]">
+              Fornecedor
+            </Badge>
+          )}
+          {row.cliente !== true && row.fornecedor !== true && (
+            <span className="text-xs text-muted-foreground">—</span>
+          )}
+        </div>
+      ),
+    },
+    {
       id: 'active',
       header: 'Status',
       accessorKey: 'active',

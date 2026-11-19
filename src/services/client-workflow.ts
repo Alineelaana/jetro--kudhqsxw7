@@ -141,10 +141,10 @@ export async function checkDocumentDuplicity(
   const cleanDoc = cpfCnpj.replace(/\D/g, '')
   if (!cleanDoc) return { isDuplicate: false }
 
-  // 1. Checar em clientes oficiais (partners com partner_type = 'Cliente')
+  // 1. Checar em clientes oficiais (partners com flag cliente = true)
   try {
     const clients = await pb.collection('partners').getFullList({
-      filter: `partner_type = "Cliente" && (cnpj ~ "${cleanDoc}" || cpf ~ "${cleanDoc}")`,
+      filter: `cliente = true && (cnpj ~ "${cleanDoc}" || cpf ~ "${cleanDoc}")`,
       sort: '-created',
     })
     if (clients.length > 0) {
@@ -259,6 +259,7 @@ export async function concluirCadastroOficial(params: {
   const novoClientePayload: Record<string, any> = {
     ...dadosCliente,
     partner_type: 'Cliente',
+    cliente: true,
     active: true,
     blocked: false,
     financial_restriction: false,

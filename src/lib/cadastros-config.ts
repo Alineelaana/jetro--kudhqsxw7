@@ -70,16 +70,8 @@ export const CADASTROS: CadastroConfig[] = [
     ],
   },
   {
-    key: 'clientes',
-    label: 'Clientes',
-    collection: 'partners',
-    isNew: false,
-    existingComponent: 'partners',
-    fields: [],
-  },
-  {
-    key: 'fornecedores',
-    label: 'Fornecedores',
+    key: 'parceiros',
+    label: 'Parceiros',
     collection: 'partners',
     isNew: false,
     existingComponent: 'partners',
@@ -279,7 +271,7 @@ export const CADASTRO_GROUPS: CadastroGroup[] = [
   { label: 'Organização', keys: ['empresas', 'filiais', 'usuarios', 'perfis_permissoes'] },
   {
     label: 'Pessoas',
-    keys: ['clientes', 'fornecedores', 'transportadoras', 'vendedores', 'representantes'],
+    keys: ['parceiros', 'transportadoras', 'vendedores', 'representantes'],
   },
   {
     label: 'Produtos & Serviços',

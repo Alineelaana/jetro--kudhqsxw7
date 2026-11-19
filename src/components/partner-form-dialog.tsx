@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -16,7 +17,6 @@ import { PartnerPfFields } from '@/components/partner-pf-fields'
 import { PartnerPjFields } from '@/components/partner-pj-fields'
 import { PartnerFinancialDialog } from '@/components/partner-financial-dialog'
 import { PartnerRestrictionControls } from '@/components/partner-restriction-controls'
-import { PartnerTypeManager } from '@/components/partner-type-manager'
 import { PartnerResponsiblesSection } from '@/components/partner-responsibles-section'
 import { type PartnerFieldProps, type PartnerRecord } from '@/components/partner-shared'
 import {
@@ -25,7 +25,6 @@ import {
   createClientForPartner,
   updateClientPassword,
 } from '@/services/partners'
-import { getPartnerTypes } from '@/services/partner-types'
 import { EMPTY_PARTNER_FORM, type PartnerFormState } from '@/lib/partner-types'
 import { Loader2, Save, Ban, Unlock, Wallet, AlertCircle, Lock } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
@@ -42,7 +41,6 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
   const { user } = useAuth()
   const [form, setForm] = useState<PartnerFormState>(EMPTY_PARTNER_FORM)
   const [files, setFiles] = useState<Record<string, File | null>>({})
-  const [partnerTypes, setPartnerTypes] = useState<string[]>(['Cliente', 'Fornecedor', 'Usuário'])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [financialOpen, setFinancialOpen] = useState(false)
@@ -50,19 +48,15 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
   const [televendasId, setTelevendasId] = useState('')
   const [responsavelDigitalId, setResponsavelDigitalId] = useState('')
   const isEditing = !!partner
-  const isCliente = form.partner_type === 'Cliente'
+  const isCliente = form.cliente === true
   const userName = (user?.name as string) || (user?.email as string) || 'Sistema'
-
-  useEffect(() => {
-    getPartnerTypes()
-      .then(setPartnerTypes)
-      .catch(() => {})
-  }, [open])
 
   useEffect(() => {
     if (partner) {
       setForm({
         partner_type: partner.partner_type || 'Cliente',
+        cliente: partner.cliente === true,
+        fornecedor: partner.fornecedor === true,
         person_type: partner.person_type || 'PF',
         email: partner.email || '',
         phone: partner.phone || '',
@@ -149,11 +143,14 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
     setError('')
     try {
       const formData = new FormData()
-      const { password, ...fields } = form
+      const { password, partner_type: _legacyType, ...fields } = form
+      // partner_type é derivado das flags para compatibilidade com consumidores legados
+      const derivedType = form.cliente ? 'Cliente' : form.fornecedor ? 'Fornecedor' : 'Cliente'
       Object.entries(fields).forEach(([k, v]) => {
         if (typeof v === 'boolean') formData.append(k, v ? 'true' : 'false')
         else if (v !== undefined && v !== null) formData.append(k, String(v))
       })
+      formData.append('partner_type', derivedType)
       Object.entries(files).forEach(([k, f]) => {
         if (f) formData.append(k, f)
       })
@@ -211,18 +208,24 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold">Tipo de Parceiro</Label>
-                <Select value={form.partner_type} onValueChange={(v) => update('partner_type', v)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {partnerTypes.map((t) => (
-                      <SelectItem key={t} value={t}>
-                        {t}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-6 rounded-md border border-border bg-white px-3 py-2.5">
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                    <Checkbox
+                      checked={form.cliente}
+                      onCheckedChange={(v) => setForm((p) => ({ ...p, cliente: v === true }))}
+                      className="data-[state=checked]:bg-[#005B2E] data-[state=checked]:border-[#005B2E]"
+                    />
+                    Cliente
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                    <Checkbox
+                      checked={form.fornecedor}
+                      onCheckedChange={(v) => setForm((p) => ({ ...p, fornecedor: v === true }))}
+                      className="data-[state=checked]:bg-[#005B2E] data-[state=checked]:border-[#005B2E]"
+                    />
+                    Fornecedor
+                  </label>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold">Tipo de Pessoa *</Label>
@@ -237,14 +240,6 @@ export function PartnerFormDialog({ open, onOpenChange, partner, onSuccess }: Pr
                 </Select>
               </div>
             </div>
-            <PartnerTypeManager
-              onTypesChange={() =>
-                getPartnerTypes()
-                  .then(setPartnerTypes)
-                  .catch(() => {})
-              }
-            />
-
             {form.person_type === 'PF' && <PartnerPfFields {...fieldProps} />}
             {form.person_type === 'PJ' && <PartnerPjFields {...fieldProps} />}
 

@@ -129,7 +129,7 @@ export function AdminB2BAccessRequestsScreen() {
       // 2. Carregar parceiros tipo Cliente para opções de vínculo manual se necessário
       try {
         const pRecords = await pb.collection('partners').getList(1, 200, {
-          filter: 'partner_type = "Cliente"',
+          filter: 'cliente = true',
           sort: 'company_name',
         })
         setPartners(

@@ -42,6 +42,7 @@ export default function ClientRegister() {
     try {
       const formData = new FormData()
       formData.append('partner_type', 'Cliente')
+      formData.append('cliente', 'true')
       formData.append('person_type', form.person_type)
       formData.append('active', 'false')
       formData.append('blocked', 'false')

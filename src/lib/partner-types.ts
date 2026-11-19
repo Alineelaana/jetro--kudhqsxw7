@@ -27,6 +27,8 @@ export interface DocumentMetadata {
 
 export interface PartnerFormState {
   partner_type: string
+  cliente: boolean
+  fornecedor: boolean
   person_type: 'PF' | 'PJ'
   email: string
   phone: string
@@ -62,6 +64,8 @@ export interface PartnerFormState {
 
 export const EMPTY_PARTNER_FORM: PartnerFormState = {
   partner_type: 'Cliente',
+  cliente: true,
+  fornecedor: false,
   person_type: 'PF',
   email: '',
   phone: '',

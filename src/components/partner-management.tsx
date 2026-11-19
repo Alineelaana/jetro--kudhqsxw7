@@ -7,7 +7,6 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { PartnerListTable } from '@/components/partner-list-table'
 import { PartnerFormDialog } from '@/components/partner-form-dialog'
-import { PartnerTypeManager } from '@/components/partner-type-manager'
 import { type PartnerRecord } from '@/components/partner-shared'
 import { UserPlus, Search, Loader2 } from 'lucide-react'
 
@@ -52,7 +51,10 @@ export function PartnerManagement() {
         (p.cnpj || '').toLowerCase().includes(term) ||
         (p.email || '').toLowerCase().includes(term) ||
         (p.phone || '').toLowerCase().includes(term)
-      const matchesType = typeFilter === 'all' || p.partner_type === typeFilter
+      const matchesType =
+        typeFilter === 'all' ||
+        (typeFilter === 'cliente' && p.cliente === true) ||
+        (typeFilter === 'fornecedor' && p.fornecedor === true)
       const matchesPerson = personFilter === 'all' || p.person_type === personFilter
       const matchesStatus =
         statusFilter === 'all' ||
@@ -98,11 +100,6 @@ export function PartnerManagement() {
     setDialogOpen(true)
   }
 
-  const partnerTypeOptions = useMemo(() => {
-    const types = new Set(partners.map((p) => p.partner_type).filter(Boolean))
-    return Array.from(types)
-  }, [partners])
-
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -114,8 +111,6 @@ export function PartnerManagement() {
           <UserPlus className="w-4 h-4 mr-2" /> Novo Parceiro
         </Button>
       </div>
-
-      <PartnerTypeManager onTypesChange={loadPartners} />
 
       <Card className="border-2 border-[#005B2E]/20">
         <CardContent className="py-4 space-y-3">
@@ -134,12 +129,9 @@ export function PartnerManagement() {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="border border-border rounded-md px-3 py-2 text-sm bg-white"
             >
-              <option value="all">Todos os tipos</option>
-              {partnerTypeOptions.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+              <option value="all">Todos</option>
+              <option value="cliente">Clientes</option>
+              <option value="fornecedor">Fornecedores</option>
             </select>
             <select
               value={personFilter}

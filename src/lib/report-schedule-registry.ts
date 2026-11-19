@@ -3178,7 +3178,7 @@ export const REPORT_SOURCES_REGISTRY: Record<string, ReportSourceDefinition> = {
       { key: 'active', label: 'Ativo', width: 10, align: 'center', type: 'boolean' },
     ],
     buildFilterString: (f) => {
-      const parts: string[] = ['partner_type = "Cliente"']
+      const parts: string[] = ['cliente = true']
       if (f.active === 'active') parts.push('active = true')
       if (f.active === 'inactive') parts.push('active = false')
       if (f.search && f.search !== 'all') {
@@ -3229,7 +3229,7 @@ export const REPORT_SOURCES_REGISTRY: Record<string, ReportSourceDefinition> = {
       { key: 'active', label: 'Ativo', width: 10, align: 'center', type: 'boolean' },
     ],
     buildFilterString: (f) => {
-      const parts: string[] = ['partner_type = "Fornecedor"']
+      const parts: string[] = ['fornecedor = true']
       if (f.active === 'active') parts.push('active = true')
       if (f.active === 'inactive') parts.push('active = false')
       if (f.search && f.search !== 'all') {

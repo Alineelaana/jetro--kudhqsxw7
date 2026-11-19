@@ -109,7 +109,7 @@ export async function getNextSalesNumber(
 
 export async function getClients() {
   try {
-    return await pb.collection('partners').getFullList({ filter: 'partner_type ~ "Cliente"' })
+    return await pb.collection('partners').getFullList({ filter: 'cliente = true' })
   } catch {
     return []
   }

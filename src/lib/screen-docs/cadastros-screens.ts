@@ -106,6 +106,59 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     },
   },
 
+  '/admin/cadastros/parceiros': {
+    route: '/admin/cadastros/parceiros',
+    title: 'Cadastro de Parceiros (Clientes e Fornecedores)',
+    moduleGroup: 'Pessoas',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-19',
+    author: 'Engenharia de Software Huram',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Unificar em uma única tela o cadastro de clientes e fornecedores (parceiros comerciais), com CNPJ/CPF e flags independentes de Cliente e Fornecedor, servindo de base única para pedidos de venda, compras e faturamento.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Listagem via JetroTable com código, razão social/nome (com nome fantasia como subtítulo), tipo de pessoa, CPF/CNPJ, cidade/UF, coluna "Perfil" com badges das flags (Cliente em verde, Fornecedor em dourado; "—" quando nenhuma flag marcada), status e restrição financeira.\n- Filtro segmentado Todos/Clientes/Fornecedores: "Clientes" lista apenas registros com a flag cliente marcada e "Fornecedores" apenas com a flag fornecedor marcada — um parceiro com ambas as flags aparece nas duas listas.\n- Filtros adicionais: busca por nome, CPF/CNPJ, e-mail ou telefone, pessoa física/jurídica, status (ativo/inativo), restrição financeira, cidade e estado, com botão "Limpar filtros".\n- Botão "Novo Parceiro" abre o formulário em dialog; o lápis na linha abre o mesmo formulário em edição.\n- Formulário com checkboxes "Cliente" e "Fornecedor" independentes (ambos podem ficar marcados ao mesmo tempo), tipo de pessoa PF/PJ, campos de pessoa física (PartnerPfFields) ou jurídica (PartnerPjFields), responsáveis comerciais (RCA, Televendas, Responsável Digital), observações e switch Ativo.\n- Quando a flag Cliente está marcada: e-mail e senha são obrigatórios na criação, o botão Financeiro abre o diálogo financeiro do parceiro e o botão Bloquear/Desbloquear cliente fica disponível (edição).\n- Controles de restrição financeira e histórico disponíveis na edição; exportação da listagem para Excel.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- As flags cliente e fornecedor são booleanos independentes na coleção `partners`: um parceiro pode ser só cliente, só fornecedor ou ambos (cliente e fornecedor marcados).\n- O campo texto partner_type é derivado automaticamente das flags apenas para compatibilidade com consumidores legados: cliente marcado → "Cliente"; sem cliente mas com fornecedor → "Fornecedor"; nunca fica vazio.\n- Para novo parceiro com flag Cliente marcada, e-mail e senha são obrigatórios; ao salvar, é criado o vínculo de acesso (client_id) via createClientForPartner.\n- Coleção `clients` é de autenticação e não faz parte deste cadastro; a base unificada é exclusivamente `partners`.\n- Migração 0327 fez o backfill: registros com partner_type "Cliente" receberam cliente=true e "Fornecedor" receberam fornecedor=true.\n- Restrição financeira e bloqueio de cliente são por registro, com histórico e responsável.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário acessa Cadastros > Parceiros no menu lateral.\n2. Para criar, clica em "Novo Parceiro", preenche os dados, marca os checkboxes Cliente e/ou Fornecedor e salva; o registro entra na listagem via realtime.\n3. Para editar, clica no lápis da linha; o dialog abre preenchido com as flags atuais marcadas.\n4. Usa o filtro segmentado Todos/Clientes/Fornecedores para recortar a lista e a busca para localizar um parceiro específico.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleção PocketBase: `partners` (via getPartners/createPartner/updatePartner em `src/services/partners.ts`), com flags bool cliente/fornecedor.\n- Vínculo de acesso do cliente: coleção `clients` (criada por createClientForPartner).\n- Financeiro e restrições do parceiro: campos JSON do próprio registro `partners`.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Consumidores da base unificada: pedido de venda (seleção de cliente filtra cliente = true), compras (seleção de fornecedor filtra fornecedor = true), cotações externas, workflow de cliente e marketing/trade.\n- Realtime PocketBase (`useRealtime`) para atualização da listagem.\n- Busca de dados por CNPJ (`src/services/cnpj-service.ts`) nos campos de pessoa jurídica.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content: 'Acesso conforme perfil de Cadastros/Configurações (`canViewConfiguracoes(role)`).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `PartnerManagement`, `PartnerFormDialog`, `PartnerListTable`, `PartnerPfFields`, `PartnerPjFields`, `PartnerFinancialDialog`, `PartnerRestrictionControls`, `PartnerResponsiblesSection`, `JetroTable`.\n- Configuração: `cadastros-config.ts` (key `parceiros`, coleção `partners`); tipos em `partner-types.ts` e `partner-shared.ts`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Falha na carga da lista exibe listagem vazia; falha ao salvar exibe a mensagem de erro no rodapé do dialog sem fechá-lo.\n- E-mail/senha ausentes para novo parceiro cliente são validados antes do envio, com mensagem no próprio formulário.',
+    },
+  },
+
   '/admin/cadastros/transportadoras': {
     route: '/admin/cadastros/transportadoras',
     title: 'Cadastro de Transportadoras',

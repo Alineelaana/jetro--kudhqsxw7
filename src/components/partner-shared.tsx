@@ -20,6 +20,8 @@ export interface PartnerRecord {
   id: string
   code?: string
   partner_type: string
+  cliente?: boolean
+  fornecedor?: boolean
   person_type: 'PF' | 'PJ'
   active: boolean
   blocked: boolean
