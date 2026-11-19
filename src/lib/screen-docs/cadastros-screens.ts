@@ -141,7 +141,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     integrations: {
       title: 'Integrações',
       content:
-        '- Consumidores da base unificada: pedido de venda (seleção de cliente filtra cliente = true), compras (seleção de fornecedor filtra fornecedor = true), cotações externas, workflow de cliente e marketing/trade.\n- Realtime PocketBase (`useRealtime`) para atualização da listagem.\n- Busca de dados por CNPJ (`src/services/cnpj-service.ts`) nos campos de pessoa jurídica.',
+        '- Consumidores da base unificada: pedido de venda (seleção de cliente filtra cliente = true), compras (seleção de fornecedor filtra fornecedor = true), cotações externas (`mk-external-quotations.ts`), workflow de cliente e marketing/trade.\n- Realtime PocketBase (`useRealtime`) para atualização da listagem.\n- Busca de dados por CNPJ nos campos de pessoa jurídica via `lookupCnpj` de `src/lib/partner-utils.ts` (rota backend `/backend/v1/cnpj/`), com diálogo de confirmação antes de sobrescrever campos já editados.',
     },
     permissions: {
       title: 'Permissões',

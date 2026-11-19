@@ -95,6 +95,9 @@ export interface ClienteOficialRecord {
   id: string
   codigo_oficial?: string
   partner_type: string
+  // Flags da base unificada de parceiros (migração 0327)
+  cliente?: boolean
+  fornecedor?: boolean
   person_type: 'PF' | 'PJ'
   cpf?: string
   cnpj?: string
