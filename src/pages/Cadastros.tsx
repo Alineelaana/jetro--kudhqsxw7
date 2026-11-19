@@ -1,21 +1,26 @@
 import { useParams } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { CadastrosPanel } from '@/components/cadastros/cadastros-panel'
-import { CadastroClientesOficialScreen } from '@/components/cadastros/cadastro-clientes-oficial-screen'
 import { PerfisPermissoesUnifiedScreen } from '@/components/configuracoes/perfis-permissoes-unified-screen'
+
+// Rotas antigas de Clientes/Fornecedores redirecionam para a base unificada Parceiros
+const LEGACY_PARTNER_ROUTES: Record<string, string> = {
+  clientes: 'parceiros',
+  fornecedores: 'parceiros',
+}
 
 // Mapeamento de segmento de URL para a key de cadastro em CADASTROS
 const ROUTE_TO_CADASTRO_KEY: Record<string, string> = {
   bancos: 'bancos',
   categorias: 'categorias',
   'centros-custo': 'centros_custo',
-  clientes: 'clientes',
   'condicoes-pagamento': 'condicoes_pagamento',
   'contas-bancarias': 'contas_bancarias',
   empresas: 'empresas',
   filiais: 'filiais',
   'formas-pagamento': 'formas_pagamento',
-  fornecedores: 'fornecedores',
   marcas: 'marcas',
+  parceiros: 'parceiros',
   'perfis-permissoes': 'perfis_permissoes',
   'plano-contas': 'plano_contas',
   produtos: 'produtos',
@@ -36,15 +41,12 @@ interface CadastrosProps {
 export default function Cadastros({ screen }: CadastrosProps) {
   const params = useParams<{ screen?: string }>()
   const resolvedScreen = screen || params.screen || 'empresas'
-  const cadastroKey = ROUTE_TO_CADASTRO_KEY[resolvedScreen] || resolvedScreen
 
-  if (cadastroKey === 'clientes') {
-    return (
-      <div className="p-4 sm:p-6">
-        <CadastroClientesOficialScreen />
-      </div>
-    )
+  if (LEGACY_PARTNER_ROUTES[resolvedScreen]) {
+    return <Navigate to="/admin/cadastros/parceiros" replace />
   }
+
+  const cadastroKey = ROUTE_TO_CADASTRO_KEY[resolvedScreen] || resolvedScreen
 
   if (cadastroKey === 'perfis_permissoes') {
     return (
