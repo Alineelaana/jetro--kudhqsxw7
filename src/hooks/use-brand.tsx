@@ -130,17 +130,24 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
 
   const corPrimaria = empresa.marca_cor_primaria?.trim() || HURAM_PALETTE.green
   const corSecundaria = empresa.marca_cor_secundaria?.trim() || HURAM_PALETTE.gold
+  // Complementar herdada por marca quando o registro só define a cor primária:
+  // Eldorado (azul royal) → âmbar; Gran Romano (marrom) → castanho; RBJ (verde
+  // lima da logomarca) → azul claro; demais → esmeralda padrão HURAM.
   const corComplementar =
     empresa.marca_cor_complementar?.trim() ||
     (corPrimaria === '#003DA5'
       ? '#F5B324'
       : corPrimaria === '#4A2E1B'
         ? '#8B5A2B'
+        : corPrimaria === '#6EC531'
+          ? '#29B6E8'
+          : HURAM_PALETTE.emerald)
 
   const nomeExibicao =
     empresa.marca_nome_exibicao?.trim() ||
     empresa.nome_fantasia?.trim() ||
     empresa.name?.trim() ||
+    BRAND_NAME
 
   const isCustom =
     !!empresa.marca_nome_exibicao ||
@@ -148,6 +155,13 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
     !!empresa.marca_cor_secundaria ||
     !!empresa.marca_cor_complementar ||
     hasUploadedLogo ||
+    !!officialFallback
+
+  // Logomarca para fundos escuros: quando a empresa tem logomarca oficial
+  // própria (upload ou fallback), ela é usada também no tema escuro; apenas
+  // a marca HURAM padrão troca para a variante escura dedicada.
+  const effectiveLogoDarkUrl =
+    uploadedLogoUrl || officialFallback || (hasUploadedLogo ? effectiveLogoUrl : logoHuramDark)
 
   return {
     empresaId: empresa.id,
@@ -161,12 +175,12 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
     isCustom,
     empresaPadrao: !!empresa.padrao,
   }
+}
 
 export function BrandProvider({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth()
   const [empresas, setEmpresas] = useState<EmpresaBrand[]>([])
   const [loading, setLoading] = useState(true)
->>>>>>>
   const [empresaAtivaId, setEmpresaAtivaIdState] = useState<string | null>(() => {
     return localStorage.getItem(ACTIVE_EMPRESA_STORAGE_KEY)
   })
