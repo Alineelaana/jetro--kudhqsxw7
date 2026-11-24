@@ -120,6 +120,11 @@ const PlatformLayer = lazy(() => import('./pages/PlatformLayer'))
 const Blueprint = lazy(() => import('./pages/Blueprint'))
 const VariableRemuneration = lazy(() => import('./pages/VariableRemuneration'))
 const InteligenciaPage = lazy(() => import('./pages/InteligenciaPage'))
+const Estrategia360Screen = lazy(() =>
+  import('@/components/estrategia360/estrategia360-screen').then((m) => ({
+    default: m.Estrategia360Screen,
+  })),
+)
 const BI = lazy(() => import('./pages/BI'))
 const Performance = lazy(() => import('./pages/Performance'))
 const ValidityAlerts = lazy(() => import('./pages/ValidityAlerts'))
@@ -1777,7 +1782,7 @@ const App = () => (
                                 <Route
                                   path="/admin/inteligencia/visao-estrategica-360"
                                   element={
-                                    <Suspense fallback={<PageLoader />}>
+                                    <Suspense fallback={<PageFallback />}>
                                       <Estrategia360Screen />
                                     </Suspense>
                                   }

@@ -554,6 +554,10 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             label: 'Relatórios e Agendamentos',
             route: '/admin/inteligencia/relatorios',
           },
+          {
+            label: 'Visão estratégica em 360°',
+            route: '/admin/inteligencia/visao-estrategica-360',
+          },
         ],
       },
       {
