@@ -132,14 +132,15 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
   const corSecundaria = empresa.marca_cor_secundaria?.trim() || HURAM_PALETTE.gold
   // Complementar herdada por marca quando o registro só define a cor primária:
   // Eldorado (azul royal) → âmbar; Gran Romano (marrom) → castanho; RBJ (verde
-  // lima da logomarca) → azul claro; demais → esmeralda padrão HURAM.
+  // sóbrio #4C9A2A — versão escura do verde da logomarca; aceita também o
+  // #6EC531 antigo) → azul claro; demais → esmeralda padrão HURAM.
   const corComplementar =
     empresa.marca_cor_complementar?.trim() ||
     (corPrimaria === '#003DA5'
       ? '#F5B324'
       : corPrimaria === '#4A2E1B'
         ? '#8B5A2B'
-        : corPrimaria === '#6EC531'
+        : corPrimaria === '#4C9A2A' || corPrimaria === '#6EC531'
           ? '#29B6E8'
           : HURAM_PALETTE.emerald)
 
