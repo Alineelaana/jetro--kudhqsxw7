@@ -1,11 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Search, FileSpreadsheet, Printer, Eye, RefreshCw } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -46,7 +41,9 @@ export const fmtInt = (n: number) => fmtNum(Math.round(n))
 export function toNum(v: unknown): number {
   if (typeof v === 'number') return Number.isFinite(v) ? v : 0
   if (v === null || v === undefined) return 0
-  const s = String(v).trim().replace(/[R$\s]/g, '')
+  const s = String(v)
+    .trim()
+    .replace(/[R$\s]/g, '')
   if (!s) return 0
   const norm = s.includes(',') ? s.replace(/\./g, '').replace(',', '.') : s
   const n = Number(norm)
@@ -64,15 +61,18 @@ export function parseDateSafe(v?: string | null): Date | null {
 }
 
 export const fmtDateBR = (d: Date | null) =>
-  d ? `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}` : '—'
+  d
+    ? `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
+    : '—'
 
-export const dateOnly = (d: Date) =>
-  new Date(d.getFullYear(), d.getMonth(), d.getDate())
+export const dateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
 
 export function sameDay(a: Date | null, b: Date): boolean {
   if (!a) return false
   return (
-    a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()
+    a.getDate() === b.getDate() &&
+    a.getMonth() === b.getMonth() &&
+    a.getFullYear() === b.getFullYear()
   )
 }
 
@@ -83,8 +83,18 @@ export function inMonth(d: Date | null, mesAno: string): boolean {
 }
 
 export const MONTH_NAMES_PT = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
 ]
 
 export function monthLabel(mesAno: string): string {
@@ -119,12 +129,16 @@ export function buildEmpresaOptions(
   const opts: EmpresaOption[] = []
   for (const e of empresas) {
     const label = e.code && e.state ? `${e.code}-${e.state}` : e.name || e.code || e.id
-    const keys = [e.id, e.code, e.name, e.marca].filter(Boolean).map((k) => String(k).toLowerCase().trim())
+    const keys = [e.id, e.code, e.name, e.marca]
+      .filter(Boolean)
+      .map((k) => String(k).toLowerCase().trim())
     opts.push({ id: `empresa:${e.id}`, label, keys: [...new Set(keys)] })
   }
   for (const f of filiais) {
     const label = f.code && f.state ? `${f.code}-${f.state}` : f.name || f.code || f.id
-    const keys = [f.id, f.code, f.name, f.empresaName].filter(Boolean).map((k) => String(k).toLowerCase().trim())
+    const keys = [f.id, f.code, f.name, f.empresaName]
+      .filter(Boolean)
+      .map((k) => String(k).toLowerCase().trim())
     opts.push({ id: `filial:${f.id}`, label, keys: [...new Set(keys)] })
   }
   return opts
@@ -153,7 +167,9 @@ export function recMatchesOrigem(rec: Record<string, unknown>, tokens: Set<strin
 
 export function recMatchesMarca(rec: Record<string, unknown>, marca: string): boolean {
   if (!marca || marca === 'TODAS') return true
-  const m = String(rec.marca ?? rec.brand ?? '').trim().toLowerCase()
+  const m = String(rec.marca ?? rec.brand ?? '')
+    .trim()
+    .toLowerCase()
   if (!m) return true // registros sem marca identificada permanecem no cálculo
   return m === marca.toLowerCase()
 }
@@ -301,7 +317,10 @@ export function VisaoDataTable({
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={columns.length} className="px-3 py-6 text-center text-muted-foreground">
+                <td
+                  colSpan={columns.length}
+                  className="px-3 py-6 text-center text-muted-foreground"
+                >
                   {emptyMessage}
                 </td>
               </tr>
@@ -356,7 +375,10 @@ export function VisaoDataTable({
               <thead className="bg-[#2d2b55] text-white">
                 <tr>
                   {columns.map((c) => (
-                    <th key={c.key} className={cn('px-2 py-1.5 text-left', c.align === 'right' && 'text-right')}>
+                    <th
+                      key={c.key}
+                      className={cn('px-2 py-1.5 text-left', c.align === 'right' && 'text-right')}
+                    >
                       {c.label}
                     </th>
                   ))}
@@ -366,7 +388,10 @@ export function VisaoDataTable({
                 {filtered.map((r, i) => (
                   <tr key={String(r.__id ?? i)} className={cn(i % 2 === 1 && 'bg-muted/40')}>
                     {columns.map((c) => (
-                      <td key={c.key} className={cn('px-2 py-1', c.align === 'right' && 'text-right')}>
+                      <td
+                        key={c.key}
+                        className={cn('px-2 py-1', c.align === 'right' && 'text-right')}
+                      >
                         {cellText(c, r)}
                       </td>
                     ))}
@@ -462,7 +487,10 @@ export function DrillDialog({
                 {columns.map((c) => (
                   <th
                     key={c.key}
-                    className={cn('px-2 py-1.5 text-left whitespace-nowrap', c.align === 'right' && 'text-right')}
+                    className={cn(
+                      'px-2 py-1.5 text-left whitespace-nowrap',
+                      c.align === 'right' && 'text-right',
+                    )}
                   >
                     {c.label}
                   </th>
@@ -472,7 +500,10 @@ export function DrillDialog({
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={columns.length} className="px-2 py-4 text-center text-muted-foreground">
+                  <td
+                    colSpan={columns.length}
+                    className="px-2 py-4 text-center text-muted-foreground"
+                  >
                     Nenhum registro no período.
                   </td>
                 </tr>
@@ -505,7 +536,11 @@ export function DrillDialog({
 // Faixa escura "Empresas Processadas"
 // ------------------------------------------------------------------
 export function DarkBand({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-t-md bg-[#2d2b55] px-4 py-3 text-sm font-semibold text-white">{children}</div>
+  return (
+    <div className="rounded-t-md bg-[#2d2b55] px-4 py-3 text-sm font-semibold text-white">
+      {children}
+    </div>
+  )
 }
 
 // ------------------------------------------------------------------
@@ -549,7 +584,13 @@ export function Gauge({
     <div className="flex flex-col items-center rounded-md border bg-background p-3">
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
       <svg viewBox="0 0 120 75" className="my-1 h-24 w-40">
-        <path d="M15,60 A45,45 0 0 1 105,60" fill="none" stroke="#e5e7eb" strokeWidth="10" strokeLinecap="round" />
+        <path
+          d="M15,60 A45,45 0 0 1 105,60"
+          fill="none"
+          stroke="#e5e7eb"
+          strokeWidth="10"
+          strokeLinecap="round"
+        />
         <path
           d="M15,60 A45,45 0 0 1 105,60"
           fill="none"

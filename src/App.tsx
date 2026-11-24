@@ -1773,6 +1773,16 @@ const App = () => (
                                     <Navigate to="/admin/comercial/remuneracao-variavel" replace />
                                   }
                                 />
+                                {/* VISÃO ESTRATÉGICA EM 360° */}
+                                <Route
+                                  path="/admin/inteligencia/visao-estrategica-360"
+                                  element={
+                                    <Suspense fallback={<PageLoader />}>
+                                      <Estrategia360Screen />
+                                    </Suspense>
+                                  }
+                                />
+
                                 {/* MÓDULO INTELIGÊNCIA (4 TELAS OFICIAIS) */}
                                 <Route path="/admin/inteligencia" element={<InteligenciaPage />} />
                                 <Route
