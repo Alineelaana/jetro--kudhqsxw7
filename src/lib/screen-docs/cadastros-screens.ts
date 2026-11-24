@@ -5,8 +5,8 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/cadastros/empresas',
     title: 'Cadastro de Empresas',
     moduleGroup: 'Organização',
-    docVersion: '1.1.0',
-    lastUpdated: '2026-11-19',
+    docVersion: '1.2.0',
+    lastUpdated: '2026-11-24',
     author: 'Engenharia de Software Huram',
     objective: {
       title: 'Objetivo',
@@ -21,7 +21,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- CNPJ validado com dígitos verificadores; o formulário oferece busca automática de dados públicos pelo CNPJ.\n- O responsável pelo registro é gravado automaticamente no primeiro cadastro (responsible_user).\n- Filiais podem estar vinculadas a uma empresa matriz (matriz_id).\n- Isolamento multiempresa: empresas é coleção de contexto organizacional e respeita o vínculo do usuário autenticado.\n- Empresas do grupo Gran Romano compartilham a mesma identidade visual: as filiais herdando da matriz Gran Romano as cores da marca (marca_cor_primaria #4A2E1B, marca_cor_secundaria #C69B45, marca_cor_complementar #8B5A2B) e o mesmo nome fantasia (GRAN ROMANO); o que diferencia cada filial no trocador de empresas é o campo marca_nome_exibicao (ex.: "GR FILIAL SP - 12").\n- A migração 0328 cadastrou a filial "GR FILIAL SP - 12" (São Paulo/SP) a partir dos dados do Cadesp (razão social GR INDUSTRIA DE ALIMENTOS S/A, nome fantasia GRAN ROMANO, CNPJ 33516806000277, IE 162545386113, RUA VILA DE AROUCA 315, SITIO BARROCADA, SAO PAULO/SP, CEP 02285020), vinculada à matriz Gran Romano (matriz_id) e ativa. A migração é idempotente: se já existir registro com o mesmo CNPJ, completa/atualiza o registro em vez de duplicá-lo.',
+        '- CNPJ validado com dígitos verificadores; o formulário oferece busca automática de dados públicos pelo CNPJ.\n- O responsável pelo registro é gravado automaticamente no primeiro cadastro (responsible_user).\n- Filiais podem estar vinculadas a uma empresa matriz (matriz_id).\n- Isolamento multiempresa: empresas é coleção de contexto organizacional e respeita o vínculo do usuário autenticado.\n- Empresas do grupo Gran Romano compartilham a mesma identidade visual: as filiais herdando da matriz Gran Romano as cores da marca (marca_cor_primaria #4A2E1B, marca_cor_secundaria #C69B45, marca_cor_complementar #8B5A2B) e o mesmo nome fantasia (GRAN ROMANO); o que diferencia cada filial no trocador de empresas é o campo marca_nome_exibicao (ex.: "GR FILIAL SP - 12").\n- A migração 0328 cadastrou a filial "GR FILIAL SP - 12" (São Paulo/SP) a partir dos dados do Cadesp (razão social GR INDUSTRIA DE ALIMENTOS S/A, nome fantasia GRAN ROMANO, CNPJ 33516806000277, IE 162545386113, RUA VILA DE AROUCA 315, SITIO BARROCADA, SAO PAULO/SP, CEP 02285020), vinculada à matriz Gran Romano (matriz_id) e ativa. A migração é idempotente: se já existir registro com o mesmo CNPJ, completa/atualiza o registro em vez de duplicá-lo.\n- A migração 0330 cadastrou a filial "GR COMÉRCIO - FILIAL 10" (Colatina/ES) a partir do Comprovante de Inscrição CNPJ da Receita (razão social GR COMERCIO DE ALIMENTOS LTDA, nome fantasia GRAN ROMANO, CNPJ 33531059000165, ESVC AS MARGENS DA ES 357 S/N KM 67, BAUNILHA, COLATINA/ES, CEP 29715000, e-mail FINANCEIRO@GRANROMANO.COM.BR, telefone (11) 3569-1665), vinculada à matriz Gran Romano (matriz_id) e ativa. A Receita não informa Inscrição Estadual nesse documento, por isso o campo IE ficou vazio (preencher quando a IE for obtida). Idempotente pelo mesmo critério da 0328 (mesmo CNPJ, raiz 33531059, código GR-FILIAL-10 ou razão social — atualiza em vez de duplicar).',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
@@ -31,7 +31,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleção PocketBase: `empresas` (via `listCadastros`/`createCadastroFormData`/`updateCadastroFormData` em `src/services/cadastros.ts`).\n- Seed de empresas do grupo via migrações em `pocketbase/migrations/` (ex.: 0279 para as matrizes Dec Eldorado e Gran Romano, 0328 para a filial GR FILIAL SP - 12).',
+        '- Coleção PocketBase: `empresas` (via `listCadastros`/`createCadastroFormData`/`updateCadastroFormData` em `src/services/cadastros.ts`).\n- Seed de empresas do grupo via migrações em `pocketbase/migrations/` (ex.: 0279 para as matrizes Dec Eldorado e Gran Romano, 0328 para a filial GR FILIAL SP - 12, 0330 para a filial GR COMÉRCIO - FILIAL 10).',
     },
     integrations: {
       title: 'Integrações',
