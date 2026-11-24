@@ -90,7 +90,17 @@ export function resolveOfficialLogoFallback(empresa?: EmpresaBrand | null): stri
     ''
   ).toLowerCase()
 
-  if (code.includes('GRAN-ROMANO') || name.includes('gran romano')) {
+  const fantasia = (empresa.nome_fantasia || '').toLowerCase()
+  const razao = (empresa.razao_social || '').toLowerCase()
+  if (
+    code.includes('GRAN-ROMANO') ||
+    code.startsWith('GR-') ||
+    name.includes('gran romano') ||
+    fantasia.includes('gran romano') ||
+    razao.includes('gr industria de alimentos')
+  ) {
+    // Matriz e filiais do grupo Gran Romano compartilham a mesma logomarca oficial;
+    // o que diferencia cada empresa no trocador é o nome de exibição (marca_nome_exibicao).
     return logoGranRomanoOfficial
   }
   if (code.includes('DEC-ELDORADO') || name.includes('dec eldorado')) {
