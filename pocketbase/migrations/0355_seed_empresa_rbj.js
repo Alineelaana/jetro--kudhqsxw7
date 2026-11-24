@@ -57,7 +57,10 @@ migrate(
     rec.set('razao_social', 'RBJ OPERACOES LOGISTICAS LTDA')
     rec.set('nome_fantasia', 'RBJ')
     rec.set('cnpj', '53775371000101')
-    rec.set('inscricao_estadual', existing ? existing.getString('inscricao_estadual') || '84219270' : '84219270')
+    rec.set(
+      'inscricao_estadual',
+      existing ? existing.getString('inscricao_estadual') || '84219270' : '84219270',
+    )
     rec.set('address', 'Avenida Porto Canoa, S/N — Lote A3C2 Modulo 1 e 2 Sala 01, Porto Canoa')
     rec.set('city', 'Serra')
     rec.set('state', 'ES')
