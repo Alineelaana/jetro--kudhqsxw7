@@ -103,7 +103,9 @@ export function resolveOfficialLogoFallback(empresa?: EmpresaBrand | null): stri
     // o que diferencia cada empresa no trocador é o nome de exibição (marca_nome_exibicao).
     return logoGranRomanoOfficial
   }
-  if (code.includes('DEC-ELDORADO') || name.includes('dec eldorado')) {
+  if (code.includes('DEC-') || name.includes('dec eldorado')) {
+    // Matriz e filiais do grupo Eldorado compartilham a mesma logomarca oficial;
+    // o que diferencia cada empresa no trocador é o nome de exibição (marca_nome_exibicao).
     return logoDecEldoradoOfficial
   }
   return null
