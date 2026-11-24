@@ -7,6 +7,7 @@ import {
   logoHuramDark,
   logoGranRomanoOfficial,
   logoDecEldoradoOfficial,
+  logoRbjOfficial,
   BRAND_NAME,
   BRAND_TAGLINE,
   HURAM_PALETTE,
@@ -108,6 +109,13 @@ export function resolveOfficialLogoFallback(empresa?: EmpresaBrand | null): stri
     // o que diferencia cada empresa no trocador é o nome de exibição (marca_nome_exibicao).
     return logoDecEldoradoOfficial
   }
+  if (code.includes('RBJ')) {
+    // Matriz e futuras filiais RBJ compartilham a mesma logomarca oficial
+    // (versão horizontal, com setas + texto "RBJ OPERAÇÕES LOGÍSTICAS"),
+    // que é a que melhor se encaixa nos pontos onde a marca é renderizada
+    // (login h-20/max-w-200px, sidebar expandida h-9/max-w-80px).
+    return logoRbjOfficial
+  }
   return null
 }
 
@@ -119,7 +127,6 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
   const uploadedLogoUrl = logoFile ? getFileUrl('empresas', empresa.id, logoFile) : ''
   const officialFallback = resolveOfficialLogoFallback(empresa)
   const effectiveLogoUrl = uploadedLogoUrl || officialFallback || logoHuramLight
-  const effectiveLogoDarkUrl = uploadedLogoUrl || officialFallback || logoHuramDark
 
   const corPrimaria = empresa.marca_cor_primaria?.trim() || HURAM_PALETTE.green
   const corSecundaria = empresa.marca_cor_secundaria?.trim() || HURAM_PALETTE.gold
@@ -129,13 +136,11 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
       ? '#F5B324'
       : corPrimaria === '#4A2E1B'
         ? '#8B5A2B'
-        : HURAM_PALETTE.emerald)
 
   const nomeExibicao =
     empresa.marca_nome_exibicao?.trim() ||
     empresa.nome_fantasia?.trim() ||
     empresa.name?.trim() ||
-    BRAND_NAME
 
   const isCustom =
     !!empresa.marca_nome_exibicao ||
@@ -143,7 +148,6 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
     !!empresa.marca_cor_secundaria ||
     !!empresa.marca_cor_complementar ||
     hasUploadedLogo ||
-    !!officialFallback
 
   return {
     empresaId: empresa.id,
@@ -157,12 +161,12 @@ export function buildBrandFromEmpresa(empresa?: EmpresaBrand | null): ActiveBran
     isCustom,
     empresaPadrao: !!empresa.padrao,
   }
-}
 
 export function BrandProvider({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth()
   const [empresas, setEmpresas] = useState<EmpresaBrand[]>([])
   const [loading, setLoading] = useState(true)
+>>>>>>>
   const [empresaAtivaId, setEmpresaAtivaIdState] = useState<string | null>(() => {
     return localStorage.getItem(ACTIVE_EMPRESA_STORAGE_KEY)
   })

@@ -3,6 +3,8 @@ import logoHuramDark from '@/assets/logotipo-huram-em-verde-esmeralda-9c184.png'
 import logoHuramOfficial from '@/assets/logotipo-huram-dourado-em-fundo-creme-765da.png'
 import logoDecEldoradoOfficial from '@/assets/logotipo-dourado-deceeldorado-em-azul-royal-917fc.png'
 import logoGranRomanoOfficial from '@/assets/rotulo-vintage-gran-romano-1-42884.png'
+import logoRbjOfficial from '@/assets/logo-rbj-operacoes-logisticas-com-setas-ae5b1.png'
+import logoRbjQuadrada from '@/assets/logo-rbj-com-setas-entrelacadas-b69af.png'
 
 export {
   logoHuramLight,
@@ -10,6 +12,8 @@ export {
   logoHuramOfficial,
   logoDecEldoradoOfficial,
   logoGranRomanoOfficial,
+  logoRbjOfficial,
+  logoRbjQuadrada,
 }
 
 export const BRAND_NAME = 'HURAM'
