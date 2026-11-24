@@ -20,6 +20,14 @@ const num = (v: unknown): number => {
 
 const sum = (arr: number[]) => arr.reduce((acc, v) => acc + v, 0)
 
+// Filtro de empresa coerente com a Origem multisseleção do rodapé (Processar).
+// Cada coleção usa um nome diferente para o campo de empresa
+// (financial_receivables/financial_payables: "empresa"; partners/purchase_invoices: "empresa_id").
+const empresaFilter = (f: GlobalFilters, field: string): string => {
+  if (!f.origens.length) return ''
+  return `(${f.origens.map((o) => `${field}='${o}'`).join(' || ')}) && `
+}
+
 const emptyWeeks = (): SemanaRow[] =>
   (['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'] as const).map((dia) => ({
     diaSemana: dia,
@@ -264,38 +272,65 @@ export async function fetchEstoque(f: GlobalFilters): Promise<{
 const emptyFinStats = () => ({
   ...FIN_EMPTY,
   titulosReceberTotal: 0,
-  titulosPagarTotal: 0,
+  titulosReceberAteHoje: 0,
   titulosReceberVencidos: 0,
   valorReceberVencido: 0,
+  titulosReceberAVencer: 0,
+  valorReceberAVencer: 0,
+  titulosPagarTotal: 0,
+  titulosPagarAteHoje: 0,
   titulosPagarVencidos: 0,
   valorPagarVencido: 0,
+  titulosPagarAVencer: 0,
+  valorPagarAVencer: 0,
 })
 
-// Títulos em aberto (não pagos nem cancelados) com vencimento até o dia de referência.
-// "Em atraso" = vencimento anterior ao dia de referência.
-const ABERTOS = "status!='Pago' && status!='Cancelado'"
+// Títulos em aberto: exclui status quitado/cancelado sem depender de caixa
+// (no banco existem "aberto", "Em Aberto", "provisionado" e "Pago").
+const ABERTOS = "status !~ 'pago' && status !~ 'cancelad'"
 
+// Posição financeira no Dia Referência: total em aberto com vencimento até o dia,
+// vencidos (vencimento < dia) e a vencer (vencimento depois do dia).
 export async function fetchFinanceiro(f: GlobalFilters) {
-  const empresa = f.origens[0] ?? ''
+  const empresa = empresaFilter(f, 'empresa')
   const dia = f.diaReferencia
   try {
-    const filtro = `empresa='${empresa}' && data_vencimento<='${dia}' && ${ABERTOS}`
+    const filtro = `${empresa}${ABERTOS}`
     const [recebIn, pagarIn] = await Promise.all([
       pb.collection('financial_receivables').getList(1, 500, { filter: filtro }),
       pb.collection('financial_payables').getList(1, 500, { filter: filtro }),
     ])
     const valorDe = (t: any) => num(t.valor_atualizado || t.valor_original)
-    const venc = (t: any) => String(t.data_vencimento || '').slice(0, 10) < dia
-    const vencR = recebIn.items.filter(venc)
-    const vencP = pagarIn.items.filter(venc)
+    const vencDe = (t: any) => String(t.data_vencimento || '').slice(0, 10)
+    const build = (items: any[]) => {
+      const venc = items.filter((t) => vencDe(t) < dia)
+      const aVencer = items.filter((t) => vencDe(t) > dia)
+      const ateHoje = items.filter((t) => vencDe(t) && vencDe(t) <= dia)
+      return {
+        titulosTotal: sum(ateHoje.map(valorDe)),
+        titulosAteHoje: ateHoje.length,
+        titulosVencidos: venc.length,
+        valorVencido: sum(venc.map(valorDe)),
+        titulosAVencer: aVencer.length,
+        valorAVencer: sum(aVencer.map(valorDe)),
+      }
+    }
+    const r = build(recebIn.items as any[])
+    const p = build(pagarIn.items as any[])
     return {
       ...emptyFinStats(),
-      titulosReceberTotal: sum(recebIn.items.map(valorDe)),
-      titulosReceberVencidos: vencR.length,
-      valorReceberVencido: sum(vencR.map(valorDe)),
-      titulosPagarTotal: sum(pagarIn.items.map(valorDe)),
-      titulosPagarVencidos: vencP.length,
-      valorPagarVencido: sum(vencP.map(valorDe)),
+      titulosReceberTotal: r.titulosTotal,
+      titulosReceberAteHoje: r.titulosAteHoje,
+      titulosReceberVencidos: r.titulosVencidos,
+      valorReceberVencido: r.valorVencido,
+      titulosReceberAVencer: r.titulosAVencer,
+      valorReceberAVencer: r.valorAVencer,
+      titulosPagarTotal: p.titulosTotal,
+      titulosPagarAteHoje: p.titulosAteHoje,
+      titulosPagarVencidos: p.titulosVencidos,
+      valorPagarVencido: p.valorVencido,
+      titulosPagarAVencer: p.titulosAVencer,
+      valorPagarAVencer: p.valorAVencer,
     }
   } catch {
     return emptyFinStats()
@@ -375,9 +410,12 @@ const FORN_EMPTY: FornecedoresStats = {
   topFornecedores: [],
 }
 
-// Fornecedores: partners com fornecedor=true. Compras: purchase_invoices emitidas no mês de referência.
+// Fornecedores: coleção unificada de parceiros (partners) com fornecedor=true
+// (migração 0327 — não existe coleção separada de fornecedores).
+// Compras: purchase_invoices (XML de entrada) emitidas no mês de referência.
+// Verbas: não há coleção de verbas/acordos no HURAM — a aba exibe isso explicitamente.
 export async function fetchFornecedores(f: GlobalFilters): Promise<FornecedoresStats> {
-  const empresa = f.origens[0] ?? ''
+  const empresa = empresaFilter(f, 'empresa_id')
   try {
     const [mm, yyyy] = f.mesAnoReferencia.split('/')
     const ini = `${yyyy}-${mm}-01`
@@ -385,10 +423,10 @@ export async function fetchFornecedores(f: GlobalFilters): Promise<FornecedoresS
     const fim = `${yyyy}-${mm}-${String(fimDia).padStart(2, '0')}`
     const [forn, compras] = await Promise.all([
       pb.collection('partners').getList(1, 500, {
-        filter: `empresa_id='${empresa}' && fornecedor=true`,
+        filter: `${empresa}fornecedor=true`,
       }),
       pb.collection('purchase_invoices').getList(1, 500, {
-        filter: `empresa_id='${empresa}' && data_emissao>='${ini}' && data_emissao<='${fim}' && status!='Cancelado'`,
+        filter: `${empresa}data_emissao>='${ini}' && data_emissao<='${fim}' && status !~ 'cancelad'`,
       }),
     ])
     const porFornecedor = new Map<string, number>()

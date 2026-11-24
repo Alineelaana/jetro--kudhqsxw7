@@ -19,36 +19,56 @@ export function FinanceiroTab({ filters }: { filters: GlobalFilters }) {
   const { data, isLoading } = useFinanceiro(filters)
   if (isLoading) return <EmptyPanel message="Carregando…" />
   const d = data!
-  const temDados = d.titulosReceberTotal > 0 || d.titulosPagarTotal > 0
-  if (!temDados) return <EmptyPanel />
+  const temDados = d.titulosReceberAteHoje > 0 || d.titulosPagarAteHoje > 0
+  if (!temDados) {
+    return (
+      <EmptyPanel message="Nenhum título em aberto com vencimento até o Dia Referência para a Origem selecionada." />
+    )
+  }
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-semibold">Contas a receber</h3>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <IndicatorCard
-          label="Total a receber"
+          label="Total a receber (venc. até o dia)"
           value={fmtBRL(d.titulosReceberTotal)}
-          drillTo="/admin/financeiro/receber"
+          hint={`${fmtNum(d.titulosReceberAteHoje)} títulos em aberto`}
+          drillTo="/admin/financeiro/contas-a-receber-cobranca"
         />
         <IndicatorCard
-          label="Títulos em atraso"
-          value={fmtNum(d.titulosReceberVencidos)}
-          drillTo="/admin/financeiro/receber"
+          label="Receber em atraso"
+          value={`${fmtNum(d.titulosReceberVencidos)} · ${fmtBRL(d.valorReceberVencido)}`}
+          drillTo="/admin/financeiro/contas-a-receber-cobranca"
+        />
+        <IndicatorCard
+          label="Receber a vencer (após o dia)"
+          value={`${fmtNum(d.titulosReceberAVencer)} · ${fmtBRL(d.valorReceberAVencer)}`}
+          drillTo="/admin/financeiro/contas-a-receber-cobranca"
         />
       </div>
       <h3 className="text-sm font-semibold">Contas a pagar</h3>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <IndicatorCard
-          label="Total a pagar"
+          label="Total a pagar (venc. até o dia)"
           value={fmtBRL(d.titulosPagarTotal)}
-          drillTo="/admin/financeiro/pagar"
+          hint={`${fmtNum(d.titulosPagarAteHoje)} títulos em aberto`}
+          drillTo="/admin/financeiro/contas-a-pagar-tesouraria"
         />
         <IndicatorCard
-          label="Títulos em atraso"
-          value={fmtNum(d.titulosPagarVencidos)}
-          drillTo="/admin/financeiro/pagar"
+          label="Pagar em atraso"
+          value={`${fmtNum(d.titulosPagarVencidos)} · ${fmtBRL(d.valorPagarVencido)}`}
+          drillTo="/admin/financeiro/contas-a-pagar-tesouraria"
+        />
+        <IndicatorCard
+          label="Pagar a vencer (após o dia)"
+          value={`${fmtNum(d.titulosPagarAVencer)} · ${fmtBRL(d.valorPagarAVencer)}`}
+          drillTo="/admin/financeiro/contas-a-pagar-tesouraria"
         />
       </div>
+      <p className="text-xs text-muted-foreground">
+        Títulos em aberto (não quitados nem cancelados) das coleções de contas a receber e a pagar,
+        posicionados no Dia Referência dos filtros.
+      </p>
     </div>
   )
 }
@@ -110,22 +130,42 @@ export function FornecedoresTab({ filters }: { filters: GlobalFilters }) {
   const { data, isLoading } = useFornecedores(filters)
   if (isLoading) return <EmptyPanel message="Carregando…" />
   const d = data!
-  if (d.totalFornecedores === 0) return <EmptyPanel />
+  if (d.totalFornecedores === 0) {
+    return (
+      <div className="space-y-4">
+        <EmptyPanel message="Nenhum fornecedor cadastrado para a Origem selecionada no cadastro unificado de Parceiros." />
+        <p className="text-xs text-muted-foreground">
+          Verbas (acordos comerciais): sem dados disponíveis — não há coleção de verbas/acordos no
+          HURAM ainda.
+        </p>
+      </div>
+    )
+  }
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <IndicatorCard
           label="Fornecedores cadastrados"
           value={fmtNum(d.totalFornecedores)}
-          drillTo="/admin/cadastros/fornecedores"
+          hint="Cadastro unificado de Parceiros (flag fornecedor)"
+          drillTo="/admin/cadastros/parceiros"
         />
         <IndicatorCard label="Fornecedores ativos" value={fmtNum(d.ativos)} />
         <IndicatorCard
           label="Compras do período"
-          value={fmtBRL(d.comprasPeriodo)}
+          value={d.comprasPeriodo > 0 ? fmtBRL(d.comprasPeriodo) : 'R$ 0,00'}
+          hint={
+            d.comprasPeriodo > 0
+              ? `Mês de referência ${filters.mesAnoReferencia}`
+              : 'Sem entradas no mês de referência'
+          }
           drillTo="/admin/fiscal/compras-entradas"
         />
       </div>
+      <p className="text-xs text-muted-foreground">
+        Verbas (acordos comerciais): sem dados disponíveis — não há coleção de verbas/acordos no
+        HURAM ainda.
+      </p>
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">Top fornecedores</CardTitle>
