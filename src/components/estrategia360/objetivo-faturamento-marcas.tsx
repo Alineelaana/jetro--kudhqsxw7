@@ -129,7 +129,7 @@ export function MarcasTab({ filters }: { filters: GlobalFilters }) {
                 className="mt-1 w-full"
               />
             </label>
-            <SearchableTable<MarcasRow>
+            <SearchableTable
               rows={top}
               searchKeys={['marca']}
               columns={[

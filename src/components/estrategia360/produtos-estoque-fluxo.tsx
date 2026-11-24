@@ -144,7 +144,7 @@ export function EstoqueTab({ filters }: { filters: GlobalFilters }) {
   })
   if (isLoading) return <EmptyPanel message="Carregando…" />
   const { comparativo, skusInativosComEstoque } = data ?? {
-    comparativo: [] as StockCompareRow[],
+    comparativo: [],
     skusInativosComEstoque: [],
   }
   const formas: { forma: string; valor: number; qtdPedidos: number }[] = []
@@ -155,7 +155,7 @@ export function EstoqueTab({ filters }: { filters: GlobalFilters }) {
           <CardTitle className="text-sm">Estoque Fiscal × WMS × Avarias × Diferença</CardTitle>
         </CardHeader>
         <CardContent>
-          <SearchableTable<StockCompareRow>
+          <SearchableTable
             rows={comparativo}
             searchKeys={['sku', 'nome']}
             columns={[

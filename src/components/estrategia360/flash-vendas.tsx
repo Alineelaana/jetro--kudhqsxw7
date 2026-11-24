@@ -63,10 +63,10 @@ export function FlashVendasTab({ filters }: { filters: GlobalFilters }) {
                   {rows.map((r, i) => (
                     <TableRow key={i}>
                       <TableCell>{r.diaSemana}</TableCell>
-                      <TableCell>
-                        {r.data ? r.data.split('-').reverse().join('/') : '—'}
+                      <TableCell>{r.data ? r.data.split('-').reverse().join('/') : '—'}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {fmtNum(r.unAnterior)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{fmtNum(r.unAnterior)}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtNum(r.unAtual)}</TableCell>
                       <TableCell
                         className={`text-right tabular-nums ${
@@ -86,7 +86,9 @@ export function FlashVendasTab({ filters }: { filters: GlobalFilters }) {
                       <TableCell className="text-right tabular-nums">
                         {fmtBRL(r.valorAnterior)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{fmtBRL(r.valorAtual)}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {fmtBRL(r.valorAtual)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

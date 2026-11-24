@@ -213,4 +213,58 @@ export const INTELIGENCIA_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Alerta visual para agendamentos com falha de disparo e relatório detalhado de erros no histórico de execuções.',
     },
   },
+
+  '/admin/inteligencia/visao-estrategica-360': {
+    route: '/admin/inteligencia/visao-estrategica-360',
+    title: 'Visão estratégica em 360°',
+    moduleGroup: 'Inteligência',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-24',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Consolidar em uma única tela multi-aba o painel estratégico do grupo: um retrato de vendas, faturamento, marcas, produtos, estoque, financeiro, fluxo de caixa, clientes e fornecedores/verbas, alimentado por filtros globais aplicados de uma só vez (botão Processar), replicando a visão "360°" do sistema de referência.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Filtros globais no rodapé do cartão superior: Origem (multisseleção de empresas), Marca (texto), Dia Referência (date) e Mês/Ano Referência (mm/aaaa), com botão "Processar".\n- 10 abas: Flash de Vendas, Objetivo, Faturamento, Marcas, Produtos, Estoque, Financeiro, Fluxo de Caixa, Clientes e Fornecedores / Verbas.\n- Flash de Vendas: cartões de unidades/valor/pedidos na semana + tabela dos últimos 7 dias comparada à semana anterior (UN, evolução %, pedidos, SKUs, itens e UN por pedido, valores).\n- Objetivo: unidades e valor realizados no mês de referência.\n- Faturamento: NF-e emitidas hoje, clientes e unidades faturados hoje, valor faturado hoje/semana/mês, romaneios e devoluções.\n- Marcas: tabela Top N% de marcas do mês (NF, UN, total, média, custo, markup, participação) com slider de percentual.\n- Produtos: SKUs e marcas ativos, itens com/sem estoque, críticas de cadastro, produtos sem foto, vendidos abaixo da tabela e tabela Top N% de produtos mais vendidos.\n- Estoque: comparativo Fiscal × WMS × Avarias × Diferença com busca "Procurar" e lista de SKUs inativos com estoque.\n- Fluxo de Caixa: saldos e tabela semanal de direitos/obrigações (real e previsto) com saldo do dia e acumulado.\n- Clientes: títulos atrasados/a vencer/liberados e ranking de clientes que mais compraram no mês.\n- Fornecedores / Verbas: fornecedores cadastrados e ativos, compras e verbas do período e top fornecedores.\n- Cartões de indicador com lupa (drill-down) que navegam para as telas reais do ERP.\n- Sem botão de refresh/engrenagem: atualização embutida via queryKey.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- O rascunho dos filtros só entra em vigor ao clicar em "Processar": alterar filtros não recalcula nada antes do clique.\n- Cada aba tem sua própria consulta React Query com queryKey dependente dos filtros aplicados; ao Processar, as abas recalculam sozinhas.\n- A marca informada é aplicada apenas nas consultas que a suportam; a Origem (empresa) é aplicada sempre.\n- Coleção inexistente ou sem dados exibem painel vazio/zeros — nunca erro.\n- Navegação entre telas exclusivamente pelo menu lateral; a lupa apenas abre telas de detalhe reais, não duplica submenus.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário abre a tela pelo menu lateral (Inteligência > Visão estratégica em 360°).\n2. Ajusta os filtros globais do topo (Origem, Marca, Dia Referência, Mês/Ano Referência).\n3. Clica em "Processar": os filtros aplicados mudam e as abas recalculam via queryKey.\n4. Navega entre as 10 abas para analisar cada dimensão.\n5. Nos cartões com lupa, clica para abrir a tela real de detalhe correspondente.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `sales_orders` (Flash de Vendas), `nfe_records` (Objetivo, Faturamento), `products` (Marcas, Produtos, Estoque), `financial_transactions` (Financeiro, Fluxo de Caixa, Clientes), `partners` (Fornecedores) e `empresas` (opções do filtro Origem).\n- Quando uma coleção não retorna dados (ou não existe), a aba exibe painel vazio/zeros.',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Drill-down por lupa para as telas reais: /admin/vendas/faturamento, /admin/comercial/pedidos-faturamento, /admin/financeiro/receber, /admin/financeiro/pagar, /admin/estoque, /admin/fiscal/documentos-fiscais, /admin/fiscal/compras-entradas, /admin/logistica/romaneios, /admin/comercial/contratos-devolucoes e cadastros de produtos/marcas/fornecedores.\n- Nenhuma integração externa: toda leitura é direto do PocketBase local.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso pelo menu controlado por `canViewBI(role)` (perfis SUP, DIRETORIA, ADMIN, CONTROLADORIA e GERENCIA, como o restante do grupo Inteligência).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes em `src/components/estrategia360/`: `estrategia360-screen.tsx` (painel principal com filtros e abas), `origem-selector.tsx` (multisseleção de Origem), `widgets.tsx` (IndicatorCard com lupa, SearchableTable, EmptyPanel), `data.ts` (consultas PocketBase com fallback vazio), `types.ts` (tipos e definição das abas) e um arquivo por grupo de abas (`flash-vendas`, `objetivo-faturamento-marcas`, `produtos-estoque-fluxo`, `financeiro-clientes-fornecedores`).\n- `@tanstack/react-query` para as consultas por queryKey.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Toda consulta tem try/catch com fallback vazio/zeros: coleção inexistente, sem permissão ou sem rede exibem o painel vazio, não um erro.\n- Validação dos filtros no cliente (dia futuro ou fora do mês de referência) desabilita "Processar".',
+    },
+  },
 }

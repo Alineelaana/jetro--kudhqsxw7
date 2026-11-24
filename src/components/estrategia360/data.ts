@@ -261,7 +261,13 @@ export async function fetchEstoque(f: GlobalFilters): Promise<{
   }
 }
 
-const emptyFinStats = () => ({ ...FIN_EMPTY, titulosReceberTotal: 0, titulosPagarTotal: 0 })
+const emptyFinStats = () => ({
+  ...FIN_EMPTY,
+  titulosReceberTotal: 0,
+  titulosPagarTotal: 0,
+  titulosReceberVencidos: 0,
+  titulosPagarVencidos: 0,
+})
 
 export async function fetchFinanceiro(f: GlobalFilters) {
   const empresa = f.origens[0] ?? ''

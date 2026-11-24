@@ -4,7 +4,14 @@ import { Search, ZoomIn } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 
 // Painel vazio / carregando: cada aba mostra este estado quando não há dados.
@@ -54,28 +61,34 @@ export function IndicatorCard({
   )
 }
 
-// Tabela simples com busca por texto.
-export function SearchableTable<Row extends Record<string, unknown>>({
+// Tabela simples com busca por texto (linhas livremente tipadas).
+export function SearchableTable({
   rows,
   columns,
   searchKeys,
   emptyMessage,
 }: {
-  rows: Row[]
+  rows: any[]
   columns: {
-    key: keyof Row & string
+    key: string
     label: string
     align?: 'left' | 'right'
-    format?: (value: unknown) => string
+    format?: (value: any) => string
   }[]
-  searchKeys: (keyof Row & string)[]
+  searchKeys: string[]
   emptyMessage?: string
 }) {
   const [search, setSearch] = useState('')
   const filtered = useMemo(() => {
     const t = search.trim().toLowerCase()
     if (!t) return rows
-    return rows.filter((row) => searchKeys.some((k) => String(row[k] ?? '').toLowerCase().includes(t)))
+    return rows.filter((row) =>
+      searchKeys.some((k) =>
+        String(row[k] ?? '')
+          .toLowerCase()
+          .includes(t),
+      ),
+    )
   }, [rows, search, searchKeys])
 
   return (
@@ -97,10 +110,7 @@ export function SearchableTable<Row extends Record<string, unknown>>({
             <TableHeader>
               <TableRow>
                 {columns.map((c) => (
-                  <TableHead
-                    key={c.key}
-                    className={cn(c.align === 'right' && 'text-right')}
-                  >
+                  <TableHead key={c.key} className={cn(c.align === 'right' && 'text-right')}>
                     {c.label}
                   </TableHead>
                 ))}
