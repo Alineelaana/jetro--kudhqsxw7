@@ -113,14 +113,12 @@ export interface ClienteStats {
 export interface FornecedorTopRow {
   nome: string
   compras: number
-  verbas: number
 }
 
 export interface FornecedoresStats {
   totalFornecedores: number
   ativos: number
   comprasPeriodo: number
-  verbasPeriodo: number
   topFornecedores: FornecedorTopRow[]
 }
 

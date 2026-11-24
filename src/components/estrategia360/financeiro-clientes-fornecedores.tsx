@@ -73,7 +73,11 @@ export function ClientesTab({ filters }: { filters: GlobalFilters }) {
           value={`${fmtNum(d.titulosAVencer)} · ${fmtBRL(d.valorAVencer)}`}
           drillTo="/admin/financeiro/receber"
         />
-        <IndicatorCard label="Títulos liberados" value={fmtNum(d.titulosLiberados)} />
+        <IndicatorCard
+          label="Títulos liberados"
+          value={fmtNum(d.titulosLiberados)}
+          drillTo="/admin/financeiro/receber"
+        />
       </div>
       <h3 className="text-sm font-semibold">Ranking — clientes que mais compraram no mês</h3>
       {d.ranking.length === 0 ? (
@@ -121,7 +125,6 @@ export function FornecedoresTab({ filters }: { filters: GlobalFilters }) {
           value={fmtBRL(d.comprasPeriodo)}
           drillTo="/admin/fiscal/compras-entradas"
         />
-        <IndicatorCard label="Verbas do período" value={fmtBRL(d.verbasPeriodo)} />
       </div>
       <Card>
         <CardHeader>
@@ -137,7 +140,6 @@ export function FornecedoresTab({ filters }: { filters: GlobalFilters }) {
                   <TableRow>
                     <TableHead>Fornecedor</TableHead>
                     <TableHead className="text-right">Compras</TableHead>
-                    <TableHead className="text-right">Verbas</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -145,7 +147,6 @@ export function FornecedoresTab({ filters }: { filters: GlobalFilters }) {
                     <TableRow key={i}>
                       <TableCell>{r.nome}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtBRL(r.compras)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{fmtBRL(r.verbas)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

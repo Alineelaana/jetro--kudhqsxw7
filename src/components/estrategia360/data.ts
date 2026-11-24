@@ -266,23 +266,36 @@ const emptyFinStats = () => ({
   titulosReceberTotal: 0,
   titulosPagarTotal: 0,
   titulosReceberVencidos: 0,
+  valorReceberVencido: 0,
   titulosPagarVencidos: 0,
+  valorPagarVencido: 0,
 })
+
+// Títulos em aberto (não pagos nem cancelados) com vencimento até o dia de referência.
+// "Em atraso" = vencimento anterior ao dia de referência.
+const ABERTOS = "status!='Pago' && status!='Cancelado'"
 
 export async function fetchFinanceiro(f: GlobalFilters) {
   const empresa = f.origens[0] ?? ''
+  const dia = f.diaReferencia
   try {
-    const titulos = await pb.collection('financial_transactions').getList(1, 500, {
-      filter: `empresa='${empresa}' && data_vencimento<='${f.diaReferencia}'`,
-    })
-    const aReceber = titulos.items.filter((t: any) => t.tipo === 'receber')
-    const aPagar = titulos.items.filter((t: any) => t.tipo === 'pagar')
+    const filtro = `empresa='${empresa}' && data_vencimento<='${dia}' && ${ABERTOS}`
+    const [recebIn, pagarIn] = await Promise.all([
+      pb.collection('financial_receivables').getList(1, 500, { filter: filtro }),
+      pb.collection('financial_payables').getList(1, 500, { filter: filtro }),
+    ])
+    const valorDe = (t: any) => num(t.valor_atualizado || t.valor_original)
+    const venc = (t: any) => String(t.data_vencimento || '').slice(0, 10) < dia
+    const vencR = recebIn.items.filter(venc)
+    const vencP = pagarIn.items.filter(venc)
     return {
       ...emptyFinStats(),
-      titulosReceberTotal: sum(aReceber.map((t: any) => num(t.valor))),
-      titulosPagarTotal: sum(aPagar.map((t: any) => num(t.valor))),
-      titulosReceberVencidos: aReceber.filter((t: any) => t.status !== 'pago').length,
-      titulosPagarVencidos: aPagar.filter((t: any) => t.status !== 'pago').length,
+      titulosReceberTotal: sum(recebIn.items.map(valorDe)),
+      titulosReceberVencidos: vencR.length,
+      valorReceberVencido: sum(vencR.map(valorDe)),
+      titulosPagarTotal: sum(pagarIn.items.map(valorDe)),
+      titulosPagarVencidos: vencP.length,
+      valorPagarVencido: sum(vencP.map(valorDe)),
     }
   } catch {
     return emptyFinStats()
@@ -359,25 +372,40 @@ const FORN_EMPTY: FornecedoresStats = {
   totalFornecedores: 0,
   ativos: 0,
   comprasPeriodo: 0,
-  verbasPeriodo: 0,
   topFornecedores: [],
 }
 
+// Fornecedores: partners com fornecedor=true. Compras: purchase_invoices emitidas no mês de referência.
 export async function fetchFornecedores(f: GlobalFilters): Promise<FornecedoresStats> {
   const empresa = f.origens[0] ?? ''
   try {
-    const res = await pb.collection('partners').getList(1, 200, {
-      filter: `empresa='${empresa}' && tipo='fornecedor'`,
-    })
+    const [mm, yyyy] = f.mesAnoReferencia.split('/')
+    const ini = `${yyyy}-${mm}-01`
+    const fimDia = new Date(Number(yyyy), Number(mm), 0).getDate()
+    const fim = `${yyyy}-${mm}-${String(fimDia).padStart(2, '0')}`
+    const [forn, compras] = await Promise.all([
+      pb.collection('partners').getList(1, 500, {
+        filter: `empresa_id='${empresa}' && fornecedor=true`,
+      }),
+      pb.collection('purchase_invoices').getList(1, 500, {
+        filter: `empresa_id='${empresa}' && data_emissao>='${ini}' && data_emissao<='${fim}' && status!='Cancelado'`,
+      }),
+    ])
+    const porFornecedor = new Map<string, number>()
+    for (const c of compras.items as any[]) {
+      const nome = String(c.supplier_name || '—')
+      porFornecedor.set(nome, (porFornecedor.get(nome) ?? 0) + num(c.total_value))
+    }
+    const topFornecedores = [...porFornecedor.entries()]
+      .map(([nome, total]) => ({ nome, compras: total }))
+      .sort((a, b) => b.compras - a.compras)
+      .slice(0, 10)
     return {
       ...FORN_EMPTY,
-      totalFornecedores: res.items.length,
-      ativos: res.items.filter((p: any) => p.ativo !== false).length,
-      topFornecedores: res.items.slice(0, 10).map((p: any) => ({
-        nome: String(p.nome_razao_social || p.nome || ''),
-        compras: 0,
-        verbas: 0,
-      })),
+      totalFornecedores: forn.items.length,
+      ativos: forn.items.filter((p: any) => p.active !== false).length,
+      comprasPeriodo: sum(compras.items.map((c: any) => num(c.total_value))),
+      topFornecedores,
     }
   } catch {
     return { ...FORN_EMPTY }
