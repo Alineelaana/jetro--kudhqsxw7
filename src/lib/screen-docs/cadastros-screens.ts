@@ -5,7 +5,7 @@ export const CADASTROS_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/cadastros/empresas',
     title: 'Cadastro de Empresas',
     moduleGroup: 'Organização',
-    docVersion: '1.3.0',
+    docVersion: '1.4.0',
     lastUpdated: '2026-11-25',
     author: 'Engenharia de Software Huram',
     objective: {
