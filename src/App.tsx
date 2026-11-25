@@ -202,6 +202,11 @@ const SegurancaScreen = lazy(() =>
     default: m.SegurancaScreen,
   })),
 )
+const SecurityAccessLogScreen = lazy(() =>
+  import('@/components/security/security-access-log-screen').then((m) => ({
+    default: m.SecurityAccessLogScreen,
+  })),
+)
 const BackupScreen = lazy(() =>
   import('@/components/configuracoes/backup-screen').then((m) => ({
     default: m.BackupScreen,
@@ -1049,6 +1054,7 @@ const App = () => (
                                     />
                                     <Route path="seguranca" element={<SegurancaScreen />} />
                                     <Route path="backup" element={<BackupScreen />} />
+                                    <Route path="acessos" element={<SecurityAccessLogScreen />} />
                                   </Route>
                                   {/* Módulo Financeiro (6 Telas Oficiais) */}
                                   <Route

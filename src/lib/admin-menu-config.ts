@@ -57,6 +57,7 @@ import {
   canManagePermissions,
   canManageSystemParams,
   canViewAuditLogs,
+  canViewSecurityAccessLog,
   canConsultCosts,
   canViewConformidade,
   canViewScreenDocs,
@@ -183,6 +184,11 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
         route: '/admin/configuracoes',
         perm: canViewConfiguracoes,
         children: [
+          {
+            label: 'Acessos',
+            route: '/admin/configuracoes/acessos',
+            perm: canViewSecurityAccessLog,
+          },
           { label: 'APIs', route: '/admin/configuracoes/apis', perm: canManageApis },
           { label: 'Backup', route: '/admin/configuracoes/backup', perm: canManageBackups },
           {

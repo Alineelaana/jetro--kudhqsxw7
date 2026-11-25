@@ -43,10 +43,82 @@ routerAdd('POST', '/backend/v1/auth/secure-login', (e) => {
     }
 
     if (!userRecord) {
+      // Falha sem usuário localizado: registra tentativa anônima para auditoria
+      try {
+        var sllCol0 = $app.findCollectionByNameOrId('security_login_logs')
+        var sllFail0 = new Record(sllCol0)
+        sllFail0.set('usuario', String(body.identity || lower))
+        sllFail0.set('sucesso', false)
+        sllFail0.set(
+          'ip',
+          String(e.requestInfo().headers.get('X-Forwarded-For') || e.realIP() || ''),
+        )
+        sllFail0.set('user_agent', String(e.requestInfo().headers.get('User-Agent') || ''))
+        sllFail0.set('origem', 'login')
+        $app.save(sllFail0)
+      } catch (_) {}
+
       return e.json(400, { error: 'Credenciais inválidas. Verifique usuário e senha.' })
     }
 
-    // 2. Verificar se a conta está ativa
+    // 2. Bloqueio temporário: 5 falhas nos últimos 15 minutos → recusa por 15 min,
+    // MESMO que a senha esteja correta (mata credential stuffing na prática).
+    // A contagem é por identidade (e-mail) na coleção security_login_logs.
+    var isUserBlocked = false
+    var minutosRestantes = 0
+    try {
+      var cutoff = new Date(Date.now() - 15 * 60 * 1000)
+        .toISOString()
+        .replace('T', ' ')
+        .replace('Z', '')
+      var recentFails = $app.findRecordsByFilter(
+        'security_login_logs',
+        'usuario = {:u} && sucesso = false && created > {:cutoff}',
+        '-created',
+        20,
+        0,
+        { u: userRecord.email(), cutoff: cutoff },
+      )
+      if (recentFails && recentFails.length >= 5) {
+        // Bloqueio de 15 min a partir da falha mais recente
+        var lastFailStr = recentFails[0].getString('created')
+        var lastFailDate = new Date(String(lastFailStr).replace(' ', 'T') + 'Z')
+        var elapsed = Date.now() - lastFailDate.getTime()
+        var restante = 15 * 60 * 1000 - elapsed
+        if (restante > 0) {
+          isUserBlocked = true
+          minutosRestantes = Math.ceil(restante / 60000)
+        }
+      }
+    } catch (lockErr) {
+      // Em caso de erro na contagem, NUNCA bloqueia o usuário (fail-open)
+      isUserBlocked = false
+    }
+
+    if (isUserBlocked) {
+      // Registra a tentativa recusada pelo bloqueio para auditoria
+      try {
+        var sllColB = $app.findCollectionByNameOrId('security_login_logs')
+        var sllB = new Record(sllColB)
+        sllB.set('usuario', userRecord.email())
+        sllB.set('sucesso', false)
+        sllB.set('ip', String(e.requestInfo().headers.get('X-Forwarded-For') || e.realIP() || ''))
+        sllB.set('user_agent', String(e.requestInfo().headers.get('User-Agent') || ''))
+        sllB.set('origem', 'bloqueio_temporario')
+        $app.save(sllB)
+      } catch (_) {}
+
+      return e.json(429, {
+        error:
+          'Bloqueado temporariamente por tentativas incorretas. Tente novamente em ' +
+          minutosRestantes +
+          ' minuto' +
+          (minutosRestantes === 1 ? '' : 's') +
+          '.',
+      })
+    }
+
+    // 3. Verificar se a conta está ativa
     if (userRecord.getBool('active') === false) {
       return e.json(403, {
         error: 'Sua conta está inativa. Entre em contato com um administrador.',
@@ -63,6 +135,20 @@ routerAdd('POST', '/backend/v1/auth/secure-login', (e) => {
 
     if (!validPassword) {
       // Registrar falha de login na auditoria
+      try {
+        var sllCol1 = $app.findCollectionByNameOrId('security_login_logs')
+        var sllFail1 = new Record(sllCol1)
+        sllFail1.set('usuario', userRecord.email())
+        sllFail1.set('sucesso', false)
+        sllFail1.set(
+          'ip',
+          String(e.requestInfo().headers.get('X-Forwarded-For') || e.realIP() || ''),
+        )
+        sllFail1.set('user_agent', String(e.requestInfo().headers.get('User-Agent') || ''))
+        sllFail1.set('origem', 'login')
+        $app.save(sllFail1)
+      } catch (_) {}
+
       try {
         var auditCol = $app.findCollectionByNameOrId('audit_logs')
         var failLog = new Record(auditCol)
@@ -101,6 +187,18 @@ routerAdd('POST', '/backend/v1/auth/secure-login', (e) => {
     // o cliente pode usar o fluxo padrão quando mfaEnabled é falso.
     // Retornamos indicador claro:
     if (!mfaEnabled || !mfaSecret) {
+      // Sucesso: registra o log de acesso e RESETA a contagem de falhas (desbloqueia)
+      try {
+        var sllCol2 = $app.findCollectionByNameOrId('security_login_logs')
+        var sllOk = new Record(sllCol2)
+        sllOk.set('usuario', userRecord.email())
+        sllOk.set('sucesso', true)
+        sllOk.set('ip', String(e.requestInfo().headers.get('X-Forwarded-For') || e.realIP() || ''))
+        sllOk.set('user_agent', String(e.requestInfo().headers.get('User-Agent') || ''))
+        sllOk.set('origem', 'login')
+        $app.save(sllOk)
+      } catch (_) {}
+
       return e.json(200, {
         mfa_required: false,
         user_id: userRecord.id,

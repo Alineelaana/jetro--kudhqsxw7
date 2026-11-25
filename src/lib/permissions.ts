@@ -203,6 +203,15 @@ export function canViewAuditLogs(role: string | undefined): boolean {
   return ['SUP', 'FINANCEIRO', 'COMERCIAL'].includes(role)
 }
 
+/**
+ * Segurança — Acessos (log de login): visível SOMENTE para administradores.
+ * SUP é o superusuário; ADMIN é o perfil administrador.
+ */
+export function canViewSecurityAccessLog(role: string | undefined): boolean {
+  if (!role) return false
+  return ['SUP', 'ADMIN'].includes(role)
+}
+
 export function canManageIntegrations(role: string | undefined): boolean {
   return role === 'SUP'
 }
