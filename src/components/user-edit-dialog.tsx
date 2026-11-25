@@ -24,6 +24,11 @@ import {
   type FilialRecord,
 } from '@/services/users'
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
+import {
+  getPasswordRuleChecks,
+  PASSWORD_RULE_SUMMARY,
+  validatePasswordStrength,
+} from '@/lib/password-policy'
 import { registerAuditLog } from '@/services/audit-logs'
 import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/hooks/use-auth'
@@ -211,9 +216,12 @@ export function UserEditDialog({
       setError('CPF inválido.')
       return
     }
-    if (newPassword && newPassword.length < 8) {
-      setError('A nova senha deve ter no mínimo 8 caracteres.')
-      return
+    if (newPassword) {
+      const senhaErro = validatePasswordStrength(newPassword)
+      if (senhaErro) {
+        setError(senhaErro)
+        return
+      }
     }
     const isSelfEdit = !!(user && currentUser?.id && user.id === currentUser.id)
     if (isSelfEdit && newPassword && !oldPassword) {
@@ -643,7 +651,24 @@ export function UserEditDialog({
               placeholder="Deixe em branco para manter a atual"
               className="focus-visible:ring-[#005B2E]"
             />
-            <p className="text-xs text-muted-foreground">Mínimo 8 caracteres</p>
+            <ul className="space-y-0.5">
+              {getPasswordRuleChecks(newPassword).map((regra) => (
+                <li
+                  key={regra.label}
+                  className={`text-xs flex items-center gap-1.5 ${
+                    newPassword
+                      ? regra.ok
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  <span aria-hidden="true">{newPassword && regra.ok ? '✓' : '•'}</span>
+                  {regra.label}
+                </li>
+              ))}
+            </ul>
+            <p className="text-[11px] text-muted-foreground">{PASSWORD_RULE_SUMMARY}</p>
           </div>
           {/* Campo Senha Atual: aparece APENAS quando o usuário sendo editado é o próprio usuário logado E o campo "Nova senha (opcional)" estiver preenchido */}
           {user && currentUser?.id && user.id === currentUser.id && newPassword.length > 0 && (

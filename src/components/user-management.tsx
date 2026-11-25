@@ -29,6 +29,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { getPerfisPermissoes, type PerfilPermissaoRecord } from '@/lib/profile-permissions'
 import { registerAuditLog } from '@/services/audit-logs'
 import {
+  getPasswordRuleChecks,
+  PASSWORD_RULE_SUMMARY,
+  validatePasswordStrength,
+} from '@/lib/password-policy'
+import {
   Loader2,
   UserPlus,
   Trash2,
@@ -215,8 +220,9 @@ export function UserManagement() {
       setError('Preencha todos os campos.')
       return
     }
-    if (password.length < 8) {
-      setError('A senha deve ter no mínimo 8 caracteres.')
+    const senhaErro = validatePasswordStrength(password)
+    if (senhaErro) {
+      setError(senhaErro)
       return
     }
     if (cpf && !validateCPF(cpf)) {
@@ -678,10 +684,28 @@ export function UserManagement() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
+                placeholder="Senha forte (veja a regra abaixo)"
                 className="focus-visible:ring-[#005B2E]"
                 required
               />
+              <ul className="space-y-0.5">
+                {getPasswordRuleChecks(password).map((regra) => (
+                  <li
+                    key={regra.label}
+                    className={`text-xs flex items-center gap-1.5 ${
+                      password
+                        ? regra.ok
+                          ? 'text-green-600'
+                          : 'text-muted-foreground'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    <span aria-hidden="true">{password && regra.ok ? '✓' : '•'}</span>
+                    {regra.label}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[11px] text-muted-foreground">{PASSWORD_RULE_SUMMARY}</p>
             </div>
 
             <div className="space-y-1.5">

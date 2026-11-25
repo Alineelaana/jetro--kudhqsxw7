@@ -253,8 +253,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return { error: null, fieldErrors: {} }
         }
       } catch (secErr: any) {
-        // Se a chamada ao secure-login retornou erro de credencial ou bloqueio, interrompe
-        if (secErr?.status === 400 || secErr?.status === 401 || secErr?.status === 403) {
+        // Se a chamada ao secure-login retornou erro de credencial ou bloqueio, interrompe.
+        // Bloqueio temporário (429 do hook auth_secure_login) propaga a mensagem real
+        // com os minutos restantes calculados no servidor.
+        if (
+          secErr?.status === 400 ||
+          secErr?.status === 401 ||
+          secErr?.status === 403 ||
+          secErr?.status === 429
+        ) {
+          // pb.send lança ClientResponseError: para rotas customizadas, o corpo JSON
+          // { error: "..." } fica em err.response (e não em err.response.data).
+          const bloqueioMsg =
+            secErr?.status === 429
+              ? secErr?.response?.error ||
+                secErr?.response?.data?.error ||
+                secErr?.data?.error ||
+                secErr?.message ||
+                'Bloqueado temporariamente por tentativas incorretas. Tente novamente em alguns minutos.'
+              : null
+          if (bloqueioMsg) {
+            return { error: bloqueioMsg, fieldErrors: {} }
+          }
           return {
             error: secErr?.data?.error || 'Credenciais inválidas. Verifique usuário e senha.',
             fieldErrors: {},
