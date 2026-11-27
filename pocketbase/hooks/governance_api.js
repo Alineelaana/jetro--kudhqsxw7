@@ -290,7 +290,7 @@ routerAdd(
       item.set('confirmed_by', userNome)
       item.set('confirmed_at', new Date().toISOString())
       $app.save(item)
- e.json(200, { ok: true, item: item.id, confirmed: confirmed })
+      e.json(200, { ok: true, item: item.id, confirmed: confirmed })
       return
     }
 

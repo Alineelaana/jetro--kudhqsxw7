@@ -1,9 +1,9 @@
 // governance_numbering.js — Numeração atômica de documentos (padrão sales_numbers_next.js)
-// onRecordCreate de governance_documents:
+// onRecordCreateRequest de governance_documents:
 //   • doc_number: número único em todo o Huram (contador atômico na coleção numerations)
 //   • doc_code: PROJETO_TIPO_NNN (sequência de 3 dígitos por empresa+projeto+tipo)
 //   • version inicial 0.1.0 (primeira minuta), status em_elaboracao
-// onRecordUpdate: bloqueia alteração de doc_number/doc_code pela API por não-admin.
+// onRecordUpdateRequest: bloqueia alteração de doc_number/doc_code por qualquer usuário.
 // IMPORTANTE (JSVM): toda lógica INLINE nos callbacks (sem referências de nível superior).
 
 onRecordCreateRequest((e) => {
@@ -16,8 +16,12 @@ onRecordCreateRequest((e) => {
 
   const auth = e.requestInfo().auth
   const empresa = String(record.get('empresa') || '')
-  const projeto = (String(record.get('project_code') || 'GER').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'GER').slice(0, 12)
-  const tipo = (String(record.get('type_code') || 'NGD').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'NGD').slice(0, 8)
+  const projeto = (
+    String(record.get('project_code') || 'GER').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'GER'
+  ).slice(0, 12)
+  const tipo = (
+    String(record.get('type_code') || 'NGD').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'NGD'
+  ).slice(0, 8)
 
   // ---------- número único global ----------
   let numero = 0
@@ -25,19 +29,22 @@ onRecordCreateRequest((e) => {
     const numerations = $app.findCollectionByNameOrId('numerations')
     let counter = null
     try {
-      counter = $app.findRecordById('numerations', 'governance_documents')
+      counter = $app.findFirstRecordByFilter(
+        'numerations',
+        'document_type = "governance_documents"',
+      )
     } catch (_) {
       counter = null
     }
     if (!counter) {
       counter = new Record(numerations)
-      counter.set('id', 'governance_documents')
-      counter.set('value', 0)
+      counter.set('document_type', 'governance_documents')
+      counter.set('next_number', 0)
       $app.save(counter)
     }
-    const atual = Number(counter.get('value') || 0)
+    const atual = Number(counter.get('next_number') || 0)
     numero = atual + 1
-    counter.set('value', numero)
+    counter.set('next_number', numero)
     $app.save(counter)
     record.set('doc_number', numero)
   } catch (err) {
@@ -51,7 +58,13 @@ onRecordCreateRequest((e) => {
   try {
     const existentes = $app.findRecordsByFilter(
       'governance_documents',
-      'empresa = "' + empresa + '" && project_code = "' + projeto + '" && type_code = "' + tipo + '"',
+      'empresa = "' +
+        empresa.replace(/"/g, '\\"') +
+        '" && project_code = "' +
+        projeto +
+        '" && type_code = "' +
+        tipo +
+        '"',
       '-doc_code',
       1000,
       0,
@@ -78,7 +91,9 @@ onRecordCreateRequest((e) => {
   if (!record.get('classification')) record.set('classification', 'interno')
   if (!record.get('pending_review')) record.set('pending_review', true)
   if (auth) {
-    if (!record.get('author')) record.set('author', String(auth.get('name') || auth.get('email') || ''))
+    if (!record.get('author')) {
+      record.set('author', String(auth.get('name') || auth.get('email') || ''))
+    }
   }
 
   e.next()
@@ -98,8 +113,13 @@ onRecordUpdateRequest((e) => {
   const codigoNovo = String(record.get('doc_code') || '')
   const codigoOriginal = String(original.get('doc_code') || '')
 
-  if ((numeroOriginal !== 0 && numeroNovo !== numeroOriginal) || (codigoOriginal !== '' && codigoNovo !== codigoOriginal)) {
-    throw new BadRequestError('O número único e o código do documento são permanentes e não podem ser alterados.')
+  if (
+    (numeroOriginal !== 0 && numeroNovo !== numeroOriginal) ||
+    (codigoOriginal !== '' && codigoNovo !== codigoOriginal)
+  ) {
+    throw new BadRequestError(
+      'O número único e o código do documento são permanentes e não podem ser alterados.',
+    )
   }
   e.next()
 }, 'governance_documents')

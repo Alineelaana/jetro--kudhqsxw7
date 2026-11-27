@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-27T18:57:59.923Z",
+  "generatedAt": "2026-11-27T19:11:42.013Z",
   "collections": [
     {
       "name": "users",
@@ -10199,7 +10199,8 @@
             "romaneios",
             "entregas",
             "chamados",
-            "outros"
+            "outros",
+            "governance_documents"
           ]
         },
         {
