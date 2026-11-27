@@ -402,6 +402,10 @@ const CHECKLIST_HINTS: Record<string, string> = {
   dados_comerciais: 'Sem preços, percentuais de remuneração ou condições comerciais.',
 }
 
+export const CLASSIFICACOES: { value: GovernanceClassification; label: string }[] = (
+  Object.keys(CLASSIFICATION_LABEL) as GovernanceClassification[]
+).map((value) => ({ value, label: CLASSIFICATION_LABEL[value] }))
+
 export const ITENS_CHECKLIST: ChecklistItem[] = RELEASE_CHECKLIST_ITEMS.map((i) => ({
   key: i.key,
   label: i.label,

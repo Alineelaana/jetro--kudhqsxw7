@@ -223,6 +223,11 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             perm: canManageConfiguracoes,
           },
           {
+            label: 'Governança Documental',
+            route: '/admin/configuracoes/governanca-documental',
+            perm: canViewConfiguracoes,
+          },
+          {
             label: 'Parâmetros',
             route: '/admin/configuracoes/parametros',
             perm: canManageSystemParams,

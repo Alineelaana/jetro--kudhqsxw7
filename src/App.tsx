@@ -212,6 +212,11 @@ const BackupScreen = lazy(() =>
     default: m.BackupScreen,
   })),
 )
+const GovernanceScreen = lazy(() =>
+  import('@/components/governance/governance-screen').then((m) => ({
+    default: m.GovernanceScreen,
+  })),
+)
 
 // Jetro On-line central
 const JetroOnlineLayout = lazy(() =>
@@ -1055,6 +1060,10 @@ const App = () => (
                                     <Route path="seguranca" element={<SegurancaScreen />} />
                                     <Route path="backup" element={<BackupScreen />} />
                                     <Route path="acessos" element={<SecurityAccessLogScreen />} />
+                                    <Route
+                                      path="governanca-documental"
+                                      element={<GovernanceScreen />}
+                                    />
                                   </Route>
                                   {/* Módulo Financeiro (6 Telas Oficiais) */}
                                   <Route
