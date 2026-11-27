@@ -4,293 +4,392 @@
 // o mesmo conteúdo de 0363 (idempotente): cria as coleções da governança
 // documental AvatarSi, faz os seeds por empresa e o backfill dos documentos
 // antigos. Tudo com guardas de existência — rodar de novo é no-op.
+//
+// IMPORTANTE: cada coleção é criada com um literal `new Collection({...})`
+// (nome explícito, regras embutidas) — a criação via spec em variável não é
+// reconhecida pela validação do runner ("referenced collection does not exist
+// at this point"). Todas as coleções são criadas ANTES de qualquer
+// findRecordsByFilter sobre elas (seeds/backfill).
 migrate(
   (app) => {
-    const ensure = (spec) => {
-      try {
-        app.findCollectionByNameOrId(spec.name)
-        return
-      } catch (_) {}
-      app.save(new Collection(spec))
-      console.log('0365: coleção criada: ' + spec.name)
-    }
-
-    const empresaRules = {
-      listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
-      viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
-      createRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
-      updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
-      deleteRule: "@request.auth.role = 'SUP'",
-    }
-
     // ---------------------------------------------------------
     // 1. Documentos (acervo de governança)
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_documents',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'filial', type: 'text' },
-        { name: 'title', type: 'text', required: true },
-        { name: 'template_id', type: 'text' },
-        { name: 'project_code', type: 'text' },
-        { name: 'type_code', type: 'text' },
-        { name: 'doc_code', type: 'text' },
-        { name: 'doc_number', type: 'number' },
-        { name: 'version_major', type: 'number' },
-        { name: 'version_minor', type: 'number' },
-        { name: 'version_patch', type: 'number' },
-        { name: 'version', type: 'text' },
-        { name: 'current_version', type: 'text' },
-        {
-          name: 'status',
-          type: 'select',
-          maxSelect: 1,
-          values: [
-            'em_elaboracao',
-            'em_revisao',
-            'em_aprovacao',
-            'aprovado',
-            'publicado',
-            'obsoleto',
-            'revogado',
+    try {
+      app.findCollectionByNameOrId('governance_documents')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_documents',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'filial', type: 'text' },
+            { name: 'title', type: 'text', required: true },
+            { name: 'template_id', type: 'text' },
+            { name: 'project_code', type: 'text' },
+            { name: 'type_code', type: 'text' },
+            { name: 'doc_code', type: 'text' },
+            { name: 'doc_number', type: 'number' },
+            { name: 'version_major', type: 'number' },
+            { name: 'version_minor', type: 'number' },
+            { name: 'version_patch', type: 'number' },
+            { name: 'version', type: 'text' },
+            { name: 'current_version', type: 'text' },
+            {
+              name: 'status',
+              type: 'select',
+              maxSelect: 1,
+              values: [
+                'em_elaboracao',
+                'em_revisao',
+                'em_aprovacao',
+                'aprovado',
+                'publicado',
+                'obsoleto',
+                'revogado',
+              ],
+            },
+            {
+              name: 'classification',
+              type: 'select',
+              maxSelect: 1,
+              values: ['publico', 'interno', 'confidencial', 'restrito'],
+            },
+            { name: 'author', type: 'text' },
+            { name: 'reviewers', type: 'text' },
+            { name: 'approver', type: 'text' },
+            { name: 'approver_role', type: 'text' },
+            { name: 'purpose', type: 'text' },
+            { name: 'audience', type: 'text' },
+            { name: 'channels', type: 'text' },
+            { name: 'approval_evidence', type: 'text' },
+            { name: 'change_summary', type: 'text' },
+            {
+              name: 'current_file',
+              type: 'file',
+              maxSelect: 10,
+              maxSize: 52428800,
+              mimeTypes: [
+                'application/pdf',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/zip',
+                'image/png',
+                'image/jpeg',
+              ],
+            },
+            { name: 'released_file_name', type: 'text' },
+            { name: 'released_at', type: 'text' },
+            { name: 'released_by', type: 'text' },
+            { name: 'approved_at', type: 'text' },
+            { name: 'pending_review', type: 'bool' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
           ],
-        },
-        {
-          name: 'classification',
-          type: 'select',
-          maxSelect: 1,
-          values: ['publico', 'interno', 'confidencial', 'restrito'],
-        },
-        { name: 'author', type: 'text' },
-        { name: 'reviewers', type: 'text' },
-        { name: 'approver', type: 'text' },
-        { name: 'approver_role', type: 'text' },
-        { name: 'purpose', type: 'text' },
-        { name: 'audience', type: 'text' },
-        { name: 'channels', type: 'text' },
-        { name: 'approval_evidence', type: 'text' },
-        { name: 'change_summary', type: 'text' },
-        {
-          name: 'current_file',
-          type: 'file',
-          maxSelect: 10,
-          maxSize: 52428800,
-          mimeTypes: [
-            'application/pdf',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/zip',
-            'image/png',
-            'image/jpeg',
+          indexes: [
+            'CREATE UNIQUE INDEX idx_govdoc_number ON governance_documents (doc_number) WHERE doc_number != 0',
+            "CREATE UNIQUE INDEX idx_govdoc_empresa_code ON governance_documents (empresa, doc_code) WHERE doc_code != ''",
+            'CREATE INDEX idx_govdoc_empresa ON governance_documents (empresa)',
+            'CREATE INDEX idx_govdoc_status ON governance_documents (status)',
+            'CREATE INDEX idx_govdoc_projtipo ON governance_documents (empresa, project_code, type_code)',
           ],
-        },
-        { name: 'released_file_name', type: 'text' },
-        { name: 'released_at', type: 'text' },
-        { name: 'released_by', type: 'text' },
-        { name: 'approved_at', type: 'text' },
-        { name: 'pending_review', type: 'bool' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE UNIQUE INDEX idx_govdoc_number ON governance_documents (doc_number) WHERE doc_number != 0',
-        "CREATE UNIQUE INDEX idx_govdoc_empresa_code ON governance_documents (empresa, doc_code) WHERE doc_code != ''",
-        'CREATE INDEX idx_govdoc_empresa ON governance_documents (empresa)',
-        'CREATE INDEX idx_govdoc_status ON governance_documents (status)',
-        'CREATE INDEX idx_govdoc_projtipo ON governance_documents (empresa, project_code, type_code)',
-      ],
-    })
+        }),
+      )
+      console.log('0365: coleção criada: governance_documents')
+    }
 
     // ---------------------------------------------------------
     // 2. Versões emitidas (histórico preservado)
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_document_versions',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'document_id', type: 'text', required: true },
-        { name: 'doc_code', type: 'text' },
-        { name: 'doc_number', type: 'number' },
-        { name: 'version', type: 'text' },
-        { name: 'status', type: 'text' },
-        { name: 'classification', type: 'text' },
-        { name: 'change_summary', type: 'text' },
-        { name: 'author', type: 'text' },
-        { name: 'approver', type: 'text' },
-        { name: 'approver_role', type: 'text' },
-        { name: 'approved_at', type: 'text' },
-        { name: 'released_at', type: 'text' },
-        { name: 'released_by', type: 'text' },
-        { name: 'file_name', type: 'text' },
-        { name: 'created_by', type: 'text' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE INDEX idx_govver_doc ON governance_document_versions (document_id)',
-        'CREATE INDEX idx_govver_empresa ON governance_document_versions (empresa)',
-      ],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_document_versions')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_document_versions',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'document_id', type: 'text', required: true },
+            { name: 'doc_code', type: 'text' },
+            { name: 'doc_number', type: 'number' },
+            { name: 'version', type: 'text' },
+            { name: 'status', type: 'text' },
+            { name: 'classification', type: 'text' },
+            { name: 'change_summary', type: 'text' },
+            { name: 'author', type: 'text' },
+            { name: 'approver', type: 'text' },
+            { name: 'approver_role', type: 'text' },
+            { name: 'approved_at', type: 'text' },
+            { name: 'released_at', type: 'text' },
+            { name: 'released_by', type: 'text' },
+            { name: 'file_name', type: 'text' },
+            { name: 'created_by', type: 'text' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: [
+            'CREATE INDEX idx_govver_doc ON governance_document_versions (document_id)',
+            'CREATE INDEX idx_govver_empresa ON governance_document_versions (empresa)',
+          ],
+        }),
+      )
+      console.log('0365: coleção criada: governance_document_versions')
+    }
 
     // ---------------------------------------------------------
     // 3. Checklist de liberação (confirmação item a item)
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_release_checklist',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'document_id', type: 'text', required: true },
-        { name: 'version', type: 'text' },
-        { name: 'item_key', type: 'text', required: true },
-        { name: 'item_label', type: 'text' },
-        { name: 'confirmed', type: 'bool' },
-        { name: 'confirmed_by', type: 'text' },
-        { name: 'confirmed_at', type: 'text' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE UNIQUE INDEX idx_govchk_item ON governance_release_checklist (document_id, version, item_key)',
-        'CREATE INDEX idx_govchk_doc ON governance_release_checklist (document_id)',
-      ],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_release_checklist')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_release_checklist',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'document_id', type: 'text', required: true },
+            { name: 'version', type: 'text' },
+            { name: 'item_key', type: 'text', required: true },
+            { name: 'item_label', type: 'text' },
+            { name: 'confirmed', type: 'bool' },
+            { name: 'confirmed_by', type: 'text' },
+            { name: 'confirmed_at', type: 'text' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: [
+            'CREATE UNIQUE INDEX idx_govchk_item ON governance_release_checklist (document_id, version, item_key)',
+            'CREATE INDEX idx_govchk_doc ON governance_release_checklist (document_id)',
+          ],
+        }),
+      )
+      console.log('0365: coleção criada: governance_release_checklist')
+    }
 
     // ---------------------------------------------------------
     // 4. Trilha de auditoria da governança
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_audit_trail',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'document_id', type: 'text' },
-        { name: 'doc_code', type: 'text' },
-        { name: 'doc_number', type: 'number' },
-        { name: 'version', type: 'text' },
-        { name: 'event', type: 'text' },
-        { name: 'user_name', type: 'text' },
-        { name: 'user_role', type: 'text' },
-        { name: 'details', type: 'text' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE INDEX idx_govaudit_doc ON governance_audit_trail (document_id)',
-        'CREATE INDEX idx_govaudit_empresa ON governance_audit_trail (empresa)',
-      ],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_audit_trail')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_audit_trail',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'document_id', type: 'text' },
+            { name: 'doc_code', type: 'text' },
+            { name: 'doc_number', type: 'number' },
+            { name: 'version', type: 'text' },
+            { name: 'event', type: 'text' },
+            { name: 'user_name', type: 'text' },
+            { name: 'user_role', type: 'text' },
+            { name: 'details', type: 'text' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: [
+            'CREATE INDEX idx_govaudit_doc ON governance_audit_trail (document_id)',
+            'CREATE INDEX idx_govaudit_empresa ON governance_audit_trail (empresa)',
+          ],
+        }),
+      )
+      console.log('0365: coleção criada: governance_audit_trail')
+    }
 
     // ---------------------------------------------------------
     // 5. Projetos (código/prefixo por empresa)
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_projects',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'code', type: 'text', required: true },
-        { name: 'name', type: 'text', required: true },
-        { name: 'active', type: 'bool' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE UNIQUE INDEX idx_govproj_empresa_code ON governance_projects (empresa, code)',
-      ],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_projects')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_projects',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'code', type: 'text', required: true },
+            { name: 'name', type: 'text', required: true },
+            { name: 'active', type: 'bool' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: [
+            'CREATE UNIQUE INDEX idx_govproj_empresa_code ON governance_projects (empresa, code)',
+          ],
+        }),
+      )
+      console.log('0365: coleção criada: governance_projects')
+    }
 
     // ---------------------------------------------------------
     // 6. Tipos documentais (por empresa, com catálogo da norma)
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_document_types',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'code', type: 'text', required: true },
-        { name: 'name', type: 'text', required: true },
-        { name: 'active', type: 'bool' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: [
-        'CREATE UNIQUE INDEX idx_govtipo_empresa_code ON governance_document_types (empresa, code)',
-      ],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_document_types')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_document_types',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'code', type: 'text', required: true },
+            { name: 'name', type: 'text', required: true },
+            { name: 'active', type: 'bool' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: [
+            'CREATE UNIQUE INDEX idx_govtipo_empresa_code ON governance_document_types (empresa, code)',
+          ],
+        }),
+      )
+      console.log('0365: coleção criada: governance_document_types')
+    }
 
     // ---------------------------------------------------------
     // 7. Configuração de papéis por empresa
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_workflow_config',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'elaboradores', type: 'text' },
-        { name: 'revisores_tecnicos', type: 'text' },
-        { name: 'revisores_identidade', type: 'text' },
-        { name: 'revisor_juridico', type: 'text' },
-        { name: 'revisor_fiscal', type: 'text' },
-        { name: 'revisor_financeiro', type: 'text' },
-        { name: 'aprovador', type: 'text' },
-        { name: 'liberador', type: 'text' },
-        { name: 'divulgador', type: 'text' },
-        { name: 'observacoes', type: 'text' },
-        { name: 'active', type: 'bool' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: ['CREATE UNIQUE INDEX idx_govwfc_empresa ON governance_workflow_config (empresa)'],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_workflow_config')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_workflow_config',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'elaboradores', type: 'text' },
+            { name: 'revisores_tecnicos', type: 'text' },
+            { name: 'revisores_identidade', type: 'text' },
+            { name: 'revisor_juridico', type: 'text' },
+            { name: 'revisor_fiscal', type: 'text' },
+            { name: 'revisor_financeiro', type: 'text' },
+            { name: 'aprovador', type: 'text' },
+            { name: 'liberador', type: 'text' },
+            { name: 'divulgador', type: 'text' },
+            { name: 'observacoes', type: 'text' },
+            { name: 'active', type: 'bool' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: [
+            'CREATE UNIQUE INDEX idx_govwfc_empresa ON governance_workflow_config (empresa)',
+          ],
+        }),
+      )
+      console.log('0365: coleção criada: governance_workflow_config')
+    }
 
     // ---------------------------------------------------------
     // 8. Norma de governança e ciência dos integrantes
     // ---------------------------------------------------------
-    ensure({
-      name: 'governance_norms',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'title', type: 'text', required: true },
-        { name: 'content', type: 'text' },
-        { name: 'version', type: 'text' },
-        { name: 'active', type: 'bool' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: ['CREATE INDEX idx_govnorma_empresa ON governance_norms (empresa)'],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_norms')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_norms',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'title', type: 'text', required: true },
+            { name: 'content', type: 'text' },
+            { name: 'version', type: 'text' },
+            { name: 'active', type: 'bool' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: ['CREATE INDEX idx_govnorma_empresa ON governance_norms (empresa)'],
+        }),
+      )
+      console.log('0365: coleção criada: governance_norms')
+    }
 
-    ensure({
-      name: 'governance_norm_acknowledgments',
-      type: 'base',
-      ...empresaRules,
-      fields: [
-        { name: 'empresa', type: 'text', required: true },
-        { name: 'norma_id', type: 'text', required: true },
-        { name: 'norma_version', type: 'text' },
-        { name: 'user_name', type: 'text' },
-        { name: 'user_function', type: 'text' },
-        { name: 'acknowledged_at', type: 'text' },
-        { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
-        { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
-      ],
-      indexes: ['CREATE INDEX idx_govack_norma ON governance_norm_acknowledgments (norma_id)'],
-    })
+    try {
+      app.findCollectionByNameOrId('governance_norm_acknowledgments')
+    } catch (_) {
+      app.save(
+        new Collection({
+          name: 'governance_norm_acknowledgments',
+          type: 'base',
+          listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          createRule:
+            "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+          updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
+          deleteRule: "@request.auth.role = 'SUP'",
+          fields: [
+            { name: 'empresa', type: 'text', required: true },
+            { name: 'norma_id', type: 'text', required: true },
+            { name: 'norma_version', type: 'text' },
+            { name: 'user_name', type: 'text' },
+            { name: 'user_function', type: 'text' },
+            { name: 'acknowledged_at', type: 'text' },
+            { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+            { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+          ],
+          indexes: ['CREATE INDEX idx_govack_norma ON governance_norm_acknowledgments (norma_id)'],
+        }),
+      )
+      console.log('0365: coleção criada: governance_norm_acknowledgments')
+    }
 
     // ---------------------------------------------------------
     // 9. Seeds idempotentes por empresa: projeto Geral, tipos da norma e papéis
