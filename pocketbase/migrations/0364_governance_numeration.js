@@ -56,9 +56,7 @@ migrate(
     try {
       const col = app.findCollectionByNameOrId('numerations')
       const field = col.fields.getByName('document_type')
-      const values = Array.from(field.values || []).filter(
-        (v) => v !== 'governance_documents',
-      )
+      const values = Array.from(field.values || []).filter((v) => v !== 'governance_documents')
       field.values = values
       app.save(col)
     } catch (_) {}

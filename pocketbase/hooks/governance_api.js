@@ -77,7 +77,17 @@ routerAdd(
       e.json(400, { error: 'Parâmetros inválidos: document_id e action' })
       return
     }
-    if (!['enviar_revisao', 'aprovar', 'devolver', 'rejeitar', 'liberar', 'revogar', 'retomar'].includes(action)) {
+    if (
+      ![
+        'enviar_revisao',
+        'aprovar',
+        'devolver',
+        'rejeitar',
+        'liberar',
+        'revogar',
+        'retomar',
+      ].includes(action)
+    ) {
       e.json(400, { error: 'Ação inválida' })
       return
     }
@@ -120,7 +130,8 @@ routerAdd(
     }
     if (!(transicoes[action] || []).includes(statusAtual)) {
       e.json(400, {
-        error: 'Transição inválida: "' + action + '" não é permitida no status "' + statusAtual + '"',
+        error:
+          'Transição inválida: "' + action + '" não é permitida no status "' + statusAtual + '"',
       })
       return
     }
@@ -139,7 +150,9 @@ routerAdd(
       } catch (_) {}
       if (pendentes.length > 0) {
         e.json(400, {
-          error: 'Checklist de liberação incompleto: confirme todos os itens antes de liberar a versão ' + versaoAtual,
+          error:
+            'Checklist de liberação incompleto: confirme todos os itens antes de liberar a versão ' +
+            versaoAtual,
         })
         return
       }
@@ -160,13 +173,25 @@ routerAdd(
       doc.set('approved_at', agora)
       doc.set('approver', userNome)
       doc.set('approver_role', userRole)
-      doc.set('approval_evidence', 'Aprovado em ' + agora + ' por ' + userNome + ' (' + userRole + '). ' + motivo)
+      doc.set(
+        'approval_evidence',
+        'Aprovado em ' + agora + ' por ' + userNome + ' (' + userRole + '). ' + motivo,
+      )
     }
     if (action === 'liberar') {
       doc.set('current_version', versaoAtual)
       doc.set('released_at', agora)
       doc.set('released_by', userNome)
-      doc.set('released_file_name', 'AVSI_' + String(doc.get('doc_code') || '') + '_V' + versaoAtual + '_' + agora.slice(0, 10) + '.pdf')
+      doc.set(
+        'released_file_name',
+        'AVSI_' +
+          String(doc.get('doc_code') || '') +
+          '_V' +
+          versaoAtual +
+          '_' +
+          agora.slice(0, 10) +
+          '.pdf',
+      )
       doc.set('pending_review', false)
       // snapshot da versão liberada no histórico
       try {
@@ -195,11 +220,23 @@ routerAdd(
     }
     if (action === 'revogar' || action === 'retomar') {
       doc.set('pending_review', true)
-      doc.set('change_summary', (doc.get('change_summary') || '') + '\n[' + agora + '] ' + action.toUpperCase() + ': ' + motivo)
+      doc.set(
+        'change_summary',
+        (doc.get('change_summary') || '') +
+          '\n[' +
+          agora +
+          '] ' +
+          action.toUpperCase() +
+          ': ' +
+          motivo,
+      )
     }
     if (action === 'devolver' || action === 'rejeitar') {
       doc.set('pending_review', true)
-      doc.set('change_summary', '[DECISÃO ' + agora + '] ' + userNome + ' (' + userRole + '): ' + motivo)
+      doc.set(
+        'change_summary',
+        '[DECISÃO ' + agora + '] ' + userNome + ' (' + userRole + '): ' + motivo,
+      )
     }
 
     try {
@@ -277,7 +314,13 @@ routerAdd(
     try {
       existente = $app.findRecordsByFilter(
         'governance_release_checklist',
-        'document_id = "' + docId + '" && version = "' + version + '" && item_key = "' + itemKey + '"',
+        'document_id = "' +
+          docId +
+          '" && version = "' +
+          version +
+          '" && item_key = "' +
+          itemKey +
+          '"',
         '',
         1,
         0,

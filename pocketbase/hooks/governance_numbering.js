@@ -17,10 +17,14 @@ onRecordCreateRequest((e) => {
   const auth = e.requestInfo().auth
   const empresa = String(record.get('empresa') || '')
   const projeto = (
-    String(record.get('project_code') || 'GER').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'GER'
+    String(record.get('project_code') || 'GER')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '') || 'GER'
   ).slice(0, 12)
   const tipo = (
-    String(record.get('type_code') || 'NGD').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'NGD'
+    String(record.get('type_code') || 'NGD')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '') || 'NGD'
   ).slice(0, 8)
 
   // ---------- número único global ----------

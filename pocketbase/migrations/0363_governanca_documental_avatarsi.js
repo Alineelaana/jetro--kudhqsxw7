@@ -15,8 +15,7 @@ migrate(
     const empresaRules = {
       listRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
       viewRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
-      createRule:
-        "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
+      createRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = @request.body.empresa",
       updateRule: "@request.auth.role = 'SUP' || @request.auth.empresa_id = empresa",
       deleteRule: "@request.auth.role = 'SUP'",
     }
@@ -97,7 +96,7 @@ migrate(
       ],
       indexes: [
         'CREATE UNIQUE INDEX idx_govdoc_number ON governance_documents (doc_number) WHERE doc_number != 0',
-        'CREATE UNIQUE INDEX idx_govdoc_empresa_code ON governance_documents (empresa, doc_code) WHERE doc_code != \'\'',
+        "CREATE UNIQUE INDEX idx_govdoc_empresa_code ON governance_documents (empresa, doc_code) WHERE doc_code != ''",
         'CREATE INDEX idx_govdoc_empresa ON governance_documents (empresa)',
         'CREATE INDEX idx_govdoc_status ON governance_documents (status)',
         'CREATE INDEX idx_govdoc_projtipo ON governance_documents (empresa, project_code, type_code)',
@@ -251,9 +250,7 @@ migrate(
         { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
         { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
       ],
-      indexes: [
-        'CREATE UNIQUE INDEX idx_govwfc_empresa ON governance_workflow_config (empresa)',
-      ],
+      indexes: ['CREATE UNIQUE INDEX idx_govwfc_empresa ON governance_workflow_config (empresa)'],
     })
 
     // ---------------------------------------------------------
@@ -289,9 +286,7 @@ migrate(
         { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
         { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
       ],
-      indexes: [
-        'CREATE INDEX idx_govack_norma ON governance_norm_acknowledgments (norma_id)',
-      ],
+      indexes: ['CREATE INDEX idx_govack_norma ON governance_norm_acknowledgments (norma_id)'],
     })
 
     // ---------------------------------------------------------
@@ -457,7 +452,9 @@ migrate(
         }
         if (!empId) continue // sem empresa resolvível: fica de fora do acervo
 
-        const projeto = String(tpl.get('category') || 'outros').toUpperCase().slice(0, 12)
+        const projeto = String(tpl.get('category') || 'outros')
+          .toUpperCase()
+          .slice(0, 12)
         const tipo = 'MOP'
         numeroAtual += 1
 
@@ -483,7 +480,10 @@ migrate(
         doc.set('status', 'em_elaboracao')
         doc.set('classification', 'interno')
         doc.set('pending_review', true)
-        doc.set('change_summary', 'Importado do acervo anterior (sem número — backfill 0363). Pendente de revisão e aprovação conforme governança.')
+        doc.set(
+          'change_summary',
+          'Importado do acervo anterior (sem número — backfill 0363). Pendente de revisão e aprovação conforme governança.',
+        )
         app.save(doc)
       }
       console.log('0363: backfill de documentos concluído')
