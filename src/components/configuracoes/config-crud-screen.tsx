@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -76,7 +77,28 @@ function FieldInput({
   )
 }
 
-export function ConfigCrudScreen({ config }: { config: ConfigCrudConfig }) {
+export interface ConfigCrudExtraColumn {
+  header: string
+  headerClassName?: string
+  cellClassName?: string
+  render: (r: any) => ReactNode
+}
+
+interface ConfigCrudScreenProps {
+  config: ConfigCrudConfig
+  extraColumns?: ConfigCrudExtraColumn[]
+  extraActions?: (r: any) => ReactNode
+  onAfterCreate?: (saved: any) => void | Promise<void>
+  onAfterUpdate?: (saved: any) => void | Promise<void>
+}
+
+export function ConfigCrudScreen({
+  config,
+  extraColumns,
+  extraActions,
+  onAfterCreate,
+  onAfterUpdate,
+}: ConfigCrudScreenProps) {
   const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -118,8 +140,13 @@ export function ConfigCrudScreen({ config }: { config: ConfigCrudConfig }) {
   const handleSave = async () => {
     setSaving(true)
     try {
-      if (editing) await updateConfig(config.collection, editing.id, form)
-      else await createConfig(config.collection, form)
+      if (editing) {
+        const saved = await updateConfig(config.collection, editing.id, form)
+        await onAfterUpdate?.(saved)
+      } else {
+        const saved = await createConfig(config.collection, form)
+        await onAfterCreate?.(saved)
+      }
       toast({ title: editing ? 'Atualizado' : 'Criado' })
       setFormOpen(false)
       load()
@@ -190,6 +217,14 @@ export function ConfigCrudScreen({ config }: { config: ConfigCrudConfig }) {
                 <tr className="bg-[#01361D] text-white">
                   <th className="text-left px-4 py-3 font-bold">Nome</th>
                   <th className="text-left px-4 py-3 font-bold hidden md:table-cell">Situação</th>
+                  {(extraColumns || []).map((c) => (
+                    <th
+                      key={c.header}
+                      className={`text-left px-4 py-3 font-bold ${c.headerClassName || ''}`}
+                    >
+                      {c.header}
+                    </th>
+                  ))}
                   <th className="text-center px-4 py-3 font-bold">Ações</th>
                 </tr>
               </thead>
@@ -204,6 +239,11 @@ export function ConfigCrudScreen({ config }: { config: ConfigCrudConfig }) {
                         {r.active !== false ? 'Ativo' : 'Inativo'}
                       </span>
                     </td>
+                    {(extraColumns || []).map((c) => (
+                      <td key={c.header} className={`px-4 py-3 ${c.cellClassName || ''}`}>
+                        {c.render(r)}
+                      </td>
+                    ))}
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
                         <Button
@@ -230,6 +270,7 @@ export function ConfigCrudScreen({ config }: { config: ConfigCrudConfig }) {
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
+                        {extraActions ? extraActions(r) : null}
                       </div>
                     </td>
                   </tr>
