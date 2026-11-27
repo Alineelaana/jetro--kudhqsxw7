@@ -52,29 +52,29 @@ export function FaturamentoTab({ filters }: { filters: GlobalFilters }) {
         <IndicatorCard
           label="NF-e emitidas hoje"
           value={fmtNum(d.nfesHoje)}
-          drillTo="/admin/fiscal/documentos-fiscais"
+          drillTo="/admin/fiscal/documentos"
         />
         <IndicatorCard
           label="Clientes faturados hoje"
           value={fmtNum(d.clientesHoje)}
-          drillTo="/admin/fiscal/documentos-fiscais"
+          drillTo="/admin/fiscal/documentos"
         />
         <IndicatorCard
           label="Unidades faturadas hoje"
           value={fmtNum(d.unidadesHoje)}
-          drillTo="/admin/fiscal/documentos-fiscais"
+          drillTo="/admin/fiscal/documentos"
         />
         <IndicatorCard
           label="Valor faturado hoje"
           value={fmtBRL(d.valorHoje)}
-          drillTo="/admin/fiscal/documentos-fiscais"
+          drillTo="/admin/fiscal/documentos"
         />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <IndicatorCard
           label="Faturamento da semana"
           value={fmtBRL(d.faturamentoSemana)}
-          drillTo="/admin/fiscal/documentos-fiscais"
+          drillTo="/admin/fiscal/documentos"
         />
         <IndicatorCard
           label="Romaneios"
@@ -89,7 +89,7 @@ export function FaturamentoTab({ filters }: { filters: GlobalFilters }) {
         <IndicatorCard
           label="Valor faturado no mês"
           value={fmtBRL(d.valorMes)}
-          drillTo="/admin/fiscal/documentos-fiscais"
+          drillTo="/admin/fiscal/documentos"
         />
       </div>
       {!temDados && <EmptyPanel />}

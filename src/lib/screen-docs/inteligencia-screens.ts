@@ -218,8 +218,8 @@ export const INTELIGENCIA_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     route: '/admin/inteligencia/visao-estrategica-360',
     title: 'Visão estratégica em 360°',
     moduleGroup: 'Inteligência',
-    docVersion: '1.2.0',
-    lastUpdated: '2026-11-24',
+    docVersion: '1.2.1',
+    lastUpdated: '2026-11-27',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
@@ -249,7 +249,7 @@ export const INTELIGENCIA_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
     integrations: {
       title: 'Integrações',
       content:
-        '- Drill-down por lupa para as telas reais: /admin/vendas/faturamento, /admin/comercial/pedidos-faturamento, /admin/financeiro/contas-a-receber-cobranca, /admin/financeiro/contas-a-pagar-tesouraria, /admin/estoque, /admin/fiscal/documentos-fiscais, /admin/fiscal/compras-entradas, /admin/logistica/romaneios, /admin/comercial/contratos-devolucoes, /admin/cadastros/parceiros e cadastros de produtos/marcas.\n- Nenhuma integração externa: toda leitura é direto do PocketBase local.',
+        '- Drill-down por lupa para as telas reais: /admin/comercial/pedidos-faturamento, /admin/financeiro/contas-a-receber-cobranca, /admin/financeiro/contas-a-pagar-tesouraria, /admin/estoque, /admin/produtos, /admin/fiscal/documentos, /admin/fiscal/compras-entradas, /admin/logistica/romaneios, /admin/comercial/contratos-devolucoes, /admin/cadastros/parceiros, /admin/cadastros/marcas, /admin/cadastros/produtos e /admin/comercial/tabelas-preco-descontos.\n- Nenhuma integração externa: toda leitura é direto do PocketBase local.',
     },
     permissions: {
       title: 'Permissões',
