@@ -162,7 +162,7 @@ export interface GovernanceDocumentVersion {
   updated: string
 }
 
-const STATUS_LABEL: Record<string, string> = {
+const STATUS_LABEL_MAP: Record<string, string> = {
   em_elaboracao: 'Em elaboração (MINUTA)',
   em_revisao: 'Em revisão',
   em_aprovacao: 'Em aprovação',
@@ -179,7 +179,7 @@ const CLASSIFICATION_LABEL: Record<string, string> = {
   restrito: 'Restrito',
 }
 
-export const governanceStatusLabels = (s: string) => STATUS_LABEL[s] ?? s
+export const governanceStatusLabels = (s: string) => STATUS_LABEL_MAP[s] ?? s
 export const governanceClassificationLabels = (c: string) => CLASSIFICATION_LABEL[c] ?? c
 
 // ---------------------------------------------------------------
@@ -376,4 +376,98 @@ export function buildGovernanceFileName(doc: {
   const data = (doc.updated || '').slice(0, 10)
   const ext = 'pdf'
   return `AVSI_${doc.doc_code || 'SEM_CODIGO'}_V${doc.version || '0.0.0'}_${data}.${ext}`
+}
+
+// ---------------------------------------------------------------
+// Aliases usados pela tela (governance-screen.tsx)
+// ---------------------------------------------------------------
+export type GovernanceTipo = GovernanceDocumentType
+export type GovernanceWfc = GovernanceWorkflowConfig
+export type GovernanceNorma = GovernanceNorm
+
+export interface ChecklistItem {
+  key: string
+  label: string
+  hint: string
+}
+
+const CHECKLIST_HINTS: Record<string, string> = {
+  codigo_versao: 'Cabeçalho padronizado com código documental, versão, data e classificação.',
+  conteudo_fontes: 'Revisão técnica de conteúdo, fontes e dados do documento.',
+  confidencialidade: 'Público-alvo, destinatários e nível de confidencialidade conferidos.',
+  marca_identidade: 'Logomarca, imagens e identidade visual conforme o manual da marca.',
+  aprovacao_registrada: 'Aprovação expressa registrada com versão, finalidade e canal.',
+  arquivo_vigente: 'Arquivo final arquivado e versão vigente identificada no acervo.',
+  conteudo_externo: 'Conferência de nomes, números, direitos de imagem e promessas.',
+  dados_comerciais: 'Sem preços, percentuais de remuneração ou condições comerciais.',
+}
+
+export const ITENS_CHECKLIST: ChecklistItem[] = RELEASE_CHECKLIST_ITEMS.map((i) => ({
+  key: i.key,
+  label: i.label,
+  hint: CHECKLIST_HINTS[i.key] || '',
+}))
+
+export const STATUS_LABEL: Record<string, string> = { ...STATUS_LABEL_MAP }
+export const CLASSIFICACAO_LABEL: Record<string, string> = { ...CLASSIFICATION_LABEL }
+
+export const STATUS_BADGE: Record<string, string> = {
+  em_elaboracao: 'bg-amber-100 text-amber-800 border-amber-300',
+  em_revisao: 'bg-blue-100 text-blue-800 border-blue-300',
+  em_aprovacao: 'bg-violet-100 text-violet-800 border-violet-300',
+  aprovado: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  publicado: 'bg-green-600 text-white border-green-700',
+  obsoleto: 'bg-gray-100 text-gray-600 border-gray-300',
+  revogado: 'bg-red-100 text-red-800 border-red-300',
+}
+
+export function parseVersion(v: string): { major: number; minor: number; patch: number } {
+  const partes = String(v || '0.1.0').split('.')
+  return {
+    major: Number(partes[0]) || 0,
+    minor: Number(partes[1]) || 0,
+    patch: Number(partes[2]) || 0,
+  }
+}
+
+export function calcularProximaVersao(
+  major: number,
+  minor: number,
+  patch: number,
+  changeType: string,
+): [number, number, number] {
+  if (changeType === 'patch') return [major, minor, patch + 1]
+  if (changeType === 'major') return [major + 1, 0, 0]
+  return [major, minor + 1, 0]
+}
+
+export function transitionAction(
+  documentId: string,
+  action: GovernanceTransitionPayload['action'],
+  version?: string,
+  motivo?: string,
+) {
+  return submitGovernanceTransition({ document_id: documentId, action, version, motivo })
+}
+
+export function confirmChecklistItem(
+  documentId: string,
+  version: string,
+  itemKey: string,
+  itemLabel: string,
+) {
+  return confirmGovernanceChecklistItem({
+    document_id: documentId,
+    version,
+    item_key: itemKey,
+    item_label: itemLabel,
+    confirmed: true,
+  })
+}
+
+export function acknowledgeNorma(
+  normaId: string,
+  dados: { user_name: string; user_function: string },
+) {
+  return acknowledgeGovernanceNorm({ norma_id: normaId, ...dados })
 }
