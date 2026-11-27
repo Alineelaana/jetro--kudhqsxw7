@@ -192,6 +192,11 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
           { label: 'APIs', route: '/admin/configuracoes/apis', perm: canManageApis },
           { label: 'Backup', route: '/admin/configuracoes/backup', perm: canManageBackups },
           {
+            label: 'Governança Documental',
+            route: '/admin/configuracoes/governanca-documental',
+            perm: canViewConfiguracoes,
+          },
+          {
             label: 'Importação/Exportação',
             route: '/admin/configuracoes/importacao-exportacao',
             perm: canManageConfiguracoes,
@@ -221,11 +226,6 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             label: 'Numerações',
             route: '/admin/configuracoes/numeracoes',
             perm: canManageConfiguracoes,
-          },
-          {
-            label: 'Governança Documental',
-            route: '/admin/configuracoes/governanca-documental',
-            perm: canViewConfiguracoes,
           },
           {
             label: 'Parâmetros',

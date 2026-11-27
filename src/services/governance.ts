@@ -324,7 +324,7 @@ export interface GovernanceTransitionPayload {
 
 export async function submitGovernanceTransition(payload: GovernanceTransitionPayload) {
   return pb.send<{ ok: boolean; document_id: string; status: string; version: string }>(
-    '/api/governance/transition',
+    '/backend/v1/governance/transition',
     { method: 'POST', body: payload },
   )
 }
@@ -336,10 +336,13 @@ export async function confirmGovernanceChecklistItem(payload: {
   item_label: string
   confirmed: boolean
 }) {
-  return pb.send<{ ok: boolean; item: string; confirmed: boolean }>('/api/governance/checklist', {
-    method: 'POST',
-    body: payload,
-  })
+  return pb.send<{ ok: boolean; item: string; confirmed: boolean }>(
+    '/backend/v1/governance/checklist',
+    {
+      method: 'POST',
+      body: payload,
+    },
+  )
 }
 
 export async function acknowledgeGovernanceNorm(payload: {
@@ -347,7 +350,7 @@ export async function acknowledgeGovernanceNorm(payload: {
   user_name: string
   user_function: string
 }) {
-  return pb.send<{ ok: boolean; ack: string }>('/api/governance/norm-ack', {
+  return pb.send<{ ok: boolean; ack: string }>('/backend/v1/governance/norm-ack', {
     method: 'POST',
     body: payload,
   })
@@ -362,7 +365,7 @@ export async function nextGovernanceVersion(payload: {
     current_version: string
     change_type: string
     next_version: string
-  }>('/api/governance/next-version', { method: 'POST', body: payload })
+  }>('/backend/v1/governance/next-version', { method: 'POST', body: payload })
 }
 
 // ---------------------------------------------------------------

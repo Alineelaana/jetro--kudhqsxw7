@@ -13,6 +13,7 @@ import { MARKETING_SCREEN_DOCS } from './marketing-screens'
 import { INTELIGENCIA_SCREEN_DOCS } from './inteligencia-screens'
 import { CONTROLADORIA_SCREEN_DOCS } from './controladoria-screens'
 import { IA_SCREEN_DOCS } from './ia-screen-docs'
+import { GOVERNANCA_SCREEN_DOCS } from './governanca-screens'
 
 /**
  * REGISTRO CENTRAL DE DOCUMENTAÇÃO TÉCNICA DAS TELAS DO ERP JETRO
@@ -612,6 +613,7 @@ const ALL_MODULE_DOCS: Record<string, ScreenDocEntry>[] = [
   INTELIGENCIA_SCREEN_DOCS,
   CONTROLADORIA_SCREEN_DOCS,
   IA_SCREEN_DOCS,
+  GOVERNANCA_SCREEN_DOCS,
 ]
 
 /**

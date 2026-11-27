@@ -1,15 +1,15 @@
 // governance_api.js — API de governança documental "AvatarSi"
 // Endpoints:
-//   POST /api/governance/next-version  — calcula próxima versão (PATCH/MINOR/MAJOR)
-//   POST /api/governance/transition    — revisão / aprovação / devolução / rejeição / liberação
-//   POST /api/governance/checklist     — confirmação item a item do checklist de liberação
-//   POST /api/governance/norm-ack      — ciência da norma de governança
+//   POST /backend/v1/governance/next-version  — calcula próxima versão (PATCH/MINOR/MAJOR)
+//   POST /backend/v1/governance/transition    — revisão / aprovação / devolução / rejeição / liberação
+//   POST /backend/v1/governance/checklist     — confirmação item a item do checklist de liberação
+//   POST /backend/v1/governance/norm-ack      — ciência da norma de governança
 //
 // IMPORTANTE (JSVM): toda lógica INLINE nos callbacks (sem referências de nível superior).
 
 routerAdd(
   'POST',
-  '/api/governance/next-version',
+  '/backend/v1/governance/next-version',
   (e) => {
     const info = e.requestInfo()
     const auth = info.auth
@@ -56,7 +56,7 @@ routerAdd(
 
 routerAdd(
   'POST',
-  '/api/governance/transition',
+  '/backend/v1/governance/transition',
   (e) => {
     const info = e.requestInfo()
     const auth = info.auth
@@ -276,7 +276,7 @@ routerAdd(
 
 routerAdd(
   'POST',
-  '/api/governance/checklist',
+  '/backend/v1/governance/checklist',
   (e) => {
     const info = e.requestInfo()
     const auth = info.auth
@@ -355,7 +355,7 @@ routerAdd(
 
 routerAdd(
   'POST',
-  '/api/governance/norm-ack',
+  '/backend/v1/governance/norm-ack',
   (e) => {
     const info = e.requestInfo()
     const auth = info.auth

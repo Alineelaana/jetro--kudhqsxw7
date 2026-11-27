@@ -34,6 +34,7 @@ import type {
   GovernanceNorma,
   GovernanceNormAck,
   ChecklistItem,
+  GovernanceTransitionPayload,
 } from '@/services/governance'
 import {
   CLASSIFICACOES,
@@ -330,7 +331,10 @@ export function GovernanceScreen() {
     }
   }
 
-  const acaoRapida = async (doc: GovernanceDocument, action: string) => {
+  const acaoRapida = async (
+    doc: GovernanceDocument,
+    action: GovernanceTransitionPayload['action'],
+  ) => {
     try {
       await transitionAction(doc.id, action, doc.version || '')
       await carregar()
