@@ -37,19 +37,32 @@ export function IndicatorCard({
 }) {
   const navigate = useNavigate()
   const clickable = Boolean(drillTo)
+  const handleDrill = () => {
+    if (drillTo) navigate(drillTo)
+  }
   return (
     <Card
-      className={cn(clickable && 'cursor-pointer transition-colors hover:border-primary/50')}
-      onClick={clickable ? () => navigate(drillTo!) : undefined}
+      className={cn(
+        clickable &&
+          'cursor-pointer transition-colors hover:border-primary/50 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+      )}
+      onClick={clickable ? handleDrill : undefined}
     >
       <CardHeader className="pb-1">
         <CardTitle className="flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>{label}</span>
           {clickable && (
-            <ZoomIn
+            <button
+              type="button"
               aria-label={`Abrir ${label}`}
-              className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
-            />
+              onClick={(ev) => {
+                ev.stopPropagation()
+                handleDrill()
+              }}
+              className="rounded p-0.5 text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring hover:text-foreground"
+            >
+              <ZoomIn className="h-3.5 w-3.5" />
+            </button>
           )}
         </CardTitle>
       </CardHeader>

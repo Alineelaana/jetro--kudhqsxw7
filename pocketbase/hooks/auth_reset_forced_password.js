@@ -17,8 +17,16 @@ routerAdd(
       return e.json(400, { error: 'Por favor, informe a nova senha.' })
     }
 
-    if (newPassword.length < 8) {
-      return e.json(400, { error: 'A nova senha deve possuir no mínimo 8 caracteres.' })
+    if (
+      newPassword.length < 10 ||
+      !/[A-Z]/.test(newPassword) ||
+      !/[a-z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword)
+    ) {
+      return e.json(400, {
+        error:
+          'A nova senha deve possuir no mínimo 10 caracteres, com ao menos 1 letra maiúscula, 1 minúscula e 1 número.',
+      })
     }
 
     if (newPassword !== confirmPassword) {

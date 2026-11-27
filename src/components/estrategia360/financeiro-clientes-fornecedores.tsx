@@ -86,17 +86,17 @@ export function ClientesTab({ filters }: { filters: GlobalFilters }) {
         <IndicatorCard
           label="Títulos atrasados"
           value={`${fmtNum(d.titulosAtrasados)} · ${fmtBRL(d.valorAtrasado)}`}
-          drillTo="/admin/financeiro/receber"
+          drillTo="/admin/financeiro/contas-a-receber-cobranca"
         />
         <IndicatorCard
           label="Títulos a vencer"
           value={`${fmtNum(d.titulosAVencer)} · ${fmtBRL(d.valorAVencer)}`}
-          drillTo="/admin/financeiro/receber"
+          drillTo="/admin/financeiro/contas-a-receber-cobranca"
         />
         <IndicatorCard
           label="Títulos liberados"
           value={fmtNum(d.titulosLiberados)}
-          drillTo="/admin/financeiro/receber"
+          drillTo="/admin/financeiro/contas-a-receber-cobranca"
         />
       </div>
       <h3 className="text-sm font-semibold">Ranking — clientes que mais compraram no mês</h3>

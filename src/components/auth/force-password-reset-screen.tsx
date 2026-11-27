@@ -13,6 +13,7 @@ import pb from '@/lib/pocketbase/client'
 import { useAuth } from '@/hooks/use-auth'
 import { useBrand } from '@/hooks/use-brand'
 import { registerAuditLog } from '@/services/audit-logs'
+import { validatePasswordStrength, getPasswordRuleChecks } from '@/lib/password-policy'
 import logoHuram from '@/assets/logo-huram-em-verde-e-dourado-1-6c1c1.png'
 import logoDecEldorado from '@/assets/logotipo-dourado-deceeldorado-em-azul-royal-8cf58.png'
 import logoGranRomano from '@/assets/rotulo-vintage-gran-romano-5bdf7.png'
@@ -56,8 +57,11 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
       return
     }
 
-    if (newPassword.length < 8) {
-      setError('A nova senha deve possuir no mínimo 8 caracteres.')
+    // Política de senha forte do HURAM (espelha a regra aplicada pelo servidor
+    // em user_password_policy.js e neste endpoint): valida ANTES de enviar.
+    const senhaErro = validatePasswordStrength(newPassword)
+    if (senhaErro) {
+      setError(senhaErro)
       return
     }
 
@@ -105,7 +109,7 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
         }
         if (status === 400) {
           throw new Error(
-            'A nova senha informada não é válida. Verifique se possui no mínimo 8 dígitos e se os dois campos são idênticos.',
+            'A nova senha informada não é válida. Verifique a política de senha (mínimo 10 caracteres, com 1 maiúscula, 1 minúscula e 1 número) e se os dois campos são idênticos.',
           )
         }
         if (status === 401 || status === 403) {
@@ -188,7 +192,7 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
   }
 
   const passwordsMatch = !!newPassword && !!confirmPassword && newPassword === confirmPassword
-  const hasMinLength = newPassword.length >= 8
+  const ruleChecks = getPasswordRuleChecks(newPassword)
 
   return (
     <div
@@ -296,7 +300,7 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
                   >
                     <span>Nova senha</span>
                     <span className="text-[11px] font-normal text-muted-foreground">
-                      Mínimo 8 dígitos
+                      Mínimo 10 caracteres
                     </span>
                   </label>
                   <div className="relative group">
@@ -372,22 +376,24 @@ export function ForcePasswordResetScreen({ onSuccess }: ForcePasswordResetScreen
                   </div>
                 </div>
 
-                {/* Indicadores de requisitos de senha */}
+                {/* Indicadores de requisitos de senha (política forte) */}
                 <div className="bg-[#0B3D2E]/5 rounded-xl p-3 text-xs space-y-1 border border-[#0B3D2E]/10">
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        hasMinLength ? 'bg-emerald-600' : 'bg-muted-foreground/40'
-                      }`}
-                    />
-                    <span
-                      className={
-                        hasMinLength ? 'text-emerald-700 font-semibold' : 'text-muted-foreground'
-                      }
-                    >
-                      Mínimo de 8 caracteres
-                    </span>
-                  </div>
+                  {ruleChecks.map((rule) => (
+                    <div key={rule.label} className="flex items-center gap-1.5">
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          rule.ok ? 'bg-emerald-600' : 'bg-muted-foreground/40'
+                        }`}
+                      />
+                      <span
+                        className={
+                          rule.ok ? 'text-emerald-700 font-semibold' : 'text-muted-foreground'
+                        }
+                      >
+                        {rule.label}
+                      </span>
+                    </div>
+                  ))}
                   <div className="flex items-center gap-1.5">
                     <span
                       className={`w-2 h-2 rounded-full ${
