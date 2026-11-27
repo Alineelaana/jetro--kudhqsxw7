@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import type { RecordModel } from 'pocketbase'
 import type { GovernanceDocument } from '@/services/governance'
 import {
   ITENS_CHECKLIST,
@@ -37,6 +38,48 @@ export function GovernanceDocBadge({ status }: { status?: string }) {
   )
 }
 
+/**
+ * Normaliza um registro PocketBase (RecordModel) para GovernanceDocument sem
+ * cast direto: cada campo é lido/validado individualmente e o id é sempre string.
+ */
+export function normalizeGovernanceDoc(raw: RecordModel): GovernanceDocument {
+  const r = raw as unknown as Record<string, unknown>
+  const num = (v: unknown) => (typeof v === 'number' ? v : Number(v) || 0)
+  const str = (v: unknown) => (typeof v === 'string' ? v : '')
+  return {
+    id: str(raw.id),
+    empresa: str(r.empresa),
+    title: str(r.title),
+    project_code: str(r.project_code),
+    type_code: str(r.type_code),
+    doc_code: str(r.doc_code),
+    doc_number: num(r.doc_number),
+    version_major: num(r.version_major),
+    version_minor: num(r.version_minor),
+    version_patch: num(r.version_patch),
+    version: str(r.version) || '0.1.0',
+    current_version: str(r.current_version),
+    status: (str(r.status) || 'em_elaboracao') as GovernanceDocument['status'],
+    classification: (str(r.classification) || 'interno') as GovernanceDocument['classification'],
+    author: str(r.author),
+    reviewers: str(r.reviewers),
+    approver: str(r.approver),
+    approver_role: str(r.approver_role),
+    purpose: str(r.purpose),
+    audience: str(r.audience),
+    channels: str(r.channels),
+    approval_evidence: str(r.approval_evidence),
+    change_summary: str(r.change_summary),
+    released_file_name: str(r.released_file_name),
+    released_at: str(r.released_at),
+    released_by: str(r.released_by),
+    approved_at: str(r.approved_at),
+    pending_review: !!r.pending_review,
+    created: str(r.created),
+    updated: str(r.updated),
+  }
+}
+
 export function useGovernanceDocForTemplate(templateId: string | null | undefined) {
   const [doc, setDoc] = useState<(GovernanceDocument & { id: string }) | null>(null)
   const [loading, setLoading] = useState(false)
@@ -51,7 +94,7 @@ export function useGovernanceDocForTemplate(templateId: string | null | undefine
       const found = await pb.collection('governance_documents').getList(1, 1, {
         filter: `template_id = "${templateId}"`,
       })
-      setDoc((found.items[0] as GovernanceDocument & { id: string }) || null)
+      setDoc(found.items.length > 0 ? normalizeGovernanceDoc(found.items[0]) : null)
     } catch {
       setDoc(null)
     } finally {
@@ -90,7 +133,11 @@ export function GovernanceFlowDialog({ doc, onClose, onTransitioned }: FlowDialo
         })
         if (!ativo) return
         const mapa: Record<string, boolean> = {}
-        for (const it of res.items) mapa[it.item_key] = it.confirmed
+        for (const raw of res.items) {
+          const it = raw as unknown as Record<string, unknown>
+          const key = typeof it.item_key === 'string' ? it.item_key : ''
+          if (key) mapa[key] = !!it.confirmed
+        }
         setChecks(mapa)
       } catch {
         if (ativo) setChecks({})
@@ -239,8 +286,8 @@ export function useDocTemplateGovernance() {
         const existentes = await pb.collection('governance_documents').getList(1, 1, {
           filter: `template_id = "${template.id}"`,
         })
-        if (existentes.items.length > 0) return existentes.items[0] as GovernanceDocument
-        const criado = (await pb.collection('governance_documents').create({
+        if (existentes.items.length > 0) return normalizeGovernanceDoc(existentes.items[0])
+        const criado = await pb.collection('governance_documents').create({
           empresa: template.company || '',
           title: template.name || 'Documento sem título',
           template_id: template.id,
@@ -250,8 +297,8 @@ export function useDocTemplateGovernance() {
           classification: 'interno',
           pending_review: true,
           change_summary: 'Criado a partir do Modelo de Documento (esteira de governança).',
-        })) as GovernanceDocument
-        return criado
+        })
+        return normalizeGovernanceDoc(criado)
       } catch (err) {
         toast({
           title: 'Governança documental',
@@ -277,12 +324,12 @@ export function useGovernanceDocColumns(reloadKey: number) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const docs = await pb.collection('governance_documents').getFullList<GovernanceDocument>({
-        sort: '-created',
-      })
+      const docs = await pb.collection('governance_documents').getFullList({ sort: '-created' })
       const mapa: Record<string, GovernanceDocument> = {}
-      for (const d of docs) {
-        if (d.template_id) mapa[d.template_id] = d
+      for (const raw of docs) {
+        const d = normalizeGovernanceDoc(raw)
+        const templateId = (raw as unknown as Record<string, unknown>).template_id
+        if (typeof templateId === 'string' && templateId) mapa[templateId] = d
       }
       setDocsByTemplate(mapa)
     } catch {

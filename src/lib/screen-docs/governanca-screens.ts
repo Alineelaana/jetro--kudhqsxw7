@@ -60,4 +60,58 @@ export const GOVERNANCA_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Tentativa de alterar doc_number/doc_code de documento existente é rejeitada pelo backend com mensagem explícita (número/código permanentes).\n- Transição inválida para o status atual é recusada com mensagem do fluxo (ex.: liberar sem estar Aprovado).\n- Liberação com checklist incompleto é bloqueada com indicação da versão pendente.\n- Motivo/observação é obrigatório em aprovar, devolver, rejeitar, liberar e revogar.\n- Operações em documento/norma de outra empresa retornam 403.',
     },
   },
+
+  '/admin/configuracoes/modelos-documentos': {
+    route: '/admin/configuracoes/modelos-documentos',
+    title: 'Modelo de Documento (Governança AvatarSi)',
+    moduleGroup: 'Configurações',
+    docVersion: '1.1.0',
+    lastUpdated: '2026-11-27',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Gerenciar os modelos de documento do ERP (coleção document_templates) com o modelo integrado à esteira de governança documental AvatarSi: cada modelo possui registro correspondente em governance_documents (vínculo template_id → document_templates.id) com número único permanente, código documental legível, versão, classificação, status de ciclo de vida e checklist de liberação, gerenciados a partir da própria tela.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- CRUD de modelos de documento (nome, categoria, empresa, filial, cabeçalho, corpo, rodapé, orientação, tamanho de papel, numeração de páginas, modelo padrão), com busca e ativação/desativação.\n- Colunas adicionais de governança na listagem: Número (número único), Código (PROJETO_TIPO_NNN), Versão, Classificação e Status do documento de governança vinculado ao modelo.\n- Badge "Pendência de governança" nos modelos cujo documento de governança não foi localizado pelo vinculo template_id.\n- Badge "Pendência" em documentos com pending_review (ex.: integrados pelo backfill sem presumir aprovação).\n- Botão "Fluxo" por linha, abrindo o diálogo de fluxo de governança: enviar para revisão, aprovar, devolver ao elaborador e liberar (publicar/vigente) com checklist de liberação item a item, sem sair da tela.\n- Fluxo reutiliza os mesmos endpoints /backend/v1/governance/transition e /backend/v1/governance/checklist usados pela tela Governança Documental.\n- Ao salvar um modelo (criação ou edição), o registro de governança é garantido de forma idempotente: se não existir documento com aquele template_id, um novo é criado (status Em elaboração V0.1.0, classificação Interna, pendência sinalizada).',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- Vínculo modelo ↔ governança: o registro em governance_documents referencia o modelo pelo campo template_id; um modelo tem no máximo um documento de governança associado.\n- Criação idempotente: ao salvar, o sistema primeiro busca documento existente por template_id e só cria quando não houver; modelos antigos já receberam documento no backfill da migração 0363.\n- Número único e código documental: gerados exclusivamente pelo backend (hook governance_numbering.js, contador atômico na coleção numerations); código no formato PROJETO_TIPO_NNN, com projeto derivado da categoria do modelo (maiúsculas, até 12 caracteres) e tipo fixo MOP (modelo de documento).\n- O documento de governança nasce sempre como minuta V0.1.0 (Em elaboração, classificação Interna) — a tela NÃO presume aprovação de modelos antigos; o badge "Pendência" sinaliza o pending_review.\n- Novo modelo criado por fora da tela (sem registro de governança) pode ser integrado pelo botão "Fluxo", que cria o registro idempotente antes de abrir o diálogo.\n- Transições seguem o fluxo AvatarSi (enviar_revisao → aprovar → liberar) com trilha de auditoria; revogar/retomar e nova versão permanecem na tela Governança Documental.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. O usuário acessa /admin/configuracoes/modelos-documentos pelo menu lateral (Configurações).\n2. A listagem exibe, além dos dados do modelo, as colunas de governança (Número, Código, Versão, Classificação, Status) e o badge de pendência quando aplicável.\n3. Ao criar ou editar um modelo, o salvamento dispará a garantia de registro de governança: documento existente é reutilizado; caso contrário, um novo é criado com número único e código PROJETO_TIPO_NNN atribuídos pelo backend, visíveis na listagem após recarga.\n4. O botão "Fluxo" (ícone de ramificação) na linha abre o diálogo de fluxo; a partir do status atual o usuário envia para revisão, aprova, devolve ou libera com checklist item a item.\n5. Cada transição é registrada na auditoria da governança e a listagem é recarregada para refletir o novo status.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Modelos: coleção PocketBase document_templates (CRUD via src/services/configuracoes.ts).\n- Governança: coleções governance_documents e governance_release_checklist (migração 0363), vinculadas por template_id.\n- Numeração: coleção numerations (migração 0364) alimentada pelo hook governance_numbering.js.\n- Transições e checklist: endpoints /backend/v1/governance/transition e /backend/v1/governance/checklist (hook governance_api.js).',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Componente de integração: src/components/governance/doc-template-governance.tsx (badge, colunas, diálogo de fluxo e garantia idempotente de registro).\n- Wrapper da tela: src/components/governance/doc-templates-governance-screen.tsx (injeta colunas/ações/callbacks no ConfigCrudScreen).\n- Serviço compartilhado: src/services/governance.ts (mesmos helpers e endpoints da tela Governança Documental).\n- Tela irmã: /admin/configuracoes/governanca-documental (acervo completo, revogar/retomar, nova versão, norma e ciência).',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso à tela pelo menu Configurações (canViewConfiguracoes).\n- Transições de fluxo exigem sessão autenticada; os endpoints validam a empresa do documento contra a do usuário (SUP irrestrito).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componente: src/components/configuracoes/config-crud-screen.tsx (CRUD base, com suporte a extraColumns/extraActions/onAfterCreate/onAfterUpdate).\n- Componente: src/components/governance/doc-template-governance.tsx (integração de governança).\n- Serviços: src/services/configuracoes.ts e src/services/governance.ts.\n- Migrações: 0363_governanca_documental_avatarsi.js (coleções e backfill) e 0364_governance_numeration.js (contador).',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Falha ao criar o registro de governança após salvar o modelo: o modelo é gravado normalmente e um toast destructive informa "Documento salvo, mas sem registro de governança" com o detalhe do erro; a listagem marca o modelo com badge de pendência.\n- Falha na transição (fluxo inválido para o status, checklist incompleto na liberação, motivo ausente): toast destructive com a mensagem retornada pelo endpoint; o diálogo permanece aberto.\n- Modelos sem documento de governança na listagem exibem badge "Pendência de governança" na coluna Status.\n- Itens de checklist pendentes na liberação são confirmados automaticamente antes da chamada de liberar (avisado no diálogo).',
+    },
+  },
 }

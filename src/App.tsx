@@ -31,7 +31,6 @@ import { getMarketingIntelligence } from '@/services/marketing-bi'
 import {
   INTEGRATIONS_CONFIG,
   EMAIL_TEMPLATE_CONFIG,
-  DOC_TEMPLATE_CONFIG,
   NOTIFICATION_CONFIG,
   NUMERATION_CONFIG,
 } from '@/lib/configuracoes-config'
@@ -215,6 +214,11 @@ const BackupScreen = lazy(() =>
 const GovernanceScreen = lazy(() =>
   import('@/components/governance/governance-screen').then((m) => ({
     default: m.GovernanceScreen,
+  })),
+)
+const DocTemplatesGovernanceScreen = lazy(() =>
+  import('@/components/governance/doc-templates-governance-screen').then((m) => ({
+    default: m.DocTemplatesGovernanceScreen,
   })),
 )
 
@@ -1047,7 +1051,7 @@ const App = () => (
                                     />
                                     <Route
                                       path="modelos-documentos"
-                                      element={<ConfigCrudScreen config={DOC_TEMPLATE_CONFIG} />}
+                                      element={<DocTemplatesGovernanceScreen />}
                                     />
                                     <Route
                                       path="notificacoes"
