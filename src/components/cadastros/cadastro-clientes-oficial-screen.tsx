@@ -754,7 +754,7 @@ export function CadastroClientesOficialScreen() {
       sortable: true,
       minWidth: 140,
       cell: ({ row }) => (
-        <span className="font-mono font-bold text-[#005B2E]">{row.numero || 'SOL-NOVA'}</span>
+        <span className="font-mono font-bold text-[#005B2E]">{row.numero || '—'}</span>
       ),
     },
     {

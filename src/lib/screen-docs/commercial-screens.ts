@@ -56,52 +56,54 @@ export const COMMERCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
 
   '/admin/comercial/clientes': {
     route: '/admin/comercial/clientes',
-    title: 'Clientes e Grupos Comerciais',
+    title: 'Cadastro Oficial de Clientes',
     moduleGroup: 'Comercial',
-    docVersion: '1.0.0',
-    lastUpdated: '2026-04-18',
+    docVersion: '2.0.0',
+    lastUpdated: '2026-11-28',
     author: 'Engenharia de Software HURAM',
     objective: {
       title: 'Objetivo',
       content:
-        'Unificar a gestão cadastral, segmentação em grupos comerciais e análise de perfil/comportamento de compra dos clientes do ERP HURAM.',
+        'Centralizar o ciclo completo do cliente no ERP HURAM: fila de solicitações de pré-cadastro (enviadas por representantes/vendedores), conclusão do Cadastro Oficial em formulário completo de 9 seções e carteira de Clientes Oficiais ativos, com geração automática do código oficial numérico do cliente.',
     },
     features: {
       title: 'Funcionalidades',
       content:
-        '- Aba 1 (Cadastro e Carteira): Listagem geral de clientes com filtros por status, limite de crédito e representante vinculado.\n- Aba 2 (Grupos e Canais): Segmentação por grupos de clientes, canais de venda e redes comerciais.\n- Aba 3 (Análise de Clientes): Indicadores de ticket médio, positivação, recência e curva ABC de clientes.',
+        '- Aba "Fila de Pré-Cadastros": listagem das solicitações (número da solicitação, data, cliente/fantasia, CPF/CNPJ, RCA, situação) com indicadores por status (aguardando validação, em análise, em correção, concluídos) e ações de atender/visualizar.\n- Aba "Clientes Oficiais": listagem dos parceiros com flag cliente ativa, exibindo código oficial numérico (ex.: 0001, 0002...), razão social, CNPJ, perfil comercial, situação de crédito e bloqueios, com ações de visualizar/gerenciar.\n- Formulário de Cadastro Oficial em 9 seções: 1. Identificação (tipo de pessoa, CPF/CNPJ com consulta automática, razão social, nome fantasia, IE, CNAE, situação cadastral), 2. Perfil Comercial, 3. Equipe de Vendas (RCA 1/2, gerente, televendas, B2B), 4. Endereço e Logística, 5. Condições Comerciais (tabela de preço, desconto máximo, pedido mínimo, limite pretendido), 6. Fiscais (regime tributário, ICMS, consumidor final), 7. Contatos, 8. Documentos & Anexos, 9. Observações & Histórico.\n- Conclusão da solicitação vinculada: ao efetivar o cadastro oficial, a solicitação de origem é marcada como concluída e o cliente entra na carteira oficial.\n- Análise de crédito: opção de encaminhar automaticamente ao Financeiro para análise, com situação de crédito e bloqueio de vendas a prazo controlados na carteira.',
     },
     businessRules: {
       title: 'Regras de Negócio',
       content:
-        '- Clientes com pendência cadastral ou bloqueio financeiro recebem destaque visual.\n- A alteração de limite de crédito exige justificativa registrada em auditoria.\n- Representantes (RCA) visualizam somente os clientes de sua carteira atribuída.',
+        '- Código oficial do cliente é gerado automaticamente pelo backend (hook `client_workflow_hooks.js`) como número SOMENTE NUMÉRICO sequencial de 4 dígitos (ex.: 0001, 0002...), sem prefixo e sem ano, para todos os tipos de parceiro, via contador atômico na coleção `numerations`.\n- Códigos de clientes gravados em formato anterior continuam exibidos como estão; apenas novos cadastros recebem o formato numérico.\n- CPF/CNPJ é validado com dígito verificador e checado contra duplicidade cadastral antes da gravação.\n- Quando "Exige crédito financeiro" está marcado, o cliente é encaminhado ao Financeiro para análise; caso contrário, é liberado para transações sem análise prévia.\n- Clientes com bloqueio de vendas a prazo ou crédito pendente recebem destaque visual na carteira.',
     },
     workflow: {
       title: 'Fluxo de Funcionamento',
       content:
-        '1. O operador navega entre as abas para consultar ou atualizar dados cadastrais.\n2. É possível cadastrar novos grupos para aplicação de tabelas de preço diferenciadas.',
+        '1. O representante/vendedor envia a solicitação de pré-cadastro, que entra na Fila da tela com número próprio.\n2. O comercial abre a solicitação, revisa os dados e inicia o Cadastro Oficial (formulário de 9 seções), com consulta automática de CNPJ preenchendo identificação e endereço.\n3. Ao salvar, o backend gera o código oficial numérico (ex.: 0001), conclui a solicitação vinculada e, se exigido, encaminha ao Financeiro para análise de crédito.\n4. O cliente passa a constar na aba "Clientes Oficiais", pronto para uso em pedidos, tabelas de preço e cobrança.',
     },
     dataSource: {
       title: 'Origem dos Dados',
       content:
-        '- Coleções: `partners` (com filtro tipo cliente), `customer_cnae_groups`, `order_sales_channels`, `sales_orders`.',
+        '- Coleções PocketBase: `partners` (clientes oficiais, flag cliente), `client_onboarding_solicitations` (fila de pré-cadastro), `numerations` (contador do código oficial), `logistics_routes`, `price_tables`.\n- Endpoint: `concluirCadastroOficial` via hook `client_workflow_hooks.js`.',
     },
     integrations: {
       title: 'Integrações',
       content:
-        '- Integração com Central de Cadastros e Consulta Pública de CNPJ (BrasilAPI/ReceitaWS).',
+        '- Consulta Pública de CNPJ (BrasilAPI/ReceitaWS) no preenchimento automático.\n- Módulo Financeiro para análise de crédito e bloqueio.\n- Pedido de Venda (wizard) consome o cliente e a tabela de preço vinculados.',
     },
     permissions: {
       title: 'Permissões',
-      content: '- Controlada por `canViewSales(role)`.',
+      content: '- Controlada por `canViewSales(role)` (SUP, COMERCIAL, Vendedor, DIRETORIA).',
     },
     dependencies: {
       title: 'Dependências',
-      content: '- Componentes `ScreenClientes`, `JetroTable`, `useBrand`.',
+      content:
+        '- Componentes `CadastroClientesOficialScreen`, `JetroTable`, `useBrand`, `pb`.\n- Hook backend `pocketbase/hooks/client_workflow_hooks.js` (geração do código oficial).',
     },
     errorHandling: {
       title: 'Tratamento de Erros',
-      content: '- Validação de CNPJ/CPF com dígito verificador e aviso de duplicidade cadastral.',
+      content:
+        '- Validação de CNPJ/CPF com dígito verificador e aviso de divergência cadastral.\n- Falha ao efetivar cadastro (CNPJ/CPF duplicado ou erro de rede) exibe mensagem explicativa em toast e mantém o formulário preenchido.',
     },
   },
 
