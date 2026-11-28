@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -61,6 +62,7 @@ import {
   Lock,
   Loader2,
   Info,
+  ArrowLeft,
 } from 'lucide-react'
 import {
   consultarCNPJPublico,
@@ -71,6 +73,12 @@ import {
 
 export function CadastroClientesOficialScreen() {
   const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+
+  // Retorno de contexto da tela "Liberações comerciais" (menu Rotinas)
+  const retornoLiberacoes = searchParams.get('retorno') === 'liberacoes'
+  const clienteDestaqueId = searchParams.get('cliente') || ''
 
   // 1. Estados da Fila de Pré-Cadastros e Clientes Oficiais
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoClienteRecord[]>([])
@@ -235,6 +243,39 @@ export function CadastroClientesOficialScreen() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // Quando aberta a partir da fila de Liberações comerciais (?cliente=<id>&retorno=liberacoes),
+  // destaca o cliente indicado ativando a aba correspondente ao registro localizado.
+  useEffect(() => {
+    if (!clienteDestaqueId) return
+    const isOficial = clientesOficiais.some((c) => c.id === clienteDestaqueId)
+    const isSolicitacao = solicitacoes.some((s) => s.id === clienteDestaqueId)
+    if (isOficial) setActiveTab('oficial')
+    else if (isSolicitacao) setActiveTab('fila')
+  }, [clienteDestaqueId, clientesOficiais, solicitacoes])
+
+  // Volta para a fila de Liberações comerciais preservando TODOS os filtros da URL
+  const handleVoltarParaLiberacoes = () => {
+    const chavesFiltros = [
+      'request',
+      'status',
+      'search',
+      'empresaId',
+      'filialId',
+      'rcaName',
+      'responsavelId',
+      'ruleType',
+      'dateFrom',
+      'dateTo',
+    ]
+    const filtros = new URLSearchParams()
+    chavesFiltros.forEach((k) => {
+      const v = searchParams.get(k)
+      if (v) filtros.set(k, v)
+    })
+    const qs = filtros.toString()
+    navigate(`/admin/rotinas/liberacoes-comerciais${qs ? `?${qs}` : ''}`)
+  }
 
   // Indicadores Superiores Reais e Clicáveis
   const kpis = useMemo(() => {
@@ -906,6 +947,11 @@ export function CadastroClientesOficialScreen() {
             {row.company_name || row.full_name || '-'}
           </p>
           <p className="text-xs text-muted-foreground">{row.trade_name || '-'}</p>
+          {row.id === clienteDestaqueId && (
+            <Badge className="mt-1 bg-amber-500/20 text-amber-800 border-amber-300 text-[10px] font-bold">
+              Cliente da liberação em análise
+            </Badge>
+          )}
         </div>
       ),
     },
@@ -1005,6 +1051,30 @@ export function CadastroClientesOficialScreen() {
 
   return (
     <div className="space-y-6">
+      {/* BANNER DE RETORNO DA TELA LIBERAÇÕES COMERCIAIS (retorno=liberacoes) */}
+      {retornoLiberacoes && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+          <div className="text-xs text-amber-900">
+            <p className="font-bold text-sm flex items-center gap-1.5">
+              <Info className="w-4 h-4" /> Contexto: Liberações comerciais
+            </p>
+            <p className="mt-0.5">
+              {clienteDestaqueId
+                ? 'O cliente desta liberação está destacado na lista abaixo.'
+                : 'Retorne à fila para continuar a análise da solicitação.'}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleVoltarParaLiberacoes}
+            className="shrink-0 border-amber-400 text-amber-900 hover:bg-amber-100 font-bold"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1.5" /> Voltar para liberações
+          </Button>
+        </div>
+      )}
+
       {/* CABEÇALHO */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
