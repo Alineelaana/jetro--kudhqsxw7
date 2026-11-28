@@ -75,6 +75,11 @@ const InserirClientesScreen = lazy(() =>
 )
 const SalesOrdersPage = lazy(() => import('./pages/sales/SalesOrdersPage'))
 const OrderApprovalsPage = lazy(() => import('./pages/sales/OrderApprovalsPage'))
+const CommercialReleasesScreen = lazy(() =>
+  import('@/components/rotinas/liberacoes-comerciais-screen').then((m) => ({
+    default: m.CommercialReleasesScreen,
+  })),
+)
 const SalesOrdersQueryPage = lazy(() => import('./pages/sales/SalesOrdersQueryPage'))
 const PurchaseOrdersPanel = lazy(() =>
   import('@/components/purchasing/purchase-orders-panel').then((m) => ({
@@ -1644,6 +1649,18 @@ const App = () => (
                                     path="/admin/crm/relatorios"
                                     element={<Navigate to="/admin/comercial/crm" replace />}
                                   />
+                                  {/* MÓDULO ROTINAS */}
+                                  <Route
+                                    path="/admin/rotinas"
+                                    element={
+                                      <Navigate to="/admin/rotinas/liberacoes-comerciais" replace />
+                                    }
+                                  />
+                                  <Route
+                                    path="/admin/rotinas/liberacoes-comerciais"
+                                    element={<CommercialReleasesScreen />}
+                                  />
+
                                   <Route path="/admin/notificacoes" element={<Notifications />} />
 
                                   {/* MÓDULO IA (4 TELAS OFICIAIS) */}

@@ -767,6 +767,17 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
     ],
   },
   {
+    title: 'Rotinas',
+    items: [
+      {
+        label: 'Liberações Comerciais',
+        icon: ClipboardList,
+        route: '/admin/rotinas/liberacoes-comerciais',
+        perm: canViewSales,
+      },
+    ],
+  },
+  {
     title: 'Planilhas Convertidas',
     items: [
       {
