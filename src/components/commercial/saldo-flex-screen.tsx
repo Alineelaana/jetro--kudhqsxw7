@@ -102,15 +102,12 @@ export function SaldoFlexScreen() {
   const [companies, setCompanies] = useState<RefOption[]>([])
   const [branches, setBranches] = useState<RefOption[]>([])
   const [rcas, setRcas] = useState<RefOption[]>([])
-  const [gerentes] = useState<RefOption[]>([])
-  const [equipes] = useState<RefOption[]>([])
   const [clientes, setClientes] = useState<RefOption[]>([])
   const [produtos, setProdutos] = useState<RefOption[]>([])
   const [authRole, setAuthRole] = useState('')
   const [authUserId, setAuthUserId] = useState('')
 
   const [panelTab, setPanelTab] = useState<'consolidado' | 'gerente' | 'rca'>('consolidado')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [adjustTarget, setAdjustTarget] = useState<FlexAccount | null>(null)
@@ -179,11 +176,15 @@ export function SaldoFlexScreen() {
         tryList('products', { sort: '-created' }),
       ])
       const asOptions = (rows: Array<Record<string, unknown>>, keys: string[]): RefOption[] =>
-        rows.map((r) => ({
-          id: String(r.id),
-          label:
-            keys.map((k) => r[k]).find((v) => typeof v === 'string' && v !== '') ?? String(r.id),
-        }))
+        rows.map((r) => {
+          const found = keys
+            .map((k) => r[k])
+            .find((v) => typeof v === 'string' && (v as string) !== '')
+          return {
+            id: String(r.id),
+            label: typeof found === 'string' ? found : String(r.id),
+          }
+        })
       setCompanies(asOptions(empresas, ['marca_nome_exibicao', 'nome_fantasia', 'name', 'nome']))
       setBranches(asOptions(filiais, ['marca_nome_exibicao', 'nome_exibicao', 'name', 'nome']))
       setRcas(asOptions(rcasList, ['name', 'nome']))
@@ -426,9 +427,9 @@ export function SaldoFlexScreen() {
       let rows = movs.length
       if (reportModel === 'resumo') {
         if (reportFormat === 'pdf') {
-          rows = printFlexSummaryPdf(movs, filters)
+          rows = printFlexSummaryPdf(movs, filters, beforePeriod)
         } else {
-          const res = exportFlexReportToExcel(movs, filters)
+          const res = exportFlexReportToExcel(movs, filters, beforePeriod)
           rows = res.rows
         }
       } else if (reportFormat === 'pdf') {
