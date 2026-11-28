@@ -37,11 +37,11 @@ export function AttributionFooter({
 
   const content = (
     <a
-      href="https://wa.me/5531991297619"
+      href="https://saftecnologiaegestao.com.br/"
       target="_blank"
       rel="noopener noreferrer"
       className={cn('inline-block transition-colors cursor-pointer select-text', linkColor)}
-      title="Falar no WhatsApp: (31) 99129-7619"
+      title="Visitar o site da SAF Tecnologia e Gestão"
     >
       {prefix} criado e gerenciado por SAF TECNOLOGIA E GESTAO LTDA — CNPJ 65.768.215/0001-00
     </a>
