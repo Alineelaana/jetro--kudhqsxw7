@@ -175,9 +175,9 @@ routerAdd(
     try {
       pendingApproval = e.app.findFirstRecordByFilter(
         'commercial_release_requests',
-        "pedido_huram = '" +
+        "order_id = '" +
           pedidoHuram +
-          "' && pedido_fv = '" +
+          "' && order_number = '" +
           pedidoFv +
           "' && status = 'pendente'",
       )

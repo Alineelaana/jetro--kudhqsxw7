@@ -28,23 +28,24 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { AdminBackButton } from '@/components/admin-back-button'
-import { listFlexAccounts, listFlexMovements, createFlexAdjustment } from '@/services/flex'
-import { buildFlexReport, openFlexReportPdf } from '@/services/flex-report'
-import type { FlexAccount, FlexMovement, FlexFilters } from '@/services/flex'
+import {
+  flexService,
+  FLEX_TYPE_LABELS,
+  type FlexAccount,
+  type FlexMovement,
+  type FlexFilters,
+} from '@/services/flex'
+import {
+  exportFlexReportToExcel,
+  exportFlexReportToCsv,
+  printFlexSummaryPdf,
+  printFlexDetailPdf,
+  type FlexAccountRow,
+} from '@/services/flex-report'
 
 const currency = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-const MOVEMENT_TYPES = [
-  { value: 'gerado', label: 'Crédito gerado' },
-  { value: 'liberado', label: 'Crédito liberado' },
-  { value: 'reserva', label: 'Reserva' },
-  { value: 'debito', label: 'FLEX gasto' },
-  { value: 'liberacao_reserva', label: 'Liberação de reserva' },
-  { value: 'estorno', label: 'Estorno' },
-  { value: 'ajuste', label: 'Ajuste' },
-] as const
-
-const typeLabel = (t: string) => MOVEMENT_TYPES.find((m) => m.value === t)?.label ?? t
+const typeLabel = (t: string) => FLEX_TYPE_LABELS[t as FlexMovement['type']] ?? t
 
 function statusBadge(status: string) {
   const map: Record<string, string> = {
@@ -129,8 +130,8 @@ export function SaldoFlexScreen() {
 
   const filters: FlexFilters = useMemo(
     () => ({
-      from: periodFrom,
-      to: periodTo,
+      dateFrom: periodFrom || undefined,
+      dateTo: periodTo || undefined,
       empresaId,
       filialId,
       rcaId: isRca ? authUserId : rcaId,
@@ -140,8 +141,8 @@ export function SaldoFlexScreen() {
       produtoId,
       pedido,
       nf,
-      movementType,
-      integrationStatus,
+      type: movementType === 'todos' ? '' : (movementType as FlexFilters['type']),
+      integrationStatus: integrationStatus === 'todos' ? '' : integrationStatus,
     }),
     [
       periodFrom,
@@ -243,18 +244,16 @@ export function SaldoFlexScreen() {
     setLoading(true)
     try {
       const [accs, movs] = await Promise.all([
-        listFlexAccounts({
+        flexService.listAccounts({
           empresaId,
           filialId,
           rcaId: filters.rcaId,
-          gerenteId,
-          equipeId,
         }),
-        listFlexMovements({ ...filters, page, pageSize }),
+        flexService.listMovements({ ...filters, page, perPage: pageSize }),
       ])
-      setAccounts(accs.items)
+      setAccounts(accs)
       setMovements(movs.items)
-      setTotal(movs.totalItems)
+      setTotal(movs.total)
     } catch (err) {
       toast({
         title: 'Erro ao carregar Saldo FLEX',
@@ -315,11 +314,13 @@ export function SaldoFlexScreen() {
     }
     setAdjustSaving(true)
     try {
-      await createFlexAdjustment({
-        account_id: adjustTarget.id,
-        tipo: adjustType,
+      await flexService.adjust({
+        empresa_id: adjustTarget.empresa_id,
+        filial_id: adjustTarget.filial_id,
+        rca_id: adjustTarget.rca_id,
         valor,
         motivo: adjustReason.trim(),
+        tipo: adjustType === 'acrescimo' ? 'credito' : 'debito',
       })
       toast({ title: 'Ajuste registrado com saldo antes/depois' })
       setAdjustOpen(false)
@@ -338,24 +339,49 @@ export function SaldoFlexScreen() {
   const generateReport = async () => {
     setReportLoading(true)
     try {
-      const model = await buildFlexReport({
-        model: reportModel,
-        filters,
+      // Todos os registros dos filtros (inclusive de outras páginas)
+      const all = await flexService.listAllMovements({
+        ...filters,
+        dateFrom: undefined,
+        dateTo: undefined,
       })
-      if (reportFormat === 'pdf') {
-        openFlexReportPdf(model)
-      } else {
-        const { exportFlexReportExcel, exportFlexReportCsv } =
-          await import('@/services/flex-report')
-        if (reportFormat === 'excel') {
-          exportFlexReportExcel(model)
+      const fromIso = periodFrom ? periodFrom + 'T00:00:00.000Z' : null
+      const toIso = periodTo ? periodTo + 'T23:59:59.999Z' : null
+      const movs = all.filter((m) => {
+        const t = new Date(m.created).getTime()
+        if (fromIso && t < new Date(fromIso).getTime()) return false
+        if (toIso && t > new Date(toIso).getTime()) return false
+        return true
+      })
+      const beforePeriod = fromIso
+        ? all.filter((m) => new Date(m.created).getTime() < new Date(fromIso).getTime())
+        : []
+      const accountRows: FlexAccountRow[] = accounts.map((a) => ({
+        rca_id: a.rca_id,
+        rca_name: a.rca_name,
+        balance: a.balance,
+        reserved: a.reserved,
+      }))
+      let rows = movs.length
+      if (reportModel === 'resumo') {
+        if (reportFormat === 'pdf') {
+          rows = printFlexSummaryPdf(movs, accountRows, filters)
         } else {
-          exportFlexReportCsv(model)
+          const res = exportFlexReportToExcel(movs, filters, accountRows)
+          rows = res.rows
         }
+      } else if (reportFormat === 'pdf') {
+        rows = printFlexDetailPdf(movs, filters)
+      } else if (reportFormat === 'csv') {
+        const res = exportFlexReportToCsv(movs)
+        rows = res.rows
+      } else {
+        const res = exportFlexReportToExcel(movs, filters, accountRows)
+        rows = res.rows
       }
       toast({
         title: 'Relatório gerado',
-        description: `${model.rows.length} linha(s), considerando todos os registros dos filtros.`,
+        description: `${rows} linha(s), considerando todos os registros dos filtros.`,
       })
       setReportOpen(false)
     } catch (err) {
@@ -618,11 +644,13 @@ export function SaldoFlexScreen() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
-                {MOVEMENT_TYPES.map((m) => (
-                  <SelectItem key={m.value} value={m.value}>
-                    {m.label}
-                  </SelectItem>
-                ))}
+                {(Object.entries(FLEX_TYPE_LABELS) as [FlexMovement['type'], string][]).map(
+                  ([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ),
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -684,7 +712,7 @@ export function SaldoFlexScreen() {
                       key={m.id}
                       className={cn(
                         'border-b align-top',
-                        m.related_movement_id && 'bg-amber-50/50 dark:bg-amber-950/20',
+                        m.link_id && 'bg-amber-50/50 dark:bg-amber-950/20',
                       )}
                     >
                       <td className="py-2 pr-3">{new Date(m.created).toLocaleString('pt-BR')}</td>
@@ -706,8 +734,8 @@ export function SaldoFlexScreen() {
                         </span>
                       </td>
                       <td className="py-2 pr-3">
-                        {m.related_movement_id ? (
-                          <Badge variant="outline">{m.related_movement_type || 'vinculado'}</Badge>
+                        {m.link_type && m.link_id ? (
+                          <Badge variant="outline">{m.link_type}</Badge>
                         ) : (
                           '—'
                         )}
