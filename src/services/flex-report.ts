@@ -46,7 +46,7 @@ function fmtMoney(v: number | undefined | null): string {
 /** Linhas do modelo (a) — resumo gerencial por RCA. */
 export function buildFlexSummaryRows(
   movements: FlexMovement[],
-  filters: FlexReportFilters,
+  _filters: FlexReportFilters,
   movementsBeforePeriod: FlexMovement[] = [],
 ): Record<string, string | number>[] {
   const perRca: Record<
@@ -187,10 +187,9 @@ export interface FlexExportResult {
 export function exportFlexReportToExcel(
   movements: FlexMovement[],
   filters: FlexReportFilters,
-  accounts: FlexAccountRow[],
 ): FlexExportResult {
   const wb = XLSX.utils.book_new()
-  const wsSummary = XLSX.utils.json_to_sheet(buildFlexSummaryRows(movements, accounts, filters))
+  const wsSummary = XLSX.utils.json_to_sheet(buildFlexSummaryRows(movements, filters))
   XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumo por RCA')
   const wsDetail = XLSX.utils.json_to_sheet(buildFlexDetailRows(movements))
   XLSX.utils.book_append_sheet(wb, wsDetail, 'Extrato detalhado')
@@ -234,12 +233,8 @@ export function exportFlexReportToCsv(movements: FlexMovement[]): FlexExportResu
 }
 
 /** PDF (via janela de impressão) — modelo (a) resumo gerencial com abertura por RCA. */
-export function printFlexSummaryPdf(
-  movements: FlexMovement[],
-  accounts: FlexAccountRow[],
-  filters: FlexReportFilters,
-): number {
-  const rows = buildFlexSummaryRows(movements, accounts, filters)
+export function printFlexSummaryPdf(movements: FlexMovement[], filters: FlexReportFilters): number {
+  const rows = buildFlexSummaryRows(movements, filters)
   const totalRows = rows.length
   const html = `
 <html>

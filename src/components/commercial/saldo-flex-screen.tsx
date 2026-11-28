@@ -40,7 +40,6 @@ import {
   exportFlexReportToCsv,
   printFlexSummaryPdf,
   printFlexDetailPdf,
-  type FlexAccountRow,
 } from '@/services/flex-report'
 
 const currency = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -103,14 +102,14 @@ export function SaldoFlexScreen() {
   const [companies, setCompanies] = useState<RefOption[]>([])
   const [branches, setBranches] = useState<RefOption[]>([])
   const [rcas, setRcas] = useState<RefOption[]>([])
-  const [gerentes, setGerentes] = useState<RefOption[]>([])
-  const [equipes, setEquipes] = useState<RefOption[]>([])
+  const [gerentes] = useState<RefOption[]>([])
+  const [equipes] = useState<RefOption[]>([])
   const [clientes, setClientes] = useState<RefOption[]>([])
   const [produtos, setProdutos] = useState<RefOption[]>([])
   const [authRole, setAuthRole] = useState('')
   const [authUserId, setAuthUserId] = useState('')
 
-  const [panelTab, setPanelTab] = useState<'consolidado' | 'rca'>('consolidado')
+  const [panelTab, setPanelTab] = useState<'consolidado' | 'gerente' | 'rca'>('consolidado')
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const [adjustOpen, setAdjustOpen] = useState(false)
@@ -271,19 +270,82 @@ export function SaldoFlexScreen() {
 
   const panelRows: PanelRow[] = useMemo(() => {
     const rows = isRca ? accounts.filter((a) => a.rca_id === authUserId) : accounts
-    return rows.map((account) => ({
-      account,
-      indicators: {
-        saldoInicial: account.balance,
-        geradoLiberado: account.balance,
-        gasto: 0,
-        aguardando: 0,
-        reservado: account.reserved,
-        estornos: 0,
-        disponivel: account.balance - account.reserved,
-      },
-    }))
-  }, [accounts, isRca, authUserId])
+    return rows.map((account) => {
+      const scope = movements.filter((m) => m.rca_id === account.rca_id)
+      let saldoInicial = account.balance - account.reserved
+      let gerado = 0
+      let gasto = 0
+      let aguardando = 0
+      let estornos = 0
+      let ajustes = 0
+      for (const m of scope) {
+        const v = Number(m.valor_flex || 0)
+        if (m.type === 'credito_gerado' || m.type === 'credito_liberado') {
+          gerado += v
+          saldoInicial -= v
+        } else if (m.type === 'flex_gasto') {
+          gasto += v
+          saldoInicial += v
+        } else if (m.type === 'reserva') {
+          aguardando += v
+        } else if (m.type === 'estorno') {
+          estornos += v
+          saldoInicial += v
+        } else if (m.type === 'ajuste') {
+          ajustes += m.balance_after - m.balance_before
+        }
+      }
+      return {
+        account,
+        indicators: {
+          saldoInicial,
+          geradoLiberado: gerado,
+          gasto,
+          aguardando,
+          reservado: account.reserved,
+          estornos: estornos + ajustes,
+          disponivel: account.balance - account.reserved,
+        },
+      }
+    })
+  }, [accounts, movements, isRca, authUserId])
+
+  // Agrupamento por gerente ou equipe (visão "Por gerente/equipe")
+  const gerenteGroups = useMemo(() => {
+    const groups: Record<string, { label: string; accounts: FlexAccount[]; disponivel: number }> =
+      {}
+    for (const r of panelRows) {
+      const key = r.account.gerente_id || r.account.gerente_name || '—'
+      if (!groups[key]) {
+        groups[key] = {
+          label: r.account.gerente_name || 'Sem gerente',
+          accounts: [],
+          disponivel: 0,
+        }
+      }
+      groups[key].accounts.push(r.account)
+      groups[key].disponivel += r.indicators.disponivel
+    }
+    return Object.values(groups)
+  }, [panelRows])
+
+  const equipeGroups = useMemo(() => {
+    const groups: Record<string, { label: string; accounts: FlexAccount[]; disponivel: number }> =
+      {}
+    for (const r of panelRows) {
+      const key = r.account.equipe_id || r.account.equipe_name || '—'
+      if (!groups[key]) {
+        groups[key] = {
+          label: r.account.equipe_name || 'Sem equipe',
+          accounts: [],
+          disponivel: 0,
+        }
+      }
+      groups[key].accounts.push(r.account)
+      groups[key].disponivel += r.indicators.disponivel
+    }
+    return Object.values(groups)
+  }, [panelRows])
 
   const openAdjust = (account: FlexAccount) => {
     setAdjustTarget(account)
@@ -291,6 +353,11 @@ export function SaldoFlexScreen() {
     setAdjustValue('')
     setAdjustReason('')
     setAdjustOpen(true)
+  }
+
+  const openStatementFor = (account: FlexAccount) => {
+    setRcaId(account.rca_id)
+    setPage(1)
   }
 
   const submitAdjust = async () => {
@@ -356,18 +423,12 @@ export function SaldoFlexScreen() {
       const beforePeriod = fromIso
         ? all.filter((m) => new Date(m.created).getTime() < new Date(fromIso).getTime())
         : []
-      const accountRows: FlexAccountRow[] = accounts.map((a) => ({
-        rca_id: a.rca_id,
-        rca_name: a.rca_name,
-        balance: a.balance,
-        reserved: a.reserved,
-      }))
       let rows = movs.length
       if (reportModel === 'resumo') {
         if (reportFormat === 'pdf') {
-          rows = printFlexSummaryPdf(movs, accountRows, filters)
+          rows = printFlexSummaryPdf(movs, filters)
         } else {
-          const res = exportFlexReportToExcel(movs, filters, accountRows)
+          const res = exportFlexReportToExcel(movs, filters)
           rows = res.rows
         }
       } else if (reportFormat === 'pdf') {
@@ -376,7 +437,7 @@ export function SaldoFlexScreen() {
         const res = exportFlexReportToCsv(movs)
         rows = res.rows
       } else {
-        const res = exportFlexReportToExcel(movs, filters, accountRows)
+        const res = exportFlexReportToExcel(movs, filters)
         rows = res.rows
       }
       toast({
@@ -416,9 +477,13 @@ export function SaldoFlexScreen() {
         usável como desconto em item de outro pedido, inclusive de outro cliente elegível.
       </p>
 
-      <Tabs value={panelTab} onValueChange={(v) => setPanelTab(v as 'consolidado' | 'rca')}>
+      <Tabs
+        value={panelTab}
+        onValueChange={(v) => setPanelTab(v as 'consolidado' | 'gerente' | 'rca')}
+      >
         <TabsList>
           <TabsTrigger value="consolidado">Consolidado</TabsTrigger>
+          <TabsTrigger value="gerente">Por gerente/equipe</TabsTrigger>
           <TabsTrigger value="rca">Por RCA</TabsTrigger>
         </TabsList>
         <TabsContent value="consolidado" className="space-y-3">
@@ -480,6 +545,41 @@ export function SaldoFlexScreen() {
               ))}
             </div>
           )}
+        </TabsContent>
+        <TabsContent value="gerente" className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Contas agrupadas por gerente comercial — clique para ver as da equipe.
+          </p>
+          <div className="grid gap-2 md:grid-cols-2">
+            {gerenteGroups.map((g) => (
+              <Card key={g.label}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{g.label}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Saldo disponível do grupo</span>
+                    <span className="font-semibold">{currency(g.disponivel)}</span>
+                  </div>
+                  {g.accounts.map((a) => (
+                    <div key={a.id} className="flex justify-between text-muted-foreground">
+                      <span>{a.rca_name || a.rca_id}</span>
+                      <span>{currency(a.balance - a.reserved)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between">
+                    <span>
+                      Equipes:{' '}
+                      {equipeGroups
+                        .filter((e) => e.accounts.some((a) => g.accounts.includes(a)))
+                        .map((e) => e.label)
+                        .join(', ') || '—'}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
         <TabsContent value="rca" className="space-y-3">
           <p className="text-sm text-muted-foreground">Abra o extrato de cada representante.</p>
