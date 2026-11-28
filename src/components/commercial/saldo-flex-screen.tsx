@@ -177,9 +177,9 @@ export function SaldoFlexScreen() {
       ])
       const asOptions = (rows: Array<Record<string, unknown>>, keys: string[]): RefOption[] =>
         rows.map((r) => {
-          const found = keys
+          const found: string | undefined = keys
             .map((k) => r[k])
-            .find((v) => typeof v === 'string' && (v as string) !== '')
+            .find((v): v is string => typeof v === 'string' && v !== '')
           return {
             id: String(r.id),
             label: typeof found === 'string' ? found : String(r.id),
@@ -427,9 +427,9 @@ export function SaldoFlexScreen() {
       let rows = movs.length
       if (reportModel === 'resumo') {
         if (reportFormat === 'pdf') {
-          rows = printFlexSummaryPdf(movs, filters, beforePeriod)
+          rows = printFlexSummaryPdf(movs, filters)
         } else {
-          const res = exportFlexReportToExcel(movs, filters, beforePeriod)
+          const res = exportFlexReportToExcel(movs, filters)
           rows = res.rows
         }
       } else if (reportFormat === 'pdf') {
