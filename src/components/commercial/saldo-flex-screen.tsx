@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Coins, FileText, Filter, Printer, Wallet } from 'lucide-react'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { Badge } from '@/components/ui/badge'
@@ -163,19 +163,32 @@ export function SaldoFlexScreen() {
   )
 
   const loadRefData = useCallback(async () => {
+    const tryList = async (collection: string, opts: Record<string, unknown>) => {
+      try {
+        return (await pb.collection(collection).getFullList(opts)) as Array<Record<string, unknown>>
+      } catch {
+        return [] as Array<Record<string, unknown>>
+      }
+    }
     try {
       const [empresas, filiais, rcasList, clientesList, produtosList] = await Promise.all([
-        pb.collection('empresas').getFullList({ sort: 'nome' }),
-        pb.collection('filiais').getFullList({ sort: 'nome' }),
-        pb.collection('representantes').getFullList({ sort: 'nome' }),
-        pb.collection('partners').getFullList({ sort: 'name', filter: "type='cliente'" }),
-        pb.collection('products').getFullList({ sort: 'name' }),
+        tryList('empresas', { sort: '-created' }),
+        tryList('filiais', { sort: '-created' }),
+        tryList('representantes', { sort: '-created' }),
+        tryList('partners', { filter: 'cliente = true', sort: '-created' }),
+        tryList('products', { sort: '-created' }),
       ])
-      setCompanies(empresas.map((r) => ({ id: r.id, label: r.nome })))
-      setBranches(filiais.map((r) => ({ id: r.id, label: r.nome })))
-      setRcas(rcasList.map((r) => ({ id: r.id, label: r.nome })))
-      setClientes(clientesList.map((r) => ({ id: r.id, label: r.name })))
-      setProdutos(produtosList.map((r) => ({ id: r.id, label: r.name })))
+      const asOptions = (rows: Array<Record<string, unknown>>, keys: string[]): RefOption[] =>
+        rows.map((r) => ({
+          id: String(r.id),
+          label:
+            keys.map((k) => r[k]).find((v) => typeof v === 'string' && v !== '') ?? String(r.id),
+        }))
+      setCompanies(asOptions(empresas, ['marca_nome_exibicao', 'nome_fantasia', 'name', 'nome']))
+      setBranches(asOptions(filiais, ['marca_nome_exibicao', 'nome_exibicao', 'name', 'nome']))
+      setRcas(asOptions(rcasList, ['name', 'nome']))
+      setClientes(asOptions(clientesList, ['company_name', 'trade_name', 'full_name', 'name']))
+      setProdutos(asOptions(produtosList, ['name', 'description', 'descricao', 'code']))
     } catch {
       // dados de referência são best-effort
     }
