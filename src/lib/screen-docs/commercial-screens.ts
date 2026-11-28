@@ -565,4 +565,58 @@ export const COMMERCIAL_SCREEN_DOCS: Record<string, ScreenDocEntry> = {
         '- Nome da tabela obrigatório para salvar.\n- Bloqueio de salvamento com box âmbar quando o prazo médio das condições diverge do prazo da tabela (tolerância ±2 dias), liberado apenas pelo checkbox "Manter mesmo assim".\n- Tabela com preço abaixo do mínimo muda de "ativa" para "aguardando_aprovacao" com toast explicativo.\n- Toasts de erro para falhas de criação/edição/duplicação com mensagens traduzidas do backend.',
     },
   },
+
+  '/admin/comercial/saldo-flex': {
+    route: '/admin/comercial/saldo-flex',
+    title: 'Saldo FLEX',
+    moduleGroup: 'Comercial',
+    docVersion: '1.0.0',
+    lastUpdated: '2026-11-28',
+    author: 'Engenharia de Software HURAM',
+    objective: {
+      title: 'Objetivo',
+      content:
+        'Painel e extrato do saldo comercial FLEX do representante (RCA): crédito gerado em venda acima do preço-base autorizado, usado como desconto em item de outro pedido (inclusive de outro cliente elegível). O saldo oficial é centralizado no Huram e consultado pelo Avatar FV via /backend/v1/flex/*.',
+    },
+    features: {
+      title: 'Funcionalidades',
+      content:
+        '- Painel com visão consolidada e visão por RCA, com 7 indicadores por conta: saldo inicial do período, FLEX gerado e liberado no período, FLEX gasto, reservas em pedidos não faturados, estornos/ajustes e saldo disponível na data de referência.\n- Agrupamento por gerente ou equipe, com abertura do extrato de cada representante.\n- Extrato de movimentos com filtros: período, empresa, filial, RCA, gerente, equipe, cliente (pesquisa onde o crédito foi gerado E onde o desconto foi usado), produto, nº do pedido, NF, tipo de movimento e status da integração.\n- Colunas do extrato: data/hora, tipo, empresa, filial, RCA, gerente, equipe, cliente, produto, quantidade, preço-base, preço negociado, valor FLEX, pedido FV, pedido Huram, NF, situação da integração, saldo antes/depois, motivo e vínculo crédito→uso.\n- Botão "Gerar relatório" (ao lado de "Filtros") considerando TODOS os registros dos filtros (inclusive outras páginas), com dois modelos: (a) resumo gerencial por RCA e (b) extrato detalhado; exportação em PDF (janela de impressão), Excel (xlsx) e CSV.\n- Ajuste manual de saldo, restrito a perfis autorizados (nunca RCA), com motivo obrigatório e registro de valor, responsável e saldo antes/depois.',
+    },
+    businessRules: {
+      title: 'Regras de Negócio',
+      content:
+        '- "Conta do representante": o saldo pertence ao RCA, não ao cliente — o mesmo saldo é usável em clientes diferentes elegíveis.\n- Indicadores separados para previsto (reserva) × reservado × efetivado (FLEX gasto): o mesmo desconto nunca é contado duas vezes — a reserva é convertida em débito apenas no faturamento.\n- Idempotência por external_id: reenvios do Avatar FV não duplicam créditos/débitos (índice único em flex_movements.external_id).\n- Atomicidade: reserva de saldo executa em transação — dois pedidos simultâneos não gastam o mesmo saldo.\n- Faturamento parcial: converte reserva → débito proporcional ao faturado e libera o restante da reserva.\n- Rejeição/cancelamento/devolução: estorno vinculado ao movimento original, com motivo, preservando os movimentos originais no extrato.\n- Pedido com liberação comercial pendente (tela Liberações comerciais, Rotinas): a reserva é recusada (409 pending_commercial_release) antes de autorizar.\n- Ajuste manual exige motivo e grava saldo antes/depois; RCA não ajusta conta.\n- Tela nasce vazia: sem dados de exemplo.',
+    },
+    workflow: {
+      title: 'Fluxo de Funcionamento',
+      content:
+        '1. Venda acima do preço-base no Avatar FV gera crédito: FV chama /backend/v1/flex/credit (tipo "gerado").\n2. Quando a liberação comercial autoriza, chama-se o mesmo endpoint com tipo "liberado".\n3. No uso do FLEX como desconto em item de pedido, o FV chama /backend/v1/flex/reserve, que valida saldo disponível e cria a reserva.\n4. No faturamento, /backend/v1/flex/convert converte reserva em débito proporcional ao faturado e libera o restante.\n5. Em rejeição/cancelamento/devolução, /backend/v1/flex/release estorna vinculado ao movimento original.\n6. O painel e o extrato desta tela refletem os movimentos em tempo quase real; o saldo nunca é recalculado no front-end.',
+    },
+    dataSource: {
+      title: 'Origem dos Dados',
+      content:
+        '- Coleções PocketBase: `flex_accounts` (saldo por empresa+filial+RCA) e `flex_movements` (ledger, migração 0370).\n- Cadastros reutilizados: empresas, filiais, RCA/gerente/equipe (representantes), clientes (partners), produtos, pedidos e NF.\n- Endpoints: /backend/v1/flex/balance, /reserve, /convert, /release, /credit, /adjust, /report-issue (pocketbase/hooks/flex_api.js).',
+    },
+    integrations: {
+      title: 'Integrações',
+      content:
+        '- Avatar FV: consulta de saldo, reserva por item na confirmação do pedido, conversão no faturamento e estorno em rejeição/cancelamento/devolução. Se o Huram estiver indisponível, o FV salva o pedido como rascunho com FLEX pendente e reenvia depois (o external_id evita duplicação).\n- Tela Liberações comerciais (Rotinas): pendência de liberação bloqueia a reserva antes da autorização.',
+    },
+    permissions: {
+      title: 'Permissões',
+      content:
+        '- Acesso pela permissão comercial (menu Comercial).\n- RCA consulta apenas a própria conta (endpoints recusam rca_id diferente do usuário autenticado).\n- Gerente/supervisor consulta as contas de sua equipe; gestão consulta e exporta dentro da empresa/filial sob responsabilidade.\n- Ajuste manual restrito a perfis autorizados — RCA nunca ajusta (403).',
+    },
+    dependencies: {
+      title: 'Dependências',
+      content:
+        '- Componentes: `SaldoFlexScreen` (src/components/commercial/saldo-flex-screen.tsx).\n- Serviços: `src/services/flex.ts` e `src/services/flex-report.ts`.\n- Migração: `0370_flex_balance.js`; hooks: `pocketbase/hooks/flex_api.js`.',
+    },
+    errorHandling: {
+      title: 'Tratamento de Erros',
+      content:
+        '- Saldo insuficiente: recusa 409 com saldo disponível e valor solicitado.\n- Pendência de liberação comercial: 409 pending_commercial_release com o id da solicitação.\n- Falhas de integração marcadas no movimento (integration_status=falha) via /flex/report-issue, com reprocessamento/conciliação pelo extrato; só concluída com confirmação do outro sistema.',
+    },
+  },
 }

@@ -80,6 +80,11 @@ const CommercialReleasesScreen = lazy(() =>
     default: m.CommercialReleasesScreen,
   })),
 )
+const SaldoFlexScreen = lazy(() =>
+  import('@/components/commercial/saldo-flex-screen').then((m) => ({
+    default: m.SaldoFlexScreen,
+  })),
+)
 const SalesOrdersQueryPage = lazy(() => import('./pages/sales/SalesOrdersQueryPage'))
 const PurchaseOrdersPanel = lazy(() =>
   import('@/components/purchasing/purchase-orders-panel').then((m) => ({
@@ -757,6 +762,10 @@ const App = () => (
                                   <Route
                                     path="/admin/comercial/tabelas-preco-descontos"
                                     element={<Commercial />}
+                                  />
+                                  <Route
+                                    path="/admin/comercial/saldo-flex"
+                                    element={<SaldoFlexScreen />}
                                   />
 
                                   {/* TELAS PRESERVADAS INTOCADAS (Comissão Analítica e Consulta de Pedidos) */}

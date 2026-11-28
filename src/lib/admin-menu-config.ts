@@ -343,6 +343,10 @@ const RAW_ADMIN_MENU: MenuGroup[] = [
             route: '/admin/comercial/remuneracao-variavel',
           },
           {
+            label: 'Saldo FLEX',
+            route: '/admin/comercial/saldo-flex',
+          },
+          {
             label: 'Tabelas de Preço e Descontos',
             route: '/admin/comercial/tabelas-preco-descontos',
           },
