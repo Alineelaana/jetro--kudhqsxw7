@@ -111,13 +111,36 @@ export function CommercialReleasesScreen() {
   const [rejectReason, setRejectReason] = useState('')
   const [reporting, setReporting] = useState(false)
 
-  // Deep-link via sino: ?request=<id> abre a liberação diretamente
+  // Deep-link via sino: ?request=<id> abre a liberação diretamente.
+  // Retorno da ficha do cliente: os filtros são hidratados da URL no mount
+  // (mesmos nomes de parâmetros gravados em openClientSheet).
+  const [hydrated, setHydrated] = useState(false)
   useEffect(() => {
+    if (hydrated) return
     const reqId = searchParams.get('request')
     if (reqId) {
       setSelectedId(reqId)
     }
-  }, [searchParams])
+    const statusParam = searchParams.get('status')
+    if (statusParam && statusParam in TAB_LABELS) setTab(statusParam as TabKey)
+    const searchParam = searchParams.get('search')
+    if (searchParam) setSearch(searchParam)
+    const empresaParam = searchParams.get('empresaId')
+    if (empresaParam) setEmpresaId(empresaParam)
+    const filialParam = searchParams.get('filialId')
+    if (filialParam) setFilialId(filialParam)
+    const rcaParam = searchParams.get('rcaName')
+    if (rcaParam) setRcaName(rcaParam)
+    const respParam = searchParams.get('responsavelId')
+    if (respParam) setResponsavelId(respParam)
+    const ruleParam = searchParams.get('ruleType')
+    if (ruleParam) setRuleType(ruleParam)
+    const fromParam = searchParams.get('dateFrom')
+    if (fromParam) setDateFrom(fromParam)
+    const toParam = searchParams.get('dateTo')
+    if (toParam) setDateTo(toParam)
+    setHydrated(true)
+  }, [searchParams, hydrated])
 
   const filters = useMemo(
     () => ({
