@@ -255,7 +255,8 @@ export async function concluirCadastroOficial(params: {
     observacoesComerciais,
   } = params
 
-  // 1. Salvar cliente em partners (o hook client_workflow_hooks gera CLI-ANO-XXXXXX atomicamente)
+  // 1. Salvar cliente em partners (o hook client_workflow_hooks gera código
+  // sequencial NUMÉRICO atomicamente via numerations, ex.: 0001, sem prefixo)
   const novoClientePayload: Record<string, any> = {
     ...dadosCliente,
     partner_type: 'Cliente',

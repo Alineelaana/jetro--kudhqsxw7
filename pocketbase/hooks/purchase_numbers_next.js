@@ -1,3 +1,9 @@
+// purchase_numbers_next.js — Numeração de compras (solicitação, cotação,
+// pedido, NF e devolução) sequencial NUMÉRICA pura, sem prefixo (pedido do
+// usuário: sem "SC-ANO-", "PC-ANO-" etc.). Continua do maior número já gravado
+// na coleção da compra (numérico puro ou sufixo de "XX-ANO-NNNN") para não
+// repetir; lógica embutida inline no callback (limitação do JSVM do
+// PocketBase: callbacks não podem referenciar funções de nível superior).
 routerAdd(
   'GET',
   '/backend/v1/purchase-numbers/next',
@@ -30,22 +36,11 @@ routerAdd(
         $app.save(record)
       }
 
-      var prefix =
-        type === 'request'
-          ? 'SC'
-          : type === 'quotation'
-            ? 'COT'
-            : type === 'order'
-              ? 'PC'
-              : type === 'invoice'
-                ? 'NF'
-                : 'DEV'
-      var year = new Date().getFullYear()
       var seqStr = String(nextNum)
       while (seqStr.length < 4) {
         seqStr = '0' + seqStr
       }
-      var number = prefix + '-' + year + '-' + seqStr
+      var number = seqStr
 
       return e.json(200, { number: number, sequence: nextNum })
     } catch (err) {

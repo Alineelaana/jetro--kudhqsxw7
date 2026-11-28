@@ -667,31 +667,39 @@ export function SalesOrderWizardDialog({
       }
 
       // 2. GERAÇÃO DO NÚMERO SEQUENCIAL TRANSACIONAL VIA ENDPOINT DEDICADO
+      // (numeração 100% numérica, sem prefixo: 000007)
       let nextNumber = ''
       try {
-        const numRes = await pb.send('/backend/v1/sales-numbers/next', {
-          method: 'POST',
-          body: JSON.stringify({ prefix: 'PV-' }),
-          headers: { 'Content-Type': 'application/json' },
-        })
-        if (numRes && numRes.next_number) {
-          nextNumber = numRes.next_number
+        const numRes = await pb.send<{ number?: string }>(
+          '/backend/v1/sales-numbers/next?type=order',
+          { method: 'GET' },
+        )
+        if (numRes && numRes.number) {
+          nextNumber = numRes.number
         }
       } catch (err) {
         console.warn('Endpoint /sales-numbers/next falhou, usando fallback sequencial:', err)
       }
 
-      // Fallback sequencial se o endpoint não responder
+      // Fallback sequencial se o endpoint não responder: numérico puro,
+      // continuando do maior número já gravado (numérico ou sufixo de PV-XXXXXX)
       if (!nextNumber) {
-        const lastOrders = await pb.collection('sales_orders').getList(1, 1, {
+        const lastOrders = await pb.collection('sales_orders').getList(1, 200, {
           sort: '-created',
         })
-        let lastSeq = 5
-        if (lastOrders.items.length > 0) {
-          const match = String(lastOrders.items[0].order_number || '').match(/(\d+)/)
-          if (match) lastSeq = parseInt(match[1], 10)
+        let lastSeq = 0
+        for (const o of lastOrders.items) {
+          const raw = String(o.order_number || '').trim()
+          if (!raw) continue
+          const direto = parseInt(raw, 10)
+          if (!Number.isNaN(direto) && direto > lastSeq) lastSeq = direto
+          const parts = raw.split('-')
+          if (parts.length === 2 && (parts[0] === 'PV' || parts[0] === 'PED')) {
+            const suf = parseInt(parts[1], 10)
+            if (!Number.isNaN(suf) && suf > lastSeq) lastSeq = suf
+          }
         }
-        nextNumber = `PV-${String(lastSeq + 1).padStart(6, '0')}`
+        nextNumber = String(lastSeq + 1).padStart(6, '0')
       }
 
       const clientName =
@@ -1316,7 +1324,7 @@ export function SalesOrderWizardDialog({
                     <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
                     <span>
                       Conferência prévia dos dados comerciais, fiscais e financeiros. O número
-                      oficial do pedido (PV-XXXXXX) será gerado transacionalmente na confirmação.
+                      oficial do pedido (0000001) será gerado transacionalmente na confirmação.
                     </span>
                   </div>
 

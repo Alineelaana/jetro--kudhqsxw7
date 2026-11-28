@@ -611,7 +611,7 @@ export function CadastroClientesOficialScreen() {
     }
   }
 
-  // Concluir Cadastro Oficial (Efetivação e Geração Sequencial CLI-ANO-XXXXXX)
+  // Concluir Cadastro Oficial (Efetivação e Geração Sequencial Numérica, ex.: 0001)
   const handleSalvarConcluirCadastro = async () => {
     if (!razaoSocial.trim() || !cpfCnpj.trim()) {
       toast({ title: 'Razão Social e CPF/CNPJ são obrigatórios', variant: 'destructive' })

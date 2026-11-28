@@ -1,46 +1,52 @@
 /**
  * Hook para o Fluxo Integrado de Cadastro de Clientes Jetro ERP
- * 1. Numeração automática de pré-cadastros: SOL-{ANO}-{000001}
- * 2. Numeração atômica sequencial oficial de clientes: CLI-{ANO}-{000001}
+ * 1. Numeração automática de pré-cadastros: sequencial numérico puro (000001…)
+ * 2. Numeração atômica sequencial oficial de clientes/parceiros: numérica pura (0001…)
  * 3. Impedir duplicidade de CNPJ/CPF em cadastros oficiais
  * 4. Impedir que Comercial ou RCA altere crédito sem permissão financeira
  * 5. Registro automático de histórico imutável
+ *
+ * Regra de numeração (pedido do usuário): código de cadastro é SOMENTE
+ * numérico, sequencial e sem prefixo — sem "CLI-", sem ano. Usa o contador
+ * atômico da coleção numerations (mesmo mecanismo da governança AvatarSi):
+ * incrementa e persiste em uma única chamada, sem corrida entre cadastros
+ * simultâneos. A lógica é embutida inline em cada callback (limitação do
+ * JSVM do PocketBase: callbacks não podem referenciar funções de nível
+ * superior — "Hook scoping error").
  */
 
 onRecordCreate((e) => {
-  var year = new Date().getFullYear()
-  var prefix = 'SOL-' + year + '-'
-
-  var seq = 1
-  try {
-    var last = $app.findRecordsByFilter(
-      'solicitacoes_clientes',
-      'numero ~ "' + prefix + '"',
-      '-numero',
-      1,
-      0,
-    )
-    if (last && last.length > 0) {
-      var lastNum = last[0].getString('numero') || ''
-      var parts = lastNum.split('-')
-      if (parts.length === 3) {
-        var parsed = parseInt(parts[2], 10)
-        if (!isNaN(parsed) && parsed >= 1) {
-          seq = parsed + 1
-        }
-      }
-    }
-  } catch (_) {
+  // Pré-cadastros (RCA): sequencial numérico puro, sem "SOL-ANO-"
+  if (!e.record.getString('numero')) {
+    var docType = 'solicitacoes_clientes'
+    var counter = null
     try {
-      seq = ($app.countRecords('solicitacoes_clientes') || 0) + 1
-    } catch (_) {
-      seq = 1
+      counter = $app.findFirstRecordByData('numerations', 'document_type', docType)
+    } catch (_) {}
+    if (!counter) {
+      try {
+        var col = $app.findCollectionByNameOrId('numerations')
+        counter = new Record(col)
+        counter.set('document_type', docType)
+        counter.set('company', '')
+        counter.set('branch', '')
+        counter.set('prefix', '')
+        counter.set('next_number', 1)
+        counter.set('digit_count', 6)
+        counter.set('annual_reset', false)
+        counter.set('active', true)
+        $app.save(counter)
+        e.record.set('numero', '000001')
+      } catch (_) {
+        e.record.set('numero', '1')
+      }
+    } else {
+      var nextSeq = (counter.getInt('next_number') || 0) + 1
+      counter.set('next_number', nextSeq)
+      $app.save(counter)
+      e.record.set('numero', ('000000' + nextSeq).slice(-6))
     }
   }
-
-  var padded = ('000000' + seq).slice(-6)
-  var numeroFinal = prefix + padded
-  e.record.set('numero', numeroFinal)
 
   if (!e.record.getString('status')) {
     e.record.set('status', 'rascunho')
@@ -66,43 +72,41 @@ onRecordCreate((e) => {
   e.next()
 }, 'solicitacoes_clientes')
 
-// Validação e geração de código oficial ao salvar cliente em partners
+// Validação e geração de código oficial ao salvar parceiro em partners
+// (clientes, fornecedores, representantes e demais tipos: mesma sequência
+// numérica única, sem prefixo).
 onRecordCreateRequest((e) => {
   var partnerType = e.record.getString('partner_type') || 'Cliente'
   if (partnerType === 'Cliente') {
-    var year = new Date().getFullYear()
-    var prefix = 'CLI-' + year + '-'
-
-    // Se ainda não tem código oficial, gerar sequencial
+    // Se ainda não tem código oficial, gerar sequencial numérico puro (0001…)
     if (!e.record.getString('codigo_oficial')) {
-      var seq = 1
+      var counterCli = null
       try {
-        var last = $app.findRecordsByFilter(
-          'partners',
-          'codigo_oficial ~ "' + prefix + '"',
-          '-codigo_oficial',
-          1,
-          0,
-        )
-        if (last && last.length > 0) {
-          var lastNum = last[0].getString('codigo_oficial') || ''
-          var parts = lastNum.split('-')
-          if (parts.length === 3) {
-            var parsed = parseInt(parts[2], 10)
-            if (!isNaN(parsed) && parsed >= 1) {
-              seq = parsed + 1
-            }
-          }
-        }
-      } catch (_) {
+        counterCli = $app.findFirstRecordByData('numerations', 'document_type', 'clientes')
+      } catch (_) {}
+      if (!counterCli) {
         try {
-          seq = ($app.countRecords('partners') || 0) + 1
+          var colNum = $app.findCollectionByNameOrId('numerations')
+          counterCli = new Record(colNum)
+          counterCli.set('document_type', 'clientes')
+          counterCli.set('company', '')
+          counterCli.set('branch', '')
+          counterCli.set('prefix', '')
+          counterCli.set('next_number', 2)
+          counterCli.set('digit_count', 4)
+          counterCli.set('annual_reset', false)
+          counterCli.set('active', true)
+          $app.save(counterCli)
+          e.record.set('codigo_oficial', '0001')
         } catch (_) {
-          seq = 1
+          e.record.set('codigo_oficial', '1')
         }
+      } else {
+        var nextCli = (counterCli.getInt('next_number') || 1) + 1
+        counterCli.set('next_number', nextCli)
+        $app.save(counterCli)
+        e.record.set('codigo_oficial', ('0000' + nextCli).slice(-4))
       }
-      var padded = ('000000' + seq).slice(-6)
-      e.record.set('codigo_oficial', prefix + padded)
     }
 
     // Validação estrita de unicidade de CNPJ/CPF entre clientes
@@ -124,6 +128,36 @@ onRecordCreateRequest((e) => {
           throw errDup
         }
       }
+    }
+  } else if (!e.record.getString('codigo_oficial')) {
+    // Fornecedores, representantes e demais parceiros: mesma sequência
+    // numérica única e sem prefixo.
+    var counterPar = null
+    try {
+      counterPar = $app.findFirstRecordByData('numerations', 'document_type', 'clientes')
+    } catch (_) {}
+    if (!counterPar) {
+      try {
+        var colNumPar = $app.findCollectionByNameOrId('numerations')
+        counterPar = new Record(colNumPar)
+        counterPar.set('document_type', 'clientes')
+        counterPar.set('company', '')
+        counterPar.set('branch', '')
+        counterPar.set('prefix', '')
+        counterPar.set('next_number', 2)
+        counterPar.set('digit_count', 4)
+        counterPar.set('annual_reset', false)
+        counterPar.set('active', true)
+        $app.save(counterPar)
+        e.record.set('codigo_oficial', '0001')
+      } catch (_) {
+        e.record.set('codigo_oficial', '1')
+      }
+    } else {
+      var nextPar = (counterPar.getInt('next_number') || 1) + 1
+      counterPar.set('next_number', nextPar)
+      $app.save(counterPar)
+      e.record.set('codigo_oficial', ('0000' + nextPar).slice(-4))
     }
   }
 

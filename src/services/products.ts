@@ -88,9 +88,27 @@ export async function getNextProductCode(): Promise<{ number: string; sequence: 
   try {
     return await pb.send('/backend/v1/product-code/next', { method: 'GET' })
   } catch {
-    // Fallback seguro caso o hook não responda
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000)
-    return { number: `PROD-${new Date().getFullYear()}-${randomSuffix}`, sequence: randomSuffix }
+    // Fallback seguro caso o hook não responda: numérico sequencial obtido dos
+    // códigos já gravados, sem prefixo (regra do usuário: só números).
+    try {
+      const recs = await pb.collection('products').getList(1, 200, { sort: '-code' })
+      let maxNum = 0
+      for (const r of recs.items) {
+        const raw = String((r as { code?: string }).code || '').trim()
+        if (!raw) continue
+        const direto = parseInt(raw, 10)
+        if (!Number.isNaN(direto) && direto > maxNum) maxNum = direto
+        const parts = raw.split('-')
+        if (parts.length === 3 && parts[0] === 'PROD') {
+          const suf = parseInt(parts[2], 10)
+          if (!Number.isNaN(suf) && suf > maxNum) maxNum = suf
+        }
+      }
+      const seq = maxNum + 1
+      return { number: String(seq).padStart(4, '0'), sequence: seq }
+    } catch {
+      return { number: '0100', sequence: 100 }
+    }
   }
 }
 

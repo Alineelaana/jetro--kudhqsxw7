@@ -1,30 +1,35 @@
+// production_order_number_next.js — Número de Ordem de Produção sequencial
+// NUMÉRICO puro, sem prefixo (pedido do usuário: sem "OP-ANO-"). Continua do
+// maior número já gravado em production_orders (numérico puro ou sufixo de
+// "OP-ANO-NNNN") para não colidir/repitir com os antigos; a lógica é embutida
+// inline no callback (limitação do JSVM do PocketBase: callbacks não podem
+// referenciar funções de nível superior — "Hook scoping error").
 routerAdd(
   'GET',
   '/backend/v1/production-order-number/next',
   (e) => {
     try {
-      var settingsCol = $app.findCollectionByNameOrId('settings')
-      var counter = null
+      // 1) Maior número já gravado (numérico puro ou sufixo de OP-ANO-NNNN)
+      var maxNum = 0
       try {
-        counter = $app.findFirstRecordByData('settings', 'key', 'production_order_sequence')
+        var recs = $app.findRecordsByFilter('production_orders', 'order_number != ""', '', 500, 0)
+        for (var i = 0; i < recs.length; i++) {
+          var raw = String(recs[i].get('order_number') || '').trim()
+          if (!raw) continue
+          var direto = parseInt(raw, 10)
+          if (!isNaN(direto) && direto > maxNum) maxNum = direto
+          var parts = raw.split('-')
+          if (parts.length === 3 && parts[0] === 'OP') {
+            var suf = parseInt(parts[2], 10)
+            if (!isNaN(suf) && suf > maxNum) maxNum = suf
+          }
+        }
       } catch (_) {}
 
-      var nextNum = 1
-      if (counter) {
-        nextNum = parseInt(counter.getString('value') || '0', 10) + 1
-        counter.set('value', String(nextNum))
-        $app.save(counter)
-      } else {
-        var record = new Record(settingsCol)
-        record.set('key', 'production_order_sequence')
-        record.set('value', '1')
-        $app.save(record)
-      }
-
-      var year = new Date().getFullYear()
+      var nextNum = maxNum + 1
       var seqStr = String(nextNum)
       while (seqStr.length < 4) seqStr = '0' + seqStr
-      var orderNumber = 'OP-' + year + '-' + seqStr
+      var orderNumber = seqStr
 
       return e.json(200, { number: orderNumber, sequence: nextNum })
     } catch (err) {
